@@ -1,21 +1,12 @@
 ﻿import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
-import { StandardPage, pageContent } from "@/features/public-web";
-
-const content = pageContent.plataforma;
-
+/** Legacy URL — prefer next.config redirect; keep page as safety net. */
 export const metadata: Metadata = {
-  title: content.seoTitle,
-  description: content.seoDescription,
-  alternates: { canonical: "/plataforma" },
+  title: "SaaS B2B | NELVYON",
+  alternates: { canonical: "/producto" },
 };
 
 export default function Page() {
-  return (
-    <StandardPage
-      content={content}
-      imageSrc={"/brand/public/platform-ui.webp"}
-      imageAlt={"Plataforma NELVYON"}
-    />
-  );
+  redirect("/producto");
 }

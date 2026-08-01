@@ -129,3 +129,6 @@ backend/data/voice_pilot*/
 .envato-browser-profile/
 .edge-envato-download-profile*/
 .tmp-local-ai-db-url.txt
+
+# Raw SaaS marketing PNGs (regen via Playwright; keep WebP only)
+apps/web/public/brand/public/saas-shots/raw/

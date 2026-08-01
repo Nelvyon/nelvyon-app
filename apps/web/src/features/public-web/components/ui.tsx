@@ -3,10 +3,87 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import type { CtaLink } from "../content/siteContent";
+import { SaasProductCapture } from "./SaasProductCapture";
 import { Reveal } from "./Reveal";
 
 export function Container({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <div className={`mx-auto w-full max-w-6xl px-4 md:px-6 ${className}`.trim()}>{children}</div>;
+  return <div className={`mx-auto w-full max-w-7xl px-4 md:px-6 ${className}`.trim()}>{children}</div>;
+}
+
+export function SectionShell({
+  children,
+  className = "",
+  soft = false,
+  band = false,
+}: {
+  children: ReactNode;
+  className?: string;
+  soft?: boolean;
+  band?: boolean;
+}) {
+  const tone = soft ? "nv-public-surface-soft" : band ? "nv-public-surface-band" : "";
+  return (
+    <section className={`relative overflow-hidden py-20 md:py-28 ${tone} ${className}`.trim()}>{children}</section>
+  );
+}
+
+export function SectionHeading({
+  eyebrow,
+  title,
+  description,
+  align = "left",
+  action,
+}: {
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  align?: "left" | "center";
+  action?: ReactNode;
+}) {
+  return (
+    <div
+      className={
+        align === "center"
+          ? "mx-auto max-w-4xl text-center"
+          : "flex flex-col gap-6 md:flex-row md:items-end md:justify-between"
+      }
+    >
+      <div className={align === "center" ? "" : "max-w-3xl"}>
+        {eyebrow ? <p className="nv-public-eyebrow">{eyebrow}</p> : null}
+        <h2 className="nv-public-display mt-4 text-3xl text-[var(--nv-fg-strong)] md:text-5xl">{title}</h2>
+        {description ? (
+          <p className="mt-5 text-base leading-relaxed text-[var(--nv-muted)] md:text-lg">{description}</p>
+        ) : null}
+      </div>
+      {action ? <div className={align === "center" ? "mt-8" : "shrink-0"}>{action}</div> : null}
+    </div>
+  );
+}
+
+export function ProductFrame({
+  src,
+  alt,
+  priority = false,
+  className = "",
+}: {
+  src: string;
+  alt: string;
+  priority?: boolean;
+  className?: string;
+}) {
+  return (
+    <div className={`nv-public-product-frame ${className}`.trim()}>
+      <div className="nv-public-product-chrome" aria-hidden>
+        <span />
+        <span />
+        <span />
+        <div className="ml-3 h-5 flex-1 rounded-md bg-white/5" />
+      </div>
+      <div className="relative aspect-[16/10] w-full">
+        <Image src={src} alt={alt} fill className="object-cover object-top" sizes="(max-width: 768px) 100vw, 90vw" priority={priority} />
+      </div>
+    </div>
+  );
 }
 
 export function PageHero({
@@ -17,6 +94,7 @@ export function PageHero({
   secondaryCta,
   imageSrc,
   imageAlt,
+  productMock = false,
 }: {
   eyebrow: string;
   title: string;
@@ -25,21 +103,19 @@ export function PageHero({
   secondaryCta?: CtaLink;
   imageSrc?: string;
   imageAlt?: string;
+  productMock?: boolean;
 }) {
   return (
     <section className="relative overflow-hidden border-b border-[var(--nv-border)]">
-      <div aria-hidden className="nv-public-grid-bg pointer-events-none absolute inset-0 opacity-70" />
-      <Container className="relative grid items-center gap-10 py-16 md:grid-cols-[1.15fr_0.85fr] md:py-24 lg:gap-14">
-        <Reveal>
+      <div aria-hidden className="nv-public-glow pointer-events-none absolute inset-0" />
+      <div aria-hidden className="nv-public-grid-bg pointer-events-none absolute inset-0 opacity-60" />
+      <Container className="relative grid items-center gap-12 py-20 md:grid-cols-[1.1fr_0.9fr] md:py-28 lg:gap-16">
+        <Reveal eager>
           <p className="nv-public-eyebrow">{eyebrow}</p>
-          <h1 className="nv-public-display mt-5 max-w-3xl text-4xl text-white md:text-5xl lg:text-[3.4rem]">
-            {title}
-          </h1>
-          <p className="mt-5 max-w-2xl text-base leading-relaxed text-[var(--nv-muted)] md:text-lg">
-            {description}
-          </p>
+          <h1 className="nv-public-display mt-5 max-w-3xl text-4xl text-[var(--nv-fg-strong)] md:text-5xl lg:text-[3.6rem]">{title}</h1>
+          <p className="mt-6 max-w-2xl text-base leading-relaxed text-[var(--nv-muted)] md:text-lg">{description}</p>
           {(primaryCta || secondaryCta) && (
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               {primaryCta ? (
                 <Link href={primaryCta.href} className="nv-public-btn nv-public-btn-primary">
                   {primaryCta.label}
@@ -53,42 +129,23 @@ export function PageHero({
             </div>
           )}
         </Reveal>
-        {imageSrc ? (
-          <Reveal delayMs={80} className="relative">
-            <div className="nv-public-panel relative aspect-[4/3] overflow-hidden">
-              <Image
-                src={imageSrc}
-                alt={imageAlt || title}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 40vw"
-                priority
-              />
-            </div>
+        {productMock ? (
+          <Reveal eager delayMs={80}>
+            <SaasProductCapture
+              device="macbook"
+              shotId="dashboard"
+              mockVariant="dashboard"
+              alt="Dashboard SaaS NELVYON"
+              priority
+            />
+          </Reveal>
+        ) : imageSrc ? (
+          <Reveal eager delayMs={80}>
+            <ProductFrame src={imageSrc} alt={imageAlt || title} priority />
           </Reveal>
         ) : null}
       </Container>
     </section>
-  );
-}
-
-export function SectionHeading({
-  eyebrow,
-  title,
-  description,
-  align = "left",
-}: {
-  eyebrow?: string;
-  title: string;
-  description?: string;
-  align?: "left" | "center";
-}) {
-  return (
-    <div className={align === "center" ? "mx-auto max-w-3xl text-center" : "max-w-3xl"}>
-      {eyebrow ? <p className="nv-public-eyebrow">{eyebrow}</p> : null}
-      <h2 className="nv-public-display mt-4 text-3xl text-white md:text-4xl">{title}</h2>
-      {description ? <p className="mt-4 text-base leading-relaxed text-[var(--nv-muted)] md:text-lg">{description}</p> : null}
-    </div>
   );
 }
 
@@ -101,9 +158,9 @@ export function FeatureCards({
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       {items.map((item, i) => (
         <Reveal key={item.title} delayMs={i * 40}>
-          <article className="nv-public-panel h-full p-6">
-            <h3 className="text-lg font-semibold text-white">{item.title}</h3>
-            <p className="mt-3 text-sm leading-relaxed text-[var(--nv-muted)]">{item.body}</p>
+          <article className="nv-public-icon-card">
+            <h3 className="text-lg font-semibold text-[var(--nv-fg-strong)]">{item.title}</h3>
+            <p className="mt-3 text-sm leading-relaxed text-[var(--nv-muted)] md:text-base">{item.body}</p>
           </article>
         </Reveal>
       ))}
@@ -117,16 +174,16 @@ export function ContentSections({
   sections: readonly { heading: string; body: string; bullets?: readonly string[] }[];
 }) {
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {sections.map((section, i) => (
         <Reveal key={section.heading} delayMs={i * 30}>
           <article className="nv-public-panel p-6 md:p-8">
-            <h2 className="text-xl font-semibold text-white md:text-2xl">{section.heading}</h2>
+            <h2 className="text-xl font-semibold text-[var(--nv-fg-strong)] md:text-2xl">{section.heading}</h2>
             <p className="mt-3 text-base leading-relaxed text-[var(--nv-muted)]">{section.body}</p>
             {section.bullets?.length ? (
               <ul className="mt-5 space-y-2.5">
                 {section.bullets.map((b) => (
-                  <li key={b} className="flex gap-3 text-sm text-slate-300">
+                  <li key={b} className="flex gap-3 text-sm text-[var(--nv-muted)] md:text-base">
                     <span aria-hidden className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--nv-accent)]" />
                     <span>{b}</span>
                   </li>
@@ -152,18 +209,18 @@ export function CtaBand({
   secondaryCta?: CtaLink;
 }) {
   return (
-    <section className="border-t border-[var(--nv-border)] py-16 md:py-20">
+    <SectionShell className="border-t border-[var(--nv-border)] !py-16 md:!py-20">
       <Container>
         <Reveal>
-          <div className="nv-public-panel relative overflow-hidden px-6 py-10 md:px-12 md:py-14">
+          <div className="nv-public-panel relative overflow-hidden px-6 py-12 md:px-14 md:py-16">
             <div
               aria-hidden
-              className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-[rgba(0,132,255,0.12)] blur-3xl"
+              className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-[rgba(0,132,255,0.16)] blur-3xl"
             />
-            <div className="relative max-w-2xl">
-              <h2 className="nv-public-display text-3xl text-white md:text-4xl">{title}</h2>
-              <p className="mt-4 text-base leading-relaxed text-[var(--nv-muted)]">{body}</p>
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <div className="relative max-w-3xl">
+              <h2 className="nv-public-display text-3xl text-[var(--nv-fg-strong)] md:text-5xl">{title}</h2>
+              <p className="mt-5 text-base leading-relaxed text-[var(--nv-muted)] md:text-lg">{body}</p>
+              <div className="mt-9 flex flex-col gap-3 sm:flex-row">
                 <Link href={primaryCta.href} className="nv-public-btn nv-public-btn-primary">
                   {primaryCta.label}
                 </Link>
@@ -177,7 +234,7 @@ export function CtaBand({
           </div>
         </Reveal>
       </Container>
-    </section>
+    </SectionShell>
   );
 }
 
@@ -199,19 +256,25 @@ export function MediaSplit({
   bullets?: readonly string[];
 }) {
   return (
-    <section className="py-16 md:py-20">
+    <SectionShell>
       <Container
-        className={`grid items-center gap-10 md:grid-cols-2 lg:gap-14 ${reverse ? "md:[&>*:first-child]:order-2" : ""}`}
+        className={`grid items-center gap-12 md:grid-cols-2 lg:gap-16 ${reverse ? "md:[&>*:first-child]:order-2" : ""}`}
       >
         <Reveal>
           <p className="nv-public-eyebrow">{eyebrow}</p>
-          <h2 className="nv-public-display mt-4 text-3xl text-white md:text-4xl">{title}</h2>
-          <p className="mt-4 text-base leading-relaxed text-[var(--nv-muted)]">{body}</p>
+          <h2 className="nv-public-display mt-4 text-3xl text-[var(--nv-fg-strong)] md:text-5xl">{title}</h2>
+          <p className="mt-5 text-base leading-relaxed text-[var(--nv-muted)] md:text-lg">{body}</p>
           {bullets?.length ? (
-            <ul className="mt-6 space-y-2.5">
+            <ul className="mt-7 space-y-3">
               {bullets.map((b) => (
-                <li key={b} className="flex gap-3 text-sm text-slate-300">
-                  <span aria-hidden className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--nv-accent)]" />
+                <li key={b} className="flex gap-3 text-sm text-[var(--nv-muted)] md:text-base">
+                  <Image
+                    src="/brand/public/product/check-circle.png"
+                    alt=""
+                    width={22}
+                    height={22}
+                    className="mt-0.5 h-[22px] w-[22px] shrink-0"
+                  />
                   <span>{b}</span>
                 </li>
               ))}
@@ -219,11 +282,9 @@ export function MediaSplit({
           ) : null}
         </Reveal>
         <Reveal delayMs={60}>
-          <div className="nv-public-panel relative aspect-[5/4] overflow-hidden">
-            <Image src={imageSrc} alt={imageAlt} fill className="object-cover" sizes="(max-width: 768px) 100vw, 45vw" />
-          </div>
+          <ProductFrame src={imageSrc} alt={imageAlt} />
         </Reveal>
       </Container>
-    </section>
+    </SectionShell>
   );
 }

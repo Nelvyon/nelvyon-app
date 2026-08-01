@@ -1,0 +1,950 @@
+{
+  "generatedAt": "2026-08-01T18:50:44.177Z",
+  "source": ".reference/envato-public-assets",
+  "output": "apps/web/public/brand/public/library",
+  "photos": [
+    {
+      "id": "F-01",
+      "kind": "photo",
+      "src": "/brand/public/library/photos/F-01.webp",
+      "avif": "/brand/public/library/photos/F-01.avif",
+      "jpg": "/brand/public/library/photos/F-01.jpg",
+      "width": 5760,
+      "height": 3840,
+      "bytesWebp": 163562
+    },
+    {
+      "id": "F-02",
+      "kind": "photo",
+      "src": "/brand/public/library/photos/F-02.webp",
+      "avif": "/brand/public/library/photos/F-02.avif",
+      "jpg": "/brand/public/library/photos/F-02.jpg",
+      "width": 5184,
+      "height": 3456,
+      "bytesWebp": 524848
+    }
+  ],
+  "icons": {
+    "I-04": {
+      "id": "I-04",
+      "count": 25,
+      "items": [
+        {
+          "slug": "business-intelligence",
+          "src": "/brand/public/library/icons/I-04/business-intelligence.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "cloud-computing",
+          "src": "/brand/public/library/icons/I-04/cloud-computing.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "compliance-tracking",
+          "src": "/brand/public/library/icons/I-04/compliance-tracking.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "crm-system",
+          "src": "/brand/public/library/icons/I-04/crm-system.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "customer-relationship",
+          "src": "/brand/public/library/icons/I-04/customer-relationship.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "cybersecurity-management",
+          "src": "/brand/public/library/icons/I-04/cybersecurity-management.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "data-analytics",
+          "src": "/brand/public/library/icons/I-04/data-analytics.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "erp-system",
+          "src": "/brand/public/library/icons/I-04/erp-system.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "financial-management",
+          "src": "/brand/public/library/icons/I-04/financial-management.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "financial-report",
+          "src": "/brand/public/library/icons/I-04/financial-report.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "hr-software",
+          "src": "/brand/public/library/icons/I-04/hr-software.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "inventory-management",
+          "src": "/brand/public/library/icons/I-04/inventory-management.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "machine-learning",
+          "src": "/brand/public/library/icons/I-04/machine-learning.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "marketing",
+          "src": "/brand/public/library/icons/I-04/marketing.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "order-processing",
+          "src": "/brand/public/library/icons/I-04/order-processing.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "performance-tracking",
+          "src": "/brand/public/library/icons/I-04/performance-tracking.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "project-management",
+          "src": "/brand/public/library/icons/I-04/project-management.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "risk-management",
+          "src": "/brand/public/library/icons/I-04/risk-management.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "robotic-process",
+          "src": "/brand/public/library/icons/I-04/robotic-process.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "sales-funnel",
+          "src": "/brand/public/library/icons/I-04/sales-funnel.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "scheduling",
+          "src": "/brand/public/library/icons/I-04/scheduling.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "supply-chain",
+          "src": "/brand/public/library/icons/I-04/supply-chain.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "task-management",
+          "src": "/brand/public/library/icons/I-04/task-management.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "time-tracking",
+          "src": "/brand/public/library/icons/I-04/time-tracking.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "workflow",
+          "src": "/brand/public/library/icons/I-04/workflow.svg",
+          "format": "svg"
+        }
+      ],
+      "note": "SVG/PNG from Envato pack; curated subset mapped in visualLibrary.ts"
+    },
+    "I-03": {
+      "id": "I-03",
+      "count": 50,
+      "items": [
+        {
+          "slug": "001-marketing",
+          "src": "/brand/public/library/icons/I-03/001-marketing.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "002-automation",
+          "src": "/brand/public/library/icons/I-03/002-automation.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "003-customer-service",
+          "src": "/brand/public/library/icons/I-03/003-customer-service.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "004-customer-satisfaction",
+          "src": "/brand/public/library/icons/I-03/004-customer-satisfaction.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "005-partnership",
+          "src": "/brand/public/library/icons/I-03/005-partnership.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "006-pyramid",
+          "src": "/brand/public/library/icons/I-03/006-pyramid.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "007-customer-service",
+          "src": "/brand/public/library/icons/I-03/007-customer-service.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "008-opportunities",
+          "src": "/brand/public/library/icons/I-03/008-opportunities.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "009-customer-support",
+          "src": "/brand/public/library/icons/I-03/009-customer-support.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "010-prospect",
+          "src": "/brand/public/library/icons/I-03/010-prospect.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "011-product-release",
+          "src": "/brand/public/library/icons/I-03/011-product-release.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "012-customer-loyalty",
+          "src": "/brand/public/library/icons/I-03/012-customer-loyalty.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "013-action-plan",
+          "src": "/brand/public/library/icons/I-03/013-action-plan.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "014-prospect",
+          "src": "/brand/public/library/icons/I-03/014-prospect.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "015-announcement",
+          "src": "/brand/public/library/icons/I-03/015-announcement.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "016-team-management",
+          "src": "/brand/public/library/icons/I-03/016-team-management.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "017-operational-risk",
+          "src": "/brand/public/library/icons/I-03/017-operational-risk.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "018-integration",
+          "src": "/brand/public/library/icons/I-03/018-integration.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "019-crm",
+          "src": "/brand/public/library/icons/I-03/019-crm.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "020-personalization",
+          "src": "/brand/public/library/icons/I-03/020-personalization.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "021-inventory",
+          "src": "/brand/public/library/icons/I-03/021-inventory.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "022-agreement",
+          "src": "/brand/public/library/icons/I-03/022-agreement.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "023-database",
+          "src": "/brand/public/library/icons/I-03/023-database.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "024-crm",
+          "src": "/brand/public/library/icons/I-03/024-crm.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "025-loyalty",
+          "src": "/brand/public/library/icons/I-03/025-loyalty.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "026-user",
+          "src": "/brand/public/library/icons/I-03/026-user.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "027-target-audience",
+          "src": "/brand/public/library/icons/I-03/027-target-audience.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "028-data-integration",
+          "src": "/brand/public/library/icons/I-03/028-data-integration.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "029-teamwork",
+          "src": "/brand/public/library/icons/I-03/029-teamwork.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "030-customer",
+          "src": "/brand/public/library/icons/I-03/030-customer.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "031-lead",
+          "src": "/brand/public/library/icons/I-03/031-lead.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "032-lead",
+          "src": "/brand/public/library/icons/I-03/032-lead.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "033-marketing",
+          "src": "/brand/public/library/icons/I-03/033-marketing.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "034-crm",
+          "src": "/brand/public/library/icons/I-03/034-crm.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "035-crm",
+          "src": "/brand/public/library/icons/I-03/035-crm.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "036-demand",
+          "src": "/brand/public/library/icons/I-03/036-demand.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "037-contract",
+          "src": "/brand/public/library/icons/I-03/037-contract.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "038-natural-language-processing",
+          "src": "/brand/public/library/icons/I-03/038-natural-language-processing.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "039-campaign",
+          "src": "/brand/public/library/icons/I-03/039-campaign.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "040-closed",
+          "src": "/brand/public/library/icons/I-03/040-closed.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "041-kpi",
+          "src": "/brand/public/library/icons/I-03/041-kpi.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "042-user",
+          "src": "/brand/public/library/icons/I-03/042-user.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "043-relationship",
+          "src": "/brand/public/library/icons/I-03/043-relationship.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "044-user",
+          "src": "/brand/public/library/icons/I-03/044-user.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "045-satisfaction",
+          "src": "/brand/public/library/icons/I-03/045-satisfaction.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "046-customer",
+          "src": "/brand/public/library/icons/I-03/046-customer.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "047-crm",
+          "src": "/brand/public/library/icons/I-03/047-crm.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "048-customer-behavior",
+          "src": "/brand/public/library/icons/I-03/048-customer-behavior.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "049-report",
+          "src": "/brand/public/library/icons/I-03/049-report.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "050-dashboard",
+          "src": "/brand/public/library/icons/I-03/050-dashboard.svg",
+          "format": "svg"
+        }
+      ],
+      "note": "SVG/PNG from Envato pack; curated subset mapped in visualLibrary.ts"
+    },
+    "I-05": {
+      "id": "I-05",
+      "count": 16,
+      "items": [
+        {
+          "slug": "backup-server-data-protection-storage",
+          "src": "/brand/public/library/icons/I-05/backup-server-data-protection-storage.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "cloud-database-storage-hosting-server",
+          "src": "/brand/public/library/icons/I-05/cloud-database-storage-hosting-server.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "cloud-server-hosting-data-cloud-storage",
+          "src": "/brand/public/library/icons/I-05/cloud-server-hosting-data-cloud-storage.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "data-center-servers-hosting-infrastructure-storage",
+          "src": "/brand/public/library/icons/I-05/data-center-servers-hosting-infrastructure-storage.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "database-connection-server-communication-data-flow",
+          "src": "/brand/public/library/icons/I-05/database-connection-server-communication-data-flow.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "database-storage-server-data-management",
+          "src": "/brand/public/library/icons/I-05/database-storage-server-data-management.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "database-table-records-storage-management",
+          "src": "/brand/public/library/icons/I-05/database-table-records-storage-management.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "dedicated-server-hosting-infrastructure-data-storage",
+          "src": "/brand/public/library/icons/I-05/dedicated-server-hosting-infrastructure-data-storage.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "firewall-server-security-data-protection-network",
+          "src": "/brand/public/library/icons/I-05/firewall-server-security-data-protection-network.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "server-monitor-management-performance-data",
+          "src": "/brand/public/library/icons/I-05/server-monitor-management-performance-data.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "server-network-data-connectivity-hosting",
+          "src": "/brand/public/library/icons/I-05/server-network-data-connectivity-hosting.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "server-rack-hosting-data-center-infrastructure",
+          "src": "/brand/public/library/icons/I-05/server-rack-hosting-data-center-infrastructure.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "server-sync-database-data-synchronization",
+          "src": "/brand/public/library/icons/I-05/server-sync-database-data-synchronization.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "sync-data-server-cloud-connection",
+          "src": "/brand/public/library/icons/I-05/sync-data-server-cloud-connection.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "transfer-data-server-network-communication",
+          "src": "/brand/public/library/icons/I-05/transfer-data-server-network-communication.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "virtual-server-cloud-hosting-infrastructure",
+          "src": "/brand/public/library/icons/I-05/virtual-server-cloud-hosting-infrastructure.svg",
+          "format": "svg"
+        }
+      ],
+      "note": "SVG/PNG from Envato pack; curated subset mapped in visualLibrary.ts"
+    },
+    "I-02": {
+      "id": "I-02",
+      "count": 40,
+      "items": [
+        {
+          "slug": "001-marketing-automation",
+          "src": "/brand/public/library/icons/I-02/001-marketing-automation.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "002-software",
+          "src": "/brand/public/library/icons/I-02/002-software.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "003-marketing-automation",
+          "src": "/brand/public/library/icons/I-02/003-marketing-automation.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "004-leads",
+          "src": "/brand/public/library/icons/I-02/004-leads.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "005-business",
+          "src": "/brand/public/library/icons/I-02/005-business.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "006-marketing-automation",
+          "src": "/brand/public/library/icons/I-02/006-marketing-automation.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "007-sales",
+          "src": "/brand/public/library/icons/I-02/007-sales.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "008-website",
+          "src": "/brand/public/library/icons/I-02/008-website.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "009-marketing-automation",
+          "src": "/brand/public/library/icons/I-02/009-marketing-automation.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "010-automation",
+          "src": "/brand/public/library/icons/I-02/010-automation.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "011-consulting",
+          "src": "/brand/public/library/icons/I-02/011-consulting.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "012-media-mix",
+          "src": "/brand/public/library/icons/I-02/012-media-mix.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "013-scoring",
+          "src": "/brand/public/library/icons/I-02/013-scoring.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "014-social-media",
+          "src": "/brand/public/library/icons/I-02/014-social-media.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "015-media-mix",
+          "src": "/brand/public/library/icons/I-02/015-media-mix.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "016-content-curation",
+          "src": "/brand/public/library/icons/I-02/016-content-curation.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "017-optimization",
+          "src": "/brand/public/library/icons/I-02/017-optimization.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "018-media-mix",
+          "src": "/brand/public/library/icons/I-02/018-media-mix.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "019-email",
+          "src": "/brand/public/library/icons/I-02/019-email.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "020-repetitive-tasks",
+          "src": "/brand/public/library/icons/I-02/020-repetitive-tasks.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "021-campaign",
+          "src": "/brand/public/library/icons/I-02/021-campaign.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "022-content",
+          "src": "/brand/public/library/icons/I-02/022-content.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "023-customers",
+          "src": "/brand/public/library/icons/I-02/023-customers.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "024-form",
+          "src": "/brand/public/library/icons/I-02/024-form.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "025-solution",
+          "src": "/brand/public/library/icons/I-02/025-solution.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "026-advertsing",
+          "src": "/brand/public/library/icons/I-02/026-advertsing.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "027-survey",
+          "src": "/brand/public/library/icons/I-02/027-survey.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "028-marketing-automation",
+          "src": "/brand/public/library/icons/I-02/028-marketing-automation.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "029-crm",
+          "src": "/brand/public/library/icons/I-02/029-crm.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "030-landing-page",
+          "src": "/brand/public/library/icons/I-02/030-landing-page.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "031-mail",
+          "src": "/brand/public/library/icons/I-02/031-mail.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "032-sms",
+          "src": "/brand/public/library/icons/I-02/032-sms.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "033-analysis",
+          "src": "/brand/public/library/icons/I-02/033-analysis.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "034-advertsing",
+          "src": "/brand/public/library/icons/I-02/034-advertsing.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "035-target",
+          "src": "/brand/public/library/icons/I-02/035-target.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "036-schedule",
+          "src": "/brand/public/library/icons/I-02/036-schedule.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "037-automation",
+          "src": "/brand/public/library/icons/I-02/037-automation.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "038-target",
+          "src": "/brand/public/library/icons/I-02/038-target.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "039-workflow",
+          "src": "/brand/public/library/icons/I-02/039-workflow.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "040-efficiency",
+          "src": "/brand/public/library/icons/I-02/040-efficiency.svg",
+          "format": "svg"
+        }
+      ],
+      "note": "SVG/PNG from Envato pack; curated subset mapped in visualLibrary.ts"
+    },
+    "I-01": {
+      "id": "I-01",
+      "count": 32,
+      "items": [
+        {
+          "slug": "cloud-hosting-saas-cloud-software-online-server-cloud-solution",
+          "src": "/brand/public/library/icons/I-01/cloud-hosting-saas-cloud-software-online-server-cloud-solution.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "cloud-mobile-saas-phone-app-responsive-software-app-sync-mobile-access",
+          "src": "/brand/public/library/icons/I-01/cloud-mobile-saas-phone-app-responsive-software-app-sync-mobile-access.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "crm-software-customer-management-saas-sales-business-tool-cloud-crm",
+          "src": "/brand/public/library/icons/I-01/crm-software-customer-management-saas-sales-business-tool-cloud-crm.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "data-transfer-saas-migration-move-to-cloud-software-shift-online-system",
+          "src": "/brand/public/library/icons/I-01/data-transfer-saas-migration-move-to-cloud-software-shift-online-system.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "saas-api-software-integration-cloud-tools-app-connection-developer-tool",
+          "src": "/brand/public/library/icons/I-01/saas-api-software-integration-cloud-tools-app-connection-developer-tool.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "saas-application-web-app-software-cloud-ui-online-tool",
+          "src": "/brand/public/library/icons/I-01/saas-application-web-app-software-cloud-ui-online-tool.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "saas-automation-cloud-process-software-workflow-smart-system-auto-task",
+          "src": "/brand/public/library/icons/I-01/saas-automation-cloud-process-software-workflow-smart-system-auto-task.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "saas-billing-online-invoice-payment-system-software-finance-subscription-bill",
+          "src": "/brand/public/library/icons/I-01/saas-billing-online-invoice-payment-system-software-finance-subscription-bill.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "saas-metrics-dashboard-data-performance-report-software-stats-cloud-analytics",
+          "src": "/brand/public/library/icons/I-01/saas-metrics-dashboard-data-performance-report-software-stats-cloud-analytics.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "saas-pricing-monthly-plan-service-tiers-software-subscription-product-plan",
+          "src": "/brand/public/library/icons/I-01/saas-pricing-monthly-plan-service-tiers-software-subscription-product-plan.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "saas-security-encrypted-data-cloud-protection-software-privacy-secure-server",
+          "src": "/brand/public/library/icons/I-01/saas-security-encrypted-data-cloud-protection-software-privacy-secure-server.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "saas-sync-data-cloud-real-time-update-software-service-app-sync",
+          "src": "/brand/public/library/icons/I-01/saas-sync-data-cloud-real-time-update-software-service-app-sync.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "saas-team-cloud-workflow-software-collaboration-online-teamwork-shared-access",
+          "src": "/brand/public/library/icons/I-01/saas-team-cloud-workflow-software-collaboration-online-teamwork-shared-access.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "saas-version-software-update-patch-cloud-release-feature-upgrade",
+          "src": "/brand/public/library/icons/I-01/saas-version-software-update-patch-cloud-release-feature-upgrade.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "user-access-saas-users-team-management-account-control-cloud-login",
+          "src": "/brand/public/library/icons/I-01/user-access-saas-users-team-management-account-control-cloud-login.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "user-onboarding-software-setup-product-tutorial-welcome-flow-app-guide",
+          "src": "/brand/public/library/icons/I-01/user-onboarding-software-setup-product-tutorial-welcome-flow-app-guide.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "cloud-hosting-saas-cloud-software-online-server-cloud-solution-16",
+          "src": "/brand/public/library/icons/I-01/cloud-hosting-saas-cloud-software-online-server-cloud-solution-16.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "cloud-mobile-saas-phone-app-responsive-software-app-sync-mobile-access-17",
+          "src": "/brand/public/library/icons/I-01/cloud-mobile-saas-phone-app-responsive-software-app-sync-mobile-access-17.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "crm-software-customer-management-saas-sales-business-tool-cloud-crm-18",
+          "src": "/brand/public/library/icons/I-01/crm-software-customer-management-saas-sales-business-tool-cloud-crm-18.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "data-transfer-saas-migration-move-to-cloud-software-shift-online-system-19",
+          "src": "/brand/public/library/icons/I-01/data-transfer-saas-migration-move-to-cloud-software-shift-online-system-19.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "saas-api-software-integration-cloud-tools-app-connection-developer-tool-20",
+          "src": "/brand/public/library/icons/I-01/saas-api-software-integration-cloud-tools-app-connection-developer-tool-20.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "saas-application-web-app-software-cloud-ui-online-tool-21",
+          "src": "/brand/public/library/icons/I-01/saas-application-web-app-software-cloud-ui-online-tool-21.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "saas-automation-cloud-process-software-workflow-smart-system-auto-task-22",
+          "src": "/brand/public/library/icons/I-01/saas-automation-cloud-process-software-workflow-smart-system-auto-task-22.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "saas-billing-online-invoice-payment-system-software-finance-subscription-bill-23",
+          "src": "/brand/public/library/icons/I-01/saas-billing-online-invoice-payment-system-software-finance-subscription-bill-23.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "saas-metrics-dashboard-data-performance-report-software-stats-cloud-analytics-24",
+          "src": "/brand/public/library/icons/I-01/saas-metrics-dashboard-data-performance-report-software-stats-cloud-analytics-24.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "saas-pricing-monthly-plan-service-tiers-software-subscription-product-plan-25",
+          "src": "/brand/public/library/icons/I-01/saas-pricing-monthly-plan-service-tiers-software-subscription-product-plan-25.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "saas-security-encrypted-data-cloud-protection-software-privacy-secure-server-26",
+          "src": "/brand/public/library/icons/I-01/saas-security-encrypted-data-cloud-protection-software-privacy-secure-server-26.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "saas-sync-data-cloud-real-time-update-software-service-app-sync-27",
+          "src": "/brand/public/library/icons/I-01/saas-sync-data-cloud-real-time-update-software-service-app-sync-27.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "saas-team-cloud-workflow-software-collaboration-online-teamwork-shared-access-28",
+          "src": "/brand/public/library/icons/I-01/saas-team-cloud-workflow-software-collaboration-online-teamwork-shared-access-28.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "saas-version-software-update-patch-cloud-release-feature-upgrade-29",
+          "src": "/brand/public/library/icons/I-01/saas-version-software-update-patch-cloud-release-feature-upgrade-29.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "user-access-saas-users-team-management-account-control-cloud-login-30",
+          "src": "/brand/public/library/icons/I-01/user-access-saas-users-team-management-account-control-cloud-login-30.svg",
+          "format": "svg"
+        },
+        {
+          "slug": "user-onboarding-software-setup-product-tutorial-welcome-flow-app-guide-31",
+          "src": "/brand/public/library/icons/I-01/user-onboarding-software-setup-product-tutorial-welcome-flow-app-guide-31.svg",
+          "format": "svg"
+        }
+      ],
+      "note": "SVG/PNG from Envato pack; curated subset mapped in visualLibrary.ts"
+    }
+  },
+  "mockups": [
+    {
+      "id": "M-04",
+      "sourceZip": "/brand/public/library — PSD retained in .reference/_organized/M-04",
+      "format": "psd-only",
+      "note": "Device frames rendered in CSS (DeviceMockup) with saas-shots screens. PSD kept for optional Photoshop composition.",
+      "organizedPath": ".reference\\envato-public-assets\\_organized\\M-04\\apple-products-multi-screen-mockups-2024-01-19-20-10-06-utc.zip"
+    },
+    {
+      "id": "M-01",
+      "sourceZip": "/brand/public/library — PSD retained in .reference/_organized/M-01",
+      "format": "psd-only",
+      "note": "Device frames rendered in CSS (DeviceMockup) with saas-shots screens. PSD kept for optional Photoshop composition.",
+      "organizedPath": ".reference\\envato-public-assets\\_organized\\M-01\\high-quality-macbook-pro-mockup-realistic-laptop-2026-02-16-05-37-00-utc.zip"
+    },
+    {
+      "id": "M-07",
+      "sourceZip": "/brand/public/library — PSD retained in .reference/_organized/M-07",
+      "format": "psd-only",
+      "note": "Device frames rendered in CSS (DeviceMockup) with saas-shots screens. PSD kept for optional Photoshop composition.",
+      "organizedPath": ".reference\\envato-public-assets\\_organized\\M-07\\high-quality-realistic-desktop-monitor-mockup-2026-03-21-17-10-21-utc.zip"
+    },
+    {
+      "id": "M-09",
+      "sourceZip": "/brand/public/library — PSD retained in .reference/_organized/M-09",
+      "format": "psd-only",
+      "note": "Device frames rendered in CSS (DeviceMockup) with saas-shots screens. PSD kept for optional Photoshop composition.",
+      "organizedPath": ".reference\\envato-public-assets\\_organized\\M-09\\monitor-mockup-monitor-2026-05-27-00-45-30-utc.zip"
+    }
+  ],
+  "videos": [],
+  "duplicatesRemoved": 7,
+  "unknownUnmapped": [],
+  "missingP0": [
+    "F-03",
+    "F-04",
+    "F-05",
+    "F-06",
+    "F-07",
+    "F-08",
+    "F-09",
+    "F-10",
+    "F-11",
+    "F-12",
+    "F-13",
+    "F-14",
+    "F-15",
+    "F-16",
+    "F-17",
+    "F-18",
+    "F-19",
+    "F-20",
+    "F-21",
+    "F-22",
+    "F-23",
+    "F-24",
+    "V-01",
+    "V-02",
+    "V-03",
+    "M-02",
+    "M-03",
+    "M-05",
+    "M-06",
+    "M-08",
+    "I-06"
+  ],
+  "rules": {
+    "productUi": "Always use /brand/public/saas-shots/*.webp inside device mockups",
+    "mockupPsd": "PSD packs stay in _organized; web uses DeviceMockup CSS frames",
+    "noDeploy": "CEO visual approval required before production deploy"
+  }
+}

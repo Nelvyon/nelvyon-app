@@ -79,7 +79,7 @@ export default function BlogPage() {
       </section>
       <CtaBand
         title="Quiere aplicar esto a su operacion?"
-        body="Hable con el equipo sobre plataforma, packs o enterprise."
+        body="Hable con el equipo sobre SaaS, packs o enterprise."
         primaryCta={{ label: "Contactar", href: "/contacto" }}
       />
     </>

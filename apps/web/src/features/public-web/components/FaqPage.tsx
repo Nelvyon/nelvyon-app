@@ -19,7 +19,7 @@ export function FaqPage() {
             {faqItems.map((item, i) => (
               <Reveal key={item.question} delayMs={Math.min(i * 20, 120)}>
                 <details className="nv-public-panel p-5">
-                  <summary className="cursor-pointer list-none text-base font-semibold text-white [&::-webkit-details-marker]:hidden">
+                  <summary className="cursor-pointer list-none text-base font-semibold text-[var(--nv-fg-strong)] [&::-webkit-details-marker]:hidden">
                     {item.question}
                   </summary>
                   <p className="mt-3 text-sm leading-relaxed text-[var(--nv-muted)]">{item.answer}</p>
@@ -31,7 +31,7 @@ export function FaqPage() {
       </section>
       <CtaBand
         title="¿No encuentra su respuesta?"
-        body="Escríbanos y le orientamos sobre plataforma, packs o enterprise."
+        body="Escríbanos y le orientamos sobre SaaS, packs o enterprise."
         primaryCta={{ label: "Ir a contacto", href: "/contacto" }}
       />
     </>

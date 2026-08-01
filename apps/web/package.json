@@ -49,6 +49,7 @@
     "gate": "pnpm typecheck && pnpm lint && pnpm test:smoke && pnpm test:bot-evals",
     "elite:reinforce": "node ../../scripts/run-local-elite-reinforce.mjs",
     "pwa:icons": "node ./scripts/generate-pwa-icons.mjs",
+    "marketing:saas-shots": "playwright test --config playwright.marketing-shots.config.ts && node ./scripts/optimize-saas-shots.mjs",
     "os:envato:index-os-full": "tsx ../../backend/os-agents/seeds/download-envato-seeds.ts --market --metadata-only --catalog all --os-full",
     "os:envato:index-million": "tsx ../../backend/os-agents/seeds/download-envato-seeds.ts --market --metadata-only --million-client"
   },

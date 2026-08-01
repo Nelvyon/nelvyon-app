@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #000;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 1.5px;
+      }
+    </style>
+  </defs>
+  <path class="cls-1" d="M60,48v8c0,2.209139-1.790861,4-4,4H8c-2.209139,0-4-1.790861-4-4v-8"/>
+  <line class="cls-1" x1="23" y1="9" x2="13" y2="9"/>
+  <line class="cls-1" x1="51" y1="9" x2="41" y2="9"/>
+  <path class="cls-1" d="M55,9h1c2.21,0,4,1.79,4,4v37c0,2.21-1.79,4-4,4H8c-2.21,0-4-1.79-4-4V13c0-2.21,1.79-4,4-4h1"/>
+  <line class="cls-1" x1="37" y1="9" x2="27" y2="9"/>
+  <line class="cls-1" x1="60" y1="20" x2="4" y2="20"/>
+  <rect class="cls-1" x="9" y="4" width="4" height="10" rx="1.999998" ry="1.999998"/>
+  <rect class="cls-1" x="23" y="4" width="4" height="10" rx="1.999998" ry="1.999998"/>
+  <rect class="cls-1" x="37" y="4" width="4" height="10" rx="1.999998" ry="1.999998"/>
+  <rect class="cls-1" x="51" y="4" width="4" height="10" rx="1.999998" ry="1.999998"/>
+  <g>
+    <g>
+      <rect class="cls-1" x="16" y="22" width="6" height="18" rx="1" ry="1" transform="translate(50 12) rotate(90)"/>
+      <g>
+        <line class="cls-1" x1="10" y1="40" x2="17" y2="40"/>
+        <line class="cls-1" x1="21" y1="40" x2="28" y2="40"/>
+        <line class="cls-1" x1="10" y1="46" x2="17" y2="46"/>
+        <line class="cls-1" x1="21" y1="46" x2="28" y2="46"/>
+      </g>
+    </g>
+    <g>
+      <rect class="cls-1" x="42" y="22" width="6" height="18" rx="1" ry="1" transform="translate(76 -14) rotate(90)"/>
+      <g>
+        <line class="cls-1" x1="54" y1="40" x2="47" y2="40"/>
+        <line class="cls-1" x1="43" y1="40" x2="36" y2="40"/>
+        <line class="cls-1" x1="54" y1="46" x2="47" y2="46"/>
+        <line class="cls-1" x1="43" y1="46" x2="36" y2="46"/>
+      </g>
+    </g>
+  </g>
+</svg>

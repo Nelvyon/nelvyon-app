@@ -1,0 +1,35 @@
+---
+title: "Email transaccional y campañas con AWS SES"
+description: "Entregabilidad, bounces, tracking HMAC y estados honestos en producción."
+date: 2026-08-01
+timeToRead: "6 min"
+authorName: "Equipo NELVYON"
+authorRole: "Infraestructura"
+authorAvatar: "/logo.png"
+previewImage: "/brand/public/blog-cloud.webp"
+labels:
+  - name: "Email"
+    hex: "#0084FF"
+  - name: "Infraestructura"
+    hex: "#0047AB"
+---
+
+Muchos productos de marketing prometen “email integrado” con un SMTP genérico o simulaciones en demo. NELVYON usa AWS SES cuando está configurado — y la UI informa cuando no lo está.
+
+## SES como infraestructura real
+
+SES ofrece entrega transaccional y de campañas con métricas de bounce y queja. Configuramos región, credenciales y dirección verificada como parte del onboarding de producción.
+
+## Bounce handling
+
+Los rebotes degradan reputación de dominio. El producto gestiona bounces para higiene de lista — no envía ciegamente a direcciones inválidas.
+
+## Tracking con secretos HMAC
+
+Open y click tracking usan `TRACKING_SECRET` (o fallback controlado). No hardcodeamos secretos ni fingimos métricas.
+
+## Separación agencia / SaaS
+
+La agencia puede diseñar estrategia y copy de [email marketing](/email-marketing); el motor de envío vive en el [módulo Campañas](/producto/campanas) del SaaS.
+
+Revise [integraciones](/integraciones) o [precios SaaS](/precios#saas).

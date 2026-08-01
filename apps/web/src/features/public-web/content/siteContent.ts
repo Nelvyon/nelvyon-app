@@ -93,9 +93,9 @@ export type LegalBlurbEntry = {
 
 export const siteBrand = {
   name: "NELVYON",
-  tagline: "Agencia de marketing digital operada por IA y plataforma SaaS B2B",
+  tagline: "Agencia de marketing digital operada por IA y SaaS B2B",
   description:
-    "Agencia de marketing digital operada por IA y plataforma SaaS B2B: CRM, campanas, workflows, packs OS y automatizacion enterprise.",
+    "Agencia de marketing digital operada por IA y SaaS B2B: CRM, campanas, workflows, packs OS y automatizacion enterprise.",
   contactEmail: "contact@nelvyon.com",
   supportEmail: "support@nelvyon.com",
 } as const;
@@ -103,29 +103,54 @@ export const siteBrand = {
 export type SiteBrand = typeof siteBrand;
 
 export const mainNav = [
-  { label: "Plataforma", href: "/plataforma" },
+  { label: "SaaS", href: "/producto" },
   { label: "Agencia", href: "/agencia" },
   { label: "Soluciones", href: "/soluciones" },
-  { label: "Servicios", href: "/servicios" },
   { label: "Precios", href: "/precios" },
   { label: "Recursos", href: "/recursos" },
-  { label: "Empresa", href: "/nosotros" },
+  { label: "Enterprise", href: "/enterprise" },
 ] as const satisfies readonly NavLink[];
 
 export type MainNavItem = (typeof mainNav)[number];
 
 export const megaNav = [
   {
-    id: "producto",
-    title: "Producto",
+    id: "saas",
+    title: "SaaS",
     links: [
-      { label: "Inicio", href: "/" },
-      { label: "Plataforma", href: "/plataforma" },
+      { label: "Visión general", href: "/producto" },
+      { label: "CRM", href: "/producto/crm" },
+      { label: "Pipeline", href: "/producto/pipeline" },
+      { label: "Automatizaciones", href: "/producto/workflows" },
+      { label: "IA", href: "/producto/ia" },
+      { label: "Agentes", href: "/producto/agentes" },
+      { label: "Email", href: "/producto/campanas" },
+      { label: "WhatsApp", href: "/producto/whatsapp" },
+      { label: "Calendario", href: "/producto/calendario" },
+      { label: "Embudos", href: "/producto/funnels" },
+      { label: "Ecommerce", href: "/producto/store" },
+      { label: "Cursos", href: "/producto/lms" },
+      { label: "Analytics", href: "/producto/analytics" },
+      { label: "Acceder al panel", href: "/login" },
+    ],
+  },
+  {
+    id: "agencia",
+    title: "Agencia",
+    links: [
       { label: "Agencia", href: "/agencia" },
-      { label: "Automatizaciones IA", href: "/automatizaciones-ia" },
-      { label: "Acceso SaaS", href: "/saas" },
-      { label: "Iniciar sesión", href: "/login" },
-      { label: "Precios", href: "/precios" },
+      { label: "SEO", href: "/seo" },
+      { label: "SEM", href: "/agencia/sem" },
+      { label: "Meta Ads", href: "/agencia/meta-ads" },
+      { label: "Google Ads", href: "/agencia/google-ads" },
+      { label: "Desarrollo web", href: "/desarrollo-web" },
+      { label: "Branding", href: "/branding" },
+      { label: "Diseño", href: "/agencia/diseno" },
+      { label: "Social Media", href: "/agencia/social-media" },
+      { label: "Email marketing", href: "/email-marketing" },
+      { label: "Automatización", href: "/servicios/automatizacion" },
+      { label: "IA marketing", href: "/agencia/ia" },
+      { label: "Consultoría", href: "/agencia/consultoria" },
     ],
   },
   {
@@ -133,21 +158,13 @@ export const megaNav = [
     title: "Soluciones",
     links: [
       { label: "Soluciones", href: "/soluciones" },
-      { label: "Servicios", href: "/servicios" },
       { label: "Sectores", href: "/sectores" },
+      { label: "Clínicas", href: "/sectores/clinicas" },
+      { label: "Ecommerce", href: "/sectores/ecommerce" },
+      { label: "Empresas", href: "/sectores/empresas" },
+      { label: "Casos de uso", href: "/casos-de-uso" },
       { label: "Enterprise", href: "/enterprise" },
       { label: "Integraciones", href: "/integraciones" },
-      { label: "Casos de éxito", href: "/casos-de-exito" },
-    ],
-  },
-  {
-    id: "empresa",
-    title: "Empresa",
-    links: [
-      { label: "Nosotros", href: "/nosotros" },
-      { label: "Contacto", href: "/contacto" },
-      { label: "Estado del servicio", href: "/status" },
-      { label: "Seguridad", href: "/seguridad" },
     ],
   },
   {
@@ -156,7 +173,10 @@ export const megaNav = [
     links: [
       { label: "Centro de recursos", href: "/recursos" },
       { label: "Blog", href: "/blog" },
-      { label: "Preguntas frecuentes", href: "/faq" },
+      { label: "FAQ", href: "/faq" },
+      { label: "Seguridad", href: "/seguridad" },
+      { label: "Contacto", href: "/contacto" },
+      { label: "Nosotros", href: "/nosotros" },
     ],
   },
   {
@@ -167,7 +187,7 @@ export const megaNav = [
       { label: "Privacidad", href: "/privacidad" },
       { label: "Cookies", href: "/cookies" },
       { label: "Términos", href: "/terminos" },
-      { label: "Acuerdo de tratamiento (DPA)", href: "/legal/dpa" },
+      { label: "DPA", href: "/legal/dpa" },
       { label: "Subprocesadores", href: "/legal/subprocessors" },
     ],
   },
@@ -180,12 +200,12 @@ export const homeContent = {
     eyebrow: "Agencia IA + SaaS B2B",
     titleLines: [
       "Marketing digital ejecutado por IA.",
-      "Operación comercial en una sola plataforma.",
+      "Operación comercial en un solo SaaS.",
     ] as const,
     subtitle:
       "NELVYON une agencia autónoma y software enterprise: CRM, campañas, workflows, packs OS y automatización con control, trazabilidad y resultados medibles.",
     primaryCta: { label: "Solicitar demo", href: "/contacto" } satisfies CtaLink,
-    secondaryCta: { label: "Ver plataforma", href: "/plataforma" } satisfies CtaLink,
+    secondaryCta: { label: "Explorar el SaaS", href: "/producto" } satisfies CtaLink,
   },
   pillars: [
     {
@@ -193,7 +213,7 @@ export const homeContent = {
       body: "Packs de marketing ejecutados por agentes especializados con revisión de calidad y flujo de aprobación.",
     },
     {
-      title: "Plataforma SaaS B2B",
+      title: "SaaS B2B",
       body: "CRM, campañas, inbox, pipeline y billing en un entorno multi-tenant con autenticación y roles.",
     },
     {
@@ -297,10 +317,10 @@ export const homeContent = {
     {
       question: "¿NELVYON es una agencia o un software?",
       answer:
-        "Ambas capas: agencia de marketing digital operada por IA y plataforma SaaS B2B para CRM, campañas, workflows y packs OS.",
+        "Ambas capas: agencia de marketing digital operada por IA y SaaS B2B para CRM, campañas, workflows y packs OS.",
     },
     {
-      question: "¿Qué incluye la plataforma SaaS?",
+      question: "¿Qué incluye el SaaS NELVYON?",
       answer:
         "Módulos operativos de CRM, campañas, workflows, pipeline, inbox y billing, con autenticación por tenant y despliegue pensado para producción.",
     },
@@ -322,7 +342,7 @@ export const homeContent = {
   ] as const,
   cta: {
     title: "Ponga orden en marketing y ventas con un sistema real",
-    body: "Hable con el equipo para evaluar su operación, el plan adecuado y el camino de activación de plataforma y packs.",
+    body: "Hable con el equipo para evaluar su operación, el plan SaaS adecuado y el camino de activación de agencia y packs.",
     primaryCta: { label: "Hablar con NELVYON", href: "/contacto" } satisfies CtaLink,
     secondaryCta: { label: "Ver precios", href: "/precios" } satisfies CtaLink,
   },
@@ -702,7 +722,7 @@ export const pageContent = {
       },
       {
         heading: "¿Aún no es cliente?",
-        body: "Solicite demo en /contacto o revise /precios y /plataforma antes de activar. Soporte: support@nelvyon.com.",
+        body: "Solicite demo en /contacto o revise /precios y /producto antes de activar. Soporte: support@nelvyon.com.",
       },
     ],
   },

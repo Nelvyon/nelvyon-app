@@ -1,22 +1,21 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 
-import { ServiceDetailPage } from "@/components/pa/marketing/service-detail-page";
-import { nelvyonServicePages } from "@/config/nelvyon-marketing-pages";
-import { getAppBaseUrl } from "@/lib/appUrl";
+import { ServiceDetailPage, getAgencyService } from "@/features/public-web";
 
-const content = nelvyonServicePages.branding;
-const base = getAppBaseUrl();
+const SLUG = "branding";
 
-export const metadata: Metadata = {
-  title: `${content.title} | NELVYON`,
-  description: content.summary,
-  openGraph: {
-    url: `${base}${content.path}`,
-    title: `${content.title} | NELVYON`,
-    description: content.summary,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const svc = getAgencyService(SLUG);
+  if (!svc) return {};
+  return {
+    title: svc.seoTitle,
+    description: svc.seoDescription,
+    alternates: { canonical: svc.href },
+  };
+}
 
 export default function BrandingPage() {
-  return <ServiceDetailPage content={content} />;
+  if (!getAgencyService(SLUG)) notFound();
+  return <ServiceDetailPage slugOrHref={SLUG} />;
 }

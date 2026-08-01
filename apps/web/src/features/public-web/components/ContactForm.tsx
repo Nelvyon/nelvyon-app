@@ -42,50 +42,50 @@ export function ContactForm() {
     <form onSubmit={onSubmit} className="nv-public-panel space-y-4 p-6 md:p-8" noValidate>
       <div className="grid gap-4 md:grid-cols-2">
         <label className="block text-sm">
-          <span className="mb-1.5 block text-slate-300">Nombre *</span>
+          <span className="mb-1.5 block text-[var(--nv-muted)]">Nombre *</span>
           <input
             name="name"
             required
             autoComplete="name"
-            className="w-full rounded-xl border border-[var(--nv-border)] bg-[#05070D] px-4 py-3 text-white outline-none focus:border-[var(--nv-accent)]"
+            className="w-full rounded-xl border border-[var(--nv-border)] bg-[#05070D] px-4 py-3 text-[var(--nv-fg-strong)] outline-none focus:border-[var(--nv-accent)]"
           />
         </label>
         <label className="block text-sm">
-          <span className="mb-1.5 block text-slate-300">Email *</span>
+          <span className="mb-1.5 block text-[var(--nv-muted)]">Email *</span>
           <input
             name="email"
             type="email"
             required
             autoComplete="email"
-            className="w-full rounded-xl border border-[var(--nv-border)] bg-[#05070D] px-4 py-3 text-white outline-none focus:border-[var(--nv-accent)]"
+            className="w-full rounded-xl border border-[var(--nv-border)] bg-[#05070D] px-4 py-3 text-[var(--nv-fg-strong)] outline-none focus:border-[var(--nv-accent)]"
           />
         </label>
         <label className="block text-sm">
-          <span className="mb-1.5 block text-slate-300">Empresa</span>
+          <span className="mb-1.5 block text-[var(--nv-muted)]">Empresa</span>
           <input
             name="company"
             autoComplete="organization"
-            className="w-full rounded-xl border border-[var(--nv-border)] bg-[#05070D] px-4 py-3 text-white outline-none focus:border-[var(--nv-accent)]"
+            className="w-full rounded-xl border border-[var(--nv-border)] bg-[#05070D] px-4 py-3 text-[var(--nv-fg-strong)] outline-none focus:border-[var(--nv-accent)]"
           />
         </label>
         <label className="block text-sm">
-          <span className="mb-1.5 block text-slate-300">Teléfono</span>
+          <span className="mb-1.5 block text-[var(--nv-muted)]">Teléfono</span>
           <input
             name="phone"
             autoComplete="tel"
-            className="w-full rounded-xl border border-[var(--nv-border)] bg-[#05070D] px-4 py-3 text-white outline-none focus:border-[var(--nv-accent)]"
+            className="w-full rounded-xl border border-[var(--nv-border)] bg-[#05070D] px-4 py-3 text-[var(--nv-fg-strong)] outline-none focus:border-[var(--nv-accent)]"
           />
         </label>
       </div>
       <label className="block text-sm">
-        <span className="mb-1.5 block text-slate-300">Interés</span>
+        <span className="mb-1.5 block text-[var(--nv-muted)]">Interés</span>
         <select
           name="plan"
-          className="w-full rounded-xl border border-[var(--nv-border)] bg-[#05070D] px-4 py-3 text-white outline-none focus:border-[var(--nv-accent)]"
+          className="w-full rounded-xl border border-[var(--nv-border)] bg-[#05070D] px-4 py-3 text-[var(--nv-fg-strong)] outline-none focus:border-[var(--nv-accent)]"
           defaultValue=""
         >
           <option value="">Seleccione una opción</option>
-          <option value="demo">Demo de plataforma</option>
+          <option value="demo">Demo del SaaS</option>
           <option value="starter">Plan Starter</option>
           <option value="growth">Plan Growth</option>
           <option value="elite">Plan Elite / Enterprise</option>
@@ -94,12 +94,12 @@ export function ContactForm() {
         </select>
       </label>
       <label className="block text-sm">
-        <span className="mb-1.5 block text-slate-300">Mensaje *</span>
+        <span className="mb-1.5 block text-[var(--nv-muted)]">Mensaje *</span>
         <textarea
           name="message"
           required
           rows={5}
-          className="w-full rounded-xl border border-[var(--nv-border)] bg-[#05070D] px-4 py-3 text-white outline-none focus:border-[var(--nv-accent)]"
+          className="w-full rounded-xl border border-[var(--nv-border)] bg-[#05070D] px-4 py-3 text-[var(--nv-fg-strong)] outline-none focus:border-[var(--nv-accent)]"
           placeholder="Cuéntenos su operación, stack y objetivo prioritario."
         />
       </label>

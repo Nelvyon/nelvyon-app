@@ -1,0 +1,33 @@
+---
+title: "Workflows con idempotencia: automatizar sin duplicar"
+description: "Por qué la idempotencia importa en campañas, triggers y entornos de producción."
+date: 2026-07-28
+timeToRead: "5 min"
+authorName: "Equipo NELVYON"
+authorRole: "Ingeniería"
+authorAvatar: "/logo.png"
+previewImage: "/brand/public/automation-ui.webp"
+labels:
+  - name: "Automatización"
+    hex: "#0084FF"
+---
+
+Duplicar un email crítico o ejecutar dos veces la misma acción de workflow no es un bug menor: erosiona confianza del cliente y puede violar compliance. En NELVYON, la idempotencia no es un detalle técnico opcional.
+
+## El problema de los dobles disparos
+
+Triggers de CRM, webhooks y cron pueden llegar en ráfaga. Sin ventana de idempotencia, el motor puede enviar dos veces la misma campaña o crear tareas duplicadas.
+
+## Cómo lo abordamos
+
+El motor de workflows SaaS incluye controles temporales para evitar re-ejecución en ventanas cortas. Los flujos se publican al backend real — no son nodos decorativos.
+
+## Observabilidad
+
+Cada ejecución deja historial auditable. En enterprise, esto alimenta revisiones de ops y cumplimiento.
+
+## Agencia vs producto
+
+El [módulo Workflows](/producto/workflows) es el software. El [servicio de automatización](/servicios/automatizacion) de agencia diseña e implanta flujos sobre ese motor.
+
+¿Quiere mapear su primer flujo? [Contacte con NELVYON](/contacto).

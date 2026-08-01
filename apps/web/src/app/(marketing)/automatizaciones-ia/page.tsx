@@ -1,6 +1,6 @@
 ﻿import type { Metadata } from "next";
 
-import { StandardPage, pageContent } from "@/features/public-web";
+import { AutomationsPage, pageContent } from "@/features/public-web";
 
 const content = pageContent["automatizaciones-ia"];
 
@@ -11,11 +11,5 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return (
-    <StandardPage
-      content={content}
-      imageSrc={"/brand/public/automation-ui.webp"}
-      imageAlt={"Automatizaciones IA"}
-    />
-  );
+  return <AutomationsPage />;
 }

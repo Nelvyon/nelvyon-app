@@ -1,0 +1,19 @@
+{
+  "generatedAt": "2026-08-01T19:18:42.115Z",
+  "iconRefs": 46,
+  "missingIcons": [],
+  "markers": {
+    "home_status": 200,
+    "home_hasMacbook": true,
+    "home_hasSaasShots": true,
+    "home_hasLibraryIcons": true,
+    "home_hasNelvyon": true,
+    "home_noSofax": true,
+    "home_noNivia": true,
+    "producto_status": 200,
+    "producto_hasMacbook": true,
+    "producto_hasF02": true,
+    "producto_hasIcons": true
+  },
+  "ok": true
+}

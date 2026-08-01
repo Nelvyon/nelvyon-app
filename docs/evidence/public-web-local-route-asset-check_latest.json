@@ -1,0 +1,116 @@
+﻿[
+    {
+        "path":  "/",
+        "status":  200,
+        "bytes":  181261,
+        "ok":  true
+    },
+    {
+        "path":  "/producto",
+        "status":  200,
+        "bytes":  110548,
+        "ok":  true
+    },
+    {
+        "path":  "/producto/crm",
+        "status":  200,
+        "bytes":  85703,
+        "ok":  true
+    },
+    {
+        "path":  "/producto/ia",
+        "status":  200,
+        "bytes":  82799,
+        "ok":  true
+    },
+    {
+        "path":  "/producto/workflows",
+        "status":  200,
+        "bytes":  83649,
+        "ok":  true
+    },
+    {
+        "path":  "/agencia",
+        "status":  200,
+        "bytes":  125304,
+        "ok":  true
+    },
+    {
+        "path":  "/enterprise",
+        "status":  200,
+        "bytes":  101879,
+        "ok":  true
+    },
+    {
+        "path":  "/servicios",
+        "status":  200,
+        "bytes":  68328,
+        "ok":  true
+    },
+    {
+        "path":  "/sectores",
+        "status":  200,
+        "bytes":  92764,
+        "ok":  true
+    },
+    {
+        "path":  "/precios",
+        "status":  200,
+        "bytes":  69926,
+        "ok":  true
+    },
+    {
+        "path":  "/contacto",
+        "status":  200,
+        "bytes":  63125,
+        "ok":  true
+    },
+    {
+        "path":  "/brand/public/library/photos/F-01.webp",
+        "status":  200,
+        "bytes":  163562,
+        "ok":  true
+    },
+    {
+        "path":  "/brand/public/library/photos/F-02.webp",
+        "status":  200,
+        "bytes":  524848,
+        "ok":  true
+    },
+    {
+        "path":  "/brand/public/saas-shots/dashboard.webp",
+        "status":  200,
+        "bytes":  57774,
+        "ok":  true
+    },
+    {
+        "path":  "/brand/public/saas-shots/crm.webp",
+        "status":  200,
+        "bytes":  39002,
+        "ok":  true
+    },
+    {
+        "path":  "/brand/public/saas-shots/ai.webp",
+        "status":  200,
+        "bytes":  74038,
+        "ok":  true
+    },
+    {
+        "path":  "/brand/public/library/icons/I-03/019-crm.svg",
+        "status":  200,
+        "bytes":  4475,
+        "ok":  true
+    },
+    {
+        "path":  "/brand/public/library/icons/I-04/workflow.svg",
+        "status":  200,
+        "bytes":  1154,
+        "ok":  true
+    },
+    {
+        "path":  "/api/health",
+        "status":  200,
+        "bytes":  72,
+        "ok":  true
+    }
+]

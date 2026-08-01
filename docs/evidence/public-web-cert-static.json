@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-01T05:23:31.387Z",
+  "generatedAt": "2026-08-01T19:17:54.604Z",
   "routes": {
     "total": 26,
     "missing": [],
@@ -138,47 +138,59 @@
   },
   "brandingHits": [],
   "hrefs": {
-    "total": 17,
+    "total": 21,
     "bad": []
   },
   "images": {
-    "total": 10,
+    "total": 13,
     "missing": [],
     "all": [
       {
-        "src": "/brand/public/enterprise-meeting.webp",
+        "src": "/brand/public/product/check-circle.png",
         "exists": true
       },
       {
-        "src": "/brand/public/ops-focus.webp",
+        "src": "/brand/public/library/photos/F-01.webp",
         "exists": true
       },
       {
-        "src": "/brand/public/hero-team.webp",
+        "src": "/brand/public/contact-map.webp",
         "exists": true
       },
       {
-        "src": "/brand/public/platform-ui.webp",
+        "src": "/brand/public/zubaz/v3/shape-v3-01.png",
         "exists": true
       },
       {
-        "src": "/brand/public/agency-collab.webp",
+        "src": "/brand/public/zubaz/v3/check.png",
         "exists": true
       },
       {
-        "src": "/brand/public/automation-ui.webp",
+        "src": "/brand/public/zubaz/icon/arrow-right2.svg",
         "exists": true
       },
       {
-        "src": "/brand/public/blog-infra.webp",
+        "src": "/brand/public/product/shape1.png",
         "exists": true
       },
       {
-        "src": "/brand/public/office-banner.webp",
+        "src": "/brand/public/product/shape2.png",
+        "exists": true
+      },
+      {
+        "src": "/brand/public/product/arrow-right.png",
+        "exists": true
+      },
+      {
+        "src": "/brand/public/product/icon8.png",
         "exists": true
       },
       {
         "src": "/brand/public/agency-brand.webp",
+        "exists": true
+      },
+      {
+        "src": "/brand/public/platform-ui.webp",
         "exists": true
       },
       {

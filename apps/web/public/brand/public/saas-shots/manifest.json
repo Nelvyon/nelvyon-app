@@ -1,0 +1,261 @@
+{
+  "generatedAt": "2026-08-01T17:30:10.797Z",
+  "tenant": "Nelvyon Demo · Aether Labs",
+  "note": "UI real /saas/* con fixtures demo. Sin PII real ni secretos.",
+  "shots": [
+    {
+      "id": "agentes",
+      "hero": "/brand/public/saas-shots/agentes.webp",
+      "card": "/brand/public/saas-shots/cards/agentes.webp",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "ai",
+      "hero": "/brand/public/saas-shots/ai.webp",
+      "card": "/brand/public/saas-shots/cards/ai.webp",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "analytics",
+      "hero": "/brand/public/saas-shots/analytics.webp",
+      "card": "/brand/public/saas-shots/cards/analytics.webp",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "billing",
+      "hero": "/brand/public/saas-shots/billing.webp",
+      "card": "/brand/public/saas-shots/cards/billing.webp",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "calendar",
+      "hero": "/brand/public/saas-shots/calendar.webp",
+      "card": "/brand/public/saas-shots/cards/calendar.webp",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "campanias",
+      "hero": "/brand/public/saas-shots/campanias.webp",
+      "card": "/brand/public/saas-shots/cards/campanias.webp",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "chat",
+      "hero": "/brand/public/saas-shots/chat.webp",
+      "card": "/brand/public/saas-shots/cards/chat.webp",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "crm-mobile",
+      "hero": "/brand/public/saas-shots/crm-mobile.webp",
+      "card": "/brand/public/saas-shots/cards/crm-mobile.webp",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "crm",
+      "hero": "/brand/public/saas-shots/crm.webp",
+      "card": "/brand/public/saas-shots/cards/crm.webp",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "dashboard-mobile",
+      "hero": "/brand/public/saas-shots/dashboard-mobile.webp",
+      "card": "/brand/public/saas-shots/cards/dashboard-mobile.webp",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "dashboard",
+      "hero": "/brand/public/saas-shots/dashboard.webp",
+      "card": "/brand/public/saas-shots/cards/dashboard.webp",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "inbox",
+      "hero": "/brand/public/saas-shots/inbox.webp",
+      "card": "/brand/public/saas-shots/cards/inbox.webp",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "integraciones",
+      "hero": "/brand/public/saas-shots/integraciones.webp",
+      "card": "/brand/public/saas-shots/cards/integraciones.webp",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "lms",
+      "hero": "/brand/public/saas-shots/lms.webp",
+      "card": "/brand/public/saas-shots/cards/lms.webp",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "pipeline",
+      "hero": "/brand/public/saas-shots/pipeline.webp",
+      "card": "/brand/public/saas-shots/cards/pipeline.webp",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "settings",
+      "hero": "/brand/public/saas-shots/settings.webp",
+      "card": "/brand/public/saas-shots/cards/settings.webp",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "store",
+      "hero": "/brand/public/saas-shots/store.webp",
+      "card": "/brand/public/saas-shots/cards/store.webp",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "workflows",
+      "hero": "/brand/public/saas-shots/workflows.webp",
+      "card": "/brand/public/saas-shots/cards/workflows.webp",
+      "width": 1440,
+      "height": 900
+    }
+  ],
+  "raw": [
+    {
+      "id": "dashboard",
+      "file": "dashboard.png",
+      "route": "/saas/dashboard",
+      "capturedAt": "2026-08-01T17:28:09.774Z",
+      "ok": true
+    },
+    {
+      "id": "crm",
+      "file": "crm.png",
+      "route": "/saas/crm",
+      "capturedAt": "2026-08-01T17:28:34.959Z",
+      "ok": true
+    },
+    {
+      "id": "pipeline",
+      "file": "pipeline.png",
+      "route": "/saas/pipeline",
+      "capturedAt": "2026-08-01T17:28:45.906Z",
+      "ok": true
+    },
+    {
+      "id": "workflows",
+      "file": "workflows.png",
+      "route": "/saas/workflows",
+      "capturedAt": "2026-08-01T17:28:50.548Z",
+      "ok": true
+    },
+    {
+      "id": "agentes",
+      "file": "agentes.png",
+      "route": "/saas/agentes",
+      "capturedAt": "2026-08-01T17:28:55.162Z",
+      "ok": true
+    },
+    {
+      "id": "ai",
+      "file": "ai.png",
+      "route": "/saas/ai",
+      "capturedAt": "2026-08-01T17:28:59.696Z",
+      "ok": true
+    },
+    {
+      "id": "chat",
+      "file": "chat.png",
+      "route": "/saas/chat",
+      "capturedAt": "2026-08-01T17:29:04.254Z",
+      "ok": true
+    },
+    {
+      "id": "analytics",
+      "file": "analytics.png",
+      "route": "/saas/reportes",
+      "capturedAt": "2026-08-01T17:29:08.598Z",
+      "ok": true
+    },
+    {
+      "id": "calendar",
+      "file": "calendar.png",
+      "route": "/saas/citas",
+      "capturedAt": "2026-08-01T17:29:12.850Z",
+      "ok": true
+    },
+    {
+      "id": "campanias",
+      "file": "campanias.png",
+      "route": "/saas/campanias",
+      "capturedAt": "2026-08-01T17:29:18.754Z",
+      "ok": true
+    },
+    {
+      "id": "billing",
+      "file": "billing.png",
+      "route": "/saas/billing",
+      "capturedAt": "2026-08-01T17:29:23.755Z",
+      "ok": true
+    },
+    {
+      "id": "store",
+      "file": "store.png",
+      "route": "/saas/store",
+      "capturedAt": "2026-08-01T17:29:29.111Z",
+      "ok": true
+    },
+    {
+      "id": "lms",
+      "file": "lms.png",
+      "route": "/saas/lms",
+      "capturedAt": "2026-08-01T17:29:34.157Z",
+      "ok": true
+    },
+    {
+      "id": "integraciones",
+      "file": "integraciones.png",
+      "route": "/saas/integraciones",
+      "capturedAt": "2026-08-01T17:29:38.755Z",
+      "ok": true
+    },
+    {
+      "id": "settings",
+      "file": "settings.png",
+      "route": "/saas/settings",
+      "capturedAt": "2026-08-01T17:29:43.182Z",
+      "ok": true
+    },
+    {
+      "id": "inbox",
+      "file": "inbox.png",
+      "route": "/saas/inbox",
+      "capturedAt": "2026-08-01T17:29:47.700Z",
+      "ok": true
+    },
+    {
+      "id": "dashboard-mobile",
+      "file": "dashboard-mobile.png",
+      "route": "/saas/dashboard",
+      "capturedAt": "2026-08-01T17:30:05.784Z",
+      "ok": true
+    },
+    {
+      "id": "crm-mobile",
+      "file": "crm-mobile.png",
+      "route": "/saas/crm",
+      "capturedAt": "2026-08-01T17:30:08.821Z",
+      "ok": true
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+---
+title: "Integraciones B2B: OAuth, webhooks y estados honestos"
+description: "Google, Meta, Stripe, WhatsApp y Microsoft — qué significa “conectado” de verdad."
+date: 2026-08-10
+timeToRead: "5 min"
+authorName: "Equipo NELVYON"
+authorRole: "Integraciones"
+authorAvatar: "/logo.png"
+previewImage: "/brand/public/automation-ui.webp"
+labels:
+  - name: "Integraciones"
+    hex: "#0084FF"
+---
+
+Un logo de partner en la home no implica que la integración esté activa en su tenant. Documentamos conectividad y estado real por conector.
+
+## Nativo vs OAuth vs API
+
+- **Nativo**: Stripe billing, SES campañas — integrados en el producto.
+- **OAuth**: Google Ads, Meta, Microsoft — activación por proyecto y credenciales.
+- **API/Webhook**: WhatsApp/Twilio, Slack, sistemas propios.
+
+## WhatsApp no es mágico
+
+Requiere Twilio o WhatsApp Business configurado. El inbox muestra el estado real; no simulamos conversaciones.
+
+## Webhooks salientes
+
+Eventos de tenant permiten alertas Slack, Zapier o ERP propio sin duplicar lógica en el SaaS.
+
+## Enterprise
+
+Organizaciones multi-equipo evalúan SSO, DPA y alcance de integraciones en [Enterprise](/enterprise).
+
+Mapa completo en [/integraciones](/integraciones).

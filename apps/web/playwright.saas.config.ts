@@ -23,6 +23,7 @@ export default defineConfig({
   fullyParallel: false,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
+  testIgnore: [/capture-marketing-shots\.spec\.ts/],
   reporter: process.env.CI
     ? [["list"], ["html", { open: "never", outputFolder: "playwright-report-saas" }]]
     : [["list"]],

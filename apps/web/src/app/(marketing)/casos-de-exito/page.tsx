@@ -11,5 +11,5 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <CasesPage />;
+  return <CasesPage successStoriesMode />;
 }

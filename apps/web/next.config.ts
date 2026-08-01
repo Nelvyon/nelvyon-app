@@ -99,6 +99,8 @@ const nextConfig: NextConfig = {
       { source: "/privacy", destination: "/privacidad", permanent: true },
       { source: "/terms", destination: "/terminos", permanent: true },
       { source: "/pricing", destination: "/precios", permanent: true },
+      { source: "/plataforma", destination: "/producto", permanent: true },
+      { source: "/plataforma/:path*", destination: "/producto/:path*", permanent: true },
       { source: "/sobre-nosotros", destination: "/nosotros", permanent: true },
       { source: "/forgot-password", destination: "/auth/forgot-password", permanent: false },
       { source: "/work", destination: "/servicios", permanent: true },

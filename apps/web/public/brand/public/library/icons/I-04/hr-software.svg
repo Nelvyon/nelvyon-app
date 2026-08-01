@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #000;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 1.5px;
+      }
+    </style>
+  </defs>
+  <g>
+    <line class="cls-1" x1="24" y1="60" x2="26.7" y2="51"/>
+    <line class="cls-1" x1="37.3" y1="51" x2="40" y2="60"/>
+    <path class="cls-1" d="M54,9h2c2.21,0,4,1.79,4,4v34c0,2.21-1.79,4-4,4H8c-2.21,0-4-1.79-4-4V13c0-2.21,1.79-4,4-4h2"/>
+    <path class="cls-1" d="M12,4h40c1.10383,0,2,.89617,2,2v37H10V6c0-1.10383.89617-2,2-2Z"/>
+    <line class="cls-1" x1="4" y1="43" x2="60" y2="43"/>
+    <line class="cls-1" x1="20" y1="60" x2="44" y2="60"/>
+  </g>
+  <g>
+    <g>
+      <g>
+        <circle class="cls-1" cx="22" cy="14" r="4"/>
+        <path class="cls-1" d="M21.999994,18h.000012c3.311487,0,5.999994,2.688507,5.999994,5.999994v1.000006h-12v-1.000006c0-3.311487,2.688507-5.999994,5.999994-5.999994Z"/>
+      </g>
+      <line class="cls-1" x1="28" y1="31" x2="16" y2="31"/>
+      <line class="cls-1" x1="28" y1="37" x2="16" y2="37"/>
+    </g>
+    <g>
+      <g>
+        <circle class="cls-1" cx="42" cy="14" r="4"/>
+        <path class="cls-1" d="M36,18h12v1.000006c0,3.311487-2.688507,5.999994-5.999994,5.999994h-.000012c-3.311487,0-5.999994-2.688507-5.999994-5.999994v-1.000006h0Z" transform="translate(84 43) rotate(-180)"/>
+      </g>
+      <line class="cls-1" x1="36" y1="31" x2="48" y2="31"/>
+      <line class="cls-1" x1="36" y1="37" x2="48" y2="37"/>
+    </g>
+  </g>
+</svg>
