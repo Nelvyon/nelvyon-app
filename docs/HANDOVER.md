@@ -6,7 +6,7 @@
 | Campo | Valor |
 |-------|-------|
 | **Tip prod live** | deploy `6159c6b8` · commit `ca081d0e` (prod intacta — **no deploy** de este WIP) |
-| **WIP local** | fix `_FUMADOCS_MDX` en `next.config.ts` + assert prod artifacts (commit pendiente en esta sesión) |
+| **WIP local** | `1d217320` — fix 500 `next start` (`_FUMADOCS_MDX` + assert artifacts). **Sin deploy.** |
 | **Web pública** | Next + AIOR · `next start` sano · crawl **34/34** |
 | **claimReady** | **true** |
 | **Canary / spend / publish** | **KILL / OFF / OFF** |
