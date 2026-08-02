@@ -20,6 +20,8 @@ const PHRASE_SWAPS = [
   ...JSON.parse(fs.readFileSync(path.join(ROOT, "scripts", "data", "aior-nelvyon-phrase-swaps-pass3.json"), "utf8")),
   ...JSON.parse(fs.readFileSync(path.join(ROOT, "scripts", "data", "aior-nelvyon-phrase-swaps-pass4.json"), "utf8")),
   ...JSON.parse(fs.readFileSync(path.join(ROOT, "scripts", "data", "aior-nelvyon-phrase-swaps-pass5.json"), "utf8")),
+  ...JSON.parse(fs.readFileSync(path.join(ROOT, "scripts", "data", "aior-nelvyon-phrase-swaps-pass6.json"), "utf8")),
+  ...JSON.parse(fs.readFileSync(path.join(ROOT, "scripts", "data", "aior-nelvyon-phrase-swaps-pass7.json"), "utf8")),
 ];
 
 /**
@@ -86,6 +88,10 @@ const MENU_LABELS = [
   ["Home Cloud SaaS", "Cloud SaaS"],
   ["10. Home Producto SaaS", "10. Producto SaaS"],
   ["Home Producto SaaS", "Producto SaaS"],
+  ["Case Studies style 2", "Casos (estilo 2)"],
+  ["Price Table", "Precios"],
+  ["Error Page", "Error 404"],
+  ["Blog Details", "Detalle del artículo"],
   ["Multipage", "Abrir"],
   ["Onepage", "Landing"],
 ];
@@ -384,6 +390,76 @@ function applyContent(html, file) {
   out = out.replace(/\$0\b/g, "€97");
   out = out.replace(/\$199\b/g, "€297");
   out = out.replace(/\$599\b/g, "€797");
+  // Contadores vanity del template (números partidos en spans) → métricas honestas NELVYON
+  out = out.replace(
+    /<h2 class="box-number"><span class="counter-number">500<\/span>K\+<\/h2>/g,
+    '<h2 class="box-number">CRM</h2>'
+  );
+  out = out.replace(
+    /<h2 class="box-number"><span class="counter-number">99\.9<\/span>%<\/h2>/g,
+    '<h2 class="box-number">SES</h2>'
+  );
+  out = out.replace(
+    /<h2 class="box-number"><span class="counter-number">2\.5<\/span>B\+<\/h2>/g,
+    '<h2 class="box-number">API</h2>'
+  );
+  out = out.replace(
+    /<h3 class="box-number"><span class="counter-number">10<\/span>M\+<\/h3>/g,
+    '<h3 class="box-number">Inbox</h3>'
+  );
+  out = out.replace(
+    /<h3 class="box-number"><span class="counter-number">150<\/span>\+<\/h3>/g,
+    '<h3 class="box-number">Packs</h3>'
+  );
+  out = out.replace(
+    /<h3 class="box-number"><span class="counter-number">4\.9<\/span>\/5<\/h3>/g,
+    '<h3 class="box-number">SaaS</h3>'
+  );
+  out = out.replace(
+    /<h3 class="box-number"><span class="counter-number">24<\/span>\/7<\/h3>/g,
+    '<h3 class="box-number">OS</h3>'
+  );
+  out = out.replace(/class="duration">\/month<\/span>/gi, 'class="duration">/mes</span>');
+  out = out.replace(/class="duration">\/Month<\/span>/gi, 'class="duration">/mes</span>');
+  // Precios SaaS reales (Starter 97 / Growth 297 / Elite 797) — sin cifras demo del template
+  out = out.replace(
+    /<h3 class="box-title">Starter<\/h3>\s*<p class="box-text">Growth — operación comercial<\/p>/g,
+    '<h3 class="box-title">Growth</h3>\n                                <p class="box-text">Operación comercial completa</p>'
+  );
+  out = out.replace(
+    /<h3 class="box-title">Starter<\/h3>\s*<p class="box-text">Plan Elite \/ enterprise<\/p>/g,
+    '<h3 class="box-title">Growth</h3>\n                                <p class="box-text">Operación comercial completa</p>'
+  );
+  out = out.replace(/&euro;<\/span>297\.99/g, "&euro;</span>297");
+  out = out.replace(/&euro;<\/span>797\.99/g, "&euro;</span>797");
+  out = out.replace(
+    /<h3 class="box-title">Enterprise<\/h3>\s*<p class="box-text">(?:Equipo según plan|Unlimited Members)<\/p>/g,
+    '<h3 class="box-title">Agencia</h3>\n                                <p class="box-text">Packs OS y operación a medida</p>'
+  );
+  out = out.replace(
+    /In today's fast-paced tech\s*environment, incorporating AI is\s*essential\. It changes\s*how businesses and customers connect, offering key insights for adapting to market trends\. AI\s*involves creating computer systems that can do things that usually need human intelligence\./gi,
+    "NELVYON une agencia de marketing digital operada por IA y SaaS B2B: CRM, campañas, inbox, workflows y packs OS con gobierno y evidencia."
+  );
+  out = out.replace(/>cases</g, ">Casos<");
+  out = out.replace(/Microsoft Teamsss+/g, "Microsoft Teams");
+  out = out.replace(/\bMicrosoft Team(?!s)\b/g, "Microsoft Teams");
+  out = out.replace(/>AI solutions</g, ">Soluciones IA<");
+  out = out.replace(/\bAI solutions\b/g, "Soluciones IA");
+  out = out.replace(/pensado para su operación/g, "pensadas para su operación");
+  out = out.replace(/Home Negocio Intelligence/g, "Business Intelligence");
+  out = out.replace(/05\. Negocio Intelligence/g, "05. Business Intelligence");
+  out = out.replace(/>Changelog</g, ">Cambios<");
+  out = out.replace(/>Team</g, ">Equipo<");
+  out = out.replace(/>Testimonial</g, ">Hechos<");
+  out = out.replace(/Contenido \/ Agencia Tool/g, "Contenido / Agencia");
+  out = out.replace(/Copyright <a /g, "<a ");
+  out = out.replace(/case studies/gi, "perfiles de proyecto");
+  out = out.replace(/\bUse contexto\b/g, "Utilice el contexto");
+  // Agencia: precio a medida (no reutilizar €97 del template)
+  out = out.replace(
+    /(<h3 class="box-title">Agencia<\/h3>[\s\S]{0,280}?<h4 class="box-price"><span class="dollar">&euro;<\/span>)97<span class="duration">\/mes<\/span><\/h4>/g,
+    '$1—<span class="duration">a medida</span></h4>'
+  );
   // Tipografía demo: sustituir filler latino por muestra NELVYON (misma etiqueta)
   if (file === "typography.html") {
     out = out.replace(

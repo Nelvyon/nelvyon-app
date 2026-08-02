@@ -1,0 +1,528 @@
+{
+  "scannedFiles": 36,
+  "uniqueEnCount": 48,
+  "uniqueEn": [
+    "04. Mejor rendimiento: limite el crawl a secciones relevantes.",
+    "Asistente comercial IA para retail",
+    "Asistente comercial IA para retail online",
+    "Biblioteca de tareas IA según plan",
+    "Canales y usuarios ampliados",
+    "Casos de uso",
+    "Comparta avances con stakeholders",
+    "Conecte sus herramientas",
+    "Configure su agente",
+    "Contexto ampliado según plan",
+    "Contexto base según plan",
+    "Contexto largo en agentes IA",
+    "Crear agente IA",
+    "Cumplimiento y gobierno",
+    "Detalle de perfil",
+    "Elija el plan",
+    "Elija el plan adecuado para su negocio",
+    "Escriba posts y piezas editoriales con",
+    "Esto es un enlace",
+    "Genere contenido IA para sus canales",
+    "Hasta 20 usuarios (según plan)",
+    "Hasta 3 usuarios (según plan)",
+    "Hasta 50 usuarios (según plan)",
+    "Historia del perfil",
+    "Home Negocio Intelligence",
+    "Integración web según plan",
+    "Integre feedback operativo",
+    "Mejor experiencia de uso",
+    "Menor carga de soporte operativo",
+    "Notificaciones en tiempo real",
+    "Optimice contenido con criterios SEO reales",
+    "Puesta en marcha guiada",
+    "Quiero lo mismo",
+    "Seguimiento de proyecto",
+    "Sobre la herramienta",
+    "Soporte por email",
+    "Suba varios archivos",
+    "Subida de archivos según plan",
+    "The Voice AI Platform for Negocio Casos de uso",
+    "Todo lo necesario para operar organizado",
+    "Todos los perfiles",
+    "Trabaje desde cualquier lugar",
+    "Transforma tu negocio con IA y marketing",
+    "Use datos de comportamiento e IA operativa",
+    "Vista de tareas y calendario",
+    "Volver al inicio",
+    "Web y landings para cualquier negocio",
+    "¿Puedo cambiar de plan más adelante?"
+  ],
+  "forbiddenHits": 0,
+  "dollarPrices": [],
+  "mailPhp": [],
+  "perFile": [
+    {
+      "file": "about.html",
+      "enCount": 5,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Mejor experiencia de uso",
+        "Sobre la herramienta"
+      ]
+    },
+    {
+      "file": "blog-details.html",
+      "enCount": 6,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "04. Mejor rendimiento: limite el crawl a secciones relevantes.",
+        "Mejor experiencia de uso",
+        "Sobre la herramienta"
+      ]
+    },
+    {
+      "file": "blog.html",
+      "enCount": 6,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Contexto largo en agentes IA",
+        "Mejor experiencia de uso",
+        "Sobre la herramienta"
+      ]
+    },
+    {
+      "file": "case-studies-2.html",
+      "enCount": 8,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Asistente comercial IA para retail online",
+        "Asistente comercial IA para retail",
+        "Mejor experiencia de uso",
+        "Sobre la herramienta"
+      ]
+    },
+    {
+      "file": "case-studies-details.html",
+      "enCount": 8,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Historia del perfil",
+        "Mejor experiencia de uso",
+        "Sobre la herramienta"
+      ]
+    },
+    {
+      "file": "case-studies.html",
+      "enCount": 14,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Asistente comercial IA para retail online",
+        "Quiero lo mismo",
+        "Asistente comercial IA para retail",
+        "Mejor experiencia de uso",
+        "Sobre la herramienta"
+      ]
+    },
+    {
+      "file": "cases.html",
+      "enCount": 6,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Casos de uso",
+        "Mejor experiencia de uso",
+        "Sobre la herramienta"
+      ]
+    },
+    {
+      "file": "contact.html",
+      "enCount": 5,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Mejor experiencia de uso",
+        "Sobre la herramienta"
+      ]
+    },
+    {
+      "file": "error.html",
+      "enCount": 6,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Volver al inicio",
+        "Mejor experiencia de uso",
+        "Sobre la herramienta"
+      ]
+    },
+    {
+      "file": "faq.html",
+      "enCount": 5,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Mejor experiencia de uso",
+        "Sobre la herramienta"
+      ]
+    },
+    {
+      "file": "features.html",
+      "enCount": 6,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Trabaje desde cualquier lugar",
+        "Mejor experiencia de uso",
+        "Sobre la herramienta"
+      ]
+    },
+    {
+      "file": "home-ai-agent-op.html",
+      "enCount": 8,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Crear agente IA",
+        "Menor carga de soporte operativo",
+        "Puesta en marcha guiada",
+        "The Voice AI Platform for Negocio Casos de uso"
+      ]
+    },
+    {
+      "file": "home-ai-agent.html",
+      "enCount": 9,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Crear agente IA",
+        "Menor carga de soporte operativo",
+        "Puesta en marcha guiada",
+        "The Voice AI Platform for Negocio Casos de uso"
+      ]
+    },
+    {
+      "file": "home-ai-chatbot-op.html",
+      "enCount": 21,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Todos los perfiles",
+        "Contexto base según plan",
+        "Integración web según plan",
+        "Suba varios archivos"
+      ]
+    },
+    {
+      "file": "home-ai-chatbot-tool-op.html",
+      "enCount": 22,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Configure su agente",
+        "Todos los perfiles",
+        "Contexto base según plan",
+        "Integración web según plan",
+        "Suba varios archivos"
+      ]
+    },
+    {
+      "file": "home-ai-chatbot-tool.html",
+      "enCount": 23,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Configure su agente",
+        "Todos los perfiles",
+        "Contexto base según plan",
+        "Integración web según plan",
+        "Suba varios archivos"
+      ]
+    },
+    {
+      "file": "home-ai-chatbot.html",
+      "enCount": 22,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Todos los perfiles",
+        "Contexto base según plan",
+        "Integración web según plan",
+        "Suba varios archivos"
+      ]
+    },
+    {
+      "file": "home-ai-startup-op.html",
+      "enCount": 13,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Transforma tu negocio con IA y marketing",
+        "Biblioteca de tareas IA según plan",
+        "Elija el plan",
+        "Mejor experiencia de uso",
+        "Sobre la herramienta"
+      ]
+    },
+    {
+      "file": "home-ai-startup.html",
+      "enCount": 14,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Transforma tu negocio con IA y marketing",
+        "Biblioteca de tareas IA según plan",
+        "Elija el plan",
+        "Mejor experiencia de uso",
+        "Sobre la herramienta"
+      ]
+    },
+    {
+      "file": "home-ai-writer-tool-op.html",
+      "enCount": 10,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Genere contenido IA para sus canales",
+        "Optimice contenido con criterios SEO reales",
+        "Escriba posts y piezas editoriales con",
+        "Hasta 20 usuarios (según plan)",
+        "Biblioteca de tareas IA según plan",
+        "Hasta 50 usuarios (según plan)"
+      ]
+    },
+    {
+      "file": "home-ai-writer-tool.html",
+      "enCount": 11,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Genere contenido IA para sus canales",
+        "Optimice contenido con criterios SEO reales",
+        "Escriba posts y piezas editoriales con",
+        "Hasta 20 usuarios (según plan)",
+        "Biblioteca de tareas IA según plan",
+        "Hasta 50 usuarios (según plan)"
+      ]
+    },
+    {
+      "file": "home-business-intelligence-op.html",
+      "enCount": 13,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Hasta 20 usuarios (según plan)",
+        "Elija el plan",
+        "Biblioteca de tareas IA según plan",
+        "Hasta 50 usuarios (según plan)"
+      ]
+    },
+    {
+      "file": "home-business-intelligence.html",
+      "enCount": 14,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Hasta 20 usuarios (según plan)",
+        "Elija el plan",
+        "Biblioteca de tareas IA según plan",
+        "Hasta 50 usuarios (según plan)"
+      ]
+    },
+    {
+      "file": "home-cloud-based-saas-op.html",
+      "enCount": 16,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Contexto base según plan",
+        "Integración web según plan",
+        "Suba varios archivos",
+        "Subida de archivos según plan",
+        "Contexto ampliado según plan"
+      ]
+    },
+    {
+      "file": "home-cloud-based-saas.html",
+      "enCount": 17,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Contexto base según plan",
+        "Integración web según plan",
+        "Suba varios archivos",
+        "Subida de archivos según plan",
+        "Contexto ampliado según plan"
+      ]
+    },
+    {
+      "file": "home-productivity-tools-op.html",
+      "enCount": 13,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Todo lo necesario para operar organizado",
+        "Conecte sus herramientas",
+        "Vista de tareas y calendario",
+        "Notificaciones en tiempo real",
+        "Elija el plan"
+      ]
+    },
+    {
+      "file": "home-productivity-tools.html",
+      "enCount": 14,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Todo lo necesario para operar organizado",
+        "Conecte sus herramientas",
+        "Vista de tareas y calendario",
+        "Notificaciones en tiempo real",
+        "Elija el plan"
+      ]
+    },
+    {
+      "file": "home-saas-product-showcase-op.html",
+      "enCount": 24,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Elija el plan adecuado para su negocio",
+        "Hasta 3 usuarios (según plan)",
+        "Integre feedback operativo",
+        "Comparta avances con stakeholders",
+        "¿Puedo cambiar de plan más adelante?",
+        "Mejor experiencia de uso",
+        "Sobre la herramienta"
+      ]
+    },
+    {
+      "file": "home-saas-product-showcase.html",
+      "enCount": 25,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Elija el plan adecuado para su negocio",
+        "Hasta 3 usuarios (según plan)",
+        "Integre feedback operativo",
+        "Comparta avances con stakeholders",
+        "¿Puedo cambiar de plan más adelante?",
+        "Mejor experiencia de uso",
+        "Sobre la herramienta"
+      ]
+    },
+    {
+      "file": "index.html",
+      "enCount": 14,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Transforma tu negocio con IA y marketing",
+        "Biblioteca de tareas IA según plan",
+        "Elija el plan",
+        "Mejor experiencia de uso",
+        "Sobre la herramienta"
+      ]
+    },
+    {
+      "file": "integrations.html",
+      "enCount": 7,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Use datos de comportamiento e IA operativa",
+        "Web y landings para cualquier negocio",
+        "Mejor experiencia de uso",
+        "Sobre la herramienta"
+      ]
+    },
+    {
+      "file": "pricing.html",
+      "enCount": 8,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Soporte por email",
+        "Canales y usuarios ampliados",
+        "Mejor experiencia de uso",
+        "Sobre la herramienta"
+      ]
+    },
+    {
+      "file": "team-details.html",
+      "enCount": 7,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Seguimiento de proyecto",
+        "Cumplimiento y gobierno",
+        "Mejor experiencia de uso",
+        "Sobre la herramienta"
+      ]
+    },
+    {
+      "file": "team.html",
+      "enCount": 5,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Mejor experiencia de uso",
+        "Sobre la herramienta"
+      ]
+    },
+    {
+      "file": "testimonial.html",
+      "enCount": 5,
+      "forbiddenCount": 0,
+      "sample": [
+        "Home Negocio Intelligence",
+        "Detalle de perfil",
+        "Mejor experiencia de uso",
+        "Sobre la herramienta"
+      ]
+    },
+    {
+      "file": "typography.html",
+      "enCount": 4,
+      "forbiddenCount": 0,
+      "sample": [
+        "Esto es un enlace",
+        "Mejor experiencia de uso",
+        "Sobre la herramienta"
+      ]
+    }
+  ]
+}

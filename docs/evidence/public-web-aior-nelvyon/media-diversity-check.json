@@ -1,0 +1,149 @@
+{
+  "inventoryTotal": 367,
+  "uniqueAssetsUsed": 367,
+  "coveragePct": 100,
+  "totalPathRewrites": 998,
+  "nelvyonRefsInSamples": 0,
+  "pageDiversity": {
+    "index.html": {
+      "total": 57,
+      "unique": 53,
+      "sample": [
+        "assets/img/logo.svg",
+        "assets/img/service/service_2_2.jpg",
+        "assets/img/service/service_2_3.jpg",
+        "assets/img/service/service_3_1.jpg",
+        "assets/img/pages/home-ai-startup.jpg",
+        "assets/img/pages/home-ai-chatbot.jpg",
+        "assets/img/pages/home-ai-image-generate.jpg",
+        "assets/img/pages/home-ai-writer-tool.jpg"
+      ]
+    },
+    "about.html": {
+      "total": 87,
+      "unique": 76,
+      "sample": [
+        "assets/img/logo.svg",
+        "assets/img/bg/process_bg_3.jpg",
+        "assets/img/bg/service_bg_1.jpg",
+        "assets/img/bg/service_bg_2.jpg",
+        "assets/img/pages/home-ai-startup.jpg",
+        "assets/img/pages/home-ai-chatbot.jpg",
+        "assets/img/pages/home-ai-image-generate.jpg",
+        "assets/img/pages/home-ai-writer-tool.jpg"
+      ]
+    },
+    "home-ai-agent.html": {
+      "total": 49,
+      "unique": 48,
+      "sample": [
+        "assets/img/logo.svg",
+        "assets/img/service/service_4_5.jpg",
+        "assets/img/service/ser_1_1.jpg",
+        "assets/img/service/ser_1_2.jpg",
+        "assets/img/logo-black.svg",
+        "assets/img/pages/home-ai-startup.jpg",
+        "assets/img/pages/home-ai-chatbot.jpg",
+        "assets/img/pages/home-ai-image-generate.jpg"
+      ]
+    },
+    "home-saas-product-showcase.html": {
+      "total": 55,
+      "unique": 53,
+      "sample": [
+        "assets/img/logo.svg",
+        "assets/img/gallery/gallery_2_3.jpg",
+        "assets/img/gallery/gallery_2_4.jpg",
+        "assets/img/gallery/gallery_2_5.jpg",
+        "assets/img/logo12.svg",
+        "assets/img/pages/home-ai-startup.jpg",
+        "assets/img/pages/home-ai-chatbot.jpg",
+        "assets/img/pages/home-ai-image-generate.jpg"
+      ]
+    },
+    "home-business-intelligence.html": {
+      "total": 55,
+      "unique": 51,
+      "sample": [
+        "assets/img/logo.svg",
+        "assets/img/blog/blog_3_1.jpg",
+        "assets/img/blog/blog_3_2.jpg",
+        "assets/img/blog/blog_3_3.jpg",
+        "assets/img/logo5.svg",
+        "assets/img/pages/home-ai-startup.jpg",
+        "assets/img/pages/home-ai-chatbot.jpg",
+        "assets/img/pages/home-ai-image-generate.jpg"
+      ]
+    },
+    "pricing.html": {
+      "total": 23,
+      "unique": 21,
+      "sample": [
+        "assets/img/logo.svg",
+        "assets/img/team/team_2_1.jpg",
+        "assets/img/team/team_2_2.jpg",
+        "assets/img/team/team_2_3.jpg",
+        "assets/img/pages/home-ai-startup.jpg",
+        "assets/img/pages/home-ai-chatbot.jpg",
+        "assets/img/pages/home-ai-image-generate.jpg",
+        "assets/img/pages/home-ai-writer-tool.jpg"
+      ]
+    },
+    "contact.html": {
+      "total": 22,
+      "unique": 20,
+      "sample": [
+        "assets/img/logo.svg",
+        "assets/img/normal/about-feature1.jpg",
+        "assets/img/normal/about-feature2.jpg",
+        "assets/img/normal/about-img1.jpg",
+        "assets/img/pages/home-ai-startup.jpg",
+        "assets/img/pages/home-ai-chatbot.jpg",
+        "assets/img/pages/home-ai-image-generate.jpg",
+        "assets/img/pages/home-ai-writer-tool.jpg"
+      ]
+    },
+    "integrations.html": {
+      "total": 21,
+      "unique": 19,
+      "sample": [
+        "assets/img/logo.svg",
+        "assets/img/normal/feature_1_1.jpg",
+        "assets/img/normal/feature_1_2.jpg",
+        "assets/img/normal/feature_bg_1.jpg",
+        "assets/img/pages/home-ai-startup.jpg",
+        "assets/img/pages/home-ai-chatbot.jpg",
+        "assets/img/pages/home-ai-image-generate.jpg",
+        "assets/img/pages/home-ai-writer-tool.jpg"
+      ]
+    },
+    "home-productivity-tools.html": {
+      "total": 49,
+      "unique": 48,
+      "sample": [
+        "assets/img/logo.svg",
+        "assets/img/blog/blog_inner_1.jpg",
+        "assets/img/blog/blog_inner_2.jpg",
+        "assets/img/blog/comment-author-1.jpg",
+        "assets/img/logo-black.svg",
+        "assets/img/pages/home-ai-startup.jpg",
+        "assets/img/pages/home-ai-chatbot.jpg",
+        "assets/img/pages/home-ai-image-generate.jpg"
+      ]
+    },
+    "home-ai-chatbot.html": {
+      "total": 60,
+      "unique": 59,
+      "sample": [
+        "assets/img/logo.svg",
+        "assets/img/pages/home-ai-startup.jpg",
+        "assets/img/pages/home-ai-chatbot.jpg",
+        "assets/img/pages/home-ai-image-generate.jpg",
+        "assets/img/pages/home-ai-writer-tool.jpg",
+        "assets/img/pages/home-business-intelligence.jpg",
+        "assets/img/pages/IA y agentes.jpg",
+        "assets/img/pages/home-productivity-tools.jpg"
+      ]
+    }
+  }
+}

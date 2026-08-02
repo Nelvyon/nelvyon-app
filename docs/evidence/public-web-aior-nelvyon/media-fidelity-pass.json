@@ -1,0 +1,1417 @@
+{
+  "policy": "fidelity-selective-v2",
+  "ffmpeg": true,
+  "framesAvailable": 5,
+  "rawFramesExtracted": 27,
+  "reviewed": 445,
+  "keptValid": 175,
+  "protected": 147,
+  "replaced": [
+    {
+      "rel": "bg/video_bg_1.png",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/analytics.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 402107,
+      "size": "1320x1008"
+    },
+    {
+      "rel": "bg/video_bg_2.png",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/billing.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 719678,
+      "size": "1920x1450"
+    },
+    {
+      "rel": "blog/author.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/campanias.webp",
+      "reason": "placeholder",
+      "bytesAfter": 82489,
+      "size": "107x106"
+    },
+    {
+      "rel": "blog/author2.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/crm.webp",
+      "reason": "placeholder",
+      "bytesAfter": 41708,
+      "size": "107x106"
+    },
+    {
+      "rel": "blog/blog-1-3.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/dashboard.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 47849,
+      "size": "536x320"
+    },
+    {
+      "rel": "blog/blog-grid-1.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/inbox.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 18700,
+      "size": "632x260"
+    },
+    {
+      "rel": "blog/blog-grid-6.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/lms.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 19430,
+      "size": "632x260"
+    },
+    {
+      "rel": "blog/blog-image.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/pipeline.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 34343,
+      "size": "387x734"
+    },
+    {
+      "rel": "blog/blog_1_1.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/settings.webp",
+      "reason": "placeholder",
+      "bytesAfter": 27253,
+      "size": "387x300"
+    },
+    {
+      "rel": "blog/blog_1_2.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/store.webp",
+      "reason": "placeholder",
+      "bytesAfter": 34148,
+      "size": "387x300"
+    },
+    {
+      "rel": "blog/blog_1_3.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/workflows.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 56959,
+      "size": "387x300"
+    },
+    {
+      "rel": "blog/blog_1_4.jpg",
+      "category": "agency",
+      "from": "scripts/data/aior-video-frames/clean/F-01-hero.jpg",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 78095,
+      "size": "387x300"
+    },
+    {
+      "rel": "blog/blog_3_2.jpg",
+      "category": "agency",
+      "from": "scripts/data/aior-video-frames/clean/F-02-hero.jpg",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 180505,
+      "size": "424x395"
+    },
+    {
+      "rel": "blog/blog_3_3.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/library/photos/F-01.jpg",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 80939,
+      "size": "424x395"
+    },
+    {
+      "rel": "blog/blog_inner_2.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/library/photos/F-01.webp",
+      "reason": "placeholder",
+      "bytesAfter": 77672,
+      "size": "312x230"
+    },
+    {
+      "rel": "blog/comment-author-1.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/library/photos/F-02.jpg",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 193456,
+      "size": "80x80"
+    },
+    {
+      "rel": "blog/comment-author-2.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/library/photos/F-02.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 185941,
+      "size": "80x80"
+    },
+    {
+      "rel": "blog/comment-author-3.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/agentes.webp",
+      "reason": "placeholder",
+      "bytesAfter": 104763,
+      "size": "80x80"
+    },
+    {
+      "rel": "blog/comment-author-4.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/ai.webp",
+      "reason": "placeholder",
+      "bytesAfter": 89029,
+      "size": "80x80"
+    },
+    {
+      "rel": "blog/recent-post-1-1.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/chat.webp",
+      "reason": "placeholder",
+      "bytesAfter": 58344,
+      "size": "85x85"
+    },
+    {
+      "rel": "blog/recent-post-1-2.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/analytics.webp",
+      "reason": "placeholder",
+      "bytesAfter": 62171,
+      "size": "85x85"
+    },
+    {
+      "rel": "blog/recent-post-1-3.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/billing.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 59273,
+      "size": "85x85"
+    },
+    {
+      "rel": "case-studies/case-s-1-1.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/campanias.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 71752,
+      "size": "1320x550"
+    },
+    {
+      "rel": "case-studies/case_study_1_3.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/crm.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 35014,
+      "size": "648x400"
+    },
+    {
+      "rel": "case-studies/case_study_1_4.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/dashboard.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 48614,
+      "size": "648x400"
+    },
+    {
+      "rel": "gallery/gallery_1_2.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/inbox.webp",
+      "reason": "placeholder",
+      "bytesAfter": 31511,
+      "size": "387x299"
+    },
+    {
+      "rel": "gallery/gallery_1_3.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/lms.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 24024,
+      "size": "661x299"
+    },
+    {
+      "rel": "gallery/gallery_1_4.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/pipeline.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 33137,
+      "size": "661x299"
+    },
+    {
+      "rel": "gallery/gallery_1_5.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/settings.webp",
+      "reason": "placeholder",
+      "bytesAfter": 27803,
+      "size": "387x299"
+    },
+    {
+      "rel": "gallery/gallery_2_3.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/store.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 34711,
+      "size": "536x390"
+    },
+    {
+      "rel": "gallery/gallery_2_4.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/workflows.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 70700,
+      "size": "536x554"
+    },
+    {
+      "rel": "hero/hero-img-1.jpg",
+      "category": "ia",
+      "from": "apps/web/public/brand/public/saas-shots/ai.webp",
+      "reason": "placeholder",
+      "bytesAfter": 79388,
+      "size": "379x362"
+    },
+    {
+      "rel": "hero/hero-img-2.jpg",
+      "category": "ia",
+      "from": "apps/web/public/brand/public/saas-shots/agentes.webp",
+      "reason": "placeholder",
+      "bytesAfter": 94814,
+      "size": "379x362"
+    },
+    {
+      "rel": "hero/hero-img.png",
+      "category": "ia",
+      "from": "scripts/data/aior-ceo-visuals/robot-features-orbit.png",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 597310,
+      "size": "776x709"
+    },
+    {
+      "rel": "hero/hero-img3.png",
+      "category": "ia",
+      "from": "apps/web/public/brand/public/saas-shots/analytics.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 157685,
+      "size": "1034x585"
+    },
+    {
+      "rel": "hero/hero-img5.png",
+      "category": "ia",
+      "from": "apps/web/public/brand/public/saas-shots/billing.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 105077,
+      "size": "480x814"
+    },
+    {
+      "rel": "normal/about-feature1.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/library/photos/F-02.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 169570,
+      "size": "280x253"
+    },
+    {
+      "rel": "normal/about-feature2.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/analytics.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 51461,
+      "size": "200x253"
+    },
+    {
+      "rel": "normal/about-img1.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/crm.webp",
+      "reason": "placeholder",
+      "bytesAfter": 43316,
+      "size": "142x148"
+    },
+    {
+      "rel": "normal/about-img2.png",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/dashboard.webp",
+      "reason": "placeholder",
+      "bytesAfter": 268474,
+      "size": "145x145"
+    },
+    {
+      "rel": "normal/about-img3.png",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/pipeline.webp",
+      "reason": "placeholder",
+      "bytesAfter": 236790,
+      "size": "145x144"
+    },
+    {
+      "rel": "normal/about_1_1.png",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/billing.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 193202,
+      "size": "502x531"
+    },
+    {
+      "rel": "normal/about_1_2.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/campanias.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 69108,
+      "size": "562x450"
+    },
+    {
+      "rel": "normal/about_4_1.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/crm.webp",
+      "reason": "placeholder",
+      "bytesAfter": 44303,
+      "size": "424x431"
+    },
+    {
+      "rel": "normal/case_1_1.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/dashboard.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 33166,
+      "size": "648x280"
+    },
+    {
+      "rel": "normal/case_1_2.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/inbox.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 19960,
+      "size": "648x280"
+    },
+    {
+      "rel": "normal/choose-img-1.jpg",
+      "category": "integra",
+      "from": "scripts/data/aior-video-frames/clean/integrations-float-clean.png",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 43970,
+      "size": "648x520"
+    },
+    {
+      "rel": "normal/counter_bg_1.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/pipeline.webp",
+      "reason": "placeholder",
+      "bytesAfter": 38599,
+      "size": "300x176"
+    },
+    {
+      "rel": "normal/counter_bg_2.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/settings.webp",
+      "reason": "placeholder",
+      "bytesAfter": 24027,
+      "size": "300x176"
+    },
+    {
+      "rel": "normal/counter_bg_3.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/store.webp",
+      "reason": "placeholder",
+      "bytesAfter": 28723,
+      "size": "300x176"
+    },
+    {
+      "rel": "normal/cta-card1.png",
+      "category": "product",
+      "from": "apps/web/public/brand/public/library/photos/F-02.webp",
+      "reason": "placeholder",
+      "bytesAfter": 1475255,
+      "size": "318x280"
+    },
+    {
+      "rel": "normal/cta-card2.png",
+      "category": "product",
+      "from": "apps/web/public/brand/public/saas-shots/analytics.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 197089,
+      "size": "318x280"
+    },
+    {
+      "rel": "normal/cta-card3.png",
+      "category": "product",
+      "from": "apps/web/public/brand/public/saas-shots/billing.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 116633,
+      "size": "318x507"
+    },
+    {
+      "rel": "normal/cta-image3.png",
+      "category": "product",
+      "from": "apps/web/public/brand/public/saas-shots/campanias.webp",
+      "reason": "placeholder",
+      "bytesAfter": 253560,
+      "size": "345x400"
+    },
+    {
+      "rel": "normal/cta-image4.png",
+      "category": "product",
+      "from": "apps/web/public/brand/public/saas-shots/crm.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 145144,
+      "size": "646x446"
+    },
+    {
+      "rel": "normal/cta-img-1.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/library/photos/F-02.jpg",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 190876,
+      "size": "250x254"
+    },
+    {
+      "rel": "normal/cta-img-2.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/library/photos/F-02.webp",
+      "reason": "placeholder",
+      "bytesAfter": 183031,
+      "size": "258x253"
+    },
+    {
+      "rel": "normal/cta-img-3.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/agentes.webp",
+      "reason": "placeholder",
+      "bytesAfter": 102645,
+      "size": "250x255"
+    },
+    {
+      "rel": "normal/cta-img-4.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/ai.webp",
+      "reason": "placeholder",
+      "bytesAfter": 86354,
+      "size": "250x255"
+    },
+    {
+      "rel": "normal/cta-img-5.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/chat.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 57950,
+      "size": "252x255"
+    },
+    {
+      "rel": "normal/cta-img-6.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/analytics.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 60245,
+      "size": "247x253"
+    },
+    {
+      "rel": "normal/cta-img-7.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/billing.webp",
+      "reason": "placeholder",
+      "bytesAfter": 58250,
+      "size": "250x255"
+    },
+    {
+      "rel": "normal/feature-item2.png",
+      "category": "product",
+      "from": "scripts/data/aior-video-frames/clean/F-01-hero.jpg",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 1004746,
+      "size": "648x450"
+    },
+    {
+      "rel": "normal/feature_1_1.png",
+      "category": "product",
+      "from": "scripts/data/aior-video-frames/clean/F-02-hero.jpg",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 1549945,
+      "size": "436x336"
+    },
+    {
+      "rel": "normal/feature_1_2.jpg",
+      "category": "product",
+      "from": "apps/web/public/brand/public/library/photos/F-01.jpg",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 80734,
+      "size": "387x350"
+    },
+    {
+      "rel": "normal/feature_1_2.png",
+      "category": "product",
+      "from": "apps/web/public/brand/public/library/photos/F-01.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 883702,
+      "size": "436x336"
+    },
+    {
+      "rel": "normal/feature_1_3.png",
+      "category": "product",
+      "from": "apps/web/public/brand/public/library/photos/F-02.jpg",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 1502383,
+      "size": "436x336"
+    },
+    {
+      "rel": "normal/feature_2_1.png",
+      "category": "product",
+      "from": "apps/web/public/brand/public/library/photos/F-02.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 1607256,
+      "size": "510x505"
+    },
+    {
+      "rel": "normal/history_1_3.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/settings.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 26847,
+      "size": "630x412"
+    },
+    {
+      "rel": "normal/history_1_4.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/store.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 30932,
+      "size": "630x412"
+    },
+    {
+      "rel": "normal/review.png",
+      "category": "product",
+      "from": "apps/web/public/brand/public/saas-shots/campanias.webp",
+      "reason": "placeholder",
+      "bytesAfter": 44637,
+      "size": "396x64"
+    },
+    {
+      "rel": "normal/social-img2.png",
+      "category": "integra",
+      "from": "apps/web/public/brand/public/saas-shots/pipeline.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 41467,
+      "size": "888x88"
+    },
+    {
+      "rel": "normal/social-img4.png",
+      "category": "integra",
+      "from": "apps/web/public/brand/public/saas-shots/settings.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 12609,
+      "size": "681x66"
+    },
+    {
+      "rel": "normal/video-img.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/ai.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 76367,
+      "size": "274x250"
+    },
+    {
+      "rel": "normal/video-img2.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/agentes.webp",
+      "reason": "placeholder",
+      "bytesAfter": 89437,
+      "size": "275x250"
+    },
+    {
+      "rel": "pages/home-ai-agent.jpg",
+      "category": "ia",
+      "from": "apps/web/public/brand/public/saas-shots/agentes.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 88625,
+      "size": "549x490"
+    },
+    {
+      "rel": "pages/home-ai-image-generate.jpg",
+      "category": "product",
+      "from": "apps/web/public/brand/public/saas-shots/settings.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 27590,
+      "size": "556x490"
+    },
+    {
+      "rel": "pages/home-ai-startup.jpg",
+      "category": "product",
+      "from": "apps/web/public/brand/public/saas-shots/store.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 31714,
+      "size": "556x499"
+    },
+    {
+      "rel": "pages/home-finance-crypto-service.jpg",
+      "category": "product",
+      "from": "apps/web/public/brand/public/saas-shots/workflows.webp",
+      "reason": "crypto-name",
+      "bytesAfter": 62100,
+      "size": "556x490"
+    },
+    {
+      "rel": "service/ser-img1.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/chat.webp",
+      "reason": "placeholder",
+      "bytesAfter": 58344,
+      "size": "200x200"
+    },
+    {
+      "rel": "service/ser-img2.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/analytics.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 62171,
+      "size": "200x200"
+    },
+    {
+      "rel": "service/ser-img3.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/billing.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 59273,
+      "size": "200x200"
+    },
+    {
+      "rel": "service/ser-img4.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/campanias.webp",
+      "reason": "placeholder",
+      "bytesAfter": 84311,
+      "size": "200x200"
+    },
+    {
+      "rel": "service/service_1_1.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/crm.webp",
+      "reason": "placeholder",
+      "bytesAfter": 32555,
+      "size": "264x404"
+    },
+    {
+      "rel": "service/service_1_2.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/dashboard.webp",
+      "reason": "placeholder",
+      "bytesAfter": 58494,
+      "size": "264x404"
+    },
+    {
+      "rel": "service/service_1_3.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/inbox.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 26001,
+      "size": "264x404"
+    },
+    {
+      "rel": "service/service_2_1.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/lms.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 35462,
+      "size": "476x328"
+    },
+    {
+      "rel": "service/service_3_1.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/pipeline.webp",
+      "reason": "placeholder",
+      "bytesAfter": 41369,
+      "size": "265x404"
+    },
+    {
+      "rel": "service/service_3_2.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/settings.webp",
+      "reason": "placeholder",
+      "bytesAfter": 20913,
+      "size": "265x404"
+    },
+    {
+      "rel": "service/service_3_3.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/store.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 23617,
+      "size": "265x404"
+    },
+    {
+      "rel": "service/service_4_1.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/workflows.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 68208,
+      "size": "424x500"
+    },
+    {
+      "rel": "service/ser_1_1.jpg",
+      "category": "agency",
+      "from": "scripts/data/aior-video-frames/clean/F-01-hero.jpg",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 78492,
+      "size": "569x446"
+    },
+    {
+      "rel": "service/ser_1_2.jpg",
+      "category": "agency",
+      "from": "scripts/data/aior-video-frames/clean/F-02-hero.jpg",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 153812,
+      "size": "569x446"
+    },
+    {
+      "rel": "team/team_1_1.png",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/library/photos/F-01.jpg",
+      "reason": "placeholder",
+      "bytesAfter": 958076,
+      "size": "408x284"
+    },
+    {
+      "rel": "team/team_1_2.png",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/library/photos/F-01.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 861511,
+      "size": "408x284"
+    },
+    {
+      "rel": "team/team_1_3.png",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/library/photos/F-02.jpg",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 1391740,
+      "size": "408x284"
+    },
+    {
+      "rel": "team/team_1_4.png",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/library/photos/F-02.webp",
+      "reason": "placeholder",
+      "bytesAfter": 1243294,
+      "size": "408x284"
+    },
+    {
+      "rel": "team/team_1_5.png",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/agentes.webp",
+      "reason": "placeholder",
+      "bytesAfter": 293814,
+      "size": "408x284"
+    },
+    {
+      "rel": "team/team_1_6.png",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/ai.webp",
+      "reason": "placeholder",
+      "bytesAfter": 260129,
+      "size": "408x284"
+    },
+    {
+      "rel": "team/team_2_2.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/chat.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 43205,
+      "size": "424x320"
+    },
+    {
+      "rel": "team/team_2_3.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/analytics.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 54086,
+      "size": "424x320"
+    },
+    {
+      "rel": "testimonial/testi-shape.png",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/billing.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 181160,
+      "size": "524x435"
+    },
+    {
+      "rel": "testimonial/testi-shape2.png",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/campanias.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 176225,
+      "size": "558x337"
+    },
+    {
+      "rel": "testimonial/testi_1_1.png",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/crm.webp",
+      "reason": "placeholder",
+      "bytesAfter": 158698,
+      "size": "82x82"
+    },
+    {
+      "rel": "testimonial/testi_1_2.png",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/dashboard.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 268474,
+      "size": "82x82"
+    },
+    {
+      "rel": "testimonial/testi_1_3.png",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/inbox.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 130725,
+      "size": "82x82"
+    },
+    {
+      "rel": "testimonial/testi_2_1.png",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/lms.webp",
+      "reason": "placeholder",
+      "bytesAfter": 143289,
+      "size": "70x70"
+    },
+    {
+      "rel": "testimonial/testi_2_2.png",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/pipeline.webp",
+      "reason": "placeholder",
+      "bytesAfter": 218540,
+      "size": "70x70"
+    },
+    {
+      "rel": "testimonial/testi_2_3.png",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/settings.webp",
+      "reason": "placeholder",
+      "bytesAfter": 102000,
+      "size": "70x70"
+    },
+    {
+      "rel": "testimonial/testi_3_1.png",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/store.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 127016,
+      "size": "82x82"
+    },
+    {
+      "rel": "testimonial/testi_3_2.jpg",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/workflows.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 70616,
+      "size": "536x549"
+    },
+    {
+      "rel": "testimonial/testi_3_2.png",
+      "category": "agency",
+      "from": "scripts/data/aior-video-frames/clean/F-01-hero.jpg",
+      "reason": "placeholder",
+      "bytesAfter": 1140457,
+      "size": "82x82"
+    },
+    {
+      "rel": "testimonial/testi_4_1.png",
+      "category": "agency",
+      "from": "scripts/data/aior-video-frames/clean/F-02-hero.jpg",
+      "reason": "placeholder",
+      "bytesAfter": 2012243,
+      "size": "64x64"
+    },
+    {
+      "rel": "testimonial/testi_4_2.png",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/library/photos/F-01.jpg",
+      "reason": "placeholder",
+      "bytesAfter": 1056030,
+      "size": "64x64"
+    },
+    {
+      "rel": "testimonial/testi_4_3.png",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/library/photos/F-01.webp",
+      "reason": "placeholder",
+      "bytesAfter": 850616,
+      "size": "64x64"
+    },
+    {
+      "rel": "testimonial/testi_4_4.png",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/library/photos/F-02.jpg",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 1925694,
+      "size": "64x64"
+    },
+    {
+      "rel": "testimonial/testi_6_1.png",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/library/photos/F-02.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 1610454,
+      "size": "70x70"
+    },
+    {
+      "rel": "testimonial/testi_6_2.png",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/agentes.webp",
+      "reason": "placeholder",
+      "bytesAfter": 390642,
+      "size": "70x70"
+    },
+    {
+      "rel": "testimonial/testi_6_3.png",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/ai.webp",
+      "reason": "placeholder",
+      "bytesAfter": 366754,
+      "size": "70x70"
+    },
+    {
+      "rel": "testimonial/testi_7_1.png",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/chat.webp",
+      "reason": "placeholder",
+      "bytesAfter": 202564,
+      "size": "72x72"
+    },
+    {
+      "rel": "testimonial/testi_7_2.png",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/analytics.webp",
+      "reason": "placeholder",
+      "bytesAfter": 204918,
+      "size": "72x72"
+    },
+    {
+      "rel": "testimonial/testi_7_3.png",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/billing.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 197211,
+      "size": "72x72"
+    },
+    {
+      "rel": "testimonial/testi_7_4.png",
+      "category": "agency",
+      "from": "apps/web/public/brand/public/saas-shots/campanias.webp",
+      "reason": "prior-en-ceo-source",
+      "bytesAfter": 279608,
+      "size": "72x72"
+    }
+  ],
+  "imperfectPagesHint": [
+    {
+      "page": "about.html",
+      "residualTinySlots": [
+        "gallery/gallery_2_1.jpg",
+        "gallery/gallery_2_2.jpg",
+        "gallery/gallery_2_6.jpg",
+        "normal/history_1_2.jpg",
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg",
+        "testimonial/single-image-1.jpg",
+        "testimonial/single-image-2.jpg"
+      ],
+      "count": 8
+    },
+    {
+      "page": "blog-details.html",
+      "residualTinySlots": [
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg"
+      ],
+      "count": 2
+    },
+    {
+      "page": "blog.html",
+      "residualTinySlots": [
+        "blog/blog-grid-1.jpg",
+        "blog/blog-grid-2.jpg",
+        "blog/blog-grid-3.jpg",
+        "blog/blog-grid-4.jpg",
+        "blog/blog-grid-5.jpg",
+        "blog/blog-grid-6.jpg",
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg"
+      ],
+      "count": 8
+    },
+    {
+      "page": "case-studies-2.html",
+      "residualTinySlots": [
+        "case-studies/case_study_1_2.jpg",
+        "case-studies/case_study_1_6.jpg",
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg"
+      ],
+      "count": 4
+    },
+    {
+      "page": "case-studies-details.html",
+      "residualTinySlots": [
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg"
+      ],
+      "count": 2
+    },
+    {
+      "page": "case-studies.html",
+      "residualTinySlots": [
+        "case-studies/case_study_1_2.jpg",
+        "case-studies/case_study_1_6.jpg",
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg"
+      ],
+      "count": 4
+    },
+    {
+      "page": "cases.html",
+      "residualTinySlots": [
+        "normal/case_1_2.jpg",
+        "normal/case_1_3.jpg",
+        "normal/case_1_4.jpg",
+        "normal/case_1_5.jpg",
+        "normal/case_1_6.jpg",
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg"
+      ],
+      "count": 7
+    },
+    {
+      "page": "contact.html",
+      "residualTinySlots": [
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg"
+      ],
+      "count": 2
+    },
+    {
+      "page": "error.html",
+      "residualTinySlots": [
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg"
+      ],
+      "count": 2
+    },
+    {
+      "page": "faq.html",
+      "residualTinySlots": [
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg"
+      ],
+      "count": 2
+    },
+    {
+      "page": "features.html",
+      "residualTinySlots": [
+        "blog/blog_2_1.jpg",
+        "blog/blog_2_2.jpg",
+        "blog/blog_2_3.jpg",
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg",
+        "service/ser_1_4.jpg"
+      ],
+      "count": 6
+    },
+    {
+      "page": "home-ai-agent-op.html",
+      "residualTinySlots": [
+        "blog/blog-1-1.jpg",
+        "blog/blog-1-2.jpg",
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg",
+        "project/project_3_1.jpg",
+        "service/service-image.jpg"
+      ],
+      "count": 6
+    },
+    {
+      "page": "home-ai-agent.html",
+      "residualTinySlots": [
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg",
+        "project/project_3_1.jpg",
+        "service/service-image.jpg"
+      ],
+      "count": 4
+    },
+    {
+      "page": "home-ai-chatbot-op.html",
+      "residualTinySlots": [
+        "blog/blog_2_1.jpg",
+        "blog/blog_2_2.jpg",
+        "blog/blog_2_3.jpg",
+        "normal/about_1_1.jpg",
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg"
+      ],
+      "count": 6
+    },
+    {
+      "page": "home-ai-chatbot-tool-op.html",
+      "residualTinySlots": [
+        "blog/blog_2_1.jpg",
+        "blog/blog_2_2.jpg",
+        "blog/blog_2_3.jpg",
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg",
+        "service/service_3_2.jpg",
+        "service/service_3_3.jpg"
+      ],
+      "count": 7
+    },
+    {
+      "page": "home-ai-chatbot-tool.html",
+      "residualTinySlots": [
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg",
+        "service/service_3_2.jpg",
+        "service/service_3_3.jpg"
+      ],
+      "count": 4
+    },
+    {
+      "page": "home-ai-chatbot.html",
+      "residualTinySlots": [
+        "blog/blog_2_1.jpg",
+        "blog/blog_2_2.jpg",
+        "blog/blog_2_3.jpg",
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg"
+      ],
+      "count": 5
+    },
+    {
+      "page": "home-ai-startup-op.html",
+      "residualTinySlots": [
+        "normal/about_1_1.jpg",
+        "normal/counter_bg_2.jpg",
+        "normal/social-img3.png",
+        "normal/social-img4.png",
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg",
+        "process/process_1_1.jpg",
+        "process/process_1_2.jpg",
+        "process/process_1_3.jpg",
+        "process/process_1_4.jpg",
+        "project/project_1_3.jpg"
+      ],
+      "count": 11
+    },
+    {
+      "page": "home-ai-startup.html",
+      "residualTinySlots": [
+        "normal/about_1_1.jpg",
+        "normal/counter_bg_2.jpg",
+        "normal/social-img3.png",
+        "normal/social-img4.png",
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg",
+        "process/process_1_1.jpg",
+        "process/process_1_2.jpg",
+        "process/process_1_3.jpg",
+        "process/process_1_4.jpg",
+        "project/project_1_3.jpg"
+      ],
+      "count": 11
+    },
+    {
+      "page": "home-ai-writer-tool-op.html",
+      "residualTinySlots": [
+        "normal/about_1_1.jpg",
+        "normal/feature-image1.jpg",
+        "normal/feature-image3.jpg",
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg",
+        "project/project_1_3.jpg"
+      ],
+      "count": 6
+    },
+    {
+      "page": "home-ai-writer-tool.html",
+      "residualTinySlots": [
+        "normal/feature-image1.jpg",
+        "normal/feature-image3.jpg",
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg"
+      ],
+      "count": 4
+    },
+    {
+      "page": "home-business-intelligence-op.html",
+      "residualTinySlots": [
+        "blog/blog-1-1.jpg",
+        "blog/blog-1-2.jpg",
+        "normal/about_3_1.jpg",
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg",
+        "team/team_2_1.jpg"
+      ],
+      "count": 6
+    },
+    {
+      "page": "home-business-intelligence.html",
+      "residualTinySlots": [
+        "blog/blog-1-1.jpg",
+        "blog/blog-1-2.jpg",
+        "normal/about_3_1.jpg",
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg",
+        "team/team_2_1.jpg"
+      ],
+      "count": 6
+    },
+    {
+      "page": "home-cloud-based-saas-op.html",
+      "residualTinySlots": [
+        "normal/about_1_1.jpg",
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg",
+        "project/project_1_3.jpg"
+      ],
+      "count": 4
+    },
+    {
+      "page": "home-cloud-based-saas.html",
+      "residualTinySlots": [
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg"
+      ],
+      "count": 2
+    },
+    {
+      "page": "home-productivity-tools-op.html",
+      "residualTinySlots": [
+        "normal/about_1_1.jpg",
+        "normal/choose-img-2.jpg",
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg",
+        "project/project_1_3.jpg"
+      ],
+      "count": 5
+    },
+    {
+      "page": "home-productivity-tools.html",
+      "residualTinySlots": [
+        "normal/choose-img-2.jpg",
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg"
+      ],
+      "count": 3
+    },
+    {
+      "page": "home-saas-product-showcase-op.html",
+      "residualTinySlots": [
+        "blog/blog_4_2.jpg",
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg"
+      ],
+      "count": 3
+    },
+    {
+      "page": "home-saas-product-showcase.html",
+      "residualTinySlots": [
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg"
+      ],
+      "count": 2
+    },
+    {
+      "page": "index.html",
+      "residualTinySlots": [
+        "normal/about_1_1.jpg",
+        "normal/counter_bg_2.jpg",
+        "normal/social-img3.png",
+        "normal/social-img4.png",
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg",
+        "process/process_1_1.jpg",
+        "process/process_1_2.jpg",
+        "process/process_1_3.jpg",
+        "process/process_1_4.jpg",
+        "project/project_1_3.jpg"
+      ],
+      "count": 11
+    },
+    {
+      "page": "integrations.html",
+      "residualTinySlots": [
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg"
+      ],
+      "count": 2
+    },
+    {
+      "page": "pricing.html",
+      "residualTinySlots": [
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg"
+      ],
+      "count": 2
+    },
+    {
+      "page": "team-details.html",
+      "residualTinySlots": [
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg",
+        "team/team_inner_2.jpg"
+      ],
+      "count": 3
+    },
+    {
+      "page": "team.html",
+      "residualTinySlots": [
+        "gallery/gallery_2_1.jpg",
+        "gallery/gallery_2_2.jpg",
+        "gallery/gallery_2_6.jpg",
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg"
+      ],
+      "count": 5
+    },
+    {
+      "page": "testimonial.html",
+      "residualTinySlots": [
+        "pages/home-business-intelligence.jpg",
+        "pages/home-productivity-tools.jpg",
+        "testimonial/single-image-1.jpg",
+        "testimonial/single-image-2.jpg"
+      ],
+      "count": 4
+    }
+  ],
+  "comparatives": [
+    {
+      "slot": "blog/blog_1_1.jpg",
+      "before": "docs/evidence/public-web-aior-nelvyon/fidelity-before-after/before__blog__blog_1_1.jpg",
+      "after": "docs/evidence/public-web-aior-nelvyon/fidelity-before-after/after__blog__blog_1_1.jpg",
+      "from": "apps/web/public/brand/public/saas-shots/settings.webp",
+      "reason": "placeholder"
+    },
+    {
+      "slot": "normal/about-img1.jpg",
+      "before": "docs/evidence/public-web-aior-nelvyon/fidelity-before-after/before__normal__about-img1.jpg",
+      "after": "docs/evidence/public-web-aior-nelvyon/fidelity-before-after/after__normal__about-img1.jpg",
+      "from": "apps/web/public/brand/public/saas-shots/crm.webp",
+      "reason": "placeholder"
+    },
+    {
+      "slot": "pages/home-ai-agent.jpg",
+      "before": "docs/evidence/public-web-aior-nelvyon/fidelity-before-after/before__pages__home-ai-agent.jpg",
+      "after": "docs/evidence/public-web-aior-nelvyon/fidelity-before-after/after__pages__home-ai-agent.jpg",
+      "from": "apps/web/public/brand/public/saas-shots/agentes.webp",
+      "reason": "prior-en-ceo-source"
+    },
+    {
+      "slot": "service/service_1_1.jpg",
+      "before": "docs/evidence/public-web-aior-nelvyon/fidelity-before-after/before__service__service_1_1.jpg",
+      "after": "docs/evidence/public-web-aior-nelvyon/fidelity-before-after/after__service__service_1_1.jpg",
+      "from": "apps/web/public/brand/public/saas-shots/crm.webp",
+      "reason": "placeholder"
+    }
+  ],
+  "residualCryptoMediaRefs": [],
+  "summary": {
+    "slotsReviewed": 445,
+    "protectedSkipped": 147,
+    "keptValidOriginalOrGood": 175,
+    "replacedThisPass": 123,
+    "imperfectPages": 35,
+    "framesUsed": 5,
+    "rawFramesExtracted": 27,
+    "ffmpeg": true
+  }
+}

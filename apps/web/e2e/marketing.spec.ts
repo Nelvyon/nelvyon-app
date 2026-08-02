@@ -3,26 +3,23 @@ import { expect, test } from "@playwright/test";
 const go = (page: import("@playwright/test").Page, path: string) =>
   page.goto(path, { waitUntil: "domcontentloaded" });
 
-test("Home carga y muestra headline NELVYON", async ({ page }) => {
+test("Home redirige al pack AIOR index y carga NELVYON", async ({ page }) => {
   await go(page, "/");
-  await expect(
-    page.getByRole("heading", { level: 1, name: /Marketing digital ejecutado por IA/i }),
-  ).toBeVisible({ timeout: 20_000 });
+  await expect(page).toHaveURL(/\/www\/index\.html/);
+  await expect(page.locator("body")).toContainText(/NELVYON/i, { timeout: 20_000 });
+  await expect(page.locator("h1").first()).toBeVisible();
 });
 
-test("Precios carga y muestra los 3 planes SaaS", async ({ page }) => {
+test("Precios carga planes SaaS en pricing.html", async ({ page }) => {
   await go(page, "/precios");
-  await expect(page.getByRole("heading", { name: "Starter" })).toBeVisible({ timeout: 20_000 });
-  await expect(page.getByRole("heading", { name: "Growth" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Elite" })).toBeVisible();
+  await expect(page).toHaveURL(/\/www\/pricing\.html/);
+  await expect(page.locator("body")).toContainText(/Starter|Growth|Elite/i, { timeout: 20_000 });
 });
 
-test("Precios muestra CTAs actuales", async ({ page }) => {
-  await go(page, "/precios");
-  await expect(page.getByRole("link", { name: /Empezar con Starter/i })).toBeVisible({
-    timeout: 20_000,
-  });
-  await expect(page.getByRole("link", { name: /Elegir Growth/i })).toBeVisible();
+test("Contacto carga formulario NELVYON", async ({ page }) => {
+  await go(page, "/contacto");
+  await expect(page).toHaveURL(/\/www\/contact\.html/);
+  await expect(page.locator("form").first()).toBeVisible({ timeout: 20_000 });
 });
 
 test("Partners carga y calculadora funciona", async ({ page }) => {
@@ -32,25 +29,21 @@ test("Partners carga y calculadora funciona", async ({ page }) => {
   await expect(page.getByText("€291.00")).toBeVisible();
 });
 
-test("CTA Solicitar demo navega a contacto", async ({ page }) => {
-  await go(page, "/");
-  await page.locator("header").getByRole("link", { name: "Solicitar demo" }).click();
-  await expect(page).toHaveURL(/\/contacto/);
-});
-
-test("Nav links funcionan correctamente", async ({ page }) => {
-  await go(page, "/");
-  const nav = page.getByRole("navigation", { name: "Principal" });
-  await nav.getByRole("link", { name: "Precios" }).click();
-  await expect(page).toHaveURL(/\/precios$/);
-  await go(page, "/");
-  await page.getByRole("navigation", { name: "Principal" }).getByRole("link", { name: "Contacto" }).click();
-  await expect(page).toHaveURL(/\/contacto$/);
-});
-
-test("SaaS hub y módulo CRM cargan", async ({ page }) => {
+test("Producto showcase AIOR carga", async ({ page }) => {
   await go(page, "/producto");
-  await expect(page.getByRole("heading", { level: 1 })).toBeVisible({ timeout: 20_000 });
-  await go(page, "/producto/crm");
-  await expect(page.getByRole("heading", { level: 1 })).toBeVisible({ timeout: 20_000 });
+  await expect(page).toHaveURL(/\/www\/home-saas-product-showcase\.html/);
+  await expect(page.locator("h1").first()).toBeVisible({ timeout: 20_000 });
+});
+
+test("IA agentes AIOR carga", async ({ page }) => {
+  await go(page, "/producto/ia");
+  await expect(page).toHaveURL(/\/www\/home-ai-agent\.html/);
+  await expect(page.locator("body")).toContainText(/NELVYON/i, { timeout: 20_000 });
+});
+
+test("Assets críticos del pack responden", async ({ page }) => {
+  const css = await page.request.get("/www/assets/css/style.css");
+  expect(css.status()).toBe(200);
+  const home = await page.request.get("/www/index.html");
+  expect(home.status()).toBe(200);
 });

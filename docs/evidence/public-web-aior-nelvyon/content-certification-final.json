@@ -1,0 +1,302 @@
+{
+  "reviewedPages": 36,
+  "present": 36,
+  "missing": [],
+  "uniqueEnglishRemaining": 0,
+  "uniqueEnglish": [],
+  "forbiddenFiles": [],
+  "dollarSpansLeft": 0,
+  "pagesWithNoindex": 36,
+  "pagesWithTempCanonical": 36,
+  "perPage": [
+    {
+      "file": "index.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "home-ai-startup.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "home-ai-startup-op.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "home-ai-chatbot.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "home-ai-chatbot-op.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "home-ai-writer-tool.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "home-ai-writer-tool-op.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "home-business-intelligence.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "home-business-intelligence-op.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "home-ai-agent.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "home-ai-agent-op.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "home-productivity-tools.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "home-productivity-tools-op.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "home-ai-chatbot-tool.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "home-ai-chatbot-tool-op.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "home-cloud-based-saas.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "home-cloud-based-saas-op.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "home-saas-product-showcase.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "home-saas-product-showcase-op.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "about.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "blog.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "blog-details.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "cases.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "case-studies.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "case-studies-2.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "case-studies-details.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "contact.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "error.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "faq.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "features.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "integrations.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "pricing.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "team.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "team-details.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "testimonial.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    },
+    {
+      "file": "typography.html",
+      "status": "OK",
+      "enCount": 0,
+      "noindex": true,
+      "canonicalWww": true,
+      "sampleEn": []
+    }
+  ],
+  "ok": true
+}

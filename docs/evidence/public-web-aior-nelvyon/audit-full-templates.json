@@ -1,0 +1,301 @@
+{
+  "ok": true,
+  "requiredHomes": 19,
+  "requiredInner": 17,
+  "presentHomes": 19,
+  "presentInner": 17,
+  "missing": [],
+  "unexpectedExcluded": [],
+  "pages": [
+    {
+      "file": "index.html",
+      "bytes": 101589,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "home-ai-startup.html",
+      "bytes": 101561,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "home-ai-startup-op.html",
+      "bytes": 103453,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "home-ai-chatbot.html",
+      "bytes": 84314,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "home-ai-chatbot-op.html",
+      "bytes": 89097,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "home-ai-writer-tool.html",
+      "bytes": 92997,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "home-ai-writer-tool-op.html",
+      "bytes": 109359,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "home-business-intelligence.html",
+      "bytes": 87087,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "home-business-intelligence-op.html",
+      "bytes": 89005,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "home-ai-agent.html",
+      "bytes": 101245,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "home-ai-agent-op.html",
+      "bytes": 110486,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "home-productivity-tools.html",
+      "bytes": 80172,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "home-productivity-tools-op.html",
+      "bytes": 89612,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "home-ai-chatbot-tool.html",
+      "bytes": 78520,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "home-ai-chatbot-tool-op.html",
+      "bytes": 88601,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "home-cloud-based-saas.html",
+      "bytes": 81181,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "home-cloud-based-saas-op.html",
+      "bytes": 98755,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "home-saas-product-showcase.html",
+      "bytes": 86048,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "home-saas-product-showcase-op.html",
+      "bytes": 97796,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "about.html",
+      "bytes": 85299,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "blog.html",
+      "bytes": 49195,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "blog-details.html",
+      "bytes": 59677,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "cases.html",
+      "bytes": 60457,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "case-studies.html",
+      "bytes": 51755,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "case-studies-2.html",
+      "bytes": 51198,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "case-studies-details.html",
+      "bytes": 49231,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "contact.html",
+      "bytes": 50015,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "error.html",
+      "bytes": 43035,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "faq.html",
+      "bytes": 53449,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "features.html",
+      "bytes": 66955,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "integrations.html",
+      "bytes": 52934,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "pricing.html",
+      "bytes": 53674,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "team.html",
+      "bytes": 53685,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "team-details.html",
+      "bytes": 53656,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "testimonial.html",
+      "bytes": 59311,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "typography.html",
+      "bytes": 22865,
+      "forbidden": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    }
+  ],
+  "forbidden": [],
+  "missingSeo": []
+}

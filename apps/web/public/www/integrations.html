@@ -1,0 +1,917 @@
+<!doctype html>
+<html class="no-js" lang="es">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>Integraciones | NELVYON</title>
+    <meta name="description" content="Integraciones Stripe, SES, Twilio, Meta, Google y webhooks.">
+    <meta name="nv:template-role" content="interna">
+    <link rel="canonical" href="https://nelvyon.com/www/integrations.html">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="es_ES">
+    <meta property="og:site_name" content="NELVYON">
+    <meta property="og:title" content="Integraciones | NELVYON">
+    <meta property="og:description" content="Integraciones Stripe, SES, Twilio, Meta, Google y webhooks.">
+    <meta property="og:url" content="https://nelvyon.com/www/integrations.html">
+    <meta property="og:image" content="https://nelvyon.com/opengraph-image">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Integraciones | NELVYON">
+    <meta name="twitter:description" content="Integraciones Stripe, SES, Twilio, Meta, Google y webhooks.">
+    <meta name="twitter:image" content="https://nelvyon.com/opengraph-image">
+    <meta name="robots" content="noindex,nofollow">
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    
+    <meta name="author" content="Nelvyon">
+    
+    <meta name="keywords" content="NELVYON - Agencia IA + SaaS B2B">
+    
+
+    <!-- Mobile Specific Metas -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Favicons - Place favicon.ico in the root directory -->
+    <link rel="apple-touch-icon" sizes="57x57" href="assets/img/favicons/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="assets/img/favicons/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="assets/img/favicons/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="assets/img/favicons/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="assets/img/favicons/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="assets/img/favicons/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="assets/img/favicons/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="assets/img/favicons/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/img/favicons/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/img/favicons/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="assets/img/favicons/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicons/favicon-16x16.png">
+    <link rel="manifest" href="assets/img/favicons/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="assets/img/favicons/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+
+    <!--==============================
+	  Google Fonts
+	============================== -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@100..800&family=Urbanist:ital,wght@0,100..900;1,100..900&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+    <!--==============================
+	    All CSS File
+	============================== -->
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <!-- Fontawesome Icon -->
+    <link rel="stylesheet" href="assets/css/fontawesome.min.css">
+    <!-- Magnific Popup -->
+    <link rel="stylesheet" href="assets/css/magnific-popup.min.css">
+    <!-- Swiper Slider -->
+    <link rel="stylesheet" href="assets/css/swiper-bundle.min.css">
+    <!-- Theme Custom CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+
+</head>
+
+<body>
+
+
+    <!--[if lte IE 9]>
+    	<p class="browserupgrade">Está usando un <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">actualice su navegador</a> to improve your experience and security.</p>
+  <![endif]-->
+
+    <!--********************************
+   		Code Start From Here 
+	******************************** -->
+
+    <div class="mouseCursor cursor-outer"></div>
+    <div class="mouseCursor cursor-inner"></div>
+
+    <div id="preloader">
+        <div class="preloader-bg preloader-bg-one"></div>
+        <div class="preloader-bg preloader-bg-two"></div>
+        <div class="loader-wrapper">
+            <span class="loader-letter">N</span>
+            <span class="loader-letter">E</span>
+            <span class="loader-letter">L</span>
+            <span class="loader-letter">V</span>
+            <div class="loader"></div>
+        </div>
+
+
+    </div><!--==============================
+    Sidemenu
+============================== -->
+    <div class="sidemenu-wrapper ">
+        <div class="sidemenu-content">
+            <button class="closeButton sideMenuCls"><i class="far fa-times"></i></button>
+            <div class="widget footer-widget mb-0">
+                <div class="th-widget-about">
+                    <div class="about-logo">
+                        <a href="index.html"><img src="assets/img/logo.svg" alt="NELVYON"></a>
+                    </div>
+                    <p class="about-text">NELVYON es la agencia de marketing digital operada por IA y el SaaS B2B que une CRM, campañas, workflows, agentes y automatización enterprise.</p>
+                    <div class="th-social mb-40">
+                        <a href="https://www.facebook.com/"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://www.twitter.com/"><i class="fab fa-twitter"></i></a>
+                        <a href="https://www.youtube.com/"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="https://www.linkedin.com/"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="https://www.youtube.com/"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="widget footer-widget">
+                <h3 class="widget_title">Artículos recientes</h3>
+                <div class="recent-post-wrap">
+                    <div class="recent-post">
+                        <div class="media-img">
+                            <a href="blog-details.html"><img src="assets/img/blog/recent-post-1-1.jpg" alt="Blog Image"></a>
+                        </div>
+                        <div class="media-body">
+                            <div class="recent-post-meta">
+                                <a href="blog.html"><i class="fa-sharp fa-solid fa-calendar-days"></i>january 02,
+                                    2026</a>
+                            </div>
+                            <h4 class="post-title"><a class="text-inherit" href="blog-details.html">IA NELVYON con gobierno y escala multi-tenant.</a></h4>
+                        </div>
+                    </div>
+                    <div class="recent-post">
+                        <div class="media-img">
+                            <a href="blog-details.html"><img src="assets/img/blog/recent-post-1-2.jpg" alt="Blog Image"></a>
+                        </div>
+                        <div class="media-body">
+                            <div class="recent-post-meta">
+                                <a href="blog.html"><i class="fa-sharp fa-solid fa-calendar-days"></i>january 25,
+                                    2026</a>
+                            </div>
+                            <h4 class="post-title"><a class="text-inherit" href="blog-details.html">Gobierno de IA: control, transparencia y trazabilidad</a></h4>
+                        </div>
+                    </div>
+                    <div class="recent-post">
+                        <div class="media-img">
+                            <a href="blog-details.html"><img src="assets/img/blog/recent-post-1-3.jpg" alt="Blog Image"></a>
+                        </div>
+                        <div class="media-body">
+                            <div class="recent-post-meta">
+                                <a href="blog.html"><i class="fa-sharp fa-solid fa-calendar-days"></i>26 january,
+                                    2026</a>
+                            </div>
+                            <h4 class="post-title"><a class="text-inherit" href="blog-details.html">La integración de agentes e inbox se conecta al SaaS NELVYON.</a></h4>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--==============================
+    Mobile Menu
+  ============================== -->
+    <div class="th-menu-wrapper">
+        <div class="th-menu-area text-center">
+            <button class="th-menu-toggle"><i class="fal fa-times"></i></button>
+            <div class="mobile-logo">
+                <a href="home-ai-startup.html"><img src="assets/img/logo.svg" alt="NELVYON"></a>
+            </div>
+
+            <div class="th-mobile-menu">
+                <ul>
+                    <li class="menu-item-has-children">
+                        <a href="home-ai-startup.html">Inicio</a>
+                        <ul class="sub-menu">
+                            <li><a href="home-ai-startup.html">Agencia + IA</a></li>
+                            <li><a href="home-ai-chatbot.html">Inbox / conversaciones</a></li>
+                            <li><a href="index.html">(excluida)</a></li>
+                            <li><a href="home-ai-writer-tool.html">Contenido / Agencia</a></li>
+                            <li><a href="home-business-intelligence.html">Business Intelligence</a></li>
+                            <li><a href="home-ai-agent.html">home-ai-agent</a></li>
+                            <li><a href="home-productivity-tools.html">Automatizaciones</a></li>
+                            <li><a href="home-ai-chatbot-tool.html">Inbox / conversaciones tool</a></li>
+                            <li><a href="home-cloud-based-saas.html">Cloud SaaS</a></li>
+                            <li><a href="home-saas-product-showcase.html">Producto SaaS</a></li>
+                            <li><a href="index.html">(excluida)</a> </li>
+                        </ul>
+                    </li>
+                    <li><a href="about.html">Nosotros</a></li>
+                    <li><a href="features.html">Funciones</a></li>
+
+                    <li class="menu-item-has-children">
+                        <a href="#">Casos</a>
+                        <ul class="sub-menu">
+                            <li><a href="case-studies.html">Casos</a></li>
+                            <li><a href="case-studies-2.html">Casos (estilo 2)</a></li>
+                            <li><a href="case-studies-details.html">Detalle de perfil</a></li>
+                        </ul>
+                    </li>
+                    <li class="menu-item-has-children">
+                        <a href="#">Páginas</a>
+                        <ul class="sub-menu">
+                            <li><a href="cases.html">Casos</a></li>
+                            <li><a href="integrations.html">Integraciones</a></li>
+                            <li><a href="team.html">Equipo</a></li>
+                            <li><a href="team-details.html">Detalle</a></li>
+                            <li><a href="faq.html">FAQ</a></li>
+                            <li><a href="testimonial.html">Hechos</a></li>
+                            <li><a href="pricing.html">Precios</a></li>
+                            <li><a href="contact.html">Contacto</a></li>
+                            <li><a href="error.html">Error 404</a></li>
+                        </ul>
+                    </li>
+
+
+                    <li class="menu-item-has-children">
+                        <a href="#">Blog</a>
+                        <ul class="sub-menu">
+                            <li><a href="blog.html">Blog</a></li>
+                            <li><a href="blog-details.html">Detalle del artículo</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div><!--==============================       
+	Header Area
+==============================-->
+    <header class="th-header header-layout1">
+        <div class="container th-container">
+            <div class="menu-area">
+                <div class="sticky-wrapper">
+                    <!-- Main Menu Area -->
+                    <div class="container">
+                        <div class="row align-items-center justify-content-between">
+                            <div class="col-auto">
+                                <div class="header-logo">
+                                    <a href="home-ai-startup.html"><img src="assets/img/logo.svg" alt="NELVYON"></a>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <nav class="main-menu style2 d-none d-xl-inline-block">
+                                    <ul>
+                                        <li class="menu-item-has-children">
+                                            <a href="home-ai-startup.html">Inicio</a>
+                                            <ul class="mega-menu mega-menu-content allow-natural-scroll">
+                                                <li>
+                                                    <div class="container">
+                                                        <div class="row gy-4">
+                                                            <div class="col-lg-4">
+                                                                <div class="mega-menu-box">
+                                                                    <div class="mega-menu-img">
+                                                                        <img src="assets/img/pages/home-ai-startup.jpg" alt="Home One">
+                                                                        <div class="btn-wrap">
+                                                                            <a href="home-ai-startup.html" class="th-btn">Abrir</a>
+                                                                            <a href="home-ai-startup-op.html" class="th-btn">Landing</a>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <h2 class="mega-menu-title"><a href="home-ai-startup.html">01. Agencia + IA</a>
+                                                                    </h2>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-4">
+                                                                <div class="mega-menu-box">
+                                                                    <div class="mega-menu-img">
+                                                                        <img src="assets/img/pages/home-ai-chatbot.jpg" alt="Home Two">
+                                                                        <div class="btn-wrap">
+                                                                            <a href="home-ai-chatbot.html" class="th-btn">Abrir</a>
+                                                                            <a href="home-ai-chatbot-op.html" class="th-btn">Landing</a>
+                                                                        </div>
+                                                                    </div>
+                                                                    <h2 class="mega-menu-title"><a href="home-ai-chatbot.html">02. Inbox / conversaciones</a></h2>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-4">
+                                                                <div class="mega-menu-box">
+                                                                    <div class="mega-menu-img">
+                                                                        <img src="assets/img/pages/home-ai-image-generate.jpg" alt="Home Three">
+                                                                        <div class="btn-wrap">
+                                                                            <a href="index.html" class="th-btn">Abrir</a>
+                                                                            <a href="index.html" class="th-btn">Landing</a>
+                                                                        </div>
+                                                                    </div>
+                                                                    <h2 class="mega-menu-title"><a href="index.html">03. (excluida)</a>
+                                                                    </h2>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-4">
+                                                                <div class="mega-menu-box">
+                                                                    <div class="mega-menu-img">
+                                                                        <img src="assets/img/pages/home-ai-writer-tool.jpg" alt="Home Three">
+                                                                        <div class="btn-wrap">
+                                                                            <a href="home-ai-writer-tool.html" class="th-btn">Abrir</a>
+                                                                            <a href="home-ai-writer-tool-op.html" class="th-btn">Landing</a>
+                                                                        </div>
+                                                                    </div>
+                                                                    <h2 class="mega-menu-title"><a href="home-ai-writer-tool.html">04. Contenido / Agencia
+                                                                            Tool</a>
+                                                                    </h2>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-4">
+                                                                <div class="mega-menu-box">
+                                                                    <div class="mega-menu-img">
+                                                                        <img src="assets/img/pages/home-business-intelligence.jpg" alt="Home Three">
+                                                                        <div class="btn-wrap">
+                                                                            <a href="home-business-intelligence.html" class="th-btn">Abrir</a>
+                                                                            <a href="home-business-intelligence-op.html" class="th-btn">Landing</a>
+                                                                        </div>
+                                                                    </div>
+                                                                    <h2 class="mega-menu-title"><a href="home-business-intelligence.html">05. Business Intelligence</a>
+                                                                    </h2>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-4">
+                                                                <div class="mega-menu-box">
+                                                                    <div class="mega-menu-img">
+                                                                        <img src="assets/img/pages/home-ai-agent.jpg" alt="Home Three">
+                                                                        <div class="btn-wrap">
+                                                                            <a href="home-ai-agent.html" class="th-btn">Abrir</a>
+                                                                            <a href="home-ai-agent-op.html" class="th-btn">Landing</a>
+                                                                        </div>
+                                                                    </div>
+                                                                    <h2 class="mega-menu-title"><a href="home-ai-agent.html">06. IA y agentes</a>
+                                                                    </h2>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-lg-4">
+                                                                <div class="mega-menu-box">
+                                                                    <div class="mega-menu-img">
+                                                                        <img src="assets/img/pages/home-productivity-tools.jpg" alt="Home Three">
+                                                                        <div class="btn-wrap">
+                                                                            <a href="home-productivity-tools.html" class="th-btn">Abrir</a>
+                                                                            <a href="home-productivity-tools-op.html" class="th-btn">Landing</a>
+                                                                        </div>
+                                                                    </div>
+                                                                    <h2 class="mega-menu-title"><a href="home-productivity-tools.html">07. Home productivity
+                                                                            tools</a>
+                                                                    </h2>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-lg-4">
+                                                                <div class="mega-menu-box">
+                                                                    <div class="mega-menu-img">
+                                                                        <img src="assets/img/pages/home-ai-chatbot-tool.jpg" alt="Home Three">
+                                                                        <div class="btn-wrap">
+                                                                            <a href="home-ai-chatbot-tool.html" class="th-btn">Abrir</a>
+                                                                            <a href="home-ai-chatbot-tool-op.html" class="th-btn">Landing</a>
+                                                                        </div>
+                                                                    </div>
+                                                                    <h2 class="mega-menu-title"><a href="home-ai-chatbot-tool.html">08. Inbox / conversaciones
+                                                                            tool</a>
+                                                                    </h2>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-lg-4">
+                                                                <div class="mega-menu-box">
+                                                                    <div class="mega-menu-img">
+                                                                        <img src="assets/img/pages/home-cloud-based-saas.jpg" alt="Home Three">
+                                                                        <div class="btn-wrap">
+                                                                            <a href="home-cloud-based-saas.html" class="th-btn">Abrir</a>
+                                                                            <a href="home-cloud-based-saas-op.html" class="th-btn">Landing</a>
+                                                                        </div>
+                                                                    </div>
+                                                                    <h2 class="mega-menu-title"><a href="home-cloud-based-saas.html">09. Home cloud Based
+                                                                            Saas</a>
+                                                                    </h2>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-4">
+                                                                <div class="mega-menu-box">
+                                                                    <div class="mega-menu-img">
+                                                                        <img src="assets/img/pages/home-saas-product-showcase.jpg" alt="Home Three">
+                                                                        <div class="btn-wrap">
+                                                                            <a href="home-saas-product-showcase.html" class="th-btn">Abrir</a>
+                                                                            <a href="home-saas-product-showcase-op.html" class="th-btn">Landing</a>
+                                                                        </div>
+                                                                    </div>
+                                                                    <h2 class="mega-menu-title"><a href="home-saas-product-showcase.html">10 Home Saas
+                                                                            product Showcase</a>
+                                                                    </h2>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-4">
+                                                                <div class="mega-menu-box">
+                                                                    <div class="mega-menu-img">
+                                                                        <img src="assets/img/pages/home-finance-digital-service.jpg" alt="Home Three">
+                                                                        <div class="btn-wrap">
+                                                                            <a href="index.html" class="th-btn">Abrir</a>
+                                                                            <a href="index.html" class="th-btn">Landing</a>
+                                                                        </div>
+                                                                    </div>
+                                                                    <h2 class="mega-menu-title"><a href="index.html">11 (excluida)</a>
+                                                                    </h2>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="about.html">Nosotros</a></li>
+                                        <li><a href="features.html">Funciones</a></li>
+
+
+                                        <li class="menu-item-has-children">
+                                            <a href="#">Casos</a>
+                                            <ul class="sub-menu">
+                                                <li><a href="case-studies.html">Casos</a></li>
+                                                <li><a href="case-studies-2.html">Casos (estilo 2)</a></li>
+                                                <li><a href="case-studies-details.html">Detalle de perfil</a></li>
+                                            </ul>
+                                        </li>
+                                        <li class="menu-item-has-children">
+                                            <a href="#">Páginas</a>
+                                            <ul class="sub-menu">
+                                                <li><a href="cases.html">Casos</a></li>
+                                                <li><a href="integrations.html">Integraciones</a></li>
+                                                <li><a href="team.html">Equipo</a></li>
+                                                <li><a href="team-details.html">Detalle</a></li>
+                                                <li><a href="faq.html">FAQ</a></li>
+                                                <li><a href="testimonial.html">Hechos</a></li>
+                                                <li><a href="pricing.html">Precios</a></li>
+                                                <li><a href="contact.html">Contacto</a></li>
+                                                <li><a href="error.html">Error 404</a></li>
+                                            </ul>
+                                        </li>
+
+
+                                        <li class="menu-item-has-children">
+                                            <a href="#">Blog</a>
+                                            <ul class="sub-menu">
+                                                <li><a href="blog.html">Blog</a></li>
+                                                <li><a href="blog-details.html">Detalle del artículo</a></li>
+                                            </ul>
+                                        </li>
+
+                                    </ul>
+                                </nav>
+                            </div>
+                            <div class="col-auto">
+                                <div class="header-button">
+                                    <a href="contact.html" class="th-btn">Contacto <span class="icon"><img src="assets/img/icon/arrow-right.svg" alt=""></span></a>
+                                    <a href="#" class="icon-btn sideMenuToggler d-none d-md-block"><img src="assets/img/icon/grid.svg" alt=""></a>
+                                    <button type="button" class="th-menu-toggle d-inline-block d-xl-none"><i class="far fa-bars"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header><!--==============================
+    Breadcumb
+============================== -->
+    <div class="breadcumb-wrapper " data-bg-src="assets/img/bg/breadcumb-bg.jpg">
+        <div class="container">
+            <div class="breadcumb-content">
+                <h1 class="breadcumb-title text-anime-style-3">Integraciones</h1>
+                <ul class="breadcumb-menu wow fadeInUp">
+                    <li><a href="home-ai-startup.html">Inicio</a></li>
+                    <li>Integraciones</li>
+                </ul>
+            </div>
+        </div>
+    </div><!--==============================
+Cta Area  
+==============================-->
+    <div class="space overflow-hidden">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-6">
+                    <div class="title-area text-center">
+                        <h2 class="sec-title h3 text-anime-style-3">Workflows IA NELVYON para su equipo</h2>
+                        <p class="title-box-text">Plantillas y playbooks operativos en el ecosistema NELVYON.</p>
+                    </div>
+                    <form class="search-form style2 mb-60">
+                        <input type="text" placeholder="integration">
+                        <button type="submit"><i class="far fa-search"></i></button>
+                    </form>
+                </div>
+            </div>
+            <div class="row gy-4 justify-content-center">
+                <div class="col-md-6 col-xl-3">
+                    <div class="service-card style2">
+                        <div class="box-icon">
+                            <img src="assets/img/icon/icon1.svg" alt="icon">
+                        </div>
+                        <div class="box-content">
+                            <h3 class="box-title"><a href="features.html">mailchimp</a></h3>
+                            <p class="box-text">Use datos de comportamiento e IA operativa</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-3">
+                    <div class="service-card style2">
+                        <div class="box-icon">
+                            <img src="assets/img/icon/icon9.png" alt="icon">
+                        </div>
+                        <div class="box-content">
+                            <h3 class="box-title"><a href="features.html">Paylike</a></h3>
+                            <p class="box-text">Payments & Accounting</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-3">
+                    <div class="service-card style2">
+                        <div class="box-icon">
+                            <img src="assets/img/icon/icon3.svg" alt="icon">
+                        </div>
+                        <div class="box-content">
+                            <h3 class="box-title"><a href="features.html">hubspot</a></h3>
+                            <p class="box-text">Plataforma comercial NELVYON</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-3">
+                    <div class="service-card style2">
+                        <div class="box-icon">
+                            <img src="assets/img/icon/icon4.svg" alt="icon">
+                        </div>
+                        <div class="box-content">
+                            <h3 class="box-title"><a href="features.html">squarespace</a></h3>
+                            <p class="box-text">Web y landings con packs OS</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-3">
+                    <div class="service-card style2">
+                        <div class="box-icon">
+                            <img src="assets/img/icon/icon5.svg" alt="icon">
+                        </div>
+                        <div class="box-content">
+                            <h3 class="box-title"><a href="features.html">zendesk</a></h3>
+                            <p class="box-text">Transforme operación comercial y de equipo</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-3">
+                    <div class="service-card style2">
+                        <div class="box-icon">
+                            <img src="assets/img/icon/icon10.png" alt="icon">
+                        </div>
+                        <div class="box-content">
+                            <h3 class="box-title"><a href="features.html">Shopify</a></h3>
+                            <p class="box-text">CRM</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-3">
+                    <div class="service-card style2">
+                        <div class="box-icon">
+                            <img src="assets/img/icon/icon11.png" alt="icon">
+                        </div>
+                        <div class="box-content">
+                            <h3 class="box-title"><a href="features.html">Stripe</a></h3>
+                            <p class="box-text">Payments & Accounting</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-3">
+                    <div class="service-card style2">
+                        <div class="box-icon">
+                            <img src="assets/img/icon/icon8.svg" alt="icon">
+                        </div>
+                        <div class="box-content">
+                            <h3 class="box-title"><a href="features.html">plataforma-web</a></h3>
+                            <p class="box-text">Web y landings para cualquier negocio</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div><!--==============================
+Faq Area
+==============================-->
+    <div class="overflow-hidden  space overflow-hidden" id="faq-sec" data-bg-src="assets/img/bg/faq_bg_1.jpg">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-xl-6">
+                    <div class="title-area mb-20 text-center">
+                        <span class="sub-title style3">[ FAQ ]</span>
+                        <h2 class="sec-title h3">Preguntas frecuentes</h2>
+                    </div>
+                    <div class="btn-group justify-content-center mb-60 text-center">
+                        <a href="contact.html" class="th-btn2 extra">Ver todo</a>
+                    </div>
+                </div>
+            </div>
+            <div class="row gy-4">
+                <div class="col-xl-4">
+                    <div class="faq-card">
+                        <h3 class="box-title">1. ¿Cuánto tarda la puesta en marcha del SaaS?</h3>
+                        <div class="box-content">
+                            <p class="box-text">La puesta en marcha del SaaS NELVYON es guiada. Sin código para el usuario de negocio.
+                                La puesta en marcha es guiada. CRM, workflows e IA en un solo SaaS.
+                                effortlessly. The AI teammate provides smart suggestions to improve workflows and track
+                                progress in real time.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4">
+                    <div class="faq-card">
+                        <h3 class="box-title">2. ¿Puedo integrar NELVYON con otras herramientas?</h3>
+                        <div class="box-content">
+                            <p class="box-text">La puesta en marcha del SaaS NELVYON es guiada. Sin código para el usuario de negocio.
+                                La puesta en marcha es guiada. CRM, workflows e IA en un solo SaaS.
+                                effortlessly. The AI teammate provides smart suggestions to improve workflows and track
+                                progress in real time.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4">
+                    <div class="faq-card">
+                        <h3 class="box-title">3. ¿Hay acceso móvil o PWA?</h3>
+                        <div class="box-content">
+                            <p class="box-text">La puesta en marcha del SaaS NELVYON es guiada. Sin código para el usuario de negocio.
+                                La puesta en marcha es guiada. CRM, workflows e IA en un solo SaaS.
+                                effortlessly. The AI teammate provides smart suggestions to improve workflows and track
+                                progress in real time.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4">
+                    <div class="faq-card">
+                        <h3 class="box-title">4. ¿Cómo se activa un plan SaaS?</h3>
+                        <div class="box-content">
+                            <p class="box-text">La puesta en marcha del SaaS NELVYON es guiada. Sin código para el usuario de negocio.
+                                La puesta en marcha es guiada. CRM, workflows e IA en un solo SaaS.
+                                effortlessly. The AI teammate provides smart suggestions to improve workflows and track
+                                progress in real time.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4">
+                    <div class="faq-card">
+                        <h3 class="box-title">5. ¿Qué canales publicitarios y de comms admite?</h3>
+                        <div class="box-content">
+                            <p class="box-text">La puesta en marcha del SaaS NELVYON es guiada. Sin código para el usuario de negocio.
+                                La puesta en marcha es guiada. CRM, workflows e IA en un solo SaaS.
+                                effortlessly. The AI teammate provides smart suggestions to improve workflows and track
+                                progress in real time.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4">
+                    <div class="faq-card">
+                        <h3 class="box-title">6. ¿Cómo se separa Agencia y SaaS?</h3>
+                        <div class="box-content">
+                            <p class="box-text">La puesta en marcha del SaaS NELVYON es guiada. Sin código para el usuario de negocio.
+                                La puesta en marcha es guiada. CRM, workflows e IA en un solo SaaS.
+                                effortlessly. The AI teammate provides smart suggestions to improve workflows and track
+                                progress in real time.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="position-relative space  overflow-hidden">
+        <div class="marquee-content positive-relative overflow-hidden">
+            <div class="marquee">
+                <div class="marquee-group style6">
+                    <div class="item "><span>IA con gobierno para su industria</span></div>
+                    <div class="item"><span>IA con gobierno para su industria</span></div>
+                    <div class="item "><span>IA con gobierno para su industria</span></div>
+                    <div class="item"><span>IA con gobierno para su industria</span></div>
+                    <div class="item "><span>IA con gobierno para su industria</span></div>
+                    <div class="item"><span>IA con gobierno para su industria</span></div>
+                    <div class="item "><span>IA con gobierno para su industria</span></div>
+                    <div class="item"><span>IA con gobierno para su industria</span></div>
+
+                </div>
+                <div aria-hidden="true" class="marquee-group style6">
+                    <div class="item "><span>IA con gobierno para su industria</span></div>
+                    <div class="item"><span>IA con gobierno para su industria</span></div>
+                    <div class="item "><span>IA con gobierno para su industria</span></div>
+                    <div class="item"><span>IA con gobierno para su industria</span></div>
+                    <div class="item "><span>IA con gobierno para su industria</span></div>
+                    <div class="item"><span>IA con gobierno para su industria</span></div>
+                    <div class="item "><span>IA con gobierno para su industria</span></div>
+                    <div class="item"><span>IA con gobierno para su industria</span></div>
+                </div>
+            </div>
+        </div>
+    </div><!--==============================
+	Footer Area
+==============================-->
+    <footer class="footer-wrapper footer-layout1" data-bg-src="assets/img/bg/footer_bg_1.jpg">
+        <div class="widget-area">
+            <div class="container th-container5">
+                <div class="footer-top">
+                    <h2 class="box-title text-white">Empiece con NELVYON: demo SaaS o presupuesto de agencia</h2>
+                    <div class="">
+                        <form class="newsletter-form"><input class="form-control" type="email" placeholder="Su email para novedades NELVYON" required=""> <button type="submit" class="th-btn">Solicitar demo <span class="icon"><img src="assets/img/icon/arrow-right.svg" alt=""></span></button></form>
+                    </div>
+                </div>
+            </div>
+            <div class="container th-container5">
+                <div class="row gy-4 justify-content-between">
+                    <div class="col-md-6 col-xl-3">
+                        <div class="widget footer-widget mb-0">
+                            <div class="th-widget-about">
+                                <div class="about-logo">
+                                    <a href="index.html"><img src="assets/img/logo-white.svg" alt="NELVYON"></a>
+                                </div>
+                                <p class="about-text">NELVYON - agencia IA + SaaS B2B</p>
+                                <div class="th-social">
+                                    <a href="https://www.facebook.com/"><i class="fab fa-facebook-f"></i></a>
+                                    <a href="https://www.twitter.com/"><i class="fab fa-twitter"></i></a>
+                                    <a href="https://www.youtube.com/"><i class="fa-brands fa-instagram"></i></a>
+                                    <a href="https://www.linkedin.com/"><i class="fab fa-linkedin-in"></i></a>
+                                    <a href="https://www.youtube.com/"><i class="fab fa-youtube"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-xl-auto">
+                        <div class="widget widget_nav_menu footer-line footer-widget">
+                            <h3 class="widget_title">Producto</h3>
+                            <div class="menu-all-pages-container">
+                                <ul class="menu">
+                                    <li><a href="#">Funciones</a></li>
+                                    <li><a href="contact.html">Beneficios</a></li>
+                                    <li><a href="contact.html">Integraciones</a></li>
+                                    <li><a href="contact.html">Precios</a></li>
+                                    <li><a href="contact.html">Cambios</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-xl-auto">
+                        <div class="widget widget_nav_menu  footer-line footer-widget">
+                            <h3 class="widget_title">Servicio</h3>
+                            <div class="menu-all-pages-container">
+                                <ul class="menu">
+                                    <li><a href="contact.html">Soporte</a></li>
+                                    <li><a href="contact.html">Mejor experiencia de uso</a></li>
+                                    <li><a href="contact.html">Acceso API</a></li>
+                                    <li><a href="contact.html">Suscripción mensual</a></li>
+                                    <li><a href="contact.html">Historial de versiones</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-xl-auto">
+                        <div class="widget widget_nav_menu footer-widget">
+                            <h3 class="widget_title">Sobre la herramienta</h3>
+                            <div class="menu-all-pages-container">
+                                <ul class="menu">
+                                    <li><a href="contact.html">Configurable</a></li>
+                                    <li><a href="contact.html">Mayor eficiencia</a></li>
+                                    <li><a href="contact.html">Apps de terceros</a></li>
+                                    <li><a href="contact.html">Compra única</a></li>
+                                    <li><a href="contact.html">Registro de cambios</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+        <div class="container th-container5">
+            <div class="copyright-wrap">
+                <div class="row gy-2 align-items-center justify-content-between">
+                    <div class="col-xl-6">
+                        <p class="copyright-text"><i class="fal fa-copyright"></i> <a href="https://nelvyon.com/user/Nelvyon">NELVYON </a> 2026 . Todos los derechos reservados.</p>
+                    </div>
+                    <div class="col-xl-6 text-center text-xl-end">
+                        <div class="footer-links">
+                            <ul>
+                                <li><a href="about.html">Privacidad</a></li>
+                                <li><a href="about.html">Términos</a></li>
+                                <li><a href="about.html">Cookies</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!--********************************
+			Code End  Here 
+	******************************** -->
+    <!-- Scroll To Top -->
+    <div class="scroll-top">
+        <svg class="progress-circle svg-content" width="100%" height="100%" viewBox="-1 -1 102 102">
+            <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98" style="transition: stroke-dashoffset 10ms linear 0s; stroke-dasharray: 307.919, 307.919; stroke-dashoffset: 307.919;">
+            </path>
+        </svg>
+    </div>
+
+    <!--==============================
+    All Js File
+============================== -->
+    <!-- Jquery -->
+    <script src="assets/js/vendor/jquery-3.7.1.min.js"></script>
+    <!-- Swiper Slider -->
+    <script src="assets/js/swiper-bundle.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="assets/js/bootstrap.min.js"></script>
+    <!-- Magnific Popup -->
+    <script src="assets/js/jquery.magnific-popup.min.js"></script>
+    <!-- Counter Up -->
+    <script src="assets/js/jquery.counterup.min.js"></script>
+    <!-- Circle Progress -->
+    <script src="assets/js/circle-progress.js"></script>
+    <!-- Range Slider -->
+    <script src="assets/js/jquery-ui.min.js"></script>
+    <!-- Imagesloadedr -->
+    <script src="assets/js/imagesloaded.pkgd.min.js"></script>
+    <!-- isotope -->
+    <script src="assets/js/isotope.pkgd.min.js"></script>
+    <!-- Nice-select -->
+    <script src="assets/js/nice-select.min.js"></script>
+    <!-- wow -->
+    <script src="assets/js/wow.min.js"></script>
+    <!-- gsap area start -->
+    <script src="assets/js/gsap.min.js"></script>
+    <script src="assets/js/ScrollTrigger.min.js"></script>
+    <script src="assets/js/SplitText.js"></script>
+    <script src="assets/js/DrawSVGPlugin3.min.js"></script>
+    <!-- gsap area end -->
+    <!-- Lenis Js -->
+    <script src="assets/js/lenis.min.js"></script>
+
+    <!-- Main Js File -->
+    <script src="assets/js/main.js"></script>
+
+</body>
+
+</html>

@@ -24,11 +24,18 @@ pip-wheel-metadata/
 # --- Reference templates (local extract only; never ship) ---
 .reference/
 
-# AIOR branded static site (~140MB). Regenerate: node scripts/brand-aior-nelvyon.mjs
-apps/web/public/www/
+# AIOR branded static site — generado por brand+content+fidelity; se versiona el pack
+# (sin vídeos pesados duplicados). Regenerar: ver docs/ops/AIOR_NELVYON_TRANSFORM_STATUS.md
+# apps/web/public/www/
 
 # Portable tooling (ffmpeg essentials, etc.)
 .tools/
+
+# Raw screen-recording frames (keep only /clean curated)
+scripts/data/aior-video-frames/v*.png
+
+# Heavy AIOR demo videos (optional local; pack HTML funciona sin ellos)
+apps/web/public/www/**/*.mp4
 
 # --- Local audit / scratch outputs ---
 tmp-*.txt

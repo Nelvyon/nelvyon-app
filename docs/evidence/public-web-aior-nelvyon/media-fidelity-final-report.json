@@ -1,0 +1,64 @@
+{
+  "generatedAt": "2026-08-02T17:32:03.076Z",
+  "policy": "selective-fidelity-final",
+  "ffmpeg": true,
+  "ffmpegVersion": "8.1.2-essentials (local .tools/ffmpeg)",
+  "slotsReviewed": 445,
+  "protectedDecorative": 146,
+  "contentSlotsOk": 299,
+  "weakResidualCount": 0,
+  "weakResidualAssets": [],
+  "fidelityPassReplaced": 123,
+  "imperfectPages": [],
+  "residualCryptoOrAiorMediaPaths": [],
+  "comparatives": [
+    {
+      "slot": "blog/blog_1_1.jpg",
+      "before": "docs/evidence/public-web-aior-nelvyon/fidelity-before-after/before__blog__blog_1_1.jpg",
+      "after": "docs/evidence/public-web-aior-nelvyon/fidelity-before-after/after__blog__blog_1_1.jpg",
+      "from": "apps/web/public/brand/public/saas-shots/settings.webp",
+      "reason": "placeholder"
+    },
+    {
+      "slot": "normal/about-img1.jpg",
+      "before": "docs/evidence/public-web-aior-nelvyon/fidelity-before-after/before__normal__about-img1.jpg",
+      "after": "docs/evidence/public-web-aior-nelvyon/fidelity-before-after/after__normal__about-img1.jpg",
+      "from": "apps/web/public/brand/public/saas-shots/crm.webp",
+      "reason": "placeholder"
+    },
+    {
+      "slot": "pages/home-ai-agent.jpg",
+      "before": "docs/evidence/public-web-aior-nelvyon/fidelity-before-after/before__pages__home-ai-agent.jpg",
+      "after": "docs/evidence/public-web-aior-nelvyon/fidelity-before-after/after__pages__home-ai-agent.jpg",
+      "from": "apps/web/public/brand/public/saas-shots/agentes.webp",
+      "reason": "prior-en-ceo-source"
+    },
+    {
+      "slot": "service/service_1_1.jpg",
+      "before": "docs/evidence/public-web-aior-nelvyon/fidelity-before-after/before__service__service_1_1.jpg",
+      "after": "docs/evidence/public-web-aior-nelvyon/fidelity-before-after/after__service__service_1_1.jpg",
+      "from": "apps/web/public/brand/public/saas-shots/crm.webp",
+      "reason": "placeholder"
+    }
+  ],
+  "confirmation": {
+    "noCryptoMediaPaths": true,
+    "noAiorInMediaPaths": true,
+    "noRandomRedistribution": true,
+    "htmlCssJsCompositionUntouched": true,
+    "readyForCeoVisualReview": true
+  },
+  "sourcesPriority": [
+    "saas-shots NELVYON",
+    "video-frames clean crops (v2 integrations icons only)",
+    "Envato photos F-01 / F-02",
+    "CEO robot-features-orbit crop (sin burbujas EN)",
+    "AIOR shapes/icons/brand SVG válidos (protegidos)"
+  ],
+  "notes": [
+    "El ZIP Envato Elements no incluye renders premium: product slots eran placeholders.",
+    "Frames MP4 crudos descartados (taskbar Windows, texto EN, logo AIOR central).",
+    "Screenshots CEO con copy EN no se usan como master.",
+    "No se redistribuyeron paths HTML; solo sustitución selectiva en disco."
+  ]
+}

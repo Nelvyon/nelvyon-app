@@ -7,6 +7,17 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| Web pública | **Pass7 contenido + informe final (sin deploy)** | Elimina EN residual / vanity metrics / chiropractic; precios SaaS reales; counters honestos; hero contraste; Playwright 7/7; certify+audit 36/36. Informe `FINAL_REPORT.md` + screenshots. claimReady false. |
+| Web pública | **Pasada fidelidad media final (sin deploy)** | FFmpeg local + 27 frames MP4; crops limpios; 445 slots revisados; sustitución selectiva (placeholders/EN-CEO/crypto); 0 residual débil; 0 paths crypto/AIOR; before/after en `fidelity-before-after/`. Evidencia `media-fidelity-final-report.json`. |
+| Web pública | **Media selectiva (placeholders → NELVYON/CEO)** | Parado scramble ciego. `fix-aior-selective-media.mjs` / `fidelity-aior-media-pass.mjs`. HTML/src AIOR intactos. Sin deploy. |
+| Web pública | **Redistribución media AIOR premium (sin deploy)** | Histórico: scramble de paths. **Supersedido** por media selectiva. |
+| Web pública | **Certificación contenido 100% NELVYON (sin deploy)** | 36 páginas (19 Homes+variantes + 17 internas) · EN 0 · AIOR/ThemeHour/demo 0 · `$` demo 0 · noindex + canonical `/www/*` temporal. Evidencia `content-certification-final.json`. URLs/nav **no** cerradas. |
+| Web pública | **Pasada contenido profunda (sin cerrar URLs)** | Phrase-swaps ES + media saas-shots; canonical temporal `/www/*.html` + `noindex`; mapa marcado **no definitivo**. Estructura AIOR intacta. Sin deploy. |
+| Web pública | **Corrección definitiva: pack AIOR íntegro (sin deploy)** | Restaura **todas** las Homes excepto 03/11 (+ `-op`) y las 17 internas. Pipeline `brand` + `content-aior-nelvyon-only` (sin borrar ni fusionar ni reemplazar megamenú). `index` = Home 01. Mapa `AIOR_NELVYON_FULL_TEMPLATE_MAP.md`. Audit full `ok: true`. |
+| Web pública | **AIOR→NELVYON transformación total (sin deploy)** | Histórico/supersedido: KEEP reducido + nav simplificado. **Revertido** por corrección definitiva. |
+| Web pública | **Decisión definitiva AIOR→NELVYON (sin deploy)** | Base visual AIOR tal cual; pipeline contenido; sin reconstrucción; sin inventar social proof. Doc `NELVYON_PUBLIC_WEB_DIRECTION.md`. |
+| Web pública | **Corrección fidelidad AIOR (sin deploy)** | Rumbo: plantilla HTML tal cual en `/www/` + branding; rutas Next redirigen; React marketing ya no es la composición. Doc `AIOR_FIDELITY_RESTORE.md`. |
+| Web pública | **Auditoría obsesiva pre-prod (sin deploy)** | Purge AIOR en HTML (`/nv` skin, Brand*); drop FA+Swiper (~460KB CSS); LH perf 55→63 / BP 92→100; chat/cookies polish. **Supersedido** por corrección de fidelidad. |
 | Web pública | **Auditoría visual premium (sin deploy)** | Skin NELVYON sobre AIOR: CTAs sólidos, hero pipeline limpio, precios con shot, titles SEO, login sin chat doble + copy enterprise. |
 | Web pública | **Fix 500 next start (webpack-runtime call)** | Guard `_FUMADOCS_MDX=1` en `next.config.ts` (alineado con `server.js`); assert `.next` prod; crawl 34/34 + sweep + PW 7/7 + LH. Sin deploy. |
 | Web pública | **Gates AIOR + timeouts crawl/sweep** | tsc/eslint/vitest/build PASS; crawl local FAIL (500 webpack-runtime en `next start`); AbortSignal.timeout en scripts cert. Sin deploy. |

@@ -1,0 +1,227 @@
+{
+  "inventoryTotal": 367,
+  "uniqueAssetsUsed": 367,
+  "totalPathRewrites": 998,
+  "coveragePct": 100,
+  "themes": {
+    "about.html": "agency",
+    "blog-details.html": "blog",
+    "blog.html": "blog",
+    "case-studies-2.html": "cases",
+    "case-studies-details.html": "cases",
+    "case-studies.html": "cases",
+    "cases.html": "cases",
+    "contact.html": "contact",
+    "error.html": "support",
+    "faq.html": "support",
+    "features.html": "product",
+    "home-ai-agent-op.html": "ia",
+    "home-ai-agent.html": "ia",
+    "home-ai-chatbot-op.html": "inbox",
+    "home-ai-chatbot-tool-op.html": "comms",
+    "home-ai-chatbot-tool.html": "comms",
+    "home-ai-chatbot.html": "inbox",
+    "home-ai-startup-op.html": "home",
+    "home-ai-startup.html": "home",
+    "home-ai-writer-tool-op.html": "agency",
+    "home-ai-writer-tool.html": "agency",
+    "home-business-intelligence-op.html": "enterprise",
+    "home-business-intelligence.html": "enterprise",
+    "home-cloud-based-saas-op.html": "cloud",
+    "home-cloud-based-saas.html": "cloud",
+    "home-productivity-tools-op.html": "workflows",
+    "home-productivity-tools.html": "workflows",
+    "home-saas-product-showcase-op.html": "product",
+    "home-saas-product-showcase.html": "product",
+    "index.html": "home",
+    "integrations.html": "enterprise",
+    "pricing.html": "pricing",
+    "team-details.html": "team",
+    "team.html": "team",
+    "testimonial.html": "product",
+    "typography.html": "support"
+  },
+  "perPage": {
+    "about.html": {
+      "theme": "agency",
+      "changed": 72,
+      "uniqueOnPage": 72
+    },
+    "blog-details.html": {
+      "theme": "blog",
+      "changed": 14,
+      "uniqueOnPage": 14
+    },
+    "blog.html": {
+      "theme": "blog",
+      "changed": 11,
+      "uniqueOnPage": 11
+    },
+    "case-studies-2.html": {
+      "theme": "cases",
+      "changed": 11,
+      "uniqueOnPage": 11
+    },
+    "case-studies-details.html": {
+      "theme": "cases",
+      "changed": 8,
+      "uniqueOnPage": 8
+    },
+    "case-studies.html": {
+      "theme": "cases",
+      "changed": 11,
+      "uniqueOnPage": 11
+    },
+    "cases.html": {
+      "theme": "cases",
+      "changed": 32,
+      "uniqueOnPage": 32
+    },
+    "contact.html": {
+      "theme": "contact",
+      "changed": 6,
+      "uniqueOnPage": 6
+    },
+    "error.html": {
+      "theme": "support",
+      "changed": 5,
+      "uniqueOnPage": 5
+    },
+    "faq.html": {
+      "theme": "support",
+      "changed": 6,
+      "uniqueOnPage": 6
+    },
+    "features.html": {
+      "theme": "product",
+      "changed": 32,
+      "uniqueOnPage": 32
+    },
+    "home-ai-agent-op.html": {
+      "theme": "ia",
+      "changed": 39,
+      "uniqueOnPage": 39
+    },
+    "home-ai-agent.html": {
+      "theme": "ia",
+      "changed": 34,
+      "uniqueOnPage": 34
+    },
+    "home-ai-chatbot-op.html": {
+      "theme": "inbox",
+      "changed": 47,
+      "uniqueOnPage": 48
+    },
+    "home-ai-chatbot-tool-op.html": {
+      "theme": "comms",
+      "changed": 29,
+      "uniqueOnPage": 29
+    },
+    "home-ai-chatbot-tool.html": {
+      "theme": "comms",
+      "changed": 23,
+      "uniqueOnPage": 23
+    },
+    "home-ai-chatbot.html": {
+      "theme": "inbox",
+      "changed": 42,
+      "uniqueOnPage": 45
+    },
+    "home-ai-startup-op.html": {
+      "theme": "home",
+      "changed": 41,
+      "uniqueOnPage": 42
+    },
+    "home-ai-startup.html": {
+      "theme": "home",
+      "changed": 41,
+      "uniqueOnPage": 41
+    },
+    "home-ai-writer-tool-op.html": {
+      "theme": "agency",
+      "changed": 32,
+      "uniqueOnPage": 32
+    },
+    "home-ai-writer-tool.html": {
+      "theme": "agency",
+      "changed": 18,
+      "uniqueOnPage": 18
+    },
+    "home-business-intelligence-op.html": {
+      "theme": "enterprise",
+      "changed": 37,
+      "uniqueOnPage": 37
+    },
+    "home-business-intelligence.html": {
+      "theme": "enterprise",
+      "changed": 36,
+      "uniqueOnPage": 36
+    },
+    "home-cloud-based-saas-op.html": {
+      "theme": "cloud",
+      "changed": 50,
+      "uniqueOnPage": 50
+    },
+    "home-cloud-based-saas.html": {
+      "theme": "cloud",
+      "changed": 36,
+      "uniqueOnPage": 36
+    },
+    "home-productivity-tools-op.html": {
+      "theme": "workflows",
+      "changed": 41,
+      "uniqueOnPage": 41
+    },
+    "home-productivity-tools.html": {
+      "theme": "workflows",
+      "changed": 34,
+      "uniqueOnPage": 34
+    },
+    "home-saas-product-showcase-op.html": {
+      "theme": "product",
+      "changed": 47,
+      "uniqueOnPage": 47
+    },
+    "home-saas-product-showcase.html": {
+      "theme": "product",
+      "changed": 39,
+      "uniqueOnPage": 39
+    },
+    "index.html": {
+      "theme": "home",
+      "changed": 41,
+      "uniqueOnPage": 41
+    },
+    "integrations.html": {
+      "theme": "enterprise",
+      "changed": 6,
+      "uniqueOnPage": 6
+    },
+    "pricing.html": {
+      "theme": "pricing",
+      "changed": 7,
+      "uniqueOnPage": 7
+    },
+    "team-details.html": {
+      "theme": "team",
+      "changed": 16,
+      "uniqueOnPage": 16
+    },
+    "team.html": {
+      "theme": "team",
+      "changed": 25,
+      "uniqueOnPage": 25
+    },
+    "testimonial.html": {
+      "theme": "product",
+      "changed": 28,
+      "uniqueOnPage": 28
+    },
+    "typography.html": {
+      "theme": "support",
+      "changed": 1,
+      "uniqueOnPage": 1
+    }
+  },
+  "unusedSample": []
+}

@@ -1,0 +1,152 @@
+{
+  "pages": [
+    {
+      "file": "index.html",
+      "bytes": 63297,
+      "forbidden": 0,
+      "english": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "home-cloud-based-saas.html",
+      "bytes": 63297,
+      "forbidden": 0,
+      "english": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "home-saas-product-showcase.html",
+      "bytes": 71364,
+      "forbidden": 0,
+      "english": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "home-business-intelligence.html",
+      "bytes": 86267,
+      "forbidden": 0,
+      "english": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "home-ai-agent.html",
+      "bytes": 87833,
+      "forbidden": 0,
+      "english": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "about.html",
+      "bytes": 83665,
+      "forbidden": 0,
+      "english": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "features.html",
+      "bytes": 65272,
+      "forbidden": 0,
+      "english": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "pricing.html",
+      "bytes": 52173,
+      "forbidden": 0,
+      "english": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "contact.html",
+      "bytes": 48058,
+      "forbidden": 0,
+      "english": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "faq.html",
+      "bytes": 50333,
+      "forbidden": 0,
+      "english": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "integrations.html",
+      "bytes": 50753,
+      "forbidden": 0,
+      "english": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "case-studies.html",
+      "bytes": 50404,
+      "forbidden": 0,
+      "english": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "blog.html",
+      "bytes": 47313,
+      "forbidden": 0,
+      "english": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "blog-details.html",
+      "bytes": 58378,
+      "forbidden": 0,
+      "english": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "error.html",
+      "bytes": 41080,
+      "forbidden": 0,
+      "english": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    },
+    {
+      "file": "team.html",
+      "bytes": 52004,
+      "forbidden": 0,
+      "english": 0,
+      "hasTitle": true,
+      "hasCanonical": true,
+      "hasOg": true
+    }
+  ],
+  "forbidden": [],
+  "english": [],
+  "missingSeo": [],
+  "brokenAssets": []
+}

@@ -45,7 +45,7 @@ const REQUIRED = [
 ];
 
 const FORBIDDEN =
-  /\bAIOR\b|Aiorchat|Aiorbot|themehour|themeforest|mail\.php|lorem ipsum|example\.com|Zipchat|Planora|Arsturn|EmbedAI|Leadwayz|Aurix|Bridal Makeup|Message credits/i;
+  /\bAIOR\b|Aiorchat|Aiorbot|themehour|themeforest|mail\.php|lorem ipsum|example\.com|Zipchat|Planora|Arsturn|EmbedAI|Leadwayz|Aurix|Bridal Makeup|Message credits|Jems Colin|Sara Lin|Mark Rivas|Contact Us|Active Users|Benefites|Cookis Policy/i;
 
 const FN =
   /\b(the|and|with|your|our|you|we|this|that|from|into|are|was|were|have|has|been|will|can|don't|it's|you're|we're|let's|their|them|they|those|these|than|then|also|just|only|every|each|some|any|many|most|other|very|really|actually|easily|quickly|without|among|becomes|ensuring|allows|assign|facilitates|crafts|aligns|streamlines|forecasts|managing|multiple|effortless|overwhelm|things|done|minutes|newsletter|submit|now|free|trial|sign|login|watch|book|request|learn|explore|discover|subscribe|deliver|train|maximize|instant|customer|platform|solution|pricing|chatbot|support|team|how|what|why|need|want|make|using|used|best|here|about)\b/i;

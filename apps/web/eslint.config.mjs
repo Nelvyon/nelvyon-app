@@ -34,7 +34,7 @@ const eslintConfig = [
       /** Legacy embed script (vanilla JS). */
       "public/embed/**",
       /** Vendor CSS/JS/fonts for public AIOR skin (not app source). */
-      "public/brand/public/aior/**",
+      "public/brand/public/nv/**",
       "public/brand/public/zubaz/**",
     ],
   },
