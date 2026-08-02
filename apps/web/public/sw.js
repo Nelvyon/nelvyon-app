@@ -1,19 +1,29 @@
-/* NELVYON PWA v3 — stale-while-revalidate + offline-first SaaS shell */
-const CACHE_NAME = "nelvyon-saas-v3";
-const STATIC_CACHE = "nelvyon-static-v3";
-const PRECACHE_URLS = ["/", "/offline.html", "/offline-saas.html", "/saas/dashboard", "/manifest.json"];
+/* NELVYON PWA v4 — SaaS shell only; never precache public marketing `/` */
+const CACHE_NAME = "nelvyon-saas-v4";
+const STATIC_CACHE = "nelvyon-static-v4";
+const PRECACHE_URLS = ["/offline.html", "/offline-saas.html", "/saas/dashboard", "/manifest.json"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(STATIC_CACHE).then((cache) => cache.addAll(PRECACHE_URLS)).then(() => self.skipWaiting()),
+    caches
+      .open(STATIC_CACHE)
+      .then((cache) => cache.addAll(PRECACHE_URLS))
+      .then(() => self.skipWaiting()),
   );
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE_NAME && k !== STATIC_CACHE).map((k) => caches.delete(k))),
-    ).then(() => self.clients.claim()),
+    caches
+      .keys()
+      .then((keys) =>
+        Promise.all(
+          keys
+            .filter((k) => k !== CACHE_NAME && k !== STATIC_CACHE)
+            .map((k) => caches.delete(k)),
+        ),
+      )
+      .then(() => self.clients.claim()),
   );
 });
 
@@ -33,6 +43,16 @@ self.addEventListener("fetch", (event) => {
   const req = event.request;
   if (req.method !== "GET") return;
   const url = new URL(req.url);
+
+  // Public web + AIOR pack: always network (no stale marketing HTML).
+  if (
+    url.pathname === "/" ||
+    url.pathname.startsWith("/www/") ||
+    url.pathname.startsWith("/brand/")
+  ) {
+    return;
+  }
+
   if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/_next/")) return;
 
   if (req.mode === "navigate" && url.pathname.startsWith("/saas")) {
@@ -41,7 +61,9 @@ self.addEventListener("fetch", (event) => {
   }
 
   if (url.pathname.startsWith("/icons/") || url.pathname === "/manifest.json") {
-    event.respondWith(caches.open(STATIC_CACHE).then((c) => c.match(req).then((hit) => hit ?? fetch(req))));
+    event.respondWith(
+      caches.open(STATIC_CACHE).then((c) => c.match(req).then((hit) => hit ?? fetch(req))),
+    );
   }
 });
 

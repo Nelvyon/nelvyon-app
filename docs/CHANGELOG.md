@@ -7,6 +7,7 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| Web pública | **Fix raíz `/` sirve AIOR (200 rewrite)** | Causa: `redirect()` devolvía 307 + RSC marketing (saas-shots). Rewrite middleware/`beforeFiles` → `/www/index.html`; `<base href="/www/">`; SW v4; sin registro SW global. |
 | Web pública | **Deploy definitivo AIOR visual + contenido NELVYON** | Push `92b2b462` · Railway `df882d11` **SUCCESS** · health `git_sha=92b2b4627420`. Media/CSS/JS AIOR; 0 saas-shots; solo logos + copy ES; 36/36 HTML limpios; `style.css` `#7B5DFF`. Sustituye tip `4e78f600`/`61cb5010`. |
 | Web pública | **Revert visual a AIOR original (local pre-deploy)** | CEO: prohibido saas-shots/rediseño. Restaurado `assets/img`+`css`+`js` desde `.reference/aior`. Solo logos NELVYON. Bloqueados fidelity/selective. Informe `VISUAL_DEVIATIONS_AUDIT.md`. |
 | Web pública | **Deploy prod AIOR→NELVYON `/www`** | Push `4e78f600` · Railway deploy `61cb5010` **SUCCESS** · health `git_sha=4e78f6007f84` · rutas `/`→`/www/index.html` 307 · assets 200. Fix build: rename Aior*→Brand*. **Nota:** ese deploy llevaba media SaaS; no republicar hasta restore visual. |

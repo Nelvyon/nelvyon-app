@@ -1,6 +1,9 @@
-import { redirect } from "next/navigation";
+import { permanentRedirect } from "next/navigation";
 
-/** Home = AIOR Home 01 (startup) íntegra — no Cloud 09. */
+/**
+ * Fallback if middleware rewrite to `/www/index.html` is skipped.
+ * Prefer middleware rewrite (200 + AIOR HTML at `/`) over this path.
+ */
 export default function HomePage() {
-  return redirect("/www/index.html");
+  permanentRedirect("/www/index.html");
 }

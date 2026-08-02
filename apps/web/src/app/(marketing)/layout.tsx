@@ -90,7 +90,6 @@ export default function MarketingRouteLayout({ children }: { children: ReactNode
       <link rel="stylesheet" href={`${NV_SKIN}/bootstrap.min.css`} />
       <link rel="stylesheet" href={`${NV_SKIN}/style.css`} />
       <link rel="stylesheet" href={`${NV_SKIN}/nelvyon-skin.css`} />
-      <link rel="preload" as="image" href="/brand/public/saas-shots/pipeline.webp" />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteLd) }} />
       <a

@@ -1,26 +1,17 @@
 ﻿# HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-08-02** — Foco: **AIOR visual + contenido NELVYON LIVE en prod**
+> Última actualización: **2026-08-03** — Foco: **raíz `/` sirve AIOR 200 (no 307 RSC)**
 
 | Campo | Valor |
 |-------|-------|
-| **Tip / deploy** | `92b2b462` · Railway `df882d11` **SUCCESS** |
-| **Health** | `git_sha=92b2b4627420` (nelvyon.com + app.nelvyon.com) |
-| **Regla** | AIOR visual intacto · solo logo/textos/precios/SEO · **0 saas-shots** |
-| **CSS** | `--theme-color: #7B5DFF` (AIOR) · sin override NELVYON |
+| **Causa raíz** | `/` era `redirect()` Next → **307 + cuerpo RSC** (layout marketing + preload saas-shots). `/www/index.html` ya era AIOR correcto. |
+| **Fix** | middleware + `beforeFiles` rewrite `/`→`/www/index.html` · `<base href="/www/">` · SW v4 sin precache `/` · sin SW en root layout |
 | **claimReady** | **false** hasta OK visual CEO + URLs definitivas |
 | **Canary** | **KILL / OFF / OFF** |
 
 ## Próximo paso EXACTO
 
-1. OK visual CEO en https://nelvyon.com (hard refresh si veía pack SaaS anterior).
-2. Decidir URLs definitivas (quitar `noindex` / canonical temporal `/www/*` cuando proceda).
-3. No reactivar scripts `fidelity-*` / `fix-aior-selective-media` / inject saas-shots.
-
-## Validación prod (hecha)
-
-- 36/36 HTML sin `saas-shots` ni `assets/img/nelvyon`
-- `/www/assets/img/nelvyon/dashboard.webp` → **404**
-- Assets clave byte-match AIOR (`hero_bg_1`, `about_1_1`, `style.css`)
-- Form contacto `action=/api/contact` · `main.js` 200
+1. Tras deploy SUCCESS del fix raíz: validar `curl -sI https://nelvyon.com/` → **200** (no 307) + HTML AIOR (`preloader`, `Transforma tu negocio`, 0 saas-shots).
+2. OK visual CEO en incógnito en https://nelvyon.com y https://app.nelvyon.com.
+3. Decidir quitar `noindex` cuando proceda.

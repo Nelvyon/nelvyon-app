@@ -91,18 +91,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style" />
         <meta content="NELVYON" name="apple-mobile-web-app-title" />
         <link href="/icons/icon-192x192.png" rel="apple-touch-icon" />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function () {
-    navigator.serviceWorker.register('/sw.js').catch(function () {});
-  });
-}
-`,
-          }}
-          suppressHydrationWarning
-        />
+        {/* Service worker: only via saas layout (ServiceWorkerRegister). Do not register on public marketing. */}
       </head>
       <body className={`${inter.variable} ${manrope.variable} ${dmSans.variable} font-sans antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>

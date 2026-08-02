@@ -101,6 +101,14 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Public home: serve AIOR pack HTML at `/` (200 rewrite). Avoid Next page redirect()
+  // which returns a 307 + RSC marketing shell (~saas-shots preload) that some clients show.
+  if (pathname === "/" || pathname === "") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/www/index.html";
+    return NextResponse.rewrite(url);
+  }
+
   const dashRedirect = resolveDashboardLegacyRedirect(pathname);
   if (dashRedirect) {
     const url = request.nextUrl.clone();

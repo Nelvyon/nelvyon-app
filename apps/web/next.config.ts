@@ -175,20 +175,41 @@ const nextConfig: NextConfig = {
     ];
   },
   async rewrites() {
-    return [
-      {
-        source: "/sites/:subdomain/:slug",
-        destination: "/api/public/site/:subdomain/:slug",
-      },
-    ];
+    return {
+      beforeFiles: [
+        // Belt-and-suspenders with middleware: `/` serves AIOR Home 01 HTML (200).
+        { source: "/", destination: "/www/index.html" },
+      ],
+      afterFiles: [
+        {
+          source: "/sites/:subdomain/:slug",
+          destination: "/api/public/site/:subdomain/:slug",
+        },
+      ],
+      fallback: [],
+    };
   },
   async headers() {
     const webhookHeaders = [...SECURITY_HEADERS_WITHOUT_CSP];
     const defaultHeaders = [...SECURITY_HEADERS_WITH_CSP];
+    const wwwHtmlNoCache = [
+      { key: "Cache-Control", value: "private, no-cache, no-store, max-age=0, must-revalidate" },
+    ];
     return [
       {
         source: "/api/webhooks/:path*",
         headers: webhookHeaders.map((h) => ({ key: h.key, value: h.value })),
+      },
+      {
+        source: "/www/:path*.html",
+        headers: [...defaultHeaders, ...wwwHtmlNoCache].map((h) => ({ key: h.key, value: h.value })),
+      },
+      {
+        source: "/sw.js",
+        headers: [
+          ...defaultHeaders.map((h) => ({ key: h.key, value: h.value })),
+          { key: "Cache-Control", value: "private, no-cache, no-store, max-age=0, must-revalidate" },
+        ],
       },
       {
         source: "/:path*",
