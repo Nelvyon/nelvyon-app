@@ -17,6 +17,7 @@ export { CasesPage } from "./components/CasesPage";
 export { SectorsPage } from "./components/SectorsPage";
 export { ResourcesPage } from "./components/ResourcesPage";
 export { ContactPage } from "./components/ContactPage";
+export { IaPage } from "./components/IaPage";
 export * from "./content/siteContent";
 export {
   saasModules,

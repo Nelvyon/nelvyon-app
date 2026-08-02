@@ -1,0 +1,62 @@
+
+/* NELVYON × AIOR overrides */
+:root {
+  --theme-color: #0084FF !important;
+  --theme-color2: #33A1FF !important;
+}
+
+.nv-aior {
+  font-family: var(--font-nv-sans), system-ui, sans-serif;
+  color: #06050b;
+  background: #fff;
+}
+
+.nv-aior .th-header {
+  z-index: 50;
+}
+
+.nv-aior .header-layout9 .main-menu > ul > li > a {
+  font-weight: 600;
+}
+
+.nv-aior .hero-image4 img,
+.nv-aior .nv-aior-product-shot {
+  border-radius: 16px;
+  box-shadow: 0 24px 80px rgba(2, 8, 23, 0.18);
+  width: 100%;
+  height: auto;
+}
+
+.nv-aior .nv-aior-no-fake-social-proof {
+  display: none !important;
+}
+
+.nv-aior .footer-wrapper a {
+  color: rgba(255, 255, 255, 0.72);
+  text-decoration: none;
+}
+
+.nv-aior .footer-wrapper a:hover {
+  color: #33a1ff;
+}
+
+.nv-aior .footer-wrapper .menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nv-aior .footer-wrapper .menu li {
+  margin-bottom: 8px;
+}
+
+.nv-aior .th-menu-wrapper.th-body-visible {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Contact form within AIOR pages */
+.nv-aior .nv-public-panel,
+.nv-aior form {
+  max-width: 100%;
+}

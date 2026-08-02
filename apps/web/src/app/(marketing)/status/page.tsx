@@ -3,6 +3,9 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { AiorSection, AiorTitle } from "@/features/public-web/components/AiorBlocks";
+import { AiorPageHero } from "@/features/public-web/components/AiorPageHero";
+
 interface StatusData {
   status: "operational" | "degraded" | "down" | "unknown";
   services: Record<
@@ -33,16 +36,16 @@ const SERVICE_LABELS: Record<string, string> = {
 };
 
 const STATUS_CONFIG = {
-  operational: { label: "Todos los sistemas operativos", color: "text-emerald-400", dot: "bg-emerald-400" },
-  degraded: { label: "Degradación parcial del servicio", color: "text-yellow-400", dot: "bg-yellow-400" },
-  down: { label: "Interrupción del servicio", color: "text-red-400", dot: "bg-red-400" },
-  unknown: { label: "Estado desconocido", color: "text-zinc-400", dot: "bg-zinc-400" },
+  operational: { label: "Todos los sistemas operativos", color: "#059669" },
+  degraded: { label: "Degradación parcial del servicio", color: "#ca8a04" },
+  down: { label: "Interrupción del servicio", color: "#dc2626" },
+  unknown: { label: "Estado desconocido", color: "#6b7c93" },
 };
 
 const SERVICE_STATUS_CONFIG = {
-  up: { label: "Operativo", color: "text-emerald-400", dot: "bg-emerald-400" },
-  degraded: { label: "Degradado", color: "text-yellow-400", dot: "bg-yellow-400" },
-  down: { label: "Caído", color: "text-red-400", dot: "bg-red-400" },
+  up: { label: "Operativo", color: "#059669" },
+  degraded: { label: "Degradado", color: "#ca8a04" },
+  down: { label: "Caído", color: "#dc2626" },
 };
 
 export default function StatusPage() {
@@ -57,7 +60,6 @@ export default function StatusPage() {
         .catch(() => setData(null))
         .finally(() => setLoading(false));
     }
-
     load();
     const id = setInterval(() => {
       fetch("/api/status")
@@ -71,79 +73,90 @@ export default function StatusPage() {
   const overall = data ? STATUS_CONFIG[data.status] : STATUS_CONFIG.unknown;
 
   return (
-    <main className="min-h-screen bg-[#080808] px-4 py-16 text-zinc-100">
-      <div className="mx-auto max-w-2xl">
-        <div className="mb-12 text-center">
-          <Link href="/" className="text-xl font-black tracking-tight text-indigo-500">
-            NELVYON
-          </Link>
-          <h1 className="mb-3 mt-6 text-3xl font-black">Estado del sistema</h1>
+    <>
+      <AiorPageHero
+        eyebrow="Operaciones"
+        title="Estado del sistema"
+        description="Estado de servicios NELVYON. Datos en vivo desde /api/status cuando está disponible."
+        primaryCta={{ label: "Volver al inicio", href: "/" }}
+        secondaryCta={{ label: "Contactar", href: "/contacto" }}
+      />
+
+      <AiorSection>
+        <div className="text-center mb-40">
           {loading ? (
-            <div className="mx-auto h-6 w-48 animate-pulse rounded-full bg-zinc-800" />
+            <p style={{ color: "#6b7c93" }}>Cargando estado…</p>
           ) : (
-            <div className={`flex items-center justify-center gap-2 ${overall.color}`}>
-              <span className={`h-2.5 w-2.5 animate-pulse rounded-full ${overall.dot}`} />
-              <span className="font-semibold">{overall.label}</span>
-            </div>
+            <p style={{ color: overall.color, fontWeight: 600, fontSize: 18 }}>{overall.label}</p>
           )}
         </div>
 
-        <div className="mb-8 overflow-hidden rounded-2xl border border-zinc-800">
+        <div style={{ maxWidth: 640, margin: "0 auto", borderRadius: 16, border: "1px solid #E0E0E0", overflow: "hidden", background: "#fff" }}>
           {loading
             ? Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="h-14 animate-pulse border-b border-zinc-800 bg-zinc-900/50" />
+                <div key={i} style={{ height: 56, borderBottom: "1px solid #E0E0E0", background: "#F4F7FF" }} />
               ))
             : Object.entries(data?.services ?? {}).map(([key, svc], i, arr) => {
                 const cfg = SERVICE_STATUS_CONFIG[svc.status];
                 return (
                   <div
                     key={key}
-                    className={`flex items-center justify-between px-5 py-4 ${
-                      i < arr.length - 1 ? "border-b border-zinc-800" : ""
-                    }`}
+                    className="d-flex justify-content-between align-items-center"
+                    style={{
+                      padding: "16px 20px",
+                      borderBottom: i < arr.length - 1 ? "1px solid #E0E0E0" : undefined,
+                    }}
                   >
-                    <span className="text-sm font-medium text-zinc-200">{SERVICE_LABELS[key] ?? key}</span>
-                    <div className={`flex items-center gap-2 text-sm ${cfg.color}`}>
-                      <span className={`h-2 w-2 rounded-full ${cfg.dot}`} />
-                      <span>{cfg.label}</span>
-                      {svc.latencyMs > 0 ? (
-                        <span className="text-xs text-zinc-600">{svc.latencyMs}ms</span>
-                      ) : null}
-                    </div>
+                    <span style={{ fontWeight: 600 }}>{SERVICE_LABELS[key] ?? key}</span>
+                    <span style={{ color: cfg.color, fontSize: 14 }}>
+                      {cfg.label}
+                      {svc.latencyMs > 0 ? ` · ${svc.latencyMs}ms` : ""}
+                    </span>
                   </div>
                 );
               })}
         </div>
 
         {(data?.incidents ?? []).length > 0 ? (
-          <div className="mb-8">
-            <h2 className="mb-4 text-lg font-bold">Incidentes recientes</h2>
-            <div className="space-y-3">
-              {data!.incidents.map((inc) => (
-                <div key={inc.id} className="rounded-xl border border-zinc-800 p-4">
-                  <div className="mb-1 flex items-center justify-between">
-                    <span className="text-sm font-semibold">{inc.title}</span>
-                    <span
-                      className={`rounded-full px-2 py-0.5 text-xs ${
-                        inc.resolved ? "bg-emerald-950 text-emerald-400" : "bg-red-950 text-red-400"
-                      }`}
-                    >
-                      {inc.resolved ? "Resuelto" : "Activo"}
-                    </span>
-                  </div>
-                  <p className="text-sm text-zinc-400">{inc.message}</p>
+          <div className="mt-40" style={{ maxWidth: 640, margin: "40px auto 0" }}>
+            <AiorTitle title="Incidentes recientes" />
+            {data!.incidents.map((inc) => (
+              <article
+                key={inc.id}
+                style={{
+                  padding: 20,
+                  borderRadius: 12,
+                  border: "1px solid #E0E0E0",
+                  marginBottom: 12,
+                  background: "#fff",
+                }}
+              >
+                <div className="d-flex justify-content-between gap-2 mb-2">
+                  <strong>{inc.title}</strong>
+                  <span style={{ fontSize: 12, color: inc.resolved ? "#059669" : "#dc2626" }}>
+                    {inc.resolved ? "Resuelto" : "Activo"}
+                  </span>
                 </div>
-              ))}
-            </div>
+                <p className="mb-0" style={{ color: "#484848", fontSize: 14 }}>
+                  {inc.message}
+                </p>
+              </article>
+            ))}
           </div>
         ) : null}
 
         {data?.updatedAt ? (
-          <p className="text-center text-xs text-zinc-600">
+          <p className="text-center mt-4" style={{ fontSize: 12, color: "#6b7c93" }}>
             Actualizado: {new Date(data.updatedAt).toLocaleString("es-ES")}
           </p>
         ) : null}
-      </div>
-    </main>
+
+        <div className="text-center mt-40">
+          <Link href="/recursos" className="th-btn2 style5">
+            Centro de recursos
+          </Link>
+        </div>
+      </AiorSection>
+    </>
   );
 }

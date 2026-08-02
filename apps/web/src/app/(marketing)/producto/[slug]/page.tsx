@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { ModuleDetailPage, getModule, saasModules } from "@/features/public-web";
+import { IaPage, ModuleDetailPage, getModule, saasModules } from "@/features/public-web";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -23,5 +23,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function Page({ params }: Props) {
   const { slug } = await params;
   if (!getModule(slug)) notFound();
+  if (slug === "ia") return <IaPage />;
   return <ModuleDetailPage slug={slug} />;
 }

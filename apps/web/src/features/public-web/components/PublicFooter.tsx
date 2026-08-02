@@ -1,77 +1,122 @@
+import Image from "next/image";
 import Link from "next/link";
 
-import { megaNav, siteBrand } from "../content/siteContent";
+import { siteBrand } from "../content/siteContent";
 
+/**
+ * Footer AIOR (layout limpio) con enlaces reales NELVYON.
+ */
 export function PublicFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-[var(--nv-border)] bg-[var(--nv-bg-soft)]">
-      <div className="mx-auto max-w-6xl px-4 py-14 md:px-6 md:py-16">
-        <div className="grid gap-10 md:grid-cols-[1.2fr_repeat(4,1fr)]">
-          <div className="max-w-sm">
-            <Link href="/" className="inline-flex items-center gap-2.5">
-              <span
-                aria-hidden
-                className="grid h-8 w-8 place-items-center rounded-lg bg-[var(--nv-accent)] text-sm font-bold text-[var(--nv-fg-strong)]"
-              >
-                N
-              </span>
-              <span className="font-[family-name:var(--font-nv-display)] text-lg font-semibold tracking-tight">
-                {siteBrand.name}
-              </span>
-            </Link>
-            <p className="mt-4 text-sm leading-relaxed text-[var(--nv-muted)]">{siteBrand.tagline}</p>
-            <p className="mt-4 text-sm text-[var(--nv-muted)]">
-              <a className="hover:text-[var(--nv-accent-deep)]" href={`mailto:${siteBrand.contactEmail}`}>
-                {siteBrand.contactEmail}
-              </a>
-            </p>
-          </div>
-
-          {megaNav.map((group) => (
-            <div key={group.id}>
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">{group.title}</p>
-              <ul className="mt-4 space-y-2.5">
-                {group.links.map((link) => (
-                  <li key={`${group.id}-${link.href}-${link.label}`}>
-                    <Link
-                      href={link.href}
-                      className="text-sm text-[var(--nv-muted)] transition-colors hover:text-[var(--nv-accent-deep)]"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+    <footer className="footer-wrapper footer-layout2" style={{ background: "#020817", color: "#fff" }}>
+      <div className="widget-area space-top">
+        <div className="container th-container5">
+          <div className="row gy-4 justify-content-between">
+            <div className="col-lg-4">
+              <div className="widget footer-widget">
+                <Link href="/" className="d-inline-flex align-items-center gap-2 mb-3">
+                  <Image src="/logo.svg" alt={siteBrand.name} width={140} height={36} />
+                </Link>
+                <p style={{ color: "rgba(255,255,255,0.72)", maxWidth: 360 }}>{siteBrand.tagline}</p>
+              </div>
             </div>
-          ))}
+            <div className="col-6 col-md-4 col-lg-2">
+              <div className="widget widget_nav_menu footer-widget">
+                <h3 className="widget_title" style={{ color: "#fff", fontSize: 16 }}>
+                  Producto
+                </h3>
+                <ul className="menu">
+                  <li>
+                    <Link href="/producto">SaaS</Link>
+                  </li>
+                  <li>
+                    <Link href="/producto/ia">IA</Link>
+                  </li>
+                  <li>
+                    <Link href="/agencia">Agencia</Link>
+                  </li>
+                  <li>
+                    <Link href="/precios">Precios</Link>
+                  </li>
+                  <li>
+                    <Link href="/enterprise">Enterprise</Link>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div className="col-6 col-md-4 col-lg-2">
+              <div className="widget widget_nav_menu footer-widget">
+                <h3 className="widget_title" style={{ color: "#fff", fontSize: 16 }}>
+                  Recursos
+                </h3>
+                <ul className="menu">
+                  <li>
+                    <Link href="/recursos">Centro</Link>
+                  </li>
+                  <li>
+                    <Link href="/blog">Blog</Link>
+                  </li>
+                  <li>
+                    <Link href="/integraciones">Integraciones</Link>
+                  </li>
+                  <li>
+                    <Link href="/faq">FAQ</Link>
+                  </li>
+                  <li>
+                    <Link href="/seguridad">Seguridad</Link>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div className="col-6 col-md-4 col-lg-2">
+              <div className="widget widget_nav_menu footer-widget">
+                <h3 className="widget_title" style={{ color: "#fff", fontSize: 16 }}>
+                  Legal
+                </h3>
+                <ul className="menu">
+                  <li>
+                    <Link href="/aviso-legal">Aviso legal</Link>
+                  </li>
+                  <li>
+                    <Link href="/privacidad">Privacidad</Link>
+                  </li>
+                  <li>
+                    <Link href="/cookies">Cookies</Link>
+                  </li>
+                  <li>
+                    <Link href="/terminos">Términos</Link>
+                  </li>
+                  <li>
+                    <Link href="/legal/dpa">DPA</Link>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div className="col-md-6 col-lg-2">
+              <div className="widget footer-widget">
+                <h3 className="widget_title" style={{ color: "#fff", fontSize: 16 }}>
+                  Contacto
+                </h3>
+                <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 14 }}>
+                  <a href={`mailto:${siteBrand.contactEmail}`} style={{ color: "#33A1FF" }}>
+                    {siteBrand.contactEmail}
+                  </a>
+                </p>
+                <Link href="/contacto" className="th-btn2 btn-gradient2 mt-2 d-inline-block">
+                  Solicitar demo
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
-
-        <div className="mt-12 flex flex-col gap-3 border-t border-[var(--nv-border)] pt-6 text-sm text-[var(--nv-muted)] md:flex-row md:items-center md:justify-between">
-          <p>
+      </div>
+      <div className="copyright-wrap" style={{ borderTop: "1px solid rgba(255,255,255,0.1)", padding: "20px 0" }}>
+        <div className="container th-container5">
+          <p className="mb-0 text-center" style={{ color: "rgba(255,255,255,0.55)", fontSize: 14 }}>
             © {year} {siteBrand.name}. Todos los derechos reservados.
           </p>
-          <div className="flex flex-wrap gap-x-4 gap-y-2">
-            <Link href="/aviso-legal" className="hover:text-[var(--nv-accent-deep)]">
-              Aviso legal
-            </Link>
-            <Link href="/privacidad" className="hover:text-[var(--nv-accent-deep)]">
-              Privacidad
-            </Link>
-            <Link href="/cookies" className="hover:text-[var(--nv-accent-deep)]">
-              Cookies
-            </Link>
-            <Link href="/terminos" className="hover:text-[var(--nv-accent-deep)]">
-              Términos
-            </Link>
-            <Link href="/seguridad" className="hover:text-[var(--nv-accent-deep)]">
-              Seguridad
-            </Link>
-            <Link href="/status" className="hover:text-[var(--nv-accent-deep)]">
-              Status
-            </Link>
-          </div>
         </div>
       </div>
     </footer>

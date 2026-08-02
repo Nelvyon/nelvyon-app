@@ -1,15 +1,28 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import { agencyServices } from "../content/catalog";
 import { pricingPlans } from "../content/siteContent";
-import { FaqAccordion } from "./DeepPage";
-import { PricingGrid } from "./sections/PricingGrid";
-import { Reveal } from "./Reveal";
-import { Container, CtaBand, PageHero, SectionHeading, SectionShell } from "./ui";
+import { AiorCtaBand, AiorPageHero } from "./AiorPageHero";
+import { AiorFaq } from "./AiorFaq";
+
+const FAQ = [
+  {
+    question: "¿Los precios SaaS son mensuales?",
+    answer: "Sí. Starter (€97), Growth (€297) y Elite (€797) se facturan mensualmente según el alcance de la operación.",
+  },
+  {
+    question: "¿La agencia usa los mismos precios?",
+    answer:
+      "No. Los servicios de agencia se presupuestan a medida. El plan SaaS licencia el software; la ejecución de agencia se cotiza aparte.",
+  },
+  {
+    question: "¿Hay periodo de prueba?",
+    answer:
+      "La activación se acuerda en demo o discovery. No publicamos trials genéricos ni descuentos inventados en esta página.",
+  },
+] as const;
 
 export function PricingPage() {
   const [tab, setTab] = useState<"saas" | "agencia">("saas");
@@ -27,176 +40,125 @@ export function PricingPage() {
 
   return (
     <>
-      <PageHero
+      <AiorPageHero
         eyebrow="Precios"
         title="SaaS y Agencia, claramente separados"
-        description="El plan SaaS licencia el software. Los servicios de agencia se presupuestan a medida. Nunca mezclamos ambos en una sola tarjeta confusa."
+        description="El plan SaaS licencia el software. Los servicios de agencia se presupuestan a medida. Nunca mezclamos ambos en una sola tarjeta confusa ni publicamos precios demo."
         primaryCta={{ label: "Solicitar demo SaaS", href: "/contacto" }}
-        secondaryCta={{ label: "Pedir presupuesto agencia", href: "/contacto?tipo=agencia" }}
-        productMock
+        secondaryCta={{ label: "Presupuesto agencia", href: "/contacto?tipo=agencia" }}
       />
 
-      <SectionShell className="!py-10">
-        <Container>
-          <div className="flex justify-center">
-            <div className="nv-public-tabs" role="tablist" aria-label="Tipo de precio">
-              <button
-                type="button"
-                role="tab"
-                className="nv-public-tab"
-                data-active={tab === "saas"}
-                aria-selected={tab === "saas"}
-                onClick={() => {
-                  setTab("saas");
-                  window.history.replaceState(null, "", "#saas");
-                }}
-              >
-                Precios del SaaS
-              </button>
-              <button
-                type="button"
-                role="tab"
-                className="nv-public-tab"
-                data-active={tab === "agencia"}
-                aria-selected={tab === "agencia"}
-                onClick={() => {
-                  setTab("agencia");
-                  window.history.replaceState(null, "", "#agencia");
-                }}
-              >
-                Servicios de Agencia
-              </button>
-            </div>
+      <section className="space overflow-hidden">
+        <div className="container th-container5">
+          <div className="d-flex justify-content-center mb-40 gap-2" role="tablist" aria-label="Tipo de precio">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={tab === "saas"}
+              className={`th-btn2 ${tab === "saas" ? "btn-gradient2" : "style5"}`}
+              onClick={() => {
+                setTab("saas");
+                window.history.replaceState(null, "", "#saas");
+              }}
+            >
+              Precios del SaaS
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={tab === "agencia"}
+              className={`th-btn2 ${tab === "agencia" ? "btn-gradient2" : "style5"}`}
+              onClick={() => {
+                setTab("agencia");
+                window.history.replaceState(null, "", "#agencia");
+              }}
+            >
+              Presupuesto Agencia
+            </button>
           </div>
-        </Container>
-      </SectionShell>
 
-      {tab === "saas" ? (
-        <div id="saas">
-          <PricingGrid
-            plans={pricingPlans}
-            eyebrow="Licencia software"
-            title="Planes mensuales del SaaS NELVYON"
-            description="Starter, Growth y Elite. Facturación en euros. El alcance exacto se confirma en onboarding. No incluye producción creativa de agencia."
-          />
-          <SectionShell>
-            <Container className="grid gap-10 lg:grid-cols-2">
-              <Reveal>
-                <SectionHeading
-                  eyebrow="Qué incluye el SaaS"
-                  title="Software operativo, no un pack creativo"
-                  description="CRM, campañas, workflows, inbox, billing y portal según plan. La agencia es opcional y aparte."
-                />
-                <ul className="mt-6 space-y-3 text-sm text-[var(--nv-muted)] md:text-base">
-                  {[
-                    "Acceso multi-tenant al panel /saas/*",
-                    "Módulos documentados en /producto",
-                    "Integraciones nativas según configuración",
-                    "Soporte según plan (email / prioritario / AM)",
-                  ].map((b) => (
-                    <li key={b} className="flex gap-3">
-                      <Image src="/brand/public/product/check-circle.png" alt="" width={20} height={20} />
-                      <span>{b}</span>
-                    </li>
-                  ))}
-                </ul>
-              </Reveal>
-              <Reveal delayMs={40}>
-                <SectionHeading eyebrow="FAQ precios SaaS" title="Preguntas frecuentes" />
-                <div className="mt-6">
-                  <FaqAccordion
-                    items={[
-                      {
-                        question: "¿Puedo pagar solo agencia sin SaaS?",
-                        answer: "Sí, pero muchos entregables se ejecutan mejor sobre el motor SaaS. Lo evaluamos en discovery.",
-                      },
-                      {
-                        question: "¿Hay descuento anual?",
-                        answer: "El toggle anual muestra el equivalente a 10 meses (2 de ahorro) sobre el precio mensual publicado.",
-                      },
-                      {
-                        question: "¿Elite incluye media spend?",
-                        answer: "No. El spend publicitario es del cliente.",
-                      },
-                    ]}
-                  />
+          {tab === "saas" ? (
+            <div className="row gy-4 justify-content-center" id="saas">
+              {pricingPlans.map((plan) => (
+                <div key={plan.id} className="col-md-6 col-xl-4">
+                  <div
+                    style={{
+                      padding: 32,
+                      borderRadius: 16,
+                      border: plan.featured ? "2px solid #0084FF" : "1px solid #E0E0E0",
+                      height: "100%",
+                      background: "#fff",
+                    }}
+                  >
+                    {plan.featured ? (
+                      <span className="sub-title style3">Recomendado</span>
+                    ) : null}
+                    <h3 className="h5">{plan.name}</h3>
+                    <p className="h2" style={{ color: "#0084FF" }}>
+                      {plan.priceLabel}
+                      {plan.period ? <span className="h6 text-muted"> {plan.period}</span> : null}
+                    </p>
+                    <p>{plan.description}</p>
+                    <ul className="hero-list" style={{ textAlign: "left" }}>
+                      {plan.features.map((f) => (
+                        <li key={f}>
+                          <i className="fa-sharp fa-solid fa-circle-check" aria-hidden /> {f}
+                        </li>
+                      ))}
+                    </ul>
+                    <Link href={plan.cta.href} className="th-btn2 btn-gradient2 mt-3 d-inline-block">
+                      {plan.cta.label}
+                    </Link>
+                  </div>
                 </div>
-              </Reveal>
-            </Container>
-          </SectionShell>
-        </div>
-      ) : (
-        <div id="agencia">
-          <SectionShell soft>
-            <Container>
-              <Reveal>
-                <SectionHeading
-                  eyebrow="Presupuesto personalizado"
-                  title="Servicios de Agencia — sin precio de lista genérico"
-                  description="Cada proyecto se presupuesta tras discovery: alcance, plazos, entregables y si requiere plan SaaS. No publicamos un ‘pack creativo’ falso como si fuera SaaS."
-                  align="center"
-                />
-              </Reveal>
-              <div className="mt-12 grid gap-4 md:grid-cols-2">
-                {agencyServices.map((svc, i) => (
-                  <Reveal key={svc.id} delayMs={i * 40}>
-                    <article className="nv-public-icon-card">
-                      <div className="relative mb-5 aspect-[16/9] overflow-hidden rounded-xl border border-[var(--nv-border)]">
-                        <Image src={svc.image} alt="" fill className="object-cover" sizes="(max-width:768px) 100vw, 40vw" />
-                      </div>
-                      <h3 className="text-xl font-semibold text-[var(--nv-fg-strong)]">{svc.name}</h3>
-                      <p className="mt-2 text-sm text-[var(--nv-muted)]">{svc.short}</p>
-                      <p className="mt-4 text-sm font-medium text-[var(--nv-fg)]">Problema: {svc.problem}</p>
-                      <p className="mt-2 text-sm text-[var(--nv-muted)]">Enfoque: {svc.solution}</p>
-                      <ul className="mt-4 space-y-1.5 text-sm text-[var(--nv-muted)]">
-                        {svc.deliverables.slice(0, 4).map((d) => (
-                          <li key={d}>· {d}</li>
-                        ))}
-                      </ul>
-                      <div className="mt-6 flex flex-col gap-2 sm:flex-row">
-                        <Link href={svc.href} className="nv-public-btn nv-public-btn-secondary !min-h-10 !text-sm">
-                          Ver servicio
-                        </Link>
-                        <Link
-                          href={`/contacto?tipo=agencia&servicio=${svc.id}`}
-                          className="nv-public-btn nv-public-btn-primary !min-h-10 !text-sm"
-                        >
-                          Pedir presupuesto
-                        </Link>
-                      </div>
-                    </article>
-                  </Reveal>
-                ))}
+              ))}
+            </div>
+          ) : (
+            <div id="agencia" style={{ maxWidth: 720, margin: "0 auto", textAlign: "center" }}>
+              <h2 className="sec-title h3">Agencia a medida</h2>
+              <p>
+                SEO, ads, branding, contenido, web, email, packs OS y automatización se cotizan según alcance,
+                sector y volumen. No hay tarifa plana de agencia en esta página porque cada operación es distinta.
+              </p>
+              <ul className="hero-list" style={{ display: "inline-block", textAlign: "left" }}>
+                <li>
+                  <i className="fa-sharp fa-solid fa-circle-check" aria-hidden /> Propuesta con alcance explícito
+                </li>
+                <li>
+                  <i className="fa-sharp fa-solid fa-circle-check" aria-hidden /> SaaS facturado aparte si aplica
+                </li>
+                <li>
+                  <i className="fa-sharp fa-solid fa-circle-check" aria-hidden /> Portal de aprobación de entregables
+                </li>
+              </ul>
+              <div className="btn-group justify-content-center mt-4">
+                <Link href="/contacto?tipo=agencia" className="th-btn2 btn-gradient2">
+                  Pedir presupuesto
+                </Link>
+                <Link href="/agencia" className="th-btn2 style5">
+                  Conocer la agencia
+                </Link>
               </div>
-              <div className="mx-auto mt-12 max-w-3xl">
-                <FaqAccordion
-                  items={[
-                    {
-                      question: "¿Por qué no hay precio fijo de agencia?",
-                      answer:
-                        "Porque el alcance varía (web, SEO, ads, packs, automatización). Un precio único sería marketing vacío.",
-                    },
-                    {
-                      question: "¿Cuánto tarda un presupuesto?",
-                      answer: "Tras un discovery breve solemos devolver propuesta con hitos y exclusiones claras.",
-                    },
-                    {
-                      question: "¿Puedo contratar agencia + SaaS juntos?",
-                      answer: "Sí. Se cotizan en líneas separadas: licencia SaaS + honorarios de agencia.",
-                    },
-                  ]}
-                />
-              </div>
-            </Container>
-          </SectionShell>
+            </div>
+          )}
         </div>
-      )}
+      </section>
 
-      <CtaBand
-        title="¿SaaS, Agencia o ambos?"
-        body="Le ayudamos a decidir el mix correcto sin mezclar conceptos de precio."
-        primaryCta={{ label: "Hablar con NELVYON", href: "/contacto" }}
-        secondaryCta={{ label: "Explorar el SaaS", href: "/producto" }}
+      <section className="space overflow-hidden" style={{ background: "#F4F7FF" }}>
+        <div className="container th-container5">
+          <div className="title-area text-center mb-40">
+            <span className="sub-title style3">[ FAQ ]</span>
+            <h2 className="sec-title h3">Preguntas sobre precios</h2>
+          </div>
+          <AiorFaq items={[...FAQ]} />
+        </div>
+      </section>
+
+      <AiorCtaBand
+        title="Elija plan SaaS o presupuesto de agencia"
+        body="Le ayudamos a separar licencia de software y ejecución de marketing con claridad."
+        primaryCta={{ label: "Contactar", href: "/contacto" }}
+        secondaryCta={{ label: "Ver SaaS", href: "/producto" }}
       />
     </>
   );

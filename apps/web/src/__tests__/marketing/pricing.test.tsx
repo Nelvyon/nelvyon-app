@@ -42,7 +42,6 @@ vi.mock("motion/react", async () => {
 vi.mock("next/image", () => ({
   default: (props: Record<string, unknown>) => {
     const { alt = "", ...rest } = props;
-    // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
     return <img alt={String(alt)} {...rest} />;
   },
 }));
@@ -68,9 +67,9 @@ vi.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(),
 }));
 
-import HomePage from "@/app/(marketing)/page";
 import PartnersPage from "@/app/(marketing)/partners/page";
 import PreciosPage from "@/app/(marketing)/precios/page";
+import { PublicHomePage } from "@/features/public-web";
 import esMessages from "../../../messages/es.json";
 
 function renderWithProviders(ui: React.ReactElement) {
@@ -92,42 +91,42 @@ describe("marketing pricing and landing", () => {
   });
 
   it("Home pública renderiza headline NELVYON", { timeout: 30000 }, () => {
-    renderWithProviders(<HomePage />);
+    renderWithProviders(<PublicHomePage />);
     const h1 = screen.getByRole("heading", { level: 1 });
     expect(h1.textContent).toMatch(/Marketing digital ejecutado por IA/i);
   });
 
   it("Home pública incluye pilares de producto", { timeout: 30000 }, () => {
-    renderWithProviders(<HomePage />);
+    renderWithProviders(<PublicHomePage />);
     expect(screen.getByText(/Agencia operada por IA/i)).toBeInTheDocument();
   });
 
-  it("Home pública tiene CTA a contacto o plataforma", { timeout: 30000 }, () => {
-    renderWithProviders(<HomePage />);
+  it("Home pública tiene CTA a contacto o producto", { timeout: 30000 }, () => {
+    renderWithProviders(<PublicHomePage />);
     const links = screen.getAllByRole("link");
     const hrefs = links.map((el) => el.getAttribute("href"));
-    expect(hrefs.some((h) => h === "/contacto" || h === "/plataforma" || h === "/login")).toBe(true);
+    expect(hrefs.some((h) => h === "/contacto" || h === "/producto" || h === "/login")).toBe(true);
   });
 
   it("Home pública muestra FAQ", { timeout: 30000 }, () => {
-    renderWithProviders(<HomePage />);
-    expect(screen.getByText(/Preguntas frecuentes/i)).toBeInTheDocument();
+    renderWithProviders(<PublicHomePage />);
+    expect(screen.getByText(/¿NELVYON es una agencia o un software\?/i)).toBeInTheDocument();
   });
 
   it("Home pública incluye marca NELVYON", { timeout: 30000 }, () => {
-    renderWithProviders(<HomePage />);
-    expect(screen.getByText(/NELVYON une agencia autónoma/i)).toBeInTheDocument();
+    renderWithProviders(<PublicHomePage />);
+    expect(screen.getByText(/NELVYON une agencia autónoma y software enterprise/i)).toBeInTheDocument();
   });
 
   it("Página /partners renderiza calculadora", () => {
     renderWithProviders(<PartnersPage />);
-    expect(screen.getByText("Calculadora simple")).toBeInTheDocument();
-    expect(screen.getByLabelText("Número de clientes")).toBeInTheDocument();
+    expect(screen.getByText(/Calculadora ilustrativa/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Número de clientes referidos/i)).toBeInTheDocument();
   });
 
   it("Calculadora muestra comisión correcta (clientes × €97 × 0.30)", () => {
     renderWithProviders(<PartnersPage />);
-    const input = screen.getByLabelText("Número de clientes");
+    const input = screen.getByLabelText(/Número de clientes referidos/i);
     fireEvent.change(input, { target: { value: "10" } });
     expect(screen.getByText(/€291\.00/)).toBeInTheDocument();
   });

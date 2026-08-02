@@ -79,8 +79,15 @@ export const HOME_SHOT_SLIDER: readonly { id: SaasShotId; label: string }[] = [
 
 export const PRODUCT_HUB_SHOTS: readonly { id: SaasShotId; label: string }[] = [
   { id: "dashboard", label: "Dashboard" },
+  { id: "crm", label: "CRM" },
   { id: "pipeline", label: "Pipeline" },
-  { id: "agentes", label: "Agentes" },
-  { id: "analytics", label: "Analítica" },
-  { id: "integraciones", label: "Integraciones" },
+  { id: "workflows", label: "Automatizaciones" },
+  { id: "agentes", label: "Agentes IA" },
+  { id: "ai", label: "IA" },
+  { id: "analytics", label: "Analytics" },
+  { id: "calendar", label: "Calendario" },
+  { id: "campanias", label: "Campañas" },
+  { id: "billing", label: "Facturación" },
+  { id: "store", label: "Ecommerce" },
+  { id: "lms", label: "LMS" },
 ] as const;

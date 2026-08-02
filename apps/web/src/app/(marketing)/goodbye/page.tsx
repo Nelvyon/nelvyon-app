@@ -1,20 +1,28 @@
 import Link from "next/link";
 
+import { AiorSection } from "@/features/public-web/components/AiorBlocks";
+import { AiorPageHero } from "@/features/public-web/components/AiorPageHero";
+
 export default function GoodbyePage() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-[#080808] px-6 py-24 text-center text-zinc-100">
-      <div className="mx-auto max-w-lg space-y-6 rounded-2xl border border-zinc-800 bg-zinc-950/80 p-10">
-        <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Hasta pronto</h1>
-        <p className="text-base leading-relaxed text-zinc-400">
-          Tu cuenta ha sido eliminada. Gracias por usar NELVYON.
-        </p>
-        <Link
-          href="/"
-          className="inline-flex min-h-[48px] items-center justify-center rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-500"
-        >
-          Volver al inicio
-        </Link>
-      </div>
-    </main>
+    <>
+      <AiorPageHero
+        eyebrow="Cuenta"
+        title="Hasta pronto"
+        description="Su cuenta ha sido eliminada. Gracias por haber usado NELVYON."
+        primaryCta={{ label: "Volver al inicio", href: "/" }}
+        secondaryCta={{ label: "Contactar", href: "/contacto" }}
+      />
+      <AiorSection>
+        <div className="text-center" style={{ maxWidth: 520, margin: "0 auto" }}>
+          <p style={{ color: "#484848" }}>
+            Si elimina la cuenta por error o necesita recuperar documentación legal, escriba a soporte.
+          </p>
+          <Link href="/" className="th-btn2 btn-gradient2">
+            Ir a NELVYON
+          </Link>
+        </div>
+      </AiorSection>
+    </>
   );
 }

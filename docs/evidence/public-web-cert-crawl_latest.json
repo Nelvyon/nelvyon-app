@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-08-01T19:17:56.342Z",
-  "base": "http://127.0.0.1:3010",
-  "passCount": 26,
-  "total": 26,
+  "generatedAt": "2026-08-02T04:34:52.842Z",
+  "base": "http://127.0.0.1:3011",
+  "passCount": 34,
+  "total": 34,
   "contactApi": {
     "status": 400,
     "ok": true
@@ -10,9 +10,9 @@
   "results": [
     {
       "route": "/",
-      "url": "http://127.0.0.1:3010/",
+      "url": "http://127.0.0.1:3011/",
       "status": 200,
-      "ms": 193,
+      "ms": 6975,
       "title": "NELVYON — Agencia IA + SaaS B2B",
       "h1": "Marketing digital ejecutado por IA. Operación comercial en un solo SaaS.",
       "ok": true,
@@ -20,13 +20,13 @@
       "brokenImages": [],
       "hasMain": true,
       "hasNav": true,
-      "bytes": 180771
+      "bytes": 179751
     },
     {
-      "route": "/plataforma",
-      "url": "http://127.0.0.1:3010/plataforma",
+      "route": "/producto",
+      "url": "http://127.0.0.1:3011/producto",
       "status": 200,
-      "ms": 47,
+      "ms": 2503,
       "title": "SaaS B2B | NELVYON | NELVYON",
       "h1": "Software operativo para marketing, ventas y automatización",
       "ok": true,
@@ -34,27 +34,97 @@
       "brokenImages": [],
       "hasMain": true,
       "hasNav": true,
-      "bytes": 110282
+      "bytes": 133749
     },
     {
-      "route": "/agencia",
-      "url": "http://127.0.0.1:3010/agencia",
+      "route": "/producto/crm",
+      "url": "http://127.0.0.1:3011/producto/crm",
       "status": 200,
-      "ms": 41,
-      "title": "Agencia de marketing IA | NELVYON | NELVYON",
-      "h1": "Servicios de marketing ejecutados con IA y gobierno humano",
+      "ms": 2644,
+      "title": "CRM B2B | SaaS NELVYON | NELVYON",
+      "h1": "CRM pensado para operar, no solo para almacenar fichas",
       "ok": true,
       "bans": [],
       "brokenImages": [],
       "hasMain": true,
       "hasNav": true,
-      "bytes": 125004
+      "bytes": 149434
+    },
+    {
+      "route": "/producto/ia",
+      "url": "http://127.0.0.1:3011/producto/ia",
+      "status": 200,
+      "ms": 495,
+      "title": "IA con gobierno | SaaS NELVYON | NELVYON",
+      "h1": "IA operativa con kill-switch y criterios enterprise",
+      "ok": true,
+      "bans": [],
+      "brokenImages": [],
+      "hasMain": true,
+      "hasNav": true,
+      "bytes": 79221
+    },
+    {
+      "route": "/producto/workflows",
+      "url": "http://127.0.0.1:3011/producto/workflows",
+      "status": 200,
+      "ms": 625,
+      "title": "Automatizaciones y workflows | SaaS NELVYON | NELVYON",
+      "h1": "Automatice sin duplicar envíos ni perder el control",
+      "ok": true,
+      "bans": [],
+      "brokenImages": [],
+      "hasMain": true,
+      "hasNav": true,
+      "bytes": 138268
+    },
+    {
+      "route": "/plataforma",
+      "url": "http://127.0.0.1:3011/plataforma",
+      "status": 200,
+      "ms": 593,
+      "title": "SaaS B2B | NELVYON | NELVYON",
+      "h1": "Software operativo para marketing, ventas y automatización",
+      "ok": true,
+      "bans": [],
+      "brokenImages": [],
+      "hasMain": true,
+      "hasNav": true,
+      "bytes": 133749
+    },
+    {
+      "route": "/agencia",
+      "url": "http://127.0.0.1:3011/agencia",
+      "status": 200,
+      "ms": 1517,
+      "title": "Agencia de marketing IA | NELVYON",
+      "h1": "Marketing digital ejecutado con IA y gobierno humano",
+      "ok": true,
+      "bans": [],
+      "brokenImages": [],
+      "hasMain": true,
+      "hasNav": true,
+      "bytes": 102086
+    },
+    {
+      "route": "/seo",
+      "url": "http://127.0.0.1:3011/seo",
+      "status": 200,
+      "ms": 2238,
+      "title": "SEO | Agencia NELVYON | NELVYON",
+      "h1": "SEO",
+      "ok": true,
+      "bans": [],
+      "brokenImages": [],
+      "hasMain": true,
+      "hasNav": true,
+      "bytes": 130012
     },
     {
       "route": "/automatizaciones-ia",
-      "url": "http://127.0.0.1:3010/automatizaciones-ia",
+      "url": "http://127.0.0.1:3011/automatizaciones-ia",
       "status": 200,
-      "ms": 43,
+      "ms": 3881,
       "title": "Automatizaciones IA | NELVYON | NELVYON",
       "h1": "Automatizaciones IA",
       "ok": true,
@@ -62,13 +132,13 @@
       "brokenImages": [],
       "hasMain": true,
       "hasNav": true,
-      "bytes": 82401
+      "bytes": 95366
     },
     {
       "route": "/soluciones",
-      "url": "http://127.0.0.1:3010/soluciones",
+      "url": "http://127.0.0.1:3011/soluciones",
       "status": 200,
-      "ms": 62,
+      "ms": 1480,
       "title": "Soluciones de marketing y SaaS | NELVYON | NELVYON",
       "h1": "Soluciones NELVYON",
       "ok": true,
@@ -76,13 +146,13 @@
       "brokenImages": [],
       "hasMain": true,
       "hasNav": true,
-      "bytes": 64539
+      "bytes": 80120
     },
     {
       "route": "/servicios",
-      "url": "http://127.0.0.1:3010/servicios",
+      "url": "http://127.0.0.1:3011/servicios",
       "status": 200,
-      "ms": 79,
+      "ms": 1594,
       "title": "Servicios de marketing IA | NELVYON | NELVYON",
       "h1": "Servicios",
       "ok": true,
@@ -90,13 +160,13 @@
       "brokenImages": [],
       "hasMain": true,
       "hasNav": true,
-      "bytes": 68167
+      "bytes": 89559
     },
     {
       "route": "/sectores",
-      "url": "http://127.0.0.1:3010/sectores",
+      "url": "http://127.0.0.1:3011/sectores",
       "status": 200,
-      "ms": 32,
+      "ms": 1639,
       "title": "Sectores y verticales | NELVYON | NELVYON",
       "h1": "NELVYON adaptado a su industria",
       "ok": true,
@@ -104,13 +174,27 @@
       "brokenImages": [],
       "hasMain": true,
       "hasNav": true,
-      "bytes": 92542
+      "bytes": 103531
+    },
+    {
+      "route": "/casos-de-uso",
+      "url": "http://127.0.0.1:3011/casos-de-uso",
+      "status": 200,
+      "ms": 1686,
+      "title": "Casos de uso | NELVYON | NELVYON",
+      "h1": "Cómo NELVYON resuelve operaciones reales",
+      "ok": true,
+      "bans": [],
+      "brokenImages": [],
+      "hasMain": true,
+      "hasNav": true,
+      "bytes": 89169
     },
     {
       "route": "/enterprise",
-      "url": "http://127.0.0.1:3010/enterprise",
+      "url": "http://127.0.0.1:3011/enterprise",
       "status": 200,
-      "ms": 44,
+      "ms": 2153,
       "title": "Enterprise | NELVYON | NELVYON",
       "h1": "Seguridad, escala y gobierno para operaciones exigentes",
       "ok": true,
@@ -118,13 +202,13 @@
       "brokenImages": [],
       "hasMain": true,
       "hasNav": true,
-      "bytes": 101541
+      "bytes": 93662
     },
     {
       "route": "/integraciones",
-      "url": "http://127.0.0.1:3010/integraciones",
+      "url": "http://127.0.0.1:3011/integraciones",
       "status": 200,
-      "ms": 39,
+      "ms": 1952,
       "title": "Integraciones | NELVYON | NELVYON",
       "h1": "Conecte NELVYON con su ecosistema real",
       "ok": true,
@@ -132,13 +216,13 @@
       "brokenImages": [],
       "hasMain": true,
       "hasNav": true,
-      "bytes": 131981
+      "bytes": 260834
     },
     {
       "route": "/precios",
-      "url": "http://127.0.0.1:3010/precios",
+      "url": "http://127.0.0.1:3011/precios",
       "status": 200,
-      "ms": 32,
+      "ms": 1954,
       "title": "Precios | NELVYON | NELVYON",
       "h1": "SaaS y Agencia, claramente separados",
       "ok": true,
@@ -146,13 +230,13 @@
       "brokenImages": [],
       "hasMain": true,
       "hasNav": true,
-      "bytes": 69771
+      "bytes": 59821
     },
     {
       "route": "/casos-de-exito",
-      "url": "http://127.0.0.1:3010/casos-de-exito",
+      "url": "http://127.0.0.1:3011/casos-de-exito",
       "status": 200,
-      "ms": 23,
+      "ms": 1951,
       "title": "Casos y perfiles de proyecto | NELVYON | NELVYON",
       "h1": "Perfiles de proyecto anonimizados",
       "ok": true,
@@ -160,13 +244,13 @@
       "brokenImages": [],
       "hasMain": true,
       "hasNav": true,
-      "bytes": 92463
+      "bytes": 123452
     },
     {
       "route": "/recursos",
-      "url": "http://127.0.0.1:3010/recursos",
+      "url": "http://127.0.0.1:3011/recursos",
       "status": 200,
-      "ms": 22,
+      "ms": 5313,
       "title": "Recursos | NELVYON | NELVYON",
       "h1": "Documentación, blog y referencias",
       "ok": true,
@@ -174,27 +258,27 @@
       "brokenImages": [],
       "hasMain": true,
       "hasNav": true,
-      "bytes": 70771
+      "bytes": 108073
     },
     {
       "route": "/blog",
-      "url": "http://127.0.0.1:3010/blog",
+      "url": "http://127.0.0.1:3011/blog",
       "status": 200,
-      "ms": 31,
-      "title": "Blog | NELVYON | NELVYON",
+      "ms": 4301,
+      "title": "Blog | NELVYON",
       "h1": "Blog NELVYON",
       "ok": true,
       "bans": [],
       "brokenImages": [],
       "hasMain": true,
       "hasNav": true,
-      "bytes": 78808
+      "bytes": 95882
     },
     {
       "route": "/faq",
-      "url": "http://127.0.0.1:3010/faq",
+      "url": "http://127.0.0.1:3011/faq",
       "status": 200,
-      "ms": 28,
+      "ms": 3230,
       "title": "Preguntas frecuentes | NELVYON | NELVYON",
       "h1": "Preguntas frecuentes",
       "ok": true,
@@ -202,13 +286,13 @@
       "brokenImages": [],
       "hasMain": true,
       "hasNav": true,
-      "bytes": 65294
+      "bytes": 73424
     },
     {
       "route": "/contacto",
-      "url": "http://127.0.0.1:3010/contacto",
+      "url": "http://127.0.0.1:3011/contacto",
       "status": 200,
-      "ms": 43,
+      "ms": 2123,
       "title": "Contacto | NELVYON | NELVYON",
       "h1": "Contacto",
       "ok": true,
@@ -216,13 +300,13 @@
       "brokenImages": [],
       "hasMain": true,
       "hasNav": true,
-      "bytes": 62989
+      "bytes": 70534
     },
     {
       "route": "/login",
-      "url": "http://127.0.0.1:3010/login",
+      "url": "http://127.0.0.1:3011/login",
       "status": 200,
-      "ms": 49,
+      "ms": 3937,
       "title": "NELVYON — Agencia de Marketing Digital con IA",
       "h1": "Bienvenido de nuevo",
       "ok": true,
@@ -230,13 +314,13 @@
       "brokenImages": [],
       "hasMain": true,
       "hasNav": true,
-      "bytes": 34833
+      "bytes": 43891
     },
     {
       "route": "/saas",
-      "url": "http://127.0.0.1:3010/saas",
+      "url": "http://127.0.0.1:3011/saas",
       "status": 200,
-      "ms": 44,
+      "ms": 2378,
       "title": "Acceso SaaS | NELVYON | NELVYON",
       "h1": "Acceso a la plataforma SaaS",
       "ok": true,
@@ -244,27 +328,55 @@
       "brokenImages": [],
       "hasMain": true,
       "hasNav": true,
-      "bytes": 65237
+      "bytes": 81912
+    },
+    {
+      "route": "/partners",
+      "url": "http://127.0.0.1:3011/partners",
+      "status": 200,
+      "ms": 7454,
+      "title": "NELVYON — Agencia IA + SaaS B2B | NELVYON",
+      "h1": "Programa de partners NELVYON",
+      "ok": true,
+      "bans": [],
+      "brokenImages": [],
+      "hasMain": true,
+      "hasNav": true,
+      "bytes": 56709
+    },
+    {
+      "route": "/alternatives",
+      "url": "http://127.0.0.1:3011/alternatives",
+      "status": 200,
+      "ms": 2490,
+      "title": "NELVYON vs alternativas | NELVYON",
+      "h1": "NELVYON frente a stacks fragmentados",
+      "ok": true,
+      "bans": [],
+      "brokenImages": [],
+      "hasMain": true,
+      "hasNav": true,
+      "bytes": 111188
     },
     {
       "route": "/aviso-legal",
-      "url": "http://127.0.0.1:3010/aviso-legal",
+      "url": "http://127.0.0.1:3011/aviso-legal",
       "status": 200,
-      "ms": 48,
-      "title": "Aviso legal | NELVYON | NELVYON",
+      "ms": 2494,
+      "title": "Aviso legal | NELVYON",
       "h1": "Aviso legal",
       "ok": true,
       "bans": [],
       "brokenImages": [],
       "hasMain": true,
       "hasNav": true,
-      "bytes": 54460
+      "bytes": 65040
     },
     {
       "route": "/privacidad",
-      "url": "http://127.0.0.1:3010/privacidad",
+      "url": "http://127.0.0.1:3011/privacidad",
       "status": 200,
-      "ms": 60,
+      "ms": 2540,
       "title": "Política de privacidad | NELVYON | NELVYON",
       "h1": "Política de privacidad",
       "ok": true,
@@ -272,13 +384,13 @@
       "brokenImages": [],
       "hasMain": true,
       "hasNav": true,
-      "bytes": 66420
+      "bytes": 76115
     },
     {
       "route": "/cookies",
-      "url": "http://127.0.0.1:3010/cookies",
+      "url": "http://127.0.0.1:3011/cookies",
       "status": 200,
-      "ms": 190,
+      "ms": 2524,
       "title": "Política de cookies | NELVYON | NELVYON",
       "h1": "Política de cookies",
       "ok": true,
@@ -286,13 +398,13 @@
       "brokenImages": [],
       "hasMain": true,
       "hasNav": true,
-      "bytes": 64491
+      "bytes": 72776
     },
     {
       "route": "/terminos",
-      "url": "http://127.0.0.1:3010/terminos",
+      "url": "http://127.0.0.1:3011/terminos",
       "status": 200,
-      "ms": 50,
+      "ms": 6235,
       "title": "Términos y condiciones | NELVYON | NELVYON",
       "h1": "Términos y condiciones",
       "ok": true,
@@ -300,13 +412,13 @@
       "brokenImages": [],
       "hasMain": true,
       "hasNav": true,
-      "bytes": 66212
+      "bytes": 74917
     },
     {
       "route": "/seguridad",
-      "url": "http://127.0.0.1:3010/seguridad",
+      "url": "http://127.0.0.1:3011/seguridad",
       "status": 200,
-      "ms": 52,
+      "ms": 2670,
       "title": "Seguridad | NELVYON | NELVYON",
       "h1": "Seguridad",
       "ok": true,
@@ -314,13 +426,13 @@
       "brokenImages": [],
       "hasMain": true,
       "hasNav": true,
-      "bytes": 64645
+      "bytes": 80221
     },
     {
       "route": "/status",
-      "url": "http://127.0.0.1:3010/status",
+      "url": "http://127.0.0.1:3011/status",
       "status": 200,
-      "ms": 51,
+      "ms": 2998,
       "title": "NELVYON — Agencia IA + SaaS B2B | NELVYON",
       "h1": "Estado del sistema",
       "ok": true,
@@ -328,13 +440,13 @@
       "brokenImages": [],
       "hasMain": true,
       "hasNav": true,
-      "bytes": 46834
+      "bytes": 53823
     },
     {
       "route": "/legal",
-      "url": "http://127.0.0.1:3010/legal",
+      "url": "http://127.0.0.1:3011/legal",
       "status": 200,
-      "ms": 49,
+      "ms": 2767,
       "title": "Documentación legal | NELVYON | NELVYON",
       "h1": "Documentación legal",
       "ok": true,
@@ -342,13 +454,13 @@
       "brokenImages": [],
       "hasMain": true,
       "hasNav": true,
-      "bytes": 65949
+      "bytes": 77852
     },
     {
       "route": "/legal/dpa",
-      "url": "http://127.0.0.1:3010/legal/dpa",
+      "url": "http://127.0.0.1:3011/legal/dpa",
       "status": 200,
-      "ms": 58,
+      "ms": 2743,
       "title": "Acuerdo de tratamiento de datos (DPA) | NELVYON",
       "h1": "Acuerdo de tratamiento de datos (DPA)",
       "ok": true,
@@ -356,13 +468,13 @@
       "brokenImages": [],
       "hasMain": true,
       "hasNav": true,
-      "bytes": 70928
+      "bytes": 83078
     },
     {
       "route": "/legal/subprocessors",
-      "url": "http://127.0.0.1:3010/legal/subprocessors",
+      "url": "http://127.0.0.1:3011/legal/subprocessors",
       "status": 200,
-      "ms": 39,
+      "ms": 4809,
       "title": "Subprocesadores | NELVYON | NELVYON",
       "h1": "Subprocesadores",
       "ok": true,
@@ -370,7 +482,7 @@
       "brokenImages": [],
       "hasMain": true,
       "hasNav": true,
-      "bytes": 73912
+      "bytes": 91444
     }
   ],
   "verdict": "PASS"

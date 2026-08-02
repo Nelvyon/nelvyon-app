@@ -1,125 +1,112 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+
+import { AiorSection, AiorTitle } from "@/features/public-web/components/AiorBlocks";
+import { AiorCtaBand, AiorPageHero } from "@/features/public-web/components/AiorPageHero";
 
 export const metadata: Metadata = {
-  title: "NELVYON vs Agencias y SaaS — Alternativa IA",
+  title: { absolute: "NELVYON vs alternativas | NELVYON" },
   description:
-    "Compara NELVYON con agencias de marketing, Jasper, Copy.ai y herramientas tradicionales. 80+ servicios IA a una fracción del coste.",
+    "Compare NELVYON con agencias tradicionales y suites fragmentadas: SaaS B2B real + agencia IA, con precios honestos.",
+  alternates: { canonical: "/alternatives" },
 };
 
 const COMPARISONS = [
   {
-    competitor: "Agencia de Marketing",
+    competitor: "Agencia de marketing tradicional",
     them: [
-      "3.000–15.000€/mes",
-      "Tiempo de respuesta: días",
-      "Equipo humano limitado",
-      "Sin disponibilidad 24/7",
+      "Presupuesto opaco o paquetes genéricos",
+      "Herramientas ajenas sin gobierno unificado",
+      "Poca trazabilidad de ejecución",
+      "Facturación mezclada con herramientas",
     ],
-    us: ["Desde 47€/mes", "Resultados en minutos", "80+ servicios IA", "Disponible 24/7/365"],
-  },
-  {
-    competitor: "Jasper AI",
-    them: ["Solo copywriting", "Sin gestión de ads", "Sin SEO técnico", "Sin email marketing"],
     us: [
-      "Copy + 80 servicios más",
-      "Ads management completo",
-      "SEO técnico incluido",
-      "Email marketing automatizado",
+      "Presupuesto de agencia a medida y separado del SaaS",
+      "CRM, campañas y workflows en el mismo tenant",
+      "Packs OS con QA y portal de aprobación",
+      "Planes SaaS claros: €97 / €297 / €797",
     ],
   },
   {
-    competitor: "Suite CRM tradicional",
+    competitor: "Herramientas solo de copy / chat IA",
     them: [
-      "Planes elevados en funciones avanzadas",
-      "Configuración compleja",
-      "Requiere equipo dedicado",
-      "Curva de aprendizaje alta",
+      "Generación de texto sin operación comercial",
+      "Sin CRM ni campañas de producción",
+      "Sin workflows con idempotencia",
+      "Sin packs de marketing orquestados",
     ],
-    us: ["Desde 47€/mes", "Funciona desde el día 1", "Sin equipo necesario", "Plantillas oficiales Nelvyon"],
+    us: [
+      "IA acoplada a CRM, workflows y packs",
+      "Email con AWS SES cuando está configurado",
+      "Gobierno: canary kill y spend off hasta autorización",
+      "Producto multi-tenant con RBAC",
+    ],
+  },
+  {
+    competitor: "Suite CRM / marketing fragmentada",
+    them: [
+      "Varios productos y contratos",
+      "Integraciones frágiles entre silos",
+      "Coste creciente por módulo",
+      "Onboarding complejo",
+    ],
+    us: [
+      "Un SaaS operativo para marketing y ventas",
+      "Integraciones con estado documentado",
+      "Planes Starter, Growth y Elite",
+      "Demo con producto real, no mock genérico",
+    ],
   },
 ] as const;
 
 export default function AlternativesPage() {
   return (
-    <main className="min-h-screen bg-[#080808] px-4 py-24 text-zinc-100">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "SoftwareApplication",
-            name: "NELVYON",
-            applicationCategory: "BusinessApplication",
-            description: "Plataforma de marketing IA autónomo con 80+ servicios automatizados",
-            offers: {
-              "@type": "Offer",
-              price: "47",
-              priceCurrency: "EUR",
-              priceSpecification: {
-                "@type": "UnitPriceSpecification",
-                billingDuration: "P1M",
-              },
-            },
-            operatingSystem: "Web",
-          }),
-        }}
+    <>
+      <AiorPageHero
+        eyebrow="Comparativa"
+        title="NELVYON frente a stacks fragmentados"
+        description="Comparación cualitativa honesta: sin inventar precios de terceros ni afirmar superioridad con métricas no verificadas. Precios SaaS NELVYON: Starter €97, Growth €297, Elite €797."
+        primaryCta={{ label: "Solicitar demo", href: "/contacto" }}
+        secondaryCta={{ label: "Ver precios", href: "/precios" }}
       />
-      <div className="mx-auto max-w-4xl">
-        <div className="mb-16 text-center">
-          <h1 className="mb-4 text-4xl font-black md:text-5xl">
-            NELVYON vs <span className="text-indigo-400">el resto</span>
-          </h1>
-          <p className="text-lg text-zinc-400">
-            Por qué los negocios eligen NELVYON sobre agencias y herramientas tradicionales
-          </p>
-        </div>
-        <div className="space-y-8">
-          {COMPARISONS.map(({ competitor, them, us }) => (
-            <div key={competitor} className="overflow-hidden rounded-2xl border border-zinc-800">
-              <div className="border-b border-zinc-800 bg-zinc-900 px-6 py-4">
-                <h2 className="text-lg font-bold">NELVYON vs {competitor}</h2>
-              </div>
-              <div className="grid grid-cols-2">
-                <div className="border-r border-zinc-800 p-6">
-                  <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-zinc-500">
-                    {competitor}
-                  </p>
-                  <ul className="space-y-2">
-                    {them.map((t) => (
-                      <li key={t} className="flex gap-2 text-sm text-zinc-500">
-                        <span className="shrink-0 text-red-500">✗</span>
-                        {t}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="p-6">
-                  <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-indigo-400">
-                    NELVYON
-                  </p>
-                  <ul className="space-y-2">
-                    {us.map((u) => (
-                      <li key={u} className="flex gap-2 text-sm text-zinc-300">
-                        <span className="shrink-0 text-emerald-400">✓</span>
-                        {u}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+
+      {COMPARISONS.map((row, idx) => (
+        <AiorSection key={row.competitor} soft={idx % 2 === 1}>
+          <AiorTitle eyebrow="Comparativa" title={row.competitor} />
+          <div className="row gy-4">
+            <div className="col-md-6">
+              <div style={{ padding: 28, borderRadius: 16, border: "1px solid #E0E0E0", background: "#fff", height: "100%" }}>
+                <h3 className="h6">Enfoque típico</h3>
+                <ul className="hero-list" style={{ textAlign: "left" }}>
+                  {row.them.map((t) => (
+                    <li key={t}>
+                      <i className="fa-sharp fa-solid fa-circle" aria-hidden style={{ fontSize: 8 }} /> {t}
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
-          ))}
-        </div>
-        <div className="mt-16 text-center">
-          <Link
-            href="/register"
-            className="inline-block rounded-xl bg-indigo-600 px-8 py-4 text-lg font-semibold text-white transition-colors hover:bg-indigo-500"
-          >
-            Empieza con NELVYON →
-          </Link>
-        </div>
-      </div>
-    </main>
+            <div className="col-md-6">
+              <div style={{ padding: 28, borderRadius: 16, border: "2px solid #0084FF", background: "#fff", height: "100%" }}>
+                <h3 className="h6">NELVYON</h3>
+                <ul className="hero-list" style={{ textAlign: "left" }}>
+                  {row.us.map((t) => (
+                    <li key={t}>
+                      <i className="fa-sharp fa-solid fa-circle-check" aria-hidden /> {t}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </AiorSection>
+      ))}
+
+      <AiorCtaBand
+        title="Evalúe NELVYON con su operación real"
+        body="Demo del SaaS y, si aplica, presupuesto de agencia — sin cifras de clientes inventadas."
+        primaryCta={{ label: "Contactar", href: "/contacto" }}
+        secondaryCta={{ label: "Ver producto", href: "/producto" }}
+      />
+    </>
   );
 }

@@ -1,89 +1,78 @@
-import Image from "next/image";
-
 import { pageContent, siteBrand } from "../content/siteContent";
+import { AiorPageHero } from "./AiorPageHero";
 import { ContactForm } from "./ContactForm";
-import { Reveal } from "./Reveal";
-import { Container, PageHero, SectionShell } from "./ui";
 
 export function ContactPage() {
   const content = pageContent.contacto;
+
   return (
     <>
-      <PageHero
+      <AiorPageHero
         eyebrow={content.eyebrow}
         title={content.title}
         description={content.description}
-        imageSrc="/brand/public/library/photos/F-01.webp"
-        imageAlt="Profesional en entorno tecnológico NELVYON"
+        primaryCta={{ label: "Escribir por email", href: `mailto:${siteBrand.contactEmail}` }}
+        secondaryCta={{ label: "Ver precios", href: "/precios" }}
       />
-      <SectionShell soft>
-        <Container className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:gap-14">
-          <div className="space-y-5">
-            {content.sections.map((section, i) => (
-              <Reveal key={section.heading} delayMs={i * 40}>
-                <article className="nv-public-icon-card">
-                  <h2 className="text-lg font-semibold text-[var(--nv-fg-strong)] md:text-xl">{section.heading}</h2>
-                  <p className="mt-3 text-sm leading-relaxed text-[var(--nv-muted)] md:text-base">{section.body}</p>
+
+      <section className="space overflow-hidden">
+        <div className="container th-container5">
+          <div className="row gy-5">
+            <div className="col-lg-5">
+              {content.sections.map((section) => (
+                <article
+                  key={section.heading}
+                  style={{
+                    padding: 24,
+                    borderRadius: 16,
+                    border: "1px solid #E0E0E0",
+                    marginBottom: 16,
+                    background: "#fff",
+                  }}
+                >
+                  <h2 className="h5">{section.heading}</h2>
+                  <p className="mb-0">{section.body}</p>
                   {"bullets" in section && section.bullets?.length ? (
-                    <ul className="mt-4 space-y-2">
+                    <ul className="hero-list mt-3" style={{ textAlign: "left" }}>
                       {section.bullets.map((b: string) => (
-                        <li key={b} className="flex gap-3 text-sm text-[var(--nv-muted)]">
-                          <Image
-                            src="/brand/public/product/check-circle.png"
-                            alt=""
-                            width={18}
-                            height={18}
-                            className="mt-0.5 h-[18px] w-[18px] shrink-0"
-                          />
-                          <span>{b}</span>
+                        <li key={b}>
+                          <i className="fa-sharp fa-solid fa-circle-check" aria-hidden /> {b}
                         </li>
                       ))}
                     </ul>
                   ) : null}
                 </article>
-              </Reveal>
-            ))}
-            <Reveal delayMs={120}>
-              <div className="nv-public-panel overflow-hidden">
-                <div className="relative aspect-[16/9]">
-                  <Image
-                    src="/brand/public/contact-map.webp"
-                    alt="Contexto visual de contacto NELVYON"
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 1024px) 100vw, 40vw"
-                  />
-                </div>
-                <div className="space-y-2 p-6 text-sm text-[var(--nv-muted)]">
-                  <p>
-                    Comercial:{" "}
-                    <a className="font-medium text-[var(--nv-accent)] hover:underline" href={`mailto:${siteBrand.contactEmail}`}>
-                      {siteBrand.contactEmail}
-                    </a>
-                  </p>
-                  <p>
-                    Soporte:{" "}
-                    <a className="font-medium text-[var(--nv-accent)] hover:underline" href={`mailto:${siteBrand.supportEmail}`}>
-                      {siteBrand.supportEmail}
-                    </a>
-                  </p>
-                </div>
-              </div>
-            </Reveal>
-          </div>
-          <Reveal delayMs={80}>
-            <div className="nv-public-panel p-6 md:p-8">
-              <h2 className="nv-public-display text-2xl text-[var(--nv-fg-strong)] md:text-3xl">Cuéntenos su operación</h2>
-              <p className="mt-3 text-sm text-[var(--nv-muted)] md:text-base">
-                Respuesta humana. Sin formularios de relleno ni promesas genéricas.
-              </p>
-              <div className="mt-8">
-                <ContactForm />
+              ))}
+              <div style={{ padding: 24, borderRadius: 16, background: "#F4F7FF" }}>
+                <p className="mb-2">
+                  Comercial:{" "}
+                  <a href={`mailto:${siteBrand.contactEmail}`}>{siteBrand.contactEmail}</a>
+                </p>
+                <p className="mb-0">
+                  Soporte:{" "}
+                  <a href={`mailto:${siteBrand.supportEmail}`}>{siteBrand.supportEmail}</a>
+                </p>
               </div>
             </div>
-          </Reveal>
-        </Container>
-      </SectionShell>
+            <div className="col-lg-7">
+              <div
+                style={{
+                  padding: 32,
+                  borderRadius: 16,
+                  border: "1px solid #E0E0E0",
+                  background: "#fff",
+                }}
+              >
+                <h2 className="sec-title h4">Cuéntenos su operación</h2>
+                <p>Respuesta humana. Formulario real vía API NELVYON — sin captura demo.</p>
+                <div className="mt-4">
+                  <ContactForm />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </>
   );
 }

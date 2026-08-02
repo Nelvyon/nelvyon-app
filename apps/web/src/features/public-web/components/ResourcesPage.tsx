@@ -1,11 +1,5 @@
-import Link from "next/link";
-
-import {
-  DeepHero,
-  DeepPageShell,
-} from "./DeepPage";
-import { Reveal } from "./Reveal";
-import { Container, SectionHeading, SectionShell } from "./ui";
+import { AiorCardLink, AiorSection, AiorTitle } from "./AiorBlocks";
+import { AiorCtaBand, AiorPageHero } from "./AiorPageHero";
 
 const RESOURCE_SECTIONS = [
   {
@@ -40,7 +34,7 @@ const RESOURCE_SECTIONS = [
   },
   {
     id: "status",
-    title: "Estado y changelog",
+    title: "Estado y partners",
     description: "Visibilidad operativa del producto y servicios.",
     items: [
       { label: "Status", href: "/status", body: "Estado de servicios e infraestructura." },
@@ -52,43 +46,34 @@ const RESOURCE_SECTIONS = [
 
 export function ResourcesPage() {
   return (
-    <DeepPageShell
-      ctaTitle="¿Prefiere hablar con una persona?"
-      ctaBody="El equipo le orienta sobre seguridad, legal, SaaS o activación."
-    >
-      <DeepHero
+    <>
+      <AiorPageHero
         eyebrow="Recursos"
         title="Documentación, blog y referencias"
         description="Centro de recursos NELVYON: contenido útil para evaluar el SaaS, la agencia y los requisitos enterprise — sin páginas vacías."
         primaryCta={{ label: "Ir al blog", href: "/blog" }}
         secondaryCta={{ label: "FAQ", href: "/faq" }}
-        image="/brand/public/library/photos/F-02.webp"
-        imageAlt="Infraestructura y operaciones tecnológicas"
       />
 
       {RESOURCE_SECTIONS.map((section, sectionIdx) => (
-        <SectionShell key={section.id} className={sectionIdx % 2 === 1 ? "bg-[var(--nv-bg-soft)]" : ""}>
-          <Container>
-            <Reveal>
-              <SectionHeading title={section.title} description={section.description} />
-            </Reveal>
-            <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {section.items.map((item, i) => (
-                <Reveal key={item.href} delayMs={i * 30}>
-                  <Link
-                    href={item.href}
-                    className="nv-public-panel block h-full p-6 transition-colors hover:border-[rgba(0,132,255,0.4)]"
-                  >
-                    <h3 className="text-lg font-semibold text-[var(--nv-fg-strong)]">{item.label}</h3>
-                    <p className="mt-3 text-sm leading-relaxed text-[var(--nv-muted)]">{item.body}</p>
-                    <span className="mt-5 inline-flex text-sm font-medium text-[var(--nv-accent-deep)]">Abrir →</span>
-                  </Link>
-                </Reveal>
-              ))}
-            </div>
-          </Container>
-        </SectionShell>
+        <AiorSection key={section.id} soft={sectionIdx % 2 === 1}>
+          <AiorTitle title={section.title} description={section.description} />
+          <div className="row gy-4">
+            {section.items.map((item) => (
+              <div key={item.href} className="col-md-6 col-xl-4">
+                <AiorCardLink href={item.href} title={item.label} body={item.body} />
+              </div>
+            ))}
+          </div>
+        </AiorSection>
       ))}
-    </DeepPageShell>
+
+      <AiorCtaBand
+        title="¿Prefiere hablar con una persona?"
+        body="El equipo le orienta sobre seguridad, legal, SaaS o activación."
+        primaryCta={{ label: "Contactar", href: "/contacto" }}
+        secondaryCta={{ label: "Ver precios", href: "/precios" }}
+      />
+    </>
   );
 }

@@ -1,15 +1,8 @@
-import Link from "next/link";
-
 import { integrationsCatalog } from "../content/catalog";
-import {
-  DeepHero,
-  DeepPageShell,
-  FaqAccordion,
-  FeatureGrid,
-  MediaBlock,
-} from "./DeepPage";
-import { Reveal } from "./Reveal";
-import { Container, SectionHeading, SectionShell } from "./ui";
+import { saasShotSrc } from "../content/saasShots";
+import { AiorAsideNext, AiorFeatureGrid, AiorSection, AiorTitle } from "./AiorBlocks";
+import { AiorCtaBand, AiorPageHero } from "./AiorPageHero";
+import { AiorFaq } from "./AiorFaq";
 
 const CONNECTIVITY_LABEL: Record<string, string> = {
   nativo: "Nativo",
@@ -20,151 +13,131 @@ const CONNECTIVITY_LABEL: Record<string, string> = {
 
 const categories = [...new Set(integrationsCatalog.map((i) => i.category))];
 
+const FAQ = [
+  {
+    question: "¿Todas las integraciones están activas en mi cuenta?",
+    answer:
+      "No necesariamente. Stripe y SES son nativos pero requieren configuración de entorno. Google/Meta/WhatsApp se activan por proyecto.",
+  },
+  {
+    question: "¿Pueden desarrollar un conector custom?",
+    answer: "Sí, en alcance enterprise. Evaluamos API, webhooks y requisitos de compliance en discovery.",
+  },
+  {
+    question: "¿WhatsApp funciona out-of-the-box?",
+    answer: "Requiere Twilio/WhatsApp Business configurado. La UI indica el estado real.",
+  },
+  {
+    question: "¿Dónde veo el mapa completo del SaaS?",
+    answer: "En /producto encontrará módulos e integraciones vinculadas al software operativo.",
+  },
+] as const;
+
 export function IntegrationsPage() {
   return (
-    <DeepPageShell
-      ctaTitle="¿Falta un conector crítico?"
-      ctaBody="Evaluamos webhooks, APIs OAuth y alcance enterprise para su stack."
-    >
-      <DeepHero
+    <>
+      <AiorPageHero
         eyebrow="Integraciones"
         title="Conecte NELVYON con su ecosistema real"
         description="Stripe, AWS SES, Google, Meta, WhatsApp, Microsoft, Outlook, Slack, Twilio y webhooks. Cada integración documenta su modo de conectividad y estado de activación — sin fingir conexiones que no existen."
         primaryCta={{ label: "Solicitar integración", href: "/contacto" }}
         secondaryCta={{ label: "Ver SaaS", href: "/producto" }}
-        image="/brand/public/saas-shots/workflows.webp"
-        imageAlt="Integraciones NELVYON"
+        imageSrc={saasShotSrc("workflows")}
+        imageAlt="Automatizaciones e integraciones SaaS NELVYON"
       />
 
-      <SectionShell soft>
-        <Container>
-          <Reveal>
-            <SectionHeading
-              eyebrow="Principio"
-              title="Estados honestos"
-              description="Si una integración requiere configuración (SES, Twilio, OAuth de proyecto), la UI y esta documentación lo indican."
-            />
-          </Reveal>
-          <div className="mt-10">
-            <FeatureGrid
-              items={[
-                {
-                  title: "Nativo",
-                  body: "Integrado en el producto (Stripe billing, SES campañas).",
-                },
-                {
-                  title: "OAuth / API",
-                  body: "Activación por proyecto o credenciales del cliente.",
-                },
-                {
-                  title: "Webhooks",
-                  body: "Eventos salientes para Slack, Zapier y sistemas propios.",
-                },
-              ]}
-            />
-          </div>
-        </Container>
-      </SectionShell>
+      <AiorSection soft>
+        <AiorTitle
+          eyebrow="Principio"
+          title="Estados honestos"
+          description="Si una integración requiere configuración (SES, Twilio, OAuth de proyecto), la UI y esta documentación lo indican."
+        />
+        <AiorFeatureGrid
+          items={[
+            { title: "Nativo", body: "Integrado en el producto (Stripe billing, SES campañas)." },
+            { title: "OAuth / API", body: "Activación por proyecto o credenciales del cliente." },
+            { title: "Webhooks", body: "Eventos salientes para Slack, Zapier y sistemas propios." },
+          ]}
+        />
+      </AiorSection>
 
-      {categories.map((category) => {
+      {categories.map((category, idx) => {
         const items = integrationsCatalog.filter((i) => i.category === category);
         return (
-          <SectionShell key={category} className={categories.indexOf(category) % 2 === 1 ? "bg-[var(--nv-bg-soft)]" : ""}>
-            <Container>
-              <Reveal>
-                <SectionHeading eyebrow={category} title={`Integraciones · ${category}`} />
-              </Reveal>
-              <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {items.map((item, i) => (
-                  <Reveal key={item.id} delayMs={i * 30}>
-                    <article className="nv-public-panel h-full p-6">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex items-center gap-3">
-                          <span className="grid h-10 w-10 place-items-center rounded-xl bg-[var(--nv-bg-soft)] text-sm font-bold text-[var(--nv-fg)]">
-                            {item.initial}
-                          </span>
-                          <h3 className="text-lg font-semibold text-[var(--nv-fg-strong)]">{item.name}</h3>
-                        </div>
-                        <span className="shrink-0 rounded-full border border-[var(--nv-border)] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--nv-accent-deep)]">
-                          {CONNECTIVITY_LABEL[item.connectivity] ?? item.connectivity}
+          <AiorSection key={category} soft={idx % 2 === 1}>
+            <AiorTitle eyebrow={category} title={`Integraciones · ${category}`} />
+            <div className="row gy-4">
+              {items.map((item) => (
+                <div key={item.id} className="col-md-6 col-xl-4">
+                  <article
+                    style={{
+                      padding: 24,
+                      borderRadius: 16,
+                      border: "1px solid #E0E0E0",
+                      background: "#fff",
+                      height: "100%",
+                    }}
+                  >
+                    <div className="d-flex justify-content-between align-items-start gap-2 mb-2">
+                      <div className="d-flex align-items-center gap-2">
+                        <span
+                          style={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: 12,
+                            background: "#F4F7FF",
+                            display: "grid",
+                            placeItems: "center",
+                            fontWeight: 700,
+                          }}
+                        >
+                          {item.initial}
                         </span>
+                        <h3 className="h6 mb-0">{item.name}</h3>
                       </div>
-                      <p className="mt-3 text-sm leading-relaxed text-[var(--nv-muted)]">{item.short}</p>
-                      <p className="mt-3 text-[11px] font-semibold uppercase tracking-wide text-[var(--nv-muted-2)]">
-                        {item.status.replace("_", " ")} · {item.statusNote}
-                      </p>
-                      <ul className="mt-4 space-y-1.5">
-                        {item.capabilities.map((cap) => (
-                          <li key={cap} className="flex gap-2 text-xs text-[var(--nv-muted)]">
-                            <span aria-hidden className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-[var(--nv-accent)]" />
-                            {cap}
-                          </li>
-                        ))}
-                      </ul>
-                    </article>
-                  </Reveal>
-                ))}
-              </div>
-            </Container>
-          </SectionShell>
+                      <span className="sub-title style3 mb-0">
+                        {CONNECTIVITY_LABEL[item.connectivity] ?? item.connectivity}
+                      </span>
+                    </div>
+                    <p style={{ fontSize: 14 }}>{item.short}</p>
+                    <p style={{ fontSize: 12, color: "#6b7c93", textTransform: "uppercase", fontWeight: 600 }}>
+                      {item.status.replace("_", " ")} · {item.statusNote}
+                    </p>
+                    <ul style={{ paddingLeft: 18, marginBottom: 0, fontSize: 13, color: "#484848" }}>
+                      {item.capabilities.map((cap) => (
+                        <li key={cap}>{cap}</li>
+                      ))}
+                    </ul>
+                  </article>
+                </div>
+              ))}
+            </div>
+          </AiorSection>
         );
       })}
 
-      <MediaBlock
-        title="Extienda con webhooks y automatización externa"
-        body="Los eventos salientes del tenant permiten conectar Zapier, sistemas propios o alertas Slack sin duplicar lógica en el SaaS."
-        bullets={[
-          "Eventos de leads y workflow configurables",
-          "Alertas operativas a Slack",
-          "Extensión vía API donde el alcance lo permita",
-        ]}
-        reverse
-        mock
-      />
+      <AiorSection soft>
+        <div className="row gy-4">
+          <div className="col-lg-7">
+            <AiorTitle eyebrow="FAQ" title="Preguntas sobre integraciones" />
+            <AiorFaq items={[...FAQ]} />
+          </div>
+          <div className="col-lg-5">
+            <AiorAsideNext
+              body="Cuéntenos qué sistemas debe conectar su operación y le proponemos alcance técnico concreto."
+              primaryCta={{ label: "Contactar", href: "/contacto" }}
+              secondaryCta={{ label: "Enterprise", href: "/enterprise" }}
+            />
+          </div>
+        </div>
+      </AiorSection>
 
-      <SectionShell>
-        <Container className="grid gap-10 lg:grid-cols-2">
-          <Reveal>
-            <SectionHeading eyebrow="FAQ Integraciones" title="Preguntas frecuentes" />
-            <div className="mt-8">
-              <FaqAccordion
-                items={[
-                  {
-                    question: "¿Todas las integraciones están activas en mi cuenta?",
-                    answer: "No necesariamente. Stripe y SES son nativos pero requieren configuración de entorno. Google/Meta/WhatsApp se activan por proyecto.",
-                  },
-                  {
-                    question: "¿Pueden desarrollar un conector custom?",
-                    answer: "Sí, en alcance enterprise. Evaluamos API, webhooks y requisitos de compliance en discovery.",
-                  },
-                  {
-                    question: "¿WhatsApp funciona out-of-the-box?",
-                    answer: "Requiere Twilio/WhatsApp Business configurado. La UI indica el estado real.",
-                  },
-                  {
-                    question: "¿Dónde veo el mapa completo del SaaS?",
-                    answer: "En /producto encontrará módulos e integraciones vinculadas al software operativo.",
-                  },
-                ]}
-              />
-            </div>
-          </Reveal>
-          <Reveal delayMs={50}>
-            <div className="nv-public-panel p-6 md:p-8">
-              <h3 className="text-xl font-semibold text-[var(--nv-fg-strong)]">Siguiente paso</h3>
-              <p className="mt-3 text-sm leading-relaxed text-[var(--nv-muted)]">
-                Cuéntenos qué sistemas debe conectar su operación y le proponemos alcance técnico concreto.
-              </p>
-              <Link href="/contacto" className="nv-public-btn nv-public-btn-primary mt-6 w-full">
-                Contactar
-              </Link>
-              <Link href="/enterprise" className="nv-public-btn nv-public-btn-secondary mt-3 w-full">
-                Enterprise
-              </Link>
-            </div>
-          </Reveal>
-        </Container>
-      </SectionShell>
-    </DeepPageShell>
+      <AiorCtaBand
+        title="¿Falta un conector crítico?"
+        body="Evaluamos webhooks, APIs OAuth y alcance enterprise para su stack."
+        primaryCta={{ label: "Hablar con NELVYON", href: "/contacto" }}
+        secondaryCta={{ label: "Ver SaaS", href: "/producto" }}
+      />
+    </>
   );
 }

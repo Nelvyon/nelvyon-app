@@ -1,27 +1,34 @@
 ﻿# HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-08-01** — Foco activo: **web pública NUEVA en producción LIVE** · claimReady true · canary **KILL**
+> Última actualización: **2026-08-02** — Foco: **web pública AIOR→NELVYON en Next (sin deploy)** · claimReady true · canary **KILL**
 
 | Campo | Valor |
 |-------|-------|
-| **Tip prod live** | deploy `6159c6b8` · commit `ca081d0e` · `@nelvyon/web` **SUCCESS** |
+| **Tip prod live** | deploy `6159c6b8` · commit `ca081d0e` · `@nelvyon/web` **SUCCESS** (prod intacta; WIP local no desplegado) |
 | **URL prod** | https://app.nelvyon.com · https://nelvyon.com |
-| **Web pública** | DeviceMockup + saas-shots + library F-01/F-02 + I-01…I-05 · post-deploy **PROD_LIVE_PASS** |
+| **Web pública** | Next + piel AIOR slim (`public/brand/public/aior/`) · Home React `/` · sin `/www/` |
+| **Mapa** | `docs/ops/AIOR_NELVYON_PAGE_MAP.md` |
 | **claimReady** | **true** |
 | **Canary / spend / publish** | **KILL / OFF / OFF** |
 
 ## Próximo paso EXACTO
 
-1. Completar descarga P0 Envato restante (F-03…F-24, V-01…V-03, M-02/03/05/06/08, I-06) → `.reference/envato-public-assets/` → `node apps/web/scripts/organize-envato-library.mjs` + integrar.
-2. Aceternity OBLIGATORIOS (`docs/ops/ACETERNITY_NELVYON_AUDIT.md`) si el CEO lo prioriza.
-3. Evidencia live: `docs/evidence/public-web-prod-postdeploy_latest.json`.
+1. Arrancar local limpio: `pnpm -C apps/web dev --port 3012`
+2. CEO revisión visual final desktop+móvil en rutas core.
+3. Si OK: gates residuales (Playwright marketing config `playwright.marketing.config.ts` · Lighthouse con browser instalado) y **entonces** autorizar deploy.
+4. **No deploy** hasta OK visual CEO.
 
-### Capturas SaaS (hecho)
+### Gates ya verificados (sesión AIOR)
 
-- Tenant demo: **Nelvyon Demo · Aether Labs** (fixtures, sin PII real).
-- Regenerar: servidor en `:3010` + `PLAYWRIGHT_BASE_URL=http://127.0.0.1:3010 pnpm -C apps/web exec playwright test --config playwright.marketing-shots.config.ts` + `node apps/web/scripts/optimize-saas-shots.mjs`
-- Raw PNG ignorables en git; WebP en `apps/web/public/brand/public/saas-shots/`
+- `tsc --noEmit` PASS  
+- `eslint` PASS (vendor aior/zubaz ignorados)  
+- `build` PASS  
+- crawl HTTP 34/34 PASS (`scripts/public-web-cert-crawl.mjs`)  
+- content sweep PASS (`scripts/public-web-content-sweep.mjs`)  
+- vitest marketing pricing 8/8 PASS  
+- Playwright: falló por servidor caído/timeouts; config corregida (sin webServer, `domcontentloaded`) — re-ejecutar con server vivo  
+- Lighthouse: bloqueado (chrome-launcher no detecta Edge en este entorno)
 
 ### Seguridad producción (mantener)
 
@@ -34,5 +41,3 @@ NELVYON_ADS_SPEND_ENABLED=0
 NELVYON_SMS_BULK_ENABLED=0
 NELVYON_ORCHESTRATOR_ENABLED=0
 ```
-
-Upstash Redis obligatorio en prod (`UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN`) — fail-closed en auth crítico sin él.

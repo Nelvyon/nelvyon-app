@@ -3,6 +3,22 @@
 > Historial acumulativo. No eliminar entradas.
 
 
+## 2026-08-02
+
+| Área | Cambio | Descripción |
+|------|--------|-------------|
+| Web pública | **AIOR→NELVYON port completo marketing (sin deploy)** | Todas las rutas `(marketing)` + legales con piel AIOR; capturas SaaS reales; dump `/www/` purgado; DeepPage/Aceternity/ZubazFaq eliminados del flujo. Gates: tsc/eslint/build/crawl/sweep PASS. Playwright/LH pendientes de re-run con server vivo. Sin deploy. |
+| Web pública | **AIOR→NELVYON en Next (Home + core, sin deploy)** | Histórico: Home + core + purge `/www/`. Supersedido por port completo. |
+| Web pública | **AIOR → NELVYON HTML base en `/www/`** | Histórico: dump HTML brandado + redirect temporal. Supersedido por integración Next. Script `brand-aior-nelvyon.mjs`. |
+| Web pública | **AIOR revaluado como kit de piezas** | Histórico pre-implementación. Doc `ENVATO_AIOR_HARVEST.md`. |
+| Web pública | **Auditoría blanco enterprise Elements (1706 IDs)** | Criterio Stripe/Apple/OpenAI · sin dark/neon/agency. Veredicto: **0 candidatas “tal cual”**. Doc `ENVATO_ELEMENTS_WHITE_ENTERPRISE_AUDIT.md`. |
+| Web pública | **TOP10 visual exhaustivo Elements (2171 IDs)** | Crawl multi-categoría. Histórico dark/agency; **supersedido** para decisión por auditoría blanco enterprise. Doc `ENVATO_ELEMENTS_TOP10_VISUAL.md`. |
+| Web pública | **Ranking Elements corregido (ecosistema, no CRM)** | Criterio 40/40/20. Histórico; supersedido por TOP10 visual. Doc `ENVATO_ELEMENTS_RANKING_ECOSYSTEM.md`. |
+| Web pública | **Auditoría profunda Envato Elements (377 IDs)** | Crawl amplio · demos reales. Histórico; supersedido en parte por ranking ecosistema (sesgo CRM corregido). Doc `ENVATO_ELEMENTS_DEEP_AUDIT.md`. |
+| Web pública | **Auditoría SOLO Envato Elements (20 plantillas)** | Pasada corta histórica → supersedida por deep audit. Archivo `ENVATO_ELEMENTS_TEMPLATE_AUDIT.md` marcado como histórico. |
+| Web pública | **Auditoría mercado plantillas premium (desarrollo detenido)** | Evaluación amplia (Framer/Relume/etc.) archivada como contexto; la decisión operativa pedida por CEO queda acotada a Elements. |
+| Web pública | **Fidelidad Zubaz TAL CUAL (WIP, sin deploy) — PAUSADO** | Port parcial index-03 iniciado; **congelado** tras auditoría de base. No continuar Zubaz por inercia. |
+
 ## 2026-08-01
 
 | Área | Cambio | Descripción |

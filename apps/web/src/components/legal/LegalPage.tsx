@@ -2,7 +2,8 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { PublicShell } from "@/features/public-web";
-import "@/features/public-web/styles/public-web.css";
+
+const AIOR = "/brand/public/aior/css";
 
 type LegalPageProps = {
   title: string;
@@ -10,39 +11,60 @@ type LegalPageProps = {
   children: ReactNode;
 };
 
+/** Legal NELVYON con chrome AIOR unificado (nav/footer). */
 export function LegalPage({ title, lastUpdated, children }: LegalPageProps) {
   return (
-    <PublicShell>
-      <div className="nv-public border-b border-[var(--nv-border)]">
-        <article className="mx-auto max-w-3xl px-4 py-14 md:px-6 md:py-20">
-          <nav className="text-sm text-[var(--nv-muted)]" aria-label="Miga de pan">
-            <ol className="flex flex-wrap items-center gap-1">
-              <li>
-                <Link href="/" className="hover:text-white">
-                  Inicio
-                </Link>
-              </li>
-              <li aria-hidden="true">/</li>
-              <li>
-                <Link href="/legal" className="hover:text-white">
-                  Legal
-                </Link>
-              </li>
-              <li aria-hidden="true">/</li>
-              <li className="text-slate-300">{title}</li>
-            </ol>
-          </nav>
-
-          <header className="mt-8 border-b border-[var(--nv-border)] pb-8">
-            <h1 className="nv-public-display text-3xl text-white md:text-4xl">{title}</h1>
-            <p className="mt-3 text-sm text-[var(--nv-muted)]">Última actualización: {lastUpdated}</p>
-          </header>
-
-          <div className="mt-10 space-y-6 text-sm leading-relaxed text-[var(--nv-muted)] [&_a]:text-[var(--nv-accent)] [&_a]:underline [&_a]:underline-offset-2 hover:[&_a]:text-white [&_h2]:mt-10 [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:text-white [&_h3]:mt-6 [&_h3]:text-base [&_h3]:font-medium [&_h3]:text-slate-200 [&_li]:mt-1 [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5 [&_strong]:text-slate-200">
-            {children}
+    <>
+      <link rel="stylesheet" href={`${AIOR}/bootstrap.min.css`} />
+      <link rel="stylesheet" href={`${AIOR}/fontawesome.min.css`} />
+      <link rel="stylesheet" href={`${AIOR}/style.css`} />
+      <link rel="stylesheet" href={`${AIOR}/nelvyon-aior.css`} />
+      <PublicShell>
+        <div className="nv-aior-inner-hero" style={{ background: "#F4F7FF", padding: "48px 0 24px" }}>
+          <div className="container th-container5">
+            <nav aria-label="Miga de pan" style={{ fontSize: 14, color: "#6b7c93" }}>
+              <ol className="d-flex flex-wrap gap-1 mb-3" style={{ listStyle: "none", padding: 0 }}>
+                <li>
+                  <Link href="/" style={{ color: "#0084FF" }}>
+                    Inicio
+                  </Link>
+                </li>
+                <li aria-hidden>/</li>
+                <li>
+                  <Link href="/legal" style={{ color: "#0084FF" }}>
+                    Legal
+                  </Link>
+                </li>
+                <li aria-hidden>/</li>
+                <li style={{ color: "#06050B" }}>{title}</li>
+              </ol>
+            </nav>
+            <span className="sub-title style3">Legal</span>
+            <h1 className="sec-title h2 mb-2">{title}</h1>
+            <p className="mb-0" style={{ color: "#484848" }}>
+              Última actualización: {lastUpdated}
+            </p>
           </div>
-        </article>
-      </div>
-    </PublicShell>
+        </div>
+        <section className="space overflow-hidden">
+          <div className="container th-container5" style={{ maxWidth: 800 }}>
+            <div
+              style={{ color: "#484848", lineHeight: 1.7, fontSize: 15 }}
+              className="nv-aior-legal-prose"
+            >
+              {children}
+            </div>
+          </div>
+        </section>
+      </PublicShell>
+      <style>{`
+        .nv-aior-legal-prose a { color: #0084FF; }
+        .nv-aior-legal-prose h2 { margin-top: 2rem; font-size: 1.25rem; color: #06050B; font-weight: 700; }
+        .nv-aior-legal-prose h3 { margin-top: 1.25rem; font-size: 1.05rem; color: #06050B; font-weight: 600; }
+        .nv-aior-legal-prose ul, .nv-aior-legal-prose ol { padding-left: 1.25rem; }
+        .nv-aior-legal-prose li { margin-top: 0.35rem; }
+        .nv-aior-legal-prose strong { color: #06050B; }
+      `}</style>
+    </>
   );
 }

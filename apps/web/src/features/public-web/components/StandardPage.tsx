@@ -1,10 +1,9 @@
 import type { ReactNode } from "react";
-import Image from "next/image";
 import Link from "next/link";
 
 import type { PageContentEntry } from "../content/siteContent";
-import { Reveal } from "./Reveal";
-import { Container, CtaBand, PageHero, SectionHeading, SectionShell } from "./ui";
+import { AiorAsideNext, AiorCheckList, AiorSection, AiorTitle } from "./AiorBlocks";
+import { AiorCtaBand, AiorPageHero } from "./AiorPageHero";
 
 export function StandardPage({
   content,
@@ -23,7 +22,7 @@ export function StandardPage({
 }) {
   return (
     <>
-      <PageHero
+      <AiorPageHero
         eyebrow={content.eyebrow}
         title={content.title}
         description={content.description}
@@ -32,70 +31,50 @@ export function StandardPage({
         imageSrc={imageSrc}
         imageAlt={imageAlt}
       />
-      <SectionShell soft>
-        <Container>
-          <Reveal>
-            <SectionHeading
-              eyebrow="Detalle"
-              title="Profundidad de contenido"
-              description="Secciones operativas — sin bloques de relleno."
-            />
-          </Reveal>
-          <div className="mt-10 grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
-            <div className="space-y-5">
-              {content.sections.map((section, i) => (
-                <Reveal key={section.heading} delayMs={i * 30}>
-                  <article className="nv-public-icon-card">
-                    <div className="mb-4 flex items-center gap-3">
-                      <Image
-                        src={`/brand/public/product/icon${(i % 9) + 1}.png`}
-                        alt=""
-                        width={40}
-                        height={40}
-                      />
-                      <h2 className="text-xl font-semibold text-[var(--nv-fg-strong)]">{section.heading}</h2>
-                    </div>
-                    <p className="text-sm leading-relaxed text-[var(--nv-muted)] md:text-base">{section.body}</p>
-                    {section.bullets?.length ? (
-                      <ul className="mt-5 space-y-2.5">
-                        {section.bullets.map((b) => (
-                          <li key={b} className="flex gap-3 text-sm text-[var(--nv-muted)]">
-                            <Image
-                              src="/brand/public/product/check-circle.png"
-                              alt=""
-                              width={18}
-                              height={18}
-                              className="mt-0.5 h-[18px] w-[18px] shrink-0"
-                            />
-                            <span>{b}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
-                  </article>
-                </Reveal>
-              ))}
-            </div>
-            <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
-              {children ?? (
-                <div className="nv-public-panel p-6">
-                  <h3 className="text-lg font-semibold text-[var(--nv-fg-strong)]">Siguiente paso</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-[var(--nv-muted)]">
-                    Evaluamos su operación y proponemos alcance concreto — SaaS, agencia o ambos.
-                  </p>
-                  <Link href="/contacto" className="nv-public-btn nv-public-btn-primary mt-6 w-full">
-                    Solicitar demo
-                  </Link>
-                  <Link href="/precios" className="nv-public-btn nv-public-btn-secondary mt-3 w-full">
-                    Ver precios
-                  </Link>
-                </div>
-              )}
-            </aside>
+      <AiorSection soft>
+        <AiorTitle
+          eyebrow="Detalle"
+          title="Profundidad de contenido"
+          description="Secciones operativas — sin bloques de relleno."
+        />
+        <div className="row gy-4">
+          <div className="col-lg-8">
+            {content.sections.map((section) => (
+              <article
+                key={section.heading}
+                style={{
+                  padding: 28,
+                  borderRadius: 16,
+                  border: "1px solid #E0E0E0",
+                  background: "#fff",
+                  marginBottom: 16,
+                }}
+              >
+                <h2 className="h5">{section.heading}</h2>
+                <p>{section.body}</p>
+                {section.bullets?.length ? <AiorCheckList items={section.bullets} /> : null}
+              </article>
+            ))}
           </div>
-        </Container>
-      </SectionShell>
-      <CtaBand
+          <div className="col-lg-4">
+            {children ?? (
+              <AiorAsideNext
+                body="Evaluamos su operación y proponemos alcance concreto — SaaS, agencia o ambos."
+                primaryCta={{ label: "Solicitar demo", href: "/contacto" }}
+                secondaryCta={{ label: "Ver precios", href: "/precios" }}
+              />
+            )}
+            <p className="mt-3" style={{ fontSize: 13, color: "#6b7c93" }}>
+              También puede{" "}
+              <Link href="/recursos" style={{ color: "#0084FF" }}>
+                explorar recursos
+              </Link>
+              .
+            </p>
+          </div>
+        </div>
+      </AiorSection>
+      <AiorCtaBand
         title="Hablemos de su operación"
         body="Evaluamos alcance, integraciones y plan adecuado sin compromisos genéricos."
         primaryCta={{ label: "Contactar", href: "/contacto" }}

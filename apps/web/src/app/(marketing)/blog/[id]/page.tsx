@@ -1,9 +1,11 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import Link from "next/link";
+
 import { blog } from "@/lib/pa/source";
-import { BlogHeader } from "@/components/pa/blogs/blog-header";
 import { Content } from "@/components/pa/blogs/content";
-import { SuggestedBlogs } from "@/components/pa/blogs/suggested-blogs";
+import { AiorSection } from "@/features/public-web/components/AiorBlocks";
+import { AiorCtaBand, AiorPageHero } from "@/features/public-web/components/AiorPageHero";
 
 interface BlogPostPageProps {
   params: Promise<{ id: string }>;
@@ -12,11 +14,9 @@ interface BlogPostPageProps {
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
   const { id } = await params;
   const page = blog.getPage([id]);
-  if (!page) {
-    return {};
-  }
+  if (!page) return {};
   return {
-    title: `${page.data.title} | Blog NELVYON`,
+    title: { absolute: `${page.data.title} | Blog NELVYON` },
     description: page.data.description,
   };
 }
@@ -32,15 +32,41 @@ export function generateStaticParams() {
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { id } = await params;
   const page = blog.getPage([id]);
-  if (!page) {
-    notFound();
-  }
+  if (!page) notFound();
+
+  const dateLabel = new Date(page.data.date).toLocaleDateString("es-ES", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
 
   return (
     <>
-      <BlogHeader page={page} />
-      <Content page={page} />
-      <SuggestedBlogs />
+      <AiorPageHero
+        eyebrow="Blog"
+        title={String(page.data.title)}
+        description={`${dateLabel}${page.data.timeToRead ? ` · ${page.data.timeToRead}` : ""}${
+          page.data.description ? ` — ${page.data.description}` : ""
+        }`}
+        primaryCta={{ label: "Todos los artículos", href: "/blog" }}
+        secondaryCta={{ label: "Recursos", href: "/recursos" }}
+      />
+      <AiorSection>
+        <div style={{ maxWidth: 800, margin: "0 auto" }}>
+          <Content page={page} />
+          <p className="mt-40">
+            <Link href="/blog" className="th-btn2 style5">
+              Volver al blog
+            </Link>
+          </p>
+        </div>
+      </AiorSection>
+      <AiorCtaBand
+        title="¿Quiere aplicar esto a su operación?"
+        body="Hable con el equipo sobre SaaS, agencia o ambos."
+        primaryCta={{ label: "Contactar", href: "/contacto" }}
+        secondaryCta={{ label: "Ver precios", href: "/precios" }}
+      />
     </>
   );
 }

@@ -23,6 +23,8 @@ const display = Outfit({
 const canonicalBase = getAppBaseUrl();
 const ogImageAbs = `${canonicalBase}/opengraph-image`;
 
+const AIOR = "/brand/public/aior/css";
+
 export const metadata: Metadata = {
   title: {
     default: `${siteBrand.name} — Agencia IA + SaaS B2B`,
@@ -84,6 +86,12 @@ export default function MarketingRouteLayout({ children }: { children: ReactNode
 
   return (
     <section lang="es" className={`${sans.variable} ${display.variable}`}>
+      {/* AIOR skin (slim) — composición visual aprobada */}
+      <link rel="stylesheet" href={`${AIOR}/bootstrap.min.css`} />
+      <link rel="stylesheet" href={`${AIOR}/fontawesome.min.css`} />
+      <link rel="stylesheet" href={`${AIOR}/swiper-bundle.min.css`} />
+      <link rel="stylesheet" href={`${AIOR}/style.css`} />
+      <link rel="stylesheet" href={`${AIOR}/nelvyon-aior.css`} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteLd) }} />
       <a

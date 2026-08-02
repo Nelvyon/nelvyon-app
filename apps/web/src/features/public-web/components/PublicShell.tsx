@@ -5,9 +5,8 @@ import { PublicNav } from "./PublicNav";
 
 export function PublicShell({ children }: { children: ReactNode }) {
   return (
-    <div className="nv-public min-h-screen">
+    <div className="nv-public nv-aior min-h-screen">
       <PublicNav />
-      {/* Root layout already provides <main>; keep a single landmark. */}
       <div id="contenido-principal">{children}</div>
       <PublicFooter />
     </div>

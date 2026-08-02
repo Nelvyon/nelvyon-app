@@ -10,6 +10,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
+/** Home pública NELVYON — composición AIOR (Cloud SaaS + BI), contenido real. */
 export default function HomePage() {
   return <PublicHomePage />;
 }

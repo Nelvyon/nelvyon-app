@@ -33,6 +33,9 @@ const eslintConfig = [
       "src/components/agenforce/**",
       /** Legacy embed script (vanilla JS). */
       "public/embed/**",
+      /** Vendor CSS/JS/fonts for public AIOR skin (not app source). */
+      "public/brand/public/aior/**",
+      "public/brand/public/zubaz/**",
     ],
   },
   ...compat.extends("next/core-web-vitals", "next/typescript"),

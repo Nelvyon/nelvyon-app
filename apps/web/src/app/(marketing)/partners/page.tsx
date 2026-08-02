@@ -1,77 +1,82 @@
 "use client";
 
-import React from "react";
-import Link from "next/link";
-import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 
-import { MarketingSubnav } from "@/components/marketing/MarketingSubnav";
-import { NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
+import { AiorFeatureGrid, AiorSection, AiorTitle } from "@/features/public-web/components/AiorBlocks";
+import { AiorCtaBand, AiorPageHero } from "@/features/public-web/components/AiorPageHero";
 
 export default function PartnersPage() {
-  const t = useTranslations();
   const [clients, setClients] = useState("10");
   const commission = useMemo(() => {
     const n = Number(clients);
     if (!Number.isFinite(n) || n < 0) return 0;
+    // Estimación ilustrativa sobre plan Starter (€97) al 30% — no es compromiso contractual.
     return n * 97 * 0.3;
   }, [clients]);
 
   return (
     <>
-      <MarketingSubnav />
-      <main className="mx-auto w-full max-w-6xl space-y-10 px-4 py-10">
-      <section className="space-y-4 text-center">
-        <NelvyonDsSectionHeader title="Programa de Partners NELVYON" subtitle={t("partners.subtitle")} />
-      </section>
+      <AiorPageHero
+        eyebrow="Partners"
+        title="Programa de partners NELVYON"
+        description="Refiera el SaaS NELVYON a empresas de su red. Comisión recurrente orientativa sobre el plan Starter; condiciones finales en acuerdo partner."
+        primaryCta={{ label: "Solicitar alta partner", href: "/contacto?tipo=partner" }}
+        secondaryCta={{ label: "Ver precios SaaS", href: "/precios#saas" }}
+      />
 
-      <section className="grid gap-4 md:grid-cols-3">
-        <NelvyonDsCard title="1. Regístrate">
-          <p className="text-sm text-muted-foreground">Crea tu cuenta partner en menos de 2 minutos.</p>
-        </NelvyonDsCard>
-        <NelvyonDsCard title="2. Comparte tu enlace">
-          <p className="text-sm text-muted-foreground">Envía tu referral link único a empresas y agencias de tu red.</p>
-        </NelvyonDsCard>
-        <NelvyonDsCard title="3. Cobra 30% recurrente">
-          <p className="text-sm text-muted-foreground">Recibe comisión mensual mientras tus referidos sigan activos.</p>
-        </NelvyonDsCard>
-      </section>
-
-      <section className="grid gap-4 md:grid-cols-3">
-        <NelvyonDsCard title="Comisión del 30% recurrente">
-          <p className="text-sm text-muted-foreground">Ingresos estables y escalables por cada cliente referido.</p>
-        </NelvyonDsCard>
-        <NelvyonDsCard title="Panel de control">
-          <p className="text-sm text-muted-foreground">Sigue leads, referidos y comisiones en tiempo real desde SaaS.</p>
-        </NelvyonDsCard>
-        <NelvyonDsCard title="Pagos mensuales">
-          <p className="text-sm text-muted-foreground">Liquidación automática y transparente de tus comisiones.</p>
-        </NelvyonDsCard>
-      </section>
-
-      <NelvyonDsCard className="space-y-3">
-        <h2 className="text-xl font-semibold text-white">Calculadora simple</h2>
-        <label className="block text-sm text-muted-foreground" htmlFor="clients">
-          Número de clientes
-        </label>
-        <input
-          id="clients"
-          className="w-full max-w-xs rounded-md border bg-background px-3 py-2 text-sm"
-          type="number"
-          value={clients}
-          onChange={(e) => setClients(e.target.value)}
+      <AiorSection soft>
+        <AiorTitle eyebrow="Cómo funciona" title="Tres pasos" center />
+        <AiorFeatureGrid
+          items={[
+            { title: "1. Regístrese", body: "Solicite alta partner y revise condiciones comerciales." },
+            { title: "2. Comparta su enlace", body: "Referral link único para empresas y agencias de su red." },
+            { title: "3. Comisión recurrente", body: "Liquidación según acuerdo mientras los referidos permanezcan activos." },
+          ]}
         />
-        <p className="text-sm text-white">
-          Comisión mensual estimada: <span className="font-semibold">€{commission.toFixed(2)}</span>
-        </p>
-      </NelvyonDsCard>
+      </AiorSection>
 
-      <section className="flex justify-center">
-        <NelvyonDsButton asChild size="lg">
-          <Link href="/contacto">Conviértete en Partner</Link>
-        </NelvyonDsButton>
-      </section>
-    </main>
+      <AiorSection>
+        <AiorTitle eyebrow="Beneficios" title="Qué incluye el programa" />
+        <AiorFeatureGrid
+          items={[
+            { title: "Comisión recurrente", body: "Ingresos alineados a la permanencia del cliente referido." },
+            { title: "Visibilidad en SaaS", body: "Seguimiento de leads y referidos desde el producto cuando el programa está activo." },
+            { title: "Pagos mensuales", body: "Liquidación periódica según el acuerdo partner firmado." },
+          ]}
+        />
+      </AiorSection>
+
+      <AiorSection soft>
+        <AiorTitle
+          eyebrow="Estimación"
+          title="Calculadora ilustrativa"
+          description="Ejemplo sobre plan Starter (€97/mes) al 30%. No sustituye el acuerdo comercial."
+        />
+        <div style={{ maxWidth: 420, margin: "0 auto", padding: 28, borderRadius: 16, border: "1px solid #E0E0E0", background: "#fff" }}>
+          <label htmlFor="clients" className="d-block mb-2">
+            Número de clientes referidos (Starter)
+          </label>
+          <input
+            id="clients"
+            type="number"
+            min={0}
+            value={clients}
+            onChange={(e) => setClients(e.target.value)}
+            className="form-control"
+            style={{ maxWidth: 200, marginBottom: 16 }}
+          />
+          <p className="mb-0">
+            Comisión mensual estimada: <strong style={{ color: "#0084FF" }}>€{commission.toFixed(2)}</strong>
+          </p>
+        </div>
+      </AiorSection>
+
+      <AiorCtaBand
+        title="Conviértase en partner NELVYON"
+        body="Le enviamos condiciones reales del programa — sin promesas de volumen inventadas."
+        primaryCta={{ label: "Contactar", href: "/contacto?tipo=partner" }}
+        secondaryCta={{ label: "Ver SaaS", href: "/producto" }}
+      />
     </>
   );
 }

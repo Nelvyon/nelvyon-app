@@ -1,0 +1,122 @@
+{
+  "base": "http://127.0.0.1:3011",
+  "generatedAt": "2026-08-02T04:35:27.863Z",
+  "fail": 0,
+  "pass": 19,
+  "results": [
+    {
+      "route": "/",
+      "status": 200,
+      "ok": true,
+      "hits": []
+    },
+    {
+      "route": "/agencia",
+      "status": 200,
+      "ok": true,
+      "hits": []
+    },
+    {
+      "route": "/producto",
+      "status": 200,
+      "ok": true,
+      "hits": []
+    },
+    {
+      "route": "/producto/ia",
+      "status": 200,
+      "ok": true,
+      "hits": []
+    },
+    {
+      "route": "/producto/crm",
+      "status": 200,
+      "ok": true,
+      "hits": []
+    },
+    {
+      "route": "/enterprise",
+      "status": 200,
+      "ok": true,
+      "hits": []
+    },
+    {
+      "route": "/precios",
+      "status": 200,
+      "ok": true,
+      "hits": []
+    },
+    {
+      "route": "/contacto",
+      "status": 200,
+      "ok": true,
+      "hits": []
+    },
+    {
+      "route": "/integraciones",
+      "status": 200,
+      "ok": true,
+      "hits": []
+    },
+    {
+      "route": "/sectores",
+      "status": 200,
+      "ok": true,
+      "hits": []
+    },
+    {
+      "route": "/casos-de-uso",
+      "status": 200,
+      "ok": true,
+      "hits": []
+    },
+    {
+      "route": "/recursos",
+      "status": 200,
+      "ok": true,
+      "hits": []
+    },
+    {
+      "route": "/blog",
+      "status": 200,
+      "ok": true,
+      "hits": []
+    },
+    {
+      "route": "/faq",
+      "status": 200,
+      "ok": true,
+      "hits": []
+    },
+    {
+      "route": "/aviso-legal",
+      "status": 200,
+      "ok": true,
+      "hits": []
+    },
+    {
+      "route": "/privacidad",
+      "status": 200,
+      "ok": true,
+      "hits": []
+    },
+    {
+      "route": "/partners",
+      "status": 200,
+      "ok": true,
+      "hits": []
+    },
+    {
+      "route": "/alternatives",
+      "status": 200,
+      "ok": true,
+      "hits": []
+    },
+    {
+      "route": "/status",
+      "status": 200,
+      "ok": true,
+      "hits": []
+    }
+  ]
+}
