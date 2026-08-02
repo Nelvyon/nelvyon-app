@@ -1,22 +1,17 @@
 /**
- * Sustitución SELECTIVA de media problemáticas / placeholders Envato.
- *
- * Política CEO:
- * - Mantener estructura, slots, HTML/CSS/JS AIOR.
- * - NO redistribuir a ciegas.
- * - Sustituir solo: placeholders dimensionales, UIs crypto/wallet,
- *   branding AIOR embebido, nombres ficticios, interfaces irreales.
- * - Conservar shapes/icons/brand SVG reales y assets > umbral.
- * - Fuentes: saas-shots NELVYON + capturas premium CEO (robots/integraciones).
- *
- * Tras brand + content:
- *   node scripts/fix-aior-selective-media.mjs
- *   (o el wrapper redistribute-aior-media.mjs)
+ * BLOQUEADO — CEO 2026-08-02:
+ * Prohibido sustituir media AIOR por saas-shots / CEO crops.
+ * Mantener ilustraciones, mockups, robots y renders originales de AIOR.
  */
 import fs from "node:fs";
 import path from "node:path";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
+
+console.error(
+  "BLOCKED: fix-aior-selective-media.mjs is disabled. Keep original AIOR media. Use restore-aior-visuals-keep-content.mjs if needed."
+);
+process.exit(2);
 
 const ROOT = process.cwd();
 const WWW = path.join(ROOT, "apps", "web", "public", "www");

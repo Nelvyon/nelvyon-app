@@ -1,0 +1,13 @@
+{
+  "restoredImg": true,
+  "restoredCss": true,
+  "logosNelvyon": true,
+  "htmlPathFixes": 0,
+  "sampleByteMatch": {
+    "normal/about-img1.jpg": true,
+    "normal/hero-image4.png": true,
+    "normal/about_2_1.jpg": true
+  },
+  "nelvyonFolderGone": true,
+  "deploy": false
+}

@@ -35,7 +35,8 @@ pip-wheel-metadata/
 scripts/data/aior-video-frames/v*.png
 
 # Heavy AIOR demo videos (optional local; pack HTML funciona sin ellos)
-apps/web/public/www/**/*.mp4
+# Permitir vídeo hero AIOR en /www (necesario para fidelidad visual)
+# apps/web/public/www/**/*.mp4
 
 # --- Local audit / scratch outputs ---
 tmp-*.txt

@@ -17,20 +17,8 @@ const EXCLUDE = new Set([
   "home-finance-crypto-service-op.html",
 ]);
 
-const COLOR_MAP = [
-  ["#7B5DFF", "#0084FF"],
-  ["#7b5dff", "#0084ff"],
-  ["#D4FF12", "#33A1FF"],
-  ["#d4ff12", "#33a1ff"],
-  ["#A378FF", "#4DA3FF"],
-  ["#a378ff", "#4da3ff"],
-  ["#C726FD", "#0066FF"],
-  ["#c726fd", "#0066ff"],
-  ["#FF1CA4", "#0084FF"],
-  ["#ff1ca4", "#0084ff"],
-  ["#5DFFD9", "#66C2FF"],
-  ["#5dffd9", "#66c2ff"],
-];
+/** DESACTIVADO: cambiar colores = cambiar estilo AIOR (prohibido por CEO). */
+const COLOR_MAP = [];
 
 const TEXT_REPLACEMENTS = [
   [/Aior\s*-\s*AI\s*&\s*SaaS/gi, "NELVYON — Agencia IA + SaaS B2B"],
@@ -192,65 +180,14 @@ function writeLogos() {
   }
 }
 
+/** DESACTIVADO: override de --theme-color = cambio de estilo AIOR. */
 function injectBrandCss() {
-  const stylePath = path.join(DEST, "assets", "css", "style.css");
-  const extra = `
-
-/* ===== NELVYON brand overrides (AIOR base preserved) ===== */
-:root {
-  --theme-color: #0084FF !important;
-  --theme-color2: #33A1FF !important;
-}
-`;
-  fs.appendFileSync(stylePath, extra);
-  const schemes = path.join(DEST, "assets", "css", "color.schemes.css");
-  if (fs.existsSync(schemes)) {
-    let s = fs.readFileSync(schemes, "utf8");
-    s = brandText(s);
-    fs.writeFileSync(schemes, s);
-  }
+  console.log("injectBrandCss: SKIPPED (AIOR colors preserved)");
 }
 
-/** Copy real SaaS shots into template img slots (structure preserved). */
+/** DESACTIVADO: capturas SaaS NELVYON prohibidas en la web pública. */
 function injectSaasShots() {
-  const shotsSrc = path.join(ROOT, "apps", "web", "public", "brand", "public", "saas-shots");
-  const destImg = path.join(DEST, "assets", "img", "nelvyon");
-  fs.mkdirSync(destImg, { recursive: true });
-  const map = {
-    "hero-image4.png": "pipeline.webp",
-    "project-image-1.png": "crm.webp",
-    "project-image-2.png": "workflows.webp",
-    "project-image-3.png": "ai.webp",
-    "project-image-4.png": "campanias.webp",
-    "process-image2.png": "dashboard.webp",
-    "feature_3_1.png": "agentes.webp",
-  };
-  for (const [slot, shot] of Object.entries(map)) {
-    const from = path.join(shotsSrc, shot);
-    if (!fs.existsSync(from)) continue;
-    const to = path.join(destImg, shot);
-    fs.copyFileSync(from, to);
-    // Also overwrite the original slot path used by AIOR markup
-    const normal = path.join(DEST, "assets", "img", "normal", slot);
-    const project = path.join(DEST, "assets", "img", "project", slot);
-    if (fs.existsSync(path.dirname(normal))) fs.copyFileSync(from, normal.replace(/\.png$/i, path.extname(from)));
-    if (fs.existsSync(path.dirname(project)) && slot.startsWith("project")) {
-      fs.copyFileSync(from, project.replace(/\.png$/i, path.extname(from)));
-    }
-  }
-  // Patch HTML src extensions png→webp for swapped slots
-  for (const file of walk(DEST).filter((f) => f.endsWith(".html"))) {
-    let html = fs.readFileSync(file, "utf8");
-    const before = html;
-    html = html.replace(/assets\/img\/normal\/hero-image4\.png/g, "assets/img/nelvyon/pipeline.webp");
-    html = html.replace(/assets\/img\/project\/project-image-1\.png/g, "assets/img/nelvyon/crm.webp");
-    html = html.replace(/assets\/img\/project\/project-image-2\.png/g, "assets/img/nelvyon/workflows.webp");
-    html = html.replace(/assets\/img\/project\/project-image-3\.png/g, "assets/img/nelvyon/ai.webp");
-    html = html.replace(/assets\/img\/project\/project-image-4\.png/g, "assets/img/nelvyon/campanias.webp");
-    html = html.replace(/assets\/img\/normal\/process-image2\.png/g, "assets/img/nelvyon/dashboard.webp");
-    html = html.replace(/assets\/img\/normal\/feature_3_1\.png/g, "assets/img/nelvyon/agentes.webp");
-    if (html !== before) fs.writeFileSync(file, html);
-  }
+  console.log("injectSaasShots: SKIPPED (keep AIOR illustrations/mockups)");
 }
 
 /** Precios SaaS reales en las 3 cards AIOR (misma composición). */
@@ -467,7 +404,7 @@ for (const file of files) {
 }
 
 writeLogos();
-injectBrandCss();
+// NO injectBrandCss / NO injectSaasShots — visual AIOR intacto
 writeDemosIndex();
 applyFidelityHooks();
 
@@ -476,10 +413,13 @@ fs.writeFileSync(
   `NELVYON × AIOR — plantilla completa
 - TODAS las homes excepto 03 (image-generate) y 11 (finance-crypto)
 - TODAS las páginas internas
-- Diseño/HTML/CSS/JS intactos — solo branding + contenido
+- Diseño/HTML/CSS/JS/imágenes AIOR intactos — SOLO logo + textos + precios + SEO/legales
+- PROHIBIDO: capturas SaaS NELVYON, fidelity/selective media, cambio de colores
 - index.html = Home 01 (startup) original
 - Mapa: /www/mapa-plantillas.html (noindex)
-- Regenerar: node scripts/brand-aior-nelvyon.mjs && node scripts/content-aior-nelvyon-only.mjs && node scripts/redistribute-aior-media.mjs
+- Regenerar contenido: node scripts/brand-aior-nelvyon.mjs && node scripts/content-aior-nelvyon-only.mjs
+- Si se alteró media: node scripts/restore-aior-visuals-keep-content.mjs
+- NUNCA: redistribute/fidelity/selective media passes
 `
 );
 

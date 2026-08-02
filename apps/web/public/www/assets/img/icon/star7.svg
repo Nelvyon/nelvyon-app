@@ -5,15 +5,15 @@
 <defs>
 <linearGradient id="paint0_linear_4906_4214" x1="3.34906" y1="-0.560015" x2="27.5835" y2="14.8372" gradientUnits="userSpaceOnUse">
 <stop stop-color="#AEFF5D"/>
-<stop offset="1" stop-color="#66C2FF"/>
+<stop offset="1" stop-color="#5DFFD9"/>
 </linearGradient>
 <linearGradient id="paint1_linear_4906_4214" x1="18.5021" y1="-1.23502" x2="28.474" y2="5.1006" gradientUnits="userSpaceOnUse">
 <stop stop-color="#AEFF5D"/>
-<stop offset="1" stop-color="#66C2FF"/>
+<stop offset="1" stop-color="#5DFFD9"/>
 </linearGradient>
 <linearGradient id="paint2_linear_4906_4214" x1="18.5021" y1="13.8939" x2="28.474" y2="20.2295" gradientUnits="userSpaceOnUse">
 <stop stop-color="#AEFF5D"/>
-<stop offset="1" stop-color="#66C2FF"/>
+<stop offset="1" stop-color="#5DFFD9"/>
 </linearGradient>
 </defs>
 </svg>

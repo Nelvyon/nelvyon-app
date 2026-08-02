@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-02T18:49:23.429Z",
+  "generatedAt": "2026-08-02T21:28:44.614Z",
   "pagesReviewed": 36,
   "pagesOkStrict": 36,
   "realErrorCount": 0,
@@ -8,183 +8,8 @@
   "brokenIcons": [],
   "faviconMissing": [],
   "templatePages": [],
-  "lowResSamples": [
-    {
-      "file": "home-ai-chatbot-tool-op.html",
-      "src": "assets/img/icon/star6.png",
-      "bytes": 1705,
-      "decor": true
-    },
-    {
-      "file": "home-ai-chatbot-tool-op.html",
-      "src": "assets/img/icon/ser-logo1.png",
-      "bytes": 1654,
-      "decor": true
-    },
-    {
-      "file": "home-ai-chatbot-tool-op.html",
-      "src": "assets/img/icon/ser-logo2.png",
-      "bytes": 1822,
-      "decor": true
-    },
-    {
-      "file": "home-ai-chatbot-tool-op.html",
-      "src": "assets/img/icon/ser-logo3.png",
-      "bytes": 1725,
-      "decor": true
-    },
-    {
-      "file": "home-ai-chatbot-tool-op.html",
-      "src": "assets/img/icon/ser-logo1.png",
-      "bytes": 1654,
-      "decor": true
-    },
-    {
-      "file": "home-ai-chatbot-tool.html",
-      "src": "assets/img/icon/star6.png",
-      "bytes": 1705,
-      "decor": true
-    },
-    {
-      "file": "home-ai-chatbot-tool.html",
-      "src": "assets/img/icon/ser-logo1.png",
-      "bytes": 1654,
-      "decor": true
-    },
-    {
-      "file": "home-ai-chatbot-tool.html",
-      "src": "assets/img/icon/ser-logo2.png",
-      "bytes": 1822,
-      "decor": true
-    },
-    {
-      "file": "home-ai-chatbot-tool.html",
-      "src": "assets/img/icon/ser-logo3.png",
-      "bytes": 1725,
-      "decor": true
-    },
-    {
-      "file": "home-ai-chatbot-tool.html",
-      "src": "assets/img/icon/ser-logo1.png",
-      "bytes": 1654,
-      "decor": true
-    },
-    {
-      "file": "home-ai-startup-op.html",
-      "src": "assets/img/icon/icon-1.png",
-      "bytes": 1590,
-      "decor": true
-    },
-    {
-      "file": "home-ai-startup-op.html",
-      "src": "assets/img/icon/icon-3.png",
-      "bytes": 685,
-      "decor": true
-    },
-    {
-      "file": "home-ai-startup-op.html",
-      "src": "assets/img/icon/icon-4.png",
-      "bytes": 1298,
-      "decor": true
-    },
-    {
-      "file": "home-ai-startup.html",
-      "src": "assets/img/icon/icon-1.png",
-      "bytes": 1590,
-      "decor": true
-    },
-    {
-      "file": "home-ai-startup.html",
-      "src": "assets/img/icon/icon-3.png",
-      "bytes": 685,
-      "decor": true
-    },
-    {
-      "file": "home-ai-startup.html",
-      "src": "assets/img/icon/icon-4.png",
-      "bytes": 1298,
-      "decor": true
-    },
-    {
-      "file": "home-ai-writer-tool-op.html",
-      "src": "assets/img/icon/review-star.png",
-      "bytes": 642,
-      "decor": true
-    },
-    {
-      "file": "home-ai-writer-tool-op.html",
-      "src": "assets/img/icon/review-star2.png",
-      "bytes": 1285,
-      "decor": true
-    },
-    {
-      "file": "home-ai-writer-tool.html",
-      "src": "assets/img/icon/review-star.png",
-      "bytes": 642,
-      "decor": true
-    },
-    {
-      "file": "home-ai-writer-tool.html",
-      "src": "assets/img/icon/review-star2.png",
-      "bytes": 1285,
-      "decor": true
-    },
-    {
-      "file": "home-productivity-tools-op.html",
-      "src": "assets/img/shape/calendar.png",
-      "bytes": 1963,
-      "decor": true
-    },
-    {
-      "file": "home-productivity-tools-op.html",
-      "src": "assets/img/shape/layer_2.png",
-      "bytes": 1490,
-      "decor": true
-    },
-    {
-      "file": "home-productivity-tools-op.html",
-      "src": "assets/img/shape/layer.png",
-      "bytes": 2270,
-      "decor": true
-    },
-    {
-      "file": "home-productivity-tools.html",
-      "src": "assets/img/shape/calendar.png",
-      "bytes": 1963,
-      "decor": true
-    },
-    {
-      "file": "home-productivity-tools.html",
-      "src": "assets/img/shape/layer_2.png",
-      "bytes": 1490,
-      "decor": true
-    },
-    {
-      "file": "home-productivity-tools.html",
-      "src": "assets/img/shape/layer.png",
-      "bytes": 2270,
-      "decor": true
-    },
-    {
-      "file": "index.html",
-      "src": "assets/img/icon/icon-1.png",
-      "bytes": 1590,
-      "decor": true
-    },
-    {
-      "file": "index.html",
-      "src": "assets/img/icon/icon-3.png",
-      "bytes": 685,
-      "decor": true
-    },
-    {
-      "file": "index.html",
-      "src": "assets/img/icon/icon-4.png",
-      "bytes": 1298,
-      "decor": true
-    }
-  ],
-  "lowResCount": 29,
+  "lowResSamples": [],
+  "lowResCount": 0,
   "heavyImageReuseTop": [],
   "siteFiles": {
     "robotsTxtPublic": false,
@@ -194,59 +19,72 @@
     "opengraphRouteNote": "og:image apunta a /opengraph-image (ruta Next), no a asset estático del pack"
   },
   "live": {
-    "base": "http://127.0.0.1:3013",
+    "base": "http://127.0.0.1:3010",
     "probes": [
       {
         "path": "/www/index.html",
-        "status": 200
+        "status": 0,
+        "error": "fetch failed"
       },
       {
         "path": "/www/pricing.html",
-        "status": 200
+        "status": 0,
+        "error": "fetch failed"
       },
       {
         "path": "/www/contact.html",
-        "status": 200
+        "status": 0,
+        "error": "fetch failed"
       },
       {
         "path": "/www/about.html",
-        "status": 200
+        "status": 0,
+        "error": "fetch failed"
       },
       {
         "path": "/www/features.html",
-        "status": 200
+        "status": 0,
+        "error": "fetch failed"
       },
       {
         "path": "/www/home-ai-agent.html",
-        "status": 200
+        "status": 0,
+        "error": "fetch failed"
       },
       {
         "path": "/www/assets/css/style.css",
-        "status": 200
+        "status": 0,
+        "error": "fetch failed"
       },
       {
         "path": "/www/assets/img/logo.svg",
-        "status": 200
+        "status": 0,
+        "error": "fetch failed"
       },
       {
         "path": "/www/assets/img/favicons/favicon-32x32.png",
-        "status": 200
+        "status": 0,
+        "error": "fetch failed"
       },
       {
         "path": "/www/assets/img/favicons/favicon.ico",
-        "status": 200
+        "status": 0,
+        "error": "fetch failed"
       },
       {
         "path": "/robots.txt",
-        "status": 200
+        "status": 0,
+        "error": "fetch failed"
       },
       {
         "path": "/sitemap.xml",
-        "status": 200
+        "status": 0,
+        "error": "fetch failed"
       },
       {
         "path": "/opengraph-image",
-        "status": 200
+        "status": 0,
+        "error": "fetch failed"
       }
     ]
   },

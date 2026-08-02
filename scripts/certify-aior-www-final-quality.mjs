@@ -7,8 +7,18 @@ import path from "node:path";
 
 const ROOT = process.cwd();
 const WWW = path.join(ROOT, "apps", "web", "public", "www");
+const REF_IMG = path.join(ROOT, ".reference", "aior", "download-version", "assets", "img");
 const EVIDENCE = path.join(ROOT, "docs", "evidence", "public-web-aior-nelvyon");
 const BASE = (process.argv.find((a) => a.startsWith("--base=")) || "").slice(7) || "http://127.0.0.1:3010";
+
+function matchesAiorOriginal(absPath) {
+  if (!absPath.includes(`${path.sep}assets${path.sep}img${path.sep}`)) return false;
+  const rel = path.relative(path.join(WWW, "assets", "img"), absPath);
+  if (rel.startsWith("..")) return false;
+  const ref = path.join(REF_IMG, rel);
+  if (!fs.existsSync(ref)) return false;
+  return fs.statSync(ref).size === fs.statSync(absPath).size;
+}
 
 const PAGES = fs.readdirSync(WWW).filter((f) => f.endsWith(".html") && f !== "mapa-plantillas.html").sort();
 
@@ -94,12 +104,13 @@ for (const file of PAGES) {
       /[\\/](icon|shape|favicons|logo)[\\/]/i.test(r.abs) ||
       /\.(svg)$/i.test(r.abs) ||
       /favicon|logo-icon|mask-shape|integration-logo/i.test(r.abs);
-    // Solo fotos de contenido demasiado pequeñas = error real (no iconos AIOR)
-    if (!isDecor && st.size < 8000 && /\.(jpe?g|png|webp)$/i.test(r.abs)) {
+    // Placeholders pequeños del ZIP AIOR original NO son error (fidelidad visual).
+    if (matchesAiorOriginal(r.abs)) {
+      // ok — byte-identical to Envato AIOR
+    } else if (!isDecor && st.size < 8000 && /\.(jpe?g|png|webp)$/i.test(r.abs)) {
       lowRes.push({ file, src, bytes: st.size });
       issues.push(`low_bytes_content:${src}:${st.size}`);
     } else if (isDecor && st.size < 2500 && /\.(jpe?g|png|webp)$/i.test(r.abs)) {
-      // informativo, no error
       lowRes.push({ file, src, bytes: st.size, decor: true });
     }
   }

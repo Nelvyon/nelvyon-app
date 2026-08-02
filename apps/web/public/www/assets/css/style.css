@@ -1,10 +1,10 @@
 @charset "UTF-8";
 /*
-Template Name: NELVYON 
-Template URL: http://Nelvyon.com/html/NELVYON 
-Description: NELVYON  -  NELVYON AI & SaaS HTML Template 
-Author: Nelvyon
-Author URI: https://themeforest.net/user/Nelvyon 
+Template Name: Aior 
+Template URL: http://themehour.com/html/Aior 
+Description: Aior  -  AIOR AI & SaaS HTML Template 
+Author: themehour
+Author URI: https://themeforest.net/user/themehour 
 Version: 1.0.0
 */
 /*=================================
@@ -85,8 +85,8 @@ Version: 1.0.0
 /*------------------- 1.2. Function -------------------*/
 /*------------------- 1.3. Variable-------------------*/
 :root {
-  --theme-color: #0084FF;
-  --theme-color2: #33A1FF;
+  --theme-color: #7B5DFF;
+  --theme-color2: #D4FF12;
   --title-color: #06050B;
   --body-color: #484848;
   --smoke-color: #D4D4D4;
@@ -139,7 +139,7 @@ body.theme2 {
 }
 body.theme3 {
   --theme-color: #1C4EFF;
-  --theme-color2: #4DA3FF;
+  --theme-color2: #A378FF;
 }
 body.theme4 {
   --theme-color: #4E0055;
@@ -153,16 +153,16 @@ body.theme6 {
 }
 body.theme7 {
   --theme-color: #AEFF5D;
-  --theme-color2: #66C2FF;
+  --theme-color2: #5DFFD9;
 }
 body.theme8 {
-  --theme-color: #0084FF;
+  --theme-color: #7B5DFF;
   --theme-color2: #B35DFF;
   background-color: #07090E;
 }
 body.theme9 {
   --theme-color: #1C4EFF;
-  --theme-color2: #4DA3FF;
+  --theme-color2: #A378FF;
   background-color: #06050B;
 }
 
@@ -1846,7 +1846,7 @@ input[type=time]::-webkit-calendar-picker-indicator {
   transition: all 0.4s ease-in-out;
 }
 .swiper-pagination-bullets .swiper-pagination-bullet.swiper-pagination-bullet-active {
-  background: linear-gradient(116.7deg, #0084FF 0%, #B35DFF 100%);
+  background: linear-gradient(116.7deg, #7B5DFF 0%, #B35DFF 100%);
   border-color: var(--theme-color);
 }
 
@@ -1939,7 +1939,7 @@ input[type=time]::-webkit-calendar-picker-indicator {
   transition: all 0.4s ease;
 }
 .slider-arrow.style5:hover {
-  background: linear-gradient(261.14deg, #0066FF 20.53%, #0084FF 69.42%);
+  background: linear-gradient(261.14deg, #C726FD 20.53%, #FF1CA4 69.42%);
   border: 4px solid #F7F7F7;
   -webkit-box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.06);
           box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.06);
@@ -1992,7 +1992,7 @@ input[type=time]::-webkit-calendar-picker-indicator {
   color: var(--title-color);
 }
 .slider-arrow.style6:hover {
-  background: linear-gradient(261.14deg, #0066FF 20.53%, #0084FF 69.42%);
+  background: linear-gradient(261.14deg, #C726FD 20.53%, #FF1CA4 69.42%);
   border: none;
 }
 .slider-arrow.style7 {
@@ -2008,8 +2008,8 @@ input[type=time]::-webkit-calendar-picker-indicator {
   transition: all 0.4s ease;
 }
 .slider-arrow.style7:hover {
-  background: linear-gradient(261.14deg, #0066FF 20.53%, #0084FF 69.42%);
-  border: 1px solid #0084FF;
+  background: linear-gradient(261.14deg, #C726FD 20.53%, #FF1CA4 69.42%);
+  border: 1px solid #FF1CA4;
 }
 .slider-arrow.style7.slider-next {
   right: var(--pos-x, 520px);
@@ -2640,7 +2640,7 @@ input[type=time]::-webkit-calendar-picker-indicator {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: radial-gradient(circle at 50% 50%, #0084FF 0%, transparent 50%), radial-gradient(circle at 45% 45%, #33A1FF 0%, transparent 45%), radial-gradient(circle at 55% 55%, #0084FF 0%, transparent 45%), radial-gradient(circle at 45% 55%, #0066FF 0%, transparent 45%), radial-gradient(circle at 55% 45%, #4E0055 0%, transparent 45%);
+  background-image: radial-gradient(circle at 50% 50%, #7B5DFF 0%, transparent 50%), radial-gradient(circle at 45% 45%, #D4FF12 0%, transparent 45%), radial-gradient(circle at 55% 55%, #FF1CA4 0%, transparent 45%), radial-gradient(circle at 45% 55%, #C726FD 0%, transparent 45%), radial-gradient(circle at 55% 45%, #4E0055 0%, transparent 45%);
   -webkit-mask: radial-gradient(circle at 50% 50%, transparent 0%, transparent 10%, black 25%);
           mask: radial-gradient(circle at 50% 50%, transparent 0%, transparent 10%, black 25%);
   -webkit-animation: transform-animation 2s infinite alternate, opacity-animation 4s infinite;
@@ -3266,7 +3266,7 @@ input[type=time]::-webkit-calendar-picker-indicator {
   color: var(--white-color);
 }
 .th-btn3.style3 {
-  background: linear-gradient(261.14deg, #0066FF 20.53%, #0084FF 69.42%);
+  background: linear-gradient(261.14deg, #C726FD 20.53%, #FF1CA4 69.42%);
   border-radius: 16px;
 }
 .th-btn3.style3 .icon {
@@ -9220,10 +9220,10 @@ ol.widget_recent_comments,
   }
 }
 .header-layout7 .main-menu > ul > li > a:hover {
-  color: #0084FF;
+  color: #7B5DFF;
 }
 .header-layout7 .mega-menu-box .mega-menu-img .btn-wrap .th-btn {
-  background-color: #0084FF;
+  background-color: #7B5DFF;
 }
 .header-layout7 .th-menu-toggle {
   color: var(--title-color);
@@ -10279,7 +10279,7 @@ ol.widget_recent_comments,
   color: var(--smoke-color);
 }
 .footer-layout4.style2 .footer-widget.widget_nav_menu a:hover {
-  color: #0084FF;
+  color: #FF1CA4;
 }
 .footer-layout4.style2 .box-title {
   font-weight: 600;
@@ -10302,7 +10302,7 @@ ol.widget_recent_comments,
   }
 }
 .footer-layout4.style2 .copyright-text a {
-  color: #0084FF;
+  color: #FF1CA4;
   font-size: 16px;
 }
 .footer-layout4.style2 .about-logo {
@@ -10562,7 +10562,7 @@ ol.widget_recent_comments,
   max-width: 450px;
   display: block;
   margin: auto;
-  background: linear-gradient(116.7deg, #0084FF 0%, #B35DFF 100%);
+  background: linear-gradient(116.7deg, #7B5DFF 0%, #B35DFF 100%);
   border: 1px solid #FFFFFF;
   border-radius: 24px;
   padding: 9px 32px;
@@ -12771,7 +12771,7 @@ ul.comment-list .th-comment-item:first-child:not(.children .th-comment-item) > .
 .hero-5 .scroll-down .icon-btn {
   width: 56px;
   height: 56px;
-  background: linear-gradient(261.14deg, #0066FF 20.53%, #0084FF 69.42%);
+  background: linear-gradient(261.14deg, #C726FD 20.53%, #FF1CA4 69.42%);
   border-radius: 48px;
   border: none;
   color: var(--white-color);
@@ -17883,7 +17883,7 @@ span.select2-selection.select2-selection--single:focus {
   margin-bottom: 15px;
 }
 .case-study.style2 .date .icon {
-  background: linear-gradient(309.43deg, #4DA3FF 9.12%, #1C4EFF 100%);
+  background: linear-gradient(309.43deg, #A378FF 9.12%, #1C4EFF 100%);
 }
 .case-study.style2 .box-content2 {
   max-width: 570px;
@@ -17999,7 +17999,7 @@ span.select2-selection.select2-selection--single:focus {
   top: 0;
   width: 312px;
   height: 312px;
-  background: linear-gradient(261.14deg, #0066FF 20.53%, #0084FF 69.42%);
+  background: linear-gradient(261.14deg, #C726FD 20.53%, #FF1CA4 69.42%);
   -webkit-filter: blur(100px);
           filter: blur(100px);
   z-index: -1;
@@ -18949,7 +18949,7 @@ span.select2-selection.select2-selection--single:focus {
   height: 72px;
   line-height: 72px;
   text-align: center;
-  background: linear-gradient(261.14deg, #0066FF 20.53%, #0084FF 69.42%);
+  background: linear-gradient(261.14deg, #C726FD 20.53%, #FF1CA4 69.42%);
   border-radius: 10px;
   margin-bottom: 30px;
 }
@@ -20018,7 +20018,7 @@ span.select2-selection.select2-selection--single:focus {
   position: absolute;
   inset: 0;
   height: 0;
-  background: linear-gradient(309.43deg, #4DA3FF 9.12%, #1C4EFF 100%);
+  background: linear-gradient(309.43deg, #A378FF 9.12%, #1C4EFF 100%);
   border-radius: 24px;
   z-index: -1;
   -webkit-transition: all 0.4s ease-in-out;
@@ -20335,7 +20335,7 @@ span.select2-selection.select2-selection--single:focus {
   }
 }
 .testiSlide4 .icon-box .slider-arrow:hover {
-  background: linear-gradient(309.43deg, #4DA3FF 9.12%, #1C4EFF 100%);
+  background: linear-gradient(309.43deg, #A378FF 9.12%, #1C4EFF 100%);
   color: var(--white-color);
 }
 .testiSlide4 .slider-controller {
@@ -20369,7 +20369,7 @@ span.select2-selection.select2-selection--single:focus {
   bottom: 74px;
 }
 .testiSlide4 .testi-wrapp.style2 .discount-wrapp {
-  background: linear-gradient(309.43deg, #4DA3FF 9.12%, #1C4EFF 100%);
+  background: linear-gradient(309.43deg, #A378FF 9.12%, #1C4EFF 100%);
 }
 .testiSlide4 .discount-wrapp {
   width: 192px;
@@ -21854,7 +21854,7 @@ span.select2-selection.select2-selection--single:focus {
   color: #484848;
 }
 .blog-card.style2 .blog-meta a:hover {
-  color: #0084FF;
+  color: #7B5DFF;
 }
 .blog-card.style2 .box-title {
   font-size: 28px;
@@ -21868,7 +21868,7 @@ span.select2-selection.select2-selection--single:focus {
   }
 }
 .blog-card.style2 .box-title:hover {
-  color: #0084FF;
+  color: #7B5DFF;
 }
 .blog-card.style2 .box-title a {
   color: inherit;
@@ -23124,7 +23124,7 @@ span.select2-selection.select2-selection--single:focus {
 }
 .award-item:nth-child(4) {
   background: #F3FFFC;
-  border: 1px solid #66C2FF;
+  border: 1px solid #5DFFD9;
   border-radius: 50px;
   -webkit-transform: rotate(-15deg);
           transform: rotate(-15deg);
@@ -24174,7 +24174,7 @@ span.select2-selection.select2-selection--single:focus {
 }
 
 .faq-mail {
-  color: #0084FF;
+  color: #7B5DFF;
 }
 
 .faq-area3 {
@@ -25808,7 +25808,7 @@ span.select2-selection.select2-selection--single:focus {
   height: 54px;
   line-height: 54px;
   text-align: center;
-  background: linear-gradient(309.43deg, #4DA3FF 9.12%, #1C4EFF 100%);
+  background: linear-gradient(309.43deg, #A378FF 9.12%, #1C4EFF 100%);
   border-radius: 10px;
   margin-bottom: 32px;
   position: relative;
@@ -27241,7 +27241,7 @@ span.select2-selection.select2-selection--single:focus {
   color: var(--title-color);
 }
 .price-box.style3 .box-icon {
-  background: linear-gradient(309.43deg, #4DA3FF 9.12%, #1C4EFF 100%);
+  background: linear-gradient(309.43deg, #A378FF 9.12%, #1C4EFF 100%);
 }
 .price-box.style3 .th-btn {
   display: -webkit-box;
@@ -27258,7 +27258,7 @@ span.select2-selection.select2-selection--single:focus {
 .price-box.style3.active .box-content {
   position: relative;
   z-index: 2;
-  background: linear-gradient(309.43deg, #4DA3FF 9.12%, #1C4EFF 100%);
+  background: linear-gradient(309.43deg, #A378FF 9.12%, #1C4EFF 100%);
 }
 .price-box.style3.active .box-content:before {
   content: "";
@@ -27364,7 +27364,7 @@ span.select2-selection.select2-selection--single:focus {
   }
 }
 .price-box.style5 .th-btn3 {
-  background: linear-gradient(261.14deg, #0066FF 20.53%, #0084FF 69.42%);
+  background: linear-gradient(261.14deg, #C726FD 20.53%, #FF1CA4 69.42%);
 }
 .price-box.style5 .available-list {
   background: var(--title-color);
@@ -27384,7 +27384,7 @@ span.select2-selection.select2-selection--single:focus {
   width: 24px;
   height: 24px;
   line-height: 24px;
-  background: linear-gradient(261.14deg, #0066FF 20.53%, #0084FF 69.42%);
+  background: linear-gradient(261.14deg, #C726FD 20.53%, #FF1CA4 69.42%);
   border-radius: 10px;
   font-size: 14px;
   color: var(--white-color);
@@ -27544,7 +27544,7 @@ span.select2-selection.select2-selection--single:focus {
   color: var(--title-color);
 }
 .price-box.style7 .box-icon {
-  background: linear-gradient(309.43deg, #4DA3FF 9.12%, #1C4EFF 100%);
+  background: linear-gradient(309.43deg, #A378FF 9.12%, #1C4EFF 100%);
 }
 .price-box.style7.active {
   background: #F4F7FF;
@@ -27552,7 +27552,7 @@ span.select2-selection.select2-selection--single:focus {
 .price-box.style7.active .box-content {
   position: relative;
   z-index: 2;
-  background: linear-gradient(309.43deg, #4DA3FF 9.12%, #1C4EFF 100%);
+  background: linear-gradient(309.43deg, #A378FF 9.12%, #1C4EFF 100%);
 }
 .price-box.style7.active .box-content:before {
   content: "";
@@ -27834,7 +27834,7 @@ span.select2-selection.select2-selection--single:focus {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(309.43deg, #4DA3FF 9.12%, #1C4EFF 100%);
+  background: linear-gradient(309.43deg, #A378FF 9.12%, #1C4EFF 100%);
   -webkit-filter: blur(15px);
           filter: blur(15px);
   z-index: -1;
@@ -28285,7 +28285,7 @@ span.select2-selection.select2-selection--single:focus {
   border-radius: 48px;
 }
 .pricing-tabs.style3 .toggler.toggler--is-active {
-  background: linear-gradient(309.43deg, #4DA3FF 9.12%, #1C4EFF 100%);
+  background: linear-gradient(309.43deg, #A378FF 9.12%, #1C4EFF 100%);
   color: var(--white-color);
 }
 .pricing-tabs.style3 .toggler.toggler--is-active span {
@@ -28309,7 +28309,7 @@ span.select2-selection.select2-selection--single:focus {
   margin: auto;
 }
 .pricing-tabs.style4 .toggler.toggler--is-active {
-  background: linear-gradient(309.43deg, #4DA3FF 9.12%, #1C4EFF 100%);
+  background: linear-gradient(309.43deg, #A378FF 9.12%, #1C4EFF 100%);
   color: var(--white-color);
 }
 .pricing-tabs.style4 .toggler {
@@ -28329,7 +28329,7 @@ span.select2-selection.select2-selection--single:focus {
   left: 63%;
 }
 .pricing-tabs.style8 .toggler.toggler--is-active {
-  background: linear-gradient(122.43deg, #AEFF5D 4.09%, #66C2FF 100.57%);
+  background: linear-gradient(122.43deg, #AEFF5D 4.09%, #5DFFD9 100.57%);
   border-radius: 48px;
   color: var(--title-color);
 }
@@ -31799,7 +31799,7 @@ span.select2-selection.select2-selection--single:focus {
   bottom: 0;
   width: 219px;
   height: 253px;
-  background: #0084FF;
+  background: #7B5DFF;
   opacity: 0.4;
   -webkit-filter: blur(75px);
           filter: blur(75px);
@@ -31851,7 +31851,7 @@ span.select2-selection.select2-selection--single:focus {
 .choose-item2 {
   position: relative;
   z-index: 2;
-  background: linear-gradient(309.43deg, #4DA3FF 9.12%, #1C4EFF 100%);
+  background: linear-gradient(309.43deg, #A378FF 9.12%, #1C4EFF 100%);
   border-radius: 48px;
   padding: 70px;
   display: -webkit-box;
@@ -32490,7 +32490,7 @@ span.select2-selection.select2-selection--single:focus {
   left: -5px;
   width: 29px;
   height: 29px;
-  background: linear-gradient(122.43deg, #AEFF5D 4.09%, #66C2FF 100.57%);
+  background: linear-gradient(122.43deg, #AEFF5D 4.09%, #5DFFD9 100.57%);
   border-radius: 50%;
   z-index: -1;
 }
@@ -32746,7 +32746,7 @@ span.select2-selection.select2-selection--single:focus {
           mask-repeat: no-repeat;
   -webkit-mask-position: bottom center;
           mask-position: bottom center;
-  background: linear-gradient(261.14deg, #0066FF 20.53%, #0084FF 69.42%);
+  background: linear-gradient(261.14deg, #C726FD 20.53%, #FF1CA4 69.42%);
   border-radius: 24px;
   z-index: -1;
   /* Extra small devices */
@@ -34490,10 +34490,3 @@ span.select2-selection.select2-selection--single:focus {
   border-radius: 32px;
 }
 /*# sourceMappingURL=style.css.map */
-
-
-/* ===== NELVYON brand overrides (AIOR base preserved) ===== */
-:root {
-  --theme-color: #0084FF !important;
-  --theme-color2: #33A1FF !important;
-}

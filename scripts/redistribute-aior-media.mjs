@@ -1,15 +1,7 @@
 /**
- * Wrapper de media — política SELECTIVA (CEO 2026-08-02).
- * Delega en pasada de fidelidad (no scramble de paths).
- *
- *   node scripts/brand-aior-nelvyon.mjs
- *   node scripts/content-aior-nelvyon-only.mjs
- *   node scripts/redistribute-aior-media.mjs
+ * BLOQUEADO — CEO 2026-08-02: no sustituir media AIOR.
  */
-import { spawnSync } from "node:child_process";
-import path from "node:path";
-
-const ROOT = process.cwd();
-const script = path.join(ROOT, "scripts", "fidelity-aior-media-pass.mjs");
-const r = spawnSync(process.execPath, [script], { stdio: "inherit", cwd: ROOT });
-process.exit(r.status ?? 1);
+console.error(
+  "BLOCKED: redistribute-aior-media.mjs disabled. Keep AIOR visuals. Use restore-aior-visuals-keep-content.mjs if needed."
+);
+process.exit(2);

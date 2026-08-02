@@ -7,7 +7,9 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
-| Web pública | **Deploy prod AIOR→NELVYON `/www`** | Push `4e78f600` · Railway deploy `61cb5010` **SUCCESS** · health `git_sha=4e78f6007f84` · rutas `/`→`/www/index.html` 307 · assets 200. Fix build: rename Aior*→Brand*. |
+| Web pública | **Deploy definitivo AIOR visual + contenido NELVYON** | Restaura media/CSS/JS AIOR (`nonLogoDiff=0`); elimina `assets/img/nelvyon`; 0 saas-shots; solo logos + copy ES; pipeline fidelity/selective bloqueado; certify content EN0 + audit 36/36 + final PASS. |
+| Web pública | **Revert visual a AIOR original (local pre-deploy)** | CEO: prohibido saas-shots/rediseño. Restaurado `assets/img`+`css`+`js` desde `.reference/aior`. Solo logos NELVYON. Bloqueados fidelity/selective. Informe `VISUAL_DEVIATIONS_AUDIT.md`. |
+| Web pública | **Deploy prod AIOR→NELVYON `/www`** | Push `4e78f600` · Railway deploy `61cb5010` **SUCCESS** · health `git_sha=4e78f6007f84` · rutas `/`→`/www/index.html` 307 · assets 200. Fix build: rename Aior*→Brand*. **Nota:** ese deploy llevaba media SaaS; no republicar hasta restore visual. |
 | Web pública | **Auditoría absoluta final (sin deploy)** | Solo errores reales: mapa Angfuztheme→ES, CSP Google Maps, placeholders/FAQ/héroes/EN plantilla (pass9–11), blog/case/about/team. Cert `FINAL_QUALITY_CERTIFICATE.md` PASS; live QA 10/10; claimReady false (CEO+URLs). |
 | Web pública | **Cierre excelencia (sin deploy)** | Pass8: copy único, contacto sin datos ficticios, equipo sin nombres inventados, precios style2 alineados, sin −35% inventado. Informe `EXCELLENCE_CLOSURE_REPORT.md`. claimReady false (CEO+URLs). |
 | Web pública | **Pass7 contenido + informe final (sin deploy)** | Elimina EN residual / vanity metrics / chiropractic; precios SaaS reales; counters honestos; hero contraste; Playwright 7/7; certify+audit 36/36. Informe `FINAL_REPORT.md` + screenshots. claimReady false. |

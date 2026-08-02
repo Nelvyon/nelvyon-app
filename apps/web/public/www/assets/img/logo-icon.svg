@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" role="img" aria-label="NELVYON">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none">
   <rect width="40" height="40" rx="10" fill="#0084FF"/>
-  <text x="20" y="27" text-anchor="middle" fill="#FFFFFF" font-family="Sora, system-ui, sans-serif" font-size="18" font-weight="700">N</text>
+  <text x="8" y="28" font-family="Inter,Arial,sans-serif" font-size="22" font-weight="700" fill="#fff">N</text>
 </svg>

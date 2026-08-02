@@ -1,6 +1,6 @@
 # Certificado final de calidad — pack AIOR NELVYON
 
-**Fecha:** 2026-08-02T18:49:23.429Z
+**Fecha:** 2026-08-02T21:28:44.614Z
 **Resultado:** **PASS**
 **Páginas:** 36
 **Errores reales:** 0
@@ -22,23 +22,23 @@
 
 ## Live probes
 
-- `/www/index.html` → **200**
-- `/www/pricing.html` → **200**
-- `/www/contact.html` → **200**
-- `/www/about.html` → **200**
-- `/www/features.html` → **200**
-- `/www/home-ai-agent.html` → **200**
-- `/www/assets/css/style.css` → **200**
-- `/www/assets/img/logo.svg` → **200**
-- `/www/assets/img/favicons/favicon-32x32.png` → **200**
-- `/www/assets/img/favicons/favicon.ico` → **200**
-- `/robots.txt` → **200**
-- `/sitemap.xml` → **200**
-- `/opengraph-image` → **200**
+- `/www/index.html` → **0** (fetch failed)
+- `/www/pricing.html` → **0** (fetch failed)
+- `/www/contact.html` → **0** (fetch failed)
+- `/www/about.html` → **0** (fetch failed)
+- `/www/features.html` → **0** (fetch failed)
+- `/www/home-ai-agent.html` → **0** (fetch failed)
+- `/www/assets/css/style.css` → **0** (fetch failed)
+- `/www/assets/img/logo.svg` → **0** (fetch failed)
+- `/www/assets/img/favicons/favicon-32x32.png` → **0** (fetch failed)
+- `/www/assets/img/favicons/favicon.ico` → **0** (fetch failed)
+- `/robots.txt` → **0** (fetch failed)
+- `/sitemap.xml` → **0** (fetch failed)
+- `/opengraph-image` → **0** (fetch failed)
 
 ## Imágenes low-bytes (<2.5KB)
 
-29 hallazgos (ver JSON). Pueden ser shapes/iconos legítimos.
+Ninguna.
 
 ## Pendientes de producto (no errores del pack)
 

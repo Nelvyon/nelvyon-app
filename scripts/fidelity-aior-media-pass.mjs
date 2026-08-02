@@ -1,17 +1,17 @@
 /**
- * Pasada final de fidelidad visual AIOR→NELVYON (selectiva por slot).
- *
- * - NO redistribuye paths HTML
- * - NO cambia CSS/JS/composición/tamaños de slot
- * - Sustituye solo: placeholders, rotos, crypto-named, fuentes con EN/AIOR embebido
- * - Prioridad fuentes: saas-shots → frames MP4 → fotos Envato → CEO limpios (sin texto) → AIOR válido
- *
- *   node scripts/fidelity-aior-media-pass.mjs
+ * BLOQUEADO — CEO 2026-08-02:
+ * Prohibido sustituir ilustraciones/mockups AIOR por capturas SaaS u otras imágenes.
+ * Usar: node scripts/restore-aior-visuals-keep-content.mjs
  */
 import fs from "node:fs";
 import path from "node:path";
 import { createRequire } from "node:module";
 import { spawnSync } from "node:child_process";
+
+console.error(
+  "BLOCKED: fidelity-aior-media-pass.mjs is disabled. Keep original AIOR media. Use restore-aior-visuals-keep-content.mjs if needed."
+);
+process.exit(2);
 
 const ROOT = process.cwd();
 const WWW = path.join(ROOT, "apps", "web", "public", "www");

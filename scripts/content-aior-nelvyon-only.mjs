@@ -26,6 +26,7 @@ const PHRASE_SWAPS = [
   ...JSON.parse(fs.readFileSync(path.join(ROOT, "scripts", "data", "aior-nelvyon-phrase-swaps-pass9.json"), "utf8")),
   ...JSON.parse(fs.readFileSync(path.join(ROOT, "scripts", "data", "aior-nelvyon-phrase-swaps-pass10.json"), "utf8")),
   ...JSON.parse(fs.readFileSync(path.join(ROOT, "scripts", "data", "aior-nelvyon-phrase-swaps-pass11.json"), "utf8")),
+  ...JSON.parse(fs.readFileSync(path.join(ROOT, "scripts", "data", "aior-nelvyon-phrase-swaps-pass12.json"), "utf8")),
 ];
 
 /**
