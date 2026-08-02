@@ -9,7 +9,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const svc = getAgencyService(SLUG);
   if (!svc) return {};
   return {
-    title: svc.seoTitle,
+    title: { absolute: svc.seoTitle },
     description: svc.seoDescription,
     alternates: { canonical: svc.href },
   };

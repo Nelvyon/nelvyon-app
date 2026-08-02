@@ -1,1 +1,1 @@
-export { AiorHomePage as PublicHomePage } from "./AiorHomePage";
+export { BrandHomePage as PublicHomePage } from "./BrandHomePage";

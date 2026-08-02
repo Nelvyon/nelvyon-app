@@ -5,7 +5,7 @@ import { SectorsPage, pageContent } from "@/features/public-web";
 const content = pageContent.sectores;
 
 export const metadata: Metadata = {
-  title: content.seoTitle,
+  title: { absolute: content.seoTitle },
   description: content.seoDescription,
   alternates: { canonical: "/sectores" },
 };

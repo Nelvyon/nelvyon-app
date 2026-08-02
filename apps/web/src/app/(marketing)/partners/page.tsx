@@ -2,8 +2,8 @@
 
 import { useMemo, useState } from "react";
 
-import { AiorFeatureGrid, AiorSection, AiorTitle } from "@/features/public-web/components/AiorBlocks";
-import { AiorCtaBand, AiorPageHero } from "@/features/public-web/components/AiorPageHero";
+import { BrandFeatureGrid, BrandSection, BrandTitle } from "@/features/public-web/components/BrandBlocks";
+import { BrandCtaBand, BrandPageHero } from "@/features/public-web/components/BrandPageHero";
 
 export default function PartnersPage() {
   const [clients, setClients] = useState("10");
@@ -16,7 +16,7 @@ export default function PartnersPage() {
 
   return (
     <>
-      <AiorPageHero
+      <BrandPageHero
         eyebrow="Partners"
         title="Programa de partners NELVYON"
         description="Refiera el SaaS NELVYON a empresas de su red. Comisión recurrente orientativa sobre el plan Starter; condiciones finales en acuerdo partner."
@@ -24,30 +24,30 @@ export default function PartnersPage() {
         secondaryCta={{ label: "Ver precios SaaS", href: "/precios#saas" }}
       />
 
-      <AiorSection soft>
-        <AiorTitle eyebrow="Cómo funciona" title="Tres pasos" center />
-        <AiorFeatureGrid
+      <BrandSection soft>
+        <BrandTitle eyebrow="Cómo funciona" title="Tres pasos" center />
+        <BrandFeatureGrid
           items={[
             { title: "1. Regístrese", body: "Solicite alta partner y revise condiciones comerciales." },
             { title: "2. Comparta su enlace", body: "Referral link único para empresas y agencias de su red." },
             { title: "3. Comisión recurrente", body: "Liquidación según acuerdo mientras los referidos permanezcan activos." },
           ]}
         />
-      </AiorSection>
+      </BrandSection>
 
-      <AiorSection>
-        <AiorTitle eyebrow="Beneficios" title="Qué incluye el programa" />
-        <AiorFeatureGrid
+      <BrandSection>
+        <BrandTitle eyebrow="Beneficios" title="Qué incluye el programa" />
+        <BrandFeatureGrid
           items={[
             { title: "Comisión recurrente", body: "Ingresos alineados a la permanencia del cliente referido." },
             { title: "Visibilidad en SaaS", body: "Seguimiento de leads y referidos desde el producto cuando el programa está activo." },
             { title: "Pagos mensuales", body: "Liquidación periódica según el acuerdo partner firmado." },
           ]}
         />
-      </AiorSection>
+      </BrandSection>
 
-      <AiorSection soft>
-        <AiorTitle
+      <BrandSection soft>
+        <BrandTitle
           eyebrow="Estimación"
           title="Calculadora ilustrativa"
           description="Ejemplo sobre plan Starter (€97/mes) al 30%. No sustituye el acuerdo comercial."
@@ -69,9 +69,9 @@ export default function PartnersPage() {
             Comisión mensual estimada: <strong style={{ color: "#0084FF" }}>€{commission.toFixed(2)}</strong>
           </p>
         </div>
-      </AiorSection>
+      </BrandSection>
 
-      <AiorCtaBand
+      <BrandCtaBand
         title="Conviértase en partner NELVYON"
         body="Le enviamos condiciones reales del programa — sin promesas de volumen inventadas."
         primaryCta={{ label: "Contactar", href: "/contacto?tipo=partner" }}

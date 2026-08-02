@@ -5,7 +5,7 @@ import { AutomationsPage, pageContent } from "@/features/public-web";
 const content = pageContent["automatizaciones-ia"];
 
 export const metadata: Metadata = {
-  title: content.seoTitle,
+  title: { absolute: content.seoTitle },
   description: content.seoDescription,
   alternates: { canonical: "/automatizaciones-ia" },
 };

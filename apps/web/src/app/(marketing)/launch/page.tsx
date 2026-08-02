@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 
-import { AiorSection, AiorTitle } from "@/features/public-web/components/AiorBlocks";
-import { AiorCtaBand, AiorPageHero } from "@/features/public-web/components/AiorPageHero";
+import { BrandSection, BrandTitle } from "@/features/public-web/components/BrandBlocks";
+import { BrandCtaBand, BrandPageHero } from "@/features/public-web/components/BrandPageHero";
 
 /** Página de interés / waitlist — sin countdown de lanzamiento inventado. */
 export default function LaunchPage() {
@@ -32,7 +32,7 @@ export default function LaunchPage() {
 
   return (
     <>
-      <AiorPageHero
+      <BrandPageHero
         eyebrow="Novedades"
         title="Manténgase al día con NELVYON"
         description="Deje su email para novedades de producto y activación. El SaaS y la agencia ya están documentados en el sitio público."
@@ -40,8 +40,8 @@ export default function LaunchPage() {
         secondaryCta={{ label: "Ver precios", href: "/precios" }}
       />
 
-      <AiorSection soft>
-        <AiorTitle eyebrow="Lista" title="Registro de interés" center />
+      <BrandSection soft>
+        <BrandTitle eyebrow="Lista" title="Registro de interés" center />
         <div style={{ maxWidth: 480, margin: "0 auto", padding: 28, borderRadius: 16, border: "1px solid #E0E0E0", background: "#fff" }}>
           {submitted ? (
             <p className="mb-0 text-center">Gracias. Hemos registrado su interés.</p>
@@ -73,9 +73,9 @@ export default function LaunchPage() {
             .
           </p>
         </div>
-      </AiorSection>
+      </BrandSection>
 
-      <AiorCtaBand
+      <BrandCtaBand
         title="¿Prefiere hablar ahora?"
         body="Demo del producto real o presupuesto de agencia."
         primaryCta={{ label: "Contactar", href: "/contacto" }}

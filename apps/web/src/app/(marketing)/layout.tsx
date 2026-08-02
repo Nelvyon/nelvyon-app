@@ -23,7 +23,7 @@ const display = Outfit({
 const canonicalBase = getAppBaseUrl();
 const ogImageAbs = `${canonicalBase}/opengraph-image`;
 
-const AIOR = "/brand/public/aior/css";
+const NV_SKIN = "/brand/public/nv/css";
 
 export const metadata: Metadata = {
   title: {
@@ -86,12 +86,11 @@ export default function MarketingRouteLayout({ children }: { children: ReactNode
 
   return (
     <section lang="es" className={`${sans.variable} ${display.variable}`}>
-      {/* AIOR skin (slim) — composición visual aprobada */}
-      <link rel="stylesheet" href={`${AIOR}/bootstrap.min.css`} />
-      <link rel="stylesheet" href={`${AIOR}/fontawesome.min.css`} />
-      <link rel="stylesheet" href={`${AIOR}/swiper-bundle.min.css`} />
-      <link rel="stylesheet" href={`${AIOR}/style.css`} />
-      <link rel="stylesheet" href={`${AIOR}/nelvyon-aior.css`} />
+      {/* NELVYON public skin (bootstrap grid + brand overrides; no Font Awesome / Swiper) */}
+      <link rel="stylesheet" href={`${NV_SKIN}/bootstrap.min.css`} />
+      <link rel="stylesheet" href={`${NV_SKIN}/style.css`} />
+      <link rel="stylesheet" href={`${NV_SKIN}/nelvyon-skin.css`} />
+      <link rel="preload" as="image" href="/brand/public/saas-shots/pipeline.webp" />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteLd) }} />
       <a

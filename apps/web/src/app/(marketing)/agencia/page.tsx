@@ -1,15 +1,5 @@
-﻿import type { Metadata } from "next";
+﻿import { redirect } from "next/navigation";
 
-import { AgencyPage, pageContent } from "@/features/public-web";
-
-const content = pageContent.agencia;
-
-export const metadata: Metadata = {
-  title: { absolute: content.seoTitle },
-  description: content.seoDescription,
-  alternates: { canonical: "/agencia" },
-}
-
-export default function Page() {
-  return <AgencyPage />;
+export default function AgenciaPage() {
+  redirect("/www/about.html");
 }

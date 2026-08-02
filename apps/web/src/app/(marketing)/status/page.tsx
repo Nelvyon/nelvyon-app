@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import { AiorSection, AiorTitle } from "@/features/public-web/components/AiorBlocks";
-import { AiorPageHero } from "@/features/public-web/components/AiorPageHero";
+import { BrandSection, BrandTitle } from "@/features/public-web/components/BrandBlocks";
+import { BrandPageHero } from "@/features/public-web/components/BrandPageHero";
 
 interface StatusData {
   status: "operational" | "degraded" | "down" | "unknown";
@@ -74,7 +74,7 @@ export default function StatusPage() {
 
   return (
     <>
-      <AiorPageHero
+      <BrandPageHero
         eyebrow="Operaciones"
         title="Estado del sistema"
         description="Estado de servicios NELVYON. Datos en vivo desde /api/status cuando está disponible."
@@ -82,7 +82,7 @@ export default function StatusPage() {
         secondaryCta={{ label: "Contactar", href: "/contacto" }}
       />
 
-      <AiorSection>
+      <BrandSection>
         <div className="text-center mb-40">
           {loading ? (
             <p style={{ color: "#6b7c93" }}>Cargando estado…</p>
@@ -119,7 +119,7 @@ export default function StatusPage() {
 
         {(data?.incidents ?? []).length > 0 ? (
           <div className="mt-40" style={{ maxWidth: 640, margin: "40px auto 0" }}>
-            <AiorTitle title="Incidentes recientes" />
+            <BrandTitle title="Incidentes recientes" />
             {data!.incidents.map((inc) => (
               <article
                 key={inc.id}
@@ -156,7 +156,7 @@ export default function StatusPage() {
             Centro de recursos
           </Link>
         </div>
-      </AiorSection>
+      </BrandSection>
     </>
   );
 }

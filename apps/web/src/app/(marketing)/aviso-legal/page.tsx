@@ -2,8 +2,8 @@
 import Link from "next/link";
 
 import { siteBrand } from "@/features/public-web";
-import { AiorSection } from "@/features/public-web/components/AiorBlocks";
-import { AiorPageHero } from "@/features/public-web/components/AiorPageHero";
+import { BrandSection } from "@/features/public-web/components/BrandBlocks";
+import { BrandPageHero } from "@/features/public-web/components/BrandPageHero";
 
 export const metadata: Metadata = {
   title: { absolute: "Aviso legal | NELVYON" },
@@ -16,12 +16,12 @@ const EFFECTIVE_DATE = "1 de agosto de 2026";
 export default function AvisoLegalPage() {
   return (
     <>
-      <AiorPageHero
+      <BrandPageHero
         eyebrow="Legal"
         title="Aviso legal"
         description={`Información identificativa y condiciones de uso informativo del sitio ${siteBrand.name}.`}
       />
-      <AiorSection>
+      <BrandSection>
         <article style={{ maxWidth: 720, margin: "0 auto", color: "#484848", lineHeight: 1.7 }}>
           <p>
             <strong>Última actualización:</strong> {EFFECTIVE_DATE}
@@ -38,6 +38,12 @@ export default function AvisoLegalPage() {
             <a href={`mailto:${siteBrand.contactEmail}`} style={{ color: "#0084FF" }}>
               {siteBrand.contactEmail}
             </a>
+          </p>
+          <p>
+            <strong>Datos registrales (completar antes de producción):</strong> razón social, NIF/CIF, domicilio
+            social e inscripción en Registro Mercantil —{" "}
+            <em>[PENDIENTE_DATOS_REGISTRALES]</em>. Hasta entonces, el canal válido de identificación operativa es{" "}
+            {siteBrand.contactEmail}.
           </p>
           <h2 className="h5" style={{ color: "#06050B" }}>
             2. Objeto
@@ -100,7 +106,7 @@ export default function AvisoLegalPage() {
             </li>
           </ul>
         </article>
-      </AiorSection>
+      </BrandSection>
     </>
   );
 }

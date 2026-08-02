@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 
 import { StandardPage, pageContent } from "@/features/public-web";
@@ -7,7 +7,7 @@ import { nelvyonServices } from "@/config/nelvyon-pa-content";
 const content = pageContent["servicios-overview"];
 
 export const metadata: Metadata = {
-  title: content.seoTitle,
+  title: { absolute: content.seoTitle },
   description: content.seoDescription,
   alternates: { canonical: "/servicios" },
 };

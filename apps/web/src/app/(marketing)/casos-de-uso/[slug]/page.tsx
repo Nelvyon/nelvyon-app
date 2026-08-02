@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const useCase = getUseCase(slug);
   if (!useCase) return {};
   return {
-    title: useCase.seoTitle,
+    title: { absolute: useCase.seoTitle },
     description: useCase.seoDescription,
     alternates: { canonical: `/casos-de-uso/${useCase.slug}` },
   };

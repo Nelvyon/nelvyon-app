@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 
-import { AiorSection, AiorTitle } from "@/features/public-web/components/AiorBlocks";
-import { AiorCtaBand, AiorPageHero } from "@/features/public-web/components/AiorPageHero";
+import { BrandCheck } from "@/features/public-web/components/BrandCheck";
+import { BrandSection, BrandTitle } from "@/features/public-web/components/BrandBlocks";
+import { BrandCtaBand, BrandPageHero } from "@/features/public-web/components/BrandPageHero";
 
 export const metadata: Metadata = {
   title: { absolute: "NELVYON vs alternativas | NELVYON" },
@@ -61,7 +62,7 @@ const COMPARISONS = [
 export default function AlternativesPage() {
   return (
     <>
-      <AiorPageHero
+      <BrandPageHero
         eyebrow="Comparativa"
         title="NELVYON frente a stacks fragmentados"
         description="Comparación cualitativa honesta: sin inventar precios de terceros ni afirmar superioridad con métricas no verificadas. Precios SaaS NELVYON: Starter €97, Growth €297, Elite €797."
@@ -70,8 +71,8 @@ export default function AlternativesPage() {
       />
 
       {COMPARISONS.map((row, idx) => (
-        <AiorSection key={row.competitor} soft={idx % 2 === 1}>
-          <AiorTitle eyebrow="Comparativa" title={row.competitor} />
+        <BrandSection key={row.competitor} soft={idx % 2 === 1}>
+          <BrandTitle eyebrow="Comparativa" title={row.competitor} />
           <div className="row gy-4">
             <div className="col-md-6">
               <div style={{ padding: 28, borderRadius: 16, border: "1px solid #E0E0E0", background: "#fff", height: "100%" }}>
@@ -79,7 +80,7 @@ export default function AlternativesPage() {
                 <ul className="hero-list" style={{ textAlign: "left" }}>
                   {row.them.map((t) => (
                     <li key={t}>
-                      <i className="fa-sharp fa-solid fa-circle" aria-hidden style={{ fontSize: 8 }} /> {t}
+                      <span className="nv-dot" aria-hidden /> {t}
                     </li>
                   ))}
                 </ul>
@@ -91,17 +92,17 @@ export default function AlternativesPage() {
                 <ul className="hero-list" style={{ textAlign: "left" }}>
                   {row.us.map((t) => (
                     <li key={t}>
-                      <i className="fa-sharp fa-solid fa-circle-check" aria-hidden /> {t}
+                      <BrandCheck /> {t}
                     </li>
                   ))}
                 </ul>
               </div>
             </div>
           </div>
-        </AiorSection>
+        </BrandSection>
       ))}
 
-      <AiorCtaBand
+      <BrandCtaBand
         title="Evalúe NELVYON con su operación real"
         body="Demo del SaaS y, si aplica, presupuesto de agencia — sin cifras de clientes inventadas."
         primaryCta={{ label: "Contactar", href: "/contacto" }}

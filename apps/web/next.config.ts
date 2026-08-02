@@ -107,7 +107,29 @@ const nextConfig: NextConfig = {
     return config;
   },
   async redirects() {
+    const aiorContentRoutes = [
+      { source: "/agencia-ia", destination: "/www/home-ai-startup.html", permanent: false },
+      { source: "/landing/agencia-ia", destination: "/www/home-ai-startup-op.html", permanent: false },
+      { source: "/producto/inbox", destination: "/www/home-ai-chatbot.html", permanent: false },
+      { source: "/landing/inbox", destination: "/www/home-ai-chatbot-op.html", permanent: false },
+      { source: "/agencia/contenido", destination: "/www/home-ai-writer-tool.html", permanent: false },
+      { source: "/landing/contenido", destination: "/www/home-ai-writer-tool-op.html", permanent: false },
+      { source: "/landing/enterprise", destination: "/www/home-business-intelligence-op.html", permanent: false },
+      { source: "/landing/ia", destination: "/www/home-ai-agent-op.html", permanent: false },
+      { source: "/landing/automatizaciones", destination: "/www/home-productivity-tools-op.html", permanent: false },
+      { source: "/landing/comms", destination: "/www/home-ai-chatbot-tool-op.html", permanent: false },
+      { source: "/producto/cloud", destination: "/www/home-cloud-based-saas.html", permanent: false },
+      { source: "/landing/cloud", destination: "/www/home-cloud-based-saas-op.html", permanent: false },
+      { source: "/landing/producto", destination: "/www/home-saas-product-showcase-op.html", permanent: false },
+      { source: "/casos-de-uso/grid", destination: "/www/case-studies-2.html", permanent: false },
+      { source: "/casos-de-uso/detalle", destination: "/www/case-studies-details.html", permanent: false },
+      { source: "/casos-de-uso/lista", destination: "/www/cases.html", permanent: false },
+      { source: "/nosotros/detalle", destination: "/www/team-details.html", permanent: false },
+      { source: "/producto/hechos", destination: "/www/testimonial.html", permanent: false },
+      { source: "/brand/tipografia", destination: "/www/typography.html", permanent: false },
+    ];
     return [
+      ...aiorContentRoutes,
       { source: "/legal/privacy", destination: "/privacidad", permanent: true },
       { source: "/legal/terms", destination: "/terminos", permanent: true },
       { source: "/privacy", destination: "/privacidad", permanent: true },

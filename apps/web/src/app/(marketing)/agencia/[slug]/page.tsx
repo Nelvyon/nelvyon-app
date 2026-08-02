@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const svc = getAgencyService(slug);
   if (!svc) return {};
   return {
-    title: svc.seoTitle,
+    title: { absolute: svc.seoTitle },
     description: svc.seoDescription,
     alternates: { canonical: svc.href },
   };

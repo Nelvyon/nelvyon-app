@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { blog } from "@/lib/pa/source";
-import { AiorBlogContent } from "@/features/public-web/components/AiorBlogContent";
-import { AiorSection } from "@/features/public-web/components/AiorBlocks";
-import { AiorCtaBand, AiorPageHero } from "@/features/public-web/components/AiorPageHero";
+import { BrandBlogContent } from "@/features/public-web/components/BrandBlogContent";
+import { BrandSection } from "@/features/public-web/components/BrandBlocks";
+import { BrandCtaBand, BrandPageHero } from "@/features/public-web/components/BrandPageHero";
 
 interface BlogPostPageProps {
   params: Promise<{ id: string }>;
@@ -42,7 +42,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   return (
     <>
-      <AiorPageHero
+      <BrandPageHero
         eyebrow="Blog"
         title={String(page.data.title)}
         description={`${dateLabel}${page.data.timeToRead ? ` · ${page.data.timeToRead}` : ""}${
@@ -51,15 +51,15 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         primaryCta={{ label: "Todos los artículos", href: "/blog" }}
         secondaryCta={{ label: "Recursos", href: "/recursos" }}
       />
-      <AiorSection>
-        <AiorBlogContent page={page} />
+      <BrandSection>
+        <BrandBlogContent page={page} />
         <p className="mt-40 text-center">
           <Link href="/blog" className="th-btn2 style5">
             Volver al blog
           </Link>
         </p>
-      </AiorSection>
-      <AiorCtaBand
+      </BrandSection>
+      <BrandCtaBand
         title="¿Quiere aplicar esto a su operación?"
         body="Hable con el equipo sobre SaaS, agencia o ambos."
         primaryCta={{ label: "Contactar", href: "/contacto" }}

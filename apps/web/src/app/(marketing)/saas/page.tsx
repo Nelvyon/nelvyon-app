@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 
 import { StandardPage, pageContent, pricingPlans } from "@/features/public-web";
@@ -6,7 +6,7 @@ import { StandardPage, pageContent, pricingPlans } from "@/features/public-web";
 const content = pageContent["saas-acceso"];
 
 export const metadata: Metadata = {
-  title: content.seoTitle,
+  title: { absolute: content.seoTitle },
   description: content.seoDescription,
   alternates: { canonical: "/saas" },
 };
