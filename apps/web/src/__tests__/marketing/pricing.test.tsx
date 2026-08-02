@@ -83,11 +83,8 @@ function renderWithProviders(ui: React.ReactElement) {
 }
 
 describe("marketing pricing and landing", () => {
-  it("Página /precios renderiza planes", { timeout: 30000 }, () => {
-    renderWithProviders(<PreciosPage />);
-    expect(screen.getByText("Starter")).toBeInTheDocument();
-    expect(screen.getByText("Growth")).toBeInTheDocument();
-    expect(screen.getByText("Elite")).toBeInTheDocument();
+  it("Página /precios redirige al pack AIOR pricing.html", () => {
+    expect(() => renderWithProviders(<PreciosPage />)).toThrow(/NEXT_REDIRECT:\/www\/pricing\.html/);
   });
 
   it("Home pública renderiza headline NELVYON", { timeout: 30000 }, () => {

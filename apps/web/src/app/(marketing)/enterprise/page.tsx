@@ -1,4 +1,4 @@
 ﻿import { redirect } from "next/navigation";
 export default function Page() {
-  redirect("/www/home-business-intelligence.html");
+  return redirect("/www/home-business-intelligence.html");
 }

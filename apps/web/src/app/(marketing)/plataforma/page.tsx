@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  redirect("/producto");
+  return redirect("/producto");
 }

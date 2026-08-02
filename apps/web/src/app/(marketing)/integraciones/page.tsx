@@ -1,5 +1,5 @@
 ﻿import { redirect } from "next/navigation";
 
 export default function IntegracionesPage() {
-  redirect("/www/integrations.html");
+  return redirect("/www/integrations.html");
 }
