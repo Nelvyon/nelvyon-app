@@ -1,0 +1,1524 @@
+{
+  "ok": false,
+  "pages": 36,
+  "dirtyPages": 36,
+  "top": [
+    {
+      "file": "home-ai-startup-op.html",
+      "hits": [
+        {
+          "id": "awkward_es",
+          "count": 4,
+          "samples": [
+            "Descubrir más",
+            "Saber más"
+          ]
+        },
+        {
+          "id": "literal_en_es",
+          "count": 5,
+          "samples": [
+            "data science",
+            "Insights accionables",
+            "build vs buy",
+            "kill-switch"
+          ]
+        },
+        {
+          "id": "template_filler",
+          "count": 5,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 1,
+          "samples": [
+            ">FAQ<"
+          ]
+        },
+        {
+          "id": "repetition_marker",
+          "count": 5,
+          "samples": [
+            "Integraciones y webhooks: Stripe, SES, Twilio, Meta, Google y API del tenant."
+          ]
+        },
+        {
+          "id": "repeated_body_copy",
+          "count": 5,
+          "samples": [
+            "Integraciones y webhooks… repeated"
+          ]
+        },
+        {
+          "id": "repeated_checklist",
+          "count": 4,
+          "samples": [
+            "Experiencia operativa x4"
+          ]
+        }
+      ],
+      "hitCount": 29
+    },
+    {
+      "file": "home-ai-startup.html",
+      "hits": [
+        {
+          "id": "awkward_es",
+          "count": 4,
+          "samples": [
+            "Descubrir más",
+            "Saber más"
+          ]
+        },
+        {
+          "id": "literal_en_es",
+          "count": 5,
+          "samples": [
+            "data science",
+            "Insights accionables",
+            "build vs buy",
+            "kill-switch"
+          ]
+        },
+        {
+          "id": "template_filler",
+          "count": 1,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        },
+        {
+          "id": "repetition_marker",
+          "count": 5,
+          "samples": [
+            "Integraciones y webhooks: Stripe, SES, Twilio, Meta, Google y API del tenant."
+          ]
+        },
+        {
+          "id": "repeated_body_copy",
+          "count": 5,
+          "samples": [
+            "Integraciones y webhooks… repeated"
+          ]
+        },
+        {
+          "id": "repeated_checklist",
+          "count": 4,
+          "samples": [
+            "Experiencia operativa x4"
+          ]
+        }
+      ],
+      "hitCount": 26
+    },
+    {
+      "file": "index.html",
+      "hits": [
+        {
+          "id": "awkward_es",
+          "count": 4,
+          "samples": [
+            "Descubrir más",
+            "Saber más"
+          ]
+        },
+        {
+          "id": "literal_en_es",
+          "count": 5,
+          "samples": [
+            "data science",
+            "Insights accionables",
+            "build vs buy",
+            "kill-switch"
+          ]
+        },
+        {
+          "id": "template_filler",
+          "count": 1,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        },
+        {
+          "id": "repetition_marker",
+          "count": 5,
+          "samples": [
+            "Integraciones y webhooks: Stripe, SES, Twilio, Meta, Google y API del tenant."
+          ]
+        },
+        {
+          "id": "repeated_body_copy",
+          "count": 5,
+          "samples": [
+            "Integraciones y webhooks… repeated"
+          ]
+        },
+        {
+          "id": "repeated_checklist",
+          "count": 4,
+          "samples": [
+            "Experiencia operativa x4"
+          ]
+        }
+      ],
+      "hitCount": 26
+    },
+    {
+      "file": "home-ai-writer-tool-op.html",
+      "hits": [
+        {
+          "id": "awkward_es",
+          "count": 1,
+          "samples": [
+            "Saber más"
+          ]
+        },
+        {
+          "id": "literal_en_es",
+          "count": 2,
+          "samples": [
+            "kill-switch"
+          ]
+        },
+        {
+          "id": "template_filler",
+          "count": 6,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 1,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 10
+    },
+    {
+      "file": "faq.html",
+      "hits": [
+        {
+          "id": "template_filler",
+          "count": 5,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 4,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 9
+    },
+    {
+      "file": "home-cloud-based-saas-op.html",
+      "hits": [
+        {
+          "id": "awkward_es",
+          "count": 1,
+          "samples": [
+            "Saber más"
+          ]
+        },
+        {
+          "id": "literal_en_es",
+          "count": 2,
+          "samples": [
+            "kill-switch"
+          ]
+        },
+        {
+          "id": "template_filler",
+          "count": 5,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 1,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 9
+    },
+    {
+      "file": "home-productivity-tools-op.html",
+      "hits": [
+        {
+          "id": "awkward_es",
+          "count": 1,
+          "samples": [
+            "Saber más"
+          ]
+        },
+        {
+          "id": "literal_en_es",
+          "count": 2,
+          "samples": [
+            "kill-switch"
+          ]
+        },
+        {
+          "id": "template_filler",
+          "count": 5,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 1,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 9
+    },
+    {
+      "file": "blog-details.html",
+      "hits": [
+        {
+          "id": "template_filler",
+          "count": 6,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 8
+    },
+    {
+      "file": "home-ai-chatbot-op.html",
+      "hits": [
+        {
+          "id": "awkward_es",
+          "count": 1,
+          "samples": [
+            "Saber más"
+          ]
+        },
+        {
+          "id": "literal_en_es",
+          "count": 1,
+          "samples": [
+            "Insights accionables"
+          ]
+        },
+        {
+          "id": "template_filler",
+          "count": 4,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 8
+    },
+    {
+      "file": "home-ai-chatbot-tool-op.html",
+      "hits": [
+        {
+          "id": "literal_en_es",
+          "count": 1,
+          "samples": [
+            "Insights accionables"
+          ]
+        },
+        {
+          "id": "template_filler",
+          "count": 5,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 8
+    },
+    {
+      "file": "contact.html",
+      "hits": [
+        {
+          "id": "template_filler",
+          "count": 5,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 7
+    },
+    {
+      "file": "home-ai-agent-op.html",
+      "hits": [
+        {
+          "id": "template_filler",
+          "count": 5,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 7
+    },
+    {
+      "file": "home-business-intelligence-op.html",
+      "hits": [
+        {
+          "id": "literal_en_es",
+          "count": 1,
+          "samples": [
+            "kill-switch"
+          ]
+        },
+        {
+          "id": "template_filler",
+          "count": 5,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 1,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 7
+    },
+    {
+      "file": "home-saas-product-showcase-op.html",
+      "hits": [
+        {
+          "id": "template_filler",
+          "count": 6,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 1,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 7
+    },
+    {
+      "file": "pricing.html",
+      "hits": [
+        {
+          "id": "template_filler",
+          "count": 5,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 7
+    },
+    {
+      "file": "typography.html",
+      "hits": [
+        {
+          "id": "template_filler",
+          "count": 6,
+          "samples": [
+            "placeholder"
+          ]
+        }
+      ],
+      "hitCount": 6
+    },
+    {
+      "file": "home-ai-chatbot-tool.html",
+      "hits": [
+        {
+          "id": "literal_en_es",
+          "count": 1,
+          "samples": [
+            "Insights accionables"
+          ]
+        },
+        {
+          "id": "template_filler",
+          "count": 1,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 3,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 5
+    },
+    {
+      "file": "about.html",
+      "hits": [
+        {
+          "id": "awkward_es",
+          "count": 1,
+          "samples": [
+            "Saber más"
+          ]
+        },
+        {
+          "id": "template_filler",
+          "count": 1,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 4
+    },
+    {
+      "file": "home-ai-agent.html",
+      "hits": [
+        {
+          "id": "template_filler",
+          "count": 1,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 3,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 4
+    },
+    {
+      "file": "home-ai-chatbot.html",
+      "hits": [
+        {
+          "id": "literal_en_es",
+          "count": 1,
+          "samples": [
+            "Insights accionables"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 3,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 4
+    }
+  ],
+  "all": [
+    {
+      "file": "home-ai-startup-op.html",
+      "hits": [
+        {
+          "id": "awkward_es",
+          "count": 4,
+          "samples": [
+            "Descubrir más",
+            "Saber más"
+          ]
+        },
+        {
+          "id": "literal_en_es",
+          "count": 5,
+          "samples": [
+            "data science",
+            "Insights accionables",
+            "build vs buy",
+            "kill-switch"
+          ]
+        },
+        {
+          "id": "template_filler",
+          "count": 5,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 1,
+          "samples": [
+            ">FAQ<"
+          ]
+        },
+        {
+          "id": "repetition_marker",
+          "count": 5,
+          "samples": [
+            "Integraciones y webhooks: Stripe, SES, Twilio, Meta, Google y API del tenant."
+          ]
+        },
+        {
+          "id": "repeated_body_copy",
+          "count": 5,
+          "samples": [
+            "Integraciones y webhooks… repeated"
+          ]
+        },
+        {
+          "id": "repeated_checklist",
+          "count": 4,
+          "samples": [
+            "Experiencia operativa x4"
+          ]
+        }
+      ],
+      "hitCount": 29
+    },
+    {
+      "file": "home-ai-startup.html",
+      "hits": [
+        {
+          "id": "awkward_es",
+          "count": 4,
+          "samples": [
+            "Descubrir más",
+            "Saber más"
+          ]
+        },
+        {
+          "id": "literal_en_es",
+          "count": 5,
+          "samples": [
+            "data science",
+            "Insights accionables",
+            "build vs buy",
+            "kill-switch"
+          ]
+        },
+        {
+          "id": "template_filler",
+          "count": 1,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        },
+        {
+          "id": "repetition_marker",
+          "count": 5,
+          "samples": [
+            "Integraciones y webhooks: Stripe, SES, Twilio, Meta, Google y API del tenant."
+          ]
+        },
+        {
+          "id": "repeated_body_copy",
+          "count": 5,
+          "samples": [
+            "Integraciones y webhooks… repeated"
+          ]
+        },
+        {
+          "id": "repeated_checklist",
+          "count": 4,
+          "samples": [
+            "Experiencia operativa x4"
+          ]
+        }
+      ],
+      "hitCount": 26
+    },
+    {
+      "file": "index.html",
+      "hits": [
+        {
+          "id": "awkward_es",
+          "count": 4,
+          "samples": [
+            "Descubrir más",
+            "Saber más"
+          ]
+        },
+        {
+          "id": "literal_en_es",
+          "count": 5,
+          "samples": [
+            "data science",
+            "Insights accionables",
+            "build vs buy",
+            "kill-switch"
+          ]
+        },
+        {
+          "id": "template_filler",
+          "count": 1,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        },
+        {
+          "id": "repetition_marker",
+          "count": 5,
+          "samples": [
+            "Integraciones y webhooks: Stripe, SES, Twilio, Meta, Google y API del tenant."
+          ]
+        },
+        {
+          "id": "repeated_body_copy",
+          "count": 5,
+          "samples": [
+            "Integraciones y webhooks… repeated"
+          ]
+        },
+        {
+          "id": "repeated_checklist",
+          "count": 4,
+          "samples": [
+            "Experiencia operativa x4"
+          ]
+        }
+      ],
+      "hitCount": 26
+    },
+    {
+      "file": "home-ai-writer-tool-op.html",
+      "hits": [
+        {
+          "id": "awkward_es",
+          "count": 1,
+          "samples": [
+            "Saber más"
+          ]
+        },
+        {
+          "id": "literal_en_es",
+          "count": 2,
+          "samples": [
+            "kill-switch"
+          ]
+        },
+        {
+          "id": "template_filler",
+          "count": 6,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 1,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 10
+    },
+    {
+      "file": "faq.html",
+      "hits": [
+        {
+          "id": "template_filler",
+          "count": 5,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 4,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 9
+    },
+    {
+      "file": "home-cloud-based-saas-op.html",
+      "hits": [
+        {
+          "id": "awkward_es",
+          "count": 1,
+          "samples": [
+            "Saber más"
+          ]
+        },
+        {
+          "id": "literal_en_es",
+          "count": 2,
+          "samples": [
+            "kill-switch"
+          ]
+        },
+        {
+          "id": "template_filler",
+          "count": 5,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 1,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 9
+    },
+    {
+      "file": "home-productivity-tools-op.html",
+      "hits": [
+        {
+          "id": "awkward_es",
+          "count": 1,
+          "samples": [
+            "Saber más"
+          ]
+        },
+        {
+          "id": "literal_en_es",
+          "count": 2,
+          "samples": [
+            "kill-switch"
+          ]
+        },
+        {
+          "id": "template_filler",
+          "count": 5,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 1,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 9
+    },
+    {
+      "file": "blog-details.html",
+      "hits": [
+        {
+          "id": "template_filler",
+          "count": 6,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 8
+    },
+    {
+      "file": "home-ai-chatbot-op.html",
+      "hits": [
+        {
+          "id": "awkward_es",
+          "count": 1,
+          "samples": [
+            "Saber más"
+          ]
+        },
+        {
+          "id": "literal_en_es",
+          "count": 1,
+          "samples": [
+            "Insights accionables"
+          ]
+        },
+        {
+          "id": "template_filler",
+          "count": 4,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 8
+    },
+    {
+      "file": "home-ai-chatbot-tool-op.html",
+      "hits": [
+        {
+          "id": "literal_en_es",
+          "count": 1,
+          "samples": [
+            "Insights accionables"
+          ]
+        },
+        {
+          "id": "template_filler",
+          "count": 5,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 8
+    },
+    {
+      "file": "contact.html",
+      "hits": [
+        {
+          "id": "template_filler",
+          "count": 5,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 7
+    },
+    {
+      "file": "home-ai-agent-op.html",
+      "hits": [
+        {
+          "id": "template_filler",
+          "count": 5,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 7
+    },
+    {
+      "file": "home-business-intelligence-op.html",
+      "hits": [
+        {
+          "id": "literal_en_es",
+          "count": 1,
+          "samples": [
+            "kill-switch"
+          ]
+        },
+        {
+          "id": "template_filler",
+          "count": 5,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 1,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 7
+    },
+    {
+      "file": "home-saas-product-showcase-op.html",
+      "hits": [
+        {
+          "id": "template_filler",
+          "count": 6,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 1,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 7
+    },
+    {
+      "file": "pricing.html",
+      "hits": [
+        {
+          "id": "template_filler",
+          "count": 5,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 7
+    },
+    {
+      "file": "typography.html",
+      "hits": [
+        {
+          "id": "template_filler",
+          "count": 6,
+          "samples": [
+            "placeholder"
+          ]
+        }
+      ],
+      "hitCount": 6
+    },
+    {
+      "file": "home-ai-chatbot-tool.html",
+      "hits": [
+        {
+          "id": "literal_en_es",
+          "count": 1,
+          "samples": [
+            "Insights accionables"
+          ]
+        },
+        {
+          "id": "template_filler",
+          "count": 1,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 3,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 5
+    },
+    {
+      "file": "about.html",
+      "hits": [
+        {
+          "id": "awkward_es",
+          "count": 1,
+          "samples": [
+            "Saber más"
+          ]
+        },
+        {
+          "id": "template_filler",
+          "count": 1,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 4
+    },
+    {
+      "file": "home-ai-agent.html",
+      "hits": [
+        {
+          "id": "template_filler",
+          "count": 1,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 3,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 4
+    },
+    {
+      "file": "home-ai-chatbot.html",
+      "hits": [
+        {
+          "id": "literal_en_es",
+          "count": 1,
+          "samples": [
+            "Insights accionables"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 3,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 4
+    },
+    {
+      "file": "home-ai-writer-tool.html",
+      "hits": [
+        {
+          "id": "template_filler",
+          "count": 2,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 4
+    },
+    {
+      "file": "home-business-intelligence.html",
+      "hits": [
+        {
+          "id": "literal_en_es",
+          "count": 1,
+          "samples": [
+            "kill-switch"
+          ]
+        },
+        {
+          "id": "template_filler",
+          "count": 1,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 4
+    },
+    {
+      "file": "integrations.html",
+      "hits": [
+        {
+          "id": "template_filler",
+          "count": 2,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 4
+    },
+    {
+      "file": "blog.html",
+      "hits": [
+        {
+          "id": "template_filler",
+          "count": 1,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 3
+    },
+    {
+      "file": "case-studies-2.html",
+      "hits": [
+        {
+          "id": "template_filler",
+          "count": 1,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 3
+    },
+    {
+      "file": "case-studies-details.html",
+      "hits": [
+        {
+          "id": "template_filler",
+          "count": 1,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 3
+    },
+    {
+      "file": "case-studies.html",
+      "hits": [
+        {
+          "id": "template_filler",
+          "count": 1,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 3
+    },
+    {
+      "file": "cases.html",
+      "hits": [
+        {
+          "id": "template_filler",
+          "count": 1,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 3
+    },
+    {
+      "file": "error.html",
+      "hits": [
+        {
+          "id": "template_filler",
+          "count": 1,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 3
+    },
+    {
+      "file": "features.html",
+      "hits": [
+        {
+          "id": "template_filler",
+          "count": 1,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 3
+    },
+    {
+      "file": "home-cloud-based-saas.html",
+      "hits": [
+        {
+          "id": "template_filler",
+          "count": 1,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 3
+    },
+    {
+      "file": "home-productivity-tools.html",
+      "hits": [
+        {
+          "id": "template_filler",
+          "count": 1,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 3
+    },
+    {
+      "file": "home-saas-product-showcase.html",
+      "hits": [
+        {
+          "id": "template_filler",
+          "count": 1,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 3
+    },
+    {
+      "file": "team-details.html",
+      "hits": [
+        {
+          "id": "template_filler",
+          "count": 1,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 3
+    },
+    {
+      "file": "team.html",
+      "hits": [
+        {
+          "id": "template_filler",
+          "count": 1,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 3
+    },
+    {
+      "file": "testimonial.html",
+      "hits": [
+        {
+          "id": "template_filler",
+          "count": 1,
+          "samples": [
+            "placeholder"
+          ]
+        },
+        {
+          "id": "wrong_case_menu",
+          "count": 2,
+          "samples": [
+            ">FAQ<"
+          ]
+        }
+      ],
+      "hitCount": 3
+    }
+  ]
+}

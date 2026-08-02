@@ -22,6 +22,7 @@ const PHRASE_SWAPS = [
   ...JSON.parse(fs.readFileSync(path.join(ROOT, "scripts", "data", "aior-nelvyon-phrase-swaps-pass5.json"), "utf8")),
   ...JSON.parse(fs.readFileSync(path.join(ROOT, "scripts", "data", "aior-nelvyon-phrase-swaps-pass6.json"), "utf8")),
   ...JSON.parse(fs.readFileSync(path.join(ROOT, "scripts", "data", "aior-nelvyon-phrase-swaps-pass7.json"), "utf8")),
+  ...JSON.parse(fs.readFileSync(path.join(ROOT, "scripts", "data", "aior-nelvyon-phrase-swaps-pass8.json"), "utf8")),
 ];
 
 /**
@@ -397,7 +398,7 @@ function applyContent(html, file) {
   );
   out = out.replace(
     /<h2 class="box-number"><span class="counter-number">99\.9<\/span>%<\/h2>/g,
-    '<h2 class="box-number">SES</h2>'
+    '<h2 class="box-number">Email</h2>'
   );
   out = out.replace(
     /<h2 class="box-number"><span class="counter-number">2\.5<\/span>B\+<\/h2>/g,
@@ -460,6 +461,158 @@ function applyContent(html, file) {
     /(<h3 class="box-title">Agencia<\/h3>[\s\S]{0,280}?<h4 class="box-price"><span class="dollar">&euro;<\/span>)97<span class="duration">\/mes<\/span><\/h4>/g,
     '$1—<span class="duration">a medida</span></h4>'
   );
+  out = out.replace(
+    /<h2 class="box-number">SES<\/h2>/g,
+    '<h2 class="box-number">Email</h2>'
+  );
+  out = out.replace(
+    /(<h3 class="box-title">Definición del problema<\/h3>\s*<p class="box-text">)Integraciones y webhooks: Stripe, SES, Twilio, Meta, Google y API del tenant\./g,
+    "$1Aclaramos objetivos, canales y restricciones del tenant antes de activar módulos."
+  );
+  out = out.replace(
+    /(<h3 class="box-title">Inteligencia de datos<\/h3>\s*<p class="box-text">)Integraciones y webhooks: Stripe, SES, Twilio, Meta, Google y API del tenant\./g,
+    "$1Conectamos CRM, campañas e inbox con gobierno de datos del tenant."
+  );
+  out = out.replace(
+    /(<h3 class="box-title">Estrategia de modelo<\/h3>\s*<p class="box-text">)Integraciones y webhooks: Stripe, SES, Twilio, Meta, Google y API del tenant\./g,
+    "$1Definimos automatizaciones, agentes y umbrales con control humano."
+  );
+  out = out.replace(
+    /(<h3 class="box-title">Humano en el bucle<\/h3>\s*<p class="box-text">)Integraciones y webhooks: Stripe, SES, Twilio, Meta, Google y API del tenant\./g,
+    "$1Validación operativa, roles y cortes de emergencia antes de escalar."
+  );
+  out = out.replace(
+    /(<h3 class="box-title">Producción<\/h3>\s*<p class="box-text">)Integraciones y webhooks: Stripe, SES, Twilio, Meta, Google y API del tenant\./g,
+    "$1Despliegue con trazabilidad, alertas y mejora continua en producción."
+  );
+  // Checklist about: eliminar duplicados de plantilla
+  out = out.replace(
+    /<div class="checklist list-two-column about-checklist[\s\S]*?<\/div>/,
+    `<div class="checklist list-two-column about-checklist wow fadeInUp" data-wow-delay=".6s">
+                            <ul>
+                                <li class="wow fadeInUp" data-wow-delay=".1s">Agencia operada por IA</li>
+                                <li class="wow fadeInUp" data-wow-delay=".2s">SaaS B2B multi-tenant</li>
+                                <li class="wow fadeInUp" data-wow-delay=".3s">CRM, campañas e inbox</li>
+                                <li class="wow fadeInUp" data-wow-delay=".4s">Workflows con idempotencia</li>
+                                <li class="wow fadeInUp" data-wow-delay=".5s">Packs OS con evidencia</li>
+                                <li class="wow fadeInUp" data-wow-delay=".5s">Gobierno y roles</li>
+                            </ul>
+                        </div>`
+  );
+  // Perfiles: textos alineados al título (evitar copy idéntico)
+  out = out.replace(
+    /(<h3 class="box-title"><a href="case-studies-details\.html">Soporte<\/a><\/h3>\s*<p class="box-text">)[\s\S]*?(<\/p>)/,
+    "$1Inbox, agentes e IA con gobierno: corte de emergencia, roles y evidencia.$2"
+  );
+  out = out.replace(
+    /(<h3 class="box-title"><a href="case-studies-details\.html">Salud y citas<\/a><\/h3>\s*<p class="box-text">)[\s\S]*?(<\/p>)/,
+    "$1Operación de agenda, recordatorios y seguimiento en el SaaS NELVYON.$2"
+  );
+  out = out.replace(
+    /(<h3 class="box-title"><a href="case-studies-details\.html">Formación y LMS<\/a><\/h3>\s*<p class="box-text">)[\s\S]*?(<\/p>)/,
+    "$1Formación interna y contenidos operativos ligados al tenant.$2"
+  );
+  out = out.replace(
+    /(<h3 class="box-title"><a href="case-studies-details\.html">Comercio electrónico<\/a><\/h3>\s*<p class="box-text">)[\s\S]*?(<\/p>)/,
+    "$1Catálogo, campañas y recuperación de carritos con workflows NELVYON.$2"
+  );
+  // Integraciones: textos distintos por marca
+  out = out.replace(
+    /(<h3 class="box-title">Microsoft Teams<\/h3>\s*)[\s\S]*?(<p class="box-text">)[\s\S]*?(<\/p>)/,
+    "$1$2Notificaciones y colaboración del equipo conectadas al SaaS NELVYON.$3"
+  );
+  out = out.replace(
+    /(<h3 class="box-title">IA NELVYON<\/h3>\s*)[\s\S]*?(<p class="box-text">)[\s\S]*?(<\/p>)/,
+    "$1$2Agentes y automatizaciones con contexto del CRM y gobierno.$3"
+  );
+  out = out.replace(
+    /(<h3 class="box-title">Zapier<\/h3>\s*)[\s\S]*?(<p class="box-text">)[\s\S]*?(<\/p>)/,
+    "$1$2Conectores y webhooks hacia herramientas del stack del cliente.$3"
+  );
+  out = out.replace(
+    /(<h3 class="box-title">Loom<\/h3>\s*)[\s\S]*?(<p class="box-text">)[\s\S]*?(<\/p>)/,
+    "$1$2Material de onboarding y soporte embebido en la operación.$3"
+  );
+  // Precios: diferenciar bullets por plan (Growth / Starter / Elite / Agencia)
+  out = out.replace(
+    /(<h3 class="box-title">Growth<\/h3>[\s\S]*?<ul>\s*)<li>CRM \+ contactos<\/li>\s*<li>Módulos SaaS según plan<\/li>\s*<li>Despliegue autogestionado<\/li>\s*<li>Acceso al dashboard SaaS<\/li>/,
+    "$1<li>CRM + pipeline</li>\n                                    <li>Campañas e inbox</li>\n                                    <li>Workflows programados</li>\n                                    <li>Dashboard Growth</li>"
+  );
+  out = out.replace(
+    /(<h3 class="box-title">Starter<\/h3>[\s\S]*?<ul>\s*)<li>Campañas email SES<\/li>\s*<li>Módulos SaaS según plan<\/li>\s*<li>Secuencias y seguimiento<\/li>\s*<li>Acceso al dashboard SaaS<\/li>/,
+    "$1<li>CRM esencial</li>\n                                    <li>Campañas email SES</li>\n                                    <li>Secuencias básicas</li>\n                                    <li>Dashboard Starter</li>"
+  );
+  out = out.replace(
+    /(<h3 class="box-title">Elite<\/h3>[\s\S]*?<ul>\s*)<li>Workflows \+ automatizaciones<\/li>\s*<li>Módulos SaaS según plan<\/li>\s*<li>Secuencias y seguimiento<\/li>\s*<li>Acceso al dashboard SaaS<\/li>/,
+    "$1<li>Automatizaciones avanzadas</li>\n                                    <li>Gobierno y roles</li>\n                                    <li>API y webhooks</li>\n                                    <li>Dashboard Elite</li>"
+  );
+  out = out.replace(
+    /(<h3 class="box-title">Agencia<\/h3>[\s\S]*?<ul>\s*)<li>Workflows \+ automatizaciones<\/li>\s*<li>Módulos SaaS según plan<\/li>\s*<li>Secuencias y seguimiento<\/li>\s*<li>Acceso al dashboard SaaS<\/li>/,
+    "$1<li>Packs OS a medida</li>\n                                    <li>Operación de agencia</li>\n                                    <li>Portal cliente</li>\n                                    <li>Presupuesto personalizado</li>"
+  );
+  out = out.replace(
+    /(<h3 class="box-title">Definición del problema<\/h3>[\s\S]*?<ul>\s*)<li>Experiencia operativa<\/li>\s*<li>Enfoque en el cliente<\/li>\s*<li>Tecnología avanzada<\/li>\s*<li>Soluciones a medida<\/li>\s*<li>Diseño centrado en el usuario<\/li>/,
+    "$1<li>Objetivos de negocio</li>\n                                            <li>Canales prioritarios</li>\n                                            <li>Restricciones del tenant</li>\n                                            <li>Criterios de éxito</li>\n                                            <li>Alcance del kickoff</li>"
+  );
+  out = out.replace(
+    /(<h3 class="box-title">Inteligencia de datos<\/h3>[\s\S]*?<ul>\s*)<li>Preparación de datos del tenant<\/li>\s*<li>Mapa de riesgos y sesgos<\/li>\s*<li>Recomendación construir o comprar<\/li>\s*<li>Soluciones a medida<\/li>\s*<li>Diseño centrado en el usuario<\/li>/,
+    "$1<li>Preparación de datos del tenant</li>\n                                            <li>Mapa de riesgos y sesgos</li>\n                                            <li>Calidad e integridad</li>\n                                            <li>Permisos y roles</li>\n                                            <li>Fuentes CRM y campañas</li>"
+  );
+  out = out.replace(
+    /(<h3 class="box-title">Estrategia de modelo<\/h3>[\s\S]*?<ul>\s*)<li>Equilibrio precisión \/ latencia<\/li>\s*<li>Coste según escala<\/li>\s*<li>Interpretabilidad y control<\/li>\s*<li>Soluciones a medida<\/li>\s*<li>Diseño centrado en el usuario<\/li>/,
+    "$1<li>Automatizaciones clave</li>\n                                            <li>Umbrales y alertas</li>\n                                            <li>Coste según escala</li>\n                                            <li>Interpretabilidad</li>\n                                            <li>Control operativo</li>"
+  );
+  out = out.replace(
+    /(<h3 class="box-title">Humano en el bucle<\/h3>[\s\S]*?<ul>\s*)<li>Equilibrio precisión \/ latencia<\/li>\s*<li>Coste según escala<\/li>\s*<li>Tecnología avanzada<\/li>\s*<li>Soluciones a medida<\/li>\s*<li>Diseño centrado en el usuario<\/li>/,
+    "$1<li>Revisión humana</li>\n                                            <li>Roles y permisos</li>\n                                            <li>Cortes de emergencia</li>\n                                            <li>Escalado seguro</li>\n                                            <li>Evidencia de decisiones</li>"
+  );
+  out = out.replace(
+    /(<h3 class="box-title">Producción<\/h3>[\s\S]*?<ul>\s*)<li>Monitorización y alertas<\/li>\s*<li>Versionado y rollback<\/li>\s*<li>Cumplimiento y trazabilidad<\/li>\s*<li>Soluciones a medida<\/li>\s*<li>Diseño centrado en el usuario<\/li>/,
+    "$1<li>Monitorización y alertas</li>\n                                            <li>Versionado y rollback</li>\n                                            <li>Cumplimiento y trazabilidad</li>\n                                            <li>Mejora continua</li>\n                                            <li>Soporte operativo</li>"
+  );
+  out = out.replace(/Works Process/g, "Proceso de trabajo");
+  out = out.replace(/<\/span> STEP<\/span>/g, "</span> PASO</span>");
+  // Contacto: eliminar dirección/teléfonos ficticios de plantilla
+  out = out.replace(/>Location</g, ">Ubicación<");
+  out = out.replace(
+    /300 SW 1st Ave, Suite 155, Fort Lauderdale, FL 33301/g,
+    "Operación remota · España / UE"
+  );
+  out = out.replace(
+    /<a href="tel:\+00123456789">\+\(00\) 12 - 345 6789<\/a>\s*<a href="tel:\+00109876543">\+\(00\) 10 - 9876 543<\/a>/g,
+    '<a href="mailto:contact@nelvyon.com">contact@nelvyon.com</a>'
+  );
+  out = out.replace(
+    /<a href="mailto:contact@nelvyon\.com">contact@nelvyon\.com<\/a>\s*<a href="mailto:contact@nelvyon\.com">contact@nelvyon\.com<\/a>/g,
+    '<a href="mailto:contact@nelvyon.com">contact@nelvyon.com</a>'
+  );
+  // Select de precios: opciones reales (no 4× Demo)
+  out = out.replace(
+    /<option value="Demo del SaaS">Demo del SaaS<\/option>\s*<option value="Demo del SaaS">Demo del SaaS<\/option>\s*<option value="Demo del SaaS">Demo del SaaS<\/option>\s*<option value="Demo del SaaS">Demo del SaaS\s*<\/option>/g,
+    `<option value="demo-saas">Demo del SaaS</option>
+                                        <option value="plan-starter">Plan Starter</option>
+                                        <option value="plan-growth">Plan Growth</option>
+                                        <option value="plan-elite">Plan Elite</option>
+                                        <option value="agencia">Servicios de agencia / packs</option>`
+  );
+  // pricing.html style2: alinear título/precio con la lista de features
+  if (file === "pricing.html") {
+    out = out.replace(
+      /(<h3 class="box-title">)Elite(<\/h3>\s*<h4 class="box-price"><span class="dollar">&euro;<\/span>)797(<span class="duration">\/mes<\/span><\/h4>\s*<p class="subtitle">)Plan SaaS - enterprise(<\/p>\s*<\/div>\s*<div class="available-list">\s*<ul>\s*<li>Dashboard unificado<\/li>)/,
+      "$1Starter$297$3Plan SaaS - 1 usuario$4"
+    );
+    out = out.replace(
+      /(<h3 class="box-title">)Growth(<\/h3>\s*<h4 class="box-price"><span class="dollar">&euro;<\/span>)297(<span class="duration">\/mes<\/span><\/h4>\s*<p class="subtitle">)Plan SaaS - hasta 5 usuarios(<\/p>\s*<\/div>\s*<div class="available-list">\s*<ul>\s*<li>Todo lo de Growth<\/li>)/,
+      "$1Elite$2797$3Plan SaaS - enterprise$4"
+    );
+    out = out.replace(
+      /(<h3 class="box-title">)Starter(<\/h3>\s*<h4 class="box-price"><span class="dollar">&euro;<\/span>)97(<span class="duration">\/mes<\/span><\/h4>\s*<p class="subtitle">)Plan SaaS - 1 usuario(<\/p>\s*<\/div>\s*<div class="available-list">\s*<ul>\s*<li>Todo lo de Starter<\/li>)/,
+      "$1Growth$2297$3Plan SaaS - hasta 5 usuarios$4"
+    );
+  }
+  out = out.replace(/Anual <span class="">-35%<\/span>/g, "Anual");
+  out = out.replace(/Anual −35%/g, "Anual");
+  out = out.replace(/Anual -35%/g, "Anual");
   // Tipografía demo: sustituir filler latino por muestra NELVYON (misma etiqueta)
   if (file === "typography.html") {
     out = out.replace(
