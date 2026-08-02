@@ -7,6 +7,7 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| Web pública | **Gates AIOR + timeouts crawl/sweep** | tsc/eslint/vitest/build PASS; crawl local FAIL (500 webpack-runtime en `next start`); AbortSignal.timeout en scripts cert. Sin deploy. |
 | Web pública | **AIOR cleanup residuales + blog body** | `AiorBlogContent` en `/blog/[id]`; eliminados ui/DeepPage/Zubaz CSS/mocks huérfanos. Sin deploy. |
 | Web pública | **AIOR→NELVYON port completo marketing (sin deploy)** | Todas las rutas `(marketing)` + legales con piel AIOR; capturas SaaS reales; dump `/www/` purgado; DeepPage/Aceternity/ZubazFaq eliminados del flujo. Sin deploy. |
 | Web pública | **AIOR→NELVYON en Next (Home + core, sin deploy)** | Histórico: Home + core + purge `/www/`. Supersedido por port completo. |

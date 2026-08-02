@@ -48,7 +48,10 @@ let fail = 0;
 for (const route of ROUTES) {
   const url = `${base}${route}`;
   try {
-    const res = await fetch(url, { headers: { "user-agent": "nelvyon-content-sweep/1.0" } });
+    const res = await fetch(url, {
+      headers: { "user-agent": "nelvyon-content-sweep/1.0" },
+      signal: AbortSignal.timeout(20_000),
+    });
     const html = await res.text();
     // Ignore Next flight / source maps / asset paths containing aior folder
     const body = html

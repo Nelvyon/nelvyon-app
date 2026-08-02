@@ -73,6 +73,7 @@ async function crawl() {
       const res = await fetch(url, {
         redirect: "follow",
         headers: { "user-agent": "nelvyon-public-web-cert/1.0" },
+        signal: AbortSignal.timeout(20_000),
       });
       const html = await res.text();
       const ms = Date.now() - started;
@@ -85,7 +86,7 @@ async function crawl() {
       for (const src of imgSrcs) {
         if (!src.startsWith("/brand/public/")) continue;
         const abs = `${base}${src}`;
-        const ir = await fetch(abs, { method: "HEAD" }).catch(() => null);
+        const ir = await fetch(abs, { method: "HEAD", signal: AbortSignal.timeout(10_000) }).catch(() => null);
         if (!ir || !ir.ok) brokenHints.push(src);
       }
       const hasMain = /id=["']contenido-principal["']/.test(html) || /<main\b/i.test(html);
@@ -125,6 +126,7 @@ async function crawl() {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({}),
+      signal: AbortSignal.timeout(20_000),
     });
     contactApi = { status: res.status, ok: res.status === 400 || res.status === 200 };
   } catch (e) {
