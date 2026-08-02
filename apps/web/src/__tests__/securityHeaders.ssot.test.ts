@@ -10,6 +10,11 @@ describe("security headers SSOT", () => {
     expect(CONTENT_SECURITY_POLICY).toContain("formspree.io");
   });
 
+  it("CONTENT_SECURITY_POLICY allows Google Maps embeds (contact)", () => {
+    expect(CONTENT_SECURITY_POLICY).toContain("https://www.google.com");
+    expect(CONTENT_SECURITY_POLICY).toContain("https://maps.google.com");
+  });
+
   it("SECURITY_HEADERS_WITHOUT_CSP has X-Frame-Options SAMEORIGIN", () => {
     const xfo = SECURITY_HEADERS_WITHOUT_CSP.find((h) => h.key === "X-Frame-Options");
     expect(xfo?.value).toBe("SAMEORIGIN");

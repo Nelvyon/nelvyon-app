@@ -1,0 +1,147 @@
+{
+  "generatedAt": "2026-08-02T18:48:42.451Z",
+  "passCount": 10,
+  "failCount": 0,
+  "results": [
+    {
+      "path": "/www/index.html",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "ok": true,
+      "overflowX": false,
+      "pixelatedCount": 0,
+      "brokenImgs": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failed404": []
+    },
+    {
+      "path": "/www/pricing.html",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "ok": true,
+      "overflowX": false,
+      "pixelatedCount": 0,
+      "brokenImgs": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failed404": []
+    },
+    {
+      "path": "/www/contact.html",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "ok": true,
+      "overflowX": false,
+      "pixelatedCount": 0,
+      "brokenImgs": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failed404": []
+    },
+    {
+      "path": "/www/about.html",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "ok": true,
+      "overflowX": false,
+      "pixelatedCount": 0,
+      "brokenImgs": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failed404": []
+    },
+    {
+      "path": "/www/features.html",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "ok": true,
+      "overflowX": false,
+      "pixelatedCount": 0,
+      "brokenImgs": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failed404": []
+    },
+    {
+      "path": "/www/home-ai-agent.html",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "ok": true,
+      "overflowX": false,
+      "pixelatedCount": 0,
+      "brokenImgs": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failed404": []
+    },
+    {
+      "path": "/www/home-saas-product-showcase.html",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "ok": true,
+      "overflowX": false,
+      "pixelatedCount": 0,
+      "brokenImgs": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failed404": []
+    },
+    {
+      "path": "/www/blog.html",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "ok": true,
+      "overflowX": false,
+      "pixelatedCount": 0,
+      "brokenImgs": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failed404": []
+    },
+    {
+      "path": "/www/team.html",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "ok": true,
+      "overflowX": false,
+      "pixelatedCount": 0,
+      "brokenImgs": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failed404": []
+    },
+    {
+      "path": "/www/faq.html",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "ok": true,
+      "overflowX": false,
+      "pixelatedCount": 0,
+      "brokenImgs": [],
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failed404": []
+    }
+  ]
+}

@@ -8,7 +8,7 @@ const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:3012";
  */
 export default defineConfig({
   testDir: "./e2e",
-  testMatch: ["**/marketing.spec.ts"],
+  testMatch: ["**/marketing.spec.ts", "**/www-live-qa.spec.ts"],
   timeout: 45_000,
   retries: 0,
   workers: 1,

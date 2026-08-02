@@ -7,6 +7,7 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| Web pública | **Auditoría absoluta final (sin deploy)** | Solo errores reales: mapa Angfuztheme→ES, CSP Google Maps, placeholders/FAQ/héroes/EN plantilla (pass9–11), blog/case/about/team. Cert `FINAL_QUALITY_CERTIFICATE.md` PASS; live QA 10/10; claimReady false (CEO+URLs). |
 | Web pública | **Cierre excelencia (sin deploy)** | Pass8: copy único, contacto sin datos ficticios, equipo sin nombres inventados, precios style2 alineados, sin −35% inventado. Informe `EXCELLENCE_CLOSURE_REPORT.md`. claimReady false (CEO+URLs). |
 | Web pública | **Pass7 contenido + informe final (sin deploy)** | Elimina EN residual / vanity metrics / chiropractic; precios SaaS reales; counters honestos; hero contraste; Playwright 7/7; certify+audit 36/36. Informe `FINAL_REPORT.md` + screenshots. claimReady false. |
 | Web pública | **Pasada fidelidad media final (sin deploy)** | FFmpeg local + 27 frames MP4; crops limpios; 445 slots revisados; sustitución selectiva (placeholders/EN-CEO/crypto); 0 residual débil; 0 paths crypto/AIOR; before/after en `fidelity-before-after/`. Evidencia `media-fidelity-final-report.json`. |

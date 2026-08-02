@@ -1,0 +1,986 @@
+{
+  "generatedAt": "2026-08-02T18:49:23.429Z",
+  "pagesReviewed": 36,
+  "pagesOkStrict": 36,
+  "realErrorCount": 0,
+  "brokenImages": [],
+  "brokenLinks": [],
+  "brokenIcons": [],
+  "faviconMissing": [],
+  "templatePages": [],
+  "lowResSamples": [
+    {
+      "file": "home-ai-chatbot-tool-op.html",
+      "src": "assets/img/icon/star6.png",
+      "bytes": 1705,
+      "decor": true
+    },
+    {
+      "file": "home-ai-chatbot-tool-op.html",
+      "src": "assets/img/icon/ser-logo1.png",
+      "bytes": 1654,
+      "decor": true
+    },
+    {
+      "file": "home-ai-chatbot-tool-op.html",
+      "src": "assets/img/icon/ser-logo2.png",
+      "bytes": 1822,
+      "decor": true
+    },
+    {
+      "file": "home-ai-chatbot-tool-op.html",
+      "src": "assets/img/icon/ser-logo3.png",
+      "bytes": 1725,
+      "decor": true
+    },
+    {
+      "file": "home-ai-chatbot-tool-op.html",
+      "src": "assets/img/icon/ser-logo1.png",
+      "bytes": 1654,
+      "decor": true
+    },
+    {
+      "file": "home-ai-chatbot-tool.html",
+      "src": "assets/img/icon/star6.png",
+      "bytes": 1705,
+      "decor": true
+    },
+    {
+      "file": "home-ai-chatbot-tool.html",
+      "src": "assets/img/icon/ser-logo1.png",
+      "bytes": 1654,
+      "decor": true
+    },
+    {
+      "file": "home-ai-chatbot-tool.html",
+      "src": "assets/img/icon/ser-logo2.png",
+      "bytes": 1822,
+      "decor": true
+    },
+    {
+      "file": "home-ai-chatbot-tool.html",
+      "src": "assets/img/icon/ser-logo3.png",
+      "bytes": 1725,
+      "decor": true
+    },
+    {
+      "file": "home-ai-chatbot-tool.html",
+      "src": "assets/img/icon/ser-logo1.png",
+      "bytes": 1654,
+      "decor": true
+    },
+    {
+      "file": "home-ai-startup-op.html",
+      "src": "assets/img/icon/icon-1.png",
+      "bytes": 1590,
+      "decor": true
+    },
+    {
+      "file": "home-ai-startup-op.html",
+      "src": "assets/img/icon/icon-3.png",
+      "bytes": 685,
+      "decor": true
+    },
+    {
+      "file": "home-ai-startup-op.html",
+      "src": "assets/img/icon/icon-4.png",
+      "bytes": 1298,
+      "decor": true
+    },
+    {
+      "file": "home-ai-startup.html",
+      "src": "assets/img/icon/icon-1.png",
+      "bytes": 1590,
+      "decor": true
+    },
+    {
+      "file": "home-ai-startup.html",
+      "src": "assets/img/icon/icon-3.png",
+      "bytes": 685,
+      "decor": true
+    },
+    {
+      "file": "home-ai-startup.html",
+      "src": "assets/img/icon/icon-4.png",
+      "bytes": 1298,
+      "decor": true
+    },
+    {
+      "file": "home-ai-writer-tool-op.html",
+      "src": "assets/img/icon/review-star.png",
+      "bytes": 642,
+      "decor": true
+    },
+    {
+      "file": "home-ai-writer-tool-op.html",
+      "src": "assets/img/icon/review-star2.png",
+      "bytes": 1285,
+      "decor": true
+    },
+    {
+      "file": "home-ai-writer-tool.html",
+      "src": "assets/img/icon/review-star.png",
+      "bytes": 642,
+      "decor": true
+    },
+    {
+      "file": "home-ai-writer-tool.html",
+      "src": "assets/img/icon/review-star2.png",
+      "bytes": 1285,
+      "decor": true
+    },
+    {
+      "file": "home-productivity-tools-op.html",
+      "src": "assets/img/shape/calendar.png",
+      "bytes": 1963,
+      "decor": true
+    },
+    {
+      "file": "home-productivity-tools-op.html",
+      "src": "assets/img/shape/layer_2.png",
+      "bytes": 1490,
+      "decor": true
+    },
+    {
+      "file": "home-productivity-tools-op.html",
+      "src": "assets/img/shape/layer.png",
+      "bytes": 2270,
+      "decor": true
+    },
+    {
+      "file": "home-productivity-tools.html",
+      "src": "assets/img/shape/calendar.png",
+      "bytes": 1963,
+      "decor": true
+    },
+    {
+      "file": "home-productivity-tools.html",
+      "src": "assets/img/shape/layer_2.png",
+      "bytes": 1490,
+      "decor": true
+    },
+    {
+      "file": "home-productivity-tools.html",
+      "src": "assets/img/shape/layer.png",
+      "bytes": 2270,
+      "decor": true
+    },
+    {
+      "file": "index.html",
+      "src": "assets/img/icon/icon-1.png",
+      "bytes": 1590,
+      "decor": true
+    },
+    {
+      "file": "index.html",
+      "src": "assets/img/icon/icon-3.png",
+      "bytes": 685,
+      "decor": true
+    },
+    {
+      "file": "index.html",
+      "src": "assets/img/icon/icon-4.png",
+      "bytes": 1298,
+      "decor": true
+    }
+  ],
+  "lowResCount": 29,
+  "heavyImageReuseTop": [],
+  "siteFiles": {
+    "robotsTxtPublic": false,
+    "sitemapXmlPublic": false,
+    "robotsTxtWww": false,
+    "sitemapXmlWww": false,
+    "opengraphRouteNote": "og:image apunta a /opengraph-image (ruta Next), no a asset estático del pack"
+  },
+  "live": {
+    "base": "http://127.0.0.1:3013",
+    "probes": [
+      {
+        "path": "/www/index.html",
+        "status": 200
+      },
+      {
+        "path": "/www/pricing.html",
+        "status": 200
+      },
+      {
+        "path": "/www/contact.html",
+        "status": 200
+      },
+      {
+        "path": "/www/about.html",
+        "status": 200
+      },
+      {
+        "path": "/www/features.html",
+        "status": 200
+      },
+      {
+        "path": "/www/home-ai-agent.html",
+        "status": 200
+      },
+      {
+        "path": "/www/assets/css/style.css",
+        "status": 200
+      },
+      {
+        "path": "/www/assets/img/logo.svg",
+        "status": 200
+      },
+      {
+        "path": "/www/assets/img/favicons/favicon-32x32.png",
+        "status": 200
+      },
+      {
+        "path": "/www/assets/img/favicons/favicon.ico",
+        "status": 200
+      },
+      {
+        "path": "/robots.txt",
+        "status": 200
+      },
+      {
+        "path": "/sitemap.xml",
+        "status": 200
+      },
+      {
+        "path": "/opengraph-image",
+        "status": 200
+      }
+    ]
+  },
+  "notes": [
+    "noindex + canonical /www/* son intencionales hasta decisión de URLs.",
+    "json-ld ausente: no es bug del pack AIOR; pendiente al cerrar URLs públicas.",
+    "Sitemap/robots del pack: la app Next controla SEO de producto; no inventar sitemap /www hasta URLs finales.",
+    "stretchedSuspects requiere inspección visual (no hay métricas intrínsecas en HTML)."
+  ],
+  "pages": [
+    {
+      "page": "about.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 113
+    },
+    {
+      "page": "blog-details.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 51
+    },
+    {
+      "page": "blog.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 52
+    },
+    {
+      "page": "case-studies-2.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 52
+    },
+    {
+      "page": "case-studies-details.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 43
+    },
+    {
+      "page": "case-studies.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 52
+    },
+    {
+      "page": "cases.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 75
+    },
+    {
+      "page": "contact.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 46
+    },
+    {
+      "page": "error.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 41
+    },
+    {
+      "page": "faq.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 45
+    },
+    {
+      "page": "features.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 90
+    },
+    {
+      "page": "home-ai-agent-op.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 91
+    },
+    {
+      "page": "home-ai-agent.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 79
+    },
+    {
+      "page": "home-ai-chatbot-op.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 115
+    },
+    {
+      "page": "home-ai-chatbot-tool-op.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 96
+    },
+    {
+      "page": "home-ai-chatbot-tool.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 85
+    },
+    {
+      "page": "home-ai-chatbot.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 108
+    },
+    {
+      "page": "home-ai-startup-op.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 117
+    },
+    {
+      "page": "home-ai-startup.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 113
+    },
+    {
+      "page": "home-ai-writer-tool-op.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 91
+    },
+    {
+      "page": "home-ai-writer-tool.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 67
+    },
+    {
+      "page": "home-business-intelligence-op.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 81
+    },
+    {
+      "page": "home-business-intelligence.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 77
+    },
+    {
+      "page": "home-cloud-based-saas-op.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 102
+    },
+    {
+      "page": "home-cloud-based-saas.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 78
+    },
+    {
+      "page": "home-productivity-tools-op.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 99
+    },
+    {
+      "page": "home-productivity-tools.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 83
+    },
+    {
+      "page": "home-saas-product-showcase-op.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 98
+    },
+    {
+      "page": "home-saas-product-showcase.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 85
+    },
+    {
+      "page": "index.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 113
+    },
+    {
+      "page": "integrations.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 49
+    },
+    {
+      "page": "pricing.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 50
+    },
+    {
+      "page": "team-details.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 52
+    },
+    {
+      "page": "team.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 60
+    },
+    {
+      "page": "testimonial.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 72
+    },
+    {
+      "page": "typography.html",
+      "issues": [
+        "seo_no_jsonld"
+      ],
+      "ok": true,
+      "seo": {
+        "title": true,
+        "description": true,
+        "canonical": true,
+        "robots": true,
+        "ogTitle": true,
+        "ogImage": true,
+        "twitterCard": true,
+        "viewport": true,
+        "langEs": true,
+        "jsonLd": false
+      },
+      "imageCount": 20
+    }
+  ],
+  "certificate": {
+    "pass": true,
+    "grade": "PASS"
+  },
+  "realErrors": []
+}

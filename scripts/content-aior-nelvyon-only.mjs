@@ -23,6 +23,9 @@ const PHRASE_SWAPS = [
   ...JSON.parse(fs.readFileSync(path.join(ROOT, "scripts", "data", "aior-nelvyon-phrase-swaps-pass6.json"), "utf8")),
   ...JSON.parse(fs.readFileSync(path.join(ROOT, "scripts", "data", "aior-nelvyon-phrase-swaps-pass7.json"), "utf8")),
   ...JSON.parse(fs.readFileSync(path.join(ROOT, "scripts", "data", "aior-nelvyon-phrase-swaps-pass8.json"), "utf8")),
+  ...JSON.parse(fs.readFileSync(path.join(ROOT, "scripts", "data", "aior-nelvyon-phrase-swaps-pass9.json"), "utf8")),
+  ...JSON.parse(fs.readFileSync(path.join(ROOT, "scripts", "data", "aior-nelvyon-phrase-swaps-pass10.json"), "utf8")),
+  ...JSON.parse(fs.readFileSync(path.join(ROOT, "scripts", "data", "aior-nelvyon-phrase-swaps-pass11.json"), "utf8")),
 ];
 
 /**
@@ -613,6 +616,96 @@ function applyContent(html, file) {
   out = out.replace(/Anual <span class="">-35%<\/span>/g, "Anual");
   out = out.replace(/Anual −35%/g, "Anual");
   out = out.replace(/Anual -35%/g, "Anual");
+  // Placeholders EN residuales (UI plantilla)
+  out = out.replace(/What are you looking for\?/g, "¿Qué busca?");
+  out = out.replace(/Write a prompt here\.\.\./g, "Escriba un prompt aquí...");
+  out = out.replace(/Enter Su nombre/g, "Su nombre");
+  out = out.replace(/Write you message/g, "Su mensaje");
+  out = out.replace(/Su email address/g, "Su email");
+  out = out.replace(/placeholder="integration"/g, 'placeholder="Buscar integración"');
+  // Contact map: eliminar embed Angfuztheme (plantilla) → mapa genérico España
+  out = out.replace(
+    /src="https:\/\/www\.google\.com\/maps\/embed\?pb=[^"]*Angfuztheme[^"]*"/gi,
+    'src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d194348!2d-3.7038!3d40.4168!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1ses!2ses!4v1700000000000!5m2!1ses!2ses" title="NELVYON — España / UE"'
+  );
+  out = out.replace(
+    /loading="lazy"\s+allowfullscreen=""\s+loading="lazy"/gi,
+    'allowfullscreen="" loading="lazy"'
+  );
+  // About: misión/visión plantilla EN → NELVYON ES
+  if (file === "about.html") {
+    out = out.replace(
+      /NELVYON Agencia \+ IA es <span class="d-block">[\s\S]*?<\/span><\/span><\/h2>/,
+      `NELVYON Agencia + IA es <span class="d-block">operación con IA fiable</span></h2>`
+    );
+    out = out.replace(
+      /<p class="about-text">NELVYON Inspire Platform[\s\S]*?<\/p>/,
+      `<p class="about-text">NELVYON une agencia de marketing digital operada por IA y SaaS B2B: CRM, campañas, workflows, inbox e integraciones en un solo stack, con puesta en marcha guiada y datos reales — sin mocks silenciosos.</p>`
+    );
+    out = out.replace(
+      /<p class="about-text">Our vision is to empower[\s\S]*?<\/p>/,
+      `<p class="about-text">Nuestra visión: que equipos de marketing y ventas operen con un sistema unificado — Agencia + SaaS — medible, seguro por tenant y listo para crecer sin cambiar de herramienta cada trimestre.</p>`
+    );
+  }
+  // FAQ: cortar cola EN plantilla residual (si queda tras phrase swaps)
+  out = out.replace(
+    /\s*effortlessly\. The AI teammate provides smart suggestions to improve workflows and track\s*progress in real time\./gi,
+    ""
+  );
+  // Team details: bio plantilla arquitectura → rol NELVYON
+  if (file === "team-details.html") {
+    out = out.replace(
+      /Architecture the structure is defined by clean lines[\s\S]*?inside and out\./,
+      "Perfil de producto y plataforma NELVYON: CRM, workflows, campañas e integraciones con foco en operación real, seguridad multi-tenant y entrega medible."
+    );
+    out = out.replace(
+      /Sustainability is also at the core of the design[\s\S]*?throughout\./g,
+      "El enfoque NELVYON prioriza operación sostenible: menos herramientas sueltas, más gobierno, trazabilidad y entrega medible."
+    );
+    out = out.replace(
+      /Material selection plays a key role[\s\S]*?conservation strategies\./g,
+      "Seleccionamos módulos e integraciones según el caso: CRM, campañas, workflows, inbox y reporting, con un stack coherente en lugar de un collage de herramientas."
+    );
+  }
+  // FAQ plantilla EN (cuerpo genérico)
+  out = out.replace(
+    /For the most precise and current pricing details,\s*we encourage\s*you to contact our amicable sales representatives\./gi,
+    "Consulte precios actuales en la página de precios (Starter €97, Growth €297, Elite €797) o solicite presupuesto de agencia en contacto."
+  );
+  // Blog details: cuerpo EN robots.txt → artículo NELVYON ES
+  if (file === "blog-details.html") {
+    out = out.replace(
+      /The robots\.txt file is one of the simplest yet most important tools[\s\S]*?adopt AI\./g,
+      "Cómo NELVYON estructura la operación de marketing: CRM, secuencias, workflows e IA con evidencia. Este artículo resume buenas prácticas para poner en marcha el SaaS sin improvisar datos ni procesos."
+    );
+    out = out.replace(
+      /The robots\.txt file is one of the simplest yet most important tools in[\s\S]*?search engines\./g,
+      "La base es un proceso claro: captación, cualificación, nurturing y reporting en el mismo panel. NELVYON conecta canales y automatiza lo repetible para que el equipo decida con datos."
+    );
+    out = out.replace(
+      /Your robots\.txt file should do just enough to guide search engines without[\s\S]*?(?:blocking|access)\./g,
+      "Defina alcance, conecte integraciones críticas y active solo los módulos que vaya a operar. Evite activar todo a la vez sin dueño ni métrica."
+    );
+    out = out.replace(
+      /A well-configured robots\.txt file improves crawl efficiency,[\s\S]*?\./g,
+      "Una puesta en marcha ordenada mejora la adopción, reduce ruido operativo y deja el stack listo para escalar campañas y workflows con control."
+    );
+  }
+  // Case study details: cuerpo EN → caso NELVYON ES
+  if (file === "case-studies-details.html") {
+    out = out.replace(
+      /This U\.S\.-based ecommerce brand offers high-quality canvas wall art crafted[\s\S]*?\./g,
+      "Marca ecommerce B2C que necesitaba unificar captación, CRM y campañas sin depender de hojas de cálculo ni herramientas desconectadas."
+    );
+    out = out.replace(
+      /The goal was to optimize ad performance, cut wasted spend, and scale[\s\S]*?\./g,
+      "El objetivo: optimizar rendimiento de adquisición, cortar gasto improductivo y escalar nurturing con workflows NELVYON y reporting claro."
+    );
+    out = out.replace(
+      /The store had been running campaigns[\s\S]*?break-even\. Budgets were spread[\s\S]*?\./g,
+      "Las campañas estaban dispersas, el CRM no reflejaba el embudo real y no había un dueño único del dato. Se unificó operación en NELVYON con reglas por etapa."
+    );
+  }
   // Tipografía demo: sustituir filler latino por muestra NELVYON (misma etiqueta)
   if (file === "typography.html") {
     out = out.replace(
