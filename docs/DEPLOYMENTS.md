@@ -1,6 +1,20 @@
 # DEPLOYMENTS — Historial
 
-> Actualizado: **2026-07-30** tip prod `3f10c272` · deploy `3d76918b` SUCCESS · migs 521+522 APPLIED · canary KILL ON · `claimReady: false`.
+> Actualizado: **2026-08-02** tip prod `4e78f600` · deploy `61cb5010` SUCCESS · pack `/www` AIOR→NELVYON LIVE · canary KILL · `claimReady: false`.
+
+## 2026-08-02 — Public web AIOR→NELVYON `/www` (production)
+
+| Campo | Valor |
+|-------|-------|
+| **Tip remoto** | `4e78f6007f845d28a4e1c340fc45bbb1f6dbecf0` |
+| **Env** | Railway production `@nelvyon/web` · https://nelvyon.com · https://app.nelvyon.com |
+| **Deploy** | `61cb5010-c5cb-4184-bbc2-665e57631969` **SUCCESS** |
+| **Prev tip** | `f89a498d` (React polish; `/www` **404** — pack no estaba en origin) |
+| **Health** | `/api/health/live` **200** `{"ok":true,"git_sha":"4e78f6007f84"}` (nelvyon.com + app) |
+| **Smokes** | `/` `agencia` `producto` `producto/ia` `enterprise` `precios` `contacto` → **307** a `/www/*.html` · HTML/CSS/JS/logo/favicon **200** · contacto form ES · sin Angfuztheme |
+| **Bloqueo resuelto** | Deploy `5efee2c2` **FAILED** (imports `AiorPageHero`/`AiorBlocks` huérfanos) → fix commit `4e78f600` |
+| **claimReady** | **false** (CEO visual + URLs definitivas) |
+| **Canary** | **KILL ON** |
 
 ## 2026-07-30 — Fase 1 producción (migrate 521–522 + deploy)
 

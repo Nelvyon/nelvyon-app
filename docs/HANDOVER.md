@@ -1,23 +1,23 @@
 ﻿# HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-08-02** — Foco: **auditoría absoluta final pack `/www` · certificado PASS · sin deploy**
+> Última actualización: **2026-08-02** — Foco: **pack AIOR→NELVYON LIVE en producción**
 
 | Campo | Valor |
 |-------|-------|
-| **Tip prod live** | deploy `6159c6b8` · commit `ca081d0e` (prod intacta) |
-| **WIP local** | `/www/` pass9–11 + mapa contacto ES + CSP Google Maps · noindex |
-| **Evidencia** | `docs/evidence/public-web-aior-nelvyon/FINAL_QUALITY_CERTIFICATE.md` |
+| **Tip prod live** | deploy `61cb5010` **SUCCESS** · commit `4e78f600` · health `git_sha=4e78f6007f84` |
+| **WIP local** | `/www/` pack publicado · redirects 307 → `/www/*.html` · noindex temporal |
+| **Evidencia** | `docs/evidence/public-web-aior-nelvyon/FINAL_QUALITY_CERTIFICATE.md` + smokes prod abajo |
 | **Mapa** | `docs/ops/AIOR_NELVYON_FULL_TEMPLATE_MAP.md` (**temporal**) |
-| **claimReady** | **false** (OK visual CEO + URLs definitivas) |
+| **claimReady** | **false** (OK visual CEO + URLs definitivas sin noindex) |
 | **Canary / spend / publish** | **KILL / OFF / OFF** |
 
 ## Próximo paso EXACTO
 
-1. **Revisión visual CEO** (`/www/mapa-plantillas.html` + homes) — único gate humano de publicación.
+1. **Revisión visual CEO** en prod (`https://nelvyon.com` + `/www/mapa-plantillas.html`).
 2. Decidir URLs definitivas (quitar `noindex` / canonical `/www/*`).
-3. Opcional: sustituir fotos stock de equipo por fotos reales.
-4. **No deploy** hasta OK explícito. Publicar solo con build que incluya CSP Google Maps (`headers.ts`).
+3. Opcional: fotos reales de equipo.
+4. Commit docs HANDOVER/DEPLOYMENTS si quedan WIP locales no relacionados.
 
 ## Gates
 
