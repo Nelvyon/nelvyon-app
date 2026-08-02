@@ -7,7 +7,8 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
-| Web pública | **AIOR→NELVYON port completo marketing (sin deploy)** | Todas las rutas `(marketing)` + legales con piel AIOR; capturas SaaS reales; dump `/www/` purgado; DeepPage/Aceternity/ZubazFaq eliminados del flujo. Gates: tsc/eslint/build/crawl/sweep PASS. Playwright/LH pendientes de re-run con server vivo. Sin deploy. |
+| Web pública | **AIOR cleanup residuales + blog body** | `AiorBlogContent` en `/blog/[id]`; eliminados ui/DeepPage/Zubaz CSS/mocks huérfanos. Sin deploy. |
+| Web pública | **AIOR→NELVYON port completo marketing (sin deploy)** | Todas las rutas `(marketing)` + legales con piel AIOR; capturas SaaS reales; dump `/www/` purgado; DeepPage/Aceternity/ZubazFaq eliminados del flujo. Sin deploy. |
 | Web pública | **AIOR→NELVYON en Next (Home + core, sin deploy)** | Histórico: Home + core + purge `/www/`. Supersedido por port completo. |
 | Web pública | **AIOR → NELVYON HTML base en `/www/`** | Histórico: dump HTML brandado + redirect temporal. Supersedido por integración Next. Script `brand-aior-nelvyon.mjs`. |
 | Web pública | **AIOR revaluado como kit de piezas** | Histórico pre-implementación. Doc `ENVATO_AIOR_HARVEST.md`. |
