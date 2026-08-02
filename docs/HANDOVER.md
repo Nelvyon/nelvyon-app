@@ -1,26 +1,26 @@
 ﻿# HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-08-02** — Foco: **AIOR visual 99% + contenido NELVYON · deploy en curso**
+> Última actualización: **2026-08-02** — Foco: **AIOR visual + contenido NELVYON LIVE en prod**
 
 | Campo | Valor |
 |-------|-------|
+| **Tip / deploy** | `92b2b462` · Railway `df882d11` **SUCCESS** |
+| **Health** | `git_sha=92b2b4627420` (nelvyon.com + app.nelvyon.com) |
 | **Regla** | AIOR visual intacto · solo logo/textos/precios/SEO · **0 saas-shots** |
-| **Evidencia** | `VISUAL_FIDELITY_PREDEPLOY.md` · `VISUAL_DEVIATIONS_AUDIT.md` · certify PASS |
-| **claimReady** | **false** hasta validación prod post-deploy |
+| **CSS** | `--theme-color: #7B5DFF` (AIOR) · sin override NELVYON |
+| **claimReady** | **false** hasta OK visual CEO + URLs definitivas |
 | **Canary** | **KILL / OFF / OFF** |
 
 ## Próximo paso EXACTO
 
-1. Tras deploy SUCCESS: validar nelvyon.com (hero AIOR, sin saas-shots, textos NELVYON).
-2. OK visual CEO.
-3. URLs definitivas (quitar noindex) cuando proceda.
+1. OK visual CEO en https://nelvyon.com (hard refresh si veía pack SaaS anterior).
+2. Decidir URLs definitivas (quitar `noindex` / canonical temporal `/www/*` cuando proceda).
+3. No reactivar scripts `fidelity-*` / `fix-aior-selective-media` / inject saas-shots.
 
-## Gates locales (pre-push)
+## Validación prod (hecha)
 
-```bash
-# visual: nonLogoDiff=0 · style.css AIOR · sin assets/img/nelvyon
-node scripts/audit-aior-www-pages.mjs          # 36/36
-node scripts/certify-aior-nelvyon-content.mjs  # EN0
-node scripts/certify-aior-www-final-quality.mjs # PASS realErrorCount 0
-```
+- 36/36 HTML sin `saas-shots` ni `assets/img/nelvyon`
+- `/www/assets/img/nelvyon/dashboard.webp` → **404**
+- Assets clave byte-match AIOR (`hero_bg_1`, `about_1_1`, `style.css`)
+- Form contacto `action=/api/contact` · `main.js` 200

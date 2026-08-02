@@ -1,14 +1,28 @@
 # DEPLOYMENTS — Historial
 
-> Actualizado: **2026-08-02** tip prod `4e78f600` · deploy `61cb5010` SUCCESS · pack `/www` AIOR→NELVYON LIVE · canary KILL · `claimReady: false`.
+> Actualizado: **2026-08-02** tip prod `92b2b462` · deploy `df882d11` SUCCESS · AIOR visual restaurado + contenido NELVYON · canary KILL · `claimReady: false`.
 
-## 2026-08-02 — Public web AIOR→NELVYON `/www` (production)
+## 2026-08-02 — Public web AIOR visual restore (production)
+
+| Campo | Valor |
+|-------|-------|
+| **Tip remoto** | `92b2b462742022616a2266cf6987124973969b95` |
+| **Env** | Railway production `@nelvyon/web` · https://nelvyon.com · https://app.nelvyon.com |
+| **Deploy** | `df882d11-87b2-4c4b-9355-0ad0d4d85f70` **SUCCESS** |
+| **Prev tip** | `4e78f600` / deploy `61cb5010` (llevaba media SaaS — **sustituido**) |
+| **Health** | `/api/health/live` **200** `{"ok":true,"git_sha":"92b2b4627420"}` (nelvyon.com + app) |
+| **Smokes** | 36/36 HTML sin saas-shots · `assets/img/nelvyon/*` **404** · `style.css` `--theme-color:#7B5DFF` · hero/about byte-match AIOR · form `/api/contact` · `main.js` 200 |
+| **Regla** | Solo logos + copy NELVYON; CSS/JS/img AIOR originales |
+| **claimReady** | **false** (CEO visual + URLs definitivas) |
+| **Canary** | **KILL ON** |
+
+## 2026-08-02 — Public web AIOR→NELVYON `/www` (production) — supersedido
 
 | Campo | Valor |
 |-------|-------|
 | **Tip remoto** | `4e78f6007f845d28a4e1c340fc45bbb1f6dbecf0` |
 | **Env** | Railway production `@nelvyon/web` · https://nelvyon.com · https://app.nelvyon.com |
-| **Deploy** | `61cb5010-c5cb-4184-bbc2-665e57631969` **SUCCESS** |
+| **Deploy** | `61cb5010-c5cb-4184-bbc2-665e57631969` **SUCCESS** (media SaaS — reemplazado por `df882d11`) |
 | **Prev tip** | `f89a498d` (React polish; `/www` **404** — pack no estaba en origin) |
 | **Health** | `/api/health/live` **200** `{"ok":true,"git_sha":"4e78f6007f84"}` (nelvyon.com + app) |
 | **Smokes** | `/` `agencia` `producto` `producto/ia` `enterprise` `precios` `contacto` → **307** a `/www/*.html` · HTML/CSS/JS/logo/favicon **200** · contacto form ES · sin Angfuztheme |
