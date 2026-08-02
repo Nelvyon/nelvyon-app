@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { blog } from "@/lib/pa/source";
-import { Content } from "@/components/pa/blogs/content";
+import { AiorBlogContent } from "@/features/public-web/components/AiorBlogContent";
 import { AiorSection } from "@/features/public-web/components/AiorBlocks";
 import { AiorCtaBand, AiorPageHero } from "@/features/public-web/components/AiorPageHero";
 
@@ -52,14 +52,12 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         secondaryCta={{ label: "Recursos", href: "/recursos" }}
       />
       <AiorSection>
-        <div style={{ maxWidth: 800, margin: "0 auto" }}>
-          <Content page={page} />
-          <p className="mt-40">
-            <Link href="/blog" className="th-btn2 style5">
-              Volver al blog
-            </Link>
-          </p>
-        </div>
+        <AiorBlogContent page={page} />
+        <p className="mt-40 text-center">
+          <Link href="/blog" className="th-btn2 style5">
+            Volver al blog
+          </Link>
+        </p>
       </AiorSection>
       <AiorCtaBand
         title="¿Quiere aplicar esto a su operación?"
