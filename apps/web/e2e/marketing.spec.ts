@@ -6,7 +6,7 @@ const go = (page: import("@playwright/test").Page, path: string) =>
 test("Home carga y muestra headline NELVYON", async ({ page }) => {
   await go(page, "/");
   await expect(
-    page.getByRole("heading", { name: /Marketing digital ejecutado por IA/i }),
+    page.getByRole("heading", { level: 1, name: /Marketing digital ejecutado por IA/i }),
   ).toBeVisible({ timeout: 20_000 });
 });
 

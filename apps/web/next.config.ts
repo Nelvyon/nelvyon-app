@@ -7,6 +7,20 @@ import {
   SECURITY_HEADERS_WITH_CSP,
 } from "./src/lib/security/headers";
 
+/**
+ * Same guard as `server.js`: skip fumadocs-mdx init on `next start`.
+ * Without this, MDX regenerates into `.next` at boot and can leave a corrupted
+ * production tree (dev `build-manifest` + empty `static/`), which surfaces as:
+ * `TypeError: Cannot read properties of undefined (reading 'call')` in webpack-runtime.
+ */
+const isNextStartCli =
+  process.argv.includes("start") ||
+  process.env.npm_lifecycle_event === "start" ||
+  process.env._FUMADOCS_MDX === "1";
+if (isNextStartCli) {
+  process.env._FUMADOCS_MDX = "1";
+}
+
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 const withMDX = createMDX();
 

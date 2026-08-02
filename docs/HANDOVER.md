@@ -1,39 +1,39 @@
 ﻿# HANDOVER — NELVYON
 
 > **Lee primero** `docs/NELVYON_MASTER_CONTEXT.md` · **luego este HANDOVER**.  
-> Última actualización: **2026-08-02** — Foco: **web pública AIOR port cerrado · gates parciales · sin deploy**
+> Última actualización: **2026-08-02** — Foco: **fix 500 next start · gates verdes · sin deploy**
 
 | Campo | Valor |
 |-------|-------|
-| **Tip prod live** | deploy `6159c6b8` · commit `ca081d0e` (prod intacta) |
-| **WIP local** | `7ce213b2` → `3310912e` (+ fetch timeout en scripts crawl/sweep sin commit aún) |
-| **Web pública** | Next + AIOR slim · port de páginas **cerrado** · sin `/www/` |
+| **Tip prod live** | deploy `6159c6b8` · commit `ca081d0e` (prod intacta — **no deploy** de este WIP) |
+| **WIP local** | fix `_FUMADOCS_MDX` en `next.config.ts` + assert prod artifacts (commit pendiente en esta sesión) |
+| **Web pública** | Next + AIOR · `next start` sano · crawl **34/34** |
 | **claimReady** | **true** |
 | **Canary / spend / publish** | **KILL / OFF / OFF** |
 
 ## Próximo paso EXACTO
 
-1. Diagnosticar `next start` local: todas las páginas HTML responden **500** con `TypeError: Cannot read properties of undefined (reading 'call')` en `webpack-runtime.js` (API `/api/contact` sí responde 400). Rebuild limpio no lo arregló.
-2. Tras fix runtime: re-ejecutar crawl + content-sweep + Playwright marketing (`playwright.marketing.config.ts` + `PLAYWRIGHT_BASE_URL`) · timeout 10 min/gate.
-3. CEO revisión visual local · **no deploy** hasta OK.
+1. CEO revisión visual local (`http://127.0.0.1:3010` con build limpio + `next start`).
+2. **No deploy** hasta OK visual CEO.
+3. Antes de cualquier `next start` local: `node scripts/assert-next-prod-artifacts.mjs` (falla si `.next/static` vacío o manifest `development`).
 
-## Gates 2026-08-02 (esta sesión)
+## Causa raíz del 500 (resuelta)
+
+`next start` CLI **no** aplicaba el guard `_FUMADOCS_MDX=1` que ya tenía `apps/web/server.js`. fumadocs-mdx regeneraba en boot y, con `.next` contaminado (manifest `static/development` + `static/` vacío), webpack-runtime hacía `a[moduleId].call` sobre `undefined` → HTTP 500 en HTML. APIs como `/api/contact` seguían vivas.
+
+**Fix:** mismo guard en `apps/web/next.config.ts` antes de `createMDX()` + script `assert-next-prod-artifacts.mjs`.
+
+## Gates post-fix (evidencia)
 
 | Gate | Resultado |
 |------|-----------|
-| `tsc --noEmit` | **PASS** |
-| eslint public-web/marketing/legal | **PASS** |
-| vitest `pricing.test.tsx` | **PASS** 8/8 |
-| `pnpm -C apps/web build` | **PASS** (×2, incl. rebuild limpio) |
-| content-sweep (sin server) | **BLOCKED** — fetch colgado; matado; añadido `AbortSignal.timeout(20s)` |
-| cert-crawl `:3010` | **FAIL** — 0/34 (HTTP 500 webpack-runtime); contactApi ok |
-| Playwright marketing | **SKIP** — mismo runtime 500 |
-| Lighthouse | **SKIP** — sin browser/server sano |
+| assert-next-prod-artifacts | **PASS** (1108 static files) |
+| `/` + `/login` | **200** |
+| cert-crawl | **34/34 PASS** + contactApi **400** |
+| content-sweep | **PASS** fail=0 |
+| Playwright marketing | **7/7 PASS** |
+| Lighthouse (Edge, 4 rutas) | **PASS** a11y 99–100 · seo 92 · bp 92 · perf 55–60 (local; residual shell JS) |
 
-## Port AIOR — inventario
+## Port AIOR
 
-**Terminadas (piel AIOR+NELVYON en código):** `/`, `/agencia`, `/agencia/[slug]`, `/producto`, `/producto/[slug]` (+ `/producto/ia`), `/enterprise`, `/precios`, `/contacto`, `/integraciones`, `/sectores`, `/sectores/[slug]`, `/casos-de-uso`, `/casos-de-uso/[slug]`, `/casos-de-exito`, `/recursos`, `/faq`, `/automatizaciones-ia`, StandardPage (`/nosotros`, `/servicios`, `/saas`, `/soluciones`, `/seguridad`), aliases agencia (`/seo`, `/ads`, …), `/blog`, `/blog/[id]`, `/aviso-legal`, `/partners`, `/alternatives`, `/status`, `/launch`, `/goodbye`, legales (`LegalPage`).
-
-**Pendientes de port de página:** ninguna (cleanup residual hecho).
-
-**Bloqueo ops:** certificación HTTP/runtime `next start` local (no es “página sin portar”).
+Cerrado. Sin páginas pendientes de port.

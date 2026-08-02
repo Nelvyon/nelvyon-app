@@ -1,30 +1,34 @@
-﻿[
-    {
-        "page":  "/",
-        "performance":  87,
-        "accessibility":  100,
-        "bestPractices":  100,
-        "seo":  92
-    },
-    {
-        "page":  "/precios",
-        "performance":  89,
-        "accessibility":  100,
-        "bestPractices":  100,
-        "seo":  91
-    },
-    {
-        "page":  "/contacto",
-        "performance":  87,
-        "accessibility":  100,
-        "bestPractices":  100,
-        "seo":  92
-    },
-    {
-        "page":  "/plataforma",
-        "performance":  88,
-        "accessibility":  100,
-        "bestPractices":  100,
-        "seo":  92
-    }
+[
+  {
+    "id": "home",
+    "url": "http://127.0.0.1:3010/",
+    "performance": 55,
+    "accessibility": 100,
+    "bestPractices": 92,
+    "seo": 92
+  },
+  {
+    "id": "precios",
+    "url": "http://127.0.0.1:3010/precios",
+    "performance": 55,
+    "accessibility": 99,
+    "bestPractices": 92,
+    "seo": 92
+  },
+  {
+    "id": "contacto",
+    "url": "http://127.0.0.1:3010/contacto",
+    "performance": 55,
+    "accessibility": 100,
+    "bestPractices": 92,
+    "seo": 92
+  },
+  {
+    "id": "producto",
+    "url": "http://127.0.0.1:3010/producto",
+    "performance": 60,
+    "accessibility": 100,
+    "bestPractices": 92,
+    "seo": 92
+  }
 ]
