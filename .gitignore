@@ -24,6 +24,12 @@ pip-wheel-metadata/
 # --- Reference templates (local extract only; never ship) ---
 .reference/
 
+# AIOR branded static site (~140MB). Regenerate: node scripts/brand-aior-nelvyon.mjs
+apps/web/public/www/
+
+# Portable tooling (ffmpeg essentials, etc.)
+.tools/
+
 # --- Local audit / scratch outputs ---
 tmp-*.txt
 tmp-*.json
