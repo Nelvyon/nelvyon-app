@@ -1,34 +1,204 @@
 
-/* NELVYON × AIOR overrides */
+/* NELVYON × AIOR — brand skin (overrides template tells) */
 :root {
   --theme-color: #0084FF !important;
   --theme-color2: #33A1FF !important;
+  --nv-ink: #06050b;
+  --nv-muted: #5b6170;
+  --nv-line: rgba(6, 5, 11, 0.08);
+  --nv-surface: #ffffff;
+  --nv-surface-soft: #f5f8fc;
+  --nv-radius: 14px;
 }
 
 .nv-aior {
   font-family: var(--font-nv-sans), system-ui, sans-serif;
-  color: #06050b;
-  background: #fff;
+  color: var(--nv-ink);
+  background: var(--nv-surface);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.nv-aior .sec-title,
+.nv-aior .hero-title,
+.nv-aior h1,
+.nv-aior h2,
+.nv-aior h3 {
+  font-family: var(--font-nv-display), var(--font-nv-sans), system-ui, sans-serif;
+  letter-spacing: -0.02em;
+  color: var(--nv-ink);
 }
 
 .nv-aior .th-header {
   z-index: 50;
 }
 
+.nv-aior .header-layout9 .menu-area {
+  min-height: 72px;
+}
+
+.nv-aior .header-layout9.sticky .sticky-wrapper {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--nv-line);
+  box-shadow: none;
+}
+
 .nv-aior .header-layout9 .main-menu > ul > li > a {
   font-weight: 600;
+  font-size: 0.95rem;
+  color: #1a1f2c;
+}
+
+.nv-aior .header-layout9 .main-menu > ul > li > a[aria-current="page"],
+.nv-aior .header-layout9 .main-menu > ul > li > a:hover {
+  color: #0084ff;
+}
+
+/* Kill template gradient CTAs → solid NELVYON blue */
+.nv-aior .th-btn2,
+.nv-aior .btn-gradient2,
+.nv-aior a.th-btn2 {
+  border-radius: 999px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em;
+  box-shadow: none !important;
+  background-image: none !important;
+  transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+
+.nv-aior .btn-gradient2,
+.nv-aior a.btn-gradient2 {
+  background: #0084ff !important;
+  border: 1px solid #0084ff !important;
+  color: #fff !important;
+}
+
+.nv-aior .btn-gradient2:hover,
+.nv-aior a.btn-gradient2:hover {
+  background: #006fd6 !important;
+  border-color: #006fd6 !important;
+  color: #fff !important;
+  transform: translateY(-1px);
+}
+
+.nv-aior .th-btn2.style5,
+.nv-aior a.th-btn2.style5 {
+  background: transparent !important;
+  border: 1px solid rgba(6, 5, 11, 0.18) !important;
+  color: var(--nv-ink) !important;
+}
+
+.nv-aior .th-btn2.style5:hover,
+.nv-aior a.th-btn2.style5:hover {
+  border-color: #0084ff !important;
+  color: #0084ff !important;
+}
+
+.nv-aior .hero-style9 {
+  padding-top: 2.5rem;
+  padding-bottom: 1rem;
+}
+
+.nv-aior .hero-style9 .sub-title,
+.nv-aior .nv-aior-inner-hero .sub-title {
+  color: #0084ff !important;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+}
+
+.nv-aior .hero-style9 .hero-title {
+  max-width: 18ch;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.08;
+}
+
+.nv-aior .hero-style9 .hero-text {
+  max-width: 42rem;
+  margin-left: auto;
+  margin-right: auto;
+  color: var(--nv-muted);
+  font-size: 1.125rem;
+  line-height: 1.65;
+}
+
+.nv-aior .hero-list {
+  justify-content: center;
+  gap: 1.25rem 1.75rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1.75rem;
+}
+
+.nv-aior .hero-list li {
+  color: #2a3140;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.nv-aior .hero-list .fa-circle-check {
+  color: #0084ff !important;
 }
 
 .nv-aior .hero-image4 img,
 .nv-aior .nv-aior-product-shot {
-  border-radius: 16px;
-  box-shadow: 0 24px 80px rgba(2, 8, 23, 0.18);
+  border-radius: 18px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.6) inset,
+    0 24px 80px rgba(2, 8, 23, 0.16);
   width: 100%;
   height: auto;
+  border: 1px solid rgba(2, 8, 23, 0.06);
 }
 
 .nv-aior .nv-aior-no-fake-social-proof {
   display: none !important;
+}
+
+/* Interior heroes */
+.nv-aior .nv-aior-inner-hero {
+  background: linear-gradient(180deg, #f5f8fc 0%, #ffffff 100%) !important;
+  padding-top: 88px !important;
+  padding-bottom: 56px !important;
+}
+
+.nv-aior .nv-aior-inner-hero.nv-aior-hero-centered {
+  text-align: center;
+}
+
+.nv-aior .nv-aior-inner-hero.nv-aior-hero-centered .btn-group {
+  justify-content: center;
+}
+
+.nv-aior .nv-aior-inner-hero.nv-aior-hero-centered p {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Cards / grids — less “Envato card soup” */
+.nv-aior .price-card-wrap,
+.nv-aior .process-card,
+.nv-aior .feature-card,
+.nv-aior .service-card,
+.nv-aior [class*="card-"] {
+  border-radius: var(--nv-radius);
+}
+
+.nv-aior .space,
+.nv-aior .space-extra {
+  padding-top: clamp(4rem, 8vw, 6.5rem);
+  padding-bottom: clamp(4rem, 8vw, 6.5rem);
+}
+
+.nv-aior .sec-title.h2,
+.nv-aior .sec-title.h3 {
+  line-height: 1.15;
+}
+
+.nv-aior .footer-wrapper {
+  background: #020817 !important;
 }
 
 .nv-aior .footer-wrapper a {
@@ -47,7 +217,11 @@
 }
 
 .nv-aior .footer-wrapper .menu li {
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+}
+
+.nv-aior .copyright-wrap p {
+  letter-spacing: 0.01em;
 }
 
 .nv-aior .th-menu-wrapper.th-body-visible {
@@ -59,4 +233,28 @@
 .nv-aior .nv-public-panel,
 .nv-aior form {
   max-width: 100%;
+}
+
+.nv-aior .nv-public-panel {
+  border: 1px solid var(--nv-line);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 18px 50px rgba(2, 8, 23, 0.06);
+}
+
+/* Soften template icon boxes */
+.nv-aior .icon-box,
+.nv-aior .feature-icon {
+  border-radius: 14px;
+}
+
+@media (max-width: 991px) {
+  .nv-aior .hero-style9 .hero-title {
+    max-width: none;
+  }
+
+  .nv-aior .hero-list {
+    flex-direction: column;
+    align-items: center;
+  }
 }

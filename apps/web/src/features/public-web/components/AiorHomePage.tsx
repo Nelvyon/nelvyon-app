@@ -94,8 +94,8 @@ export function AiorHomePage() {
                 </div>
                 <div className="hero-image4 nv-aior-product-shot">
                   <Image
-                    src={saasShotSrc("dashboard")}
-                    alt="Dashboard SaaS NELVYON"
+                    src={saasShotSrc("pipeline")}
+                    alt="Pipeline comercial SaaS NELVYON"
                     width={1200}
                     height={720}
                     priority

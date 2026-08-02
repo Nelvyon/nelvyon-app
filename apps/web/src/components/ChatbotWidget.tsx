@@ -1,14 +1,30 @@
 "use client";
 
 import { MessageCircle, Send, X } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 import { BRAND } from "@/components/landing/shared";
 
+function shouldHideChat(pathname: string | null): boolean {
+  if (!pathname) return false;
+  return (
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/register") ||
+    pathname.startsWith("/auth/") ||
+    pathname.startsWith("/saas/") ||
+    pathname.startsWith("/os/") ||
+    pathname.startsWith("/dashboard")
+  );
+}
+
 export function ChatbotWidget() {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [sent, setSent] = useState(false);
+
+  if (shouldHideChat(pathname)) return null;
 
   return (
     <>

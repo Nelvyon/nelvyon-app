@@ -7,6 +7,7 @@
 
 | Área | Cambio | Descripción |
 |------|--------|-------------|
+| Web pública | **Auditoría visual premium (sin deploy)** | Skin NELVYON sobre AIOR: CTAs sólidos, hero pipeline limpio, precios con shot, titles SEO, login sin chat doble + copy enterprise. |
 | Web pública | **Fix 500 next start (webpack-runtime call)** | Guard `_FUMADOCS_MDX=1` en `next.config.ts` (alineado con `server.js`); assert `.next` prod; crawl 34/34 + sweep + PW 7/7 + LH. Sin deploy. |
 | Web pública | **Gates AIOR + timeouts crawl/sweep** | tsc/eslint/vitest/build PASS; crawl local FAIL (500 webpack-runtime en `next start`); AbortSignal.timeout en scripts cert. Sin deploy. |
 | Web pública | **AIOR cleanup residuales + blog body** | `AiorBlogContent` en `/blog/[id]`; eliminados ui/DeepPage/Zubaz CSS/mocks huérfanos. Sin deploy. |

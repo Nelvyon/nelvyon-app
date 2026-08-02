@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 /** Legacy URL — prefer next.config redirect; keep page as safety net. */
 export const metadata: Metadata = {
-  title: "SaaS B2B | NELVYON",
+  title: "SaaS B2B",
   alternates: { canonical: "/producto" },
 };
 

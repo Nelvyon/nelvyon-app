@@ -23,20 +23,24 @@ export function AiorPageHero({
   imageSrc,
   imageAlt = "",
 }: Props) {
+  const centered = !imageSrc;
+
   return (
-    <div className="nv-aior-inner-hero space overflow-hidden" style={{ background: "#F4F7FF", paddingTop: 72 }}>
+    <div
+      className={`nv-aior-inner-hero overflow-hidden${centered ? " nv-aior-hero-centered" : ""}`}
+    >
       <div className="container th-container5">
-        <div className="row align-items-center gy-4">
-          <div className={imageSrc ? "col-lg-6" : "col-lg-10"}>
+        <div className={`row align-items-center gy-4${centered ? " justify-content-center" : ""}`}>
+          <div className={imageSrc ? "col-lg-6" : "col-lg-8"}>
             <span className="sub-title style3">{eyebrow}</span>
             <h1 className="sec-title h2 mb-3" style={{ color: "#06050B" }}>
               {title}
             </h1>
-            <p className="mb-4" style={{ maxWidth: 560, color: "#484848" }}>
+            <p className="mb-4" style={{ maxWidth: 560, color: "#5b6170" }}>
               {description}
             </p>
             {primaryCta || secondaryCta ? (
-              <div className="btn-group">
+              <div className={`btn-group${centered ? " justify-content-center" : ""}`}>
                 {primaryCta ? (
                   <Link href={primaryCta.href} className="th-btn2 btn-gradient2">
                     {primaryCta.label}

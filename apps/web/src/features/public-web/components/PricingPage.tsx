@@ -46,6 +46,8 @@ export function PricingPage() {
         description="El plan SaaS licencia el software. Los servicios de agencia se presupuestan a medida. Nunca mezclamos ambos en una sola tarjeta confusa ni publicamos precios demo."
         primaryCta={{ label: "Solicitar demo SaaS", href: "/contacto" }}
         secondaryCta={{ label: "Presupuesto agencia", href: "/contacto?tipo=agencia" }}
+        imageSrc="/brand/public/saas-shots/billing.webp"
+        imageAlt="Facturación y planes SaaS NELVYON"
       />
 
       <section className="space overflow-hidden">

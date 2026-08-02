@@ -1,9 +1,9 @@
 export const NELVYON = {
   name: "NELVYON",
-  slogan: "Donde nace tu imperio, crece tu marca y se impone tu legado",
-  tagline: "Sistema autónomo de marketing con inteligencia artificial",
-  electric: "#0066FF",
-  electricGlow: "rgba(0, 102, 255, 0.45)",
+  slogan: "Marketing digital ejecutado por IA. Operación comercial en un solo SaaS.",
+  tagline: "Agencia autónoma + SaaS B2B enterprise con CRM, workflows y gobierno.",
+  electric: "#0084FF",
+  electricGlow: "rgba(0, 132, 255, 0.45)",
   bg: "#050505",
   bgElevated: "#0c0c0e",
   border: "rgba(255,255,255,0.08)",

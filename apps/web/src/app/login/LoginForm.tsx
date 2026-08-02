@@ -9,7 +9,7 @@ import { useAuth } from "@/core/auth/AuthContext";
 import { nelvyonPlanToUiRole } from "@/core/auth/nelvyonPlanRole";
 
 const inputClass =
-  "w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-zinc-100 placeholder-zinc-500 transition focus:border-[#0066FF] focus:outline-none focus:ring-2 focus:ring-[#0066FF]/40";
+  "w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-zinc-100 placeholder-zinc-500 transition focus:border-[#0084FF] focus:outline-none focus:ring-2 focus:ring-[#0084FF]/40";
 
 type LoginSuccess = {
   userId: string;
@@ -93,7 +93,7 @@ export function LoginForm() {
 
   return (
     <AuthLayout
-      subtitle="Accede al centro de operaciones de Nelvyon — packs autónomos y OS de marketing en un solo panel."
+      subtitle="CRM, campañas, workflows e IA en un solo entorno multi-tenant."
       title="Bienvenido de nuevo"
     >
       <form className="space-y-5" noValidate onSubmit={(ev) => void handleSubmit(ev)}>
