@@ -3,8 +3,8 @@ import Link from "next/link";
 
 import { getModule } from "../content/catalog";
 import { saasShotSrc } from "../content/saasShots";
-import { AiorCtaBand, AiorPageHero } from "./AiorPageHero";
-import { AiorFaq } from "./AiorFaq";
+import { BrandCtaBand, BrandPageHero } from "./BrandPageHero";
+import { BrandFaq } from "./BrandFaq";
 
 const FAQ = [
   {
@@ -30,7 +30,7 @@ export function IaPage() {
 
   return (
     <>
-      <AiorPageHero
+      <BrandPageHero
         eyebrow="Inteligencia artificial"
         title={mod?.hero.title ?? "IA operativa con gobierno enterprise"}
         description={
@@ -100,7 +100,7 @@ export function IaPage() {
                 alt="Agentes IA NELVYON"
                 width={800}
                 height={500}
-                className="nv-aior-product-shot"
+                className="nv-brand-product-shot"
               />
             </div>
           </div>
@@ -113,11 +113,11 @@ export function IaPage() {
             <span className="sub-title style3">[ FAQ ]</span>
             <h2 className="sec-title h3">IA con criterios reales</h2>
           </div>
-          <AiorFaq items={[...FAQ]} />
+          <BrandFaq items={[...FAQ]} />
         </div>
       </section>
 
-      <AiorCtaBand
+      <BrandCtaBand
         title="Evalúe IA NELVYON con su operación"
         body="Mostramos gobierno, límites y módulos reales — sin inventar métricas ni clientes."
         primaryCta={{ label: "Hablar con el equipo", href: "/contacto?tipo=ia" }}

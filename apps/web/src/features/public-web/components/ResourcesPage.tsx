@@ -1,5 +1,5 @@
-import { AiorCardLink, AiorSection, AiorTitle } from "./AiorBlocks";
-import { AiorCtaBand, AiorPageHero } from "./AiorPageHero";
+import { BrandCardLink, BrandSection, BrandTitle } from "./BrandBlocks";
+import { BrandCtaBand, BrandPageHero } from "./BrandPageHero";
 
 const RESOURCE_SECTIONS = [
   {
@@ -47,7 +47,7 @@ const RESOURCE_SECTIONS = [
 export function ResourcesPage() {
   return (
     <>
-      <AiorPageHero
+      <BrandPageHero
         eyebrow="Recursos"
         title="Documentación, blog y referencias"
         description="Centro de recursos NELVYON: contenido útil para evaluar el SaaS, la agencia y los requisitos enterprise — sin páginas vacías."
@@ -56,19 +56,19 @@ export function ResourcesPage() {
       />
 
       {RESOURCE_SECTIONS.map((section, sectionIdx) => (
-        <AiorSection key={section.id} soft={sectionIdx % 2 === 1}>
-          <AiorTitle title={section.title} description={section.description} />
+        <BrandSection key={section.id} soft={sectionIdx % 2 === 1}>
+          <BrandTitle title={section.title} description={section.description} />
           <div className="row gy-4">
             {section.items.map((item) => (
               <div key={item.href} className="col-md-6 col-xl-4">
-                <AiorCardLink href={item.href} title={item.label} body={item.body} />
+                <BrandCardLink href={item.href} title={item.label} body={item.body} />
               </div>
             ))}
           </div>
-        </AiorSection>
+        </BrandSection>
       ))}
 
-      <AiorCtaBand
+      <BrandCtaBand
         title="¿Prefiere hablar con una persona?"
         body="El equipo le orienta sobre seguridad, legal, SaaS o activación."
         primaryCta={{ label: "Contactar", href: "/contacto" }}

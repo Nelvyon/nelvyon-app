@@ -2,15 +2,15 @@ import Link from "next/link";
 
 import { saasShotSrc } from "../content/saasShots";
 import { pageContent } from "../content/siteContent";
-import { AiorCheckList, AiorFeatureGrid, AiorSection, AiorShot, AiorTitle } from "./AiorBlocks";
-import { AiorCtaBand, AiorPageHero } from "./AiorPageHero";
+import { BrandCheckList, BrandFeatureGrid, BrandSection, BrandShot, BrandTitle } from "./BrandBlocks";
+import { BrandCtaBand, BrandPageHero } from "./BrandPageHero";
 
 const content = pageContent["automatizaciones-ia"];
 
 export function AutomationsPage() {
   return (
     <>
-      <AiorPageHero
+      <BrandPageHero
         eyebrow={content.eyebrow}
         title={content.title}
         description={content.description}
@@ -20,13 +20,13 @@ export function AutomationsPage() {
         imageAlt="Workflows SaaS NELVYON"
       />
 
-      <AiorSection soft>
-        <AiorTitle
+      <BrandSection soft>
+        <BrandTitle
           eyebrow="Automatización"
           title="Workflows, agentes y packs con idempotencia"
           description="Densidad de producto real: lo que el motor ejecuta en producción, sin nodos decorativos."
         />
-        <AiorFeatureGrid
+        <BrandFeatureGrid
           items={[
             {
               title: "Workflows SaaS",
@@ -50,17 +50,17 @@ export function AutomationsPage() {
             Ver IA
           </Link>
         </div>
-      </AiorSection>
+      </BrandSection>
 
-      <AiorSection>
+      <BrandSection>
         <div className="row align-items-center gy-4">
           <div className="col-lg-6">
-            <AiorTitle
+            <BrandTitle
               eyebrow="Motor"
               title="Automatizar sin perder el control"
               description={content.sections[0]?.body ?? content.description}
             />
-            <AiorCheckList
+            <BrandCheckList
               items={[
                 "Diseño visual + clásico alineados al motor SaaS",
                 "Idempotencia en acciones críticas",
@@ -69,13 +69,13 @@ export function AutomationsPage() {
             />
           </div>
           <div className="col-lg-6">
-            <AiorShot id="ai" alt="Panel IA NELVYON" />
+            <BrandShot id="ai" alt="Panel IA NELVYON" />
           </div>
         </div>
-      </AiorSection>
+      </BrandSection>
 
-      <AiorSection soft>
-        <AiorTitle eyebrow="Profundidad" title="Qué cubre esta capa" />
+      <BrandSection soft>
+        <BrandTitle eyebrow="Profundidad" title="Qué cubre esta capa" />
         <div className="row gy-4">
           {content.sections.map((section) => (
             <div key={section.heading} className="col-md-6">
@@ -94,9 +94,9 @@ export function AutomationsPage() {
             </div>
           ))}
         </div>
-      </AiorSection>
+      </BrandSection>
 
-      <AiorCtaBand
+      <BrandCtaBand
         title="Evalúe automatización en su operación"
         body="Demo con workflows reales y criterios de gobierno — sin nodos de plantilla."
         primaryCta={{ label: "Solicitar demo", href: "/contacto" }}

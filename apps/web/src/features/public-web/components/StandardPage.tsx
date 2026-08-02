@@ -2,8 +2,8 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 
 import type { PageContentEntry } from "../content/siteContent";
-import { AiorAsideNext, AiorCheckList, AiorSection, AiorTitle } from "./AiorBlocks";
-import { AiorCtaBand, AiorPageHero } from "./AiorPageHero";
+import { BrandAsideNext, BrandCheckList, BrandSection, BrandTitle } from "./BrandBlocks";
+import { BrandCtaBand, BrandPageHero } from "./BrandPageHero";
 
 export function StandardPage({
   content,
@@ -22,7 +22,7 @@ export function StandardPage({
 }) {
   return (
     <>
-      <AiorPageHero
+      <BrandPageHero
         eyebrow={content.eyebrow}
         title={content.title}
         description={content.description}
@@ -31,8 +31,8 @@ export function StandardPage({
         imageSrc={imageSrc}
         imageAlt={imageAlt}
       />
-      <AiorSection soft>
-        <AiorTitle
+      <BrandSection soft>
+        <BrandTitle
           eyebrow="Detalle"
           title="Profundidad de contenido"
           description="Secciones operativas — sin bloques de relleno."
@@ -52,13 +52,13 @@ export function StandardPage({
               >
                 <h2 className="h5">{section.heading}</h2>
                 <p>{section.body}</p>
-                {section.bullets?.length ? <AiorCheckList items={section.bullets} /> : null}
+                {section.bullets?.length ? <BrandCheckList items={section.bullets} /> : null}
               </article>
             ))}
           </div>
           <div className="col-lg-4">
             {children ?? (
-              <AiorAsideNext
+              <BrandAsideNext
                 body="Evaluamos su operación y proponemos alcance concreto — SaaS, agencia o ambos."
                 primaryCta={{ label: "Solicitar demo", href: "/contacto" }}
                 secondaryCta={{ label: "Ver precios", href: "/precios" }}
@@ -73,8 +73,8 @@ export function StandardPage({
             </p>
           </div>
         </div>
-      </AiorSection>
-      <AiorCtaBand
+      </BrandSection>
+      <BrandCtaBand
         title="Hablemos de su operación"
         body="Evaluamos alcance, integraciones y plan adecuado sin compromisos genéricos."
         primaryCta={{ label: "Contactar", href: "/contacto" }}

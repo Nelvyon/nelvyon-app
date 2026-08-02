@@ -4,8 +4,9 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { pricingPlans } from "../content/siteContent";
-import { AiorCtaBand, AiorPageHero } from "./AiorPageHero";
-import { AiorFaq } from "./AiorFaq";
+import { BrandCheck } from "./BrandCheck";
+import { BrandCtaBand, BrandPageHero } from "./BrandPageHero";
+import { BrandFaq } from "./BrandFaq";
 
 const FAQ = [
   {
@@ -40,7 +41,7 @@ export function PricingPage() {
 
   return (
     <>
-      <AiorPageHero
+      <BrandPageHero
         eyebrow="Precios"
         title="SaaS y Agencia, claramente separados"
         description="El plan SaaS licencia el software. Los servicios de agencia se presupuestan a medida. Nunca mezclamos ambos en una sola tarjeta confusa ni publicamos precios demo."
@@ -104,7 +105,7 @@ export function PricingPage() {
                     <ul className="hero-list" style={{ textAlign: "left" }}>
                       {plan.features.map((f) => (
                         <li key={f}>
-                          <i className="fa-sharp fa-solid fa-circle-check" aria-hidden /> {f}
+                          <BrandCheck /> {f}
                         </li>
                       ))}
                     </ul>
@@ -124,13 +125,13 @@ export function PricingPage() {
               </p>
               <ul className="hero-list" style={{ display: "inline-block", textAlign: "left" }}>
                 <li>
-                  <i className="fa-sharp fa-solid fa-circle-check" aria-hidden /> Propuesta con alcance explícito
+                  <BrandCheck /> Propuesta con alcance explícito
                 </li>
                 <li>
-                  <i className="fa-sharp fa-solid fa-circle-check" aria-hidden /> SaaS facturado aparte si aplica
+                  <BrandCheck /> SaaS facturado aparte si aplica
                 </li>
                 <li>
-                  <i className="fa-sharp fa-solid fa-circle-check" aria-hidden /> Portal de aprobación de entregables
+                  <BrandCheck /> Portal de aprobación de entregables
                 </li>
               </ul>
               <div className="btn-group justify-content-center mt-4">
@@ -152,11 +153,11 @@ export function PricingPage() {
             <span className="sub-title style3">[ FAQ ]</span>
             <h2 className="sec-title h3">Preguntas sobre precios</h2>
           </div>
-          <AiorFaq items={[...FAQ]} />
+          <BrandFaq items={[...FAQ]} />
         </div>
       </section>
 
-      <AiorCtaBand
+      <BrandCtaBand
         title="Elija plan SaaS o presupuesto de agencia"
         body="Le ayudamos a separar licencia de software y ejecución de marketing con claridad."
         primaryCta={{ label: "Contactar", href: "/contacto" }}

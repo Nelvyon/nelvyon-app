@@ -2,9 +2,9 @@ import Link from "next/link";
 
 import { getModule, saasModules } from "../content/catalog";
 import { SLUG_TO_SHOT, shotForMock, type SaasShotId } from "../content/saasShots";
-import { AiorAsideNext, AiorCheckList, AiorFeatureGrid, AiorProcess, AiorRelated, AiorSection, AiorShot, AiorTitle } from "./AiorBlocks";
-import { AiorCtaBand, AiorPageHero } from "./AiorPageHero";
-import { AiorFaq } from "./AiorFaq";
+import { BrandAsideNext, BrandCheckList, BrandFeatureGrid, BrandProcess, BrandRelated, BrandSection, BrandShot, BrandTitle } from "./BrandBlocks";
+import { BrandCtaBand, BrandPageHero } from "./BrandPageHero";
+import { BrandFaq } from "./BrandFaq";
 
 export function ModuleDetailPage({ slug }: { slug: string }) {
   const mod = getModule(slug);
@@ -16,7 +16,7 @@ export function ModuleDetailPage({ slug }: { slug: string }) {
 
   return (
     <>
-      <AiorPageHero
+      <BrandPageHero
         eyebrow={mod.hero.eyebrow || "Módulo SaaS"}
         title={mod.hero.title}
         description={mod.hero.body}
@@ -26,8 +26,8 @@ export function ModuleDetailPage({ slug }: { slug: string }) {
         imageAlt={`${mod.name} · SaaS NELVYON`}
       />
 
-      <AiorSection soft>
-        <AiorTitle
+      <BrandSection soft>
+        <BrandTitle
           eyebrow="En el producto"
           title={`${mod.name} forma parte del SaaS NELVYON`}
           description={
@@ -36,50 +36,50 @@ export function ModuleDetailPage({ slug }: { slug: string }) {
               : `Estado: ${statusLabel}.`
           }
         />
-        <AiorFeatureGrid items={mod.benefits} />
-      </AiorSection>
+        <BrandFeatureGrid items={mod.benefits} />
+      </BrandSection>
 
       {primaryShot ? (
-        <AiorSection>
+        <BrandSection>
           <div className="row align-items-center gy-4">
             <div className="col-lg-6">
-              <AiorTitle
+              <BrandTitle
                 eyebrow="Capturas"
                 title="Cómo se ve en el panel"
                 description="Capturas reales del SaaS (tenant demo Aether Labs). Sin PII de clientes."
               />
             </div>
             <div className="col-lg-6">
-              <AiorShot id={primaryShot} alt={mod.name} />
+              <BrandShot id={primaryShot} alt={mod.name} />
             </div>
           </div>
-        </AiorSection>
+        </BrandSection>
       ) : null}
 
-      <AiorSection soft>
-        <AiorTitle eyebrow="Funcionalidades" title="Capacidades en detalle" />
-        <AiorFeatureGrid items={mod.features} />
-      </AiorSection>
+      <BrandSection soft>
+        <BrandTitle eyebrow="Funcionalidades" title="Capacidades en detalle" />
+        <BrandFeatureGrid items={mod.features} />
+      </BrandSection>
 
-      <AiorSection>
-        <AiorTitle eyebrow="Casos de uso" title="Cómo se usa en operaciones reales" />
-        <AiorFeatureGrid items={mod.useCases} />
-      </AiorSection>
+      <BrandSection>
+        <BrandTitle eyebrow="Casos de uso" title="Cómo se usa en operaciones reales" />
+        <BrandFeatureGrid items={mod.useCases} />
+      </BrandSection>
 
       {mod.comparisonPoints?.length ? (
-        <AiorSection soft>
-          <AiorTitle eyebrow="Comparativa" title="Stack fragmentado vs NELVYON" />
+        <BrandSection soft>
+          <BrandTitle eyebrow="Comparativa" title="Stack fragmentado vs NELVYON" />
           <div className="row gy-4">
             <div className="col-md-6">
               <div style={{ padding: 28, borderRadius: 16, border: "1px solid #E0E0E0", background: "#fff", height: "100%" }}>
                 <h3 className="h6">Herramientas sueltas</h3>
-                <AiorCheckList items={["Datos en silos", "Pegamentos frágiles", "Difícil de auditar"]} />
+                <BrandCheckList items={["Datos en silos", "Pegamentos frágiles", "Difícil de auditar"]} />
               </div>
             </div>
             <div className="col-md-6">
               <div style={{ padding: 28, borderRadius: 16, border: "2px solid #0084FF", background: "#fff", height: "100%" }}>
                 <h3 className="h6">NELVYON</h3>
-                <AiorCheckList
+                <BrandCheckList
                   items={[
                     mod.comparisonPoints[0] || "Contexto unificado",
                     mod.comparisonPoints[1] || "Mismo tenant y permisos",
@@ -89,12 +89,12 @@ export function ModuleDetailPage({ slug }: { slug: string }) {
               </div>
             </div>
           </div>
-        </AiorSection>
+        </BrandSection>
       ) : null}
 
-      <AiorSection>
-        <AiorTitle eyebrow="Adopción" title="Cómo se activa" />
-        <AiorProcess
+      <BrandSection>
+        <BrandTitle eyebrow="Adopción" title="Cómo se activa" />
+        <BrandProcess
           steps={[
             { title: "Demo", body: "Recorrido del módulo en tenant de evaluación." },
             { title: "Alcance", body: "Plan SaaS y permisos necesarios." },
@@ -102,16 +102,16 @@ export function ModuleDetailPage({ slug }: { slug: string }) {
             { title: "Operación", body: "Equipo trabajando con datos reales." },
           ]}
         />
-      </AiorSection>
+      </BrandSection>
 
-      <AiorSection soft>
+      <BrandSection soft>
         <div className="row gy-4">
           <div className="col-lg-7">
-            <AiorTitle eyebrow={`FAQ · ${mod.name}`} title="Preguntas específicas" />
-            <AiorFaq items={[...mod.faqs]} />
+            <BrandTitle eyebrow={`FAQ · ${mod.name}`} title="Preguntas específicas" />
+            <BrandFaq items={[...mod.faqs]} />
           </div>
           <div className="col-lg-5">
-            <AiorAsideNext
+            <BrandAsideNext
               body="Active el módulo en un plan SaaS o combínelo con servicios de agencia (presupuesto aparte)."
               primaryCta={{ label: "Ver precios SaaS", href: "/precios#saas" }}
               secondaryCta={{ label: "Hablar con ventas", href: "/contacto" }}
@@ -126,14 +126,14 @@ export function ModuleDetailPage({ slug }: { slug: string }) {
             ) : null}
           </div>
         </div>
-      </AiorSection>
+      </BrandSection>
 
-      <AiorRelated
+      <BrandRelated
         title="Módulos relacionados"
         items={related.map((m) => ({ label: m.name, href: `/producto/${m.slug}`, body: m.short }))}
       />
 
-      <AiorCtaBand
+      <BrandCtaBand
         title={`Demo del módulo ${mod.name}`}
         body="Recorremos el flujo real en un tenant de evaluación."
         primaryCta={{ label: "Solicitar demo", href: "/contacto" }}

@@ -1,5 +1,6 @@
 import { pageContent, siteBrand } from "../content/siteContent";
-import { AiorPageHero } from "./AiorPageHero";
+import { BrandCheck } from "./BrandCheck";
+import { BrandPageHero } from "./BrandPageHero";
 import { ContactForm } from "./ContactForm";
 
 export function ContactPage() {
@@ -7,7 +8,7 @@ export function ContactPage() {
 
   return (
     <>
-      <AiorPageHero
+      <BrandPageHero
         eyebrow={content.eyebrow}
         title={content.title}
         description={content.description}
@@ -36,7 +37,7 @@ export function ContactPage() {
                     <ul className="hero-list mt-3" style={{ textAlign: "left" }}>
                       {section.bullets.map((b: string) => (
                         <li key={b}>
-                          <i className="fa-sharp fa-solid fa-circle-check" aria-hidden /> {b}
+                          <BrandCheck /> {b}
                         </li>
                       ))}
                     </ul>

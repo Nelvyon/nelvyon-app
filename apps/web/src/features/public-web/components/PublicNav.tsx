@@ -13,7 +13,7 @@ function isActive(pathname: string, href: string): boolean {
 }
 
 /**
- * Header AIOR (header-layout9) con navegación y CTAs NELVYON.
+ * Header público NELVYON (layout header-9) con navegación y CTAs.
  */
 export function PublicNav() {
   const pathname = usePathname() ?? "/";
@@ -78,7 +78,15 @@ export function PublicNav() {
                   aria-expanded={open}
                   onClick={() => setOpen((v) => !v)}
                 >
-                  <i className={open ? "far fa-times" : "far fa-bars"} aria-hidden />
+                  {open ? (
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+                      <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                  ) : (
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+                      <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                  )}
                 </button>
               </div>
               <div className="col-auto d-none d-xl-block">
@@ -100,7 +108,9 @@ export function PublicNav() {
       <div className={`th-menu-wrapper${open ? " th-body-visible" : ""}`} style={open ? { visibility: "visible" } : undefined}>
         <div className="th-menu-area text-center">
           <button type="button" className="th-menu-toggle" onClick={() => setOpen(false)} aria-label="Cerrar">
-            <i className="fal fa-times" aria-hidden />
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
           </button>
           <div className="mobile-logo mb-4">
             <Link href="/" onClick={() => setOpen(false)}>

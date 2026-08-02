@@ -3,12 +3,13 @@ import Link from "next/link";
 
 import { agencyServices } from "../content/catalog";
 import { saasShotSrc } from "../content/saasShots";
-import { AiorCtaBand, AiorPageHero } from "./AiorPageHero";
+import { BrandCheck } from "./BrandCheck";
+import { BrandCtaBand, BrandPageHero } from "./BrandPageHero";
 
 export function AgencyPage() {
   return (
     <>
-      <AiorPageHero
+      <BrandPageHero
         eyebrow="Agencia NELVYON"
         title="Marketing digital ejecutado con IA y gobierno humano"
         description="SEO, ads, branding, contenido, web, email y automatización producidos con agentes, control de calidad y portal de aprobación. El presupuesto de agencia se cotiza a medida y nunca se mezcla con el plan SaaS."
@@ -82,13 +83,13 @@ export function AgencyPage() {
               </p>
               <ul className="hero-list">
                 <li>
-                  <i className="fa-sharp fa-solid fa-circle-check" aria-hidden /> Orquestación de packs en producto
+                  <BrandCheck /> Orquestación de packs en producto
                 </li>
                 <li>
-                  <i className="fa-sharp fa-solid fa-circle-check" aria-hidden /> Umbral QA ≥ 85 para auto-aprobación
+                  <BrandCheck /> Umbral QA ≥ 85 para auto-aprobación
                 </li>
                 <li>
-                  <i className="fa-sharp fa-solid fa-circle-check" aria-hidden /> Portal cliente para decisión humana
+                  <BrandCheck /> Portal cliente para decisión humana
                 </li>
               </ul>
             </div>
@@ -98,14 +99,14 @@ export function AgencyPage() {
                 alt="Automatizaciones y packs NELVYON"
                 width={800}
                 height={500}
-                className="nv-aior-product-shot"
+                className="nv-brand-product-shot"
               />
             </div>
           </div>
         </div>
       </section>
 
-      <AiorCtaBand
+      <BrandCtaBand
         title="Presupuesto de agencia a medida"
         body="Cuéntenos sector, objetivos y alcance. Recibirá una propuesta real, no un formulario de demo genérico."
         primaryCta={{ label: "Solicitar presupuesto", href: "/contacto?tipo=agencia" }}

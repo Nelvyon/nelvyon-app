@@ -2,8 +2,8 @@ import Link from "next/link";
 
 import { useCasesCatalog } from "../content/catalog";
 import { caseStudies } from "../content/siteContent";
-import { AiorCardLink, AiorSection, AiorTitle } from "./AiorBlocks";
-import { AiorCtaBand, AiorPageHero } from "./AiorPageHero";
+import { BrandCardLink, BrandSection, BrandTitle } from "./BrandBlocks";
+import { BrandCtaBand, BrandPageHero } from "./BrandPageHero";
 
 type CasesPageProps = {
   successStoriesMode?: boolean;
@@ -12,7 +12,7 @@ type CasesPageProps = {
 export function CasesPage({ successStoriesMode = false }: CasesPageProps) {
   return (
     <>
-      <AiorPageHero
+      <BrandPageHero
         eyebrow={successStoriesMode ? "Casos de éxito" : "Casos de uso"}
         title={
           successStoriesMode
@@ -31,7 +31,7 @@ export function CasesPage({ successStoriesMode = false }: CasesPageProps) {
       />
 
       {successStoriesMode ? (
-        <AiorSection soft>
+        <BrandSection soft>
           <p className="mb-0" style={{ maxWidth: 720 }}>
             Esta página recoge perfiles anonimizados de capacidad. Para casos de uso con narrativa paso a paso,
             visite{" "}
@@ -40,11 +40,11 @@ export function CasesPage({ successStoriesMode = false }: CasesPageProps) {
             </Link>
             .
           </p>
-        </AiorSection>
+        </BrandSection>
       ) : null}
 
-      <AiorSection>
-        <AiorTitle
+      <BrandSection>
+        <BrandTitle
           eyebrow="Casos de uso"
           title="Explore por perfil operativo"
           description="Cada caso enlaza a la página profunda con narrativa tipificada y enlaces al SaaS. Sin clientes inventados."
@@ -53,7 +53,7 @@ export function CasesPage({ successStoriesMode = false }: CasesPageProps) {
         <div className="row gy-4">
           {useCasesCatalog.map((item) => (
             <div key={item.id} className="col-md-6">
-              <AiorCardLink
+              <BrandCardLink
                 href={`/casos-de-uso/${item.slug}`}
                 title={item.name}
                 body={item.short}
@@ -63,11 +63,11 @@ export function CasesPage({ successStoriesMode = false }: CasesPageProps) {
             </div>
           ))}
         </div>
-      </AiorSection>
+      </BrandSection>
 
       {successStoriesMode ? (
-        <AiorSection soft>
-          <AiorTitle
+        <BrandSection soft>
+          <BrandTitle
             eyebrow="Perfiles anonimizados"
             title="Rangos de capacidad"
             description="Las métricas describen objetivos típicos; no son testimonios de clientes con nombre inventado."
@@ -104,10 +104,10 @@ export function CasesPage({ successStoriesMode = false }: CasesPageProps) {
               </div>
             ))}
           </div>
-        </AiorSection>
+        </BrandSection>
       ) : null}
 
-      <AiorCtaBand
+      <BrandCtaBand
         title="Construyamos el siguiente perfil"
         body="Diagnóstico inicial, alcance claro y activación de SaaS o packs según su operación."
         primaryCta={{ label: "Contactar", href: "/contacto" }}

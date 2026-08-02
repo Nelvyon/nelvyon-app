@@ -1,12 +1,12 @@
 import { sectorsCatalog } from "../content/catalog";
 import { libraryPhoto } from "../content/visualLibrary";
-import { AiorCardLink, AiorSection, AiorTitle } from "./AiorBlocks";
-import { AiorCtaBand, AiorPageHero } from "./AiorPageHero";
+import { BrandCardLink, BrandSection, BrandTitle } from "./BrandBlocks";
+import { BrandCtaBand, BrandPageHero } from "./BrandPageHero";
 
 export function SectorsPage() {
   return (
     <>
-      <AiorPageHero
+      <BrandPageHero
         eyebrow="Sectores"
         title="NELVYON adaptado a su industria"
         description="Negocios locales, ecommerce, SaaS B2B, servicios profesionales, salud y enterprise — cada sector tiene retos, módulos y servicios recomendados documentados."
@@ -16,8 +16,8 @@ export function SectorsPage() {
         imageAlt="Sectores NELVYON"
       />
 
-      <AiorSection>
-        <AiorTitle
+      <BrandSection>
+        <BrandTitle
           eyebrow="Explore por sector"
           title="Seleccione su perfil"
           description="Cada tarjeta enlaza a la página profunda con retos, resultados, módulos SaaS y servicios de agencia."
@@ -26,7 +26,7 @@ export function SectorsPage() {
         <div className="row gy-4">
           {sectorsCatalog.map((sector) => (
             <div key={sector.id} className="col-md-6 col-xl-4">
-              <AiorCardLink
+              <BrandCardLink
                 href={`/sectores/${sector.slug}`}
                 title={sector.name}
                 body={sector.short}
@@ -36,9 +36,9 @@ export function SectorsPage() {
             </div>
           ))}
         </div>
-      </AiorSection>
+      </BrandSection>
 
-      <AiorCtaBand
+      <BrandCtaBand
         title="¿Su sector requiere un diseño específico?"
         body="Definimos flujos, integraciones y packs según su modelo de negocio."
         primaryCta={{ label: "Solicitar demo", href: "/contacto" }}

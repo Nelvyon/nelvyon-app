@@ -2,8 +2,8 @@ import Link from "next/link";
 
 import { integrationsCatalog } from "../content/catalog";
 import { saasShotSrc } from "../content/saasShots";
-import { AiorCtaBand, AiorPageHero } from "./AiorPageHero";
-import { AiorFaq } from "./AiorFaq";
+import { BrandCtaBand, BrandPageHero } from "./BrandPageHero";
+import { BrandFaq } from "./BrandFaq";
 
 const FAQ = [
   {
@@ -33,7 +33,7 @@ export function EnterprisePage() {
 
   return (
     <>
-      <AiorPageHero
+      <BrandPageHero
         eyebrow="Enterprise NELVYON"
         title="Seguridad, escala y gobierno para operaciones exigentes"
         description="SaaS multi-tenant, automatización con kill-switch, integraciones gobernadas y documentación de cumplimiento. Composición enterprise — contenido profundo, sin plantilla genérica ni promesas inventadas."
@@ -114,11 +114,11 @@ export function EnterprisePage() {
             <span className="sub-title style3">[ FAQ ]</span>
             <h2 className="sec-title h3">Preguntas enterprise</h2>
           </div>
-          <AiorFaq items={[...FAQ]} />
+          <BrandFaq items={[...FAQ]} />
         </div>
       </section>
 
-      <AiorCtaBand
+      <BrandCtaBand
         title="Evaluación enterprise con alcance concreto"
         body="Seguridad, integraciones, SLA y despliegue — sin inventar clientes ni certificaciones."
         primaryCta={{ label: "Contactar enterprise", href: "/contacto?tipo=enterprise" }}

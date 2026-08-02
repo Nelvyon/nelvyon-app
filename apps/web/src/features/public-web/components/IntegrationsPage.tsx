@@ -1,8 +1,8 @@
 import { integrationsCatalog } from "../content/catalog";
 import { saasShotSrc } from "../content/saasShots";
-import { AiorAsideNext, AiorFeatureGrid, AiorSection, AiorTitle } from "./AiorBlocks";
-import { AiorCtaBand, AiorPageHero } from "./AiorPageHero";
-import { AiorFaq } from "./AiorFaq";
+import { BrandAsideNext, BrandFeatureGrid, BrandSection, BrandTitle } from "./BrandBlocks";
+import { BrandCtaBand, BrandPageHero } from "./BrandPageHero";
+import { BrandFaq } from "./BrandFaq";
 
 const CONNECTIVITY_LABEL: Record<string, string> = {
   nativo: "Nativo",
@@ -36,7 +36,7 @@ const FAQ = [
 export function IntegrationsPage() {
   return (
     <>
-      <AiorPageHero
+      <BrandPageHero
         eyebrow="Integraciones"
         title="Conecte NELVYON con su ecosistema real"
         description="Stripe, AWS SES, Google, Meta, WhatsApp, Microsoft, Outlook, Slack, Twilio y webhooks. Cada integración documenta su modo de conectividad y estado de activación — sin fingir conexiones que no existen."
@@ -46,26 +46,26 @@ export function IntegrationsPage() {
         imageAlt="Automatizaciones e integraciones SaaS NELVYON"
       />
 
-      <AiorSection soft>
-        <AiorTitle
+      <BrandSection soft>
+        <BrandTitle
           eyebrow="Principio"
           title="Estados honestos"
           description="Si una integración requiere configuración (SES, Twilio, OAuth de proyecto), la UI y esta documentación lo indican."
         />
-        <AiorFeatureGrid
+        <BrandFeatureGrid
           items={[
             { title: "Nativo", body: "Integrado en el producto (Stripe billing, SES campañas)." },
             { title: "OAuth / API", body: "Activación por proyecto o credenciales del cliente." },
             { title: "Webhooks", body: "Eventos salientes para Slack, Zapier y sistemas propios." },
           ]}
         />
-      </AiorSection>
+      </BrandSection>
 
       {categories.map((category, idx) => {
         const items = integrationsCatalog.filter((i) => i.category === category);
         return (
-          <AiorSection key={category} soft={idx % 2 === 1}>
-            <AiorTitle eyebrow={category} title={`Integraciones · ${category}`} />
+          <BrandSection key={category} soft={idx % 2 === 1}>
+            <BrandTitle eyebrow={category} title={`Integraciones · ${category}`} />
             <div className="row gy-4">
               {items.map((item) => (
                 <div key={item.id} className="col-md-6 col-xl-4">
@@ -112,27 +112,27 @@ export function IntegrationsPage() {
                 </div>
               ))}
             </div>
-          </AiorSection>
+          </BrandSection>
         );
       })}
 
-      <AiorSection soft>
+      <BrandSection soft>
         <div className="row gy-4">
           <div className="col-lg-7">
-            <AiorTitle eyebrow="FAQ" title="Preguntas sobre integraciones" />
-            <AiorFaq items={[...FAQ]} />
+            <BrandTitle eyebrow="FAQ" title="Preguntas sobre integraciones" />
+            <BrandFaq items={[...FAQ]} />
           </div>
           <div className="col-lg-5">
-            <AiorAsideNext
+            <BrandAsideNext
               body="Cuéntenos qué sistemas debe conectar su operación y le proponemos alcance técnico concreto."
               primaryCta={{ label: "Contactar", href: "/contacto" }}
               secondaryCta={{ label: "Enterprise", href: "/enterprise" }}
             />
           </div>
         </div>
-      </AiorSection>
+      </BrandSection>
 
-      <AiorCtaBand
+      <BrandCtaBand
         title="¿Falta un conector crítico?"
         body="Evaluamos webhooks, APIs OAuth y alcance enterprise para su stack."
         primaryCta={{ label: "Hablar con NELVYON", href: "/contacto" }}

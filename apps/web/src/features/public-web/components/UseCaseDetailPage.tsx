@@ -1,6 +1,7 @@
 import { getUseCase, useCasesCatalog } from "../content/catalog";
-import { AiorFeatureGrid, AiorRelated, AiorSection, AiorTitle } from "./AiorBlocks";
-import { AiorCtaBand, AiorPageHero } from "./AiorPageHero";
+import { BrandCheck } from "./BrandCheck";
+import { BrandFeatureGrid, BrandRelated, BrandSection, BrandTitle } from "./BrandBlocks";
+import { BrandCtaBand, BrandPageHero } from "./BrandPageHero";
 
 export function UseCaseDetailPage({ slug }: { slug: string }) {
   const useCase = getUseCase(slug);
@@ -10,7 +11,7 @@ export function UseCaseDetailPage({ slug }: { slug: string }) {
 
   return (
     <>
-      <AiorPageHero
+      <BrandPageHero
         eyebrow="Caso de uso"
         title={useCase.name}
         description={`${useCase.short} Audiencia: ${useCase.audience}.`}
@@ -20,7 +21,7 @@ export function UseCaseDetailPage({ slug }: { slug: string }) {
         imageAlt={useCase.name}
       />
 
-      <AiorSection soft>
+      <BrandSection soft>
         <div className="row gy-4">
           {useCase.metrics.map((m) => (
             <div key={m.label} className="col-md-6">
@@ -41,30 +42,30 @@ export function UseCaseDetailPage({ slug }: { slug: string }) {
             </div>
           ))}
         </div>
-      </AiorSection>
+      </BrandSection>
 
       {useCase.story.map((block, idx) => (
-        <AiorSection key={block.title} soft={idx % 2 === 1}>
-          <AiorTitle eyebrow={block.eyebrow || `Paso ${idx + 1}`} title={block.title} description={block.body} />
+        <BrandSection key={block.title} soft={idx % 2 === 1}>
+          <BrandTitle eyebrow={block.eyebrow || `Paso ${idx + 1}`} title={block.title} description={block.body} />
           {block.bullets?.length ? (
             <ul className="hero-list" style={{ textAlign: "left" }}>
               {block.bullets.map((b) => (
                 <li key={b}>
-                  <i className="fa-sharp fa-solid fa-circle-check" aria-hidden /> {b}
+                  <BrandCheck /> {b}
                 </li>
               ))}
             </ul>
           ) : null}
-        </AiorSection>
+        </BrandSection>
       ))}
 
-      <AiorSection>
-        <AiorTitle
+      <BrandSection>
+        <BrandTitle
           eyebrow="Nota metodológica"
           title="Perfil tipificado, no testimonio inventado"
           description="Este caso describe capacidades y enfoques reales de NELVYON. No incluye métricas de clientes con nombre ficticio ni promesas de ROI garantizado."
         />
-        <AiorFeatureGrid
+        <BrandFeatureGrid
           items={[
             {
               title: "Honestidad operativa",
@@ -80,14 +81,14 @@ export function UseCaseDetailPage({ slug }: { slug: string }) {
             },
           ]}
         />
-      </AiorSection>
+      </BrandSection>
 
-      <AiorRelated
+      <BrandRelated
         title="Otros casos de uso"
         items={related.map((u) => ({ label: u.name, href: `/casos-de-uso/${u.slug}`, body: u.short }))}
       />
 
-      <AiorCtaBand
+      <BrandCtaBand
         title="Aplicar este caso a su operación"
         body="Perfil tipificado — adaptamos módulos, servicios e integraciones en discovery."
         primaryCta={{ label: "Contactar", href: "/contacto" }}

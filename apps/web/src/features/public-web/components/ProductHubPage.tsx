@@ -3,12 +3,12 @@ import Link from "next/link";
 
 import { saasModules } from "../content/catalog";
 import { PRODUCT_HUB_SHOTS, saasShotSrc } from "../content/saasShots";
-import { AiorCtaBand, AiorPageHero } from "./AiorPageHero";
+import { BrandCtaBand, BrandPageHero } from "./BrandPageHero";
 
 export function ProductHubPage() {
   return (
     <>
-      <AiorPageHero
+      <BrandPageHero
         eyebrow="SaaS B2B NELVYON"
         title="Software operativo para marketing, ventas y automatización"
         description="CRM, pipeline, campañas, workflows, agentes IA, analytics, calendario, billing y más — multi-tenant, con autenticación real y estados honestos. Capturas del producto NELVYON, no mockups genéricos."
@@ -78,7 +78,7 @@ export function ProductHubPage() {
         </div>
       </section>
 
-      <AiorCtaBand
+      <BrandCtaBand
         title="Vea NELVYON en su contexto operativo"
         body="Demo con producto real: CRM, campañas, workflows, IA y billing según su caso."
         primaryCta={{ label: "Hablar con NELVYON", href: "/contacto" }}

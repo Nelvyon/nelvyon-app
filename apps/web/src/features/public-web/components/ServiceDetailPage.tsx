@@ -8,16 +8,16 @@ import {
 } from "../content/catalog";
 import { saasShotSrc } from "../content/saasShots";
 import {
-  AiorAsideNext,
-  AiorCheckList,
-  AiorFeatureGrid,
-  AiorProcess,
-  AiorRelated,
-  AiorSection,
-  AiorTitle,
-} from "./AiorBlocks";
-import { AiorCtaBand, AiorPageHero } from "./AiorPageHero";
-import { AiorFaq } from "./AiorFaq";
+  BrandAsideNext,
+  BrandCheckList,
+  BrandFeatureGrid,
+  BrandProcess,
+  BrandRelated,
+  BrandSection,
+  BrandTitle,
+} from "./BrandBlocks";
+import { BrandCtaBand, BrandPageHero } from "./BrandPageHero";
+import { BrandFaq } from "./BrandFaq";
 
 export function ServiceDetailPage({ slugOrHref }: { slugOrHref: string }) {
   const svc =
@@ -33,7 +33,7 @@ export function ServiceDetailPage({ slugOrHref }: { slugOrHref: string }) {
 
   return (
     <>
-      <AiorPageHero
+      <BrandPageHero
         eyebrow="Agencia NELVYON"
         title={svc.name}
         description={`${svc.short} Problema: ${svc.problem} Enfoque: ${svc.solution}`}
@@ -43,44 +43,44 @@ export function ServiceDetailPage({ slugOrHref }: { slugOrHref: string }) {
         imageAlt={svc.name}
       />
 
-      <AiorSection soft>
+      <BrandSection soft>
         <div className="row gy-4">
           <div className="col-lg-6">
-            <AiorTitle eyebrow="Problema" title="Qué resolvemos" description={svc.problem} />
+            <BrandTitle eyebrow="Problema" title="Qué resolvemos" description={svc.problem} />
           </div>
           <div className="col-lg-6">
-            <AiorTitle eyebrow="Enfoque" title="Cómo lo resolvemos" description={svc.solution} />
+            <BrandTitle eyebrow="Enfoque" title="Cómo lo resolvemos" description={svc.solution} />
           </div>
         </div>
-      </AiorSection>
+      </BrandSection>
 
-      <AiorSection>
-        <AiorTitle eyebrow="Beneficios" title="Por qué equipos eligen este servicio" />
-        <AiorFeatureGrid items={svc.benefits} />
-      </AiorSection>
+      <BrandSection>
+        <BrandTitle eyebrow="Beneficios" title="Por qué equipos eligen este servicio" />
+        <BrandFeatureGrid items={svc.benefits} />
+      </BrandSection>
 
-      <AiorSection soft>
-        <AiorTitle eyebrow="Entregables" title="Qué recibe su organización" />
-        <AiorCheckList items={svc.deliverables} />
-      </AiorSection>
+      <BrandSection soft>
+        <BrandTitle eyebrow="Entregables" title="Qué recibe su organización" />
+        <BrandCheckList items={svc.deliverables} />
+      </BrandSection>
 
-      <AiorSection>
-        <AiorTitle
+      <BrandSection>
+        <BrandTitle
           eyebrow="Proceso"
           title="Cómo trabajamos"
           description="Fases claras, exclusiones explícitas y handoff documentado."
         />
-        <AiorProcess steps={svc.process} />
-      </AiorSection>
+        <BrandProcess steps={svc.process} />
+      </BrandSection>
 
-      <AiorSection soft>
+      <BrandSection soft>
         <div className="row gy-4">
           <div className="col-lg-7">
-            <AiorTitle eyebrow={`FAQ · ${svc.name}`} title="Preguntas frecuentes" />
-            <AiorFaq items={[...svc.faqs]} />
+            <BrandTitle eyebrow={`FAQ · ${svc.name}`} title="Preguntas frecuentes" />
+            <BrandFaq items={[...svc.faqs]} />
           </div>
           <div className="col-lg-5">
-            <AiorAsideNext
+            <BrandAsideNext
               title="SaaS + Agencia"
               body="Si el servicio requiere el motor software, cotizamos la licencia SaaS en línea separada."
               primaryCta={{ label: "Pedir presupuesto", href: `/contacto?tipo=agencia&servicio=${svc.id}` }}
@@ -99,14 +99,14 @@ export function ServiceDetailPage({ slugOrHref }: { slugOrHref: string }) {
             </ul>
           </div>
         </div>
-      </AiorSection>
+      </BrandSection>
 
-      <AiorRelated
+      <BrandRelated
         title="Otros servicios de agencia"
         items={related.map((s) => ({ label: s.name, href: s.href, body: s.short }))}
       />
 
-      <AiorCtaBand
+      <BrandCtaBand
         title={`Presupuesto para ${svc.name}`}
         body="Los servicios de agencia se cotizan a medida. El SaaS, si aplica, se factura aparte."
         primaryCta={{ label: "Pedir presupuesto", href: `/contacto?tipo=agencia&servicio=${svc.id}` }}
