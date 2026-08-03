@@ -59,15 +59,15 @@ const Header = ({ onNote }: HeaderProps) => {
 					<div className="collapse navbar-collapse justify-content-between">
 						<div className="header-left">
 							<div className="input-group search-area">
-								<span className="input-group-text rounded-0">
-									<Link href="#" scroll={false}>
+								<span className="input-group-text rounded-0" aria-hidden="true">
+									<span>
 										<svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
 											<circle cx="8.78605" cy="8.78605" r="8.23951" stroke="white" strokeLinecap="round" strokeLinejoin="round" />
 											<path d="M14.5168 14.9447L17.7471 18.1667" stroke="white" strokeLinecap="round" strokeLinejoin="round" />
 										</svg>
-									</Link>
+									</span>
 								</span>
-								<input type="text" className="form-control rounded-0" placeholder="Search" />
+								<input type="text" className="form-control rounded-0" placeholder="Search" aria-label="Buscar" />
 							</div>
 						</div>
 						<ul className="navbar-nav header-right">
@@ -176,7 +176,7 @@ const Header = ({ onNote }: HeaderProps) => {
 								</Dropdown.Menu>
 							</Dropdown>
 							<Dropdown as="li" className="nav-item dropdown notification_dropdown">
-								<Dropdown.Toggle className="nav-link i-false c-pointer" variant="" as="a">
+								<Dropdown.Toggle className="nav-link i-false c-pointer" variant="" as="div" role="button" tabIndex={0} aria-label="Notificaciones">
 									<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 										<path d="M18 8C18 6.4087 17.3679 4.88258 16.2426 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.88258 2.63214 7.75736 3.75736C6.63214 4.88258 6 6.4087 6 8C6 15 3 17 3 17H21C21 17 18 15 18 8Z" stroke="white" strokeLinecap="round" strokeLinejoin="round"></path>
 										<path d="M13.73 21C13.5542 21.3031 13.3019 21.5547 12.9982 21.7295C12.6946 21.9044 12.3504 21.9965 12 21.9965C11.6496 21.9965 11.3054 21.9044 11.0018 21.7295C10.6982 21.5547 10.4458 21.3031 10.27 21" stroke="white" strokeLinecap="round" strokeLinejoin="round"></path>
@@ -197,7 +197,7 @@ const Header = ({ onNote }: HeaderProps) => {
 								</Dropdown.Menu>
 							</Dropdown>
 							<Dropdown as="li" className="nav-item dropdown notification_dropdown ">
-								<Dropdown.Toggle variant="" as="a" className="nav-link  i-false c-pointer" onClick={() => onNote()}>
+								<Dropdown.Toggle variant="" as="div" role="button" tabIndex={0} aria-label="Mensajes" className="nav-link  i-false c-pointer" onClick={() => onNote()}>
 									<svg width="20" height="22" viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
 										<path d="M16.9026 6.85114L12.4593 10.4642C11.6198 11.1302 10.4387 11.1302 9.59922 10.4642L5.11844 6.85114" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
 										<path fillRule="evenodd" clipRule="evenodd" d="M15.9089 19C18.9502 19.0084 21 16.5095 21 13.4384V6.57001C21 3.49883 18.9502 1 15.9089 1H6.09114C3.04979 1 1 3.49883 1 6.57001V13.4384C1 16.5095 3.04979 19.0084 6.09114 19H15.9089Z" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />

@@ -110,7 +110,9 @@ const SideBar = ({ menuList = MenuList }: { menuList?: W3crmMenuItem[] }) => {
                             <>
                               <Link href={"#"} scroll={false}
                                 className="has-arrow"
-                                onClick={() => {handleMenuActive(data.title)}}
+                                role="button"
+                                aria-expanded={state.active === data.title}
+                                onClick={(e) => {e.preventDefault(); handleMenuActive(data.title)}}
                                 >		
                                   <div className="menu-icon">
                                     {data.iconStyle}
@@ -134,7 +136,9 @@ const SideBar = ({ menuList = MenuList }: { menuList?: W3crmMenuItem[] }) => {
                                             {data.content && data.content.length > 0 ?
                                                 <>
                                                   <Link href={"#"} scroll={false} className={data.hasMenu ? 'has-arrow' : ''}
-                                                    onClick={() => { handleSubmenuActive(data.title)}}
+                                                    role="button"
+                                                    aria-expanded={state.activeSubmenu === data.title}
+                                                    onClick={(e) => { e.preventDefault(); handleSubmenuActive(data.title); }}
                                                   >
                                                     {data.title}
                                                   </Link>
@@ -182,7 +186,7 @@ const SideBar = ({ menuList = MenuList }: { menuList?: W3crmMenuItem[] }) => {
               })}          
           </ul>
           <div className="help-desk">
-            <Link href="#" scroll={false} className="btn btn-primary">Help Desk</Link>
+            <Link href="/saas/helpdesk" className="btn btn-primary">Help Desk</Link>
           </div>
         </div>
     </div>
