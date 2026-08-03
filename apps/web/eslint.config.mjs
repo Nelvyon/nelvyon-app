@@ -36,6 +36,10 @@ const eslintConfig = [
       /** Vendor CSS/JS/fonts for public AIOR skin (not app source). */
       "public/brand/public/nv/**",
       "public/brand/public/zubaz/**",
+      /** Pack estático AIOR servido en /www: jQuery, GSAP, Swiper… minificados. */
+      "public/www/**",
+      /** Plantilla W3CRM: CSS compilado de terceros, no fuente de la app. */
+      "public/w3crm/**",
     ],
   },
   ...compat.extends("next/core-web-vitals", "next/typescript"),
@@ -61,6 +65,19 @@ const eslintConfig = [
     plugins: { "jsx-a11y": jsxA11y },
     rules: {
       "jsx-a11y/label-has-associated-control": "error",
+    },
+  },
+  /**
+   * Plantilla oficial W3CRM portada a TS (ADR pendiente · Fase 0).
+   * Es código de terceros: se conserva su estructura original y su estado de
+   * tema es heterogéneo por diseño (mezcla `string` y `{value,label}`), por lo
+   * que `any` es deliberado y acotado a este árbol. El resto del código sigue
+   * con la regla activa.
+   */
+  {
+    files: ["src/features/saas-w3crm/**/*.{ts,tsx}"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
     },
   },
 ];

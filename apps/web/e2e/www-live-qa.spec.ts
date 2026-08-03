@@ -15,7 +15,8 @@ const PAGES = [
   "/www/faq.html",
 ];
 
-const results: any[] = [];
+type QaResult = Record<string, unknown>;
+const results: QaResult[] = [];
 
 for (const route of PAGES) {
   test(`QA live ${route}`, async ({ page }) => {
@@ -82,7 +83,7 @@ for (const route of PAGES) {
 }
 
 test.afterAll(() => {
-  const outDir = path.join(process.cwd(), "..", "..", "docs", "evidence", "public-web-aior-nelvyon");
+  const _outDir = path.join(process.cwd(), "..", "..", "docs", "evidence", "public-web-aior-nelvyon");
   // when cwd is apps/web
   const candidates = [
     path.join(process.cwd(), "docs", "evidence", "public-web-aior-nelvyon"),
