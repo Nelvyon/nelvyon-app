@@ -46,6 +46,22 @@ test.describe("Dashboard SaaS", () => {
         body: JSON.stringify(dashboardPayload),
       });
     });
+    // El shell lee los permisos de /api/saas/settings. Sin mock devuelve 401 y
+    // el filtro RBAC oculta los modulos que exigen permiso (CRM, Pipeline...).
+    await page.route("**/api/saas/settings", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          role: "owner",
+          permissions: [
+            "contacts.read", "contacts.write", "deals.read", "campanias.read",
+            "workflows.read", "analytics.read",
+          ],
+          tenant: { companyName: "NELVYON Labs", plan: "pro" },
+        }),
+      });
+    });
   });
 
   test("Dashboard muestra 4 KPI cards", async ({ page }) => {
@@ -61,11 +77,15 @@ test.describe("Dashboard SaaS", () => {
   test("Sidebar tiene todos los nav links", async ({ page }) => {
     await page.goto("/saas/dashboard");
     const nav = page.getByTestId("saas-sidebar");
-    await expect(nav.getByText("Dashboard", { exact: true })).toBeVisible();
-    await expect(nav.getByText("Setup", { exact: false })).toBeVisible();
-    await expect(nav.getByText("Unified Inbox", { exact: true })).toBeVisible();
-    await expect(nav.getByText("CRM", { exact: true })).toBeVisible();
-    await expect(nav.getByText("AI Panel", { exact: true })).toBeVisible();
+    // El sidebar de W3CRM es un acordeon: solo un grupo abierto a la vez, y se
+    // abre el que contiene la ruta actual. Los modulos de otros grupos siguen
+    // en el DOM pero colapsados, asi que se comprueba su presencia (que es lo
+    // que este test verifica) y la visibilidad solo del grupo activo.
+    await expect(nav.getByText("Dashboard", { exact: true }).first()).toBeVisible();
+    await expect(nav.getByText("Setup", { exact: false }).first()).toBeVisible();
+    await expect(nav.getByText("Unified Inbox", { exact: true }).first()).toBeVisible();
+    await expect(nav.getByText("CRM", { exact: true }).first()).toBeVisible();
+    await expect(nav.getByText("AI Panel", { exact: true }).first()).toBeAttached();
   });
 
   test("Empty state visible si no hay jobs", async ({ page }) => {

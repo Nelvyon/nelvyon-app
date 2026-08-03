@@ -60,11 +60,11 @@ const SideBar = ({ menuList = MenuList }: { menuList?: W3crmMenuItem[] }) => {
 	// Menu dropdown list End
 
   /// Path
-  let path = "";
-  if (typeof window !== "undefined") {
-    const segmentos = window.location.pathname.split("/");
-    path = segmentos[segmentos.length - 1];
-  }
+  // La plantilla comparaba solo el ULTIMO segmento porque sus rutas son de un
+  // nivel (`/dashboard`). Las de NELVYON son completas (`/saas/dashboard`), asi
+  // que se usa el pathname entero y su deteccion de activo vuelve a funcionar:
+  // el grupo que contiene la ruta actual se abre solo, como en la demo original.
+  const path = typeof window !== "undefined" ? window.location.pathname : "";
  	
   useEffect(() => {
     menuList.forEach((data) => {
@@ -79,7 +79,7 @@ const SideBar = ({ menuList = MenuList }: { menuList?: W3crmMenuItem[] }) => {
         })
       })
   })
-  },[path]);
+  },[path, menuList]);
 
   return (
     <div
@@ -91,7 +91,7 @@ const SideBar = ({ menuList = MenuList }: { menuList?: W3crmMenuItem[] }) => {
             ? "fixed"
             : ""
           : ""
-      }`}      
+      }`} data-testid="saas-sidebar"      
     >
         <div className="deznav-scroll">         
           <ul className="metismenu" id="menu">              

@@ -41,6 +41,24 @@ const GROUP_ICON: Record<string, unknown> = {
   cuenta: SVGICON.User,
 };
 
+/**
+ * Quita los emojis decorativos de las etiquetas (`⚙️ Configuración` →
+ * `Configuración`). Los iconos los aporta la plantilla en SVG; el emoji
+ * duplicaba esa función y desentonaba en el submenú.
+ *
+ * Se hace aquí y no en `saasNav.ts` para no alterar la fuente de verdad que
+ * consumen las 97 páginas y sus tests.
+ */
+export function stripEmoji(label: string): string {
+  return label
+    .replace(
+      /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}\u{20E3}\u{2190}-\u{21FF}\u{2300}-\u{23FF}]/gu,
+      "",
+    )
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
 export type BuildMenuOptions = {
   /** Ítems ya filtrados por permisos (`filterSaasNavForPermissions`). */
   items?: readonly SaasNavItem[];
@@ -56,8 +74,10 @@ export type BuildMenuOptions = {
  */
 export function buildNelvyonMenu(options: BuildMenuOptions = {}): W3crmMenuItem[] {
   const items = options.items ?? SAAS_NAV_ITEMS;
-  const etiquetaItem = options.translateItem ?? ((i: SaasNavItem) => i.label);
-  const etiquetaGrupo = options.translateGroup ?? ((g: string) => GROUP_LABEL[g] ?? g);
+  const traducir = options.translateItem ?? ((i: SaasNavItem) => i.label);
+  const etiquetaItem = (i: SaasNavItem) => stripEmoji(traducir(i));
+  const traducirGrupo = options.translateGroup ?? ((g: string) => GROUP_LABEL[g] ?? g);
+  const etiquetaGrupo = (g: string) => stripEmoji(traducirGrupo(g));
 
   const porGrupo = new Map<string, SaasNavItem[]>();
   for (const item of items) {
