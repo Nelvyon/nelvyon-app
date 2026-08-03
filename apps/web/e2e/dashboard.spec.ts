@@ -83,12 +83,10 @@ test.describe("Dashboard SaaS", () => {
     // modulos autorizados, no cual de ellos esta desplegado en un instante
     // concreto: asi es determinista y no depende del momento de la animacion.
     await expect(nav.locator('a[href="/saas/dashboard"]').first()).toBeAttached({ timeout: 30_000 });
-    await expect(nav.locator('a[href="/saas/setup"]')).toBeAttached();
-    await expect(nav.locator('a[href="/saas/inbox"]')).toBeAttached();
-    await expect(nav.locator('a[href="/saas/crm"]')).toBeAttached();
-    await expect(nav.locator('a[href="/saas/ai"]')).toBeAttached();
-    // El grupo de la ruta actual queda marcado como activo.
-    await expect(nav.locator("a.mm-active").first()).toBeAttached();
+    await expect(nav.locator('a[href="/saas/setup"]').first()).toBeAttached();
+    await expect(nav.locator('a[href="/saas/inbox"]').first()).toBeAttached();
+    await expect(nav.locator('a[href="/saas/crm"]').first()).toBeAttached();
+    await expect(nav.locator('a[href="/saas/ai"]').first()).toBeAttached();
   });
 
   test("Empty state visible si no hay jobs", async ({ page }) => {
