@@ -20,6 +20,17 @@ const initialState = {
 }
 
 /** `menuList` permite inyectar la navegacion de NELVYON sin tocar el marcado. */
+/**
+ * Clave estable para el menu. La plantilla usaba el indice del array, lo que
+ * con una lista dinamica (se reconstruye al llegar los permisos y cambia de
+ * longitud) hacia que React reconciliara mal y dejara enlaces duplicados de
+ * forma transitoria. Se usa el destino, que es unico, y el titulo como
+ * respaldo para las cabeceras de grupo, que no tienen `to`.
+ */
+function claveMenu(item: W3crmMenuItem, index: number): string {
+  return item.to ?? item.title ?? `item-${index}`;
+}
+
 const SideBar = ({ menuList = MenuList }: { menuList?: W3crmMenuItem[] }) => {
 	const {
 		iconHover,
@@ -99,12 +110,12 @@ const SideBar = ({ menuList = MenuList }: { menuList?: W3crmMenuItem[] }) => {
                 const menuClass = data.classsChange;
                   if(menuClass === "menu-title"){
                     return(
-                      <li className={menuClass}  key={index} >{data.title}</li>
+                      <li className={menuClass}  key={claveMenu(data, index)} >{data.title}</li>
                     )
                   }else{
                     return(				
                       <li className={` ${ state.active === data.title ? 'mm-active' : ''}`}
-                        key={index} 
+                        key={claveMenu(data, index)} 
                       >                        
                         {data.content && data.content.length > 0 ?
                             <>
@@ -130,7 +141,7 @@ const SideBar = ({ menuList = MenuList }: { menuList?: W3crmMenuItem[] }) => {
                                   <ul className={`${menuClass === "mm-collapse" ? "mm-show" : ""}`}>
                                     {data.content && data.content.map((data,index) => {									
                                       return(	
-                                          <li key={index}
+                                          <li key={claveMenu(data, index)}
                                             className={`${ state.activeSubmenu === data.title ? "mm-active" : ""}`}                                    
                                           >
                                             {data.content && data.content.length > 0 ?
@@ -146,7 +157,7 @@ const SideBar = ({ menuList = MenuList }: { menuList?: W3crmMenuItem[] }) => {
                                                       <ul className={`${menuClass === "mm-collapse" ? "mm-show" : ""}`}>
                                                         {data.content && data.content.map((data,ind) => {
                                                           return(	                                                           
-                                                            <li key={ind}>
+                                                            <li key={claveMenu(data, ind)}>
                                                                 <Link className={`${path === data.to ? "mm-active" : ""}`} href={data.to ?? "#"}>{data.title}</Link>
                                                             </li>                                                            
                                                           )
