@@ -6,6 +6,7 @@ import {
   SECURITY_HEADERS_WITHOUT_CSP,
   SECURITY_HEADERS_WITH_CSP,
 } from "./src/lib/security/headers";
+import { AIOR_NELVYON_ROUTES } from "./src/features/public-web/aiorNelvyonRoutes";
 
 /**
  * Same guard as `server.js`: skip fumadocs-mdx init on `next start`.
@@ -107,27 +108,12 @@ const nextConfig: NextConfig = {
     return config;
   },
   async redirects() {
-    const aiorContentRoutes = [
-      { source: "/agencia-ia", destination: "/www/home-ai-startup.html", permanent: false },
-      { source: "/landing/agencia-ia", destination: "/www/home-ai-startup-op.html", permanent: false },
-      { source: "/producto/inbox", destination: "/www/home-ai-chatbot.html", permanent: false },
-      { source: "/landing/inbox", destination: "/www/home-ai-chatbot-op.html", permanent: false },
-      { source: "/agencia/contenido", destination: "/www/home-ai-writer-tool.html", permanent: false },
-      { source: "/landing/contenido", destination: "/www/home-ai-writer-tool-op.html", permanent: false },
-      { source: "/landing/enterprise", destination: "/www/home-business-intelligence-op.html", permanent: false },
-      { source: "/landing/ia", destination: "/www/home-ai-agent-op.html", permanent: false },
-      { source: "/landing/automatizaciones", destination: "/www/home-productivity-tools-op.html", permanent: false },
-      { source: "/landing/comms", destination: "/www/home-ai-chatbot-tool-op.html", permanent: false },
-      { source: "/producto/cloud", destination: "/www/home-cloud-based-saas.html", permanent: false },
-      { source: "/landing/cloud", destination: "/www/home-cloud-based-saas-op.html", permanent: false },
-      { source: "/landing/producto", destination: "/www/home-saas-product-showcase-op.html", permanent: false },
-      { source: "/casos-de-uso/grid", destination: "/www/case-studies-2.html", permanent: false },
-      { source: "/casos-de-uso/detalle", destination: "/www/case-studies-details.html", permanent: false },
-      { source: "/casos-de-uso/lista", destination: "/www/cases.html", permanent: false },
-      { source: "/nosotros/detalle", destination: "/www/team-details.html", permanent: false },
-      { source: "/producto/hechos", destination: "/www/testimonial.html", permanent: false },
-      { source: "/brand/tipografia", destination: "/www/typography.html", permanent: false },
-    ];
+    // Solo Inicio (08) + SaaS (02) + interiores; sin otras Homes AIOR.
+    const aiorContentRoutes = AIOR_NELVYON_ROUTES.filter((r) => r.source !== "/").map((r) => ({
+      source: r.source,
+      destination: r.destination,
+      permanent: false as const,
+    }));
     return [
       ...aiorContentRoutes,
       { source: "/legal/privacy", destination: "/privacidad", permanent: true },

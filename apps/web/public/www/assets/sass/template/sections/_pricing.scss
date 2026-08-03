@@ -242,7 +242,7 @@
         }
 
         .box-icon {
-            background: linear-gradient(309.43deg, #4DA3FF 9.12%, #1C4EFF 100%);
+            background: linear-gradient(309.43deg, #A378FF 9.12%, #1C4EFF 100%);
         }
 
         .th-btn {
@@ -257,7 +257,7 @@
             .box-content {
                 position: relative;
                 z-index: 2;
-                background: linear-gradient(309.43deg, #4DA3FF 9.12%, #1C4EFF 100%);
+                background: linear-gradient(309.43deg, #A378FF 9.12%, #1C4EFF 100%);
 
                 &:before {
                     content: "";
@@ -391,7 +391,7 @@
 
     &.style5 {
         .th-btn3 {
-            background: linear-gradient(261.14deg, #0066FF 20.53%, #0084FF 69.42%);
+            background: linear-gradient(261.14deg, #C726FD 20.53%, #FF1CA4 69.42%);
         }
 
         .available-list {
@@ -414,7 +414,7 @@
                         width: 24px;
                         height: 24px;
                         line-height: 24px;
-                        background: linear-gradient(261.14deg, #0066FF 20.53%, #0084FF 69.42%);
+                        background: linear-gradient(261.14deg, #C726FD 20.53%, #FF1CA4 69.42%);
                         border-radius: 10px;
                         font-size: 14px;
                         color: $white-color;
@@ -620,7 +620,7 @@
         }
 
         .box-icon {
-            background: linear-gradient(309.43deg, #4DA3FF 9.12%, #1C4EFF 100%);
+            background: linear-gradient(309.43deg, #A378FF 9.12%, #1C4EFF 100%);
         }
 
 
@@ -631,7 +631,7 @@
             .box-content {
                 position: relative;
                 z-index: 2;
-                background: linear-gradient(309.43deg, #4DA3FF 9.12%, #1C4EFF 100%);
+                background: linear-gradient(309.43deg, #A378FF 9.12%, #1C4EFF 100%);
 
                 &:before {
                     content: "";
@@ -918,7 +918,7 @@
                 content: "";
                 position: absolute;
                 inset: 0;
-                background: linear-gradient(309.43deg, #4DA3FF 9.12%, #1C4EFF 100%);
+                background: linear-gradient(309.43deg, #A378FF 9.12%, #1C4EFF 100%);
                 filter: blur(15px);
                 z-index: -1;
             }
@@ -1421,7 +1421,7 @@
         border-radius: 48px;
 
         .toggler.toggler--is-active {
-            background: linear-gradient(309.43deg, #4DA3FF 9.12%, #1C4EFF 100%);
+            background: linear-gradient(309.43deg, #A378FF 9.12%, #1C4EFF 100%);
             color: var(--white-color);
 
             span {
@@ -1449,7 +1449,7 @@
         margin: auto;
 
         .toggler.toggler--is-active {
-            background: linear-gradient(309.43deg, #4DA3FF 9.12%, #1C4EFF 100%);
+            background: linear-gradient(309.43deg, #A378FF 9.12%, #1C4EFF 100%);
             color: var(--white-color);
         }
 
@@ -1475,7 +1475,7 @@
     &.style8 {
 
         .toggler.toggler--is-active {
-            background: linear-gradient(122.43deg, #AEFF5D 4.09%, #66C2FF 100.57%);
+            background: linear-gradient(122.43deg, #AEFF5D 4.09%, #5DFFD9 100.57%);
             border-radius: 48px;
             color: $title-color;
         }
