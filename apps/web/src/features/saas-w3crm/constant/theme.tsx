@@ -10,6 +10,10 @@ import Tab1 from "@/features/saas-w3crm/assets/images/tab/1.jpg";
 export const IMAGES = { Avatar, Tab1 };
 
 export const SVGICON: Record<string, ReactNode> = {
+  HomeSvg: <svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2.125 6.375L8.5 1.41667L14.875 6.375V14.1667C14.875 14.5424 14.7257 14.9027 14.4601 15.1684C14.1944 15.4341 13.8341 15.5833 13.4583 15.5833H3.54167C3.16594 15.5833 2.80561 15.4341 2.53993 15.1684C2.27426 14.9027 2.125 14.5424 2.125 14.1667V6.375Z" stroke="#2C2C2C" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M6.375 15.5833V8.5H10.625V15.5833" stroke="#2C2C2C" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>,
   AikitSvg: <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g clipPath="url(#clip0_14_1294)">
         <path d="M12.1498 18.1013H8.30563L7.86828 15.8455H5.15205L4.71469 18.1013H1.05469L3.67883 3.80664H9.52563L12.1498 18.1013ZM7.43092 13.1523L6.62526 8.04211H6.46413L5.65847 13.1523H7.43092Z" stroke="#888888"/>
