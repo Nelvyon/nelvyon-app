@@ -1,11 +1,13 @@
 /* Iconos W3CRM copiados VERBATIM de src/constant/theme.jsx.
  * Solo se incluyen las claves que usa el shell (Fase 0). */
 import type { ReactNode } from "react";
+import Avatar from "@/features/saas-w3crm/assets/images/avatar/1.jpg";
+import Tab1 from "@/features/saas-w3crm/assets/images/tab/1.jpg";
 
-export const IMAGES = {
-  Avatar: "/w3crm/images/avatar-1.jpg",
-  Tab1: "/w3crm/images/tab-1.jpg",
-} as const;
+// Imports estaticos como en la plantilla original: next/image necesita las
+// dimensiones intrinsecas y una ruta de texto no las aporta.
+
+export const IMAGES = { Avatar, Tab1 };
 
 export const SVGICON: Record<string, ReactNode> = {
   AikitSvg: <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">

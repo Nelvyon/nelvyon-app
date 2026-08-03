@@ -2,10 +2,11 @@
 // import { ThemeContext } from "@/features/saas-w3crm/context/ThemeContext";
 import { useEffect, useState } from "react";
 import Nav  from "@/features/saas-w3crm/layouts/nav";
+import type { W3crmMenuItem } from "@/features/saas-w3crm/layouts/nav/Menu";
 import Footer from "@/features/saas-w3crm/layouts/Footer";
 import { usePathname } from "next/navigation";
 
-const Layout = ({ children }: { children: React.ReactNode }) => {
+const Layout = ({ children, menuList }: { children: React.ReactNode; menuList?: W3crmMenuItem[] }) => {
     // const { menuToggle } = useContext(ThemeContext);
     const [minHeight, setMinHeight] = useState(0);
     useEffect(() => {    
@@ -23,7 +24,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 // className={`show ${ menuToggle ? "menu-toggle" : ""}`}
                 className={`show`}
             >
-                <Nav />
+                <Nav menuList={menuList} />
                 <div className="content-body" style={{ minHeight: minHeight }}>                    
                     <main>{children}</main>
                 </div>

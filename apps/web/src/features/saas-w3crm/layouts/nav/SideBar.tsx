@@ -5,7 +5,7 @@ import Collapse from 'react-bootstrap/Collapse';
 /// Link
 import Link from "next/link";
 
-import {MenuList} from './Menu';
+import {MenuList, type W3crmMenuItem} from './Menu';
 import {useScrollPosition} from "@n8tb1t/use-scroll-position";
 import { ThemeContext } from "@/features/saas-w3crm/context/ThemeContext";
 
@@ -19,7 +19,8 @@ const initialState = {
   activeSubmenu : "",
 }
 
-const SideBar = () => {
+/** `menuList` permite inyectar la navegacion de NELVYON sin tocar el marcado. */
+const SideBar = ({ menuList = MenuList }: { menuList?: W3crmMenuItem[] }) => {
 	const {
 		iconHover,
 		sidebarposition,
@@ -66,7 +67,7 @@ const SideBar = () => {
   }
  	
   useEffect(() => {
-    MenuList.forEach((data) => {
+    menuList.forEach((data) => {
       data.content?.forEach((item) => {        
         if(path === item.to){         
           setState({active : data.title})          
@@ -94,7 +95,7 @@ const SideBar = () => {
     >
         <div className="deznav-scroll">         
           <ul className="metismenu" id="menu">              
-              {MenuList.map((data, index)=>{
+              {menuList.map((data, index)=>{
                 const menuClass = data.classsChange;
                   if(menuClass === "menu-title"){
                     return(
