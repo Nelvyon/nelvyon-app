@@ -2,7 +2,7 @@
  * S54 — E2E: Partner Zone
  */
 import { expect, test } from "@playwright/test";
-import { setupAuthedSaas, mockPartnerZone, expectUnauthorizedApi, LOGIN_URL, gotoAwaitingApi } from "./fixtures";
+import { setupAuthedSaas, mockPartnerZone, expectUnauthorizedApi, LOGIN_URL, gotoAwaitingApi, esperarAppLista } from "./fixtures";
 
 test.describe("S54 — /saas/partner page", () => {
   test.beforeEach(async ({ page, context }) => {
@@ -41,6 +41,7 @@ test.describe("S54 — /saas/partner page", () => {
 
   test("wholesale tab shows catalog SKUs", async ({ page }) => {
     await gotoAwaitingApi(page, "/saas/partner", "/api/saas/partner");
+    await esperarAppLista(page);
     await page.getByRole("button", { name: "Wholesale" }).click();
     await expect(page.getByText("Plan Pro")).toBeVisible({ timeout: 8000 });
     await expect(page.getByText("Pack Crecimiento Local")).toBeVisible();
@@ -55,18 +56,13 @@ test.describe("S54 — /saas/partner page", () => {
     // el clic podia caer antes de que React enganchase los manejadores: la
     // pestana no cambiaba, el fetch nunca salia y la columna no aparecia jamas.
     //
-    // Se espera al estado real en cada paso, sin ampliar timeouts ni reintentar:
-    // 1) que termine el streaming (desaparece el contenedor temporal `div#S:1`),
-    //    que es la senal de que el documento esta completo y React puede hidratar;
-    // 2) que el boton este visible y habilitado;
-    // 3) a la RESPUESTA del ledger, con el waiter registrado ANTES del clic para
-    //    que no pueda adelantarsele.
-    await page.waitForFunction(() => !document.querySelector("body > div[id^='S:']"), null, { timeout: 15_000 });
-    await expect(page.locator("main [data-testid='saas-sidebar']")).toBeVisible({ timeout: 15_000 });
+    // `esperarAppLista` es la puerta de hidratacion compartida (ver fixtures):
+    // sin ella el clic caia sobre el HTML del servidor, sin manejador, y el
+    // `waitForResponse` de mas abajo expiraba porque el fetch nunca salia.
+    await esperarAppLista(page);
 
     const ledger = page.getByRole("button", { name: "Ledger" });
     await expect(ledger).toBeVisible({ timeout: 10_000 });
-    await expect(ledger).toBeEnabled();
 
     const respuestaLedger = page.waitForResponse(
       (r) => r.url().includes("/api/saas/partner/ledger"),
@@ -80,12 +76,14 @@ test.describe("S54 — /saas/partner page", () => {
 
   test("referidos tab shows referral code", async ({ page }) => {
     await gotoAwaitingApi(page, "/saas/partner", "/api/saas/partner");
+    await esperarAppLista(page);
     await page.getByRole("button", { name: "Referidos" }).click();
     await expect(page.getByText("AGENCY99")).toBeVisible({ timeout: 8000 });
   });
 
   test("connect tab shows status", async ({ page }) => {
     await gotoAwaitingApi(page, "/saas/partner", "/api/saas/partner");
+    await esperarAppLista(page);
     await page.getByRole("button", { name: "Connect" }).click();
     await expect(page.getByText("Charges habilitados")).toBeVisible({ timeout: 8000 });
   });

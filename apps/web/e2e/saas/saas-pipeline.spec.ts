@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { setAuthCookie, mockSaasApis, LOGIN_URL, expectUnauthorizedApi } from "./fixtures";
+import { setAuthCookie, mockSaasApis, LOGIN_URL, expectUnauthorizedApi, esperarAppLista } from "./fixtures";
 
 test.describe("SaaS Pipeline — deals", () => {
   test.beforeEach(async ({ page, context }) => {
@@ -30,7 +30,10 @@ test.describe("SaaS Pipeline — deals", () => {
     const errors: string[] = [];
     page.on("pageerror", err => errors.push(err.message));
     await page.goto("/saas/pipeline");
-    await page.waitForTimeout(800);
+    // Puerta de hidratacion compartida en vez de un timeout fijo: con 800ms la
+    // app podia no haber hidratado aun y un `pageerror` tardio caia fuera de la
+    // ventana observada, o al reves, un error de carga se contaba a destiempo.
+    await esperarAppLista(page);
     const criticalErrors = errors.filter(e => !e.includes("hydration") && !e.includes("Warning"));
     expect(criticalErrors).toHaveLength(0);
   });

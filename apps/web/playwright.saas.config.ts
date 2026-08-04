@@ -54,6 +54,12 @@ export default defineConfig({
           JWT_SECRET: TEST_JWT_SECRET,
           NODE_ENV: "test",
           DATABASE_URL: process.env.DATABASE_URL ?? "postgresql://noop:noop@localhost:5432/noop",
+          // Los 349 tests corren desde una sola IP con varios workers en menos
+          // de dos minutos y cruzan el umbral de `public-api` (30/min): el
+          // servidor cortaba conexiones y fallaba un test distinto en cada
+          // ejecucion. Solo surte efecto fuera de produccion; ver la guarda en
+          // `isRateLimitDisabledForTests`.
+          RATE_LIMIT_DISABLED: "1",
         },
       },
 });
