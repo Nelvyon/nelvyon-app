@@ -48,7 +48,33 @@ test.describe("S54 — /saas/partner page", () => {
 
   test("ledger tab shows totals", async ({ page }) => {
     await page.goto("/saas/partner", { waitUntil: "domcontentloaded" });
-    await page.getByRole("button", { name: "Ledger" }).click();
+
+    // La cabecera "Bruto" solo existe si `ledger.length > 0`, y eso depende de
+    // que resuelva el fetch a `/api/saas/partner/ledger`, que a su vez solo se
+    // dispara si el clic llega DESPUES de la hidratacion. Con `domcontentloaded`
+    // el clic podia caer antes de que React enganchase los manejadores: la
+    // pestana no cambiaba, el fetch nunca salia y la columna no aparecia jamas.
+    //
+    // Se espera al estado real en cada paso, sin ampliar timeouts ni reintentar:
+    // 1) que termine el streaming (desaparece el contenedor temporal `div#S:1`),
+    //    que es la senal de que el documento esta completo y React puede hidratar;
+    // 2) que el boton este visible y habilitado;
+    // 3) a la RESPUESTA del ledger, con el waiter registrado ANTES del clic para
+    //    que no pueda adelantarsele.
+    await page.waitForFunction(() => !document.querySelector("body > div[id^='S:']"), null, { timeout: 15_000 });
+    await expect(page.locator("main [data-testid='saas-sidebar']")).toBeVisible({ timeout: 15_000 });
+
+    const ledger = page.getByRole("button", { name: "Ledger" });
+    await expect(ledger).toBeVisible({ timeout: 10_000 });
+    await expect(ledger).toBeEnabled();
+
+    const respuestaLedger = page.waitForResponse(
+      (r) => r.url().includes("/api/saas/partner/ledger"),
+      { timeout: 15_000 },
+    );
+    await ledger.click();
+    await respuestaLedger;
+
     await expect(page.getByRole("columnheader", { name: "Bruto" })).toBeVisible({ timeout: 8000 });
   });
 

@@ -18,7 +18,14 @@ test.beforeEach(async ({ page, context }) => {
 for (const route of CRITICAL_SAAS_ROUTES) {
   test(`a11y landmarks: ${route} has main navigation`, async ({ page }) => {
     await page.goto(route, { waitUntil: "domcontentloaded" });
-    await expect(page.getByTestId("saas-sidebar")).toBeVisible({ timeout: 15_000 });
+    // Acotado a `main`: mientras React transmite la pagina por streaming, el
+    // contenido existe un instante por duplicado —en su posicion real dentro de
+    // `main` y en el contenedor temporal `div#S:1`, colgado de `<body>`— hasta
+    // que React lo mueve con `$RC()`. `getByTestId` en modo estricto cuenta
+    // elementos adjuntos aunque esten ocultos, asi que sin acotar fallaba con
+    // "resolved to 2 elements" segun quien ganase la carrera. Se sigue exigiendo
+    // que el sidebar exista y sea visible en su sitio.
+    await expect(page.locator("main [data-testid='saas-sidebar']")).toBeVisible({ timeout: 15_000 });
     await expect(page.locator("nav, [role='navigation']").first()).toBeVisible({ timeout: 15_000 });
     await expect(page.locator("main, [role='main']").first()).toBeVisible({ timeout: 15_000 });
   });

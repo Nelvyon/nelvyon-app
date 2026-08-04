@@ -42,7 +42,10 @@ test.describe("SaaS Auth — autenticado carga dashboard", () => {
   test("con token válido /saas/dashboard carga correctamente", async ({ page }) => {
     await page.goto("/saas/dashboard");
     await expect(page).not.toHaveURL(LOGIN_URL);
-    await expect(page.getByTestId("saas-sidebar")).toBeVisible({ timeout: 15_000 });
+    // Acotado a `main` por el mismo motivo que en a11y-core-routes.spec.ts: la
+    // copia temporal del streaming de React (`div#S:1`) hacia saltar el modo
+    // estricto con "resolved to 2 elements".
+    await expect(page.locator("main [data-testid='saas-sidebar']")).toBeVisible({ timeout: 15_000 });
     await expect(page.locator("body")).toBeVisible();
   });
 });
