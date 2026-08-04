@@ -1,9 +1,41 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+/**
+ * /saas/team sobre la pantalla `(apps)/user` de la plantilla oficial W3CRM.
+ *
+ * Marcado de la plantilla: cabecera de pagina + `container-fluid` > `row` >
+ * `Tab.Container` con `d-flex justify-content-between align-items-center mb-4`,
+ * `h4.heading`, la conmutacion lista/rejilla en
+ * `nav nav-pills mix-chart-tab user-m-tabe` con `SVGICON.List` y
+ * `SVGICON.GridDots`, el boton `btn btn-primary btn-sm ms-2` y el
+ * `col-xl-12 active-p` con las dos `Tab.Pane`.
+ *
+ * Las vistas son los componentes portados verbatim en `W3crmUserTabs`
+ * (`GridTab`, `ListTab`) y la invitacion usa el offcanvas de
+ * `EmployeeOffcanvas`, con el formulario real de NELVYON dentro.
+ *
+ * Logica de NELVYON intacta: `/api/saas/team` con su GET, su POST de
+ * invitacion y sus dos PATCH (rol y suspension/reactivacion), los tipos
+ * `TeamMember` y `ApiTeamMember`, `ROLE_CONFIG`, `STATUS_CONFIG`,
+ * `ROLE_PERMISSIONS`, `initialsFrom`, `mapApiMember`, `timeAgo`,
+ * `InviteMemberModal`, `EditRoleModal`, los cinco `useState`, `load` y
+ * `suspendMember`.
+ */
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Dropdown, Modal, Nav, Tab } from "react-bootstrap";
+
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import {
+  W3crmEmployeeOffcanvas,
+  W3crmRowDropdown,
+  W3crmUserGrid,
+  W3crmUserList,
+  type W3crmOffcanvasHandle,
+  type W3crmUserGridItem,
+  type W3crmUserListItem,
+} from "@/features/saas-w3crm/components/W3crmUserTabs";
+import { SVGICON } from "@/features/saas-w3crm/constant/theme";
 
 type Role = "owner" | "admin" | "manager" | "user" | "viewer";
 type MemberStatus = "active" | "invited" | "suspended";
@@ -28,18 +60,19 @@ interface ApiTeamMember {
   lastActiveAt?: string | null;
 }
 
+/** `color` traducido a las clases de badge de W3CRM. */
 const ROLE_CONFIG: Record<Role, { label: string; color: string; description: string }> = {
-  owner: { label: "Propietario", color: "text-warning bg-warning/10 border-warning/20", description: "Acceso total. No se puede modificar." },
-  admin: { label: "Administrador", color: "text-primary bg-primary/10 border-primary/20", description: "Acceso completo excepto billing y configuración de cuenta." },
-  manager: { label: "Manager", color: "text-primary bg-primary/10 border-primary/20", description: "Gestiona CRM, campañas y puede ver reportes." },
-  user: { label: "Usuario", color: "text-success bg-success/10 border-success/20", description: "Acceso a módulos asignados sin configuración." },
-  viewer: { label: "Solo lectura", color: "text-muted-foreground bg-muted/30 border-border", description: "Puede ver pero no modificar datos." },
+  owner: { label: "Propietario", color: "badge-warning", description: "Acceso total. No se puede modificar." },
+  admin: { label: "Administrador", color: "badge-primary", description: "Acceso completo excepto billing y configuración de cuenta." },
+  manager: { label: "Manager", color: "badge-primary", description: "Gestiona CRM, campañas y puede ver reportes." },
+  user: { label: "Usuario", color: "badge-success", description: "Acceso a módulos asignados sin configuración." },
+  viewer: { label: "Solo lectura", color: "badge-secondary", description: "Puede ver pero no modificar datos." },
 };
 
-const STATUS_CONFIG: Record<MemberStatus, { label: string; tone: "success" | "warning" | "danger" }> = {
-  active: { label: "Activo", tone: "success" },
-  invited: { label: "Invitado", tone: "warning" },
-  suspended: { label: "Suspendido", tone: "danger" },
+const STATUS_CONFIG: Record<MemberStatus, { label: string; tone: string }> = {
+  active: { label: "Activo", tone: "badge-success" },
+  invited: { label: "Invitado", tone: "badge-warning" },
+  suspended: { label: "Suspendido", tone: "badge-danger" },
 };
 
 const ROLE_PERMISSIONS: Record<Role, string[]> = {
@@ -49,6 +82,20 @@ const ROLE_PERMISSIONS: Record<Role, string[]> = {
   user: ["CRM (asignados)", "Citas", "Chat"],
   viewer: ["Dashboard (solo vista)", "Reportes (solo vista)"],
 };
+
+/** Un rol o estado fuera del catalogo no puede dejar la pantalla en blanco. */
+const ROL_DESCONOCIDO = { label: "Sin rol", color: "badge-secondary", description: "Rol no reconocido." };
+const ESTADO_DESCONOCIDO = { label: "Desconocido", tone: "badge-secondary" };
+
+function rolDe(role: Role | string) {
+  return ROLE_CONFIG[role as Role] ?? ROL_DESCONOCIDO;
+}
+function estadoDe(status: MemberStatus | string) {
+  return STATUS_CONFIG[status as MemberStatus] ?? ESTADO_DESCONOCIDO;
+}
+function permisosDe(role: Role | string): string[] {
+  return ROLE_PERMISSIONS[role as Role] ?? [];
+}
 
 function initialsFrom(name: string, email: string): string {
   const base = name.trim() || email;
@@ -70,6 +117,16 @@ function mapApiMember(m: ApiTeamMember): TeamMember {
   };
 }
 
+function timeAgo(iso: string) {
+  const t = new Date(iso).getTime();
+  if (Number.isNaN(t)) return "—";
+  const d = Date.now() - t;
+  if (d < 3600000) return `Hace ${Math.floor(d / 60000)}min`;
+  if (d < 86400000) return `Hace ${Math.floor(d / 3600000)}h`;
+  return `Hace ${Math.floor(d / 86400000)} días`;
+}
+
+/** Formulario real de invitacion — vive dentro del offcanvas de la plantilla. */
 function InviteMemberModal({ onClose }: { onClose: () => void }) {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -99,54 +156,53 @@ function InviteMemberModal({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-lg rounded-2xl border border-border bg-card shadow-2xl">
-        <div className="flex items-center justify-between border-b border-border px-6 py-4">
-          <h2 className="text-lg font-semibold text-foreground">Invitar miembro</h2>
-          <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
+    <form onSubmit={invite} data-testid="form-invitacion">
+      {error && <div className="alert alert-danger" role="alert">{error}</div>}
+      <div className="row">
+        <div className="col-xl-6 mb-3">
+          <label htmlFor="invitar-nombre" className="form-label">Nombre</label>
+          <input id="invitar-nombre" type="text" className="form-control" value={name} onChange={(e) => setName(e.target.value)} placeholder="Nombre y apellidos" />
         </div>
-        <form onSubmit={invite} className="space-y-4 p-6">
-          {error && <p className="rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre</label>
-              <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nombre y apellidos"
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">Email *</label>
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@empresa.com" required
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
-            </div>
-          </div>
-          <div>
-            <label className="mb-2 block text-xs font-medium text-muted-foreground">Rol</label>
-            <div className="space-y-2">
-              {(["admin", "manager", "user", "viewer"] as Role[]).map((r) => {
-                const rc = ROLE_CONFIG[r];
-                return (
-                  <label key={r} className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition-colors ${role === r ? "border-primary bg-primary/5" : "border-border hover:bg-muted/10"}`}>
-                    <input type="radio" name="role" value={r} checked={role === r} onChange={() => setRole(r)} className="mt-0.5 accent-primary" />
-                    <div>
-                      <p className="text-sm font-medium text-foreground">{rc.label}</p>
-                      <p className="text-xs text-muted-foreground">{rc.description}</p>
-                      <p className="mt-1 text-xs text-primary">Acceso: {ROLE_PERMISSIONS[r].join(", ")}</p>
-                    </div>
-                  </label>
-                );
-              })}
-            </div>
-          </div>
-          <div className="flex gap-3 pt-2">
-            <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
-            <NelvyonDsButton type="submit" disabled={sending || !email} className="flex-1">{sending ? "Enviando invitación…" : "↗ Enviar invitación"}</NelvyonDsButton>
-          </div>
-        </form>
+        <div className="col-xl-6 mb-3">
+          <label htmlFor="invitar-email" className="form-label">Email <span className="text-danger">*</span></label>
+          <input id="invitar-email" type="email" className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@empresa.com" required />
+        </div>
+        <div className="col-xl-12 mb-3">
+          <label className="form-label">Rol <span className="text-danger">*</span></label>
+          {(["admin", "manager", "user", "viewer"] as Role[]).map((r) => {
+            const rc = rolDe(r);
+            return (
+              <div className="form-check mb-2" key={r}>
+                <input
+                  className="form-check-input"
+                  type="radio"
+                  name="role"
+                  id={`rol-${r}`}
+                  value={r}
+                  checked={role === r}
+                  onChange={() => setRole(r)}
+                />
+                <label className="form-check-label" htmlFor={`rol-${r}`}>
+                  <strong>{rc.label}</strong>
+                  <span className="d-block text-muted fs-13">{rc.description}</span>
+                  <span className="d-block text-primary fs-13">Acceso: {permisosDe(r).join(", ")}</span>
+                </label>
+              </div>
+            );
+          })}
+        </div>
       </div>
-    </div>
+      <div className="d-flex gap-2">
+        <button type="button" className="btn btn-primary light" onClick={onClose}>Cancelar</button>
+        <button type="submit" className="btn btn-primary" disabled={sending || !email}>
+          {sending ? "Enviando invitación…" : "Enviar invitación"}
+        </button>
+      </div>
+    </form>
   );
 }
 
+/** Edicion de rol en un `Modal` de react-bootstrap con `form-control`. */
 function EditRoleModal({ member, onClose, onSaved }: { member: TeamMember; onClose: () => void; onSaved: () => void }) {
   const [role, setRole] = useState<Role>(member.role === "owner" ? "admin" : member.role);
   const [saving, setSaving] = useState(false);
@@ -175,43 +231,44 @@ function EditRoleModal({ member, onClose, onSaved }: { member: TeamMember; onClo
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-2xl border border-border bg-card shadow-2xl">
-        <div className="flex items-center justify-between border-b border-border px-6 py-4">
-          <h2 className="text-lg font-semibold text-foreground">Editar rol — {member.name}</h2>
-          <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
-        </div>
-        <form onSubmit={save} className="space-y-4 p-6">
-          {error && <p className="rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
-          <div className="space-y-2">
-            {(["admin", "manager", "user", "viewer"] as Role[]).map((r) => {
-              const rc = ROLE_CONFIG[r];
-              return (
-                <label key={r} className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 ${role === r ? "border-primary bg-primary/5" : "border-border"}`}>
-                  <input type="radio" name="edit-role" value={r} checked={role === r} onChange={() => setRole(r)} className="mt-0.5 accent-primary" />
-                  <div>
-                    <p className="text-sm font-medium text-foreground">{rc.label}</p>
-                    <p className="text-xs text-muted-foreground">{rc.description}</p>
-                  </div>
+    <Modal className="modal fade" show onHide={onClose} centered>
+      <div className="modal-header">
+        <h5 className="modal-title">Editar rol — {member.name}</h5>
+        <button type="button" className="btn-close" onClick={onClose} aria-label="Cerrar" />
+      </div>
+      <div className="modal-body">
+        <form onSubmit={save} data-testid="form-rol">
+          {error && <div className="alert alert-danger" role="alert">{error}</div>}
+          {(["admin", "manager", "user", "viewer"] as Role[]).map((r) => {
+            const rc = rolDe(r);
+            return (
+              <div className="form-check mb-2" key={r}>
+                <input
+                  className="form-check-input"
+                  type="radio"
+                  name="edit-role"
+                  id={`edit-rol-${r}`}
+                  value={r}
+                  checked={role === r}
+                  onChange={() => setRole(r)}
+                />
+                <label className="form-check-label" htmlFor={`edit-rol-${r}`}>
+                  <strong>{rc.label}</strong>
+                  <span className="d-block text-muted fs-13">{rc.description}</span>
                 </label>
-              );
-            })}
-          </div>
-          <div className="flex gap-3 pt-2">
-            <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
-            <NelvyonDsButton type="submit" disabled={saving} className="flex-1">{saving ? "Guardando…" : "Guardar rol"}</NelvyonDsButton>
+              </div>
+            );
+          })}
+          <div className="d-flex gap-2 mt-3">
+            <button type="button" className="btn btn-primary light" onClick={onClose}>Cancelar</button>
+            <button type="submit" className="btn btn-primary" disabled={saving}>
+              {saving ? "Guardando…" : "Guardar rol"}
+            </button>
           </div>
         </form>
       </div>
-    </div>
+    </Modal>
   );
-}
-
-function timeAgo(iso: string) {
-  const d = Date.now() - new Date(iso).getTime();
-  if (d < 3600000) return `Hace ${Math.floor(d / 60000)}min`;
-  if (d < 86400000) return `Hace ${Math.floor(d / 3600000)}h`;
-  return `Hace ${Math.floor(d / 86400000)} días`;
 }
 
 export default function SaasTeamPage() {
@@ -220,6 +277,7 @@ export default function SaasTeamPage() {
   const [showInvite, setShowInvite] = useState(false);
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  const offcanvasRef = useRef<W3crmOffcanvasHandle>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -227,7 +285,7 @@ export default function SaasTeamPage() {
       const res = await fetch("/api/saas/team");
       if (res.ok) {
         const d = (await res.json()) as { members?: ApiTeamMember[] };
-        setMembers((d.members ?? []).map(mapApiMember));
+        setMembers(Array.isArray(d.members) ? d.members.map(mapApiMember) : []);
       } else {
         setMembers([]);
       }
@@ -258,143 +316,189 @@ export default function SaasTeamPage() {
     void load();
   }
 
+  function abrirInvitacion() {
+    setShowInvite(true);
+    offcanvasRef.current?.showEmployeModal();
+  }
+  function cerrarInvitacion() {
+    setShowInvite(false);
+    offcanvasRef.current?.hideEmployeModal();
+    void load();
+  }
+
+  const itemsGrid: W3crmUserGridItem[] = members.map((m) => {
+    const rc = rolDe(m.role);
+    const sc = estadoDe(m.status);
+    return {
+      activo: m.status === "active",
+      iniciales: m.avatar,
+      titulo: m.name,
+      email: m.email,
+      // `card__info` es la fila de tres cifras de la plantilla (posts/followers/
+      // following): solo admite valores cortos. Meter ahi "Administrador" o
+      // "Suspendido" ensanchaba el `li` a 90px y desbordaba la pagina 72px.
+      // Rol y estado van a `post-pos`, que es el slot "etiqueta: valor".
+      estadisticas: [
+        { valor: String(permisosDe(m.role).length), etiqueta: "módulos" },
+        { valor: m.status === "active" ? "Sí" : "No", etiqueta: "activo" },
+        { valor: m.role === "owner" ? "Sí" : "No", etiqueta: "dueño" },
+      ],
+      detalles: [
+        { etiqueta: "Rol", valor: rc.label },
+        { etiqueta: "Estado", valor: sc.label },
+        { etiqueta: "Última actividad", valor: m.lastActive ? timeAgo(m.lastActive) : "Nunca" },
+      ],
+      acciones: (
+        <>
+          <button type="button" className="btn btn-primary btn-sm me-2" onClick={() => setSelectedMember(m)}>
+            Editar rol
+          </button>{" "}
+          <button
+            type="button"
+            className="btn btn-secondary btn-sm ms-2"
+            disabled={m.role === "owner"}
+            onClick={() => void suspendMember(m.id)}
+          >
+            {m.status === "suspended" ? "Reactivar" : "Suspender"}
+          </button>
+        </>
+      ),
+    };
+  });
+
+  const itemsLista: W3crmUserListItem[] = members.map((m) => {
+    const sc = estadoDe(m.status);
+    return {
+      clave: m.id,
+      iniciales: m.avatar,
+      titulo: m.name,
+      email: m.email,
+      posicion: rolDe(m.role).label,
+      fecha: m.lastActive ? timeAgo(m.lastActive) : "Nunca",
+      estado: <span className={`badge badge-sm ${sc.tone}`}>{sc.label}</span>,
+      acciones: (
+        <W3crmRowDropdown etiqueta={`Acciones de ${m.name}`}>
+          <Dropdown.Item onClick={() => setSelectedMember(m)}>Editar rol</Dropdown.Item>
+          <Dropdown.Item disabled={m.role === "owner"} onClick={() => void suspendMember(m.id)}>
+            {m.status === "suspended" ? "Reactivar" : "Suspender"}
+          </Dropdown.Item>
+        </W3crmRowDropdown>
+      ),
+    };
+  });
+
+  const csvCabeceras = [
+    { label: "Nombre", key: "nombre" },
+    { label: "Email", key: "email" },
+    { label: "Rol", key: "rol" },
+    { label: "Estado", key: "estado" },
+    { label: "Última actividad", key: "actividad" },
+  ];
+  const csvFilas = members.map((m) => ({
+    nombre: m.name,
+    email: m.email,
+    rol: rolDe(m.role).label,
+    estado: estadoDe(m.status).label,
+    actividad: m.lastActive ? timeAgo(m.lastActive) : "Nunca",
+  }));
+
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="team" />}>
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <NelvyonDsSectionHeader title="Gestión de Equipo" subtitle="Invita colaboradores y controla sus permisos por módulo y rol" />
-        <NelvyonDsButton onClick={() => setShowInvite(true)}>+ Invitar miembro</NelvyonDsButton>
-      </div>
-
-      {actionError && (
-        <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm text-destructive">{actionError}</p>
-      )}
-
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {[
-          { label: "Total miembros", value: members.length },
-          { label: "Activos", value: members.filter((m) => m.status === "active").length },
-          { label: "Invitaciones pendientes", value: members.filter((m) => m.status === "invited").length },
-          { label: "Roles distintos", value: new Set(members.map((m) => m.role)).size },
-        ].map(({ label, value }) => (
-          <NelvyonDsCard key={label} className="p-4">
-            <p className="text-xs text-muted-foreground">{label}</p>
-            <p className="mt-1 text-2xl font-bold text-foreground">{value}</p>
-          </NelvyonDsCard>
-        ))}
-      </div>
-
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-        {(Object.entries(ROLE_CONFIG) as [Role, typeof ROLE_CONFIG[Role]][]).map(([role, rc]) => {
-          const count = members.filter((m) => m.role === role).length;
-          return (
-            <NelvyonDsCard key={role} className={`border p-3 ${rc.color}`}>
-              <p className="text-xs font-medium">{rc.label}</p>
-              <p className="mt-1 text-2xl font-bold">{count}</p>
-              <p className="mt-1 text-[10px] opacity-70">{rc.description.substring(0, 40)}…</p>
-            </NelvyonDsCard>
-          );
-        })}
-      </div>
-
-      {loading ? (
-        <div className="space-y-2">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-16 animate-pulse rounded-xl bg-muted/30" />)}</div>
-      ) : members.length === 0 ? (
-        <NelvyonDsCard className="p-16 text-center">
-          <p className="text-5xl">👥</p>
-          <p className="mt-4 text-lg font-semibold text-foreground">Sin miembros de equipo</p>
-          <p className="mt-2 text-sm text-muted-foreground">Invita a tu primer colaborador y asígnale un rol con permisos granulares</p>
-          <NelvyonDsButton className="mt-5" onClick={() => setShowInvite(true)}>+ Invitar miembro</NelvyonDsButton>
-        </NelvyonDsCard>
-      ) : (
-        <NelvyonDsCard className="overflow-hidden p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border bg-muted/20">
-                  {["Miembro", "Rol", "Estado", "Acceso a", "Última actividad", "Acciones"].map((h) => (
-                    <th key={h} className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {members.map((member) => {
-                  const rc = ROLE_CONFIG[member.role] ?? ROLE_CONFIG.user;
-                  const sc = STATUS_CONFIG[member.status] ?? STATUS_CONFIG.invited;
-                  return (
-                    <tr key={member.id} className="hover:bg-muted/10 transition-colors">
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 font-semibold text-primary">{member.avatar}</div>
-                          <div>
-                            <p className="font-medium text-foreground">{member.name}</p>
-                            <p className="text-xs text-muted-foreground">{member.email}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className={`rounded-md border px-2 py-0.5 text-xs font-medium ${rc.color}`}>{rc.label}</span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <NelvyonDsBadge tone={sc.tone}>{sc.label}</NelvyonDsBadge>
-                      </td>
-                      <td className="px-4 py-3">
-                        <p className="text-xs text-muted-foreground max-w-48 truncate">{(ROLE_PERMISSIONS[member.role] ?? []).join(", ")}</p>
-                      </td>
-                      <td className="px-4 py-3 text-xs text-muted-foreground">
-                        {member.lastActive ? timeAgo(member.lastActive) : "Nunca (pendiente)"}
-                      </td>
-                      <td className="px-4 py-3">
-                        {member.role !== "owner" && (
-                          <div className="flex gap-1.5">
-                            <NelvyonDsButton variant="ghost" className="text-xs" onClick={() => setSelectedMember(member)}>✎ Editar</NelvyonDsButton>
-                            <NelvyonDsButton variant="ghost" className="text-xs" onClick={() => void suspendMember(member.id)}>
-                              {member.status === "suspended" ? "Activar" : "Suspender"}
-                            </NelvyonDsButton>
-                          </div>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="Gestión de Equipo" parentTitle="Cuenta" pageTitle="Equipo" />
+      <div className="container-fluid">
+        {actionError && (
+          <div className="alert alert-danger alert-dismissible fade show" role="alert">
+            {actionError}
+            <button type="button" className="btn-close" aria-label="Cerrar" onClick={() => setActionError(null)} />
           </div>
-        </NelvyonDsCard>
-      )}
+        )}
 
-      <NelvyonDsCard className="p-5">
-        <h3 className="mb-4 text-sm font-semibold text-foreground">Matriz de permisos por rol</h3>
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs">
-            <thead>
-              <tr className="border-b border-border">
-                <th className="pb-2 text-left text-muted-foreground">Módulo</th>
-                {(["owner", "admin", "manager", "user", "viewer"] as Role[]).map((r) => (
-                  <th key={r} className={`pb-2 text-center text-[11px] font-medium ${ROLE_CONFIG[r].color.split(" ")[0]}`}>{ROLE_CONFIG[r].label}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border/50">
-              {["CRM", "Campañas", "Workflows", "Pipeline", "Facturación", "Reportes", "Configuración", "Equipo"].map((mod) => (
-                <tr key={mod}>
-                  <td className="py-2 text-muted-foreground">{mod}</td>
-                  {(["owner", "admin", "manager", "user", "viewer"] as Role[]).map((r) => {
-                    const has = ROLE_PERMISSIONS[r].some((p) => p.toLowerCase().includes(mod.toLowerCase()) || p === "Todo");
-                    const partial = ROLE_PERMISSIONS[r].some((p) => p.includes(mod) && p.includes("vista"));
-                    return (
-                      <td key={r} className="py-2 text-center">
-                        {has && !partial ? <span className="text-success">✓</span> : partial ? <span className="text-warning">◑</span> : <span className="text-muted-foreground/40">–</span>}
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="row">
+          {[
+            { label: "Total miembros", value: members.length },
+            { label: "Activos", value: members.filter((m) => m.status === "active").length },
+            { label: "Invitaciones pendientes", value: members.filter((m) => m.status === "invited").length },
+            { label: "Roles distintos", value: new Set(members.map((m) => m.role)).size },
+          ].map(({ label, value }) => (
+            <div className="col-xl-3 col-sm-6" key={label}>
+              <div className="card">
+                <div className="card-body">
+                  <span className="d-block text-muted fs-13 text-uppercase mb-1">{label}</span>
+                  <h3 className="mb-0">{value}</h3>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
-      </NelvyonDsCard>
 
-      {showInvite && <InviteMemberModal onClose={() => { setShowInvite(false); void load(); }} />}
+        <div className="row">
+          <Tab.Container defaultActiveKey="Grid">
+            <div className="d-flex justify-content-between align-items-center mb-4">
+              <h4 className="heading mb-0">Miembros del equipo</h4>
+              <div className="d-flex align-items-center">
+                <Nav as="ul" className="nav nav-pills mix-chart-tab user-m-tabe" id="pills-tab">
+                  <Nav.Item as="li" className="nav-item" role="presentation">
+                    <Nav.Link as="button" type="button" className="nav-link" eventKey="List" aria-label="Vista de lista">
+                      {SVGICON.List}
+                    </Nav.Link>
+                  </Nav.Item>
+                  <Nav.Item as="li" className="nav-item">
+                    <Nav.Link as="button" type="button" className="nav-link" eventKey="Grid" aria-label="Vista de rejilla">
+                      {SVGICON.GridDots}
+                    </Nav.Link>
+                  </Nav.Item>
+                </Nav>
+                <button type="button" className="btn btn-primary btn-sm ms-2" onClick={abrirInvitacion}>
+                  + Invitar miembro
+                </button>
+              </div>
+            </div>
+            <div className="col-xl-12 active-p">
+              {loading ? (
+                <div className="card">
+                  <div className="card-body">
+                    <div className="d-flex align-items-center justify-content-center py-5" role="status">
+                      <div className="spinner-border text-primary me-3" aria-hidden="true" />
+                      <span className="text-muted">Cargando…</span>
+                    </div>
+                  </div>
+                </div>
+              ) : members.length === 0 ? (
+                <div className="card">
+                  <div className="card-body text-center py-5">
+                    <h5 className="mb-1">Sin miembros</h5>
+                    <p className="mb-3 text-muted fs-14">Invita a tu primer colaborador para empezar.</p>
+                    <button type="button" className="btn btn-primary" onClick={abrirInvitacion}>
+                      + Invitar miembro
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <Tab.Content>
+                  <Tab.Pane eventKey="Grid">
+                    <W3crmUserGrid items={itemsGrid} />
+                  </Tab.Pane>
+                  <Tab.Pane eventKey="List">
+                    <W3crmUserList
+                      titulo="Lista de miembros"
+                      items={itemsLista}
+                      csvCabeceras={csvCabeceras}
+                      csvFilas={csvFilas}
+                      csvNombre="equipo.csv"
+                    />
+                  </Tab.Pane>
+                </Tab.Content>
+              )}
+            </div>
+          </Tab.Container>
+        </div>
+      </div>
+
+      {/* Invitacion — offcanvas de `EmployeeOffcanvas` con el formulario real */}
+      <W3crmEmployeeOffcanvas ref={offcanvasRef} title="Invitar miembro">
+        {showInvite ? <InviteMemberModal onClose={cerrarInvitacion} /> : null}
+      </W3crmEmployeeOffcanvas>
+
       {selectedMember && (
         <EditRoleModal
           member={selectedMember}
@@ -402,6 +506,6 @@ export default function SaasTeamPage() {
           onSaved={() => void load()}
         />
       )}
-    </SaasShellLayout>
+    </SaasW3crmShell>
   );
 }
