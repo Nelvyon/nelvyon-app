@@ -1,14 +1,31 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+/**
+ * /saas/billing sobre la pantalla `ecom-product-order` de la plantilla oficial
+ * W3CRM (`src/app/(ecommerce)/ecom-product-order/page.jsx`).
+ *
+ * Marcado y clases de la plantilla, tal cual: `h-80` > `container-fluid` >
+ * `row` > `col-lg-12` > `card` > `card-body` > `table-responsive` >
+ * `table table-sm mb-0 table-responsive-lg` con `thead` en `text-white
+ * bg-primary`, filas `btn-reveal-trigger`, celdas `py-2`, badges
+ * `badge badge-sm badge-*` con su `<span className="ms-1 fa fa-check">`,
+ * importes en `text-end font-w600`, el selector maestro `chackboxFun` y el
+ * dropdown de tres puntos `btn btn-primary i-false tp-btn-light sharp`.
+ *
+ * Dentro va la logica REAL de NELVYON sin cambios: los 5 endpoints
+ * (`/api/saas/billing`, `/api/saas/billing/portal`, `/api/saas/billing/cancel`,
+ * `/api/saas/invoices` y `/api/billing/checkout`), el aviso de retorno de
+ * checkout, el consumo frente a limites del plan, el cambio de plan, el portal
+ * de Stripe y las acciones de pausa, cancelacion y reactivacion.
+ */
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Fragment, useCallback, useEffect, useState } from "react";
+import { Dropdown } from "react-bootstrap";
 
-import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard } from "@/design-system/components";
-import { SaasPermissionDenied } from "@/features/saas-shell/components/SaasPermissionDenied";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
 import { saasRoleLabel } from "@/features/saas-shell/saasPermissions";
-import type { SaasNavId } from "@/features/saas-shell/saasNav";
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
 
 type BillingStatus = "active" | "paused" | "cancel_at_period_end";
 
@@ -39,11 +56,12 @@ const PLANS = [
   { id: "agency", name: "Agency", price: 797, features: ["2.000 llamadas IA/mes", "Sectores ilimitados", "Todo Pro + White-label + OS"] },
 ] as const;
 
-const INVOICE_STATUS_LABEL: Record<PlatformInvoice["status"], { label: string; tone: "primary" | "success" | "warning" | "danger" }> = {
-  draft: { label: "Borrador", tone: "primary" },
-  issued: { label: "Emitida", tone: "warning" },
-  paid: { label: "Pagada", tone: "success" },
-  overdue: { label: "Vencida", tone: "danger" },
+/** Tonos de badge de W3CRM para el estado de factura. */
+const INVOICE_STATUS_LABEL: Record<PlatformInvoice["status"], { label: string; clase: string }> = {
+  draft: { label: "Borrador", clase: "badge-primary" },
+  issued: { label: "Emitida", clase: "badge-warning" },
+  paid: { label: "Pagada", clase: "badge-success" },
+  overdue: { label: "Vencida", clase: "badge-danger" },
 };
 
 function usagePct(used: number, limit: number | null): number | null {
@@ -62,6 +80,43 @@ const USAGE_LABELS: Record<string, string> = {
   workflows: "Workflows",
   users: "Usuarios",
 };
+
+/** Dropdown de acciones por fila — `DropdonBlog` de la plantilla, con la accion real. */
+function AccionesFactura({ onPortal }: { onPortal: () => void }) {
+  return (
+    <Dropdown className="text-sans-serif">
+      <Dropdown.Toggle as="div" variant="" className="i-false">
+        <button className="btn btn-primary i-false tp-btn-light sharp" type="button" aria-label="Acciones de la factura">
+          <span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" viewBox="0 0 24 24" version="1.1">
+              <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+                <rect x="0" y="0" width="24" height="24"></rect>
+                <circle fill="#000000" cx="12" cy="5" r="2"></circle>
+                <circle fill="#000000" cx="12" cy="12" r="2"></circle>
+                <circle fill="#000000" cx="12" cy="19" r="2"></circle>
+              </g>
+            </svg>
+          </span>
+        </button>
+      </Dropdown.Toggle>
+      <Dropdown.Menu className="dropdown-menu-right border py-0" align="end">
+        <div className="py-2">
+          <Link
+            className="dropdown-item"
+            href="#"
+            scroll={false}
+            onClick={(e) => {
+              e.preventDefault();
+              onPortal();
+            }}
+          >
+            Ver en el portal
+          </Link>
+        </div>
+      </Dropdown.Menu>
+    </Dropdown>
+  );
+}
 
 export default function SaasBillingPage() {
   const router = useRouter();
@@ -191,258 +246,378 @@ export default function SaasBillingPage() {
     }
   }
 
-  const activeId: SaasNavId = "billing";
+  /** Selector maestro de la plantilla (`chackboxFun`). */
+  const chackboxFun = (type: string) => {
+    setTimeout(() => {
+      const chackbox = document.querySelectorAll<HTMLInputElement>(".product_order");
+      const motherChackBox = document.querySelector<HTMLInputElement>(".product_order_single");
+      if (!motherChackBox) return;
+      for (let i = 0; i < chackbox.length; i++) {
+        const element = chackbox[i];
+        if (!element) continue;
+        if (type === "all") {
+          element.checked = motherChackBox.checked;
+        } else if (!element.checked) {
+          motherChackBox.checked = false;
+          break;
+        } else {
+          motherChackBox.checked = true;
+        }
+      }
+    }, 100);
+  };
+
   /** saas_tenants.plan uses enterprise for agency; plan cards use starter/pro/agency ids */
-  const currentPlanRaw = data?.tenant.plan ?? null;
-  const currentPlan =
-    currentPlanRaw === "enterprise" ? "agency" : currentPlanRaw;
-  const billingStatus = data?.tenant.billingStatus ?? "active";
+  // `?.tenant?.` y no `?.tenant.`: un payload sin `tenant` (respuesta degradada
+  // o malformada) hacia estallar la pagina entera con
+  // "Cannot read properties of undefined (reading 'plan')", sin shell ni
+  // mensaje. Con la guarda cae en el estado vacio de mas abajo.
+  const currentPlanRaw = data?.tenant?.plan ?? null;
+  const currentPlan = currentPlanRaw === "enterprise" ? "agency" : currentPlanRaw;
+  const billingStatus = data?.tenant?.billingStatus ?? "active";
+  const datosListos = data != null && data.tenant != null;
 
   return (
-    <SaasShellLayout
-      sidebar={
-        <SaasSidebar
-          activeId={activeId}
-          tenantCompany={data?.tenant.companyName}
-          tenantPlan={currentPlan as "starter" | "pro" | "enterprise" | undefined}
-        />
-      }
-    >
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-widest text-primary/70">Cuenta</p>
-        <h1 className="mt-1 text-2xl font-bold text-foreground">Facturación y plan</h1>
-        <p className="mt-0.5 text-sm text-muted-foreground">Gestiona tu suscripción y consulta el uso en tiempo real.</p>
-      </div>
-
-      {loading && <NelvyonDsCard><p className="text-sm text-muted-foreground">Cargando…</p></NelvyonDsCard>}
-      {error && <SaasPermissionDenied message={error} />}
-      {actionError && (
-        <div className="rounded-lg border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive flex items-center justify-between gap-3">
-          <span>{actionError}</span>
-          <button onClick={() => setActionError(null)} className="shrink-0 font-medium hover:underline">Cerrar</button>
-        </div>
-      )}
-
-      {checkoutNotice === "success" && (
-        <div className="rounded-lg border border-success/20 bg-success/5 px-4 py-3 text-sm text-success flex items-start justify-between gap-3">
-          <div>
-            <p className="font-medium">Pago recibido en Stripe</p>
-            <p className="mt-1 text-success/80">
-              {data?.billingNote ??
-                "Tu plan se activará en unos segundos cuando Stripe confirme el webhook. Refresca si no ves el cambio."}
-            </p>
-          </div>
-          <button onClick={() => setCheckoutNotice(null)} className="shrink-0 font-medium hover:underline">Cerrar</button>
-        </div>
-      )}
-
-      {checkoutNotice === "cancelled" && (
-        <div className="rounded-lg border border-warning/20 bg-warning/5 px-4 py-3 text-sm text-warning flex items-center justify-between gap-3">
-          <span>Checkout cancelado. Tu plan actual no ha cambiado.</span>
-          <button onClick={() => setCheckoutNotice(null)} className="shrink-0 font-medium hover:underline">Cerrar</button>
-        </div>
-      )}
-
-      {!loading && !error && data && data.stripeConfigured === false && (
-        <div className="rounded-lg border border-warning/20 bg-warning/5 px-4 py-3 text-sm text-warning">
-          {data.billingNote ?? "Stripe no está configurado en el servidor. Contacta soporte para activar checkout."}
-        </div>
-      )}
-
-      {!loading && !error && data && billingStatus !== "active" && (
-        <div className="rounded-lg border border-warning/20 bg-warning/5 px-4 py-3 text-sm text-warning flex flex-wrap items-center justify-between gap-3">
-          <span>
-            {billingStatus === "paused"
-              ? "Tu suscripción está en pausa. No se realizarán nuevos cargos hasta que la reactives."
-              : "Tu suscripción se cancelará al final del periodo actual. Puedes reactivarla en cualquier momento."}
-          </span>
-          <NelvyonDsButton
-            variant="ghost"
-            disabled={subscriptionAction !== null}
-            onClick={() => void handleSubscriptionAction("resume")}
-          >
-            {subscriptionAction === "resume" ? "Reactivando…" : "Reactivar suscripción"}
-          </NelvyonDsButton>
-        </div>
-      )}
-
-      {!loading && !error && data && (
-        <>
-          {/* Plan actual */}
-          <NelvyonDsCard className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-wrap items-center gap-3">
-              <NelvyonDsBadge tone={data.tenant.plan === "enterprise" ? "warning" : data.tenant.plan === "pro" ? "success" : "primary"}>
-                {data.tenant.plan}
-              </NelvyonDsBadge>
-              <span className="text-sm text-muted-foreground">{data.tenant.companyName}</span>
-              <span className="text-xs text-muted-foreground/70">{saasRoleLabel(data.role)}</span>
-              {billingStatus !== "active" && (
-                <NelvyonDsBadge tone="warning">{billingStatus === "paused" ? "En pausa" : "Cancelación programada"}</NelvyonDsBadge>
-              )}
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <NelvyonDsButton variant="ghost" onClick={() => void handlePortal()} disabled={portaling}>
-                {portaling ? "Abriendo portal…" : "Gestionar facturación"}
-              </NelvyonDsButton>
-              {billingStatus === "active" && (
-                <>
-                  <NelvyonDsButton
-                    variant="ghost"
-                    disabled={subscriptionAction !== null}
-                    onClick={() => void handleSubscriptionAction("pause")}
-                  >
-                    {subscriptionAction === "pause" ? "Pausando…" : "Pausar suscripción"}
-                  </NelvyonDsButton>
-                  <NelvyonDsButton
-                    variant="ghost"
-                    className="text-destructive hover:text-destructive"
-                    disabled={subscriptionAction !== null}
-                    onClick={() => setConfirmingCancel(true)}
-                  >
-                    Cancelar suscripción
-                  </NelvyonDsButton>
-                </>
-              )}
-            </div>
-          </NelvyonDsCard>
-
-          {confirmingCancel && (
-            <NelvyonDsCard className="border-destructive/30 bg-destructive/5">
-              <p className="text-sm font-medium text-foreground">¿Cancelar tu suscripción?</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Seguirás con acceso hasta el final del periodo actual. Después no se te volverá a cobrar. Puedes reactivarla en cualquier momento antes de que finalice el periodo.
-              </p>
-              <div className="mt-4 flex gap-2">
-                <NelvyonDsButton variant="ghost" onClick={() => setConfirmingCancel(false)}>Volver</NelvyonDsButton>
-                <NelvyonDsButton
-                  variant="danger"
-                  disabled={subscriptionAction !== null}
-                  onClick={() => void handleSubscriptionAction("cancel_at_period_end")}
-                >
-                  {subscriptionAction === "cancel_at_period_end" ? "Cancelando…" : "Sí, cancelar al final del periodo"}
-                </NelvyonDsButton>
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="Facturación y plan" parentTitle="Cuenta" pageTitle="Facturación" />
+      <div className="h-80">
+        <div className="container-fluid">
+          {loading && (
+            <div className="row">
+              <div className="col-lg-12">
+                <div className="card">
+                  <div className="card-body">
+                    <div className="d-flex align-items-center justify-content-center py-5" role="status">
+                      <div className="spinner-border text-primary me-3" aria-hidden="true" />
+                      <span className="text-muted">Cargando…</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </NelvyonDsCard>
+            </div>
           )}
 
-          {/* Uso */}
-          <NelvyonDsCard>
-            <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Uso del plan</p>
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {(["contacts", "deals", "campanias", "workflows", "users"] as const).map((key) => {
-                const used = data.usage[key] ?? 0;
-                const limit = data.limits[key] ?? null;
-                const pct = usagePct(used, limit);
-                const isHigh = pct !== null && pct >= 80;
-                return (
-                  <div key={key} className="rounded-xl border border-border bg-muted/10 p-4">
-                    <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{USAGE_LABELS[key] ?? key}</p>
-                    <p className="mt-1 text-2xl font-semibold tabular-nums text-foreground">
-                      {used}
-                      <span className="text-base font-normal text-muted-foreground">{limit !== null ? ` / ${limit}` : " / ∞"}</span>
+          {error && <div className="alert alert-danger" role="alert">{error}</div>}
+
+          {actionError && (
+            <div className="alert alert-danger alert-dismissible fade show" role="alert">
+              {actionError}
+              <button type="button" className="btn-close" aria-label="Cerrar" onClick={() => setActionError(null)} />
+            </div>
+          )}
+
+          {checkoutNotice === "success" && (
+            <div className="alert alert-success alert-dismissible fade show" role="alert">
+              <strong>Pago recibido en Stripe.</strong>{" "}
+              {data?.billingNote ??
+                "Tu plan se activará en unos segundos cuando Stripe confirme el webhook. Refresca si no ves el cambio."}
+              <button type="button" className="btn-close" aria-label="Cerrar" onClick={() => setCheckoutNotice(null)} />
+            </div>
+          )}
+
+          {checkoutNotice === "cancelled" && (
+            <div className="alert alert-warning alert-dismissible fade show" role="alert">
+              Checkout cancelado. Tu plan actual no ha cambiado.
+              <button type="button" className="btn-close" aria-label="Cerrar" onClick={() => setCheckoutNotice(null)} />
+            </div>
+          )}
+
+          {!loading && !error && !datosListos && (
+            <div className="row">
+              <div className="col-lg-12">
+                <div className="card">
+                  <div className="card-body text-center py-5">
+                    <h5 className="mb-1">Sin datos de facturación</h5>
+                    <p className="mb-0 text-muted fs-14">
+                      No hemos podido recuperar tu plan. Vuelve a intentarlo en unos segundos.
                     </p>
-                    {pct !== null ? (
-                      <div className="mt-3 h-1 overflow-hidden rounded-full bg-muted/30">
-                        <div
-                          className={`h-full rounded-full transition-all ${isHigh ? "bg-destructive" : "bg-primary"}`}
-                          style={{ width: `${pct}%` }}
-                        />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {!loading && !error && datosListos && data && data.stripeConfigured === false && (
+            <div className="alert alert-warning" role="alert">
+              {data.billingNote ?? "Stripe no está configurado en el servidor. Contacta soporte para activar checkout."}
+            </div>
+          )}
+
+          {!loading && !error && datosListos && data && billingStatus !== "active" && (
+            <div className="alert alert-warning d-flex flex-wrap align-items-center justify-content-between" role="alert">
+              <span>
+                {billingStatus === "paused"
+                  ? "Tu suscripción está en pausa. No se realizarán nuevos cargos hasta que la reactives."
+                  : "Tu suscripción se cancelará al final del periodo actual. Puedes reactivarla en cualquier momento."}
+              </span>
+              <button
+                type="button"
+                className="btn btn-primary btn-sm"
+                disabled={subscriptionAction !== null}
+                onClick={() => void handleSubscriptionAction("resume")}
+              >
+                {subscriptionAction === "resume" ? "Reactivando…" : "Reactivar suscripción"}
+              </button>
+            </div>
+          )}
+
+          {!loading && !error && datosListos && data && (
+            <Fragment>
+              {/* Plan actual */}
+              <div className="row">
+                <div className="col-lg-12">
+                  <div className="card">
+                    <div className="card-header">
+                      <h4 className="card-title">Plan actual</h4>
+                      <div className="d-flex flex-wrap align-items-center gap-2">
+                        <button
+                          type="button"
+                          className="btn btn-primary light btn-sm"
+                          onClick={() => void handlePortal()}
+                          disabled={portaling}
+                        >
+                          {portaling ? "Abriendo portal…" : "Gestionar facturación"}
+                        </button>
+                        {billingStatus === "active" && (
+                          <Fragment>
+                            <button
+                              type="button"
+                              className="btn btn-warning light btn-sm"
+                              disabled={subscriptionAction !== null}
+                              onClick={() => void handleSubscriptionAction("pause")}
+                            >
+                              {subscriptionAction === "pause" ? "Pausando…" : "Pausar suscripción"}
+                            </button>
+                            <button
+                              type="button"
+                              className="btn btn-danger light btn-sm"
+                              disabled={subscriptionAction !== null}
+                              onClick={() => setConfirmingCancel(true)}
+                            >
+                              Cancelar suscripción
+                            </button>
+                          </Fragment>
+                        )}
                       </div>
-                    ) : (
-                      <p className="mt-2 text-xs text-muted-foreground/70">Sin límite</p>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </NelvyonDsCard>
-
-          {/* Plan cards */}
-          <div>
-            <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Cambiar de plan</p>
-            <div className="grid gap-4 sm:grid-cols-3">
-              {PLANS.map((plan) => {
-                const isCurrent = currentPlan === plan.id;
-                return (
-                  <div
-                    key={plan.id}
-                    className={`relative overflow-hidden rounded-xl border p-5 flex flex-col gap-4 transition-all ${
-                      isCurrent
-                        ? "border-primary/40 bg-primary/5 shadow-[0_0_32px_rgba(0,132,255,0.15)]"
-                        : "border-border bg-muted/5 hover:border-border/80 hover:bg-muted/10"
-                    }`}
-                  >
-                    {isCurrent && (
-                      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
-                    )}
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold text-foreground">{plan.name}</span>
-                      {isCurrent && <NelvyonDsBadge tone="primary">Activo</NelvyonDsBadge>}
                     </div>
-                    <p className="text-3xl font-bold text-foreground">
-                      {plan.price}€
-                      <span className="text-sm font-normal text-muted-foreground">/mes</span>
-                    </p>
-                    <ul className="space-y-2 flex-1">
-                      {plan.features.map((f) => (
-                        <li key={f} className="flex items-start gap-2 text-sm text-muted-foreground">
-                          <span className="mt-0.5 text-primary">✓</span> {f}
-                        </li>
-                      ))}
-                    </ul>
-                    <NelvyonDsButton
-                      disabled={isCurrent || upgrading !== null}
-                      onClick={() => void handleUpgrade(plan.id)}
-                      variant={isCurrent ? "ghost" : "primary"}
-                      className="w-full"
-                    >
-                      {upgrading === plan.id ? "Redirigiendo…" : isCurrent ? "Plan actual" : "Cambiar a este plan"}
-                    </NelvyonDsButton>
+                    <div className="card-body">
+                      <div className="d-flex flex-wrap align-items-center gap-3">
+                        <span
+                          className={`badge badge-sm ${
+                            data.tenant.plan === "enterprise"
+                              ? "badge-warning"
+                              : data.tenant.plan === "pro"
+                                ? "badge-success"
+                                : "badge-primary"
+                          }`}
+                        >
+                          {data.tenant.plan}
+                        </span>
+                        <span className="text-muted">{data.tenant.companyName}</span>
+                        <span className="text-muted fs-13">{saasRoleLabel(data.role)}</span>
+                        {billingStatus !== "active" && (
+                          <span className="badge badge-sm badge-warning">
+                            {billingStatus === "paused" ? "En pausa" : "Cancelación programada"}
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                );
-              })}
-            </div>
-          </div>
+                </div>
+              </div>
 
-          {/* Historial de facturas de plataforma */}
-          <div>
-            <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Historial de facturas</p>
-            {invoices.length === 0 ? (
-              <NelvyonDsCard className="p-8 text-center">
-                <p className="text-sm text-muted-foreground">Todavía no se han emitido facturas de suscripción para tu cuenta.</p>
-              </NelvyonDsCard>
-            ) : (
-              <NelvyonDsCard className="overflow-hidden p-0">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-border bg-muted/20">
-                      {["Número", "Periodo", "Importe", "Estado", "Emitida"].map((h) => (
-                        <th key={h} className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border">
-                    {invoices.map((inv) => {
-                      const sc = INVOICE_STATUS_LABEL[inv.status];
-                      return (
-                        <tr key={inv.id} className="hover:bg-muted/10 transition-colors">
-                          <td className="px-4 py-3 font-mono text-xs text-foreground">{inv.invoiceNumber}</td>
-                          <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">
-                            {fmtDate(inv.periodStart)} – {fmtDate(inv.periodEnd)}
-                          </td>
-                          <td className="px-4 py-3 font-bold text-foreground">€{inv.amountEur.toFixed(2)}</td>
-                          <td className="px-4 py-3"><NelvyonDsBadge tone={sc.tone}>{sc.label}</NelvyonDsBadge></td>
-                          <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">{fmtDate(inv.createdAt)}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </NelvyonDsCard>
-            )}
-          </div>
-        </>
-      )}
-    </SaasShellLayout>
+              {confirmingCancel && (
+                <div className="row">
+                  <div className="col-lg-12">
+                    <div className="card">
+                      <div className="card-body">
+                        <h4 className="mb-2">¿Cancelar tu suscripción?</h4>
+                        <p className="text-muted mb-3">
+                          Seguirás con acceso hasta el final del periodo actual. Después no se te volverá a cobrar.
+                          Puedes reactivarla en cualquier momento antes de que finalice el periodo.
+                        </p>
+                        <button type="button" className="btn btn-primary light me-2" onClick={() => setConfirmingCancel(false)}>
+                          Volver
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-danger"
+                          disabled={subscriptionAction !== null}
+                          onClick={() => void handleSubscriptionAction("cancel_at_period_end")}
+                        >
+                          {subscriptionAction === "cancel_at_period_end" ? "Cancelando…" : "Sí, cancelar al final del periodo"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Uso del plan */}
+              <div className="row">
+                {(["contacts", "deals", "campanias", "workflows", "users"] as const).map((key) => {
+                  const used = data.usage[key] ?? 0;
+                  const limit = data.limits[key] ?? null;
+                  const pct = usagePct(used, limit);
+                  const isHigh = pct !== null && pct >= 80;
+                  return (
+                    <div className="col-xl-3 col-sm-6" key={key}>
+                      <div className="card">
+                        <div className="card-body">
+                          <span className="d-block text-muted fs-13 text-uppercase mb-1">{USAGE_LABELS[key] ?? key}</span>
+                          <h3 className="mb-2">
+                            {used}
+                            <span className="fs-16 text-muted">{limit !== null ? ` / ${limit}` : " / ∞"}</span>
+                          </h3>
+                          {pct !== null ? (
+                            <div className="progress" style={{ height: 6 }}>
+                              <div
+                                className={`progress-bar ${isHigh ? "bg-danger" : "bg-primary"}`}
+                                style={{ width: `${pct}%`, height: 6 }}
+                                role="progressbar"
+                                aria-valuenow={pct}
+                                aria-valuemin={0}
+                                aria-valuemax={100}
+                                aria-label={`Uso de ${USAGE_LABELS[key] ?? key}`}
+                              />
+                            </div>
+                          ) : (
+                            <span className="text-muted fs-13">Sin límite</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Cambiar de plan */}
+              <div className="row">
+                {PLANS.map((plan) => {
+                  const isCurrent = currentPlan === plan.id;
+                  return (
+                    <div className="col-xl-4 col-lg-6" key={plan.id}>
+                      <div className={`card ${isCurrent ? "border-primary" : ""}`}>
+                        <div className="card-header">
+                          <h4 className="card-title">{plan.name}</h4>
+                          {isCurrent && <span className="badge badge-sm badge-primary">Activo</span>}
+                        </div>
+                        <div className="card-body">
+                          <h2 className="mb-3">
+                            {plan.price}€<span className="fs-16 text-muted">/mes</span>
+                          </h2>
+                          <ul className="list-group list-group-flush mb-3">
+                            {plan.features.map((f) => (
+                              <li className="list-group-item border-0 px-0 py-1" key={f}>
+                                <i className="fa-solid fa-check text-primary me-2" />
+                                {f}
+                              </li>
+                            ))}
+                          </ul>
+                          <button
+                            type="button"
+                            className={`btn w-100 ${isCurrent ? "btn-primary light" : "btn-primary"}`}
+                            disabled={isCurrent || upgrading !== null}
+                            onClick={() => void handleUpgrade(plan.id)}
+                          >
+                            {upgrading === plan.id ? "Redirigiendo…" : isCurrent ? "Plan actual" : "Cambiar a este plan"}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Historial de facturas — tabla de `ecom-product-order` */}
+              <div className="row">
+                <div className="col-lg-12">
+                  <div className="card">
+                    <div className="card-header">
+                      <h4 className="card-title">Historial de facturas</h4>
+                    </div>
+                    <div className="card-body">
+                      {invoices.length === 0 ? (
+                        <div className="text-center py-4">
+                          <h5 className="mb-1">Sin facturas</h5>
+                          <p className="mb-0 text-muted fs-14">
+                            Todavía no se han emitido facturas de suscripción para tu cuenta.
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="table-responsive">
+                          <table className="table table-sm mb-0 table-responsive-lg ">
+                            <thead className="text-white bg-primary">
+                              <tr>
+                                <th className="align-middle">
+                                  <div className="form-check custom-checkbox checkbox-success">
+                                    <input
+                                      type="checkbox"
+                                      className="form-check-input  product_order_single"
+                                      id="checkAll"
+                                      aria-label="Seleccionar todas las facturas"
+                                      onClick={() => chackboxFun("all")}
+                                    />
+                                  </div>
+                                </th>
+                                <th className="align-middle">Factura</th>
+                                <th className="align-middle pr-7">Emitida</th>
+                                <th className="align-middle minw200">Periodo</th>
+                                <th className="align-middle text-end">Estado</th>
+                                <th className="align-middle text-end">Importe</th>
+                                <th className="no-sort text-end">Acción</th>
+                              </tr>
+                            </thead>
+                            <tbody id="orders">
+                              {invoices.map((inv) => {
+                                const sc = INVOICE_STATUS_LABEL[inv.status];
+                                return (
+                                  <tr className="btn-reveal-trigger" key={inv.id}>
+                                    <td className="py-2">
+                                      <div className="form-check custom-checkbox checkbox-success">
+                                        <input
+                                          type="checkbox"
+                                          className="form-check-input product_order"
+                                          aria-label={`Seleccionar factura ${inv.invoiceNumber}`}
+                                          onClick={() => chackboxFun("")}
+                                        />
+                                      </div>
+                                    </td>
+                                    <td className="py-2">
+                                      <strong>#{inv.invoiceNumber}</strong>
+                                      <br />
+                                      <span className="text-muted fs-13">{data.tenant.companyName}</span>
+                                    </td>
+                                    <td className="py-2">{fmtDate(inv.createdAt)}</td>
+                                    <td className="py-2">
+                                      {fmtDate(inv.periodStart)} – {fmtDate(inv.periodEnd)}
+                                      <p className="mb-0 text-500">Suscripción {data.tenant.plan}</p>
+                                    </td>
+                                    <td className="py-2 text-end">
+                                      <span className={`badge badge-sm ${sc.clase}`}>
+                                        {sc.label}
+                                        <span className="ms-1 fa fa-check" />
+                                      </span>
+                                    </td>
+                                    <td className="py-2 text-end font-w600">€{inv.amountEur.toFixed(2)}</td>
+                                    <td className="py-2 text-end">
+                                      <AccionesFactura onPortal={() => void handlePortal()} />
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Fragment>
+          )}
+        </div>
+      </div>
+    </SaasW3crmShell>
   );
 }
