@@ -8,8 +8,10 @@ const PAGES = [
   "/www/contact.html",
   "/www/about.html",
   "/www/features.html",
-  "/www/home-ai-agent.html",
-  "/www/home-saas-product-showcase.html",
+  // Home 08 (`index.html`) y SaaS 02 (`saas.html`) son las dos paginas AIOR
+  // vigentes. `home-ai-agent.html` y `home-saas-product-showcase.html` se
+  // consolidaron en ellas y ya no existen.
+  "/www/saas.html",
   "/www/blog.html",
   "/www/team.html",
   "/www/faq.html",
