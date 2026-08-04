@@ -6,7 +6,11 @@ export const CONTENT_SECURITY_POLICY = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://eu.i.posthog.com https://js.stripe.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-  "font-src 'self' https://fonts.gstatic.com",
+  // `data:` es necesario para las fuentes embebidas en base64 dentro de
+  // `assets/css/app.min.css` y `swiper-bundle.min.css` del pack publico; sin
+  // ello la CSP las bloqueaba y cada pagina emitia un error de consola. Son
+  // fuentes autocontenidas, no suponen una peticion a terceros.
+  "font-src 'self' data: https://fonts.gstatic.com",
   "img-src 'self' data: blob: https:",
   "connect-src 'self' https://eu.i.posthog.com https://eu.posthog.com https://api.stripe.com https://*.sentry.io",
   "frame-src https://js.stripe.com https://hooks.stripe.com https://www.google.com https://maps.google.com",

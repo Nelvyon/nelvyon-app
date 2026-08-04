@@ -165,6 +165,14 @@ const nextConfig: NextConfig = {
       beforeFiles: [
         // Belt-and-suspenders with middleware: `/` serves AIOR Home 01 HTML (200).
         { source: "/", destination: "/www/index.html" },
+        // La Home se sirve en `/` mediante rewrite, asi que la URL del documento
+        // sigue siendo `/`. `index.html` referencia sus recursos y sus enlaces de
+        // forma relativa (`assets/...`, `about.html`), que desde la raiz se
+        // resolvian a `/assets/...` y `/about.html` y devolvian 404: la portada
+        // se pintaba sin CSS, sin JS y sin imagenes. Estos dos rewrites los
+        // reconducen al pack sin tocar el HTML de la plantilla.
+        { source: "/assets/:path*", destination: "/www/assets/:path*" },
+        { source: "/:pagina([a-z0-9-]+).html", destination: "/www/:pagina.html" },
       ],
       afterFiles: [
         {

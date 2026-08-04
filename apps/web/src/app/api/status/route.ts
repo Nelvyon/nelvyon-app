@@ -8,8 +8,15 @@ export const runtime = "nodejs";
 
 export async function GET() {
   try {
-    const [current, incidents] = await Promise.all([
-      getCurrentStatus(),
+    // `DbClient.getInstance()` lanza de forma SINCRONA si falta DATABASE_URL.
+    // Invocado directamente dentro del array de `Promise.all`, abortaba la
+    // construccion del array despues de que `getCurrentStatus()` ya hubiera
+    // devuelto una promesa rechazada: esa promesa se quedaba sin manejador y
+    // el `unhandledRejection` de server.js tumbaba el proceso entero, aunque
+    // este `catch` devolviese su respuesta de reserva. Envolviendolo en una
+    // funcion async, el throw sincrono se convierte en rechazo y `Promise.all`
+    // llega siempre a manejar ambas promesas.
+    const consultaIncidencias = async () =>
       DbClient.getInstance().query<{
         id: string;
         title: string;
@@ -23,8 +30,9 @@ export async function GET() {
          WHERE resolved = false OR created_at > now() - interval '7 days'
          ORDER BY created_at DESC
          LIMIT 10`,
-      ),
-    ]);
+      );
+
+    const [current, incidents] = await Promise.all([getCurrentStatus(), consultaIncidencias()]);
 
     const allUp = Object.values(current).every((s) => s.status === "up");
     const anyDown = Object.values(current).some((s) => s.status === "down");

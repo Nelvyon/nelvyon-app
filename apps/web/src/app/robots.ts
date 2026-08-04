@@ -13,7 +13,10 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: [
         "/dashboard",
-        "/saas",
+        // `/saas/` con barra: bloquea la aplicacion autenticada (`/saas/crm`,
+        // `/saas/inbox`...) sin bloquear `/saas`, que es la pagina publica de
+        // producto y esta publicada en el sitemap. Sin la barra se contradecian.
+        "/saas/",
         "/os",
         "/api",
         "/admin",
