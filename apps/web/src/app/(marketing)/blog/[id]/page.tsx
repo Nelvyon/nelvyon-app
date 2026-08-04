@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import Link from "next/link";
+// Enlace que usa `<a>` para las rutas servidas por el pack estatico y
+// `next/link` para el resto. Ver EnlacePublico.tsx.
+import { EnlacePublico as Link } from "@/features/public-web/components/EnlacePublico";
 
 import { blog } from "@/lib/pa/source";
 import { BrandBlogContent } from "@/features/public-web/components/BrandBlogContent";

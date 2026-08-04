@@ -25,8 +25,14 @@ const Layout = ({ children, menuList }: { children: React.ReactNode; menuList?: 
                 className={`show`}
             >
                 <Nav menuList={menuList} />
-                <div className="content-body" style={{ minHeight: minHeight }}>                    
-                    <main>{children}</main>
+                <div className="content-body" style={{ minHeight: minHeight }}>
+                    {/* La plantilla usa <main> aqui, pero el layout raiz de NELVYON
+                        (app/layout.tsx) ya envuelve todo en <main>. Anidarlos daba
+                        dos landmarks `main` por documento, que es invalido y hacia
+                        fallar los tests de accesibilidad. Se usa <div>: ninguna regla
+                        del CSS del pack selecciona la etiqueta `main`, asi que el
+                        cambio es solo semantico y no altera el diseno. */}
+                    <div>{children}</div>
                 </div>
                 <Footer />
             </div>

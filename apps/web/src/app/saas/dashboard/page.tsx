@@ -209,7 +209,11 @@ export default function SaasDashboardPage() {
     );
   }
 
-  if (!summary) {
+  // `!summary.tenant` ademas de `!summary`: si la API devolvia un payload sin
+  // `tenant` (respuesta malformada o degradada), la linea `tenant.onboarding
+  // Completed` de mas abajo lanzaba y desmontaba el arbol entero, dejando la
+  // pantalla en blanco sin shell ni mensaje. Ahora cae en el estado vacio.
+  if (!summary || !summary.tenant) {
     return (
       <SaasW3crmShell>
         <div className="container-fluid">

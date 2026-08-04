@@ -1,4 +1,6 @@
-import Link from "next/link";
+// Enlace que usa `<a>` para las rutas servidas por el pack estatico y
+// `next/link` para el resto. Ver EnlacePublico.tsx.
+import { EnlacePublico as Link } from "@/features/public-web/components/EnlacePublico";
 
 import { getMDXComponents } from "@/mdx-components-pa";
 
