@@ -1,60 +1,72 @@
 "use client";
 
+/**
+ * /saas/secuencias sobre `(cms)/content` de W3CRM, con las piezas ya portadas.
+ * Mapeo: los cuatro modales -> `W3crmModal`; galeria de plantillas y detalle
+ * de secuencia -> `W3crmContentBox`; pasos -> `W3crmDataTable`.
+ *
+ * Logica de NELVYON intacta: `GET/POST /api/saas/sequences`,
+ * `GET/POST /api/saas/sequences/templates`,
+ * `GET/PATCH /api/saas/sequences/[id]`, `POST /api/saas/sequences/[id]/enroll`,
+ * `POST /api/saas/sequences/[id]/steps` y `GET /api/saas/crm/contacts`;
+ * `EnrollModal` con su busqueda con rebote de 300 ms, `AddStepModal` con los
+ * cinco tipos de paso y el cuerpo que arma por tipo, `CreateSequenceModal`,
+ * `SequenceTemplateGallery` con su filtro por categoria, `loadSequences`,
+ * `loadDetail`, `toggleStatus` y los avisos `ses_configured` /
+ * `twilio_configured`.
+ */
 import { useState, useEffect, useCallback } from "react";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
-import {
-  NelvyonDsBadge,
-  NelvyonDsButton,
-  NelvyonDsCard,
-  NelvyonDsSectionHeader,
-} from "@/design-system/components";
-import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
-import { SaasEmptyState } from "@/features/saas-shell/components/SaasEmptyState";
-import type { SaasSequence, SaasSequenceStep } from "@nelvyon/saas";
 
-// ── Types ───────────────────────────────────────────────────────────────────
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmEmptyState, W3crmKpiTile } from "@/features/saas-w3crm/components/W3crmUi";
+import { W3crmCargando, W3crmContentBox, W3crmDataTable, W3crmModal } from "@/features/saas-w3crm/components/W3crmContentBox";
+import type { SaasSequence, SaasSequenceStep } from "@nelvyon/saas";
 
 type SequenceWithSteps = SaasSequence & { steps?: SaasSequenceStep[] };
 
-// ── Step type badge ──────────────────────────────────────────────────────────
-
 const STEP_TYPE_LABELS: Record<string, string> = {
-  email: "Email",
-  sms: "SMS",
-  whatsapp: "WhatsApp",
-  wait: "Espera",
-  branch: "Bifurcación",
+  email: "Email", sms: "SMS", whatsapp: "WhatsApp", wait: "Espera", branch: "Bifurcación",
 };
 
-const STEP_TYPE_TONE: Record<string, "primary" | "success" | "warning" | "neutral"> = {
-  email: "primary",
-  sms: "success",
-  whatsapp: "success",
-  wait: "warning",
-  branch: "neutral",
+const STEP_TYPE_BADGE: Record<string, string> = {
+  email: "badge-primary", sms: "badge-success", whatsapp: "badge-success",
+  wait: "badge-warning", branch: "badge-secondary",
 };
 
-function StepTypeBadge({ type }: { type: string }) {
-  return (
-    <NelvyonDsBadge tone={STEP_TYPE_TONE[type] ?? "neutral"}>
-      {STEP_TYPE_LABELS[type] ?? type}
-    </NelvyonDsBadge>
-  );
+const TRIGGER_LABELS: Record<string, string> = {
+  manual: "Manual", contact_created: "Nuevo contacto",
+  form_submitted: "Formulario", tag_added: "Etiqueta",
+};
+
+const SEQ_STATUS_BADGE: Record<string, string> = {
+  active: "badge-success", paused: "badge-warning", archived: "badge-secondary",
+};
+const SEQ_STATUS_LABELS: Record<string, string> = {
+  active: "Activa", paused: "Pausada", archived: "Archivada",
+};
+
+/** Catalogos que pueden crecer en el backend sin dejar la pantalla en blanco. */
+function etiquetaPaso(t: string) { return STEP_TYPE_LABELS[t] ?? String(t || "—"); }
+function badgePaso(t: string) { return STEP_TYPE_BADGE[t] ?? "badge-secondary"; }
+function etiquetaTrigger(t: string) { return TRIGGER_LABELS[t] ?? String(t || "—"); }
+function etiquetaEstado(s: string) { return SEQ_STATUS_LABELS[s] ?? String(s || "—"); }
+function badgeEstado(s: string) { return SEQ_STATUS_BADGE[s] ?? "badge-secondary"; }
+function num(v: unknown): number {
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+/** `steps` puede llegar nulo o no-array. */
+function pasosDe(s: SequenceWithSteps | null): SaasSequenceStep[] {
+  return Array.isArray(s?.steps) ? s.steps : [];
 }
 
-// ── Enroll Modal ─────────────────────────────────────────────────────────────
+// ── Inscribir contacto ───────────────────────────────────────────────────────
 
 type CrmContact = { id: string; name: string; email: string | null; company?: string | null };
 
-function EnrollModal({
-  sequence,
-  onClose,
-  onEnrolled,
-}: {
-  sequence: SaasSequence;
-  onClose: () => void;
-  onEnrolled: () => void;
+function EnrollModal({ sequence, onClose, onEnrolled }: {
+  sequence: SaasSequence; onClose: () => void; onEnrolled: () => void;
 }) {
   const [search, setSearch] = useState("");
   const [contacts, setContacts] = useState<CrmContact[]>([]);
@@ -70,8 +82,8 @@ function EnrollModal({
       if (q.trim()) params.set("search", q.trim());
       const res = await fetch(`/api/saas/crm/contacts?${params.toString()}`);
       if (!res.ok) throw new Error("No se pudieron cargar contactos");
-      const d = await res.json() as { contacts?: CrmContact[] };
-      setContacts(d.contacts ?? []);
+      const d = (await res.json().catch(() => ({}))) as { contacts?: CrmContact[] };
+      setContacts(Array.isArray(d.contacts) ? d.contacts : []);
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Error al buscar contactos");
       setContacts([]);
@@ -95,7 +107,7 @@ function EnrollModal({
         body: JSON.stringify({ contact_id: selected.id }),
       });
       if (!res.ok) {
-        const d = await res.json().catch(() => ({})) as { error?: string };
+        const d = (await res.json().catch(() => ({}))) as { error?: string };
         throw new Error(d.error ?? "Error al inscribir");
       }
       onEnrolled();
@@ -108,67 +120,62 @@ function EnrollModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl">
-        <h3 className="mb-1 font-semibold text-foreground">Inscribir contacto</h3>
-        <p className="mb-4 text-sm text-muted-foreground">Secuencia: <span className="text-foreground">{sequence.name}</span></p>
-        <input
-          className="mb-3 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
-          placeholder="Buscar por nombre, email o empresa…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <div className="mb-3 max-h-48 overflow-y-auto rounded-lg border border-border">
+    <W3crmModal titulo="Inscribir contacto" onClose={onClose} error={err} testId="modal-inscribir">
+      <p className="fs-14 text-muted">Secuencia: <strong>{sequence.name}</strong></p>
+      <div className="form-group mb-3">
+        <label htmlFor="sq-buscar" className="text-black font-w600">Buscar contacto</label>
+        <input id="sq-buscar" type="text" className="form-control" placeholder="Buscar por nombre, email o empresa…"
+          value={search} onChange={(e) => setSearch(e.target.value)} />
+      </div>
+      <div className="table-responsive mb-3" style={{ maxHeight: 260, overflowY: "auto" }}>
+        <div className="dataTables_wrapper no-footer">
           {searching ? (
-            <p className="px-3 py-4 text-xs text-muted-foreground">Buscando contactos…</p>
+            <W3crmCargando texto="Buscando contactos…" />
           ) : contacts.length === 0 ? (
-            <p className="px-3 py-4 text-xs text-muted-foreground">Sin contactos — prueba otra búsqueda</p>
+            <W3crmEmptyState title="Sin contactos" description="Prueba con otra búsqueda." />
           ) : (
-            contacts.map((c) => (
-              <button
-                key={c.id}
-                type="button"
-                onClick={() => setSelected(c)}
-                className={`w-full border-b border-border/60 px-3 py-2 text-left text-sm last:border-0 transition ${
-                  selected?.id === c.id ? "bg-primary/15 text-foreground" : "text-muted-foreground hover:bg-muted/20"
-                }`}
-              >
-                <span className="font-medium">{c.name}</span>
-                {c.email && <span className="block text-xs text-muted-foreground">{c.email}</span>}
-              </button>
-            ))
+            <table className="table table-responsive-lg table-striped table-condensed flip-content">
+              <thead>
+                <tr>
+                  <th className="text-black">Contacto</th>
+                  <th className="text-black">Email</th>
+                  <th className="text-black text-end">Seleccionar</th>
+                </tr>
+              </thead>
+              <tbody>
+                {contacts.map((c) => (
+                  <tr key={c.id}>
+                    <td><span className="fw-bold">{c.name || "—"}</span></td>
+                    <td><span className="text-muted fs-12">{c.email ?? "—"}</span></td>
+                    <td className="text-end">
+                      <button type="button"
+                        className={`btn btn-sm ${selected?.id === c.id ? "btn-primary" : "btn-primary light"}`}
+                        aria-pressed={selected?.id === c.id}
+                        onClick={() => setSelected(c)}>
+                        {selected?.id === c.id ? "Seleccionado" : "Seleccionar"}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           )}
         </div>
-        {selected && (
-          <p className="mb-3 text-xs text-muted-foreground">
-            Seleccionado: <span className="text-foreground">{selected.name}</span>
-            {selected.email ? ` · ${selected.email}` : ""}
-          </p>
-        )}
-        {err && <p className="mb-3 text-xs text-destructive">{err}</p>}
-        <div className="flex gap-2">
-          <NelvyonDsButton type="button" variant="ghost" className="flex-1" onClick={onClose}>
-            Cancelar
-          </NelvyonDsButton>
-          <NelvyonDsButton type="button" className="flex-1" disabled={loading || !selected} onClick={handleEnroll}>
-            {loading ? "Inscribiendo…" : "Inscribir"}
-          </NelvyonDsButton>
-        </div>
       </div>
-    </div>
+      <div className="text-end">
+        <button type="button" className="btn btn-danger light me-2" onClick={onClose}>Cancelar</button>
+        <button type="button" className="btn btn-primary" disabled={loading || !selected} onClick={() => void handleEnroll()}>
+          {loading ? "Inscribiendo…" : "Inscribir"}
+        </button>
+      </div>
+    </W3crmModal>
   );
 }
 
-// ── Add Step Modal ───────────────────────────────────────────────────────────
+// ── Añadir paso ──────────────────────────────────────────────────────────────
 
-function AddStepModal({
-  sequence,
-  onClose,
-  onAdded,
-}: {
-  sequence: SaasSequence;
-  onClose: () => void;
-  onAdded: () => void;
+function AddStepModal({ sequence, onClose, onAdded }: {
+  sequence: SaasSequence; onClose: () => void; onAdded: () => void;
 }) {
   const [stepType, setStepType] = useState<"email" | "sms" | "whatsapp" | "wait" | "branch">("email");
   const [delayDays, setDelayDays] = useState("0");
@@ -202,7 +209,7 @@ function AddStepModal({
         body: JSON.stringify(body),
       });
       if (!res.ok) {
-        const d = await res.json().catch(() => ({})) as { error?: string };
+        const d = (await res.json().catch(() => ({}))) as { error?: string };
         throw new Error(d.error ?? "Error al añadir step");
       }
       onAdded(); onClose();
@@ -214,95 +221,95 @@ function AddStepModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl">
-        <h3 className="mb-4 font-semibold text-foreground">Añadir paso</h3>
+    <W3crmModal titulo="Añadir paso" onClose={onClose} error={err} testId="modal-paso">
+      <div className="mb-3">
+        <label className="text-black font-w600 d-block mb-2">Tipo de paso</label>
+        {(["email", "sms", "whatsapp", "wait", "branch"] as const).map((t) => (
+          <button key={t} type="button" aria-pressed={stepType === t}
+            className={`btn btn-sm me-1 mb-1 ${stepType === t ? "btn-primary" : "btn-primary light"}`}
+            onClick={() => setStepType(t)}>
+            {STEP_TYPE_LABELS[t]}
+          </button>
+        ))}
+      </div>
 
-        <div className="mb-4 flex flex-wrap gap-2">
-          {(["email", "sms", "whatsapp", "wait", "branch"] as const).map((t) => (
-            <button
-              key={t}
-              type="button"
-              onClick={() => setStepType(t)}
-              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-                stepType === t ? "bg-primary text-primary-foreground" : "bg-muted/30 text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {t === "email" ? "Email" : t === "sms" ? "SMS" : t === "whatsapp" ? "WhatsApp" : t === "wait" ? "Espera" : "Bifurcación"}
-            </button>
-          ))}
-        </div>
-
-        <div className="mb-3 flex gap-2">
-          <div className="flex-1">
-            <label className="mb-1 block text-xs text-muted-foreground">Retraso (días)</label>
-            <input className="w-full rounded-lg border border-border bg-background px-2 py-1.5 text-sm text-foreground" type="number" value={delayDays} onChange={(e) => setDelayDays(e.target.value)} />
+      <div className="row">
+        <div className="col-6">
+          <div className="form-group mb-3">
+            <label htmlFor="sq-dias" className="text-black font-w600">Retraso (días)</label>
+            <input id="sq-dias" type="number" className="form-control" value={delayDays} onChange={(e) => setDelayDays(e.target.value)} />
           </div>
-          <div className="flex-1">
-            <label className="mb-1 block text-xs text-muted-foreground">Retraso (horas)</label>
-            <input className="w-full rounded-lg border border-border bg-background px-2 py-1.5 text-sm text-foreground" type="number" value={delayHours} onChange={(e) => setDelayHours(e.target.value)} />
+        </div>
+        <div className="col-6">
+          <div className="form-group mb-3">
+            <label htmlFor="sq-horas" className="text-black font-w600">Retraso (horas)</label>
+            <input id="sq-horas" type="number" className="form-control" value={delayHours} onChange={(e) => setDelayHours(e.target.value)} />
           </div>
         </div>
 
         {(stepType === "email" || stepType === "sms" || stepType === "whatsapp") && (
           <>
             {stepType === "email" && (
-              <input
-                className="mb-2 w-full rounded-lg border border-border bg-background px-2 py-1.5 text-sm text-foreground placeholder:text-muted-foreground"
-                placeholder="Asunto del email"
-                value={subject}
-                onChange={(e) => setSubject(e.target.value)}
-              />
+              <div className="col-lg-12">
+                <div className="form-group mb-3">
+                  <label htmlFor="sq-asunto" className="text-black font-w600">Asunto del email</label>
+                  <input id="sq-asunto" type="text" className="form-control" value={subject} onChange={(e) => setSubject(e.target.value)} />
+                </div>
+              </div>
             )}
-            <textarea
-              className="mb-2 h-24 w-full resize-none rounded-lg border border-border bg-background px-2 py-1.5 text-sm text-foreground placeholder:text-muted-foreground"
-              placeholder={stepType === "email" ? "Cuerpo HTML del email" : "Mensaje SMS / WhatsApp"}
-              value={bodyHtml}
-              onChange={(e) => setBodyHtml(e.target.value)}
-            />
+            <div className="col-lg-12">
+              <div className="form-group mb-3">
+                <label htmlFor="sq-cuerpo" className="text-black font-w600">
+                  {stepType === "email" ? "Cuerpo HTML del email" : "Mensaje SMS / WhatsApp"}
+                </label>
+                <textarea id="sq-cuerpo" className="form-control" rows={5} value={bodyHtml} onChange={(e) => setBodyHtml(e.target.value)} />
+              </div>
+            </div>
           </>
         )}
 
         {stepType === "branch" && (
-          <div className="mb-2 space-y-2">
-            <div>
-              <label className="mb-1 block text-xs text-muted-foreground">Condición</label>
-              <select
-                className="w-full rounded-lg border border-border bg-background px-2 py-1.5 text-sm text-foreground"
-                value={branchField}
-                onChange={(e) => setBranchField(e.target.value as "replied" | "opened" | "clicked")}
-              >
-                <option value="replied">Ha respondido</option>
-                <option value="opened">Ha abierto email</option>
-                <option value="clicked">Ha hecho click</option>
-              </select>
-            </div>
-            <div className="flex gap-2">
-              <div className="flex-1">
-                <label className="mb-1 block text-xs text-success">Sí → posición</label>
-                <input className="w-full rounded-lg border border-border bg-background px-2 py-1.5 text-sm text-foreground" type="number" placeholder="auto" value={branchYes} onChange={(e) => setBranchYes(e.target.value)} />
-              </div>
-              <div className="flex-1">
-                <label className="mb-1 block text-xs text-destructive">No → posición</label>
-                <input className="w-full rounded-lg border border-border bg-background px-2 py-1.5 text-sm text-foreground" type="number" placeholder="auto" value={branchNo} onChange={(e) => setBranchNo(e.target.value)} />
+          <>
+            <div className="col-lg-12">
+              <div className="form-group mb-3">
+                <label htmlFor="sq-condicion" className="text-black font-w600">Condición</label>
+                <select id="sq-condicion" className="form-control" value={branchField}
+                  onChange={(e) => setBranchField(e.target.value as "replied" | "opened" | "clicked")}>
+                  <option value="replied">Ha respondido</option>
+                  <option value="opened">Ha abierto email</option>
+                  <option value="clicked">Ha hecho click</option>
+                </select>
               </div>
             </div>
-          </div>
+            <div className="col-6">
+              <div className="form-group mb-3">
+                <label htmlFor="sq-si" className="text-black font-w600">Sí → posición</label>
+                <input id="sq-si" type="number" className="form-control" placeholder="auto" value={branchYes} onChange={(e) => setBranchYes(e.target.value)} />
+              </div>
+            </div>
+            <div className="col-6">
+              <div className="form-group mb-3">
+                <label htmlFor="sq-no" className="text-black font-w600">No → posición</label>
+                <input id="sq-no" type="number" className="form-control" placeholder="auto" value={branchNo} onChange={(e) => setBranchNo(e.target.value)} />
+              </div>
+            </div>
+          </>
         )}
 
-        {err && <p className="mb-3 text-xs text-destructive">{err}</p>}
-        <div className="mt-4 flex gap-2">
-          <NelvyonDsButton type="button" variant="ghost" className="flex-1" onClick={onClose}>Cancelar</NelvyonDsButton>
-          <NelvyonDsButton type="button" className="flex-1" disabled={loading} onClick={handleAdd}>
-            {loading ? "Añadiendo…" : "Añadir paso"}
-          </NelvyonDsButton>
+        <div className="col-lg-12">
+          <div className="text-end">
+            <button type="button" className="btn btn-danger light me-2" onClick={onClose}>Cancelar</button>
+            <button type="button" className="btn btn-primary" disabled={loading} onClick={() => void handleAdd()}>
+              {loading ? "Añadiendo…" : "Añadir paso"}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </W3crmModal>
   );
 }
 
-// ── Create Sequence Modal ────────────────────────────────────────────────────
+// ── Nueva secuencia ──────────────────────────────────────────────────────────
 
 function CreateSequenceModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
   const [name, setName] = useState("");
@@ -321,7 +328,7 @@ function CreateSequenceModal({ onClose, onCreated }: { onClose: () => void; onCr
         body: JSON.stringify({ name, description: description || null, trigger_type: trigger }),
       });
       if (!res.ok) {
-        const d = await res.json().catch(() => ({})) as { error?: string };
+        const d = (await res.json().catch(() => ({}))) as { error?: string };
         throw new Error(d.error ?? "Error al crear");
       }
       onCreated(); onClose();
@@ -333,30 +340,46 @@ function CreateSequenceModal({ onClose, onCreated }: { onClose: () => void; onCr
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-6 shadow-2xl">
-        <h3 className="mb-4 font-semibold text-foreground">Nueva secuencia</h3>
-        <input className="mb-3 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground" placeholder="Nombre" value={name} onChange={(e) => setName(e.target.value)} />
-        <input className="mb-3 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground" placeholder="Descripción (opcional)" value={description} onChange={(e) => setDescription(e.target.value)} />
-        <select className="mb-3 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground" value={trigger} onChange={(e) => setTrigger(e.target.value)}>
-          <option value="manual">Manual</option>
-          <option value="contact_created">Al crear contacto</option>
-          <option value="form_submitted">Al enviar formulario</option>
-          <option value="tag_added">Al añadir etiqueta</option>
-        </select>
-        {err && <p className="mb-3 text-xs text-destructive">{err}</p>}
-        <div className="flex gap-2">
-          <NelvyonDsButton type="button" variant="ghost" className="flex-1" onClick={onClose}>Cancelar</NelvyonDsButton>
-          <NelvyonDsButton type="button" className="flex-1" disabled={loading} onClick={handleCreate}>
-            {loading ? "Creando…" : "Crear"}
-          </NelvyonDsButton>
+    <W3crmModal titulo="Nueva secuencia" onClose={onClose} error={err} testId="modal-secuencia">
+      <div className="row">
+        <div className="col-lg-12">
+          <div className="form-group mb-3">
+            <label htmlFor="sq-nombre" className="text-black font-w600">Nombre <span className="required">*</span></label>
+            <input id="sq-nombre" type="text" className="form-control" value={name} onChange={(e) => setName(e.target.value)} />
+          </div>
+        </div>
+        <div className="col-lg-12">
+          <div className="form-group mb-3">
+            <label htmlFor="sq-descripcion" className="text-black font-w600">Descripción</label>
+            <input id="sq-descripcion" type="text" className="form-control" placeholder="Opcional"
+              value={description} onChange={(e) => setDescription(e.target.value)} />
+          </div>
+        </div>
+        <div className="col-lg-12">
+          <div className="form-group mb-3">
+            <label htmlFor="sq-trigger" className="text-black font-w600">Disparador</label>
+            <select id="sq-trigger" className="form-control" value={trigger} onChange={(e) => setTrigger(e.target.value)}>
+              <option value="manual">Manual</option>
+              <option value="contact_created">Al crear contacto</option>
+              <option value="form_submitted">Al enviar formulario</option>
+              <option value="tag_added">Al añadir etiqueta</option>
+            </select>
+          </div>
+        </div>
+        <div className="col-lg-12">
+          <div className="text-end">
+            <button type="button" className="btn btn-danger light me-2" onClick={onClose}>Cancelar</button>
+            <button type="button" className="btn btn-primary" disabled={loading} onClick={() => void handleCreate()}>
+              {loading ? "Creando…" : "Crear"}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </W3crmModal>
   );
 }
 
-// ── Sequence template gallery ────────────────────────────────────────────────
+// ── Galería de plantillas ────────────────────────────────────────────────────
 
 type SeqTemplateCategory = "welcome" | "nurture" | "sales" | "re-engagement" | "reviews" | "multichannel";
 interface SeqTemplate {
@@ -373,7 +396,6 @@ function SequenceTemplateGallery({ onImported }: { onImported: () => void }) {
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState<SeqTemplateCategory | "all">("all");
   const [importing, setImporting] = useState<string | null>(null);
-  const [expanded, setExpanded] = useState(true);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -381,8 +403,8 @@ function SequenceTemplateGallery({ onImported }: { onImported: () => void }) {
       const q = category === "all" ? "" : `?category=${category}`;
       const res = await fetch(`/api/saas/sequences/templates${q}`);
       if (res.ok) {
-        const d = await res.json() as { templates?: SeqTemplate[] };
-        setTemplates(d.templates ?? []);
+        const d = (await res.json().catch(() => ({}))) as { templates?: SeqTemplate[] };
+        setTemplates(Array.isArray(d.templates) ? d.templates : []);
       }
     } finally { setLoading(false); }
   }, [category]);
@@ -402,52 +424,48 @@ function SequenceTemplateGallery({ onImported }: { onImported: () => void }) {
   }
 
   return (
-    <NelvyonDsCard className="overflow-hidden border-primary/20">
-      <button type="button" className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left" onClick={() => setExpanded((v) => !v)}>
-        <div>
-          <p className="font-semibold text-foreground">Plantillas oficiales Nelvyon</p>
-          <p className="text-xs text-muted-foreground">{templates.length} secuencias drip — email, SMS y WhatsApp</p>
-        </div>
-        <span className="text-muted-foreground">{expanded ? "▲" : "▼"}</span>
-      </button>
-      {expanded && (
-        <div className="border-t border-border px-5 pb-5 pt-4">
-          <div className="mb-4 flex flex-wrap gap-2">
-            {(Object.keys(SEQ_CAT_LABELS) as Array<SeqTemplateCategory | "all">).map((c) => (
-              <button key={c} type="button" onClick={() => setCategory(c)}
-                className={`rounded-full px-3 py-1 text-xs ${category === c ? "bg-primary/20 text-primary" : "border border-border text-muted-foreground"}`}>
-                {SEQ_CAT_LABELS[c]}
-              </button>
-            ))}
-          </div>
-          {loading ? (
-            <p className="py-4 text-sm text-muted-foreground">Cargando plantillas…</p>
-          ) : (
-            <div className="grid gap-3 sm:grid-cols-2">
-              {templates.map((t) => (
-                <div key={t.id} className="rounded-xl border border-border p-4">
-                  <p className="text-sm font-medium text-foreground">{t.name}</p>
-                  <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{t.description}</p>
-                  <NelvyonDsButton
-                    variant="ghost"
-                    size="sm"
-                    className="mt-3 w-full"
-                    disabled={importing === t.id}
-                    onClick={() => void importTpl(t.id)}
-                  >
+    <W3crmContentBox
+      titulo={`Plantillas oficiales Nelvyon (${templates.length})`}
+      icono="fa-solid fa-layer-group"
+      testId="galeria-plantillas"
+    >
+      <p className="fs-12 text-muted">Secuencias drip — email, SMS y WhatsApp.</p>
+      <div className="mb-3">
+        {(Object.keys(SEQ_CAT_LABELS) as Array<SeqTemplateCategory | "all">).map((c) => (
+          <button key={c} type="button" aria-pressed={category === c}
+            className={`btn btn-sm me-1 mb-1 ${category === c ? "btn-primary" : "btn-primary light"}`}
+            onClick={() => setCategory(c)}>
+            {SEQ_CAT_LABELS[c]}
+          </button>
+        ))}
+      </div>
+      {loading ? (
+        <W3crmCargando texto="Cargando plantillas…" />
+      ) : templates.length === 0 ? (
+        <W3crmEmptyState title="Sin plantillas" description="No hay plantillas en esta categoría." />
+      ) : (
+        <div className="row">
+          {templates.map((t) => (
+            <div className="col-xl-4 col-md-6 mb-3" key={t.id}>
+              <div className="card mb-0 h-100">
+                <div className="card-body">
+                  <h6 className="mb-1">{t.name}</h6>
+                  <p className="fs-12 text-muted mb-3">{t.description}</p>
+                  <button type="button" className="btn btn-primary btn-sm" disabled={importing === t.id}
+                    onClick={() => void importTpl(t.id)}>
                     {importing === t.id ? "Importando…" : "Importar secuencia"}
-                  </NelvyonDsButton>
+                  </button>
                 </div>
-              ))}
+              </div>
             </div>
-          )}
+          ))}
         </div>
       )}
-    </NelvyonDsCard>
+    </W3crmContentBox>
   );
 }
 
-// ── Main Page ────────────────────────────────────────────────────────────────
+// ── Página ───────────────────────────────────────────────────────────────────
 
 export default function SecuenciasPage() {
   const [sequences, setSequences] = useState<SequenceWithSteps[]>([]);
@@ -465,11 +483,14 @@ export default function SecuenciasPage() {
     try {
       const res = await fetch("/api/saas/sequences");
       if (!res.ok) throw new Error("Error al cargar secuencias");
-      const d = await res.json() as { sequences: SaasSequence[]; ses_configured?: boolean; twilio_configured?: boolean };
-      setSequences(d.sequences);
+      const d = (await res.json().catch(() => ({}))) as {
+        sequences?: SaasSequence[]; ses_configured?: boolean; twilio_configured?: boolean;
+      };
+      setSequences(Array.isArray(d.sequences) ? d.sequences : []);
       setSesConfigured(typeof d.ses_configured === "boolean" ? d.ses_configured : null);
       setTwilioConfigured(typeof d.twilio_configured === "boolean" ? d.twilio_configured : null);
     } catch (e) {
+      setSequences([]);
       setErr(e instanceof Error ? e.message : "Error");
     } finally {
       setLoading(false);
@@ -482,8 +503,11 @@ export default function SecuenciasPage() {
     try {
       const res = await fetch(`/api/saas/sequences/${seq.id}`);
       if (!res.ok) return;
-      const d = await res.json() as { sequence: SaasSequence; steps: SaasSequenceStep[] };
-      const full: SequenceWithSteps = { ...d.sequence, steps: d.steps };
+      const d = (await res.json().catch(() => ({}))) as { sequence?: SaasSequence; steps?: SaasSequenceStep[] };
+      // Sin `sequence` en la respuesta se conserva la que ya se tenia: el
+      // detalle no puede quedar en blanco por un payload incompleto.
+      const base = d.sequence ?? seq;
+      const full: SequenceWithSteps = { ...base, steps: Array.isArray(d.steps) ? d.steps : [] };
       setSelected(full);
       setSequences((prev) => prev.map((s) => (s.id === seq.id ? full : s)));
     } catch { /* noop */ }
@@ -503,183 +527,175 @@ export default function SecuenciasPage() {
     } catch { /* noop */ }
   }
 
-  const TRIGGER_LABELS: Record<string, string> = {
-    manual: "Manual", contact_created: "Nuevo contacto",
-    form_submitted: "Formulario", tag_added: "Etiqueta",
-  };
-
-  const SEQ_STATUS_TONE: Record<string, "success" | "warning" | "neutral"> = {
-    active: "success", paused: "warning", archived: "neutral",
-  };
-  const SEQ_STATUS_LABELS: Record<string, string> = {
-    active: "Activa", paused: "Pausada", archived: "Archivada",
-  };
-
-  const totalEnrollments = sequences.reduce((sum, s) => sum + s.enrollmentsCount, 0);
+  const totalEnrollments = sequences.reduce((sum, s) => sum + num(s.enrollmentsCount), 0);
   const activeCount = sequences.filter((s) => s.status === "active").length;
+  const pasosSeleccion = pasosDe(selected);
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="secuencias" />}>
-      <div className="flex flex-col gap-6 pb-8">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <NelvyonDsSectionHeader
-            title="Secuencias"
-            subtitle="Secuencias drip multicanal — plantillas oficiales Nelvyon"
-          />
-          <NelvyonDsButton onClick={() => setShowCreate(true)}>+ Nueva secuencia</NelvyonDsButton>
-        </div>
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="Secuencias" parentTitle="Comunicación" pageTitle="Secuencias" />
+      <div className="container-fluid">
+        <div className="row">
+          {err && (
+            <div className="col-xl-12">
+              <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                {err}
+                <button type="button" className="btn-close" aria-label="Cerrar" onClick={() => setErr(null)} />
+              </div>
+            </div>
+          )}
+          {sesConfigured === false && (
+            <div className="col-xl-12">
+              <div className="alert alert-warning" role="alert">
+                <strong>Email no configurado:</strong> las variables <code>SES_FROM_EMAIL</code> y{" "}
+                <code>SES_ACCESS_KEY_ID</code> no están definidas en el servidor. Los pasos de email en
+                secuencias fallarán hasta configurar SES (y salir de sandbox si aplica).
+              </div>
+            </div>
+          )}
+          {twilioConfigured === false && (
+            <div className="col-xl-12">
+              <div className="alert alert-warning" role="alert">
+                <strong>SMS no configurado:</strong> define <code>TWILIO_ACCOUNT_SID</code>,{" "}
+                <code>TWILIO_AUTH_TOKEN</code> y <code>TWILIO_FROM_NUMBER</code>. Los pasos SMS fallarán
+                hasta configurar Twilio.
+              </div>
+            </div>
+          )}
 
-        {err && (
-          <NelvyonDsCard className="border-destructive/30 bg-destructive/5 p-4">
-            <p className="text-sm text-destructive">⚠ {err}</p>
-          </NelvyonDsCard>
-        )}
+          <div className="col-xl-4 col-sm-6"><W3crmKpiTile label="Secuencias" value={sequences.length} accent /></div>
+          <div className="col-xl-4 col-sm-6"><W3crmKpiTile label="Activas" value={activeCount} /></div>
+          <div className="col-xl-4 col-sm-6"><W3crmKpiTile label="Inscritos" value={totalEnrollments.toLocaleString("es-ES")} /></div>
 
-        {sesConfigured === false && (
-          <NelvyonDsCard className="border-warning/30 bg-warning/5 p-4">
-            <p className="text-sm text-warning">
-              <strong>Email no configurado:</strong> las variables{" "}
-              <code className="text-xs">SES_FROM_EMAIL</code> y{" "}
-              <code className="text-xs">SES_ACCESS_KEY_ID</code> no están definidas en el servidor.
-              Los pasos de email en secuencias fallarán hasta configurar SES (y salir de sandbox si aplica).
-            </p>
-          </NelvyonDsCard>
-        )}
-
-        {twilioConfigured === false && (
-          <NelvyonDsCard className="border-warning/30 bg-warning/5 p-4">
-            <p className="text-sm text-warning">
-              <strong>SMS no configurado:</strong> define{" "}
-              <code className="text-xs">TWILIO_ACCOUNT_SID</code>,{" "}
-              <code className="text-xs">TWILIO_AUTH_TOKEN</code> y{" "}
-              <code className="text-xs">TWILIO_FROM_NUMBER</code>. Los pasos SMS fallarán hasta configurar Twilio.
-            </p>
-          </NelvyonDsCard>
-        )}
-
-        {/* KPIs */}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          <KpiTile icon="🔄" label="Secuencias" value={sequences.length} />
-          <KpiTile icon="⚡" label="Activas" value={activeCount} accent />
-          <KpiTile icon="👥" label="Inscritos" value={totalEnrollments} />
-        </div>
-
-        <SequenceTemplateGallery onImported={() => void loadSequences()} />
-
-        {loading ? (
-          <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="h-24 animate-pulse rounded-xl bg-muted/30" />
-            ))}
-          </div>
-        ) : sequences.length === 0 ? (
-          <SaasEmptyState
-            title="Sin secuencias aún"
-            description="Crea tu primera secuencia de email drip con branching automático, o importa una plantilla oficial arriba."
-            action={<NelvyonDsButton onClick={() => setShowCreate(true)}>Crear secuencia</NelvyonDsButton>}
-          />
-        ) : (
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-            {/* Sequence list */}
-            <div className="space-y-3">
-              {sequences.map((seq) => (
-                <NelvyonDsCard
-                  key={seq.id}
-                  className={`cursor-pointer transition hover:border-primary/40 ${selected?.id === seq.id ? "border-primary/50 bg-primary/5" : ""}`}
-                  onClick={() => void loadDetail(seq)}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-foreground">{seq.name}</p>
-                      {seq.description && <p className="mt-0.5 truncate text-xs text-muted-foreground">{seq.description}</p>}
-                      <p className="mt-1 text-xs text-muted-foreground">{TRIGGER_LABELS[seq.triggerType] ?? seq.triggerType} · {seq.enrollmentsCount} inscritos</p>
-                    </div>
-                    <NelvyonDsBadge tone={SEQ_STATUS_TONE[seq.status] ?? "neutral"}>
-                      {SEQ_STATUS_LABELS[seq.status] ?? seq.status}
-                    </NelvyonDsBadge>
-                  </div>
-                </NelvyonDsCard>
-              ))}
+          <div className="col-xl-12">
+            <div className="mb-3">
+              <ul className="d-flex align-items-center flex-wrap">
+                <li><button type="button" className="btn btn-primary" onClick={() => setShowCreate(true)}>+ Nueva secuencia</button></li>
+              </ul>
             </div>
 
-            {/* Detail panel */}
-            {selected ? (
-              <div className="lg:col-span-2">
-                <NelvyonDsCard>
-                  <div className="mb-4 flex items-center justify-between">
-                    <h2 className="font-semibold text-foreground">{selected.name}</h2>
-                    <div className="flex gap-2">
-                      <NelvyonDsButton variant="ghost" size="sm" onClick={() => setEnrollTarget(selected)}>
-                        Inscribir contacto
-                      </NelvyonDsButton>
-                      <NelvyonDsButton
-                        variant={selected.status === "active" ? "secondary" : "primary"}
-                        size="sm"
-                        onClick={() => void toggleStatus(selected)}
-                      >
-                        {selected.status === "active" ? "Pausar" : "Activar"}
-                      </NelvyonDsButton>
-                    </div>
-                  </div>
+            <SequenceTemplateGallery onImported={() => void loadSequences()} />
 
-                  {/* Steps */}
-                  <div className="mb-4 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Pasos ({selected.steps?.length ?? 0})</h3>
-                      <button type="button" onClick={() => setShowAddStep(true)} className="text-xs text-primary hover:underline">
-                        + Añadir paso
-                      </button>
-                    </div>
-                    {!selected.steps?.length ? (
-                      <p className="py-4 text-center text-sm text-muted-foreground">Sin pasos — añade email, espera o bifurcación</p>
-                    ) : (
-                      selected.steps.map((step, i) => (
-                        <div key={step.id} className="flex items-start gap-3 rounded-lg border border-border bg-muted/10 p-3">
-                          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs text-muted-foreground">{i}</div>
-                          <div className="min-w-0 flex-1">
-                            <div className="mb-1 flex items-center gap-2">
-                              <StepTypeBadge type={step.stepType} />
-                              {(step.delayDays > 0 || step.delayHours > 0) && (
-                                <span className="text-xs text-muted-foreground">+{step.delayDays}d {step.delayHours}h</span>
-                              )}
-                            </div>
-                            {step.stepType === "email" && (
-                              <p className="truncate text-sm text-foreground">{step.subject || "(sin asunto)"}</p>
-                            )}
-                            {step.stepType === "branch" && step.branchCondition && (
-                              <p className="text-xs text-muted-foreground">
-                                Si {step.branchCondition.field} → pos {step.branchYesPosition ?? "auto"} | No → pos {step.branchNoPosition ?? "auto"}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      ))
+            <W3crmContentBox titulo="Secuencias" icono="fa-solid fa-arrows-turn-right">
+              {loading ? (
+                <W3crmCargando texto="Cargando secuencias…" />
+              ) : sequences.length === 0 ? (
+                <W3crmEmptyState
+                  title="Sin secuencias aún"
+                  description="Crea tu primera secuencia de email drip con branching automático, o importa una plantilla oficial arriba."
+                />
+              ) : (
+                <W3crmDataTable
+                  filas={sequences}
+                  etiqueta="secuencias"
+                  columnas={[{ titulo: "Nombre" }, { titulo: "Disparador" }, { titulo: "Inscritos" }, { titulo: "Estado" }, { titulo: "Acciones", alFinal: true }]}
+                  render={(seq) => (
+                    <tr key={seq.id}>
+                      <td>
+                        <span className="fw-bold">{seq.name || "—"}</span>
+                        {seq.description ? <div className="text-muted fs-12">{seq.description}</div> : null}
+                      </td>
+                      <td>{etiquetaTrigger(seq.triggerType)}</td>
+                      <td>{num(seq.enrollmentsCount).toLocaleString("es-ES")}</td>
+                      <td><span className={`badge ${badgeEstado(seq.status)}`}>{etiquetaEstado(seq.status)}</span></td>
+                      <td className="text-end">
+                        <button type="button" className="btn btn-primary light btn-sm me-1"
+                          aria-label={`Ver pasos de ${seq.name}`} onClick={() => void loadDetail(seq)}>
+                          Ver pasos
+                        </button>
+                        <button type="button" className="btn btn-primary light btn-sm me-1"
+                          aria-label={`Inscribir contacto en ${seq.name}`} onClick={() => setEnrollTarget(seq)}>
+                          Inscribir
+                        </button>
+                        <button type="button"
+                          className={`btn btn-sm ${seq.status === "active" ? "btn-primary light" : "btn-primary"}`}
+                          aria-label={seq.status === "active" ? `Pausar ${seq.name}` : `Activar ${seq.name}`}
+                          onClick={() => void toggleStatus(seq)}>
+                          {seq.status === "active" ? "Pausar" : "Activar"}
+                        </button>
+                      </td>
+                    </tr>
+                  )}
+                />
+              )}
+            </W3crmContentBox>
+
+            {selected && (
+              <W3crmContentBox
+                testId="detalle-secuencia"
+                icono="fa-solid fa-arrows-turn-right"
+                titulo={
+                  <>
+                    {selected.name || "—"}
+                    <span className={`badge ${badgeEstado(selected.status)} ms-2`}>{etiquetaEstado(selected.status)}</span>
+                    <span className="text-muted fs-12 ms-2">Pasos ({pasosSeleccion.length})</span>
+                  </>
+                }
+                acciones={
+                  <>
+                    <button type="button" className="btn btn-primary btn-sm me-2" onClick={() => setShowAddStep(true)}>
+                      + Añadir paso
+                    </button>
+                    <button type="button" className="btn btn-primary light btn-sm me-2" onClick={() => setEnrollTarget(selected)}>
+                      Inscribir contacto
+                    </button>
+                    <button type="button"
+                      className={`btn btn-sm me-2 ${selected.status === "active" ? "btn-primary light" : "btn-primary"}`}
+                      onClick={() => void toggleStatus(selected)}>
+                      {selected.status === "active" ? "Pausar" : "Activar"}
+                    </button>
+                    <button type="button" className="btn btn-danger light btn-sm me-2" onClick={() => setSelected(null)}>
+                      Cerrar
+                    </button>
+                  </>
+                }
+              >
+                {pasosSeleccion.length === 0 ? (
+                  <W3crmEmptyState title="Sin pasos" description="Añade un paso de email, espera o bifurcación." />
+                ) : (
+                  <W3crmDataTable
+                    filas={pasosSeleccion}
+                    etiqueta="pasos"
+                    wrapperId="pasos_wrapper"
+                    porPagina={10}
+                    columnas={[{ titulo: "#" }, { titulo: "Tipo" }, { titulo: "Retraso" }, { titulo: "Contenido", alFinal: true }]}
+                    render={(step, i) => (
+                      <tr key={step.id}>
+                        <td>{i}</td>
+                        <td><span className={`badge ${badgePaso(step.stepType)}`}>{etiquetaPaso(step.stepType)}</span></td>
+                        <td>
+                          {num(step.delayDays) > 0 || num(step.delayHours) > 0
+                            ? `+${num(step.delayDays)}d ${num(step.delayHours)}h`
+                            : "—"}
+                        </td>
+                        <td className="text-end">
+                          {step.stepType === "email" ? (
+                            <span>{step.subject || "(sin asunto)"}</span>
+                          ) : step.stepType === "branch" && step.branchCondition ? (
+                            <span className="text-muted fs-12">
+                              Si {step.branchCondition.field} → pos {step.branchYesPosition ?? "auto"} | No → pos {step.branchNoPosition ?? "auto"}
+                            </span>
+                          ) : (
+                            <span className="text-muted">—</span>
+                          )}
+                        </td>
+                      </tr>
                     )}
-                  </div>
-                </NelvyonDsCard>
-              </div>
-            ) : (
-              <div className="flex items-center justify-center text-sm text-muted-foreground lg:col-span-2">
-                Selecciona una secuencia para editar sus pasos
-              </div>
+                  />
+                )}
+              </W3crmContentBox>
             )}
           </div>
-        )}
+        </div>
       </div>
 
-      {showCreate && (
-        <CreateSequenceModal onClose={() => setShowCreate(false)} onCreated={loadSequences} />
-      )}
+      {showCreate && <CreateSequenceModal onClose={() => setShowCreate(false)} onCreated={loadSequences} />}
       {enrollTarget && (
         <EnrollModal sequence={enrollTarget} onClose={() => setEnrollTarget(null)} onEnrolled={loadSequences} />
       )}
       {showAddStep && selected && (
-        <AddStepModal
-          sequence={selected}
-          onClose={() => setShowAddStep(false)}
-          onAdded={() => void loadDetail(selected)}
-        />
+        <AddStepModal sequence={selected} onClose={() => setShowAddStep(false)} onAdded={() => void loadDetail(selected)} />
       )}
-    </SaasShellLayout>
+    </SaasW3crmShell>
   );
 }
