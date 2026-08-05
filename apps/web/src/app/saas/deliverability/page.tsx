@@ -1,14 +1,24 @@
 "use client";
 
+/**
+ * /saas/deliverability sobre `(cms)/content` de W3CRM, con las piezas ya
+ * portadas. Mapeo: metricas -> `W3crmKpiTile`; IP dedicada y warm-up ->
+ * `W3crmContentBox`. Sin componentes nuevos.
+ *
+ * Inventario: sin `data-testid` y sin spec dedicado — lo cubre
+ * `saas-nav-full-coverage`. Sin textos-contrato.
+ *
+ * Logica de NELVYON intacta: `GET /api/saas/deliverability` y su `POST` con
+ * las dos acciones (`dedicated-ip`, que reenvia el `warmupDay` vigente, y
+ * `warmup-advance`), el umbral de salud en 80 y la etiqueta del boton con el
+ * dia siguiente de warm-up.
+ */
 import { useCallback, useEffect, useState } from "react";
-import {
-  NelvyonDsButton,
-  NelvyonDsCard,
-  NelvyonDsSectionHeader,
-} from "@/design-system/components";
-import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmEmptyState, W3crmKpiTile } from "@/features/saas-w3crm/components/W3crmUi";
+import { W3crmCargando, W3crmContentBox } from "@/features/saas-w3crm/components/W3crmContentBox";
 
 type Snapshot = {
   bounceRate: number;
@@ -20,6 +30,10 @@ type Snapshot = {
   warmupDay: number;
 };
 
+function num(v: unknown): number {
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
 function healthTone(score: number): boolean {
   return score >= 80;
 }
@@ -38,13 +52,12 @@ export default function DeliverabilityPage() {
     setError(null);
     try {
       const res = await fetch("/api/saas/deliverability");
+      const d = (await res.json().catch(() => ({}))) as { snapshot?: Snapshot; error?: string };
       if (!res.ok) {
-        const j = (await res.json().catch(() => ({}))) as { error?: string };
-        throw new Error(j.error ?? `Error ${res.status} al cargar métricas`);
+        throw new Error(d.error ?? `Error ${res.status} al cargar métricas`);
       }
-      const d = (await res.json()) as { snapshot: Snapshot };
-      setSnapshot(d.snapshot);
-      setDedicatedIp(d.snapshot.dedicatedIp ?? "");
+      setSnapshot(d.snapshot ?? null);
+      setDedicatedIp(d.snapshot?.dedicatedIp ?? "");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al cargar métricas de deliverability");
     } finally {
@@ -94,67 +107,92 @@ export default function DeliverabilityPage() {
     }
   }
 
+  const salud = num(snapshot?.healthScore);
+
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="deliverability" />}>
-      <div className="flex flex-col gap-6 pb-8">
-        <NelvyonDsSectionHeader
-          title="Deliverability Center"
-          subtitle="Salud de envío de email, bounce rate y warm-up de IP dedicada"
-        />
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="Deliverability Center" parentTitle="Gestión" pageTitle="Deliverability" />
+      <div className="container-fluid">
+        <div className="row">
+          {error && (
+            <div className="col-xl-12">
+              <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                {error}
+                <button type="button" className="btn-close" aria-label="Cerrar" onClick={() => setError(null)} />
+              </div>
+            </div>
+          )}
+          {feedback && (
+            <div className="col-xl-12">
+              <div className="alert alert-success" role="status">{feedback}</div>
+            </div>
+          )}
 
-        {error && (
-          <NelvyonDsCard className="border-destructive/30 bg-destructive/5 p-4">
-            <p className="text-sm text-destructive">⚠ {error}</p>
-          </NelvyonDsCard>
-        )}
-        {feedback && (
-          <NelvyonDsCard className="border-success/30 bg-success/5 p-3">
-            <p className="text-sm text-success">{feedback}</p>
-          </NelvyonDsCard>
-        )}
+          {loading ? (
+            <div className="col-xl-12">
+              <W3crmContentBox titulo="Métricas de envío" icono="fa-solid fa-paper-plane">
+                <W3crmCargando texto="Cargando métricas…" />
+              </W3crmContentBox>
+            </div>
+          ) : snapshot ? (
+            <>
+              <div className="col-xl-4 col-sm-6">
+                <W3crmKpiTile label="Health score" value={`${salud}/100`} accent={healthTone(salud)} />
+              </div>
+              <div className="col-xl-4 col-sm-6">
+                <W3crmKpiTile label="Bounce rate 30d" value={`${num(snapshot.bounceRate).toFixed(2)}%`} />
+              </div>
+              <div className="col-xl-4 col-sm-6">
+                <W3crmKpiTile label="Enviados 30d" value={num(snapshot.sent30d).toLocaleString("es-ES")} />
+              </div>
+            </>
+          ) : (
+            <div className="col-xl-12">
+              <W3crmContentBox titulo="Métricas de envío" icono="fa-solid fa-paper-plane">
+                <W3crmEmptyState title="Sin métricas" description="No se pudieron cargar las métricas todavía." />
+              </W3crmContentBox>
+            </div>
+          )}
 
-        {loading ? (
-          <div className="grid gap-3 sm:grid-cols-3">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="h-24 animate-pulse rounded-xl bg-muted/30" />
-            ))}
-          </div>
-        ) : snapshot ? (
-          <div className="grid gap-3 sm:grid-cols-3">
-            <KpiTile icon={healthTone(snapshot.healthScore) ? "✅" : "⚠️"} label="Health score" value={`${snapshot.healthScore}/100`} accent={healthTone(snapshot.healthScore)} />
-            <KpiTile icon="📉" label="Bounce rate 30d" value={`${snapshot.bounceRate.toFixed(2)}%`} />
-            <KpiTile icon="📤" label="Enviados 30d" value={snapshot.sent30d.toLocaleString("es-ES")} />
-          </div>
-        ) : (
-          <NelvyonDsCard className="p-8 text-center">
-            <p className="text-sm text-muted-foreground">No se pudieron cargar las métricas todavía.</p>
-          </NelvyonDsCard>
-        )}
+          <div className="col-xl-12">
+            <p className="fs-14 text-muted">
+              Salud de envío de email, bounce rate y warm-up de IP dedicada
+            </p>
 
-        <NelvyonDsCard className="space-y-3 p-5" title="Dedicated IP (SES)">
-          <p className="text-sm text-muted-foreground">
-            Configura una IP dedicada de Amazon SES y avanza el plan de warm-up progresivamente para maximizar la reputación de envío.
-          </p>
-          <input
-            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
-            placeholder="52.x.x.x"
-            value={dedicatedIp}
-            onChange={(e) => setDedicatedIp(e.target.value)}
-          />
-          <div className="flex flex-wrap gap-2">
-            <NelvyonDsButton disabled={savingIp} onClick={() => void saveDedicatedIp()}>
-              {savingIp ? "Guardando…" : "Guardar IP"}
-            </NelvyonDsButton>
-            <NelvyonDsButton
-              variant="secondary"
-              disabled={advancingWarmup}
-              onClick={() => void advanceWarmup()}
-            >
-              {advancingWarmup ? "Avanzando…" : `Avanzar warm-up (día ${(snapshot?.warmupDay ?? 0) + 1})`}
-            </NelvyonDsButton>
+            <W3crmContentBox titulo="Dedicated IP (SES)" icono="fa-solid fa-server">
+              <p className="fs-14 text-muted">
+                Configura una IP dedicada de Amazon SES y avanza el plan de warm-up progresivamente
+                para maximizar la reputación de envío.
+              </p>
+              <div className="row align-items-end">
+                <div className="col-xl-6 col-sm-12">
+                  <div className="form-group mb-3">
+                    <label htmlFor="dlv-ip" className="text-black font-w600">IP dedicada</label>
+                    <input id="dlv-ip" className="form-control" placeholder="52.x.x.x"
+                      value={dedicatedIp} onChange={(e) => setDedicatedIp(e.target.value)} />
+                  </div>
+                </div>
+                <div className="col-xl-3 col-sm-6">
+                  <div className="form-group mb-3">
+                    <button type="button" className="btn btn-primary w-100" disabled={savingIp}
+                      onClick={() => void saveDedicatedIp()}>
+                      {savingIp ? "Guardando…" : "Guardar IP"}
+                    </button>
+                  </div>
+                </div>
+                <div className="col-xl-3 col-sm-6">
+                  <div className="form-group mb-3">
+                    <button type="button" className="btn btn-primary light w-100" disabled={advancingWarmup}
+                      onClick={() => void advanceWarmup()}>
+                      {advancingWarmup ? "Avanzando…" : `Avanzar warm-up (día ${num(snapshot?.warmupDay) + 1})`}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </W3crmContentBox>
           </div>
-        </NelvyonDsCard>
+        </div>
       </div>
-    </SaasShellLayout>
+    </SaasW3crmShell>
   );
 }

@@ -17,6 +17,8 @@
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 
+import { PlatformHealthBanner } from "@/features/saas-shell/components/PlatformHealthBanner";
+import { SaasVoiceCommand } from "@/features/saas-shell/components/SaasVoiceCommand";
 import { filterSaasNavForPermissions, SAAS_NAV_ITEMS, type SaasNavItem } from "@/features/saas-shell/saasNav";
 import { useSaasPermissions } from "@/features/saas-shell/useSaasPermissions";
 import ThemeContextProvider from "@/features/saas-w3crm/context/ThemeContext";
@@ -61,7 +63,20 @@ export function SaasW3crmShell({ children }: { children: React.ReactNode }) {
       <link rel="stylesheet" href="/w3crm/css/comman.css" />
       <div className="w3crm-scope">
         <ThemeContextProvider>
-          <Layout menuList={menuList}>{children}</Layout>
+          <Layout menuList={menuList}>
+            {/* Dos piezas que `SaasShellLayout` montaba en TODAS las paginas
+                SaaS y que este shell se habia dejado por el camino: el banner
+                de salud de plataforma y el FAB global de comando de voz
+                (`aria-label="Comando de voz"`, que exige
+                `saas-voice-command.spec.ts:61`). Sin ellas los modulos ya
+                migrados perdian ambas funciones; ningun test lo detectaba
+                porque el unico que las cubre apunta a `/saas/voice`, que
+                seguia sin migrar. La capa visual es W3CRM, pero NELVYON tiene
+                que seguir completo por dentro. */}
+            <PlatformHealthBanner />
+            {children}
+            <SaasVoiceCommand />
+          </Layout>
         </ThemeContextProvider>
       </div>
     </>
