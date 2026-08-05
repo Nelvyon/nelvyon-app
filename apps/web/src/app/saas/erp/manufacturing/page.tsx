@@ -1,15 +1,25 @@
 "use client";
 
+/**
+ * /saas/erp/manufacturing sobre `(cms)/content` de W3CRM, con las piezas ya
+ * portadas. Mapeo: alta de BOM+MO, ordenes de fabricacion y BOMs ->
+ * `W3crmContentBox` + `W3crmDataTable`; KPIs -> `W3crmKpiTile`. Sin
+ * componentes nuevos.
+ *
+ * Inventario: sin `data-testid`, sin spec dedicado (solo
+ * `saas-nav-full-coverage`) y sin textos-contrato.
+ *
+ * Logica de NELVYON intacta: `GET/POST /api/saas/erp/manufacturing` con su
+ * flujo encadenado de tres llamadas (`create_bom` -> `approve_bom` ->
+ * `create_mo`), el manejo de error de cada paso por separado y el aviso de
+ * exito de 3 s.
+ */
 import { useCallback, useEffect, useState } from "react";
-import {
-  NelvyonDsBadge,
-  NelvyonDsButton,
-  NelvyonDsCard,
-  NelvyonDsSectionHeader,
-} from "@/design-system/components";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
-import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
+
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmEmptyState, W3crmKpiTile } from "@/features/saas-w3crm/components/W3crmUi";
+import { W3crmCargando, W3crmContentBox, W3crmDataTable } from "@/features/saas-w3crm/components/W3crmContentBox";
 
 type Bom = {
   id: string;
@@ -26,8 +36,14 @@ type Mo = {
   status: string;
 };
 
-const inputCls =
-  "w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none";
+function num(v: unknown): number {
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+/** `lines` puede llegar nula o no-array. */
+function lineasDe(b: Bom): Bom["lines"] {
+  return Array.isArray(b.lines) ? b.lines : [];
+}
 
 export default function ErpManufacturingPage() {
   const [boms, setBoms] = useState<Bom[]>([]);
@@ -47,18 +63,15 @@ export default function ErpManufacturingPage() {
     setError(null);
     try {
       const res = await fetch("/api/saas/erp/manufacturing");
-      const data = (await res.json()) as {
-        boms?: Bom[];
-        manufacturingOrders?: Mo[];
-        note?: string;
-        error?: string;
+      const data = (await res.json().catch(() => ({}))) as {
+        boms?: Bom[]; manufacturingOrders?: Mo[]; note?: string; error?: string;
       };
       if (!res.ok) {
         setError(data.error ?? `HTTP ${res.status}`);
         return;
       }
-      setBoms(data.boms ?? []);
-      setMos(data.manufacturingOrders ?? []);
+      setBoms(Array.isArray(data.boms) ? data.boms : []);
+      setMos(Array.isArray(data.manufacturingOrders) ? data.manufacturingOrders : []);
       setNote(data.note ?? "");
     } catch (e) {
       setError(e instanceof Error ? e.message : "load failed");
@@ -67,9 +80,7 @@ export default function ErpManufacturingPage() {
     }
   }, []);
 
-  useEffect(() => {
-    void load();
-  }, [load]);
+  useEffect(() => { void load(); }, [load]);
 
   async function createBomFlow(e: React.FormEvent) {
     e.preventDefault();
@@ -85,7 +96,7 @@ export default function ErpManufacturingPage() {
           lines: [{ componentSku, qty: Number(compQty), uom: "u" }],
         }),
       });
-      const createData = (await createRes.json()) as { bom?: Bom; error?: string };
+      const createData = (await createRes.json().catch(() => ({}))) as { bom?: Bom; error?: string };
       if (!createRes.ok || !createData.bom) {
         setError(createData.error ?? `create_bom HTTP ${createRes.status}`);
         return;
@@ -96,7 +107,7 @@ export default function ErpManufacturingPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "approve_bom", bomId: createData.bom.id }),
       });
-      const approveData = (await approveRes.json()) as { error?: string };
+      const approveData = (await approveRes.json().catch(() => ({}))) as { error?: string };
       if (!approveRes.ok) {
         setError(approveData.error ?? `approve_bom HTTP ${approveRes.status}`);
         return;
@@ -105,13 +116,9 @@ export default function ErpManufacturingPage() {
       const moRes = await fetch("/api/saas/erp/manufacturing", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "create_mo",
-          bomId: createData.bom.id,
-          qty: Number(moQty),
-        }),
+        body: JSON.stringify({ action: "create_mo", bomId: createData.bom.id, qty: Number(moQty) }),
       });
-      const moData = (await moRes.json()) as { error?: string };
+      const moData = (await moRes.json().catch(() => ({}))) as { error?: string };
       if (!moRes.ok) {
         setError(moData.error ?? `create_mo HTTP ${moRes.status}`);
         return;
@@ -128,81 +135,123 @@ export default function ErpManufacturingPage() {
   }
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="erp-manufacturing" />}>
-      <div className="flex flex-col gap-6 pb-8">
-        <NelvyonDsSectionHeader
-          title="Manufactura"
-          subtitle={note || "BOM → aprobar → orden de fabricación · IoT bloqueado"}
-        />
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="Manufactura" parentTitle="Gestión" pageTitle="Manufactura" />
+      <div className="container-fluid">
+        <div className="row">
+          {error && (
+            <div className="col-xl-12">
+              <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                {error}
+                <button type="button" className="btn-close" aria-label="Cerrar" onClick={() => setError(null)} />
+              </div>
+            </div>
+          )}
+          {ok && (
+            <div className="col-xl-12">
+              <div className="alert alert-success" role="status">{ok}</div>
+            </div>
+          )}
 
-        {error && (
-          <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm text-destructive" role="alert">
-            {error}
-          </p>
-        )}
-        {ok && (
-          <p className="rounded-lg border border-primary/30 bg-primary/10 px-4 py-2 text-sm text-primary" role="status">
-            {ok}
-          </p>
-        )}
+          <div className="col-xl-4 col-sm-6"><W3crmKpiTile label="BOMs" value={boms.length} /></div>
+          <div className="col-xl-4 col-sm-6"><W3crmKpiTile label="Órdenes MO" value={mos.length} accent /></div>
+          <div className="col-xl-4 col-sm-6"><W3crmKpiTile label="BOMs aprobadas" value={boms.filter((b) => b.status === "approved").length} /></div>
 
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-          <KpiTile icon="📋" label="BOMs" value={boms.length} />
-          <KpiTile icon="⚙️" label="Órdenes MO" value={mos.length} accent />
-          <KpiTile icon="✅" label="BOMs aprobadas" value={boms.filter((b) => b.status === "approved").length} />
+          <div className="col-xl-12">
+            <W3crmContentBox titulo="Crear BOM + aprobar + MO" icono="fa-solid fa-industry">
+              {note ? <p className="fs-12 text-muted">{note}</p> : null}
+              <form onSubmit={(e) => void createBomFlow(e)}>
+                <div className="row align-items-end">
+                  <div className="col-xl-3 col-sm-6">
+                    <div className="form-group mb-3">
+                      <label htmlFor="mf-producto" className="text-black font-w600">SKU producto <span className="required">*</span></label>
+                      <input id="mf-producto" className="form-control" required
+                        value={productSku} onChange={(e) => setProductSku(e.target.value)} />
+                    </div>
+                  </div>
+                  <div className="col-xl-3 col-sm-6">
+                    <div className="form-group mb-3">
+                      <label htmlFor="mf-componente" className="text-black font-w600">SKU componente <span className="required">*</span></label>
+                      <input id="mf-componente" className="form-control" required
+                        value={componentSku} onChange={(e) => setComponentSku(e.target.value)} />
+                    </div>
+                  </div>
+                  <div className="col-xl-2 col-sm-6">
+                    <div className="form-group mb-3">
+                      <label htmlFor="mf-cantcomp" className="text-black font-w600">Cant. componente</label>
+                      <input id="mf-cantcomp" className="form-control" type="number" min={0.0001} step="any" required
+                        value={compQty} onChange={(e) => setCompQty(e.target.value)} />
+                    </div>
+                  </div>
+                  <div className="col-xl-2 col-sm-6">
+                    <div className="form-group mb-3">
+                      <label htmlFor="mf-cantmo" className="text-black font-w600">Cantidad MO</label>
+                      <input id="mf-cantmo" className="form-control" type="number" min={1} required
+                        value={moQty} onChange={(e) => setMoQty(e.target.value)} />
+                    </div>
+                  </div>
+                  <div className="col-xl-2 col-sm-6">
+                    <div className="form-group mb-3">
+                      <button type="submit" className="btn btn-primary w-100" disabled={saving}>
+                        {saving ? "Creando…" : "BOM + MO"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </W3crmContentBox>
+
+            <W3crmContentBox titulo="Órdenes de fabricación" icono="fa-solid fa-gears">
+              {loading ? (
+                <W3crmCargando texto="Cargando órdenes…" />
+              ) : mos.length === 0 ? (
+                <W3crmEmptyState title="Sin órdenes de fabricación" />
+              ) : (
+                <W3crmDataTable
+                  filas={mos}
+                  etiqueta="órdenes"
+                  wrapperId="mos_wrapper"
+                  porPagina={10}
+                  columnas={[{ titulo: "Producto" }, { titulo: "Cantidad" }, { titulo: "Estado", alFinal: true }]}
+                  render={(mo) => (
+                    <tr key={mo.id}>
+                      <td><span className="fw-bold">{mo.productSku || "—"}</span></td>
+                      <td>{num(mo.qty)}</td>
+                      <td className="text-end"><span className="badge badge-primary">{mo.status || "—"}</span></td>
+                    </tr>
+                  )}
+                />
+              )}
+            </W3crmContentBox>
+
+            <W3crmContentBox titulo="BOMs" icono="fa-solid fa-list-check">
+              {boms.length === 0 ? (
+                <W3crmEmptyState title="Sin BOMs" />
+              ) : (
+                <W3crmDataTable
+                  filas={boms}
+                  etiqueta="BOMs"
+                  wrapperId="boms_wrapper"
+                  porPagina={10}
+                  columnas={[{ titulo: "Producto" }, { titulo: "Versión" }, { titulo: "Líneas" }, { titulo: "Estado", alFinal: true }]}
+                  render={(b) => (
+                    <tr key={b.id}>
+                      <td><span className="fw-bold">{b.productSku || "—"}</span></td>
+                      <td>v{num(b.version)}</td>
+                      <td>{lineasDe(b).length}</td>
+                      <td className="text-end">
+                        <span className={`badge ${b.status === "approved" ? "badge-success" : "badge-warning"}`}>
+                          {b.status || "—"}
+                        </span>
+                      </td>
+                    </tr>
+                  )}
+                />
+              )}
+            </W3crmContentBox>
+          </div>
         </div>
-
-        <NelvyonDsCard className="p-4">
-          <p className="mb-3 text-sm font-medium text-foreground">Crear BOM + aprobar + MO</p>
-          <form onSubmit={(e) => void createBomFlow(e)} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-            <input className={inputCls} value={productSku} onChange={(e) => setProductSku(e.target.value)} placeholder="SKU producto *" required />
-            <input className={inputCls} value={componentSku} onChange={(e) => setComponentSku(e.target.value)} placeholder="SKU componente *" required />
-            <input className={inputCls} type="number" min={0.0001} step="any" value={compQty} onChange={(e) => setCompQty(e.target.value)} required />
-            <input className={inputCls} type="number" min={1} value={moQty} onChange={(e) => setMoQty(e.target.value)} required />
-            <NelvyonDsButton type="submit" disabled={saving} variant="primary">
-              {saving ? "Creando…" : "BOM + MO"}
-            </NelvyonDsButton>
-          </form>
-        </NelvyonDsCard>
-
-        <section className="space-y-2">
-          <h2 className="text-sm font-medium text-muted-foreground">Órdenes de fabricación</h2>
-          {loading ? (
-            <p className="text-sm text-muted-foreground" role="status">Cargando…</p>
-          ) : mos.length === 0 ? (
-            <NelvyonDsCard className="p-8 text-center text-sm text-muted-foreground">Sin MOs.</NelvyonDsCard>
-          ) : (
-            <div className="flex flex-col gap-2">
-              {mos.map((mo) => (
-                <NelvyonDsCard key={mo.id} className="flex justify-between gap-3 p-4">
-                  <span className="text-sm text-foreground">
-                    {mo.productSku} · qty {mo.qty}
-                  </span>
-                  <NelvyonDsBadge tone="primary">{mo.status}</NelvyonDsBadge>
-                </NelvyonDsCard>
-              ))}
-            </div>
-          )}
-        </section>
-
-        <section className="space-y-2">
-          <h2 className="text-sm font-medium text-muted-foreground">BOMs</h2>
-          {boms.length === 0 ? (
-            <NelvyonDsCard className="p-8 text-center text-sm text-muted-foreground">Sin BOMs.</NelvyonDsCard>
-          ) : (
-            <div className="flex flex-col gap-2">
-              {boms.map((b) => (
-                <NelvyonDsCard key={b.id} className="flex justify-between gap-3 p-4">
-                  <span className="text-sm text-foreground">
-                    {b.productSku} v{b.version} · {b.lines.length} líneas
-                  </span>
-                  <NelvyonDsBadge tone={b.status === "approved" ? "success" : "warning"}>{b.status}</NelvyonDsBadge>
-                </NelvyonDsCard>
-              ))}
-            </div>
-          )}
-        </section>
       </div>
-    </SaasShellLayout>
+    </SaasW3crmShell>
   );
 }
