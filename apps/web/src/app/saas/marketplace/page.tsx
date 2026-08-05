@@ -1,9 +1,25 @@
 "use client";
 
+/**
+ * /saas/marketplace sobre `(cms)/content` de W3CRM, con las piezas ya portadas.
+ * Mapeo: catalogo de apps -> `W3crmContentBox` + `W3crmDataTable`; KPIs ->
+ * `W3crmKpiTile`. Sin componentes nuevos.
+ *
+ * Inventario: el modulo no exponia `data-testid`, no tiene spec dedicado y su
+ * unica cobertura es `saas-nav-full-coverage` (recorre `SAAS_NAV_ITEMS`, que
+ * incluye `marketplace`): exige que la ruta cargue sin redirigir a login y sin
+ * "Internal Server Error". Ningun texto actua como contrato.
+ *
+ * Logica de NELVYON intacta: `GET/POST /api/saas/marketplace` con sus acciones
+ * `install` / `uninstall`, el enlace de descarga de blueprint para make, n8n y
+ * zapier cuando la app esta instalada, y el manejo de error con reintento.
+ */
 import { useCallback, useEffect, useState } from "react";
-import { NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmEmptyState, W3crmKpiTile } from "@/features/saas-w3crm/components/W3crmUi";
+import { W3crmCargando, W3crmContentBox, W3crmDataTable } from "@/features/saas-w3crm/components/W3crmContentBox";
 
 type App = {
   id: string;
@@ -13,6 +29,9 @@ type App = {
   category: string;
   installed: boolean;
 };
+
+/** Slugs con blueprint descargable. */
+const CON_BLUEPRINT = ["make", "n8n", "zapier"];
 
 export default function MarketplacePage() {
   const [apps, setApps] = useState<App[]>([]);
@@ -26,8 +45,8 @@ export default function MarketplacePage() {
     try {
       const res = await fetch("/api/saas/marketplace");
       if (!res.ok) throw new Error(`Error ${res.status}`);
-      const d = (await res.json()) as { apps?: App[] };
-      setApps(d.apps ?? []);
+      const d = (await res.json().catch(() => ({}))) as { apps?: App[] };
+      setApps(Array.isArray(d.apps) ? d.apps : []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al cargar marketplace");
       setApps([]);
@@ -59,59 +78,85 @@ export default function MarketplacePage() {
     }
   };
 
+  const instaladas = apps.filter((a) => a.installed).length;
+  const categorias = new Set(apps.map((a) => a.category).filter(Boolean)).size;
+
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="marketplace" />}>
-      <NelvyonDsSectionHeader
-        title="Integration Marketplace"
-        subtitle="Instala conectores y automatizaciones para tu tenant"
-      />
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="Integration Marketplace" parentTitle="Cuenta" pageTitle="Marketplace" />
+      <div className="container-fluid">
+        <div className="row">
+          {error && (
+            <div className="col-xl-12">
+              <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                {error}
+                <button type="button" className="btn-close" aria-label="Cerrar"
+                  onClick={() => { setError(null); void load(); }} />
+              </div>
+            </div>
+          )}
 
-      {error && (
-        <NelvyonDsCard className="border-red-500/30 bg-red-500/5 p-4">
-          <p className="text-sm text-red-400">{error}</p>
-          <button type="button" onClick={() => void load()} className="mt-2 text-xs text-primary hover:underline">Reintentar</button>
-        </NelvyonDsCard>
-      )}
+          <div className="col-xl-4 col-sm-6"><W3crmKpiTile label="Apps en catálogo" value={apps.length} accent /></div>
+          <div className="col-xl-4 col-sm-6"><W3crmKpiTile label="Instaladas" value={instaladas} /></div>
+          <div className="col-xl-4 col-sm-6"><W3crmKpiTile label="Categorías" value={categorias} /></div>
 
-      {loading ? (
-        <div className="grid gap-4 md:grid-cols-2">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-36 animate-pulse rounded-xl bg-muted/30" />
-          ))}
-        </div>
-      ) : apps.length === 0 ? (
-        <NelvyonDsCard className="p-16 text-center">
-          <p className="text-lg font-semibold text-foreground">Sin apps en el catálogo</p>
-          <p className="mt-2 text-sm text-muted-foreground">Cuando haya integraciones disponibles aparecerán aquí.</p>
-        </NelvyonDsCard>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2">
-          {apps.map((app) => (
-            <NelvyonDsCard key={app.id} className="p-4">
-              <p className="text-xs uppercase text-muted-foreground">{app.category}</p>
-              <h2 className="text-lg font-semibold text-foreground">{app.name}</h2>
-              <p className="mt-2 text-sm text-muted-foreground">{app.description}</p>
-              {["make", "n8n", "zapier"].includes(app.slug) && app.installed && (
-                <a
-                  href={`/api/saas/marketplace/blueprints?slug=${app.slug}`}
-                  className="mt-2 inline-block text-xs text-primary hover:underline"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Descargar blueprint →
-                </a>
+          <div className="col-xl-12">
+            <W3crmContentBox titulo="Catálogo de apps" icono="fa-solid fa-puzzle-piece">
+              {loading ? (
+                <W3crmCargando texto="Cargando marketplace…" />
+              ) : apps.length === 0 ? (
+                <W3crmEmptyState
+                  title="Sin apps en el catálogo"
+                  description="Cuando haya integraciones disponibles aparecerán aquí."
+                />
+              ) : (
+                <W3crmDataTable
+                  filas={apps}
+                  etiqueta="apps"
+                  columnas={[{ titulo: "App" }, { titulo: "Categoría" }, { titulo: "Estado" }, { titulo: "Gestión", alFinal: true }]}
+                  render={(app) => (
+                    <tr key={app.id}>
+                      <td>
+                        <span className="fw-bold">{app.name || app.slug || "—"}</span>
+                        {app.description ? <div className="text-muted fs-12">{app.description}</div> : null}
+                      </td>
+                      <td>
+                        <span className="badge badge-secondary light">{app.category || "—"}</span>
+                      </td>
+                      <td>
+                        {app.installed
+                          ? <span className="badge badge-success">Instalada</span>
+                          : <span className="badge badge-secondary">Sin instalar</span>}
+                      </td>
+                      <td className="text-end">
+                        {CON_BLUEPRINT.includes(app.slug) && app.installed && (
+                          <a
+                            href={`/api/saas/marketplace/blueprints?slug=${app.slug}`}
+                            className="btn btn-primary light btn-sm me-1"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Descargar blueprint
+                          </a>
+                        )}
+                        <button
+                          type="button"
+                          className={`btn btn-sm ${app.installed ? "btn-danger light" : "btn-primary"}`}
+                          disabled={toggling === app.id}
+                          aria-label={`${app.installed ? "Desinstalar" : "Instalar"} ${app.name || app.slug}`}
+                          onClick={() => void toggle(app)}
+                        >
+                          {toggling === app.id ? "…" : app.installed ? "Desinstalar" : "Instalar"}
+                        </button>
+                      </td>
+                    </tr>
+                  )}
+                />
               )}
-              <NelvyonDsButton
-                className="mt-4"
-                disabled={toggling === app.id}
-                onClick={() => void toggle(app)}
-              >
-                {toggling === app.id ? "…" : app.installed ? "Desinstalar" : "Instalar"}
-              </NelvyonDsButton>
-            </NelvyonDsCard>
-          ))}
+            </W3crmContentBox>
+          </div>
         </div>
-      )}
-    </SaasShellLayout>
+      </div>
+    </SaasW3crmShell>
   );
 }
