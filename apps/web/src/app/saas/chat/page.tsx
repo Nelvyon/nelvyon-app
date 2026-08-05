@@ -1,10 +1,31 @@
 "use client";
 
+/**
+ * /saas/chat sobre `(cms)/content` de W3CRM, con las piezas ya portadas.
+ * Mapeo: hilo de mensajes, sugerencias y compositor -> `W3crmContentBox`
+ * (`card-body` con scroll propio). Sin componentes nuevos.
+ *
+ * Inventario: sin `data-testid`. Lo cubre `capture-marketing-shots.spec.ts:47`,
+ * que espera texto visible que case con `/Chat|IA|convers|mensaje/i`: lo
+ * satisfacen el titulo "Asistente IA" y el boton "Nueva conversación", ambos
+ * conservados. Tambien `saas-nav-full-coverage`.
+ *
+ * Logica de NELVYON intacta: `GET /api/saas/chat` con `credentials:
+ * "same-origin"` (historial + `openai_configured`), el `POST` que reenvia el
+ * hilo COMPLETO en `messages` y el `DELETE` que lo borra; el saludo inicial,
+ * las seis sugerencias, el auto-scroll al final, Enter para enviar y
+ * Shift+Enter para nueva linea, y el bloqueo del envio cuando OpenAI no esta
+ * configurado.
+ *
+ * Unico cambio de comportamiento: el `window.confirm()` pasa al dialogo de
+ * sweetalert2 que ya usa el resto del SaaS migrado.
+ */
 import { useEffect, useRef, useState } from "react";
+import Alert from "sweetalert2";
 
-import { NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmContentBox } from "@/features/saas-w3crm/components/W3crmContentBox";
 
 interface Message {
   role: "user" | "assistant";
@@ -22,8 +43,14 @@ const SUGGESTIONS = [
 
 const GREETING: Message = {
   role: "assistant",
-  content: "Hola 👋 Soy tu asistente de marketing IA. Puedo ayudarte con CRM, campañas, SEO, publicidad, redes sociales, workflows, agentes IA y mucho más. ¿En qué empezamos?",
+  content:
+    "Hola 👋 Soy tu asistente de marketing IA. Puedo ayudarte con CRM, campañas, SEO, publicidad, redes sociales, workflows, agentes IA y mucho más. ¿En qué empezamos?",
 };
+
+/** Un `role` fuera de catalogo se trata como del asistente, no rompe el hilo. */
+function esUsuario(role: unknown): boolean {
+  return role === "user";
+}
 
 export default function SaasChatPage() {
   const [messages, setMessages] = useState<Message[]>([GREETING]);
@@ -39,13 +66,19 @@ export default function SaasChatPage() {
       try {
         const res = await fetch("/api/saas/chat", { credentials: "same-origin" });
         if (!res.ok) return;
-        const data = (await res.json()) as {
+        const data = (await res.json().catch(() => ({}))) as {
           openai_configured?: boolean;
           messages?: { role: "user" | "assistant"; content: string }[];
         };
         setOpenaiConfigured(data.openai_configured ?? false);
-        if (data.messages && data.messages.length > 0) {
-          setMessages(data.messages.map((m) => ({ role: m.role, content: m.content })));
+        // Un `messages` que no sea array reventaba el `.length`/`.map`.
+        if (Array.isArray(data.messages) && data.messages.length > 0) {
+          setMessages(
+            data.messages.map((m) => ({
+              role: esUsuario(m?.role) ? "user" : "assistant",
+              content: String(m?.content ?? ""),
+            })),
+          );
         }
       } catch {
         setOpenaiConfigured(false);
@@ -56,7 +89,17 @@ export default function SaasChatPage() {
   }, []);
 
   async function handleNewConversation() {
-    if (!window.confirm("¿Borrar todo el historial de esta conversación? Esta acción no se puede deshacer.")) return;
+    const r = await Alert.fire({
+      title: "¿Borrar todo el historial de esta conversación?",
+      text: "Esta acción no se puede deshacer.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Borrar",
+      cancelButtonText: "Cancelar",
+    });
+    if (!r.isConfirmed) return;
     setClearing(true);
     try {
       await fetch("/api/saas/chat", { method: "DELETE", credentials: "same-origin" });
@@ -101,99 +144,123 @@ export default function SaasChatPage() {
   }
 
   function handleKey(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); void send(); }
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      void send();
+    }
   }
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="chat" />}>
-      <div className="flex h-[calc(100vh-80px)] flex-col gap-4">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <NelvyonDsSectionHeader
-            title="Asistente IA"
-            subtitle="Tu experto en marketing digital disponible 24/7 — historial guardado por usuario"
-          />
-          {messages.length > 1 && (
-            <NelvyonDsButton variant="ghost" onClick={() => void handleNewConversation()} disabled={clearing}>
-              {clearing ? "Borrando…" : "🗑 Nueva conversación"}
-            </NelvyonDsButton>
-          )}
-        </div>
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="Asistente IA" parentTitle="Inteligencia" pageTitle="Chat" />
+      <div className="container-fluid">
+        <div className="row">
+          <div className="col-xl-12">
+            <p className="fs-14 text-muted">
+              Tu experto en marketing digital disponible 24/7 — historial guardado por usuario
+            </p>
 
-        {openaiConfigured === false && (
-          <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
-            OpenAI no está configurado en el servidor (<code className="text-amber-100">OPENAI_API_KEY</code>).
-            El chat estará disponible cuando el administrador active la integración.
-          </div>
-        )}
-
-        {/* Messages */}
-        <NelvyonDsCard className="flex flex-1 flex-col overflow-hidden p-0">
-          <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4">
-            {historyLoading && (
-              <p className="text-center text-xs text-muted-foreground">Cargando historial…</p>
-            )}
-            {messages.map((m, i) => (
-              <div key={i} className={`flex gap-3 ${m.role === "user" ? "flex-row-reverse" : ""}`}>
-                <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${m.role === "assistant" ? "bg-primary/20 text-primary" : "bg-muted/50 text-foreground"}`}>
-                  {m.role === "assistant" ? "N" : "Tú"}
-                </div>
-                <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${m.role === "assistant" ? "bg-muted/20 text-foreground" : "bg-primary text-primary-foreground"}`}>
-                  <p className="whitespace-pre-wrap">{m.content}</p>
-                </div>
-              </div>
-            ))}
-            {loading && (
-              <div className="flex gap-3">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/20 text-sm font-bold text-primary">N</div>
-                <div className="rounded-2xl bg-muted/20 px-4 py-3">
-                  <span className="inline-flex gap-1">
-                    {[0, 1, 2].map((i) => (
-                      <span key={i} className="h-2 w-2 rounded-full bg-muted-foreground/50 animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />
-                    ))}
-                  </span>
-                </div>
+            {openaiConfigured === false && (
+              <div className="alert alert-warning" role="alert">
+                OpenAI no está configurado en el servidor (<code>OPENAI_API_KEY</code>). El chat estará
+                disponible cuando el administrador active la integración.
               </div>
             )}
-            <div ref={bottomRef} />
-          </div>
 
-          {/* Suggestions */}
-          {messages.length === 1 && (
-            <div className="border-t border-border px-5 py-3">
-              <p className="mb-2 text-xs font-medium text-muted-foreground">Sugerencias:</p>
-              <div className="flex flex-wrap gap-2">
-                {SUGGESTIONS.map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => void send(s)}
-                    className="rounded-full border border-border bg-muted/20 px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
-                  >
-                    {s}
+            <W3crmContentBox
+              titulo="Conversación"
+              icono="fa-solid fa-comments"
+              acciones={
+                messages.length > 1 ? (
+                  <button type="button" className="btn btn-primary light btn-sm me-2" disabled={clearing}
+                    onClick={() => void handleNewConversation()}>
+                    {clearing ? "Borrando…" : "Nueva conversación"}
                   </button>
-                ))}
+                ) : undefined
+              }
+            >
+              {/* El hilo se desborda dentro de su propia caja, nunca en la pagina. */}
+              <div className="overflow-auto mb-3" style={{ maxHeight: "50vh" }}>
+                {historyLoading && <p className="text-center text-muted fs-12">Cargando historial…</p>}
+                {messages.map((m, i) => {
+                  const usuario = esUsuario(m.role);
+                  return (
+                    <div key={i} className={`d-flex gap-3 mb-3 ${usuario ? "flex-row-reverse" : ""}`}>
+                      <span
+                        className={`avatar avatar-sm rounded-circle d-inline-flex align-items-center justify-content-center text-white ${usuario ? "bg-secondary" : "bg-primary"}`}
+                        style={{ width: 36, height: 36, flex: "0 0 36px" }}
+                        aria-hidden="true"
+                      >
+                        {usuario ? "Tú" : "N"}
+                      </span>
+                      <div
+                        className={`rounded p-3 ${usuario ? "bg-primary text-white" : "bg-light"}`}
+                        style={{ maxWidth: "80%" }}
+                      >
+                        <p className="mb-0" style={{ whiteSpace: "pre-wrap" }}>{m.content}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+                {loading && (
+                  <div className="d-flex gap-3 mb-3">
+                    <span
+                      className="avatar avatar-sm rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center"
+                      style={{ width: 36, height: 36, flex: "0 0 36px" }}
+                      aria-hidden="true"
+                    >
+                      N
+                    </span>
+                    <div className="rounded bg-light p-3">
+                      <div className="spinner-border spinner-border-sm text-primary" role="status">
+                        <span className="visually-hidden">Escribiendo…</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <div ref={bottomRef} />
               </div>
-            </div>
-          )}
 
-          {/* Input */}
-          <div className="border-t border-border px-4 py-3">
-            <div className="flex items-end gap-3">
-              <textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKey}
-                placeholder="Pregunta cualquier cosa sobre marketing, SEO, publicidad, agentes IA… (Enter para enviar)"
-                rows={2}
-                className="flex-1 resize-none rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none"
-              />
-              <NelvyonDsButton onClick={() => void send()} disabled={!input.trim() || loading || openaiConfigured === false} className="shrink-0">
-                {loading ? "…" : "Enviar"}
-              </NelvyonDsButton>
-            </div>
-            <p className="mt-1.5 text-xs text-muted-foreground">Shift+Enter para nueva línea</p>
+              {messages.length === 1 && (
+                <div className="border-top pt-3 mb-3">
+                  <p className="text-black font-w600 fs-14">Sugerencias:</p>
+                  <div className="d-flex flex-wrap gap-2">
+                    {SUGGESTIONS.map((s) => (
+                      <button key={s} type="button" className="btn btn-primary light btn-sm"
+                        onClick={() => void send(s)}>
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="border-top pt-3">
+                <div className="form-group mb-2">
+                  <label htmlFor="chat-input" className="text-black font-w600">Tu mensaje</label>
+                  <textarea
+                    id="chat-input"
+                    className="form-control"
+                    rows={2}
+                    placeholder="Pregunta cualquier cosa sobre marketing, SEO, publicidad, agentes IA… (Enter para enviar)"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={handleKey}
+                  />
+                </div>
+                <div className="d-flex align-items-center justify-content-between gap-2">
+                  <span className="text-muted fs-12">Shift+Enter para nueva línea</span>
+                  <button type="button" className="btn btn-primary"
+                    disabled={!input.trim() || loading || openaiConfigured === false}
+                    onClick={() => void send()}>
+                    {loading ? "Enviando…" : "Enviar"}
+                  </button>
+                </div>
+              </div>
+            </W3crmContentBox>
           </div>
-        </NelvyonDsCard>
+        </div>
       </div>
-    </SaasShellLayout>
+    </SaasW3crmShell>
   );
 }
