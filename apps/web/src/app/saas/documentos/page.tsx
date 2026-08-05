@@ -1,38 +1,43 @@
 "use client";
 
+/**
+ * /saas/documentos sobre `(cms)/content` de W3CRM, con las piezas ya portadas.
+ * Las dos pestanas (documentos / plantillas) usan el `nav nav-tabs` de la
+ * plantilla.
+ *
+ * Logica de NELVYON intacta: `GET/POST/DELETE /api/saas/documents` con sus
+ * acciones (`update` para renombrar y para marcar como enviado), los tipos
+ * `Document`, `DocStatus` y `ApiDocType`, `STATUS_CONFIG`, `TYPE_LABEL`,
+ * `TEMPLATES` con sus secciones, `mapDocument`, `shortId`, `fmt`, el filtrado
+ * por estado y texto, `sendDocument` y `deleteDocument` (solo en borradores).
+ */
 import { useCallback, useEffect, useState } from "react";
-import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+import Alert from "sweetalert2";
+
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmEmptyState, W3crmKpiTile } from "@/features/saas-w3crm/components/W3crmUi";
+import { W3crmCargando, W3crmContentBox, W3crmDataTable, W3crmModal } from "@/features/saas-w3crm/components/W3crmContentBox";
 
 type DocStatus = "draft" | "sent" | "viewed" | "signed" | "declined" | "expired";
 type ApiDocType = "document" | "contract" | "proposal" | "nda";
 
 interface Document {
-  id: string;
-  name: string;
-  type: ApiDocType;
-  status: DocStatus;
-  contactId: string | null;
-  signedAt: string | null;
-  expiresAt: string | null;
-  createdAt: string;
+  id: string; name: string; type: ApiDocType; status: DocStatus;
+  contactId: string | null; signedAt: string | null; expiresAt: string | null; createdAt: string;
 }
 
-const STATUS_CONFIG: Record<DocStatus, { label: string; tone: "primary" | "success" | "warning" | "danger"; icon: string }> = {
-  draft: { label: "Borrador", tone: "primary", icon: "✎" },
-  sent: { label: "Enviado", tone: "warning", icon: "↗" },
-  viewed: { label: "Visto", tone: "primary", icon: "◉" },
-  signed: { label: "Firmado", tone: "success", icon: "✓" },
-  declined: { label: "Rechazado", tone: "danger", icon: "✕" },
-  expired: { label: "Expirado", tone: "danger", icon: "⏰" },
+const STATUS_CONFIG: Record<DocStatus, { label: string; badge: string; icon: string }> = {
+  draft: { label: "Borrador", badge: "badge-primary", icon: "✎" },
+  sent: { label: "Enviado", badge: "badge-warning", icon: "↗" },
+  viewed: { label: "Visto", badge: "badge-primary", icon: "◉" },
+  signed: { label: "Firmado", badge: "badge-success", icon: "✓" },
+  declined: { label: "Rechazado", badge: "badge-danger", icon: "✕" },
+  expired: { label: "Expirado", badge: "badge-danger", icon: "⏰" },
 };
 
 const TYPE_LABEL: Record<ApiDocType, string> = {
-  document: "Documento",
-  proposal: "Propuesta",
-  contract: "Contrato",
-  nda: "NDA",
+  document: "Documento", proposal: "Propuesta", contract: "Contrato", nda: "NDA",
 };
 
 const TEMPLATES = [
@@ -42,16 +47,24 @@ const TEMPLATES = [
   { id: "t4", name: "Acuerdo de confidencialidad", type: "nda" as ApiDocType, sections: ["Definición de información confidencial", "Obligaciones de las partes", "Excepciones", "Duración"] },
 ];
 
+/** Catalogos que pueden crecer en el backend sin dejar la pantalla en blanco. */
+function estadoDe(s: DocStatus | string) {
+  return STATUS_CONFIG[s as DocStatus] ?? { label: String(s || "—"), badge: "badge-secondary", icon: "•" };
+}
+function tipoDe(t: ApiDocType | string) {
+  return TYPE_LABEL[t as ApiDocType] ?? String(t || "—");
+}
+
 function mapDocument(raw: Record<string, unknown>): Document {
   return {
     id: String(raw.id),
-    name: String(raw.name),
+    name: String(raw.name ?? ""),
     type: String(raw.type) as ApiDocType,
     status: String(raw.status) as DocStatus,
     contactId: raw.contactId != null ? String(raw.contactId) : null,
     signedAt: raw.signedAt != null ? String(raw.signedAt) : null,
     expiresAt: raw.expiresAt != null ? String(raw.expiresAt) : null,
-    createdAt: String(raw.createdAt),
+    createdAt: String(raw.createdAt ?? ""),
   };
 }
 
@@ -62,21 +75,15 @@ function shortId(id: string | null): string {
 
 function fmt(iso: string | null) {
   if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" });
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? "—" : d.toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" });
 }
 
 function CreateDocumentModal({
-  onClose,
-  onCreated,
-  initialName = "",
-  initialType = "document" as ApiDocType,
-  templateId,
+  onClose, onCreated, initialName = "", initialType = "document" as ApiDocType, templateId,
 }: {
-  onClose: () => void;
-  onCreated: () => void;
-  initialName?: string;
-  initialType?: ApiDocType;
-  templateId?: string;
+  onClose: () => void; onCreated: () => void;
+  initialName?: string; initialType?: ApiDocType; templateId?: string;
 }) {
   const [name, setName] = useState(initialName);
   const [type, setType] = useState<ApiDocType>(initialType);
@@ -91,11 +98,7 @@ function CreateDocumentModal({
       const res = await fetch("/api/saas/documents", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: name.trim(),
-          type,
-          ...(templateId ? { templateId } : {}),
-        }),
+        body: JSON.stringify({ name: name.trim(), type, ...(templateId ? { templateId } : {}) }),
       });
       if (!res.ok) {
         const body = (await res.json().catch(() => null)) as { error?: string; message?: string } | null;
@@ -111,44 +114,35 @@ function CreateDocumentModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm">
-      <div className="my-8 w-full max-w-lg rounded-2xl border border-border bg-card shadow-2xl">
-        <div className="flex items-center justify-between border-b border-border px-6 py-4">
-          <h2 className="text-lg font-semibold text-foreground">Nuevo documento</h2>
-          <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
+    <W3crmModal titulo="Nuevo documento" onClose={onClose} error={error} testId="modal-documento">
+      <form onSubmit={save}>
+        <div className="row">
+          <div className="col-lg-8">
+            <div className="form-group mb-3">
+              <label htmlFor="doc-nombre" className="text-black font-w600">Nombre <span className="required">*</span></label>
+              <input id="doc-nombre" type="text" className="form-control" placeholder="Ej: Propuesta Q3 2026"
+                value={name} onChange={(e) => setName(e.target.value)} />
+            </div>
+          </div>
+          <div className="col-lg-4">
+            <div className="form-group mb-3">
+              <label htmlFor="doc-tipo" className="text-black font-w600">Tipo</label>
+              <select id="doc-tipo" className="form-control" value={type} onChange={(e) => setType(e.target.value as ApiDocType)}>
+                {(Object.keys(TYPE_LABEL) as ApiDocType[]).map((t) => <option key={t} value={t}>{TYPE_LABEL[t]}</option>)}
+              </select>
+            </div>
+          </div>
+          <div className="col-lg-12">
+            <div className="text-end">
+              <button type="button" className="btn btn-danger light me-2" onClick={onClose}>Cancelar</button>
+              <button type="submit" className="btn btn-primary" disabled={saving || !name.trim()}>
+                {saving ? "Creando…" : "Crear documento"}
+              </button>
+            </div>
+          </div>
         </div>
-        <form onSubmit={save} className="space-y-4 p-6">
-          {error && <p className="text-sm text-red-400">{error}</p>}
-          <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre *</label>
-            <input
-              value={name}
-              onChange={e => setName(e.target.value)}
-              placeholder="Ej: Propuesta Q3 2026"
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
-            />
-          </div>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Tipo</label>
-            <select
-              value={type}
-              onChange={e => setType(e.target.value as ApiDocType)}
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
-            >
-              {(Object.keys(TYPE_LABEL) as ApiDocType[]).map(t => (
-                <option key={t} value={t}>{TYPE_LABEL[t]}</option>
-              ))}
-            </select>
-          </div>
-          <div className="flex gap-3 pt-2">
-            <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
-            <NelvyonDsButton type="submit" disabled={saving || !name.trim()} className="flex-1">
-              {saving ? "Creando…" : "Crear documento"}
-            </NelvyonDsButton>
-          </div>
-        </form>
-      </div>
-    </div>
+      </form>
+    </W3crmModal>
   );
 }
 
@@ -181,35 +175,30 @@ function EditDocumentModal({ doc, onClose, onSaved }: { doc: Document; onClose: 
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm">
-      <div className="my-8 w-full max-w-lg rounded-2xl border border-border bg-card shadow-2xl">
-        <div className="flex items-center justify-between border-b border-border px-6 py-4">
-          <h2 className="text-lg font-semibold text-foreground">Editar documento</h2>
-          <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
+    <W3crmModal titulo="Editar documento" onClose={onClose} error={error} testId="modal-editar-documento">
+      <form onSubmit={save}>
+        <div className="row">
+          <div className="col-lg-12">
+            <div className="form-group mb-3">
+              <label htmlFor="doc-edit-nombre" className="text-black font-w600">Nombre <span className="required">*</span></label>
+              <input id="doc-edit-nombre" type="text" className="form-control" placeholder="Nombre del documento"
+                value={name} onChange={(e) => setName(e.target.value)} />
+            </div>
+            <p className="fs-12 text-muted">
+              Tipo: {tipoDe(doc.type)} · Estado: {estadoDe(doc.status).label}
+            </p>
+          </div>
+          <div className="col-lg-12">
+            <div className="text-end">
+              <button type="button" className="btn btn-danger light me-2" onClick={onClose}>Cancelar</button>
+              <button type="submit" className="btn btn-primary" disabled={saving || !name.trim()}>
+                {saving ? "Guardando…" : "Guardar cambios"}
+              </button>
+            </div>
+          </div>
         </div>
-        <form onSubmit={save} className="space-y-4 p-6">
-          {error && <p className="text-sm text-red-400">{error}</p>}
-          <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre *</label>
-            <input
-              value={name}
-              onChange={e => setName(e.target.value)}
-              placeholder="Nombre del documento"
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
-            />
-          </div>
-          <div className="rounded-lg border border-border bg-muted/10 px-3 py-2 text-xs text-muted-foreground">
-            Tipo: {TYPE_LABEL[doc.type] ?? doc.type} · Estado: {STATUS_CONFIG[doc.status].label}
-          </div>
-          <div className="flex gap-3 pt-2">
-            <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
-            <NelvyonDsButton type="submit" disabled={saving || !name.trim()} className="flex-1">
-              {saving ? "Guardando…" : "Guardar cambios"}
-            </NelvyonDsButton>
-          </div>
-        </form>
-      </div>
-    </div>
+      </form>
+    </W3crmModal>
   );
 }
 
@@ -234,8 +223,8 @@ export default function SaasDocumentosPage() {
     try {
       const res = await fetch("/api/saas/documents");
       if (!res.ok) throw new Error(`Error ${res.status}`);
-      const d = (await res.json()) as { documents?: Record<string, unknown>[] };
-      setDocs((d.documents ?? []).map(mapDocument));
+      const d = (await res.json().catch(() => ({}))) as { documents?: Record<string, unknown>[] };
+      setDocs(Array.isArray(d.documents) ? d.documents.map(mapDocument) : []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al cargar documentos");
       setDocs([]);
@@ -273,6 +262,17 @@ export default function SaasDocumentosPage() {
   }
 
   async function deleteDocument(id: string) {
+    const r = await Alert.fire({
+      title: "¿Eliminar este borrador?",
+      text: "Esta acción no se puede deshacer.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Eliminar",
+      cancelButtonText: "Cancelar",
+    });
+    if (!r.value) return;
     setDeletingId(id);
     setActionError(null);
     try {
@@ -289,188 +289,169 @@ export default function SaasDocumentosPage() {
     }
   }
 
-  const filtered = docs.filter(d => {
+  const filtered = docs.filter((d) => {
     if (filterStatus !== "all" && d.status !== filterStatus) return false;
-    if (search && !d.name.toLowerCase().includes(search.toLowerCase())) return false;
+    if (search && !(d.name ?? "").toLowerCase().includes(search.toLowerCase())) return false;
     return true;
   });
 
   const stats = {
     total: docs.length,
-    signed: docs.filter(d => d.status === "signed").length,
-    pending: docs.filter(d => ["sent", "viewed"].includes(d.status)).length,
-    expired: docs.filter(d => d.status === "expired").length,
+    signed: docs.filter((d) => d.status === "signed").length,
+    pending: docs.filter((d) => ["sent", "viewed"].includes(d.status)).length,
+    expired: docs.filter((d) => d.status === "expired").length,
   };
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="documentos" />}>
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <NelvyonDsSectionHeader
-                title="Documentos & Contratos"
-                subtitle="Gestiona propuestas, contratos y documentos con seguimiento de estado interno. La firma electrónica externa aún no está disponible."
-              />
-              <NelvyonDsButton onClick={() => openCreateModal()}>+ Nuevo documento</NelvyonDsButton>
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="Documentos" parentTitle="Gestión" pageTitle="Documentos" />
+      <div className="container-fluid">
+        <div className="row">
+          {(error || actionError) && (
+            <div className="col-xl-12">
+              <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                {actionError ?? error}
+                <button type="button" className="btn-close" aria-label="Cerrar"
+                  onClick={() => { setActionError(null); setError(null); }} />
+              </div>
+            </div>
+          )}
+
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Documentos" value={stats.total} accent /></div>
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Firmados" value={stats.signed} /></div>
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Pendientes firma" value={stats.pending} /></div>
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Expirados" value={stats.expired} /></div>
+
+          <div className="col-xl-12">
+            <div className="mb-3">
+              <ul className="d-flex align-items-center flex-wrap">
+                <li><button type="button" className="btn btn-primary" onClick={() => openCreateModal()}>+ Nuevo documento</button></li>
+              </ul>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {[
-                { label: "Documentos", value: stats.total },
-                { label: "Firmados", value: stats.signed },
-                { label: "Pendientes firma", value: stats.pending },
-                { label: "Expirados", value: stats.expired },
-              ].map(({ label, value }) => (
-                <NelvyonDsCard key={label} className="p-4">
-                  <p className="text-xs text-muted-foreground">{label}</p>
-                  <p className="mt-1 text-xl font-bold text-foreground">{value}</p>
-                </NelvyonDsCard>
+            <ul className="nav nav-tabs mb-3" role="tablist">
+              {(["docs", "templates"] as const).map((t) => (
+                <li className="nav-item" key={t} role="presentation">
+                  <button type="button" role="tab" aria-selected={tab === t}
+                    className={`nav-link ${tab === t ? "active" : ""}`} onClick={() => setTab(t)}>
+                    {t === "docs" ? `Mis documentos (${docs.length})` : "Plantillas"}
+                  </button>
+                </li>
               ))}
-            </div>
-
-            {error && (
-              <NelvyonDsCard className="p-4 border-red-500/30 bg-red-500/5">
-                <p className="text-sm text-red-400">{error}</p>
-                <button onClick={() => void load()} className="mt-2 text-xs text-primary hover:underline">Reintentar</button>
-              </NelvyonDsCard>
-            )}
-
-            {actionError && (
-              <NelvyonDsCard className="p-4 border-red-500/30 bg-red-500/5">
-                <p className="text-sm text-red-400">{actionError}</p>
-                <button onClick={() => setActionError(null)} className="mt-2 text-xs text-primary hover:underline">Cerrar</button>
-              </NelvyonDsCard>
-            )}
-
-            <div className="flex gap-2">
-              {(["docs", "templates"] as const).map(t => (
-                <button key={t} onClick={() => setTab(t)}
-                  className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${tab === t ? "bg-primary text-primary-foreground" : "bg-muted/30 text-muted-foreground hover:text-foreground"}`}>
-                  {t === "docs" ? `Mis documentos (${docs.length})` : "Plantillas"}
-                </button>
-              ))}
-            </div>
+            </ul>
 
             {tab === "docs" ? (
               <>
-                <div className="flex flex-wrap gap-3">
-                  <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar documento…"
-                    className="h-9 flex-1 min-w-48 rounded-lg border border-border bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none" />
-                  <select value={filterStatus} onChange={e => setFilterStatus(e.target.value as DocStatus | "all")}
-                    className="h-9 rounded-lg border border-border bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none">
-                    <option value="all">Todos los estados</option>
-                    {(Object.keys(STATUS_CONFIG) as DocStatus[]).map(s => <option key={s} value={s}>{STATUS_CONFIG[s].label}</option>)}
-                  </select>
-                </div>
-                {loading ? (
-                  <div className="space-y-3">
-                    {Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-14 animate-pulse rounded-xl bg-muted/30" />)}
+                <W3crmContentBox titulo="Filtro" icono="fas fa-filter" bodyClassName="card-body pb-3">
+                  <div className="row">
+                    <div className="col-xl-4 col-sm-6">
+                      <label className="visually-hidden" htmlFor="doc-buscar">Buscar documento</label>
+                      <input id="doc-buscar" type="text" className="form-control mb-3 mb-xl-0" placeholder="Buscar documento…"
+                        value={search} onChange={(e) => setSearch(e.target.value)} />
+                    </div>
+                    <div className="col-xl-4 col-sm-6 mb-3 mb-xl-0">
+                      <label className="visually-hidden" htmlFor="doc-filtro-estado">Estado</label>
+                      <select id="doc-filtro-estado" className="form-control" value={filterStatus}
+                        onChange={(e) => setFilterStatus(e.target.value as DocStatus | "all")}>
+                        <option value="all">Todos los estados</option>
+                        {(Object.keys(STATUS_CONFIG) as DocStatus[]).map((s) => (
+                          <option key={s} value={s}>{STATUS_CONFIG[s].label}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="col-xl-4 col-sm-6">
+                      <button type="button" className="btn btn-danger light" onClick={() => { setSearch(""); setFilterStatus("all"); }}>
+                        Quitar filtros
+                      </button>
+                    </div>
                   </div>
-                ) : docs.length === 0 && !error ? (
-                  <NelvyonDsCard className="p-16 text-center">
-                    <p className="text-4xl">📄</p>
-                    <p className="mt-4 font-semibold text-foreground">Sin documentos todavía</p>
-                    <p className="mt-2 text-sm text-muted-foreground">Crea tu primera propuesta, contrato o presupuesto</p>
-                    <NelvyonDsButton className="mt-5" onClick={() => openCreateModal()}>+ Nuevo documento</NelvyonDsButton>
-                  </NelvyonDsCard>
-                ) : (
-                  <NelvyonDsCard className="overflow-hidden p-0">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b border-border bg-muted/20">
-                          {["Documento", "Contacto", "Tipo", "Estado", "Creado", "Firmado"].map(h => (
-                            <th key={h} className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">{h}</th>
-                          ))}
-                          <th className="px-4 py-3" />
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-border">
-                        {filtered.length === 0 ? (
-                          <tr>
-                            <td colSpan={7} className="px-4 py-8 text-center text-sm text-muted-foreground">
-                              Sin resultados para los filtros aplicados
+                </W3crmContentBox>
+
+                <W3crmContentBox titulo="Documentos" icono="fa-solid fa-file-lines">
+                  {loading ? (
+                    <W3crmCargando texto="Cargando documentos…" />
+                  ) : filtered.length === 0 ? (
+                    <W3crmEmptyState
+                      title={docs.length === 0 ? "Sin documentos todavía" : "Sin resultados"}
+                      description={docs.length === 0
+                        ? "Crea tu primera propuesta, contrato o presupuesto."
+                        : "Sin resultados para los filtros aplicados."}
+                    />
+                  ) : (
+                    <W3crmDataTable
+                      filas={filtered}
+                      etiqueta="documentos"
+                      reiniciarEn={`${filterStatus}|${search}`}
+                      columnas={[{ titulo: "Documento" }, { titulo: "Contacto" }, { titulo: "Tipo" }, { titulo: "Estado" }, { titulo: "Creado" }, { titulo: "Firmado" }, { titulo: "Acciones", alFinal: true }]}
+                      render={(d) => {
+                        const sc = estadoDe(d.status);
+                        return (
+                          <tr key={d.id}>
+                            <td><span className="fw-bold">{d.name || "—"}</span></td>
+                            <td><span className="text-muted fs-12" title={d.contactId ?? undefined}>{shortId(d.contactId)}</span></td>
+                            <td>{tipoDe(d.type)}</td>
+                            <td><span className={`badge ${sc.badge}`}>{sc.icon} {sc.label}</span></td>
+                            <td>{fmt(d.createdAt)}</td>
+                            <td>{fmt(d.signedAt)}</td>
+                            <td className="text-end">
+                              <button type="button" className="btn btn-warning btn-sm content-icon me-1"
+                                aria-label={`Editar ${d.name || "documento"}`}
+                                onClick={() => { setEditingDoc(d); setShowEditModal(true); }}>
+                                <i className="fa fa-edit" />
+                              </button>
+                              {d.status === "draft" && (
+                                <>
+                                  <button type="button" className="btn btn-primary btn-sm content-icon me-1"
+                                    disabled={sendingId === d.id}
+                                    title="Marca el documento como enviado (seguimiento interno)"
+                                    aria-label={`Enviar ${d.name || "documento"}`}
+                                    onClick={() => void sendDocument(d.id)}>
+                                    <i className="fa-solid fa-paper-plane" />
+                                  </button>
+                                  <button type="button" className="btn btn-danger btn-sm content-icon"
+                                    disabled={deletingId === d.id}
+                                    aria-label={`Eliminar ${d.name || "documento"}`}
+                                    onClick={() => void deleteDocument(d.id)}>
+                                    <i className="fa-solid fa-trash" />
+                                  </button>
+                                </>
+                              )}
                             </td>
                           </tr>
-                        ) : filtered.map(d => {
-                          const sc = STATUS_CONFIG[d.status];
-                          return (
-                            <tr key={d.id} className="hover:bg-muted/10 transition-colors">
-                              <td className="px-4 py-3">
-                                <p className="font-medium text-foreground truncate max-w-48">{d.name}</p>
-                              </td>
-                              <td className="px-4 py-3 text-xs text-muted-foreground font-mono" title={d.contactId ?? undefined}>
-                                {shortId(d.contactId)}
-                              </td>
-                              <td className="px-4 py-3 text-xs text-muted-foreground">{TYPE_LABEL[d.type] ?? d.type}</td>
-                              <td className="px-4 py-3"><NelvyonDsBadge tone={sc.tone}>{sc.icon} {sc.label}</NelvyonDsBadge></td>
-                              <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">{fmt(d.createdAt)}</td>
-                              <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">{fmt(d.signedAt)}</td>
-                              <td className="px-4 py-3">
-                                <div className="flex gap-1">
-                                  <NelvyonDsButton
-                                    variant="ghost"
-                                    className="text-xs px-2"
-                                    onClick={() => { setEditingDoc(d); setShowEditModal(true); }}
-                                  >
-                                    ✎ Editar
-                                  </NelvyonDsButton>
-                                  {d.status === "draft" && (
-                                    <>
-                                      <NelvyonDsButton
-                                        className="text-xs px-2"
-                                        disabled={sendingId === d.id}
-                                        onClick={() => void sendDocument(d.id)}
-                                        title="Marca el documento como enviado (seguimiento interno)"
-                                      >
-                                        {sendingId === d.id ? "Enviando…" : "↗ Enviar"}
-                                      </NelvyonDsButton>
-                                      <NelvyonDsButton
-                                        variant="ghost"
-                                        className="text-xs px-2 text-red-400"
-                                        disabled={deletingId === d.id}
-                                        onClick={() => {
-                                          if (window.confirm("¿Eliminar este borrador?")) void deleteDocument(d.id);
-                                        }}
-                                      >
-                                        {deletingId === d.id ? "…" : "Eliminar"}
-                                      </NelvyonDsButton>
-                                    </>
-                                  )}
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </NelvyonDsCard>
-                )}
+                        );
+                      }}
+                    />
+                  )}
+                </W3crmContentBox>
               </>
             ) : (
-              <div className="grid gap-4 sm:grid-cols-2">
-                {TEMPLATES.map(t => (
-                  <NelvyonDsCard key={t.id} className="p-5 hover:border-primary/30 transition-colors">
-                    <div className="mb-3 flex items-center justify-between">
-                      <div>
-                        <p className="font-semibold text-foreground">{t.name}</p>
-                        <p className="text-xs text-muted-foreground">{TYPE_LABEL[t.type]}</p>
-                      </div>
-                      <NelvyonDsButton
-                        className="text-xs"
-                        onClick={() => openCreateModal({ name: t.name, type: t.type, templateId: t.id })}
-                      >
-                        Usar plantilla
-                      </NelvyonDsButton>
-                    </div>
-                    <div className="space-y-1">
-                      {t.sections.map((s, i) => (
-                        <div key={s} className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <span className="text-primary">{i + 1}.</span> {s}
+              <div className="row">
+                {TEMPLATES.map((t) => (
+                  <div className="col-xl-6 mb-3" key={t.id}>
+                    <div className="card mb-0 h-100">
+                      <div className="card-body">
+                        <div className="d-flex align-items-start justify-content-between mb-3">
+                          <div>
+                            <h5 className="mb-1">{t.name}</h5>
+                            <p className="fs-12 text-muted mb-0">{TYPE_LABEL[t.type]}</p>
+                          </div>
+                          <button type="button" className="btn btn-primary btn-sm"
+                            onClick={() => openCreateModal({ name: t.name, type: t.type, templateId: t.id })}>
+                            Usar plantilla
+                          </button>
                         </div>
-                      ))}
+                        <ol className="mb-0 ps-3">
+                          {t.sections.map((s) => <li className="fs-12 text-muted" key={s}>{s}</li>)}
+                        </ol>
+                      </div>
                     </div>
-                  </NelvyonDsCard>
+                  </div>
                 ))}
               </div>
             )}
+          </div>
+        </div>
+      </div>
 
       {showModal && (
         <CreateDocumentModal
@@ -488,6 +469,6 @@ export default function SaasDocumentosPage() {
           onSaved={() => void load()}
         />
       )}
-    </SaasShellLayout>
+    </SaasW3crmShell>
   );
 }
