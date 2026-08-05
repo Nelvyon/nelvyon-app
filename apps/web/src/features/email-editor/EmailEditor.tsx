@@ -13,9 +13,15 @@ interface EmailEditorProps {
   placeholder?: string;
 }
 
-const TOOLBAR_BTN =
-  "rounded px-2 py-1 text-xs font-medium transition-colors hover:bg-muted/60 disabled:opacity-40";
-const ACTIVE = "bg-primary/20 text-primary";
+/**
+ * El cromo del editor usa clases de Bootstrap 5 (las que trae la plantilla
+ * W3CRM) para que encaje dentro del hueco `custom-ekeditor ct-ticket` que la
+ * pantalla `(cms)/add-email` reserva para su CKEditor. La logica de TipTap
+ * —extensiones, `setLink`, variables, `value`/`onChange`— no cambia.
+ */
+const TOOLBAR_BTN = "btn btn-sm";
+const ACTIVE = "btn-primary";
+const INACTIVE = "btn-primary light";
 
 export function EmailEditor({ value, onChange, placeholder = "Escribe el contenido del email…" }: EmailEditorProps) {
   const editor = useEditor({
@@ -31,8 +37,8 @@ export function EmailEditor({ value, onChange, placeholder = "Escribe el conteni
     },
     editorProps: {
       attributes: {
-        class:
-          "min-h-[280px] px-4 py-3 text-sm text-foreground focus:outline-none prose prose-invert prose-sm max-w-none",
+        class: "px-3 py-3 fs-14 email-editor-body",
+        style: "min-height:280px;outline:none;",
       },
     },
   });
@@ -53,31 +59,32 @@ export function EmailEditor({ value, onChange, placeholder = "Escribe el conteni
       type="button"
       onClick={onClick}
       title={title ?? label}
-      className={`${TOOLBAR_BTN} ${active ? ACTIVE : "text-muted-foreground"}`}
+      aria-pressed={active}
+      className={`${TOOLBAR_BTN} ${active ? ACTIVE : INACTIVE}`}
     >
       {label}
     </button>
   );
 
   return (
-    <div className="overflow-hidden rounded-xl border border-border bg-card">
+    <div className="border rounded overflow-hidden">
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-1 border-b border-border bg-muted/20 px-3 py-2">
+      <div className="d-flex flex-wrap align-items-center gap-1 border-bottom p-2">
         {btn(editor.isActive("bold"), () => editor.chain().focus().toggleBold().run(), "B", "Negrita")}
         {btn(editor.isActive("italic"), () => editor.chain().focus().toggleItalic().run(), "I", "Cursiva")}
         {btn(editor.isActive("underline"), () => editor.chain().focus().toggleUnderline().run(), "U", "Subrayado")}
-        <span className="mx-1 text-border">|</span>
+        <span className="mx-1 text-muted">|</span>
         {btn(editor.isActive("heading", { level: 1 }), () => editor.chain().focus().toggleHeading({ level: 1 }).run(), "H1")}
         {btn(editor.isActive("heading", { level: 2 }), () => editor.chain().focus().toggleHeading({ level: 2 }).run(), "H2")}
         {btn(editor.isActive("heading", { level: 3 }), () => editor.chain().focus().toggleHeading({ level: 3 }).run(), "H3")}
-        <span className="mx-1 text-border">|</span>
+        <span className="mx-1 text-muted">|</span>
         {btn(editor.isActive({ textAlign: "left" }), () => editor.chain().focus().setTextAlign("left").run(), "⬅", "Alinear izq")}
         {btn(editor.isActive({ textAlign: "center" }), () => editor.chain().focus().setTextAlign("center").run(), "↔", "Centrar")}
         {btn(editor.isActive({ textAlign: "right" }), () => editor.chain().focus().setTextAlign("right").run(), "➡", "Alinear der")}
-        <span className="mx-1 text-border">|</span>
+        <span className="mx-1 text-muted">|</span>
         {btn(editor.isActive("bulletList"), () => editor.chain().focus().toggleBulletList().run(), "• Lista")}
         {btn(editor.isActive("orderedList"), () => editor.chain().focus().toggleOrderedList().run(), "1. Lista")}
-        <span className="mx-1 text-border">|</span>
+        <span className="mx-1 text-muted">|</span>
         {btn(editor.isActive("link"), setLink, "🔗 Enlace")}
         {btn(false, () => editor.chain().focus().undo().run(), "↩", "Deshacer")}
         {btn(false, () => editor.chain().focus().redo().run(), "↪", "Rehacer")}
@@ -87,15 +94,15 @@ export function EmailEditor({ value, onChange, placeholder = "Escribe el conteni
       <EditorContent editor={editor} />
 
       {/* Variables hint */}
-      <div className="border-t border-border bg-muted/10 px-4 py-2">
-        <p className="text-xs text-muted-foreground">
+      <div className="border-top p-2">
+        <p className="mb-0 fs-12 text-muted">
           Variables disponibles:{" "}
           {["{{nombre}}", "{{empresa}}", "{{email}}", "{{plan}}"].map((v) => (
             <button
               key={v}
               type="button"
               onClick={() => editor.chain().focus().insertContent(v).run()}
-              className="mx-0.5 rounded bg-primary/10 px-1.5 py-0.5 font-mono text-[11px] text-primary hover:bg-primary/20"
+              className="btn btn-primary light btn-xs me-1"
             >
               {v}
             </button>
