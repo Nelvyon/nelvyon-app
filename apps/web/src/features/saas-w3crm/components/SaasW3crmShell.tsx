@@ -23,6 +23,9 @@ import ThemeContextProvider from "@/features/saas-w3crm/context/ThemeContext";
 import Layout from "@/features/saas-w3crm/layouts/Layout";
 import { buildNelvyonMenu } from "@/features/saas-w3crm/layouts/nav/nelvyonMenu";
 
+// Convivencia Tailwind v4 / Bootstrap 5 dentro del scope (ver el propio fichero).
+import "@/features/saas-w3crm/w3crmScope.css";
+
 export function SaasW3crmShell({ children }: { children: React.ReactNode }) {
   // Mismo namespace que usaba SaasSidebar: las claves son saas.nav.items.* / saas.nav.groups.*
   const t = useTranslations("saas.nav");

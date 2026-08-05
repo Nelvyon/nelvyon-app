@@ -1,0 +1,29 @@
+/**
+ * Correcciones de convivencia Tailwind v4 <-> Bootstrap 5 dentro de `.w3crm-scope`.
+ *
+ * NO es maquillaje visual ni un rediseño: aquí solo se neutralizan utilidades de
+ * Tailwind cuyo NOMBRE coincide con el de un componente de Bootstrap que la
+ * plantilla W3CRM usa tal cual. El marcado, las clases y la CSS de la plantilla
+ * quedan intactos.
+ *
+ * ---------------------------------------------------------------------------
+ * `.collapse` — incompatibilidad demostrada
+ *
+ * Tailwind v4 emite la utilidad `.collapse { visibility: collapse }` (sirve para
+ * ocultar filas y columnas de tabla). Bootstrap 5 usa `.collapse` como
+ * componente y solo gobierna `display`: al abrirse añade `.show`, que restaura
+ * `display`, pero NADA restaura `visibility`.
+ *
+ * El submenú del sidebar (`react-bootstrap/Collapse` -> `class="collapse show"`)
+ * quedaba entonces con `display: block` y `visibility: collapse`: ocupaba su
+ * altura real (635 px medidos) pero era invisible para el usuario y quedaba
+ * fuera del árbol de accesibilidad. De ahí que el sidebar mostrase los grupos
+ * y ningún enlace de módulo, y que las comprobaciones basadas en medir alturas
+ * no detectaran nada raro: `getBoundingClientRect()` no ve `visibility`.
+ *
+ * La especificidad (0,2,0 frente a 0,1,0) hace que esto gane sin depender del
+ * orden en que se carguen las hojas de estilo.
+ */
+.w3crm-scope .collapse {
+  visibility: visible;
+}

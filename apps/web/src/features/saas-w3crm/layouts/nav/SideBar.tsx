@@ -1,9 +1,10 @@
 /// Menu
-import React, { useContext, useEffect, useReducer, useState } from "react";
+import React, { useContext, useEffect, useMemo, useReducer, useState } from "react";
 import Collapse from 'react-bootstrap/Collapse';
 
 /// Link
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import {MenuList, type W3crmMenuItem} from './Menu';
 import {useScrollPosition} from "@n8tb1t/use-scroll-position";
@@ -39,7 +40,10 @@ const SideBar = ({ menuList = MenuList }: { menuList?: W3crmMenuItem[] }) => {
 		sidebarLayout,
 	} = useContext(ThemeContext);
 
-  const [state, setState] = useReducer(reducer, initialState);	
+  const [state, setState] = useReducer(reducer, initialState);
+  /** Tras la primera interaccion manda el estado, no la ruta. */
+  const [tocadoPorUsuario, setTocadoPorUsuario] = useState(false);
+
 	useEffect(() => {
 			
 	}, []);
@@ -54,7 +58,8 @@ const SideBar = ({ menuList = MenuList }: { menuList?: W3crmMenuItem[] }) => {
 	)
 
  
-  const handleMenuActive = (status: string) => {	
+  const handleMenuActive = (status: string) => {
+    setTocadoPorUsuario(true);
     setState({active : status});		
 		if(state.active === status){			
       setState({active : ""});
@@ -75,13 +80,27 @@ const SideBar = ({ menuList = MenuList }: { menuList?: W3crmMenuItem[] }) => {
   // nivel (`/dashboard`). Las de NELVYON son completas (`/saas/dashboard`), asi
   // que se usa el pathname entero y su deteccion de activo vuelve a funcionar:
   // el grupo que contiene la ruta actual se abre solo, como en la demo original.
-  const path = typeof window !== "undefined" ? window.location.pathname : "";
+  //
+  // ADAPTACION FORZADA (incompatibilidad demostrada con SSR de Next 15):
+  // la plantilla es una SPA sin servidor y leia `window.location.pathname`
+  // durante el render. Bajo SSR eso vale "" en el servidor, asi que el HTML
+  // salia con todos los grupos cerrados (`class="collapse"`, sin `show`). En
+  // hidratacion de PRODUCCION React no rediffea los atributos: da por bueno el
+  // marcado del servidor. El valor correcto del cliente nunca llegaba al DOM y
+  // el submenu quedaba oculto de forma permanente, con el enlace del modulo
+  // presente pero invisible. Solo se "arreglaba" si algo provocaba un segundo
+  // render (por ejemplo permisos que tardaban), de ahi que pareciera aleatorio.
+  //
+  // `usePathname()` devuelve el mismo valor en servidor y cliente, asi que el
+  // servidor ya emite el grupo abierto y no hay discrepancia. Resultado visual
+  // identico al de la plantilla: mismo marcado, mismas clases, misma animacion.
+  const path = usePathname() ?? "";
  	
   useEffect(() => {
     menuList.forEach((data) => {
-      data.content?.forEach((item) => {        
-        if(path === item.to){         
-          setState({active : data.title})          
+      data.content?.forEach((item) => {
+        if(path === item.to){
+          setState({active : data.title})
         }
         item.content?.forEach(ele => {
           if(path === ele.to){
@@ -91,6 +110,36 @@ const SideBar = ({ menuList = MenuList }: { menuList?: W3crmMenuItem[] }) => {
       })
   })
   },[path, menuList]);
+
+  /**
+   * Grupo que contiene la ruta actual, DERIVADO en el render.
+   *
+   * El efecto de arriba (el de la plantilla) abre el grupo despues del primer
+   * pintado, asi que `<Collapse>` recibe `in` pasando de false a true y anima
+   * midiendo `scrollHeight`. Cuando llegan los permisos, `menuList` cambia de
+   * identidad y los hijos del `<ul>` se sustituyen a mitad de esa transicion:
+   * la animacion termina con `height: 0` y el submenu queda atascado cerrado
+   * aunque el grupo figure como `aria-expanded="true"`. De ahi que el sidebar
+   * mostrase los grupos pero ningun enlace de modulo.
+   *
+   * Derivandolo aqui, `Collapse` monta ya abierto y no hay animacion que
+   * pueda quedarse a medias. El efecto se conserva —sigue siendo el de la
+   * plantilla y gobierna el submenu de segundo nivel—, y el estado manual
+   * mantiene la prioridad en cuanto el usuario pulsa un grupo.
+   */
+  const grupoDeLaRuta = useMemo(() => {
+    for (const data of menuList) {
+      for (const item of data.content ?? []) {
+        if (path === item.to) return data.title ?? "";
+        for (const ele of item.content ?? []) {
+          if (path === ele.to) return data.title ?? "";
+        }
+      }
+    }
+    return "";
+  }, [menuList, path]);
+
+  const grupoAbierto = tocadoPorUsuario ? state.active : (state.active || grupoDeLaRuta);
 
   return (
     <div
@@ -102,7 +151,7 @@ const SideBar = ({ menuList = MenuList }: { menuList?: W3crmMenuItem[] }) => {
             ? "fixed"
             : ""
           : ""
-      }`} data-testid="saas-sidebar"      
+      }`} data-testid="saas-sidebar"
     >
         <div className="deznav-scroll">         
           <ul className="metismenu" id="menu">              
@@ -114,7 +163,7 @@ const SideBar = ({ menuList = MenuList }: { menuList?: W3crmMenuItem[] }) => {
                     )
                   }else{
                     return(				
-                      <li className={` ${ state.active === data.title ? 'mm-active' : ''}`}
+                      <li className={` ${ grupoAbierto === data.title ? 'mm-active' : ''}`}
                         key={claveMenu(data, index)} 
                       >                        
                         {data.content && data.content.length > 0 ?
@@ -122,7 +171,7 @@ const SideBar = ({ menuList = MenuList }: { menuList?: W3crmMenuItem[] }) => {
                               <Link href={"#"} scroll={false}
                                 className="has-arrow"
                                 role="button"
-                                aria-expanded={state.active === data.title}
+                                aria-expanded={grupoAbierto === data.title}
                                 onClick={(e) => {e.preventDefault(); handleMenuActive(data.title)}}
                                 >		
                                   <div className="menu-icon">
@@ -137,7 +186,7 @@ const SideBar = ({ menuList = MenuList }: { menuList?: W3crmMenuItem[] }) => {
                                   } 
                                 </span>
                               </Link>
-                              <Collapse in={state.active === data.title ? true :false}>
+                              <Collapse in={grupoAbierto === data.title ? true :false}>
                                   <ul className={`${menuClass === "mm-collapse" ? "mm-show" : ""}`}>
                                     {data.content && data.content.map((data,index) => {									
                                       return(	
