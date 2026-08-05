@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 import {
   type ConsentPreferences,
@@ -63,6 +63,34 @@ export function CookieBanner() {
     setCustomizeOpen(true);
   }, []);
 
+  /**
+   * El banner esta fijo al fondo de la ventana, asi que tapa siempre la ultima
+   * franja del viewport. Cuando el ultimo control de una pagina cae ahi, deja
+   * de ser alcanzable: aunque se llegue al final del scroll, el elemento sigue
+   * por debajo del banner y los clics los intercepta el.
+   *
+   * Se reserva en el `body` el espacio que el banner ocupa realmente (su alto
+   * varia: crece al plegarse a una columna en movil y al abrir la ventana de
+   * preferencias), de modo que el contenido pueda desplazarse por encima. Se
+   * devuelve el `body` a su estado original al aceptar o al desmontar.
+   */
+  const bannerRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (consented) return;
+    const el = bannerRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const aplicar = () => {
+      document.body.style.paddingBottom = `${Math.ceil(el.getBoundingClientRect().height)}px`;
+    };
+    aplicar();
+    const ro = new ResizeObserver(aplicar);
+    ro.observe(el);
+    return () => {
+      ro.disconnect();
+      document.body.style.paddingBottom = "";
+    };
+  }, [consented]);
+
   if (consented) {
     return null;
   }
@@ -70,7 +98,8 @@ export function CookieBanner() {
   return (
     <>
       <div
-        className="fixed inset-x-0 bottom-0 z-[100] border-t border-zinc-800/80 bg-zinc-950/95 px-4 py-4 backdrop-blur-md md:px-6"
+        ref={bannerRef}
+        className="fixed inset-x-0 bottom-0 z-[100] border-t border-zinc-800/80 bg-[#020817]/96 px-4 py-4 backdrop-blur-md md:px-6"
         role="dialog"
         aria-label="Preferencias de cookies"
       >
@@ -82,7 +111,7 @@ export function CookieBanner() {
               política de privacidad
             </Link>{" "}
             y{" "}
-            <Link href="/cookies" className="text-[#4da3ff] underline hover:text-[#7cbcff]">
+            <Link href="/cookies" className="text-[#33A1FF] underline hover:text-[#7cbcff]">
               cookies
             </Link>
             .
