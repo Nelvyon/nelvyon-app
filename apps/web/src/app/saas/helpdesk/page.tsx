@@ -1,13 +1,36 @@
 "use client";
 
+/**
+ * /saas/helpdesk sobre `(cms)/content` de W3CRM, con las piezas ya portadas.
+ * Mapeo: listado de tickets -> `W3crmContentBox` + `W3crmDataTable`; alta y
+ * detalle (conversacion, SLA, macros, respuesta) -> `W3crmModal`; KPIs ->
+ * `W3crmKpiTile`. Sin componentes nuevos.
+ *
+ * Contrato de la suite: `saas-nav-full-coverage` recorre `SAAS_NAV_ITEMS` y
+ * exige que la ruta cargue sin redirigir a login y sin "Internal Server Error"
+ * en el body. No habia `data-testid` previos; solo se usan los que aceptan los
+ * componentes ya portados, para poder certificar.
+ *
+ * El titulo usa "Helpdesk" (la etiqueta de `saasNav`) y no "Help Desk": el
+ * `SideBar` de W3CRM ya trae un boton fijo "Help Desk" hacia esta misma ruta en
+ * todas las paginas, y repetir el texto crearia dos nombres accesibles iguales.
+ *
+ * Logica de NELVYON intacta: `/api/saas/helpdesk` con sus variantes (`?id=`
+ * para mensajes, `?resource=macros`) y sus acciones POST (alta, `message`,
+ * `update`, `apply-macro`); los tipos `Ticket`, `Message` y `Macro`, los
+ * catalogos de prioridad, estado y politica SLA, `slaStatus`, `fmtDue`, el
+ * filtro por estado y los recuentos de abiertos, urgentes e incumplidos.
+ */
 import { useCallback, useEffect, useState } from "react";
-import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 
-type Priority   = "low" | "medium" | "high" | "urgent";
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmEmptyState, W3crmKpiTile } from "@/features/saas-w3crm/components/W3crmUi";
+import { W3crmCargando, W3crmContentBox, W3crmDataTable, W3crmModal } from "@/features/saas-w3crm/components/W3crmContentBox";
+
+type Priority = "low" | "medium" | "high" | "urgent";
 type TicketStatus = "open" | "in_progress" | "resolved" | "closed";
-type SlaPolicy  = "standard" | "priority" | "urgent";
+type SlaPolicy = "standard" | "priority" | "urgent";
 
 interface Ticket {
   id: string; subject: string; description: string | null;
@@ -24,33 +47,53 @@ interface Macro {
   id: string; name: string; actions: Array<{ type: string; [k: string]: unknown }>; active: boolean;
 }
 
-const PRIORITY_COLOR: Record<Priority, string> = {
-  low: "text-muted-foreground", medium: "text-yellow-400", high: "text-orange-400", urgent: "text-red-400"
+const PRIORITY_BADGE: Record<Priority, string> = {
+  low: "badge-secondary", medium: "badge-warning", high: "badge-warning", urgent: "badge-danger",
 };
 const PRIORITY_LABEL: Record<Priority, string> = { low: "Baja", medium: "Media", high: "Alta", urgent: "Urgente" };
-const STATUS_TONE: Record<TicketStatus, "primary" | "success" | "warning" | "danger"> = {
-  open: "warning", in_progress: "primary", resolved: "success", closed: "success"
+const STATUS_BADGE: Record<TicketStatus, string> = {
+  open: "badge-warning", in_progress: "badge-primary", resolved: "badge-success", closed: "badge-success",
 };
 const STATUS_LABEL: Record<TicketStatus, string> = {
-  open: "Abierto", in_progress: "En curso", resolved: "Resuelto", closed: "Cerrado"
+  open: "Abierto", in_progress: "En curso", resolved: "Resuelto", closed: "Cerrado",
 };
-const SLA_LABEL: Record<SlaPolicy, string> = { standard: "Estándar (4h/24h)", priority: "Prioritario (1h/8h)", urgent: "Urgente (30m/4h)" };
-const inp = "w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none";
+const SLA_LABEL: Record<SlaPolicy, string> = {
+  standard: "Estándar (4h/24h)", priority: "Prioritario (1h/8h)", urgent: "Urgente (30m/4h)",
+};
+
+/** Catalogos que pueden crecer en el backend sin dejar la pantalla en blanco. */
+function etiquetaPrioridad(p: Priority | string) { return PRIORITY_LABEL[p as Priority] ?? String(p || "—"); }
+function badgePrioridad(p: Priority | string) { return PRIORITY_BADGE[p as Priority] ?? "badge-secondary"; }
+function etiquetaEstado(s: TicketStatus | string) { return STATUS_LABEL[s as TicketStatus] ?? String(s || "—"); }
+function badgeEstado(s: TicketStatus | string) { return STATUS_BADGE[s as TicketStatus] ?? "badge-secondary"; }
+function etiquetaSla(s: SlaPolicy | string) { return SLA_LABEL[s as SlaPolicy] ?? String(s || "—"); }
+function num(v: unknown): number {
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
 
 function slaStatus(due: string | null, done: string | null): "ok" | "risk" | "breached" | null {
   if (!due) return null;
   if (done) return "ok";
-  const diff = new Date(due).getTime() - Date.now();
+  const t = new Date(due).getTime();
+  if (Number.isNaN(t)) return null;
+  const diff = t - Date.now();
   if (diff < 0) return "breached";
   if (diff < 30 * 60000) return "risk";
   return "ok";
 }
 function fmtDue(due: string | null): string {
   if (!due) return "—";
-  return new Date(due).toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" });
+  const d = new Date(due);
+  return Number.isNaN(d.getTime()) ? "—" : d.toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" });
+}
+/** Color del texto segun el estado del SLA. */
+function claseSla(estado: ReturnType<typeof slaStatus>) {
+  return estado === "breached" ? "text-danger" : estado === "risk" ? "text-warning" : "";
 }
 
-// ── New Ticket Modal ──────────────────────────────────────────────────────────
+// ── Nuevo ticket ──────────────────────────────────────────────────────────────
+
 function NewTicketModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
   const [subject, setSubject] = useState("");
   const [desc, setDesc] = useState("");
@@ -68,59 +111,91 @@ function NewTicketModal({ onClose, onSaved }: { onClose: () => void; onSaved: ()
     try {
       const res = await fetch("/api/saas/helpdesk", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subject: subject.trim(), description: desc.trim(), contactName: contactName.trim(), contactEmail: contactEmail.trim(), priority, slaPolicy }),
+        body: JSON.stringify({
+          subject: subject.trim(), description: desc.trim(),
+          contactName: contactName.trim(), contactEmail: contactEmail.trim(),
+          priority, slaPolicy,
+        }),
       });
-      const d = await res.json() as { error?: string };
+      const d = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) { setError(d.error ?? "Error al crear ticket"); return; }
       onSaved(); onClose();
     } finally { setSaving(false); }
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl">
-        <h2 className="mb-5 text-lg font-semibold text-foreground">Nuevo ticket</h2>
-        {error && <p className="mb-4 rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
-        <form onSubmit={save} className="space-y-4">
-          <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Asunto *</label>
-            <input value={subject} onChange={e => setSubject(e.target.value)} placeholder="Error al acceder al módulo…" className={inp} /></div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre contacto</label>
-              <input value={contactName} onChange={e => setContactName(e.target.value)} placeholder="María García" className={inp} /></div>
-            <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Email *</label>
-              <input type="email" value={contactEmail} onChange={e => setContactEmail(e.target.value)} placeholder="maria@empresa.com" className={inp} /></div>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Prioridad</label>
-              <div className="flex gap-1.5">
-                {(["low","medium","high","urgent"] as Priority[]).map(p => (
-                  <button key={p} type="button" onClick={() => setPriority(p)}
-                    className={`flex-1 rounded-lg border py-1.5 text-xs font-medium ${priority === p ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/40"}`}>
-                    {PRIORITY_LABEL[p]}
-                  </button>
-                ))}
-              </div>
+    <W3crmModal titulo="Nuevo ticket" onClose={onClose} error={error} testId="modal-ticket">
+      <form onSubmit={save}>
+        <div className="row">
+          <div className="col-lg-12">
+            <div className="form-group mb-3">
+              <label htmlFor="hd-asunto" className="text-black font-w600">Asunto <span className="required">*</span></label>
+              <input id="hd-asunto" type="text" className="form-control" placeholder="Error al acceder al módulo…"
+                value={subject} onChange={(e) => setSubject(e.target.value)} />
             </div>
-            <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Política SLA</label>
-              <select value={slaPolicy} onChange={e => setSlaPolicy(e.target.value as SlaPolicy)} className={inp}>
-                {(["standard","priority","urgent"] as SlaPolicy[]).map(s => <option key={s} value={s}>{SLA_LABEL[s]}</option>)}
+          </div>
+          <div className="col-lg-6">
+            <div className="form-group mb-3">
+              <label htmlFor="hd-nombre" className="text-black font-w600">Nombre contacto</label>
+              <input id="hd-nombre" type="text" className="form-control" placeholder="María García"
+                value={contactName} onChange={(e) => setContactName(e.target.value)} />
+            </div>
+          </div>
+          <div className="col-lg-6">
+            <div className="form-group mb-3">
+              <label htmlFor="hd-email" className="text-black font-w600">Email <span className="required">*</span></label>
+              <input id="hd-email" type="email" className="form-control" placeholder="maria@empresa.com"
+                value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} />
+            </div>
+          </div>
+          <div className="col-lg-6">
+            <div className="form-group mb-3">
+              <label className="text-black font-w600 d-block">Prioridad</label>
+              {(["low", "medium", "high", "urgent"] as Priority[]).map((p) => (
+                <button key={p} type="button" aria-pressed={priority === p}
+                  className={`btn btn-sm me-1 mb-1 ${priority === p ? "btn-primary" : "btn-primary light"}`}
+                  onClick={() => setPriority(p)}>
+                  {PRIORITY_LABEL[p]}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="col-lg-6">
+            <div className="form-group mb-3">
+              <label htmlFor="hd-sla" className="text-black font-w600">Política SLA</label>
+              <select id="hd-sla" className="form-control" value={slaPolicy} onChange={(e) => setSlaPolicy(e.target.value as SlaPolicy)}>
+                {(["standard", "priority", "urgent"] as SlaPolicy[]).map((s) => (
+                  <option key={s} value={s}>{SLA_LABEL[s]}</option>
+                ))}
               </select>
             </div>
           </div>
-          <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Descripción</label>
-            <textarea value={desc} onChange={e => setDesc(e.target.value)} rows={3} className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" /></div>
-          <div className="flex gap-3">
-            <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
-            <NelvyonDsButton type="submit" disabled={saving} className="flex-1">{saving ? "Creando…" : "Crear ticket"}</NelvyonDsButton>
+          <div className="col-lg-12">
+            <div className="form-group mb-3">
+              <label htmlFor="hd-descripcion" className="text-black font-w600">Descripción</label>
+              <textarea id="hd-descripcion" className="form-control" rows={3}
+                value={desc} onChange={(e) => setDesc(e.target.value)} />
+            </div>
           </div>
-        </form>
-      </div>
-    </div>
+          <div className="col-lg-12">
+            <div className="text-end">
+              <button type="button" className="btn btn-danger light me-2" onClick={onClose}>Cancelar</button>
+              <button type="submit" className="btn btn-primary" disabled={saving}>
+                {saving ? "Creando…" : "Crear ticket"}
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </W3crmModal>
   );
 }
 
-// ── Ticket Detail Panel ───────────────────────────────────────────────────────
-function TicketDetail({ ticket, macros, onClose, onUpdated }: { ticket: Ticket; macros: Macro[]; onClose: () => void; onUpdated: () => void }) {
+// ── Detalle de ticket ─────────────────────────────────────────────────────────
+
+function TicketDetail({ ticket, macros, onClose, onUpdated }: {
+  ticket: Ticket; macros: Macro[]; onClose: () => void; onUpdated: () => void;
+}) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMsg, setNewMsg] = useState("");
   const [sendingMsg, setSendingMsg] = useState(false);
@@ -135,8 +210,8 @@ function TicketDetail({ ticket, macros, onClose, onUpdated }: { ticket: Ticket; 
     try {
       const res = await fetch(`/api/saas/helpdesk?id=${ticket.id}`);
       if (!res.ok) throw new Error(`Error ${res.status}`);
-      const d = await res.json() as { messages?: Message[] };
-      setMessages(d.messages ?? []);
+      const d = (await res.json().catch(() => ({}))) as { messages?: Message[] };
+      setMessages(Array.isArray(d.messages) ? d.messages : []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al cargar mensajes");
       setMessages([]);
@@ -156,15 +231,10 @@ function TicketDetail({ ticket, macros, onClose, onUpdated }: { ticket: Ticket; 
       const res = await fetch("/api/saas/helpdesk", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "message",
-          ticket_id: ticket.id,
-          body: newMsg.trim(),
-          is_internal: isInternal,
-        }),
+        body: JSON.stringify({ action: "message", ticket_id: ticket.id, body: newMsg.trim(), is_internal: isInternal }),
       });
       if (!res.ok) {
-        const d = await res.json().catch(() => null) as { error?: string } | null;
+        const d = (await res.json().catch(() => null)) as { error?: string } | null;
         throw new Error(d?.error ?? `Error ${res.status}`);
       }
       setNewMsg("");
@@ -188,7 +258,7 @@ function TicketDetail({ ticket, macros, onClose, onUpdated }: { ticket: Ticket; 
         body: JSON.stringify({ action: "update", id: ticket.id, status }),
       });
       if (!res.ok) {
-        const d = await res.json().catch(() => null) as { error?: string } | null;
+        const d = (await res.json().catch(() => null)) as { error?: string } | null;
         throw new Error(d?.error ?? `Error ${res.status}`);
       }
       onUpdated();
@@ -210,7 +280,7 @@ function TicketDetail({ ticket, macros, onClose, onUpdated }: { ticket: Ticket; 
         body: JSON.stringify({ action: "apply-macro", ticketId: ticket.id, macroId }),
       });
       if (!res.ok) {
-        const d = await res.json().catch(() => null) as { error?: string } | null;
+        const d = (await res.json().catch(() => null)) as { error?: string } | null;
         throw new Error(d?.error ?? `Error ${res.status}`);
       }
       onUpdated();
@@ -222,103 +292,110 @@ function TicketDetail({ ticket, macros, onClose, onUpdated }: { ticket: Ticket; 
     }
   }
 
-  const slaDue = slaStatus(ticket.resolutionDue, ticket.resolvedAt);
+  const slaResolucion = slaStatus(ticket.resolutionDue, ticket.resolvedAt);
+  const slaRespuesta = slaStatus(ticket.firstResponseDue, ticket.firstRespondedAt);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-end bg-black/40 backdrop-blur-sm" onClick={onClose}>
-      <div className="h-full w-full max-w-lg overflow-y-auto bg-card border-l border-border shadow-2xl" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between border-b border-border px-5 py-4">
-          <div>
-            <p className="font-semibold text-foreground text-sm line-clamp-1">{ticket.subject}</p>
-            <p className="text-xs text-muted-foreground">{ticket.contactName} · {ticket.contactEmail}</p>
-          </div>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground ml-4">✕</button>
-        </div>
+    <W3crmModal titulo={ticket.subject || "Ticket"} onClose={onClose} error={error} size="lg" testId="detalle-ticket">
+      <p className="fs-12 text-muted">{ticket.contactName || "—"} · {ticket.contactEmail || "—"}</p>
 
-        <div className="p-5 space-y-5">
-          {error && <p className="rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
+      <div className="mb-3">
+        <span className={`badge ${badgeEstado(ticket.status)} me-1`}>{etiquetaEstado(ticket.status)}</span>
+        <span className={`badge ${badgePrioridad(ticket.priority)} me-1`}>{etiquetaPrioridad(ticket.priority)}</span>
+        {ticket.slaBreached && <span className="badge badge-danger">SLA incumplido</span>}
+      </div>
 
-          {/* Status + Priority */}
-          <div className="flex flex-wrap gap-2">
-            <NelvyonDsBadge tone={STATUS_TONE[ticket.status]}>{STATUS_LABEL[ticket.status]}</NelvyonDsBadge>
-            <span className={`text-xs font-bold uppercase ${PRIORITY_COLOR[ticket.priority]}`}>{PRIORITY_LABEL[ticket.priority]}</span>
-            {ticket.slaBreached && <NelvyonDsBadge tone="danger">SLA Incumplido</NelvyonDsBadge>}
-          </div>
-
-          {/* SLA */}
-          <div className="rounded-lg bg-muted/10 border border-border p-3 text-xs space-y-1">
-            <p className="font-medium text-foreground text-xs mb-1">SLA — {SLA_LABEL[ticket.slaPolicy]}</p>
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <p className="text-muted-foreground">Primera respuesta</p>
-                <p className={`font-medium ${slaStatus(ticket.firstResponseDue, ticket.firstRespondedAt) === "breached" ? "text-red-400" : "text-foreground"}`}>{fmtDue(ticket.firstResponseDue)}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground">Resolución</p>
-                <p className={`font-medium ${slaDue === "breached" ? "text-red-400" : slaDue === "risk" ? "text-amber-400" : "text-foreground"}`}>{fmtDue(ticket.resolutionDue)}</p>
-              </div>
+      <div className="card mb-3">
+        <div className="card-body">
+          <p className="fw-bold fs-14 mb-2">SLA — {etiquetaSla(ticket.slaPolicy)}</p>
+          <div className="row">
+            <div className="col-6">
+              <p className="fs-12 text-muted mb-0">Primera respuesta</p>
+              <p className={`mb-0 fw-bold ${claseSla(slaRespuesta)}`}>{fmtDue(ticket.firstResponseDue)}</p>
+            </div>
+            <div className="col-6">
+              <p className="fs-12 text-muted mb-0">Resolución</p>
+              <p className={`mb-0 fw-bold ${claseSla(slaResolucion)}`}>{fmtDue(ticket.resolutionDue)}</p>
             </div>
           </div>
-
-          {/* Actions */}
-          <div className="flex flex-wrap gap-2">
-            {(["open","in_progress","resolved","closed"] as TicketStatus[]).filter(s => s !== ticket.status).map(s => (
-              <button key={s} disabled={acting} onClick={() => void changeStatus(s)} className="rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:border-primary hover:text-primary transition-colors disabled:opacity-50">
-                → {STATUS_LABEL[s]}
-              </button>
-            ))}
-          </div>
-
-          {/* Macros */}
-          {macros.length > 0 && (
-            <div>
-              <p className="text-xs font-medium text-muted-foreground mb-2">Macros</p>
-              <div className="flex flex-wrap gap-2">
-                {macros.map(m => (
-                  <button key={m.id} disabled={acting} onClick={() => void applyMacro(m.id)} className="rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:border-primary hover:text-primary transition-colors disabled:opacity-50">
-                    ⚡ {m.name}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Messages */}
-          <div>
-            <p className="text-xs font-medium text-muted-foreground mb-3">Conversación ({messages.length})</p>
-            {loading ? <div className="space-y-2">{[1,2].map(i => <div key={i} className="h-12 animate-pulse rounded-lg bg-muted/20" />)}</div> : (
-              <div className="space-y-3">
-                {messages.map(m => (
-                  <div key={m.id} className={`rounded-lg p-3 text-sm ${m.isInternal ? "bg-amber-500/5 border border-amber-500/20" : "bg-muted/10 border border-border"}`}>
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-medium text-foreground text-xs">{m.author}{m.isInternal ? " · 🔒 interno" : ""}</span>
-                      <span className="text-xs text-muted-foreground">{new Date(m.createdAt).toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" })}</span>
-                    </div>
-                    <p className="text-foreground whitespace-pre-wrap">{m.body}</p>
-                  </div>
-                ))}
-                {messages.length === 0 && <p className="text-sm text-muted-foreground">Sin mensajes todavía</p>}
-              </div>
-            )}
-          </div>
-
-          {/* Reply */}
-          <form onSubmit={sendMessage} className="space-y-2">
-            <textarea value={newMsg} onChange={e => setNewMsg(e.target.value)} rows={3} placeholder="Escribe una respuesta…"
-              className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
-            <label className="flex items-center gap-2 text-xs text-muted-foreground">
-              <input type="checkbox" checked={isInternal} onChange={e => setIsInternal(e.target.checked)} className="accent-primary" />
-              Nota interna (no visible para el cliente)
-            </label>
-            <NelvyonDsButton type="submit" disabled={sendingMsg || !newMsg.trim()} className="w-full">{sendingMsg ? "Enviando…" : "Responder"}</NelvyonDsButton>
-          </form>
         </div>
       </div>
-    </div>
+
+      <div className="mb-3">
+        <label className="text-black font-w600 d-block mb-2">Cambiar estado</label>
+        {(["open", "in_progress", "resolved", "closed"] as TicketStatus[])
+          .filter((s) => s !== ticket.status)
+          .map((s) => (
+            <button key={s} type="button" className="btn btn-primary light btn-sm me-1 mb-1" disabled={acting}
+              onClick={() => void changeStatus(s)}>
+              {STATUS_LABEL[s]}
+            </button>
+          ))}
+      </div>
+
+      {macros.length > 0 && (
+        <div className="mb-3">
+          <label className="text-black font-w600 d-block mb-2">Macros</label>
+          {macros.map((m) => (
+            <button key={m.id} type="button" className="btn btn-primary light btn-sm me-1 mb-1" disabled={acting}
+              onClick={() => void applyMacro(m.id)}>
+              ⚡ {m.name || "Macro"}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <p className="fw-bold fs-14 mb-2">Conversación ({messages.length})</p>
+      {loading ? (
+        <W3crmCargando texto="Cargando mensajes…" />
+      ) : messages.length === 0 ? (
+        <W3crmEmptyState title="Sin mensajes todavía" />
+      ) : (
+        <W3crmDataTable
+          filas={messages}
+          etiqueta="mensajes"
+          wrapperId="mensajes_wrapper"
+          porPagina={10}
+          columnas={[{ titulo: "Autor" }, { titulo: "Mensaje" }, { titulo: "Fecha", alFinal: true }]}
+          render={(m) => (
+            <tr key={m.id}>
+              <td>
+                <span className="fw-bold">{m.author || "—"}</span>
+                {m.isInternal ? <span className="badge badge-warning ms-1 fs-12">interno</span> : null}
+              </td>
+              <td><span style={{ whiteSpace: "pre-wrap" }}>{m.body}</span></td>
+              <td className="text-end">{fmtDue(m.createdAt)}</td>
+            </tr>
+          )}
+        />
+      )}
+
+      <form onSubmit={sendMessage} className="mt-3">
+        <div className="form-group mb-2">
+          <label htmlFor="hd-respuesta" className="text-black font-w600">Responder</label>
+          <textarea id="hd-respuesta" className="form-control" rows={3} placeholder="Escribe una respuesta…"
+            value={newMsg} onChange={(e) => setNewMsg(e.target.value)} />
+        </div>
+        <div className="form-check mb-2">
+          <input className="form-check-input" type="checkbox" id="hd-interno"
+            checked={isInternal} onChange={(e) => setIsInternal(e.target.checked)} />
+          <label className="form-check-label fs-12" htmlFor="hd-interno">
+            Nota interna (no visible para el cliente)
+          </label>
+        </div>
+        <div className="text-end">
+          <button type="button" className="btn btn-danger light me-2" onClick={onClose}>Cerrar</button>
+          <button type="submit" className="btn btn-primary" disabled={sendingMsg || !newMsg.trim()}>
+            {sendingMsg ? "Enviando…" : "Responder"}
+          </button>
+        </div>
+      </form>
+    </W3crmModal>
   );
 }
 
-// ── Main Page ─────────────────────────────────────────────────────────────────
+// ── Página ────────────────────────────────────────────────────────────────────
+
 export default function SaasHelpdeskPage() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [macros, setMacros] = useState<Macro[]>([]);
@@ -337,11 +414,11 @@ export default function SaasHelpdeskPage() {
         fetch("/api/saas/helpdesk?resource=macros"),
       ]);
       if (!tRes.ok) throw new Error(`Error ${tRes.status}`);
-      const tData = await tRes.json() as { tickets?: Ticket[] };
-      setTickets(tData.tickets ?? []);
+      const tData = (await tRes.json().catch(() => ({}))) as { tickets?: Ticket[] };
+      setTickets(Array.isArray(tData.tickets) ? tData.tickets : []);
       if (mRes.ok) {
-        const d = await mRes.json() as { macros?: Macro[] };
-        setMacros(d.macros ?? []);
+        const d = (await mRes.json().catch(() => ({}))) as { macros?: Macro[] };
+        setMacros(Array.isArray(d.macros) ? d.macros : []);
       }
     } catch (err) {
       setLoadError(err instanceof Error ? err.message : "Error al cargar tickets");
@@ -353,83 +430,110 @@ export default function SaasHelpdeskPage() {
 
   useEffect(() => { void load(); }, [load]);
 
-  const filtered = filter === "all" ? tickets : tickets.filter(t => t.status === filter);
-  const open     = tickets.filter(t => t.status === "open").length;
-  const urgent   = tickets.filter(t => t.priority === "urgent" && t.status !== "resolved" && t.status !== "closed").length;
-  const breached = tickets.filter(t => t.slaBreached).length;
+  const filtered = filter === "all" ? tickets : tickets.filter((t) => t.status === filter);
+  const open = tickets.filter((t) => t.status === "open").length;
+  const urgent = tickets.filter((t) => t.priority === "urgent" && t.status !== "resolved" && t.status !== "closed").length;
+  const breached = tickets.filter((t) => t.slaBreached).length;
+
+  const FILTROS: Array<[TicketStatus | "all", string]> = [
+    ["all", "Todos"], ["open", "Abiertos"], ["in_progress", "En curso"],
+    ["resolved", "Resueltos"], ["closed", "Cerrados"],
+  ];
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="helpdesk" />}>
-      <div className="flex flex-col gap-6 pb-8">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <NelvyonDsSectionHeader title="Helpdesk / Soporte" subtitle="Tickets con SLA, macros y conversaciones por thread" />
-          <NelvyonDsButton onClick={() => setShowNew(true)}>+ Nuevo ticket</NelvyonDsButton>
-        </div>
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="Helpdesk" parentTitle="Gestión" pageTitle="Helpdesk" />
+      <div className="container-fluid">
+        <div className="row">
+          {loadError && (
+            <div className="col-xl-12">
+              <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                {loadError}
+                <button type="button" className="btn-close" aria-label="Cerrar"
+                  onClick={() => { setLoadError(null); void load(); }} />
+              </div>
+            </div>
+          )}
 
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {[
-            { label: "Total tickets", value: String(tickets.length) },
-            { label: "Abiertos",      value: String(open),    red: open > 0 },
-            { label: "Urgentes",      value: String(urgent),  red: urgent > 0 },
-            { label: "SLA incumplido",value: String(breached),red: breached > 0 },
-          ].map(({ label, value, red }) => (
-            <NelvyonDsCard key={label} className="p-4">
-              <p className="text-xs text-muted-foreground">{label}</p>
-              <p className={`mt-1 text-2xl font-bold ${red ? "text-red-400" : "text-foreground"}`}>{value}</p>
-            </NelvyonDsCard>
-          ))}
-        </div>
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Total tickets" value={tickets.length} accent /></div>
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Abiertos" value={open} /></div>
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Urgentes" value={urgent} /></div>
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="SLA incumplido" value={breached} /></div>
 
-        <div className="flex gap-2 flex-wrap">
-          {([["all","Todos"],["open","Abiertos"],["in_progress","En curso"],["resolved","Resueltos"],["closed","Cerrados"]] as const).map(([v, l]) => (
-            <button key={v} onClick={() => setFilter(v)}
-              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${filter === v ? "bg-primary text-primary-foreground" : "bg-muted/30 text-muted-foreground hover:text-foreground"}`}>
-              {l}
-            </button>
-          ))}
-        </div>
-
-        {loadError && (
-          <NelvyonDsCard className="p-4 border-red-500/30 bg-red-500/5">
-            <p className="text-sm text-red-400">{loadError}</p>
-            <button type="button" onClick={() => void load()} className="mt-2 text-xs text-primary hover:underline">Reintentar</button>
-          </NelvyonDsCard>
-        )}
-
-        {loading ? (
-          <div className="space-y-3">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-20 animate-pulse rounded-xl bg-muted/30" />)}</div>
-        ) : filtered.length === 0 ? (
-          <NelvyonDsCard className="p-16 text-center">
-            <p className="text-5xl">🎉</p>
-            <p className="mt-4 text-lg font-semibold text-foreground">Sin tickets pendientes</p>
-            <p className="mt-2 text-sm text-muted-foreground">Todos los tickets están al día</p>
-          </NelvyonDsCard>
-        ) : (
-          <div className="space-y-2">
-            {filtered.map(t => (
-              <NelvyonDsCard key={t.id} className="cursor-pointer p-4 hover:border-primary/30 transition-colors" onClick={() => setSelected(t)}>
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className={`text-xs font-bold uppercase ${PRIORITY_COLOR[t.priority]}`}>{PRIORITY_LABEL[t.priority]}</span>
-                      <span className="text-muted-foreground text-xs">·</span>
-                      <p className="font-medium text-foreground text-sm">{t.subject}</p>
-                      {t.slaBreached && <NelvyonDsBadge tone="danger">SLA ⚠</NelvyonDsBadge>}
-                    </div>
-                    <p className="mt-0.5 text-xs text-muted-foreground">
-                      {t.contactName} · {t.contactEmail} · {t.messageCount} mens.
-                      {t.resolutionDue && <span className={slaStatus(t.resolutionDue, t.resolvedAt) === "breached" ? " text-red-400" : " text-muted-foreground"}> · Due: {fmtDue(t.resolutionDue)}</span>}
-                    </p>
-                  </div>
-                  <NelvyonDsBadge tone={STATUS_TONE[t.status]}>{STATUS_LABEL[t.status]}</NelvyonDsBadge>
+          <div className="col-xl-12">
+            <W3crmContentBox titulo="Filtro" icono="fas fa-filter" bodyClassName="card-body pb-3">
+              <div className="row">
+                <div className="col-xl-4 col-sm-6">
+                  <label className="visually-hidden" htmlFor="hd-filtro">Estado</label>
+                  <select id="hd-filtro" className="form-control" value={filter}
+                    onChange={(e) => setFilter(e.target.value as TicketStatus | "all")}>
+                    {FILTROS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                  </select>
                 </div>
-              </NelvyonDsCard>
-            ))}
+                <div className="col-xl-4 col-sm-6">
+                  <button type="button" className="btn btn-danger light mt-3 mt-xl-0" onClick={() => setFilter("all")}>
+                    Quitar filtros
+                  </button>
+                </div>
+              </div>
+            </W3crmContentBox>
+
+            <div className="mb-3">
+              <ul className="d-flex align-items-center flex-wrap">
+                <li><button type="button" className="btn btn-primary" onClick={() => setShowNew(true)}>+ Nuevo ticket</button></li>
+              </ul>
+            </div>
+
+            <W3crmContentBox titulo="Tickets" icono="fa-solid fa-headset">
+              {loading ? (
+                <W3crmCargando texto="Cargando tickets…" />
+              ) : filtered.length === 0 ? (
+                <W3crmEmptyState
+                  title="Sin tickets pendientes"
+                  description={filter === "all" ? "Todos los tickets están al día." : "Ningún ticket en este estado."}
+                />
+              ) : (
+                <W3crmDataTable
+                  filas={filtered}
+                  etiqueta="tickets"
+                  reiniciarEn={filter}
+                  columnas={[{ titulo: "Asunto" }, { titulo: "Contacto" }, { titulo: "Prioridad" }, { titulo: "Mensajes" }, { titulo: "Resolución (SLA)" }, { titulo: "Estado" }, { titulo: "Gestión", alFinal: true }]}
+                  render={(t) => {
+                    const sla = slaStatus(t.resolutionDue, t.resolvedAt);
+                    return (
+                      <tr key={t.id}>
+                        <td>
+                          <span className="fw-bold">{t.subject || "—"}</span>
+                          {t.slaBreached && <span className="badge badge-danger ms-2 fs-12">SLA ⚠</span>}
+                        </td>
+                        <td>
+                          <span>{t.contactName || "—"}</span>
+                          <div className="text-muted fs-12">{t.contactEmail || "—"}</div>
+                        </td>
+                        <td><span className={`badge ${badgePrioridad(t.priority)}`}>{etiquetaPrioridad(t.priority)}</span></td>
+                        <td>{num(t.messageCount)}</td>
+                        <td><span className={claseSla(sla)}>{fmtDue(t.resolutionDue)}</span></td>
+                        <td><span className={`badge ${badgeEstado(t.status)}`}>{etiquetaEstado(t.status)}</span></td>
+                        <td className="text-end">
+                          <button type="button" className="btn btn-primary light btn-sm"
+                            aria-label={`Abrir ticket ${t.subject || ""}`} onClick={() => setSelected(t)}>
+                            Abrir
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  }}
+                />
+              )}
+            </W3crmContentBox>
           </div>
-        )}
+        </div>
       </div>
+
       {showNew && <NewTicketModal onClose={() => setShowNew(false)} onSaved={load} />}
-      {selected && <TicketDetail ticket={selected} macros={macros} onClose={() => setSelected(null)} onUpdated={load} />}
-    </SaasShellLayout>
+      {selected && (
+        <TicketDetail ticket={selected} macros={macros} onClose={() => setSelected(null)} onUpdated={load} />
+      )}
+    </SaasW3crmShell>
   );
 }
