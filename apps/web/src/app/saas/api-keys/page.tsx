@@ -1,10 +1,23 @@
 "use client";
 
+/**
+ * /saas/api-keys sobre `(cms)/content` de W3CRM, con las piezas ya portadas.
+ * Las dos pestanas (keys / documentacion) usan el `nav nav-tabs` de la
+ * plantilla (`(bootstrap)/ui-tab`), y las tablas su
+ * `table table-responsive-lg table-striped table-condensed flip-content`.
+ *
+ * Logica de NELVYON intacta: `GET/POST/DELETE /api/saas/api-keys`, el tipo
+ * `ApiKey`, `SCOPE_LABELS` con su agrupacion, `toggleScope` (con la exclusion
+ * mutua de `full_access`), `ENDPOINTS`, `timeAgo`, la clave en claro que solo
+ * se muestra una vez y `revokeKey` con su error.
+ */
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmEmptyState, W3crmKpiTile } from "@/features/saas-w3crm/components/W3crmUi";
+import { W3crmContentBox, W3crmDataTable, W3crmModal } from "@/features/saas-w3crm/components/W3crmContentBox";
 
 type ApiKeyScope = "read:contacts" | "write:contacts" | "read:deals" | "write:deals" | "read:campaigns" | "write:campaigns" | "read:reports" | "webhooks:manage" | "full_access";
 
@@ -32,7 +45,6 @@ const SCOPE_LABELS: Record<ApiKeyScope, { label: string; group: string }> = {
   "full_access": { label: "Acceso completo", group: "Sistema" },
 };
 
-
 const ENDPOINTS = [
   { method: "GET", path: "/api/public/v1/contacts", desc: "Lista contactos" },
   { method: "POST", path: "/api/public/v1/contacts", desc: "Crear contacto" },
@@ -42,10 +54,23 @@ const ENDPOINTS = [
   { method: "POST", path: "/api/public/v1/workflows/trigger", desc: "Disparar workflow" },
 ];
 
-const METHOD_COLOR: Record<string, string> = {
-  GET: "bg-green-500/10 text-green-400", POST: "bg-blue-500/10 text-blue-400",
-  PUT: "bg-yellow-500/10 text-yellow-400", DELETE: "bg-red-500/10 text-red-400",
+const METHOD_BADGE: Record<string, string> = {
+  GET: "badge-success", POST: "badge-primary", PUT: "badge-warning", DELETE: "badge-danger",
 };
+
+function num(v: unknown): number {
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function timeAgo(iso: string) {
+  const t = new Date(iso).getTime();
+  if (Number.isNaN(t)) return "—";
+  const d = Date.now() - t;
+  if (d < 3600000) return `Hace ${Math.floor(d / 60000)}m`;
+  if (d < 86400000) return `Hace ${Math.floor(d / 3600000)}h`;
+  return `Hace ${Math.floor(d / 86400000)}d`;
+}
 
 function CreateKeyModal({ onClose }: { onClose: () => void }) {
   const [name, setName] = useState("");
@@ -57,7 +82,9 @@ function CreateKeyModal({ onClose }: { onClose: () => void }) {
 
   function toggleScope(s: ApiKeyScope) {
     if (s === "full_access") { setScopes(["full_access"]); return; }
-    setScopes(prev => prev.includes(s) ? prev.filter(x => x !== s && x !== "full_access") : [...prev.filter(x => x !== "full_access"), s]);
+    setScopes((prev) => prev.includes(s)
+      ? prev.filter((x) => x !== s && x !== "full_access")
+      : [...prev.filter((x) => x !== "full_access"), s]);
   }
 
   async function create(e: React.FormEvent) {
@@ -71,7 +98,7 @@ function CreateKeyModal({ onClose }: { onClose: () => void }) {
         body: JSON.stringify({ name, scopes, expiresAt: expiry || null }),
       });
       if (res.ok) {
-        const d = (await res.json()) as { rawKey?: string; key?: { id: string } };
+        const d = (await res.json().catch(() => ({}))) as { rawKey?: string };
         if (d.rawKey) setCreated(d.rawKey);
         else throw new Error("No rawKey in response");
       } else {
@@ -87,18 +114,21 @@ function CreateKeyModal({ onClose }: { onClose: () => void }) {
 
   if (created) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-        <div className="w-full max-w-md rounded-2xl border border-border bg-card shadow-2xl p-6 text-center space-y-4">
-          <p className="text-4xl">🔑</p>
-          <h2 className="text-lg font-semibold text-foreground">API Key creada</h2>
-          <p className="text-sm text-muted-foreground">Copia esta clave ahora. <strong className="text-red-400">No podrás verla de nuevo.</strong></p>
-          <div className="flex items-center gap-2 rounded-lg bg-muted/20 border border-border px-4 py-3">
-            <code className="flex-1 text-xs text-primary font-mono break-all">{created}</code>
-            <button onClick={() => { void navigator.clipboard.writeText(created); }} className="shrink-0 text-xs text-primary hover:underline">Copiar</button>
-          </div>
-          <NelvyonDsButton className="w-full" onClick={onClose}>Entendido, ya la copié</NelvyonDsButton>
+      <W3crmModal titulo="API Key creada" onClose={onClose} testId="modal-key-creada">
+        <p className="fs-14">
+          Copia esta clave ahora. <strong className="text-danger">No podrás verla de nuevo.</strong>
+        </p>
+        <div className="d-flex align-items-center border rounded p-3 mb-3">
+          <code className="flex-grow-1 text-primary fs-12 text-break">{created}</code>
+          <button type="button" className="btn btn-primary light btn-sm ms-2"
+            onClick={() => { void navigator.clipboard?.writeText(created); }}>
+            Copiar
+          </button>
         </div>
-      </div>
+        <div className="text-end">
+          <button type="button" className="btn btn-primary" onClick={onClose}>Entendido, ya la copié</button>
+        </div>
+      </W3crmModal>
     );
   }
 
@@ -109,60 +139,53 @@ function CreateKeyModal({ onClose }: { onClose: () => void }) {
   }, {} as Record<string, ApiKeyScope[]>);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm">
-      <div className="my-8 w-full max-w-lg rounded-2xl border border-border bg-card shadow-2xl">
-        <div className="flex items-center justify-between border-b border-border px-6 py-4">
-          <h2 className="text-lg font-semibold text-foreground">Nueva API Key</h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
-        </div>
-        <form onSubmit={create} className="space-y-5 p-6">
-          {error && <p className="rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
-          <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre descriptivo *</label>
-            <input value={name} onChange={e => setName(e.target.value)} placeholder="Ej: Integración Zapier"
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
-          </div>
-          <div>
-            <label className="mb-2 block text-xs font-medium text-muted-foreground">Permisos (scopes) *</label>
-            <div className="space-y-3">
-              {Object.entries(byGroup).map(([group, groupScopes]) => (
-                <div key={group} className="rounded-lg border border-border p-3">
-                  <p className="mb-2 text-xs font-semibold text-foreground">{group}</p>
-                  <div className="space-y-1.5">
-                    {groupScopes.map(s => (
-                      <label key={s} className="flex items-center gap-2 cursor-pointer text-xs text-muted-foreground hover:text-foreground">
-                        <input type="checkbox" checked={scopes.includes(s)} onChange={() => toggleScope(s)} className="accent-primary" />
-                        <span className="font-mono text-[11px]">{s}</span>
-                        <span className="text-muted-foreground/60">— {SCOPE_LABELS[s].label}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              ))}
+    <W3crmModal titulo="Nueva API Key" onClose={onClose} error={error} testId="modal-api-key">
+      <form onSubmit={create}>
+        <div className="row">
+          <div className="col-lg-12">
+            <div className="form-group mb-3">
+              <label htmlFor="ak-nombre" className="text-black font-w600">Nombre descriptivo <span className="required">*</span></label>
+              <input id="ak-nombre" type="text" className="form-control" placeholder="Ej: Integración Zapier"
+                value={name} onChange={(e) => setName(e.target.value)} />
             </div>
           </div>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Expiración (opcional)</label>
-            <input type="date" value={expiry} onChange={e => setExpiry(e.target.value)}
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
+          <div className="col-lg-12">
+            <label className="text-black font-w600 d-block mb-2">Permisos (scopes) <span className="required">*</span></label>
+            {Object.entries(byGroup).map(([group, groupScopes]) => (
+              <div key={group} className="card mb-2">
+                <div className="card-body py-2">
+                  <p className="fw-bold fs-14 mb-2">{group}</p>
+                  {groupScopes.map((s) => (
+                    <div className="form-check mb-1" key={s}>
+                      <input className="form-check-input" type="checkbox" id={`scope-${s}`}
+                        checked={scopes.includes(s)} onChange={() => toggleScope(s)} />
+                      <label className="form-check-label fs-12" htmlFor={`scope-${s}`}>
+                        <code>{s}</code> — {SCOPE_LABELS[s].label}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="flex gap-3 pt-2">
-            <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
-            <NelvyonDsButton type="submit" disabled={saving || !name || scopes.length === 0} className="flex-1">
-              {saving ? "Generando…" : "🔑 Generar API Key"}
-            </NelvyonDsButton>
+          <div className="col-lg-12">
+            <div className="form-group mb-3">
+              <label htmlFor="ak-expira" className="text-black font-w600">Expiración (opcional)</label>
+              <input id="ak-expira" type="date" className="form-control" value={expiry} onChange={(e) => setExpiry(e.target.value)} />
+            </div>
           </div>
-        </form>
-      </div>
-    </div>
+          <div className="col-lg-12">
+            <div className="text-end">
+              <button type="button" className="btn btn-danger light me-2" onClick={onClose}>Cancelar</button>
+              <button type="submit" className="btn btn-primary" disabled={saving || !name || scopes.length === 0}>
+                {saving ? "Generando…" : "Generar API Key"}
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </W3crmModal>
   );
-}
-
-function timeAgo(iso: string) {
-  const d = Date.now() - new Date(iso).getTime();
-  if (d < 3600000) return `Hace ${Math.floor(d / 60000)}m`;
-  if (d < 86400000) return `Hace ${Math.floor(d / 3600000)}h`;
-  return `Hace ${Math.floor(d / 86400000)}d`;
 }
 
 export default function SaasApiKeysPage() {
@@ -175,8 +198,8 @@ export default function SaasApiKeysPage() {
     try {
       const res = await fetch("/api/saas/api-keys");
       if (res.ok) {
-        const d = (await res.json()) as { keys?: ApiKey[] };
-        setKeys(d.keys ?? []);
+        const d = (await res.json().catch(() => ({}))) as { keys?: ApiKey[] };
+        setKeys(Array.isArray(d.keys) ? d.keys : []);
       }
     } catch { /* silencioso */ }
   }, []);
@@ -198,112 +221,149 @@ export default function SaasApiKeysPage() {
   }
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="api-keys" />}>
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <NelvyonDsSectionHeader title="API Keys" subtitle="Accede a todos los datos de Nelvyon desde tus aplicaciones externas" />
-              <div className="flex gap-2 items-center">
-                <Link href="/saas/developers" className="rounded-lg border border-border px-3 py-2 text-sm text-primary hover:bg-primary/10 transition-colors">
-                  📖 Documentación API
-                </Link>
-                <NelvyonDsButton onClick={() => setShowModal(true)}>+ Nueva API Key</NelvyonDsButton>
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="API Keys" parentTitle="Cuenta" pageTitle="API Keys" />
+      <div className="container-fluid">
+        <div className="row">
+          {revokeError && (
+            <div className="col-xl-12">
+              <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                {revokeError}
+                <button type="button" className="btn-close" aria-label="Cerrar" onClick={() => setRevokeError(null)} />
               </div>
             </div>
+          )}
 
-            <div className="flex gap-2">
-              {(["keys", "docs"] as const).map(t => (
-                <button key={t} onClick={() => setTab(t)}
-                  className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${tab === t ? "bg-primary text-primary-foreground" : "bg-muted/30 text-muted-foreground hover:text-foreground"}`}>
-                  {t === "keys" ? `Mis keys (${keys.length})` : "Documentación API"}
-                </button>
-              ))}
+          <div className="col-xl-4 col-sm-6"><W3crmKpiTile label="Keys activas" value={keys.filter((k) => k.active).length} accent /></div>
+          <div className="col-xl-4 col-sm-6"><W3crmKpiTile label="Total peticiones" value={keys.reduce((s, k) => s + num(k.requests), 0).toLocaleString("es-ES")} /></div>
+          <div className="col-xl-4 col-sm-6"><W3crmKpiTile label="Base URL" value={<code className="fs-14">api.nelvyon.com/v1</code>} /></div>
+
+          <div className="col-xl-12">
+            <div className="mb-3">
+              <ul className="d-flex align-items-center flex-wrap">
+                <li>
+                  <button type="button" className="btn btn-primary" onClick={() => setShowModal(true)}>+ Nueva API Key</button>
+                </li>
+                <li>
+                  <Link href="/saas/developers" className="btn btn-primary light mx-1">Documentación API</Link>
+                </li>
+              </ul>
             </div>
+
+            <ul className="nav nav-tabs mb-3" role="tablist">
+              {(["keys", "docs"] as const).map((t) => (
+                <li className="nav-item" key={t} role="presentation">
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={tab === t}
+                    className={`nav-link ${tab === t ? "active" : ""}`}
+                    onClick={() => setTab(t)}
+                  >
+                    {t === "keys" ? `Mis keys (${keys.length})` : "Documentación API"}
+                  </button>
+                </li>
+              ))}
+            </ul>
 
             {tab === "keys" ? (
-              <div className="space-y-4">
-                {revokeError && (
-                  <NelvyonDsCard className="border-red-500/30 bg-red-500/5 p-4">
-                    <p className="text-sm text-red-400">{revokeError}</p>
-                    <button type="button" onClick={() => setRevokeError(null)} className="mt-2 text-xs text-primary hover:underline">Cerrar</button>
-                  </NelvyonDsCard>
+              <W3crmContentBox titulo="API Keys" icono="fa-solid fa-key">
+                {keys.length === 0 ? (
+                  <W3crmEmptyState title="Sin API Keys" description="Genera una clave para conectar tus aplicaciones externas." />
+                ) : (
+                  <W3crmDataTable
+                    filas={keys}
+                    etiqueta="keys"
+                    columnas={[{ titulo: "Nombre" }, { titulo: "Clave" }, { titulo: "Scopes" }, { titulo: "Peticiones" }, { titulo: "Último uso" }, { titulo: "Expira" }, { titulo: "Estado" }, { titulo: "Acciones", alFinal: true }]}
+                    render={(key) => (
+                      <tr key={key.id}>
+                        <td><span className="fw-bold">{key.name || "—"}</span></td>
+                        <td><code className="fs-12">{key.keyPreview}</code></td>
+                        <td>
+                          {(key.scopes ?? []).map((s) => (
+                            <span key={s} className="badge badge-secondary light me-1 fs-12">{s}</span>
+                          ))}
+                        </td>
+                        <td>{num(key.requests).toLocaleString("es-ES")}</td>
+                        <td>{key.lastUsedAt ? timeAgo(key.lastUsedAt) : "—"}</td>
+                        <td>
+                          {key.expiresAt && !Number.isNaN(new Date(key.expiresAt).getTime())
+                            ? new Date(key.expiresAt).toLocaleDateString("es-ES")
+                            : "Sin expiración"}
+                        </td>
+                        <td>
+                          <span className={`badge ${key.active ? "badge-success" : "badge-danger"}`}>
+                            {key.active ? "Activa" : "Revocada"}
+                          </span>
+                        </td>
+                        <td className="text-end">
+                          {key.active && (
+                            <button type="button" className="btn btn-danger btn-sm content-icon"
+                              aria-label={`Revocar ${key.name || "key"}`} onClick={() => void revokeKey(key.id)}>
+                              <i className="fa-solid fa-ban" />
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    )}
+                  />
                 )}
-                <div className="grid grid-cols-3 gap-3">
-                  {[
-                    { label: "Keys activas", value: keys.filter(k => k.active).length },
-                    { label: "Total peticiones", value: keys.reduce((s, k) => s + k.requests, 0).toLocaleString("es-ES") },
-                    { label: "Base URL", value: "api.nelvyon.com/v1" },
-                  ].map(({ label, value }) => (
-                    <NelvyonDsCard key={label} className="p-4">
-                      <p className="text-xs text-muted-foreground">{label}</p>
-                      <p className="mt-1 text-sm font-bold text-foreground font-mono">{value}</p>
-                    </NelvyonDsCard>
-                  ))}
-                </div>
-
-                {keys.map(key => (
-                  <NelvyonDsCard key={key.id} className={`p-5 ${!key.active ? "opacity-60" : ""}`}>
-                    <div className="flex flex-wrap items-start gap-3">
-                      <div className="flex-1 min-w-0 space-y-2">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-semibold text-foreground">{key.name}</h3>
-                          <NelvyonDsBadge tone={key.active ? "success" : "danger"}>{key.active ? "Activa" : "Revocada"}</NelvyonDsBadge>
-                        </div>
-                        <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/10 px-3 py-2">
-                          <code className="flex-1 text-xs text-primary font-mono">{key.keyPreview}</code>
-                        </div>
-                        <div className="flex flex-wrap gap-1">
-                          {key.scopes.map(s => <span key={s} className="rounded-md bg-muted/30 px-2 py-0.5 text-[11px] font-mono text-muted-foreground">{s}</span>)}
-                        </div>
-                        <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
-                          <span>{key.requests.toLocaleString()} peticiones</span>
-                          {key.lastUsedAt && <span>Último uso: {timeAgo(key.lastUsedAt)}</span>}
-                          {key.expiresAt && <span className="text-yellow-400">Expira: {new Date(key.expiresAt).toLocaleDateString("es-ES")}</span>}
-                          {!key.expiresAt && <span>Sin expiración</span>}
-                        </div>
-                      </div>
-                      {key.active && (
-                        <NelvyonDsButton variant="ghost" className="text-xs text-red-400 hover:text-red-300" onClick={() => revokeKey(key.id)}>Revocar</NelvyonDsButton>
-                      )}
-                    </div>
-                  </NelvyonDsCard>
-                ))}
-              </div>
+              </W3crmContentBox>
             ) : (
-              <div className="space-y-5">
-                <NelvyonDsCard className="p-5">
-                  <h3 className="mb-3 text-sm font-semibold text-foreground">Autenticación</h3>
-                  <p className="mb-3 text-xs text-muted-foreground">Incluye tu API key en el header Authorization de cada petición:</p>
-                  <pre className="rounded-lg bg-muted/20 p-3 text-xs font-mono text-foreground overflow-x-auto">{`curl https://api.nelvyon.com/v1/contacts \\
+              <>
+                <W3crmContentBox titulo="Autenticación" icono="fa-solid fa-lock">
+                  <p className="fs-14 text-muted">Incluye tu API key en el header <code>Authorization</code> de cada petición:</p>
+                  <pre className="border rounded p-3 fs-12 mb-0">{`curl https://api.nelvyon.com/v1/contacts \\
   -H "Authorization: Bearer nlv_live_tu_api_key" \\
   -H "Content-Type: application/json"`}</pre>
-                </NelvyonDsCard>
-                <NelvyonDsCard className="overflow-hidden p-0">
-                  <div className="border-b border-border bg-muted/20 px-5 py-3">
-                    <p className="text-sm font-semibold text-foreground">Endpoints disponibles</p>
+                </W3crmContentBox>
+
+                <W3crmContentBox titulo="Endpoints disponibles" icono="fa-solid fa-file-lines">
+                  <div className="table-responsive">
+                    <div id="endpoints_wrapper" className="dataTables_wrapper no-footer">
+                      <table className="table table-responsive-lg table-striped table-condensed flip-content">
+                        <thead>
+                          <tr>
+                            <th className="text-black">Método</th>
+                            <th className="text-black">Ruta</th>
+                            <th className="text-black">Descripción</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {ENDPOINTS.map((ep) => (
+                            <tr key={`${ep.method}-${ep.path}`}>
+                              <td><span className={`badge ${METHOD_BADGE[ep.method] ?? "badge-secondary"}`}>{ep.method}</span></td>
+                              <td><code className="fs-12">{ep.path}</code></td>
+                              <td><span className="text-muted fs-12">{ep.desc}</span></td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                  <div className="divide-y divide-border">
-                    {ENDPOINTS.map(ep => (
-                      <div key={ep.path} className="flex items-center gap-4 px-5 py-3">
-                        <span className={`shrink-0 rounded-md px-2 py-0.5 text-[11px] font-bold ${METHOD_COLOR[ep.method]}`}>{ep.method}</span>
-                        <code className="flex-1 text-xs text-foreground font-mono">{ep.path}</code>
-                        <span className="text-xs text-muted-foreground">{ep.desc}</span>
+                </W3crmContentBox>
+
+                <W3crmContentBox titulo="Rate limiting" icono="fa-solid fa-gauge">
+                  <div className="row">
+                    {[{ plan: "Starter", rps: "10 req/s" }, { plan: "Pro", rps: "100 req/s" }, { plan: "Agency", rps: "1.000 req/s" }].map((r) => (
+                      <div className="col-xl-4 col-sm-6 mb-3" key={r.plan}>
+                        <div className="card mb-0">
+                          <div className="card-body">
+                            <p className="mb-1 fs-14 text-muted">{r.plan}</p>
+                            <h4 className="mb-0">{r.rps}</h4>
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>
-                </NelvyonDsCard>
-                <NelvyonDsCard className="p-5">
-                  <h3 className="mb-3 text-sm font-semibold text-foreground">Rate limiting</h3>
-                  <div className="grid grid-cols-3 gap-3 text-center">
-                    {[{ plan: "Starter", rps: "10 req/s" }, { plan: "Pro", rps: "100 req/s" }, { plan: "Agency", rps: "1.000 req/s" }].map(r => (
-                      <div key={r.plan} className="rounded-lg border border-border p-3">
-                        <p className="text-xs text-muted-foreground">{r.plan}</p>
-                        <p className="mt-1 text-sm font-bold text-foreground">{r.rps}</p>
-                      </div>
-                    ))}
-                  </div>
-                </NelvyonDsCard>
-              </div>
+                </W3crmContentBox>
+              </>
             )}
+          </div>
+        </div>
+      </div>
+
       {showModal && <CreateKeyModal onClose={() => { setShowModal(false); void load(); }} />}
-    </SaasShellLayout>
+    </SaasW3crmShell>
   );
 }
