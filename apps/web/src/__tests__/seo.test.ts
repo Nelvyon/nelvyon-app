@@ -40,10 +40,22 @@ describe("SEO (MIG 287)", () => {
     const entries = sitemap();
     const paths = pathsFromSitemap(entries);
     expect(paths).toContain("/");
-    expect(paths).toContain("/pricing");
+    // Rutas canonicas en castellano. `/pricing`, `/legal/privacy` y
+    // `/legal/terms` fueron los nombres en ingles originales; hoy son alias
+    // heredados con redirect 301 permanente hacia estas tres
+    // (next.config.ts). Los tests de marketing (`marketing/pricing.test.tsx`,
+    // `e2e/pricing.spec.ts`, `e2e/marketing.spec.ts`) y el script de
+    // certificacion estatica ya usan la forma canonica.
+    expect(paths).toContain("/precios");
     expect(paths).toContain("/legal");
-    expect(paths).toContain("/legal/privacy");
-    expect(paths).toContain("/legal/terms");
+    expect(paths).toContain("/privacidad");
+    expect(paths).toContain("/terminos");
+    // Un sitemap no debe declarar URLs que devuelven redirect: Google las
+    // reporta como "Page with redirect" y no las indexa. Si alguien vuelve a
+    // meter un alias en `CORE_PATHS`, esto lo detiene.
+    for (const alias of ["/pricing", "/legal/privacy", "/legal/terms"]) {
+      expect(paths).not.toContain(alias);
+    }
     expect(entries.every((e) => new URL(e.url).origin === "https://seo-sitemap.test")).toBe(true);
   });
 
