@@ -1,15 +1,26 @@
 "use client";
 
+/**
+ * /saas/erp/purchases sobre `(cms)/content` de W3CRM, con las piezas ya
+ * portadas. Mapeo: los dos formularios y los dos listados ->
+ * `W3crmContentBox` + `W3crmDataTable`; KPIs -> `W3crmKpiTile`. Sin
+ * componentes nuevos.
+ *
+ * Inventario: sin `data-testid`, sin spec dedicado (solo
+ * `saas-nav-full-coverage`) y sin textos-contrato.
+ *
+ * Logica de NELVYON intacta: `GET/POST /api/saas/erp/purchases` con sus cuatro
+ * acciones (`create_supplier`, `create_pr`, `submit_pr`, `approve_pr`), la
+ * `idempotencyKey` que se genera al crear la PR, el `role: "admin"` que exige
+ * la aprobacion, los cuatro estados con su color, el aviso de exito de 3 s y
+ * los recuentos de borradores y enviadas.
+ */
 import { useCallback, useEffect, useState } from "react";
-import {
-  NelvyonDsBadge,
-  NelvyonDsButton,
-  NelvyonDsCard,
-  NelvyonDsSectionHeader,
-} from "@/design-system/components";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
-import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
+
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmEmptyState, W3crmKpiTile } from "@/features/saas-w3crm/components/W3crmUi";
+import { W3crmCargando, W3crmContentBox, W3crmDataTable } from "@/features/saas-w3crm/components/W3crmContentBox";
 
 type Supplier = { id: string; name: string; category: string; status: string; createdAt: string };
 type PurchaseRequest = {
@@ -20,14 +31,20 @@ type PurchaseRequest = {
   createdAt: string;
 };
 
-const inputCls =
-  "w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none";
-
-function statusTone(s: string): "neutral" | "primary" | "success" | "warning" | "danger" {
-  if (s === "approved") return "success";
-  if (s === "submitted") return "primary";
-  if (s === "rejected") return "danger";
-  return "warning";
+/** Mismos estados que antes, ahora sobre badges de W3CRM. */
+function statusBadge(s: string): string {
+  if (s === "approved") return "badge-success";
+  if (s === "submitted") return "badge-primary";
+  if (s === "rejected") return "badge-danger";
+  return "badge-warning";
+}
+function num(v: unknown): number {
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+/** `lines` puede llegar nula o no-array. */
+function lineasDe(pr: PurchaseRequest): PurchaseRequest["lines"] {
+  return Array.isArray(pr.lines) ? pr.lines : [];
 }
 
 export default function ErpPurchasesPage() {
@@ -50,11 +67,8 @@ export default function ErpPurchasesPage() {
     setError(null);
     try {
       const res = await fetch("/api/saas/erp/purchases");
-      const data = (await res.json()) as {
-        suppliers?: Supplier[];
-        purchaseRequests?: PurchaseRequest[];
-        note?: string;
-        error?: string;
+      const data = (await res.json().catch(() => ({}))) as {
+        suppliers?: Supplier[]; purchaseRequests?: PurchaseRequest[]; note?: string; error?: string;
       };
       if (!res.ok) {
         setError(data.error ?? `HTTP ${res.status}`);
@@ -62,8 +76,8 @@ export default function ErpPurchasesPage() {
         setPrs([]);
         return;
       }
-      setSuppliers(data.suppliers ?? []);
-      setPrs(data.purchaseRequests ?? []);
+      setSuppliers(Array.isArray(data.suppliers) ? data.suppliers : []);
+      setPrs(Array.isArray(data.purchaseRequests) ? data.purchaseRequests : []);
       setNote(data.note ?? "");
     } catch (e) {
       setError(e instanceof Error ? e.message : "load failed");
@@ -72,9 +86,7 @@ export default function ErpPurchasesPage() {
     }
   }, []);
 
-  useEffect(() => {
-    void load();
-  }, [load]);
+  useEffect(() => { void load(); }, [load]);
 
   function flash(msg: string) {
     setOk(msg);
@@ -92,7 +104,7 @@ export default function ErpPurchasesPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "create_supplier", name, category }),
       });
-      const data = (await res.json()) as { error?: string };
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) {
         setError(data.error ?? `HTTP ${res.status}`);
         return;
@@ -121,7 +133,7 @@ export default function ErpPurchasesPage() {
           idempotencyKey: `ui-pr-${prSku.trim()}-${Date.now()}`,
         }),
       });
-      const data = (await res.json()) as { error?: string };
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) {
         setError(data.error ?? `HTTP ${res.status}`);
         return;
@@ -147,7 +159,7 @@ export default function ErpPurchasesPage() {
           role: action === "approve_pr" ? "admin" : undefined,
         }),
       });
-      const data = (await res.json()) as { error?: string };
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) {
         setError(data.error ?? `HTTP ${res.status}`);
         return;
@@ -163,108 +175,156 @@ export default function ErpPurchasesPage() {
   const submittedCount = prs.filter((p) => p.status === "submitted").length;
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="erp-purchases" />}>
-      <div className="flex flex-col gap-6 pb-8">
-        <NelvyonDsSectionHeader
-          title="Compras & proveedores"
-          subtitle={note || "Persistido vía API · pagos/contabilidad fuera de alcance"}
-        />
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="Compras & proveedores" parentTitle="Gestión" pageTitle="Compras" />
+      <div className="container-fluid">
+        <div className="row">
+          {error && (
+            <div className="col-xl-12">
+              <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                {error}
+                <button type="button" className="btn-close" aria-label="Cerrar" onClick={() => setError(null)} />
+              </div>
+            </div>
+          )}
+          {ok && (
+            <div className="col-xl-12">
+              <div className="alert alert-success" role="status">{ok}</div>
+            </div>
+          )}
 
-        {error && (
-          <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm text-destructive" role="alert">
-            {error}
-          </p>
-        )}
-        {ok && (
-          <p className="rounded-lg border border-primary/30 bg-primary/10 px-4 py-2 text-sm text-primary" role="status">
-            {ok}
-          </p>
-        )}
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Proveedores" value={suppliers.length} /></div>
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="PRs" value={prs.length} /></div>
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Borradores" value={draftCount} /></div>
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Enviadas" value={submittedCount} accent /></div>
 
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          <KpiTile icon="🏭" label="Proveedores" value={suppliers.length} />
-          <KpiTile icon="📝" label="PRs" value={prs.length} />
-          <KpiTile icon="✏️" label="Borradores" value={draftCount} />
-          <KpiTile icon="📨" label="Enviadas" value={submittedCount} accent />
+          <div className="col-xl-12">
+            <W3crmContentBox titulo="Nuevo proveedor" icono="fa-solid fa-industry">
+              {note ? <p className="fs-12 text-muted">{note}</p> : null}
+              <form onSubmit={(e) => void createSupplier(e)}>
+                <div className="row align-items-end">
+                  <div className="col-xl-5 col-sm-6">
+                    <div className="form-group mb-3">
+                      <label htmlFor="pu-nombre" className="text-black font-w600">Nombre <span className="required">*</span></label>
+                      <input id="pu-nombre" className="form-control" required value={name} onChange={(e) => setName(e.target.value)} />
+                    </div>
+                  </div>
+                  <div className="col-xl-5 col-sm-6">
+                    <div className="form-group mb-3">
+                      <label htmlFor="pu-categoria" className="text-black font-w600">Categoría <span className="required">*</span></label>
+                      <input id="pu-categoria" className="form-control" required value={category} onChange={(e) => setCategory(e.target.value)} />
+                    </div>
+                  </div>
+                  <div className="col-xl-2 col-sm-6">
+                    <div className="form-group mb-3">
+                      <button type="submit" className="btn btn-primary w-100" disabled={saving}>
+                        {saving ? "Creando…" : "Crear proveedor"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </W3crmContentBox>
+
+            <W3crmContentBox titulo="Nueva solicitud de compra (PR)" icono="fa-solid fa-file-invoice">
+              <form onSubmit={(e) => void createPr(e)}>
+                <div className="row align-items-end">
+                  <div className="col-xl-4 col-sm-6">
+                    <div className="form-group mb-3">
+                      <label htmlFor="pu-sku" className="text-black font-w600">SKU <span className="required">*</span></label>
+                      <input id="pu-sku" className="form-control" required value={prSku} onChange={(e) => setPrSku(e.target.value)} />
+                    </div>
+                  </div>
+                  <div className="col-xl-3 col-sm-6">
+                    <div className="form-group mb-3">
+                      <label htmlFor="pu-cantidad" className="text-black font-w600">Cantidad</label>
+                      <input id="pu-cantidad" className="form-control" type="number" min={1} required
+                        value={prQty} onChange={(e) => setPrQty(e.target.value)} />
+                    </div>
+                  </div>
+                  <div className="col-xl-3 col-sm-6">
+                    <div className="form-group mb-3">
+                      <label htmlFor="pu-techo" className="text-black font-w600">Techo aprobación (¢)</label>
+                      <input id="pu-techo" className="form-control" type="number" min={0} required
+                        value={prLimit} onChange={(e) => setPrLimit(e.target.value)} />
+                    </div>
+                  </div>
+                  <div className="col-xl-2 col-sm-6">
+                    <div className="form-group mb-3">
+                      <button type="submit" className="btn btn-primary w-100" disabled={saving}>Crear PR</button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </W3crmContentBox>
+
+            <W3crmContentBox titulo="Proveedores" icono="fa-solid fa-truck">
+              {loading ? (
+                <W3crmCargando texto="Cargando proveedores…" />
+              ) : suppliers.length === 0 ? (
+                <W3crmEmptyState title="Sin proveedores aún" />
+              ) : (
+                <W3crmDataTable
+                  filas={suppliers}
+                  etiqueta="proveedores"
+                  wrapperId="suppliers_wrapper"
+                  porPagina={10}
+                  columnas={[{ titulo: "Proveedor" }, { titulo: "Categoría" }, { titulo: "Estado", alFinal: true }]}
+                  render={(s) => (
+                    <tr key={s.id}>
+                      <td><span className="fw-bold">{s.name || "—"}</span></td>
+                      <td>{s.category || "—"}</td>
+                      <td className="text-end"><span className="badge badge-secondary">{s.status || "—"}</span></td>
+                    </tr>
+                  )}
+                />
+              )}
+            </W3crmContentBox>
+
+            <W3crmContentBox titulo="Solicitudes de compra" icono="fa-solid fa-file-lines">
+              {prs.length === 0 ? (
+                <W3crmEmptyState title="Sin PRs" description="Crea una con el formulario de arriba." />
+              ) : (
+                <W3crmDataTable
+                  filas={prs}
+                  etiqueta="solicitudes"
+                  wrapperId="prs_wrapper"
+                  porPagina={10}
+                  columnas={[{ titulo: "PR" }, { titulo: "Líneas" }, { titulo: "Techo" }, { titulo: "Estado" }, { titulo: "Gestión", alFinal: true }]}
+                  render={(pr) => (
+                    <tr key={pr.id}>
+                      <td><code className="fs-12">{String(pr.id ?? "").slice(0, 8)}…</code></td>
+                      <td>
+                        <span className="text-muted fs-12">
+                          {lineasDe(pr).map((l) => `${l.sku}×${num(l.qty)}`).join(", ") || "—"}
+                        </span>
+                      </td>
+                      <td>{num(pr.approvalLimitCents)}¢</td>
+                      <td><span className={`badge ${statusBadge(pr.status)}`}>{pr.status || "—"}</span></td>
+                      <td className="text-end">
+                        {pr.status === "draft" && (
+                          <button type="button" className="btn btn-primary light btn-sm" disabled={busyId === pr.id}
+                            aria-label={`Enviar PR ${String(pr.id ?? "").slice(0, 8)}`}
+                            onClick={() => void prAction("submit_pr", pr.id)}>
+                            Enviar
+                          </button>
+                        )}
+                        {pr.status === "submitted" && (
+                          <button type="button" className="btn btn-primary btn-sm" disabled={busyId === pr.id}
+                            aria-label={`Aprobar PR ${String(pr.id ?? "").slice(0, 8)}`}
+                            onClick={() => void prAction("approve_pr", pr.id)}>
+                            Aprobar
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  )}
+                />
+              )}
+            </W3crmContentBox>
+          </div>
         </div>
-
-        <NelvyonDsCard className="p-4">
-          <p className="mb-3 text-sm font-medium text-foreground">Nuevo proveedor</p>
-          <form onSubmit={(e) => void createSupplier(e)} className="grid gap-3 sm:grid-cols-3">
-            <input className={inputCls} value={name} onChange={(e) => setName(e.target.value)} placeholder="Nombre *" required />
-            <input className={inputCls} value={category} onChange={(e) => setCategory(e.target.value)} placeholder="Categoría *" required />
-            <NelvyonDsButton type="submit" disabled={saving} variant="primary">
-              {saving ? "Creando…" : "Crear proveedor"}
-            </NelvyonDsButton>
-          </form>
-        </NelvyonDsCard>
-
-        <NelvyonDsCard className="p-4">
-          <p className="mb-3 text-sm font-medium text-foreground">Nueva solicitud de compra (PR)</p>
-          <form onSubmit={(e) => void createPr(e)} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <input className={inputCls} value={prSku} onChange={(e) => setPrSku(e.target.value)} placeholder="SKU *" required />
-            <input className={inputCls} type="number" min={1} value={prQty} onChange={(e) => setPrQty(e.target.value)} placeholder="Cantidad" required />
-            <input className={inputCls} type="number" min={0} value={prLimit} onChange={(e) => setPrLimit(e.target.value)} placeholder="Techo aprobación (¢)" required />
-            <NelvyonDsButton type="submit" disabled={saving} variant="primary">
-              Crear PR
-            </NelvyonDsButton>
-          </form>
-        </NelvyonDsCard>
-
-        <section className="space-y-2">
-          <h2 className="text-sm font-medium text-muted-foreground">Proveedores</h2>
-          {loading ? (
-            <p className="text-sm text-muted-foreground" role="status">Cargando…</p>
-          ) : suppliers.length === 0 ? (
-            <NelvyonDsCard className="p-8 text-center text-sm text-muted-foreground">Sin proveedores aún.</NelvyonDsCard>
-          ) : (
-            <div className="flex flex-col gap-2">
-              {suppliers.map((s) => (
-                <NelvyonDsCard key={s.id} className="flex items-center justify-between gap-3 p-4">
-                  <div>
-                    <p className="text-sm font-medium text-foreground">{s.name}</p>
-                    <p className="text-xs text-muted-foreground">{s.category}</p>
-                  </div>
-                  <NelvyonDsBadge tone="neutral">{s.status}</NelvyonDsBadge>
-                </NelvyonDsCard>
-              ))}
-            </div>
-          )}
-        </section>
-
-        <section className="space-y-2">
-          <h2 className="text-sm font-medium text-muted-foreground">Solicitudes de compra</h2>
-          {prs.length === 0 ? (
-            <NelvyonDsCard className="p-8 text-center text-sm text-muted-foreground">
-              Sin PRs. Crea una arriba.
-            </NelvyonDsCard>
-          ) : (
-            <div className="flex flex-col gap-2">
-              {prs.map((pr) => (
-                <NelvyonDsCard key={pr.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
-                  <div className="min-w-0 flex-1">
-                    <p className="font-mono text-sm text-foreground">{pr.id.slice(0, 8)}…</p>
-                    <p className="text-xs text-muted-foreground">
-                      {pr.lines.map((l) => `${l.sku}×${l.qty}`).join(", ")} · techo {pr.approvalLimitCents}¢
-                    </p>
-                  </div>
-                  <NelvyonDsBadge tone={statusTone(pr.status)}>{pr.status}</NelvyonDsBadge>
-                  {pr.status === "draft" && (
-                    <NelvyonDsButton size="sm" variant="secondary" disabled={busyId === pr.id} onClick={() => void prAction("submit_pr", pr.id)}>
-                      Enviar
-                    </NelvyonDsButton>
-                  )}
-                  {pr.status === "submitted" && (
-                    <NelvyonDsButton size="sm" variant="primary" disabled={busyId === pr.id} onClick={() => void prAction("approve_pr", pr.id)}>
-                      Aprobar
-                    </NelvyonDsButton>
-                  )}
-                </NelvyonDsCard>
-              ))}
-            </div>
-          )}
-        </section>
       </div>
-    </SaasShellLayout>
+    </SaasW3crmShell>
   );
 }
