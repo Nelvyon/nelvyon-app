@@ -60,7 +60,10 @@ test.describe("SaaS Autopilot — página autenticada", () => {
   test("4 toggles de servicio visibles", async ({ page }) => {
     await gotoAutopilotReady(page);
     await expect(page.getByText("Calendario social")).toBeVisible();
-    await expect(page.getByText(/Reputaci/i)).toBeVisible();
+    // La tarjeta de reputación se localiza por su control accesible, no por
+    // texto suelto: el sidebar expone un enlace "Reputación" que también casa
+    // con /Reputaci/i y hacía que el locator resolviera a dos elementos.
+    await expect(page.getByRole("button", { name: /^Toggle Reputaci/i })).toBeVisible();
     await expect(page.getByText(/Ads snapshot/i)).toBeVisible();
   });
 
