@@ -146,6 +146,11 @@ export default function SaasReportesPage() {
     } finally { setGenerating(null); }
   }
 
+  function n(v: unknown): number {
+    const x = typeof v === "number" ? v : Number(v);
+    return Number.isFinite(x) ? x : 0;
+  }
+
   function fmtSize(bytes: number | null) {
     if (!bytes) return "";
     if (bytes < 1024) return `${bytes}B`;
@@ -188,10 +193,10 @@ export default function SaasReportesPage() {
 
           {attrSummary && (
             <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-              <KpiTile icon="👁" label="Visitas" value={attrSummary.totalVisits.toLocaleString()} />
-              <KpiTile icon="📝" label="Formularios" value={attrSummary.totalFormSubmits.toLocaleString()} />
-              <KpiTile icon="🎯" label="Conversiones" value={attrSummary.totalConversions.toLocaleString()} accent />
-              <KpiTile icon="👤" label="Contactos únicos" value={attrSummary.totalContacts.toLocaleString()} />
+              <KpiTile icon="👁" label="Visitas" value={n(attrSummary.totalVisits).toLocaleString()} />
+              <KpiTile icon="📝" label="Formularios" value={n(attrSummary.totalFormSubmits).toLocaleString()} />
+              <KpiTile icon="🎯" label="Conversiones" value={n(attrSummary.totalConversions).toLocaleString()} accent />
+              <KpiTile icon="👤" label="Contactos únicos" value={n(attrSummary.totalContacts).toLocaleString()} />
             </div>
           )}
           {attrSummary?.topSource && (
@@ -232,7 +237,7 @@ export default function SaasReportesPage() {
                 {modelRows.map((row, i) => (
                   <div key={i} className="flex items-center justify-between rounded-xl bg-muted/10 p-3 text-sm">
                     <span className="font-medium text-foreground">{row.source}</span>
-                    <span className="text-muted-foreground">{row.conversions.toLocaleString()} conv. · crédito {(row.credit * 100).toFixed(1)}%</span>
+                    <span className="text-muted-foreground">{n(row.conversions).toLocaleString()} conv. · crédito {(n(row.credit) * 100).toFixed(1)}%</span>
                   </div>
                 ))}
               </div>
@@ -250,10 +255,10 @@ export default function SaasReportesPage() {
                         {ch.utmMedium && <span className="ml-2 text-xs text-muted-foreground">/ {ch.utmMedium}</span>}
                       </div>
                       <div className="flex gap-3 text-xs text-muted-foreground">
-                        <span>{ch.visits.toLocaleString()} visitas</span>
-                        <span>{ch.formSubmits.toLocaleString()} forms</span>
-                        <span className="text-primary font-medium">{ch.conversions.toLocaleString()} conv.</span>
-                        <span>{ch.contacts.toLocaleString()} leads</span>
+                        <span>{n(ch.visits).toLocaleString()} visitas</span>
+                        <span>{n(ch.formSubmits).toLocaleString()} forms</span>
+                        <span className="text-primary font-medium">{n(ch.conversions).toLocaleString()} conv.</span>
+                        <span>{n(ch.contacts).toLocaleString()} leads</span>
                       </div>
                     </div>
                     <div className="h-1.5 w-full rounded-full bg-muted/30 overflow-hidden">
@@ -276,9 +281,9 @@ export default function SaasReportesPage() {
                         {cam.utmSource && <span className="ml-2 text-xs text-muted-foreground">via {cam.utmSource}</span>}
                       </div>
                       <div className="flex gap-3 text-xs text-muted-foreground">
-                        <span>{cam.visits.toLocaleString()} visitas</span>
-                        <span>{cam.formSubmits.toLocaleString()} forms</span>
-                        <span className="text-primary font-medium">{cam.conversions.toLocaleString()} conv.</span>
+                        <span>{n(cam.visits).toLocaleString()} visitas</span>
+                        <span>{n(cam.formSubmits).toLocaleString()} forms</span>
+                        <span className="text-primary font-medium">{n(cam.conversions).toLocaleString()} conv.</span>
                       </div>
                     </div>
                     <div className="h-1.5 w-full rounded-full bg-muted/30 overflow-hidden">
@@ -298,7 +303,7 @@ export default function SaasReportesPage() {
               {roasAlerts.map((a, i) => (
                 <div key={i} className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground capitalize">{a.platform}</span>
-                  <span className="text-warning font-medium">ROAS {a.roas.toFixed(2)}x (umbral: {a.threshold}x) — gasto {a.spend.toFixed(2)} EUR</span>
+                  <span className="text-warning font-medium">ROAS {n(a.roas).toFixed(2)}x (umbral: {a.threshold}x) — gasto {n(a.spend).toFixed(2)} EUR</span>
                 </div>
               ))}
             </div>
@@ -316,7 +321,7 @@ export default function SaasReportesPage() {
                     <p className="text-xs text-muted-foreground truncate">{l.utmSource} / {l.utmMedium} / {l.utmCampaign}</p>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="text-sm font-semibold text-foreground">{l.clicks.toLocaleString()}</p>
+                    <p className="text-sm font-semibold text-foreground">{n(l.clicks).toLocaleString()}</p>
                     <p className="text-xs text-muted-foreground">clics</p>
                   </div>
                 </NelvyonDsCard>
@@ -418,12 +423,12 @@ export default function SaasReportesPage() {
                         {row.utmCampaign && <p className="text-muted-foreground/70 text-xs">{row.utmCampaign}</p>}
                       </td>
                       <td className="px-4 py-3 text-right text-muted-foreground">{row.conversions}</td>
-                      <td className="px-4 py-3 text-right text-muted-foreground">€{row.adsSpend.toFixed(0)}</td>
-                      <td className="px-4 py-3 text-right text-foreground font-semibold">€{row.attributedRevenue.toFixed(0)}</td>
+                      <td className="px-4 py-3 text-right text-muted-foreground">€{n(row.adsSpend).toFixed(0)}</td>
+                      <td className="px-4 py-3 text-right text-foreground font-semibold">€{n(row.attributedRevenue).toFixed(0)}</td>
                       <td className="px-4 py-3 text-right">
                         {row.roas !== null ? (
                           <span className={row.roas >= 2 ? "text-success font-semibold" : "text-warning"}>
-                            {row.roas.toFixed(1)}x
+                            {n(row.roas).toFixed(1)}x
                           </span>
                         ) : <span className="text-muted-foreground/50">—</span>}
                       </td>
