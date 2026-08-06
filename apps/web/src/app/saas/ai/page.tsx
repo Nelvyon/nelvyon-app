@@ -1,18 +1,35 @@
 "use client";
 
+/**
+ * /saas/ai sobre `(cms)/content` de W3CRM, con las piezas ya portadas.
+ * Mapeo: rejilla de estado -> `W3crmContentBox` + `card` de Bootstrap con
+ * `W3crmStatusBadge`; KPIs -> `W3crmKpiTile`; espera -> `W3crmCargando`. Sin
+ * componentes nuevos.
+ *
+ * Inventario: sin `data-testid`. Contrato de texto en
+ * `capture-marketing-shots.spec.ts:46`: `/Panel IA|Router|MCP/i`, que
+ * satisfacen el titulo "Panel IA" y las tarjetas "Router de modelos" y "MCP
+ * productivo". Sin `data-testid` ni spec dedicado mas alla de
+ * `saas-nav-full-coverage` y `dashboard.spec.ts:89` (el enlace del nav).
+ *
+ * NO se toca la capa de IA ni su routing: `fetchJson` conserva
+ * `credentials: "include"` y las DIEZ llamadas en paralelo con sus rutas y
+ * `resource` exactos (`private-ai/router-health`, `mcp`,
+ * `shared-memory?resource=status`, `private-ai/agents`,
+ * `orchestrator?resource=status`, `private-ai/metrics`, y los cuatro
+ * `ai-agents?resource=` status/workflows/runtime/canaries). Se conservan
+ * tambien el calculo de `agentCount` con sus dos formas de respuesta, los
+ * cuatro contadores, y el estado de cada tarjeta (incluido el `crit` por
+ * `emergencyStop` y los `pending` por flag). Solo cambia la presentacion.
+ */
 import { useCallback, useEffect, useState } from "react";
 
-import {
-  NelvyonDsBadge,
-  NelvyonDsButton,
-  NelvyonDsCard,
-  NelvyonDsSectionHeader,
-  NelvyonDsStatusDot,
-  type NelvyonDsStatus,
-} from "@/design-system/components";
-import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmKpiTile, W3crmStatusBadge } from "@/features/saas-w3crm/components/W3crmUi";
+import { W3crmCargando, W3crmContentBox } from "@/features/saas-w3crm/components/W3crmContentBox";
+
+type EstadoIA = "ok" | "warn" | "crit" | "pending";
 
 type StatusCard = {
   id: string;
@@ -20,7 +37,7 @@ type StatusCard = {
   icon: string;
   href: string;
   body: string;
-  status: NelvyonDsStatus;
+  status: EstadoIA;
 };
 
 async function fetchJson(path: string): Promise<{ ok: boolean; status: number; data: unknown }> {
@@ -33,9 +50,27 @@ async function fetchJson(path: string): Promise<{ ok: boolean; status: number; d
   }
 }
 
+/** Un `data` nulo o no-objeto rompia todos los accesos encadenados. */
+function obj(v: unknown): Record<string, unknown> {
+  return v && typeof v === "object" ? (v as Record<string, unknown>) : {};
+}
+function num(v: unknown): number {
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+function largo(v: unknown): number {
+  return Array.isArray(v) ? v.length : 0;
+}
+
+const ESTADO_LABEL: Record<EstadoIA, string> = {
+  ok: "ready", warn: "atención", crit: "crítico", pending: "standby",
+};
+
 export default function SaasAiPanelPage() {
   const [cards, setCards] = useState<StatusCard[]>([]);
-  const [kpis, setKpis] = useState<{ agentRuns: number; openClawDispatches: number; unifiedTotal: number; runtimeReady: number } | null>(null);
+  const [kpis, setKpis] = useState<{
+    agentRuns: number; openClawDispatches: number; unifiedTotal: number; runtimeReady: number;
+  } | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -54,51 +89,54 @@ export default function SaasAiPanelPage() {
       fetchJson("/api/saas/ai-agents?resource=canaries"),
     ]);
 
-    const agentCount = Array.isArray((agents.data as { agents?: unknown[] })?.agents)
-      ? (agents.data as { agents: unknown[] }).agents.length
+    const agentsData = obj(agents.data);
+    const agentCount = Array.isArray(agentsData.agents)
+      ? agentsData.agents.length
       : Array.isArray(agents.data)
         ? (agents.data as unknown[]).length
         : 0;
-    const unifiedTotal = Number((unified.data as { total?: number })?.total ?? 0);
-    const runtimeReady = Number((unified.data as { runtimeReady?: number })?.runtimeReady ?? 0);
-    const agentRuns = Number((metrics.data as { counters?: { agentRuns?: number } })?.counters?.agentRuns ?? 0);
-    const openClawDispatches = Number((metrics.data as { counters?: { openClawDispatches?: number } })?.counters?.openClawDispatches ?? 0);
+
+    const unifiedData = obj(unified.data);
+    const unifiedTotal = num(unifiedData.total);
+    const runtimeReady = num(unifiedData.runtimeReady);
+    const counters = obj(obj(metrics.data).counters);
+    const agentRuns = num(counters.agentRuns);
+    const openClawDispatches = num(counters.openClawDispatches);
+
+    const memoryData = obj(memory.data);
+    const orchData = obj(orch.data);
+    const workflowsData = obj(workflows.data);
+    const runtimeData = obj(runtime.data);
+    const canariesData = obj(canaries.data);
 
     setKpis({ agentRuns, openClawDispatches, unifiedTotal, runtimeReady });
 
     setCards([
       {
-        id: "router",
-        title: "Router de modelos",
-        icon: "🧭",
+        id: "router", title: "Router de modelos", icon: "fa-solid fa-compass",
         href: "/api/saas/private-ai/router-health",
         status: router.ok ? "ok" : "warn",
         body: router.ok ? "Certificado · health OK" : `HTTP ${router.status}`,
       },
       {
-        id: "mcp",
-        title: "MCP productivo",
-        icon: "🔌",
+        id: "mcp", title: "MCP productivo", icon: "fa-solid fa-plug",
         href: "/api/saas/mcp",
         status: mcp.ok ? "ok" : "warn",
         body: mcp.ok ? "Disponible" : `HTTP ${mcp.status}`,
       },
       {
-        id: "memory",
-        title: "Shared Memory",
-        icon: "🧠",
+        id: "memory", title: "Shared Memory", icon: "fa-solid fa-brain",
         href: "/api/saas/shared-memory?resource=status",
-        status: memory.ok && Boolean((memory.data as { enabled?: boolean })?.enabled) ? "ok" : "pending",
+        status: memory.ok && Boolean(memoryData.enabled) ? "ok" : "pending",
         body: memory.ok
-          ? ((memory.data as { enabled?: boolean; contractVersion?: string }).enabled
-              ? `ON · v${(memory.data as { contractVersion?: string }).contractVersion} · content security ON`
+          ? (memoryData.enabled
+              // `contractVersion` ausente pintaba "v undefined".
+              ? `ON · v${String(memoryData.contractVersion ?? "—")} · content security ON`
               : "OFF (flag) — set NELVYON_SHARED_MEMORY_ENABLED=1")
           : `HTTP ${memory.status}`,
       },
       {
-        id: "agents",
-        title: "Agentes runtime",
-        icon: "⚡",
+        id: "agents", title: "Agentes runtime", icon: "fa-solid fa-bolt",
         href: "/api/saas/private-ai/agents",
         status: agents.ok ? "ok" : "warn",
         body: agents.ok
@@ -106,39 +144,27 @@ export default function SaasAiPanelPage() {
           : `HTTP ${agents.status}`,
       },
       {
-        id: "orch",
-        title: "Orquestador",
-        icon: "🛠️",
+        id: "orch", title: "Orquestador", icon: "fa-solid fa-screwdriver-wrench",
         href: "/api/saas/orchestrator?resource=status",
-        status: orch.ok && Boolean((orch.data as { enabled?: boolean })?.enabled) ? "ok" : "pending",
+        status: orch.ok && Boolean(orchData.enabled) ? "ok" : "pending",
         body: orch.ok
-          ? ((orch.data as { enabled?: boolean }).enabled
-              ? "ON · sandbox executor (LIVE opt-in)"
-              : "OFF (flag)")
+          ? (orchData.enabled ? "ON · sandbox executor (LIVE opt-in)" : "OFF (flag)")
           : `HTTP ${orch.status}`,
       },
       {
-        id: "metrics",
-        title: "Métricas IA",
-        icon: "📈",
+        id: "metrics", title: "Métricas IA", icon: "fa-solid fa-chart-line",
         href: "/api/saas/private-ai/metrics",
         status: metrics.ok ? "ok" : "warn",
-        body: metrics.ok
-          ? `runs=${agentRuns} · openClaw=${openClawDispatches}`
-          : `HTTP ${metrics.status}`,
+        body: metrics.ok ? `runs=${agentRuns} · openClaw=${openClawDispatches}` : `HTTP ${metrics.status}`,
       },
       {
-        id: "elite",
-        title: "Elite cert (repo)",
-        icon: "🏅",
+        id: "elite", title: "Elite cert (repo)", icon: "fa-solid fa-medal",
         href: "docs/PHASE2_ELITE_CERT.md",
         status: "ok",
         body: "PASS (phase2EliteCertified) · residuales Docker/ops documentados",
       },
       {
-        id: "workforce",
-        title: "Fuerza de trabajo",
-        icon: "👥",
+        id: "workforce", title: "Fuerza de trabajo", icon: "fa-solid fa-users",
         href: "/api/saas/ai-agents?resource=org",
         status: unified.ok ? "ok" : "warn",
         body: unified.ok
@@ -146,39 +172,31 @@ export default function SaasAiPanelPage() {
           : `HTTP ${unified.status}`,
       },
       {
-        id: "workflows",
-        title: "Workflows enterprise",
-        icon: "🔁",
+        id: "workflows", title: "Workflows enterprise", icon: "fa-solid fa-rotate",
         href: "/api/saas/ai-agents?resource=workflows",
         status: workflows.ok ? "ok" : "warn",
         body: workflows.ok
-          ? `${(workflows.data as { certified?: number }).certified ?? "—"} certificados · ${(workflows.data as { total?: number }).total ?? "—"} total`
+          ? `${workflowsData.certified ?? "—"} certificados · ${workflowsData.total ?? "—"} total`
           : `HTTP ${workflows.status}`,
       },
       {
-        id: "runtime",
-        title: "Runtime / daemon",
-        icon: "⚙️",
+        id: "runtime", title: "Runtime / daemon", icon: "fa-solid fa-gear",
         href: "/api/saas/ai-agents?resource=runtime",
-        status: runtime.ok ? ((runtime.data as { emergencyStop?: boolean }).emergencyStop ? "crit" : "ok") : "warn",
+        status: runtime.ok ? (runtimeData.emergencyStop ? "crit" : "ok") : "warn",
         body: runtime.ok
-          ? `daemon=${(runtime.data as { daemonEnabled?: boolean }).daemonEnabled ? "on" : "off"} · mode=${(runtime.data as { operationMode?: string }).operationMode ?? "—"} · kill=${(runtime.data as { emergencyStop?: boolean }).emergencyStop ? "ON" : "off"}`
+          ? `daemon=${runtimeData.daemonEnabled ? "on" : "off"} · mode=${String(runtimeData.operationMode ?? "—")} · kill=${runtimeData.emergencyStop ? "ON" : "off"}`
           : `HTTP ${runtime.status}`,
       },
       {
-        id: "canary",
-        title: "Canary / mejoras",
-        icon: "🕊️",
+        id: "canary", title: "Canary / mejoras", icon: "fa-solid fa-dove",
         href: "/api/saas/ai-agents?resource=canaries",
         status: canaries.ok ? "pending" : "warn",
         body: canaries.ok
-          ? `canaries=${Array.isArray((canaries.data as { canaries?: unknown[] }).canaries) ? (canaries.data as { canaries: unknown[] }).canaries.length : 0} · leaderboard /api/saas/ai-agents?resource=leaderboard`
+          ? `canaries=${largo(canariesData.canaries)} · leaderboard /api/saas/ai-agents?resource=leaderboard`
           : `HTTP ${canaries.status}`,
       },
       {
-        id: "leaderboard",
-        title: "Leaderboard por capacidad",
-        icon: "🏆",
+        id: "leaderboard", title: "Leaderboard por capacidad", icon: "fa-solid fa-trophy",
         href: "/api/saas/ai-agents?resource=leaderboard",
         status: unified.ok ? "ok" : "pending",
         body: "Ranking por capacidad (no score global engañoso)",
@@ -188,71 +206,74 @@ export default function SaasAiPanelPage() {
     setRefreshing(false);
   }, []);
 
-  useEffect(() => {
-    void load();
-  }, [load]);
-
-  const statusLabel: Record<NelvyonDsStatus, string> = { ok: "ready", warn: "atención", crit: "crítico", pending: "standby" };
-  const statusBadgeTone: Record<NelvyonDsStatus, "success" | "warning" | "danger" | "neutral"> = {
-    ok: "success",
-    warn: "warning",
-    crit: "danger",
-    pending: "neutral",
-  };
+  useEffect(() => { void load(); }, [load]);
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="ai" />}>
-      <div className="space-y-6 pb-8">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <NelvyonDsSectionHeader
-            title="Panel IA"
-            subtitle="Estado en vivo de la plataforma de inteligencia propia Nelvyon — router, memoria, orquestador y agentes"
-          />
-          <NelvyonDsButton variant="ghost" onClick={() => void load()} disabled={refreshing}>
-            {refreshing ? "Actualizando…" : "↻ Actualizar"}
-          </NelvyonDsButton>
-        </div>
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="Panel IA" parentTitle="Inteligencia" pageTitle="Panel IA" />
+      <div className="container-fluid">
+        <div className="row">
+          {kpis && (
+            <>
+              <div className="col-xl-3 col-sm-6">
+                <W3crmKpiTile label="Ejecuciones de agentes" value={kpis.agentRuns} accent />
+              </div>
+              <div className="col-xl-3 col-sm-6">
+                <W3crmKpiTile label="Dispatches OpenClaw" value={kpis.openClawDispatches} />
+              </div>
+              <div className="col-xl-3 col-sm-6">
+                <W3crmKpiTile label="Fuerza de trabajo unificada" value={kpis.unifiedTotal || "—"} />
+              </div>
+              <div className="col-xl-3 col-sm-6">
+                <W3crmKpiTile label="Runtime ready" value={`${kpis.runtimeReady}/${kpis.unifiedTotal || "—"}`} />
+              </div>
+            </>
+          )}
 
-        {kpis && (
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <KpiTile icon="⚡" label="Ejecuciones de agentes" value={kpis.agentRuns} accent />
-            <KpiTile icon="🕊️" label="Dispatches OpenClaw" value={kpis.openClawDispatches} />
-            <KpiTile icon="👥" label="Fuerza de trabajo unificada" value={kpis.unifiedTotal || "—"} />
-            <KpiTile icon="✅" label="Runtime ready" value={`${kpis.runtimeReady}/${kpis.unifiedTotal || "—"}`} />
-          </div>
-        )}
+          <div className="col-xl-12">
+            <p className="fs-14 text-muted">
+              Estado en vivo de la plataforma de inteligencia propia Nelvyon — router, memoria,
+              orquestador y agentes. Router y MCP certificados · Memoria / Orquestador activables por
+              flag · OpenClaw solo con memoria ON
+            </p>
 
-        <p className="text-sm text-muted-foreground">
-          Router y MCP certificados · Memoria / Orquestador activables por flag · OpenClaw solo con memoria ON
-        </p>
-
-        {loading ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-28 animate-pulse rounded-xl bg-muted/20" />
-            ))}
-          </div>
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {cards.map((c) => (
-              <NelvyonDsCard key={c.id} className="flex flex-col gap-2 p-5">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg" aria-hidden="true">{c.icon}</span>
-                    <h2 className="font-semibold text-foreground text-sm">{c.title}</h2>
-                  </div>
-                  <NelvyonDsBadge tone={statusBadgeTone[c.status]} className="inline-flex items-center gap-1.5">
-                    <NelvyonDsStatusDot status={c.status} />
-                    {statusLabel[c.status]}
-                  </NelvyonDsBadge>
+            <W3crmContentBox
+              titulo="Estado de la plataforma"
+              icono="fa-solid fa-microchip"
+              acciones={
+                <button type="button" className="btn btn-primary light btn-sm me-2" disabled={refreshing}
+                  onClick={() => void load()}>
+                  {refreshing ? "Actualizando…" : "Actualizar"}
+                </button>
+              }
+            >
+              {loading ? (
+                <W3crmCargando texto="Consultando servicios de IA…" />
+              ) : (
+                <div className="row">
+                  {cards.map((c) => (
+                    <div className="col-xl-4 col-sm-6" key={c.id}>
+                      <div className="card border mb-3">
+                        <div className="card-body">
+                          <div className="d-flex align-items-center justify-content-between gap-2 mb-2">
+                            <span className="fw-bold">
+                              <i className={`${c.icon} me-2 text-primary`} aria-hidden="true" />
+                              {c.title}
+                            </span>
+                            <W3crmStatusBadge status={c.status} label={ESTADO_LABEL[c.status]} />
+                          </div>
+                          <p className="text-muted fs-14 mb-1">{c.body}</p>
+                          <p className="text-muted fs-12 text-truncate mb-0">{c.href}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <p className="text-sm text-muted-foreground">{c.body}</p>
-                <p className="mt-1 text-[11px] text-muted-foreground/60 font-mono truncate">{c.href}</p>
-              </NelvyonDsCard>
-            ))}
+              )}
+            </W3crmContentBox>
           </div>
-        )}
+        </div>
       </div>
-    </SaasShellLayout>
+    </SaasW3crmShell>
   );
 }

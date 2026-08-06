@@ -1,20 +1,35 @@
 "use client";
 
+/**
+ * /saas/agentes sobre `(cms)/content` de W3CRM, con las piezas ya portadas.
+ * Mapeo: catalogo -> `W3crmContentBox` + rejilla de `card`; historial de
+ * ejecuciones -> `W3crmContentBox` + `W3crmDataTable`; ejecucion ->
+ * `W3crmModal`; contadores -> `W3crmKpiTile`. Sin componentes nuevos.
+ *
+ * Inventario: sin `data-testid`. Contrato de texto en
+ * `capture-marketing-shots.spec.ts:45`: `/Agente|copy|pipeline|IA/i`, que
+ * satisface el titulo "Agentes IA por Sector". Sin spec dedicado mas alla de
+ * `saas-nav-full-coverage`.
+ *
+ * Colisiones revisadas: ningun titulo de `W3crmContentBox` repite el texto de
+ * un KPI o de un boton, porque el toggle de la caja expone
+ * `aria-label="Plegar <titulo>"` y entraria en los mismos conteos.
+ *
+ * Logica de NELVYON intacta: el catalogo estatico completo con sus ids,
+ * categorias y marca `premium`; `POST /api/saas/agentes/execute` con
+ * `{ agentId, input }` y su cascada de lectura `result ?? output ?? JSON`;
+ * `GET /api/saas/agentes/runs?limit=10` recargado cuando cambia el agente
+ * activo; el filtro por categoria y la busqueda por nombre o descripcion; el
+ * "Nueva consulta" que limpia el resultado sin cerrar el dialogo.
+ */
 import { useEffect, useState } from "react";
 
-import {
-  NelvyonDsBadge,
-  NelvyonDsButton,
-  NelvyonDsCard,
-  NelvyonDsSectionHeader,
-} from "@/design-system/components";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
-
-// ─── Static agent catalog (193 sectors) ──────────────────────────────────────
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmEmptyState, W3crmKpiTile } from "@/features/saas-w3crm/components/W3crmUi";
+import { W3crmContentBox, W3crmDataTable, W3crmModal } from "@/features/saas-w3crm/components/W3crmContentBox";
 
 const AGENT_CATALOG: { id: string; name: string; description: string; category: string; premium?: boolean }[] = [
-  // Marketing
   { id: "emailmarketing", name: "Email Marketing IA", description: "Secuencias, newsletters y nurturing automático", category: "Marketing" },
   { id: "seo", name: "SEO Completo", description: "Keywords, contenido, links internos, schema y SGE", category: "Marketing" },
   { id: "ads", name: "Publicidad IA", description: "Google, Meta, TikTok — creatividades y pujas con IA", category: "Marketing" },
@@ -25,7 +40,6 @@ const AGENT_CATALOG: { id: string; name: string; description: string; category: 
   { id: "influencer", name: "Influencer IA", description: "Detección, outreach y gestión de campañas", category: "Marketing" },
   { id: "neuromarketing", name: "Neuromarketing IA", description: "Optimización de mensajes según sesgos cognitivos", category: "Marketing" },
   { id: "growthhacking", name: "Growth Hacking IA", description: "Experimentos de crecimiento acelerado", category: "Marketing" },
-  // Ventas
   { id: "outboundb2b", name: "Outbound B2B", description: "Prospección, secuencias de frío y seguimiento", category: "Ventas" },
   { id: "salesintelligence", name: "Sales Intelligence", description: "Señales de compra y priorización de leads", category: "Ventas" },
   { id: "customerjourney", name: "Customer Journey", description: "Mapeo y optimización de todo el embudo", category: "Ventas" },
@@ -34,23 +48,19 @@ const AGENT_CATALOG: { id: string; name: string; description: string; category: 
   { id: "crm", name: "CRM IA", description: "Enriquecimiento, scoring y automatización CRM", category: "Ventas", premium: true },
   { id: "contactenrichmentmasivo", name: "Contact Enrichment", description: "Enriquecimiento masivo de base de datos", category: "Ventas" },
   { id: "leadenrich", name: "Lead Enrichment", description: "Datos firmográficos y tecnográficos en tiempo real", category: "Ventas" },
-  // SEO Avanzado
   { id: "technicalseoaudit", name: "Auditoría Técnica SEO", description: "Crawl completo, Core Web Vitals y errores", category: "SEO" },
   { id: "superiorseo", name: "Superior SEO", description: "Posicionamiento agresivo con estrategia editorial", category: "SEO", premium: true },
   { id: "contentscore", name: "Content Score", description: "Análisis de calidad de contenido vs. competencia", category: "SEO" },
   { id: "competitive", name: "Análisis Competitivo", description: "Gaps de keywords, backlinks y contenido rivales", category: "SEO" },
-  // Atención al cliente
   { id: "helpdeskomnichannel", name: "Helpdesk Omnicanal", description: "Soporte IA en chat, email y WhatsApp", category: "Soporte" },
   { id: "chatwidget", name: "Chat Widget IA", description: "Widget de chat IA embebible en cualquier web", category: "Soporte" },
   { id: "customersuccess", name: "Customer Success IA", description: "Onboarding, NPS y prevención de churn proactiva", category: "Soporte" },
   { id: "churn", name: "Predicción Churn", description: "Detecta clientes en riesgo antes de que cancelen", category: "Soporte" },
   { id: "reviews", name: "Reviews IA", description: "Gestión de reseñas y reputación online", category: "Soporte" },
-  // Contenido
   { id: "videomarketing", name: "Video Marketing IA", description: "Guiones, storyboards y shorts automatizados", category: "Contenido" },
   { id: "podcast", name: "Podcast IA", description: "Producción, notas y clips para distribución", category: "Contenido" },
   { id: "imagenes", name: "Imágenes IA", description: "Generación de imágenes y creatividades para ads", category: "Contenido" },
   { id: "socialvideo", name: "Social Video IA", description: "Reels, TikToks y YouTube Shorts con guión", category: "Contenido" },
-  // Sectores verticales
   { id: "ecommerce", name: "Ecommerce IA", description: "Fichas de producto, catálogo y optimización CRO", category: "Vertical" },
   { id: "realestate", name: "Inmobiliaria IA", description: "Listings, valoraciones y captación de propietarios", category: "Vertical" },
   { id: "health", name: "Salud y Wellness IA", description: "Contenido médico, captación y fidelización", category: "Vertical" },
@@ -63,7 +73,6 @@ const AGENT_CATALOG: { id: string; name: string; description: string; category: 
   { id: "coaching", name: "Coaching IA", description: "Captación de clientes y monetización de expertise", category: "Vertical" },
   { id: "saasb2b", name: "SaaS B2B IA", description: "PLG, trial conversion y expansión de cuentas", category: "Vertical" },
   { id: "logistics", name: "Logística IA", description: "Comunicación B2B y captación de embarcadores", category: "Vertical" },
-  // Automation & Tech
   { id: "workflow", name: "Workflow Builder IA", description: "Automatizaciones complejas sin código", category: "Automatización" },
   { id: "zapier", name: "Zapier IA", description: "Integración con 5.000+ apps vía Zapier", category: "Automatización" },
   { id: "reporting", name: "Reporting IA", description: "Informes ejecutivos PDF automáticos", category: "Automatización" },
@@ -73,9 +82,29 @@ const AGENT_CATALOG: { id: string; name: string; description: string; category: 
 
 const CATEGORIES = ["Todos", "Marketing", "Ventas", "SEO", "Soporte", "Contenido", "Vertical", "Automatización"];
 
-// ─── Execute agent modal ──────────────────────────────────────────────────────
+type AgentRun = { agentId: string; status: string; createdAt: string };
 
-function ExecuteModal({ agent, onClose }: { agent: { id: string; name: string; description: string }; onClose: () => void }) {
+const RUN_BADGE: Record<string, string> = {
+  completed: "badge-success",
+  running: "badge-primary",
+  failed: "badge-danger",
+};
+
+/** Un estado fuera de catalogo pintaba `undefined`. */
+function runBadge(s: string): string {
+  return RUN_BADGE[s] ?? "badge-secondary";
+}
+function fechaCorta(iso: string | null | undefined): string {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime())
+    ? "—"
+    : d.toLocaleString("es-ES", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
+}
+
+function ExecuteModal({ agent, onClose }: {
+  agent: { id: string; name: string; description: string }; onClose: () => void;
+}) {
   const [input, setInput] = useState("");
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState<string | null>(null);
@@ -104,191 +133,168 @@ function ExecuteModal({ agent, onClose }: { agent: { id: string; name: string; d
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm">
-      <div className="my-8 w-full max-w-2xl rounded-2xl border border-border bg-card shadow-2xl">
-        <div className="flex items-center justify-between border-b border-border px-6 py-4">
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">{agent.name}</h2>
-            <p className="text-sm text-muted-foreground">{agent.description}</p>
+    <W3crmModal titulo={agent.name} onClose={onClose} error={error} size="lg">
+      <p className="fs-14 text-muted">{agent.description}</p>
+      {!result ? (
+        <form onSubmit={(e) => void run(e)}>
+          <div className="form-group mb-3">
+            <label htmlFor="ag-input" className="text-black font-w600">
+              ¿Qué quieres que haga el agente? <span className="required">*</span>
+            </label>
+            <textarea id="ag-input" className="form-control" rows={5}
+              placeholder="Ejemplo: Analiza el SEO de nelvyon.com y dame las 10 keywords de mayor oportunidad para posicionar en el top 3 en España."
+              value={input} onChange={(e) => setInput(e.target.value)} />
           </div>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
-        </div>
-        <div className="p-6">
-          {!result ? (
-            <form onSubmit={run} className="space-y-4">
-              {error && <p className="rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
-              <div>
-                <label className="mb-2 block text-xs font-medium text-muted-foreground">
-                  ¿Qué quieres que haga el agente? *
-                </label>
-                <textarea
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  rows={5}
-                  placeholder={`Ejemplo: Analiza el SEO de nelvyon.com y dame las 10 keywords de mayor oportunidad para posicionar en el top 3 en España.`}
-                  className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
-                />
-              </div>
-              <div className="flex gap-3">
-                <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
-                <NelvyonDsButton type="submit" disabled={running || !input.trim()} className="flex-1">
-                  {running ? "Ejecutando agente…" : "Ejecutar"}
-                </NelvyonDsButton>
-              </div>
-            </form>
-          ) : (
-            <div className="space-y-4">
-              <div className="rounded-xl bg-muted/20 p-4">
-                <p className="mb-2 text-xs font-medium text-muted-foreground">Resultado del agente</p>
-                <pre className="whitespace-pre-wrap text-sm text-foreground">{result}</pre>
-              </div>
-              <div className="flex gap-3">
-                <NelvyonDsButton variant="ghost" onClick={() => setResult(null)} className="flex-1">Nueva consulta</NelvyonDsButton>
-                <NelvyonDsButton onClick={onClose} className="flex-1">Cerrar</NelvyonDsButton>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
+          <div className="text-end">
+            <button type="button" className="btn btn-primary light me-2" onClick={onClose}>Cancelar</button>
+            <button type="submit" className="btn btn-primary" disabled={running || !input.trim()}>
+              {running ? "Ejecutando agente…" : "Ejecutar"}
+            </button>
+          </div>
+        </form>
+      ) : (
+        <>
+          <div className="border rounded bg-light p-3 mb-3">
+            <p className="text-muted fs-12 mb-2">Resultado del agente</p>
+            <pre className="mb-0" style={{ whiteSpace: "pre-wrap" }}>{result}</pre>
+          </div>
+          <div className="text-end">
+            <button type="button" className="btn btn-primary light me-2" onClick={() => setResult(null)}>
+              Nueva consulta
+            </button>
+            <button type="button" className="btn btn-primary" onClick={onClose}>Cerrar</button>
+          </div>
+        </>
+      )}
+    </W3crmModal>
   );
 }
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function SaasAgentesPage() {
   const [category, setCategory] = useState("Todos");
   const [search, setSearch] = useState("");
   const [activeAgent, setActiveAgent] = useState<(typeof AGENT_CATALOG)[number] | null>(null);
-  const [runs, setRuns] = useState<{ agentId: string; status: string; createdAt: string }[]>([]);
-  const [showHistory, setShowHistory] = useState(false);
+  const [runs, setRuns] = useState<AgentRun[]>([]);
 
   const agentNameById = new Map(AGENT_CATALOG.map((a) => [a.id, a.name]));
 
   useEffect(() => {
     fetch("/api/saas/agentes/runs?limit=10")
       .then((r) => r.json())
-      .then((d: { runs?: { agentId: string; status: string; createdAt: string }[] }) => setRuns(d.runs ?? []))
+      // `runs` podia no ser array y reventaba el `.length`/`.map`.
+      .then((d: { runs?: AgentRun[] }) => setRuns(Array.isArray(d?.runs) ? d.runs : []))
       .catch(() => {});
   }, [activeAgent]);
 
   const filtered = AGENT_CATALOG.filter((a) => {
     const matchCat = category === "Todos" || a.category === category;
-    const matchSearch = !search || a.name.toLowerCase().includes(search.toLowerCase()) || a.description.toLowerCase().includes(search.toLowerCase());
+    const matchSearch = !search
+      || a.name.toLowerCase().includes(search.toLowerCase())
+      || a.description.toLowerCase().includes(search.toLowerCase());
     return matchCat && matchSearch;
   });
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="agentes" />}>
-      <div className="flex flex-col gap-6 pb-8">
-        <NelvyonDsSectionHeader
-          title="Agentes IA por Sector"
-          subtitle={`${AGENT_CATALOG.length} agentes especializados listos para ejecutar — el corazón de Nelvyon`}
-        />
-
-        {/* Stats */}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {[
-            { label: "Agentes disponibles", value: AGENT_CATALOG.length },
-            { label: "Sectores cubiertos", value: CATEGORIES.length - 1 },
-            { label: "Ejecutados (recientes)", value: runs.length },
-            { label: "Modo", value: "Producción IA" },
-          ].map(({ label, value }) => (
-            <NelvyonDsCard key={label} className="p-4">
-              <p className="text-xs text-muted-foreground">{label}</p>
-              <p className="mt-1 text-2xl font-bold text-foreground">{value}</p>
-            </NelvyonDsCard>
-          ))}
-        </div>
-
-        {/* Run history */}
-        {runs.length > 0 && (
-          <div>
-            <button
-              onClick={() => setShowHistory((v) => !v)}
-              className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground"
-            >
-              {showHistory ? "▾" : "▸"} Historial de ejecuciones ({runs.length})
-            </button>
-            {showHistory && (
-              <div className="mt-2 space-y-2">
-                {runs.map((r, i) => {
-                  const statusTone: Record<string, "success" | "warning" | "danger" | "neutral" | "primary"> = {
-                    completed: "success",
-                    running: "primary",
-                    failed: "danger",
-                  };
-                  return (
-                    <NelvyonDsCard key={i} className="flex items-center justify-between gap-3 p-3">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <NelvyonDsBadge tone={statusTone[r.status] ?? "neutral"}>{r.status}</NelvyonDsBadge>
-                        <p className="truncate text-sm text-foreground">{agentNameById.get(r.agentId) ?? r.agentId}</p>
-                      </div>
-                      <p className="shrink-0 text-xs text-muted-foreground">
-                        {new Date(r.createdAt).toLocaleString("es-ES", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
-                      </p>
-                    </NelvyonDsCard>
-                  );
-                })}
-              </div>
-            )}
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="Agentes IA por Sector" parentTitle="Inteligencia" pageTitle="Agentes" />
+      <div className="container-fluid">
+        <div className="row">
+          <div className="col-xl-3 col-sm-6">
+            <W3crmKpiTile label="Agentes disponibles" value={AGENT_CATALOG.length} accent />
           </div>
-        )}
+          <div className="col-xl-3 col-sm-6">
+            <W3crmKpiTile label="Sectores cubiertos" value={CATEGORIES.length - 1} />
+          </div>
+          <div className="col-xl-3 col-sm-6">
+            <W3crmKpiTile label="Ejecutados (recientes)" value={runs.length} />
+          </div>
+          <div className="col-xl-3 col-sm-6">
+            <W3crmKpiTile label="Modo" value="Producción IA" />
+          </div>
 
-        {/* Search + filters */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar agente…"
-            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none sm:max-w-xs"
-          />
-          <div className="flex flex-wrap gap-2">
-            {CATEGORIES.map((c) => (
-              <button
-                key={c}
-                onClick={() => setCategory(c)}
-                className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${category === c ? "bg-primary text-primary-foreground" : "bg-muted/30 text-muted-foreground hover:bg-muted/50"}`}
+          <div className="col-xl-12">
+            <p className="fs-14 text-muted">
+              {AGENT_CATALOG.length} agentes especializados listos para ejecutar — el corazón de Nelvyon
+            </p>
+
+            {runs.length > 0 && (
+              <W3crmContentBox
+                titulo={`Historial de ejecuciones (${runs.length})`}
+                icono="fa-solid fa-clock-rotate-left"
+                defaultOpen={false}
               >
-                {c}
-              </button>
-            ))}
+                <W3crmDataTable
+                  filas={runs}
+                  etiqueta="ejecuciones"
+                  wrapperId="agent_runs_wrapper"
+                  porPagina={10}
+                  columnas={[{ titulo: "Agente" }, { titulo: "Estado" }, { titulo: "Fecha", alFinal: true }]}
+                  render={(r, i) => (
+                    <tr key={`${r.agentId}-${i}`}>
+                      <td><span className="fw-bold">{agentNameById.get(r.agentId) ?? r.agentId ?? "—"}</span></td>
+                      <td><span className={`badge ${runBadge(r.status)}`}>{r.status || "—"}</span></td>
+                      <td className="text-end">{fechaCorta(r.createdAt)}</td>
+                    </tr>
+                  )}
+                />
+              </W3crmContentBox>
+            )}
+
+            <W3crmContentBox titulo="Catálogo de agentes" icono="fa-solid fa-robot">
+              <div className="row align-items-end mb-3">
+                <div className="col-xl-4 col-sm-6">
+                  <div className="form-group mb-2">
+                    <label htmlFor="ag-buscar" className="text-black font-w600">Buscar agente</label>
+                    <input id="ag-buscar" className="form-control" placeholder="Buscar agente…"
+                      value={search} onChange={(e) => setSearch(e.target.value)} />
+                  </div>
+                </div>
+                <div className="col-xl-8 col-sm-6">
+                  <div className="mb-2" role="group" aria-label="Filtrar por categoría">
+                    {CATEGORIES.map((c) => (
+                      <button key={c} type="button" aria-pressed={category === c}
+                        className={`btn btn-sm me-1 mb-1 ${category === c ? "btn-primary" : "btn-primary light"}`}
+                        onClick={() => setCategory(c)}>
+                        {c}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {filtered.length === 0 ? (
+                <W3crmEmptyState title="Sin resultados" description="Prueba otro término de búsqueda." />
+              ) : (
+                <div className="row">
+                  {filtered.map((agent) => (
+                    <div className="col-xl-3 col-lg-4 col-sm-6" key={agent.id}>
+                      <div className="card border mb-3 h-100">
+                        <div className="card-body d-flex flex-column">
+                          <div className="d-flex align-items-start justify-content-between gap-2">
+                            <span className="fw-bold">{agent.name}</span>
+                            {agent.premium ? <span className="badge badge-warning">Pro</span> : null}
+                          </div>
+                          <p className="text-muted fs-12 mt-1 mb-3">{agent.description}</p>
+                          <div className="d-flex align-items-center justify-content-between mt-auto">
+                            <span className="badge badge-primary">{agent.category}</span>
+                            <button type="button" className="btn btn-primary btn-sm"
+                              aria-label={`Ejecutar ${agent.name}`}
+                              onClick={() => setActiveAgent(agent)}>
+                              Ejecutar
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </W3crmContentBox>
           </div>
         </div>
-
-        {/* Agent grid */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filtered.map((agent) => (
-            <NelvyonDsCard key={agent.id} className="flex flex-col gap-3 p-5 transition-colors hover:border-primary/40">
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <p className="font-semibold text-foreground">{agent.name}</p>
-                  <p className="mt-0.5 text-xs text-muted-foreground">{agent.description}</p>
-                </div>
-                {agent.premium && (
-                  <NelvyonDsBadge tone="warning">Pro</NelvyonDsBadge>
-                )}
-              </div>
-              <div className="flex items-center justify-between">
-                <NelvyonDsBadge tone="primary">{agent.category}</NelvyonDsBadge>
-                <NelvyonDsButton onClick={() => setActiveAgent(agent)}>
-                  Ejecutar →
-                </NelvyonDsButton>
-              </div>
-            </NelvyonDsCard>
-          ))}
-        </div>
-
-        {filtered.length === 0 && (
-          <NelvyonDsCard className="p-12 text-center">
-            <p className="text-4xl">🤖</p>
-            <p className="mt-3 font-semibold text-foreground">Sin resultados</p>
-            <p className="mt-1 text-sm text-muted-foreground">Prueba otro término de búsqueda</p>
-          </NelvyonDsCard>
-        )}
       </div>
 
       {activeAgent && <ExecuteModal agent={activeAgent} onClose={() => setActiveAgent(null)} />}
-    </SaasShellLayout>
+    </SaasW3crmShell>
   );
 }
