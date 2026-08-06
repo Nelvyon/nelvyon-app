@@ -22,7 +22,13 @@ test.describe("S50 — /saas/compliance page", () => {
   });
 
   test("page title Compliance Vault visible", async ({ page }) => {
-    await page.goto("/saas/compliance", { waitUntil: "domcontentloaded" });
+    // Con `domcontentloaded` a secas el assert corre mientras React aún está
+    // transmitiendo: el contenido existe por duplicado —en su sitio y en el
+    // contenedor temporal `div#S:n`— y `getByText` resuelve a 2 elementos.
+    // Playwright NO reintenta las violaciones de modo estricto, así que fallaba
+    // en el primer intento. Se usa el helper que ya emplea el resto del fichero,
+    // que espera al settle. Mismo texto, mismo timeout, misma intención.
+    await gotoComplianceReady(page);
     await expect(page.getByText("Compliance Vault")).toBeVisible({ timeout: 10_000 });
   });
 
