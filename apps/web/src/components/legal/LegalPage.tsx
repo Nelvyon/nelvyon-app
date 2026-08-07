@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 
 import { PublicShell } from "@/features/public-web";
 
-const AIOR = "/brand/public/aior/css";
+const NV_SKIN = "/brand/public/nv/css";
 
 type LegalPageProps = {
   title: string;
@@ -11,16 +11,15 @@ type LegalPageProps = {
   children: ReactNode;
 };
 
-/** Legal NELVYON con chrome AIOR unificado (nav/footer). */
+/** Legal NELVYON con chrome público unificado (nav/footer). */
 export function LegalPage({ title, lastUpdated, children }: LegalPageProps) {
   return (
     <>
-      <link rel="stylesheet" href={`${AIOR}/bootstrap.min.css`} />
-      <link rel="stylesheet" href={`${AIOR}/fontawesome.min.css`} />
-      <link rel="stylesheet" href={`${AIOR}/style.css`} />
-      <link rel="stylesheet" href={`${AIOR}/nelvyon-aior.css`} />
+      <link rel="stylesheet" href={`${NV_SKIN}/bootstrap.min.css`} />
+      <link rel="stylesheet" href={`${NV_SKIN}/style.css`} />
+      <link rel="stylesheet" href={`${NV_SKIN}/nelvyon-skin.css`} />
       <PublicShell>
-        <div className="nv-aior-inner-hero" style={{ background: "#F4F7FF", padding: "48px 0 24px" }}>
+        <div className="nv-brand-inner-hero" style={{ background: "#F5F8FC", padding: "48px 0 24px" }}>
           <div className="container th-container5">
             <nav aria-label="Miga de pan" style={{ fontSize: 14, color: "#6b7c93" }}>
               <ol className="d-flex flex-wrap gap-1 mb-3" style={{ listStyle: "none", padding: 0 }}>
@@ -50,7 +49,7 @@ export function LegalPage({ title, lastUpdated, children }: LegalPageProps) {
           <div className="container th-container5" style={{ maxWidth: 800 }}>
             <div
               style={{ color: "#484848", lineHeight: 1.7, fontSize: 15 }}
-              className="nv-aior-legal-prose"
+              className="nv-brand-legal-prose"
             >
               {children}
             </div>
@@ -58,12 +57,12 @@ export function LegalPage({ title, lastUpdated, children }: LegalPageProps) {
         </section>
       </PublicShell>
       <style>{`
-        .nv-aior-legal-prose a { color: #0084FF; }
-        .nv-aior-legal-prose h2 { margin-top: 2rem; font-size: 1.25rem; color: #06050B; font-weight: 700; }
-        .nv-aior-legal-prose h3 { margin-top: 1.25rem; font-size: 1.05rem; color: #06050B; font-weight: 600; }
-        .nv-aior-legal-prose ul, .nv-aior-legal-prose ol { padding-left: 1.25rem; }
-        .nv-aior-legal-prose li { margin-top: 0.35rem; }
-        .nv-aior-legal-prose strong { color: #06050B; }
+        .nv-brand-legal-prose a { color: #0084FF; }
+        .nv-brand-legal-prose h2 { margin-top: 2rem; font-size: 1.25rem; color: #06050B; font-weight: 700; }
+        .nv-brand-legal-prose h3 { margin-top: 1.25rem; font-size: 1.05rem; color: #06050B; font-weight: 600; }
+        .nv-brand-legal-prose ul, .nv-brand-legal-prose ol { padding-left: 1.25rem; }
+        .nv-brand-legal-prose li { margin-top: 0.35rem; }
+        .nv-brand-legal-prose strong { color: #06050B; }
       `}</style>
     </>
   );
