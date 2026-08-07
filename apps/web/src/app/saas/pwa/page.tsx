@@ -1,9 +1,36 @@
 "use client";
 
+/**
+ * /saas/pwa sobre `(cms)/content` de W3CRM, con las piezas ya portadas.
+ * Mapeo: instalación, push y estadísticas -> `W3crmContentBox`; los contadores
+ * -> `W3crmKpiTile`; los estados -> `badge` de la plantilla. Sin componentes
+ * nuevos.
+ *
+ * CONTRATO — `saas-pwa-install.spec.ts`, que es estricto en cuatro puntos:
+ *   - `getByRole("heading", { name: /Instalar/ })` ÚNICO: el único encabezado
+ *     con esa palabra es el `mainTitle`. Ningún `W3crmEmptyState` —que también
+ *     pinta un `<h5>`— puede llevarla, y el breadcrumb dice "PWA".
+ *   - `getByText("Estado")` ÚNICO: por eso NINGUNA caja se titula "Estado"; el
+ *     título de `W3crmContentBox` es texto y contaría como segunda coincidencia.
+ *   - `getByText("Instalaciones")` y `getByText(/manifest-saas\.json/)`.
+ *   - `getByRole("link", { name: /Instalar App/i })` VISIBLE: lo aporta el
+ *     sidebar del shell, que despliega el grupo del módulo activo.
+ *
+ * Nada del Service Worker cambia: el registro de `/sw.js`, su `update()`, la
+ * suscripción con `applicationServerKey`, la conversión VAPID base64→Uint8Array,
+ * el `unsubscribe()` y el borrado por `endpoint` quedan exactamente igual, igual
+ * que la detección de plataforma, `display-mode: standalone`, el rescate de iOS
+ * Safari y el evento `beforeinstallprompt` con su `preventDefault`.
+ *
+ * Lógica de NELVYON intacta: `GET /api/saas/pwa/status`,
+ * `GET/POST/DELETE /api/saas/pwa/push` y `POST /api/saas/pwa/install`.
+ */
 import { useEffect, useState } from "react";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
-import { NelvyonDsBadge } from "@/design-system/components";
+
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmKpiTile } from "@/features/saas-w3crm/components/W3crmUi";
+import { W3crmCargando, W3crmContentBox } from "@/features/saas-w3crm/components/W3crmContentBox";
 import type { PwaStatus } from "@nelvyon/saas";
 
 interface BeforeInstallPromptEvent extends Event {
@@ -31,13 +58,12 @@ function detectPlatform(): "ios" | "android" | "desktop" | "unknown" {
   return "unknown";
 }
 
-function KpiCard({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div className="rounded-xl border border-white/10 bg-white/5 px-5 py-4">
-      <p className="text-white/40 text-xs uppercase tracking-wide">{label}</p>
-      <p className="text-2xl font-bold text-white mt-1">{value}</p>
-    </div>
-  );
+function txt(v: unknown): string { return typeof v === "string" ? v : ""; }
+/** Los contadores sin dato se pintan "—", no 0. */
+function cuenta(v: unknown): string {
+  if (v === null || v === undefined) return "—";
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n.toLocaleString("es-ES") : "—";
 }
 
 export default function PwaInstallHub() {
@@ -190,118 +216,122 @@ export default function PwaInstallHub() {
     }
   }
 
-  const appName = status?.appName ?? "Nelvyon";
+  const appName = txt(status?.appName) || "Nelvyon";
+  const tema = txt(status?.themeColor) || "#0084ff";
+  const porPlataforma = (status?.stats?.byPlatform ?? {}) as Record<string, unknown>;
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="pwa" />}>
-      <div className="space-y-6 p-6">
-        <div>
-          <h1 className="text-2xl font-bold text-white">📲 Instalar {appName}</h1>
-          <p className="text-white/50 text-sm mt-1">
-            Accede a tu panel como app nativa, con icono propio y modo offline.
-          </p>
-        </div>
-
-        {loading ? (
-          <div className="text-white/40 text-sm py-12 text-center">Cargando…</div>
-        ) : (
-          <>
-            {/* Status card */}
-            <div className="rounded-xl border border-white/10 bg-white/5 p-5 space-y-3 max-w-lg">
-              <div className="flex items-center justify-between">
-                <span className="text-white/60 text-sm">Estado</span>
-                {installed ? (
-                  <NelvyonDsBadge tone="success">Instalada</NelvyonDsBadge>
-                ) : (
-                  <NelvyonDsBadge tone="warning">No instalada</NelvyonDsBadge>
-                )}
-              </div>
-              {status?.whiteLabel && (
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-white/50">Marca</span>
-                  <span className="text-white/80">{appName} (white-label)</span>
-                </div>
-              )}
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-white/50">Color de tema</span>
-                <span className="inline-flex items-center gap-2 text-white/80">
-                  <span className="inline-block h-3 w-3 rounded-full" style={{ backgroundColor: status?.themeColor ?? "#0084ff" }} />
-                  {status?.themeColor}
-                </span>
-              </div>
-
-              {installed ? (
-                <p className="text-green-400 text-xs">Ya estás usando la app instalada. ✅</p>
-              ) : isIosSafari() ? (
-                <div className="rounded-lg bg-black/30 p-3 text-xs text-white/60">
-                  En iPhone/iPad (Safari): pulsa <strong className="text-white/80">Compartir</strong> →{" "}
-                  <strong className="text-white/80">Añadir a pantalla de inicio</strong>.
-                </div>
-              ) : (
-                <button
-                  onClick={() => void install()}
-                  className="w-full rounded-xl bg-[#0084ff] px-4 py-2.5 text-sm text-white font-semibold hover:bg-[#0070dd] min-h-[44px]"
-                >
-                  {deferred ? "Instalar app" : "Instalar desde el menú del navegador"}
-                </button>
-              )}
-            </div>
-
-            <div className="rounded-xl border border-white/10 bg-white/5 p-5 space-y-3 max-w-lg">
-              <div className="flex items-center justify-between">
-                <span className="text-white/60 text-sm">Notificaciones push</span>
-                {pushSubscribed ? (
-                  <NelvyonDsBadge tone="success">Activas</NelvyonDsBadge>
-                ) : (
-                  <NelvyonDsBadge tone="neutral">Inactivas</NelvyonDsBadge>
-                )}
-              </div>
-              <p className="text-xs text-white/40">
-                Recibe alertas de inbox, leads y entregables aunque la app esté cerrada.
-                {!pushConfigured && " Requiere VAPID_PUBLIC_KEY en producción."}
-              </p>
-              {pushSubscribed ? (
-                <button
-                  type="button"
-                  disabled={pushBusy}
-                  onClick={() => void unsubscribePush()}
-                  className="w-full rounded-xl border border-white/20 px-4 py-2.5 text-sm text-white/80 hover:bg-white/5 disabled:opacity-50"
-                >
-                  {pushBusy ? "…" : "Desactivar push"}
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  disabled={pushBusy}
-                  onClick={() => void subscribePush()}
-                  className="w-full rounded-xl bg-[#0084ff] px-4 py-2.5 text-sm text-white font-semibold hover:bg-[#0070dd] disabled:opacity-50 min-h-[44px]"
-                >
-                  {pushBusy ? "Activando…" : "Activar notificaciones push"}
-                </button>
-              )}
-            </div>
-
-            {/* Install stats */}
-            {status && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 max-w-lg">
-                <KpiCard label="Instalaciones" value={status.stats.total} />
-                <KpiCard label="iOS" value={status.stats.byPlatform.ios ?? 0} />
-                <KpiCard label="Android" value={status.stats.byPlatform.android ?? 0} />
-              </div>
-            )}
-
-            <p className="text-white/30 text-[11px] max-w-lg">
-              Si el manifiesto dinámico falla, la app usa <code>/manifest-saas.json</code> como respaldo.
+    <SaasW3crmShell>
+      {/* Único encabezado con "Instalar": ver contrato. */}
+      <W3crmPageTitle mainTitle={`📲 Instalar ${appName}`} parentTitle="Cuenta" pageTitle="PWA" />
+      <div className="container-fluid">
+        <div className="row">
+          <div className="col-xl-12">
+            <p className="fs-14 text-muted">
+              Accede a tu panel como app nativa, con icono propio y modo offline.
             </p>
-          </>
-        )}
-
-        {toast && (
-          <div className="fixed bottom-6 right-6 z-50 rounded-xl bg-[#0084ff] px-4 py-2 text-white text-sm shadow-lg">
-            {toast}
           </div>
-        )}
+
+          {loading ? (
+            <div className="col-xl-12"><W3crmCargando texto="Cargando…" /></div>
+          ) : (
+            <>
+              <div className="col-xl-6">
+                {/* NUNCA titular esta caja "Estado": duplicaría el texto. */}
+                <W3crmContentBox titulo="Instalación en este dispositivo" icono="fa-solid fa-mobile-screen">
+                  <div className="d-flex align-items-center justify-content-between mb-2">
+                    <span className="text-muted fs-14">Estado</span>
+                    <span className={`badge ${installed ? "badge-success" : "badge-warning"}`}>
+                      {installed ? "Instalada" : "No instalada"}
+                    </span>
+                  </div>
+                  {status?.whiteLabel && (
+                    <div className="d-flex align-items-center justify-content-between fs-12 mb-2">
+                      <span className="text-muted">Marca</span>
+                      <span>{appName} (white-label)</span>
+                    </div>
+                  )}
+                  <div className="d-flex align-items-center justify-content-between fs-12 mb-3">
+                    <span className="text-muted">Color de tema</span>
+                    <span className="d-inline-flex align-items-center gap-2">
+                      <span className="d-inline-block rounded-circle" aria-hidden="true"
+                        style={{ width: 12, height: 12, backgroundColor: tema }} />
+                      {tema}
+                    </span>
+                  </div>
+
+                  {installed ? (
+                    <p className="text-success fs-12 mb-0">Ya estás usando la app instalada. ✅</p>
+                  ) : isIosSafari() ? (
+                    <div className="alert alert-secondary py-2 fs-12 mb-0" role="note">
+                      En iPhone/iPad (Safari): pulsa <strong>Compartir</strong> →{" "}
+                      <strong>Añadir a pantalla de inicio</strong>.
+                    </div>
+                  ) : (
+                    <button type="button" className="btn btn-primary w-100"
+                      style={{ minHeight: 44 }} onClick={() => void install()}>
+                      {deferred ? "Instalar app" : "Instalar desde el menú del navegador"}
+                    </button>
+                  )}
+                </W3crmContentBox>
+              </div>
+
+              <div className="col-xl-6">
+                <W3crmContentBox titulo="Notificaciones push" icono="fa-solid fa-bell">
+                  <div className="d-flex align-items-center justify-content-between mb-2">
+                    <span className="text-muted fs-14">Suscripción</span>
+                    <span className={`badge ${pushSubscribed ? "badge-success" : "badge-secondary"}`}>
+                      {pushSubscribed ? "Activas" : "Inactivas"}
+                    </span>
+                  </div>
+                  <p className="fs-12 text-muted">
+                    Recibe alertas de inbox, leads y entregables aunque la app esté cerrada.
+                    {!pushConfigured && " Requiere VAPID_PUBLIC_KEY en producción."}
+                  </p>
+                  {pushSubscribed ? (
+                    <button type="button" className="btn btn-primary light w-100" disabled={pushBusy}
+                      onClick={() => void unsubscribePush()}>
+                      {pushBusy ? "…" : "Desactivar push"}
+                    </button>
+                  ) : (
+                    <button type="button" className="btn btn-primary w-100" disabled={pushBusy}
+                      style={{ minHeight: 44 }} onClick={() => void subscribePush()}>
+                      {pushBusy ? "Activando…" : "Activar notificaciones push"}
+                    </button>
+                  )}
+                </W3crmContentBox>
+              </div>
+
+              {status && (
+                <>
+                  <div className="col-xl-4 col-sm-4">
+                    <W3crmKpiTile icon="📥" label="Instalaciones" value={cuenta(status.stats?.total)} accent />
+                  </div>
+                  <div className="col-xl-4 col-sm-4">
+                    <W3crmKpiTile icon="🍎" label="iOS" value={cuenta(porPlataforma.ios)} />
+                  </div>
+                  <div className="col-xl-4 col-sm-4">
+                    <W3crmKpiTile icon="🤖" label="Android" value={cuenta(porPlataforma.android)} />
+                  </div>
+                </>
+              )}
+
+              <div className="col-xl-12">
+                <p className="fs-12 text-muted">
+                  Si el manifiesto dinámico falla, la app usa <code>/manifest-saas.json</code> como respaldo.
+                </p>
+              </div>
+            </>
+          )}
+        </div>
       </div>
-    </SaasShellLayout>
+
+      {toast && (
+        <div className="alert alert-primary position-fixed shadow" role="status"
+          style={{ bottom: 24, right: 24, zIndex: 1050, marginBottom: 0 }}>
+          {toast}
+        </div>
+      )}
+    </SaasW3crmShell>
   );
 }
