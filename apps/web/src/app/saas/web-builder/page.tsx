@@ -171,15 +171,8 @@ function NewPageModal({ onClose, onSaved }: { onClose: () => void; onSaved: () =
           <div className="row" role="group" aria-label="Tipo de página">
             {PAGE_TYPES.map((pt) => (
               <div className="col-4 mb-2" key={pt.type}>
-                {/*
-                  Ancho explícito, no `w-100`: `W3crmModal` monta en un portal
-                  fuera de `.w3crm-scope`, y ahí Tailwind v4 interpreta `w-100`
-                  como escala de espaciado (0.25rem × 100 = 400px) en vez de la
-                  utilidad de Bootstrap. Medido: 400px dentro de un padre de 390.
-                */}
                 <button type="button" aria-pressed={type === pt.type}
-                  style={{ width: "100%" }}
-                  className={`btn btn-sm text-start ${type === pt.type ? "btn-primary" : "btn-primary light"}`}
+                  className={`btn btn-sm w-100 text-start ${type === pt.type ? "btn-primary" : "btn-primary light"}`}
                   onClick={() => setType(pt.type)}>
                   <span className="d-block fs-18">{pt.icon}</span>
                   <span className="d-block fw-bold fs-12">{pt.label}</span>

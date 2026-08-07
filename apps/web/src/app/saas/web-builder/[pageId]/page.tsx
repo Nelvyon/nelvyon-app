@@ -680,22 +680,14 @@ export default function WebBuilderEditorPage() {
           <div className="col-xl-6 col-lg-8">
             <W3crmContentBox titulo="Vista previa" icono="fa-solid fa-eye" bodyClassName="card-body p-0">
               <div className="position-relative" style={{ height: "60vh", minHeight: 360 }}>
-                {/*
-                  Ancho y alto explícitos, no `w-100`/`h-100`: sobre el iframe
-                  esas clases resolvían a la escala de espaciado de Tailwind v4
-                  (0.25rem × 100 = 400px) en vez de a la utilidad de Bootstrap,
-                  y desbordaban 10px el viewport de 390. Medido en móvil.
-                */}
                 <iframe
                   ref={iframeRef}
                   title="Preview"
-                  className="border-0"
-                  style={{ width: "100%", height: "100%" }}
+                  className="w-100 h-100 border-0"
                   sandbox="allow-same-origin"
                 />
                 {!previewHtml && (
-                  <div className="position-absolute top-0 start-0 d-flex align-items-center justify-content-center"
-                    style={{ width: "100%", height: "100%" }}>
+                  <div className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
                     <p className="text-muted fs-14 mb-0">Sin secciones — añade una en el panel izquierdo</p>
                   </div>
                 )}
