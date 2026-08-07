@@ -2,6 +2,25 @@
 
 > Historial acumulativo. No eliminar entradas.
 
+## 2026-08-07
+
+| Área | Cambio | Descripción |
+|------|--------|-------------|
+| SaaS | **Migración visual completa a W3CRM** | 78/78 interfaces SaaS sobre la plantilla W3CRM. 0 `SaasShellLayout`, 0 `SaasSidebar`, 0 usos reales de `NelvyonDs*` en `/saas`. Lógica NELVYON intacta: endpoints, RBAC, tenant, sesión, permisos e i18n sin cambios. |
+| SaaS | **CLS del shell reducido** | `precedence="w3crm"` en los `<link>` evita que React los reinserte en el swap de streaming (3d886b38). Geometría del sidebar y cabecera fija declaradas antes del efecto del tema (006bf393, 41329758). CLS mediana 2,1-2,3 → 0,05-0,50; shifts 22-26 → 2-4; FCP ~300ms → ~110ms. NO alcanza 0,1 en 5 de 9 combinaciones: lo restante es contenido asíncrono de cada módulo y el banner de cookies, documentado y sin tocar. |
+| SaaS | **Menú sin fugas de permisos** | Durante la carga de sesión el sidebar ya no pinta `SAAS_NAV_ITEMS` completo (dc44f877). Verificado con muestreo continuo: ningún enlace no autorizado aparece ni un frame. |
+| Repo | **Código que faltaba en Git** | `backend/observability` (65c65a68) — lo importaba `OpsObservabilityCore.ts`, ya versionado, con el import roto. `backend/labs` + `backend/local-ai` (97667655). `backend/ai-panel` (662552b3) — lo importa un test versionado. |
+| Tests | **64 tests que CI no ejecutaba** | Los 9 ficheros de `backend/saas/__tests__` existían en disco pero no en Git (bc504588). Ahora 722/722 ficheros de test versionados. Vitest 6262 passed / 8 skipped. |
+| Ops | **Tooling de preproducción** | `run-production-readiness`, `run-postgres-restore-drill`, `nelvyon-security-scan` y `nelvyon-labs-master-closure` (63bc1bd3). |
+| Repo | **`backend/automations` NO versionado** | 2 ficheros de contratos sin consumidores ni tests; no rompe nada al faltar. Código futuro, no integrado. Queda en disco a propósito. |
+
+
+## 2026-08-03
+
+| Área | Cambio | Descripción |
+|------|--------|-------------|
+| Web pública | **Certificado calidad absoluta local (sin deploy)** | Pasada final: 0 EN/AIOR/ThemeHour/lorem/ficticios/demo; audit 19/19; fidelity estructural 19/19; assets/links 0 rotos. Cert `ABSOLUTE_QUALITY_CERTIFICATE_2026-08-03.md`. claimReady false. |
+| Web pública | **Reset definitivo Home 08 + SaaS 02 (local, sin deploy)** | Eliminado pack multi-home. Backup `.backup/www-pre-home08-reset-20260803-020829`. `index.html`=Home 08 Agencia · `saas.html`=Home 02 SaaS · interiores AIOR. Solo logo/nombre/azul `#0084FF`/textos ES/nav. Pipeline `rebuild-aior-home08-saas02.mjs`. Rutas Next sin otras Homes. claimReady false. |
 
 ## 2026-08-02
 
