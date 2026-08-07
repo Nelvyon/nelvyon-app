@@ -45,16 +45,36 @@ export async function requestPasswordReset(email: string): Promise<void> {
   const resetUrl = `${appUrl}/auth/reset-password?token=${encodeURIComponent(token)}`;
   const locale = await resolveUserEmailLocale(db, row.user_id);
 
-  await sendEmail(
-    "password_reset",
-    {
-      email: row.email,
-      name: row.full_name,
-      appUrl,
-      resetUrl,
-    },
-    locale,
-  );
+  /**
+   * El envío NO puede propagar el error.
+   *
+   * Esta función devuelve en silencio cuando el email no existe, justo para no
+   * revelar qué cuentas hay. Pero si `sendEmail` lanzaba —y lanza en cuanto SES
+   * no está configurado, como ocurre en staging— la ruta lo convertía en un 500,
+   * mientras que un email inexistente seguía devolviendo 200. Eso era un oráculo
+   * de enumeración de usuarios: bastaba mirar el código de estado.
+   *
+   * Además el token de reseteo YA se ha persistido en este punto, así que
+   * propagar dejaba la cuenta con un token válido y al usuario con un error
+   * genérico, sin forma de saber que su enlace existía.
+   *
+   * Se registra el fallo en servidor —donde sí interesa— y se devuelve
+   * normalmente: la respuesta al cliente es indistinguible en los tres casos.
+   */
+  try {
+    await sendEmail(
+      "password_reset",
+      {
+        email: row.email,
+        name: row.full_name,
+        appUrl,
+        resetUrl,
+      },
+      locale,
+    );
+  } catch (err) {
+    console.error("[auth/passwordReset] no se pudo enviar el email de reseteo", err);
+  }
 }
 
 export async function resetPasswordWithToken(token: string, newPassword: string): Promise<ResetPasswordResult> {
