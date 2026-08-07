@@ -2,14 +2,25 @@
  * S51 — E2E: Sector Benchmark
  */
 import { expect, test } from "@playwright/test";
-import { setAuthCookie, mockSaasApis, mockSectorBenchmark, expectUnauthorizedApi, gotoAwaitingApi } from "./fixtures";
+import { setAuthCookie, mockSaasApis, mockSectorBenchmark, expectUnauthorizedApi, gotoAwaitingApi, waitForStreamSettled } from "./fixtures";
 
 const BASE = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000";
 
 async function gotoBenchmark(page: import("@playwright/test").Page): Promise<void> {
   for (let attempt = 0; attempt < 3; attempt++) {
     const res = await gotoAwaitingApi(page, "/saas/benchmark", "/api/saas/benchmark");
-    if (res) return;
+    if (res) {
+      // Mientras React esta transmitiendo, el contenido existe DOS veces: en su
+      // sitio y en el contenedor temporal `body > div[id^='S:']`. Medido aqui en
+      // 2 de cada 20 cargas, con las dos rutas al mismo `h5.bc-title`:
+      //   body > main > … > h5.bc-title
+      //   body > div#S:1[hidden] > … > h5.bc-title
+      // Playwright NO reintenta las violaciones de modo estricto, asi que un
+      // assert inmediato veia 2 elementos y fallaba. Esto no afloja nada: es una
+      // espera de DOM pura, sin red, sin reintentos y sin ampliar timeouts.
+      await waitForStreamSettled(page);
+      return;
+    }
     if (attempt === 2) throw new Error("benchmark API response not received");
     await page.waitForTimeout(800 * (attempt + 1));
   }
