@@ -55,12 +55,29 @@ export function SaasW3crmShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      {/* El CSS de W3CRM trae Bootstrap 5 dentro; se carga con <link> para que
-          no entre en el bundle global ni lo pise el preflight de Tailwind. */}
+      {/*
+        El CSS de W3CRM trae Bootstrap 5 dentro; se carga con <link> para que no
+        entre en el bundle global ni lo pise el preflight de Tailwind.
+
+        `precedence` es lo que impide que estas hojas se reinserten. Sin él, al
+        intercambiar React el subárbol transmitido (medido: `.w3crm-scope` pasa
+        de 2 a 1 hacia los 390 ms) los `<link>` se eliminaban y se volvían a
+        añadir, de modo que el navegador dejaba de aplicar la hoja durante ~350
+        ms: `.deznav` perdía su `position:absolute; width:15rem` y medía 1440 px,
+        y `.content-body` perdía su `margin-left`. Al volver la hoja,
+        `transition: all .2s ease` (style.css:13416) ANIMABA la corrección, y
+        cada fotograma era un layout-shift de un elemento del tamaño del
+        viewport: ~15 shifts encadenados y CLS ≈ 2,2 en las 77 páginas del shell.
+
+        Con `precedence`, React 19 las eleva a <head>, las deduplica y las
+        mantiene estables durante todo el streaming. Ambas siguen cargándose
+        DESPUÉS del bundle de Tailwind, así que el orden relativo de la cascada
+        no cambia: lo único que desaparece es el hueco sin hoja.
+      */}
       {/* eslint-disable-next-line @next/next/no-css-tags */}
-      <link rel="stylesheet" href="/w3crm/css/style.css" />
+      <link rel="stylesheet" href="/w3crm/css/style.css" precedence="w3crm" />
       {/* eslint-disable-next-line @next/next/no-css-tags */}
-      <link rel="stylesheet" href="/w3crm/css/comman.css" />
+      <link rel="stylesheet" href="/w3crm/css/comman.css" precedence="w3crm" />
       <div className="w3crm-scope">
         <ThemeContextProvider>
           <Layout menuList={menuList}>
