@@ -84,3 +84,52 @@
     margin-left: 0;
   }
 }
+
+/**
+ * ---------------------------------------------------------------------------
+ * CLS vertical del primer render — cabecera fija
+ *
+ * Mismo patron que la geometria del sidebar, con otro atributo:
+ * `ThemeContextProvider` fija `data-header-position="fixed"` sobre `body` en su
+ * efecto de montaje. Hasta entonces `.header` NO es `position: fixed`, asi que
+ * ocupa 44px de flujo y empuja a `.content-body`, que ademas todavia no lleva el
+ * `padding-top` que compensa esa cabecera.
+ *
+ * Medido en /saas/dashboard, desktop 1440:
+ *   t=153ms  body sin `data-header-position`
+ *   t=316ms  div.content-body [y=44 h=138  ->  y=0 h=855]   shift 0,3991
+ *   t=317ms  body ya con "fixed"; .header position:fixed h=44;
+ *            .content-body y=0 padding-top=43.75px
+ *
+ * Ese salto vertical de 44px era el shift dominante que quedaba tras 006bf393.
+ *
+ * Se declaran aqui LAS MISMAS reglas que la plantilla aplica con el atributo
+ * (style.css:10410, 10791, 10796 y 10805), incluidas sus media queries, y SOLO
+ * mientras el atributo no existe: en cuanto el proveedor lo fija, estas dejan de
+ * aplicar y manda la hoja de W3CRM. Sin JavaScript, sin ocultar contenido, sin
+ * alturas arbitrarias y sin tocar ningun valor final.
+ */
+body:not([data-header-position]) .nav-header {
+  position: fixed;
+}
+body:not([data-header-position]) .header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+body:not([data-header-position]) .deznav {
+  margin-top: 0;
+}
+body:not([data-header-position]) .content-body {
+  padding-top: 3.125rem;
+}
+@media only screen and (max-width: 47.9375rem) {
+  body:not([data-header-position]) .content-body {
+    padding-top: 3.1rem;
+  }
+}
+@media only screen and (min-width: 48rem) and (max-width: 63.9375rem) {
+  body:not([data-header-position]) .content-body {
+    padding-top: 3.1rem;
+  }
+}
