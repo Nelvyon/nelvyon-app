@@ -35,7 +35,16 @@ const RATING_LABEL: Record<BenchmarkRating, string> = {
   sin_dato: "Sin dato",
 };
 
-function fmt(value: number | null, unit: string): string {
+function nsafe(v: unknown): number | null {
+  // La API puede devolver texto o ausencia: `.toFixed` sobre eso reventaba la
+  // página entera al hidratar, igual que en /saas/reportes (3fa35da1).
+  if (v === null || v === undefined) return null;
+  const x = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(x) ? x : null;
+}
+
+function fmt(raw: number | null, unit: string): string {
+  const value = nsafe(raw);
   if (value === null) return "—";
   if (unit === "%") return `${(value * 100).toFixed(1)}%`;
   if (unit === "x") return `${value.toFixed(2)}x`;
@@ -227,7 +236,7 @@ export default function BenchmarkPage() {
                               ? "text-green-400"
                               : "text-yellow-400"
                           }>
-                            {c.deltaPct >= 0 ? "+" : ""}{c.deltaPct.toFixed(0)}%
+                            {nsafe(c.deltaPct) !== null && nsafe(c.deltaPct)! >= 0 ? "+" : ""}{nsafe(c.deltaPct) !== null ? nsafe(c.deltaPct)!.toFixed(0) : "—"}%
                           </span>
                         )}
                       </td>

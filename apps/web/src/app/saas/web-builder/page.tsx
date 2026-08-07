@@ -145,6 +145,11 @@ function DomainModal({ page, onClose, onSaved }: { page: WebPage; onClose: () =>
   );
 }
 
+function nviews(v: unknown): number {
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+
 export default function SaasWebBuilderPage() {
   const [pages, setPages] = useState<WebPage[]>([]);
   const [templates, setTemplates] = useState<FeaturedTemplateMeta[]>([]);
@@ -228,7 +233,7 @@ export default function SaasWebBuilderPage() {
           <KpiTile icon="🌐" label="Páginas" value={pages.length} />
           <KpiTile icon="🚀" label="Publicadas" value={pages.filter(p => p.status === "published").length} accent />
           <KpiTile icon="📝" label="Borradores" value={pages.filter(p => p.status === "draft").length} />
-          <KpiTile icon="👀" label="Visitas totales" value={pages.reduce((s, p) => s + p.views, 0).toLocaleString()} />
+          <KpiTile icon="👀" label="Visitas totales" value={pages.reduce((s, p) => s + nviews(p.views), 0).toLocaleString()} />
         </div>
 
         {loading ? (
@@ -259,7 +264,7 @@ export default function SaasWebBuilderPage() {
                       {p.status === "published" ? "Publicado" : "Borrador"}
                     </NelvyonDsBadge>
                   </div>
-                  <p className="text-xs text-muted-foreground">{p.views.toLocaleString()} visitas{p.publishedAt ? ` · publicado ${new Date(p.publishedAt).toLocaleDateString("es-ES")}` : ""}</p>
+                  <p className="text-xs text-muted-foreground">{nviews(p.views).toLocaleString()} visitas{p.publishedAt ? ` · publicado ${new Date(p.publishedAt).toLocaleDateString("es-ES")}` : ""}</p>
                   <div className="flex flex-wrap items-center gap-2">
                     <Link href={`/saas/web-builder/${p.id}`}>
                       <NelvyonDsButton variant="secondary" className="text-xs px-2 py-1">✏️ Editar</NelvyonDsButton>
