@@ -798,3 +798,24 @@ export async function mockSaasFunnelsDepth(
     return route.fulfill({ json: FIXTURE_FUNNELS });
   });
 }
+
+
+/**
+ * Espera a que React termine de transmitir la pagina, SIN tocar la red.
+ *
+ * Mientras el documento se transmite, el contenido existe por duplicado: en su
+ * posicion real y en el contenedor temporal `body > div#S:n` que React mueve al
+ * completar. En esa ventana un `getByText`/`getByTestId` resuelve a 2 elementos
+ * y Playwright NO reintenta las violaciones de modo estricto, asi que el assert
+ * falla en su primer intento. Mismo criterio que `a11y-core-routes.spec.ts`.
+ *
+ * No espera respuestas HTTP: no altera el flujo de red del test ni depende de
+ * mocks. No usa `.first()`, ni reintentos, ni amplia el timeout del assert, y
+ * no oculta ningun error real del producto: solo espera a que el DOM deje de
+ * estar duplicado.
+ */
+export async function waitForStreamSettled(page: Page): Promise<void> {
+  await page
+    .waitForFunction(() => !document.querySelector("body > div[id^='S:']"), null, { timeout: 15_000 })
+    .catch(() => undefined);
+}

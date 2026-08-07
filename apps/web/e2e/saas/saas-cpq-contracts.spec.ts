@@ -2,7 +2,7 @@
  * E2E — Pipeline tab Contratos + /contracts/sign/[token] pública
  */
 import { test, expect } from "@playwright/test";
-import { setAuthCookie, mockSaasApis, expectUnauthorizedApi, LOGIN_URL } from "./fixtures";
+import { setAuthCookie, mockSaasApis, expectUnauthorizedApi, LOGIN_URL, waitForStreamSettled } from "./fixtures";
 
 const FIXTURE_CONTRACTS = {
   contracts: [
@@ -52,6 +52,10 @@ test.describe("SaaS CPQ Contratos — auth guard", () => {
 async function gotoPipelineReady(page: import("@playwright/test").Page): Promise<void> {
   await page.goto("/saas/pipeline", { waitUntil: "domcontentloaded" });
   await expect(page.getByRole("heading", { name: /Sales Hub/i })).toBeVisible({ timeout: 15_000 });
+  // El contenido existe por duplicado mientras React transmite; sin esperar
+  // al settle, `getByTestId` resolvia a 2 elementos y el assert reventaba
+  // por modo estricto. Espera de DOM pura, sin red.
+  await waitForStreamSettled(page);
   await expect(page.getByTestId("pipeline-loading")).toBeHidden({ timeout: 20_000 });
 }
 

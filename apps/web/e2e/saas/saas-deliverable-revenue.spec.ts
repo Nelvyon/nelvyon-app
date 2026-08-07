@@ -2,7 +2,7 @@
  * S48 — E2E: Revenue per Deliverable
  */
 import { expect, test } from "@playwright/test";
-import { setupAuthedSaas, mockEntregablesList, mockEntregablesRevenue, gotoAwaitingApi } from "./fixtures";
+import { setupAuthedSaas, mockEntregablesList, mockEntregablesRevenue, gotoAwaitingApi, waitForStreamSettled } from "./fixtures";
 
 const FIXTURE_ENTREGABLES = {
   deliverables: [
@@ -16,24 +16,6 @@ const FIXTURE_ENTREGABLES = {
   ],
   summary: { total: 1, pendingReview: 0, approved: 1, avgQaScore: 91, byType: {}, byStatus: {} },
 };
-
-/**
- * Espera a que React termine de transmitir la pagina, SIN tocar la red.
- *
- * Mientras el documento se transmite, el contenido existe por duplicado: en su
- * posicion real y en el contenedor temporal `body > div#S:n` que React mueve al
- * completar. En esa ventana un `getByText` resuelve a 2 elementos y Playwright
- * NO reintenta las violaciones de modo estricto, asi que el assert falla en su
- * primer intento. Mismo criterio que `a11y-core-routes.spec.ts`.
- *
- * No espera respuestas HTTP: no altera el flujo de red del test ni depende de
- * mocks. No usa .first(), ni reintentos, ni amplia el timeout del assert.
- */
-async function waitForStreamSettled(page: import("@playwright/test").Page): Promise<void> {
-  await page
-    .waitForFunction(() => !document.querySelector("body > div[id^='S:']"), null, { timeout: 15_000 })
-    .catch(() => undefined);
-}
 
 async function gotoEntregablesReady(page: import("@playwright/test").Page): Promise<void> {
   await gotoAwaitingApi(page, "/saas/entregables", "/api/saas/entregables");
