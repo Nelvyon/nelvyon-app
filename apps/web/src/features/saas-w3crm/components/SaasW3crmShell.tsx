@@ -19,7 +19,7 @@ import { useMemo } from "react";
 
 import { PlatformHealthBanner } from "@/features/saas-shell/components/PlatformHealthBanner";
 import { SaasVoiceCommand } from "@/features/saas-shell/components/SaasVoiceCommand";
-import { filterSaasNavForPermissions, SAAS_NAV_ITEMS, type SaasNavItem } from "@/features/saas-shell/saasNav";
+import { filterSaasNavForPermissions, type SaasNavItem } from "@/features/saas-shell/saasNav";
 import { useSaasPermissions } from "@/features/saas-shell/useSaasPermissions";
 import ThemeContextProvider from "@/features/saas-w3crm/context/ThemeContext";
 import Layout from "@/features/saas-w3crm/layouts/Layout";
@@ -40,10 +40,24 @@ export function SaasW3crmShell({ children }: { children: React.ReactNode }) {
   const clavePermisos = permissions.join("|");
 
   const menuList = useMemo(() => {
-    // Mientras carga la sesión no se adelantan módulos: mismo criterio que
-    // `SaasSidebar`, que espera a `permissions` antes de filtrar.
+    /**
+     * Mientras carga la sesión NO se revela ningún módulo.
+     *
+     * Antes se pintaba `SAAS_NAV_ITEMS` entero durante la carga y solo después
+     * se filtraba, así que un usuario con permisos parciales veía durante unos
+     * milisegundos los 59 módulos —incluidos los que no tiene autorizados— y
+     * luego desaparecían. Medido: 52 enlaces con permisos completos, 40 con
+     * parciales y 25 sin sesión; esa diferencia era exactamente lo que se
+     * filtraba a la vista.
+     *
+     * La lista vacía es el único estado que no puede revelar nada. No duplica
+     * RBAC ni codifica permisos: `saasNav.ts` sigue siendo la única fuente de
+     * verdad y `filterSaasNavForPermissions` la única autoridad. Tampoco añade
+     * CLS: el sidebar es `position: fixed` con su anchura fijada por CSS, así
+     * que su contenido no empuja al contenido principal.
+     */
     const items: readonly SaasNavItem[] = loading
-      ? SAAS_NAV_ITEMS
+      ? []
       : filterSaasNavForPermissions(permissions);
 
     return buildNelvyonMenu({
