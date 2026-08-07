@@ -27,3 +27,26 @@
 .w3crm-scope .collapse {
   visibility: visible;
 }
+
+/**
+ * ---------------------------------------------------------------------------
+ * Foco de los controles de XYFlow — regresión de accesibilidad demostrada
+ *
+ * La hoja de W3CRM trae dos reglas globales de Bootstrap sobre `button`:
+ *
+ *   button:focus { outline: 0; box-shadow: none }      (style.css:27546)
+ *   button:focus:not(:focus-visible) { outline: 0 }    (style.css:627)
+ *
+ * La primera no distingue `:focus-visible`, así que dentro del scope los
+ * botones de zoom, ajuste y bloqueo de `<Controls>` dejaban de mostrar CUALQUIER
+ * indicador de foco al recorrerlos con el teclado. XYFlow no define un foco
+ * propio para ellos: confía en el del navegador, que es justo el que se anula.
+ *
+ * Se restaura SOLO para esos botones y SOLO en navegación por teclado. No se
+ * toca la hoja de W3CRM ni la de XYFlow, ni se altera el foco de ningún otro
+ * botón de la plantilla: la especificidad (0,3,0) se limita a este caso.
+ */
+.w3crm-scope .react-flow__controls-button:focus-visible {
+  outline: 2px solid var(--primary, #0d99ff);
+  outline-offset: 2px;
+}

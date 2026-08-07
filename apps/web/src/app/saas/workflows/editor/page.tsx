@@ -1,5 +1,39 @@
 "use client";
 
+/**
+ * /saas/workflows/editor sobre W3CRM, con las piezas ya portadas.
+ * Mapeo: barra de acciones, lista de flujos y panel de nodo -> `W3crmContentBox`;
+ * el lienzo va en su propia caja con altura explícita. Sin componentes nuevos.
+ *
+ * EL MOTOR NO SE TOCA. `ReactFlow` recibe exactamente las mismas props y los
+ * mismos manejadores: `useNodesState`/`useEdgesState`, `addEdge` en `onConnect`,
+ * `onNodesChange`/`onEdgesChange`, `onNodeClick`/`onPaneClick`, `fitView`, y los
+ * hijos `Background`, `Controls` y `MiniMap`. Drag & drop, zoom, conexiones,
+ * minimapa y controles son los de XYFlow, sin envolver ni reimplementar.
+ *
+ * AUDITORÍA DE CSS (antes de migrar):
+ *   - `.react-flow*` no aparece NI UNA vez en `style.css` ni en `comman.css` de
+ *     W3CRM, así que no hay colisión de nombres con Bootstrap.
+ *   - El CSS de XYFlow se importa por ESM, no por `<link>`, de modo que entra en
+ *     el bundle y Next lo sirve en `<head>`: no comparte la ventana sin estilos
+ *     del shell.
+ *   - XYFlow no usa portales; `Background`, `Controls` y `MiniMap` son hijos
+ *     inline del lienzo, así que nada queda fuera de `.w3crm-scope`.
+ *   - `svg { vertical-align: middle }` y `button { border-radius: 0 }` de
+ *     Bootstrap alcanzan al minimapa y a los controles, pero solo son cosméticos.
+ *   - Único choque real: `button:focus { outline: 0; box-shadow: none }` dejaba
+ *     los botones de zoom SIN indicador de foco por teclado. Corregido con una
+ *     única regla acotada en `w3crmScope.css`, sin tocar W3CRM ni XYFlow.
+ *
+ * Cambio de capa visual: `colorMode` pasa de "dark" a "light" porque el shell ya
+ * no es oscuro; es tema del lienzo, no comportamiento.
+ *
+ * Lógica de NELVYON intacta: `GET/POST/PUT /api/saas/workflows/visual`,
+ * `DELETE /api/saas/workflows/visual/{id}`, la acción `publish-saas`, los 16
+ * triggers que pasan tal cual a `SaasWorkflow.triggerType` y las 4 acciones que
+ * `publishAsSaasWorkflow` mapea de forma explícita —no se ofrece ninguna más
+ * para no mentir sobre lo que se publicará—.
+ */
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ReactFlow,
@@ -15,9 +49,10 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
-import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsSectionHeader } from "@/design-system/components";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmEmptyState } from "@/features/saas-w3crm/components/W3crmUi";
+import { W3crmCargando, W3crmContentBox } from "@/features/saas-w3crm/components/W3crmContentBox";
 
 // ── Type catalogs ────────────────────────────────────────────────────────────
 // Triggers: all 16 pass straight through to SaasWorkflow.triggerType (no silent
@@ -55,6 +90,14 @@ type VisualFlow = {
   updatedAt: string;
 };
 
+function txt(v: unknown): string { return typeof v === "string" ? v : ""; }
+/** Una fecha corrupta imprimía "Invalid Date" en la lista de flujos. */
+function fecha(v: unknown): string {
+  if (typeof v !== "string" || !v) return "—";
+  const d = new Date(v);
+  return Number.isNaN(d.getTime()) ? "—" : d.toLocaleDateString("es-ES");
+}
+
 function initialGraph(): { nodes: Node<VisualNodeData>[]; edges: Edge[] } {
   return {
     nodes: [
@@ -88,7 +131,6 @@ export default function WorkflowVisualEditorPage() {
 
   const [flows, setFlows] = useState<VisualFlow[]>([]);
   const [flowsLoading, setFlowsLoading] = useState(true);
-  const [flowsOpen, setFlowsOpen] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const loadFlows = useCallback(async () => {
@@ -97,7 +139,8 @@ export default function WorkflowVisualEditorPage() {
       const res = await fetch("/api/saas/workflows/visual");
       if (res.ok) {
         const d = (await res.json()) as { workflows?: VisualFlow[] };
-        setFlows(d.workflows ?? []);
+        // `workflows` podía no ser array y reventaba `.map`.
+        setFlows(Array.isArray(d.workflows) ? d.workflows : []);
       }
     } finally {
       setFlowsLoading(false);
@@ -119,8 +162,10 @@ export default function WorkflowVisualEditorPage() {
   }
 
   function loadFlow(flow: VisualFlow) {
-    const restored: Node<VisualNodeData>[] = flow.nodes.map((n, i) => {
-      const kind: "trigger" | "action" = n.type === "trigger" || n.id.startsWith("t") ? "trigger" : "action";
+    const lista = Array.isArray(flow.nodes) ? flow.nodes : [];
+    const conexiones = Array.isArray(flow.edges) ? flow.edges : [];
+    const restored: Node<VisualNodeData>[] = lista.map((n, i) => {
+      const kind: "trigger" | "action" = n.type === "trigger" || txt(n.id).startsWith("t") ? "trigger" : "action";
       const nodeType = String((n.data?.triggerType ?? n.data?.actionType) ?? (kind === "trigger" ? "manual" : "notify"));
       return {
         id: n.id,
@@ -130,12 +175,11 @@ export default function WorkflowVisualEditorPage() {
       };
     });
     setNodes(restored);
-    setEdges(flow.edges.map((e) => ({ id: e.id, source: e.source, target: e.target })));
-    setName(flow.name);
+    setEdges(conexiones.map((e) => ({ id: e.id, source: e.source, target: e.target })));
+    setName(txt(flow.name) || "Flujo visual");
     setSavedId(flow.id);
     setSelectedNodeId(null);
     setStatus("");
-    setFlowsOpen(false);
   }
 
   async function deleteFlow(id: string) {
@@ -212,8 +256,8 @@ export default function WorkflowVisualEditorPage() {
         setStatus("Error al guardar");
         return;
       }
-      const d = (await res.json()) as { workflow: { id: string } };
-      setSavedId(d.workflow.id);
+      const d = (await res.json().catch(() => null)) as { workflow?: { id?: string } } | null;
+      if (d?.workflow?.id) setSavedId(d.workflow.id);
       setStatus("Guardado");
       await loadFlows();
     } finally {
@@ -232,132 +276,136 @@ export default function WorkflowVisualEditorPage() {
       body: JSON.stringify({ action: "publish-saas", visualWorkflowId: id, name }),
     });
     if (res.ok) {
-      const d = (await res.json()) as { saasWorkflowId: string };
-      setStatus(`Publicado como borrador en Workflows → activarlo en /saas/workflows (id ${d.saasWorkflowId.slice(0, 8)})`);
+      const d = (await res.json().catch(() => null)) as { saasWorkflowId?: string } | null;
+      const corto = txt(d?.saasWorkflowId).slice(0, 8);
+      setStatus(`Publicado como borrador en Workflows → activarlo en /saas/workflows${corto ? ` (id ${corto})` : ""}`);
     } else {
       setStatus("Error al publicar");
     }
   };
 
-  const inputCls =
-    "rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none";
-
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="workflows" />}>
-      <div className="flex h-[calc(100vh-4rem)] flex-col gap-3 p-4">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <NelvyonDsSectionHeader
-            title="Editor visual de workflows"
-            subtitle="Construye trigger → acciones arrastrando nodos y publícalo como workflow real."
-          />
-          <a href="/saas/workflows" className="text-sm text-muted-foreground hover:text-foreground">
-            ← Volver a Workflows
-          </a>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3">
-          <input className={inputCls} value={name} onChange={(e) => setName(e.target.value)} />
-          <NelvyonDsButton variant="ghost" size="sm" onClick={newFlow}>+ Nuevo flujo</NelvyonDsButton>
-          <NelvyonDsButton variant="secondary" size="sm" onClick={() => void addNode("trigger")}>+ Nodo trigger</NelvyonDsButton>
-          <NelvyonDsButton variant="secondary" size="sm" onClick={() => void addNode("action")}>+ Nodo acción</NelvyonDsButton>
-          <NelvyonDsButton size="sm" disabled={saving} onClick={() => void save()}>{saving ? "Guardando…" : "Guardar"}</NelvyonDsButton>
-          <NelvyonDsButton size="sm" disabled={saving} onClick={() => void publish()}>Publicar en SaaS</NelvyonDsButton>
-          {status && <span className="text-sm text-muted-foreground">{status}</span>}
-        </div>
-
-        <div className="flex flex-1 gap-3 overflow-hidden">
-          {/* Mis flujos visuales */}
-          <div className={`flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-all ${flowsOpen ? "w-64" : "w-10"}`}>
-            <button
-              type="button"
-              onClick={() => setFlowsOpen((v) => !v)}
-              className="flex items-center justify-between border-b border-border px-3 py-2 text-xs font-medium text-muted-foreground hover:text-foreground"
-            >
-              {flowsOpen && <span>Mis flujos ({flows.length})</span>}
-              <span>{flowsOpen ? "«" : "»"}</span>
-            </button>
-            {flowsOpen && (
-              <div className="flex-1 overflow-y-auto p-2">
-                {flowsLoading ? (
-                  <div className="space-y-2">
-                    {Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-14 animate-pulse rounded-lg bg-muted/30" />)}
-                  </div>
-                ) : flows.length === 0 ? (
-                  <p className="p-2 text-xs text-muted-foreground">Sin flujos guardados aún. Crea uno y pulsa &quot;Guardar&quot;.</p>
-                ) : (
-                  <div className="space-y-1.5">
-                    {flows.map((f) => (
-                      <div
-                        key={f.id}
-                        className={`group rounded-lg border p-2 text-xs transition-colors ${savedId === f.id ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"}`}
-                      >
-                        <button type="button" className="block w-full text-left" onClick={() => loadFlow(f)}>
-                          <p className="truncate font-medium text-foreground">{f.name}</p>
-                          <p className="mt-0.5 text-muted-foreground">{new Date(f.updatedAt).toLocaleDateString("es-ES")} · {f.nodes.length} nodos</p>
-                        </button>
-                        <button
-                          type="button"
-                          disabled={deletingId === f.id}
-                          onClick={() => void deleteFlow(f.id)}
-                          className="mt-1 text-destructive opacity-0 transition-opacity group-hover:opacity-100 hover:underline"
-                        >
-                          {deletingId === f.id ? "Eliminando…" : "Eliminar"}
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Canvas */}
-          <div className="flex-1 rounded-xl border border-border bg-muted/5">
-            <ReactFlow
-              nodes={nodes}
-              edges={edges}
-              onNodesChange={onNodesChange}
-              onEdgesChange={onEdgesChange}
-              onConnect={onConnect}
-              onNodeClick={(_, n) => setSelectedNodeId(n.id)}
-              onPaneClick={() => setSelectedNodeId(null)}
-              fitView
-              colorMode="dark"
-            >
-              <Background />
-              <Controls />
-              <MiniMap />
-            </ReactFlow>
-          </div>
-
-          {/* Node config panel */}
-          {selectedNode && (
-            <div className="w-64 shrink-0 rounded-xl border border-border bg-card p-4">
-              <div className="mb-3 flex items-center justify-between">
-                <NelvyonDsBadge tone={selectedNode.data.kind === "trigger" ? "primary" : "neutral"}>
-                  {selectedNode.data.kind === "trigger" ? "Trigger" : "Acción"}
-                </NelvyonDsBadge>
-                <button onClick={deleteSelectedNode} className="text-xs text-destructive hover:underline">Eliminar nodo</button>
-              </div>
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">Tipo</label>
-              <select
-                className={`${inputCls} w-full`}
-                value={selectedNode.data.nodeType}
-                onChange={(e) => updateSelectedNodeType(e.target.value)}
-              >
-                {(selectedNode.data.kind === "trigger" ? TRIGGER_TYPES : ACTION_TYPES).map((t) => (
-                  <option key={t} value={t}>
-                    {selectedNode.data.kind === "trigger" ? TRIGGER_LABELS[t] : ACTION_LABELS[t]}
-                  </option>
-                ))}
-              </select>
-              <p className="mt-3 text-xs text-muted-foreground">
-                Conecta este nodo arrastrando desde su borde hacia otro nodo del lienzo.
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="Editor visual de workflows" parentTitle="Automatización" pageTitle="Editor" />
+      <div className="container-fluid">
+        <div className="row">
+          <div className="col-xl-12">
+            <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+              <p className="fs-14 text-muted mb-0">
+                Construye trigger → acciones arrastrando nodos y publícalo como workflow real.
               </p>
+              <a href="/saas/workflows" className="btn btn-primary light btn-sm">← Volver a Workflows</a>
+            </div>
+
+            <W3crmContentBox titulo="Flujo actual" icono="fa-solid fa-diagram-project">
+              <div className="d-flex flex-wrap align-items-center gap-2">
+                <label htmlFor="wf-nombre" className="visually-hidden">Nombre del flujo</label>
+                <input id="wf-nombre" className="form-control" style={{ maxWidth: 260 }}
+                  value={name} onChange={(e) => setName(e.target.value)} />
+                <button type="button" className="btn btn-primary light btn-sm" onClick={newFlow}>+ Nuevo flujo</button>
+                <button type="button" className="btn btn-primary light btn-sm" onClick={() => addNode("trigger")}>+ Nodo trigger</button>
+                <button type="button" className="btn btn-primary light btn-sm" onClick={() => addNode("action")}>+ Nodo acción</button>
+                <button type="button" className="btn btn-primary btn-sm" disabled={saving} onClick={() => void save()}>
+                  {saving ? "Guardando…" : "Guardar"}
+                </button>
+                <button type="button" className="btn btn-primary btn-sm" disabled={saving} onClick={() => void publish()}>
+                  Publicar en SaaS
+                </button>
+                {status && <span className="text-muted fs-12">{status}</span>}
+              </div>
+            </W3crmContentBox>
+          </div>
+
+          <div className="col-xl-3 col-lg-4">
+            <W3crmContentBox titulo={`Mis flujos (${flows.length})`} icono="fa-solid fa-folder-open">
+              {flowsLoading ? (
+                <W3crmCargando texto="Cargando flujos…" />
+              ) : flows.length === 0 ? (
+                <W3crmEmptyState
+                  title="Sin flujos guardados aún"
+                  description={'Crea uno y pulsa "Guardar".'}
+                />
+              ) : (
+                <ul className="list-group list-group-flush" style={{ maxHeight: 420, overflowY: "auto" }}>
+                  {flows.map((f) => (
+                    <li key={f.id} className={`list-group-item px-0 ${savedId === f.id ? "bg-light" : ""}`}>
+                      <button type="button"
+                        className="btn btn-link p-0 text-start text-decoration-none d-block w-100"
+                        aria-pressed={savedId === f.id}
+                        onClick={() => loadFlow(f)}>
+                        <span className="fw-bold d-block">{txt(f.name) || "—"}</span>
+                        <span className="d-block text-muted fs-12">
+                          {fecha(f.updatedAt)} · {Array.isArray(f.nodes) ? f.nodes.length : 0} nodos
+                        </span>
+                      </button>
+                      <button type="button" className="btn btn-danger light btn-sm mt-1"
+                        disabled={deletingId === f.id}
+                        aria-label={`Eliminar flujo ${f.name}`}
+                        onClick={() => void deleteFlow(f.id)}>
+                        {deletingId === f.id ? "Eliminando…" : "Eliminar"}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </W3crmContentBox>
+          </div>
+
+          <div className={selectedNode ? "col-xl-6 col-lg-8" : "col-xl-9 col-lg-8"}>
+            {/* El lienzo necesita altura explícita: `card-body p-0` para que
+                XYFlow ocupe la caja entera sin recortes. */}
+            <W3crmContentBox titulo="Lienzo" icono="fa-solid fa-vector-square" bodyClassName="card-body p-0">
+              <div style={{ height: "70vh", minHeight: 420 }}>
+                <ReactFlow
+                  nodes={nodes}
+                  edges={edges}
+                  onNodesChange={onNodesChange}
+                  onEdgesChange={onEdgesChange}
+                  onConnect={onConnect}
+                  onNodeClick={(_, n) => setSelectedNodeId(n.id)}
+                  onPaneClick={() => setSelectedNodeId(null)}
+                  fitView
+                  colorMode="light"
+                >
+                  <Background />
+                  <Controls />
+                  <MiniMap />
+                </ReactFlow>
+              </div>
+            </W3crmContentBox>
+          </div>
+
+          {selectedNode && (
+            <div className="col-xl-3 col-lg-12">
+              <W3crmContentBox titulo="Nodo seleccionado" icono="fa-solid fa-sliders">
+                <div className="d-flex align-items-center justify-content-between mb-3">
+                  <span className={`badge ${selectedNode.data.kind === "trigger" ? "badge-primary" : "badge-secondary"}`}>
+                    {selectedNode.data.kind === "trigger" ? "Trigger" : "Acción"}
+                  </span>
+                  <button type="button" className="btn btn-danger light btn-sm" onClick={deleteSelectedNode}>
+                    Eliminar nodo
+                  </button>
+                </div>
+                <div className="form-group mb-3">
+                  <label htmlFor="wf-tipo" className="text-black font-w600">Tipo</label>
+                  <select id="wf-tipo" className="form-control"
+                    value={selectedNode.data.nodeType}
+                    onChange={(e) => updateSelectedNodeType(e.target.value)}>
+                    {(selectedNode.data.kind === "trigger" ? TRIGGER_TYPES : ACTION_TYPES).map((t) => (
+                      <option key={t} value={t}>
+                        {selectedNode.data.kind === "trigger" ? TRIGGER_LABELS[t] : ACTION_LABELS[t]}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <p className="fs-12 text-muted mb-0">
+                  Conecta este nodo arrastrando desde su borde hacia otro nodo del lienzo.
+                </p>
+              </W3crmContentBox>
             </div>
           )}
         </div>
       </div>
-    </SaasShellLayout>
+    </SaasW3crmShell>
   );
 }
