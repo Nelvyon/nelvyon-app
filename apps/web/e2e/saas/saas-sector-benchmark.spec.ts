@@ -15,6 +15,24 @@ async function gotoBenchmark(page: import("@playwright/test").Page): Promise<voi
   }
 }
 
+/**
+ * Errores de hidratacion de React, que este test tolera a proposito.
+ *
+ * En produccion React minifica los mensajes: en vez de "Hydration failed..."
+ * emite "Minified React error #418". El filtro anterior descartaba solo por la
+ * palabra "hydration", asi que NO reconocia esos codigos y un mismatch real
+ * hacia fallar el test con un mensaje opaco e imposible de diagnosticar.
+ *
+ * Se reconocen los dos codigos que corresponden de verdad a hidratacion: #418
+ * (el HTML del servidor no coincide con el del cliente) y #423 (error al
+ * hidratar, React recurre a render en cliente). No se ignora ningun otro error
+ * de React: un TypeError o un #185 siguen haciendo fallar el test.
+ */
+function esErrorDeHidratacion(mensaje: string): boolean {
+  if (/hydration/i.test(mensaje)) return true;
+  return /Minified React error #(418|423)/.test(mensaje);
+}
+
 test.describe("S51 — /saas/benchmark page", () => {
   test.beforeEach(async ({ context, page }) => {
     await setAuthCookie(context);
@@ -26,7 +44,7 @@ test.describe("S51 — /saas/benchmark page", () => {
     const errors: string[] = [];
     page.on("pageerror", (e) => errors.push(e.message));
     await gotoBenchmark(page);
-    expect(errors.filter((e) => !e.includes("hydration"))).toHaveLength(0);
+    expect(errors.filter((e) => !esErrorDeHidratacion(e))).toHaveLength(0);
   });
 
   test("header and sector badge visible", async ({ page }) => {
