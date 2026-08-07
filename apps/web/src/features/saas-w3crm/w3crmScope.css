@@ -50,3 +50,37 @@
   outline: 2px solid var(--primary, #0d99ff);
   outline-offset: 2px;
 }
+
+/**
+ * ---------------------------------------------------------------------------
+ * CLS del primer render — geometria inicial del sidebar
+ *
+ * `ThemeContextProvider` decide `data-sidebar-style` en su efecto de montaje,
+ * leyendo `window.innerWidth`: `>=768 && <1024` -> mini, `<=768` -> overlay,
+ * resto -> full. Hasta que ese efecto corre, `body` no tiene el atributo y
+ * aplica el valor por defecto de la plantilla (`.content-body{margin-left:15rem}`),
+ * que en tablet y movil NO es el que acabara aplicandose. Medido: el margen
+ * pasaba de 210px a 53,2px (tablet) o a 0 (movil) hacia los ~127ms, y ese
+ * unico ajuste discreto era el CLS restante tras 3d886b38.
+ *
+ * Aqui se declara ESA MISMA geometria por media query, con los mismos umbrales
+ * que usa el efecto y los mismos valores que ya define W3CRM
+ * (`[data-sidebar-style="mini"] .content-body{margin-left:3.8rem}` en
+ * style.css:14415 y `[data-sidebar-style="overlay"] .content-body{margin-left:0}`
+ * en 15450), y SOLO mientras el atributo no existe: en cuanto el proveedor lo
+ * fija, estas reglas dejan de aplicar y manda la hoja de la plantilla.
+ *
+ * Sin JavaScript, sin leer `window` en SSR, sin tocar los valores finales y sin
+ * geometria unica para todos los viewports: no puede producir hydration
+ * mismatch ni cambiar la UX.
+ */
+@media (min-width: 48rem) and (max-width: 63.99rem) {
+  body:not([data-sidebar-style]) .content-body {
+    margin-left: 3.8rem;
+  }
+}
+@media (max-width: 47.99rem) {
+  body:not([data-sidebar-style]) .content-body {
+    margin-left: 0;
+  }
+}
