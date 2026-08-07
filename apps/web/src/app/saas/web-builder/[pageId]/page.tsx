@@ -1,10 +1,49 @@
 "use client";
 
+/**
+ * /saas/web-builder/[pageId] (editor) sobre W3CRM, con las piezas ya portadas.
+ * Mapeo: los tres paneles del editor -> `W3crmContentBox` dentro de una fila
+ * Bootstrap (`col-xl-3` / `col-xl-6` / `col-xl-3`), que apila en tablet y móvil
+ * donde antes había tres columnas de ancho fijo; dominio, SEO e historial ->
+ * `W3crmModal`. Sin componentes nuevos.
+ *
+ * Se migra a la vez que el listado a propósito: son el mismo producto y dejar
+ * uno con W3CRM y el otro con la interfaz antigua partiría el módulo.
+ *
+ * CONTRATO — `saas-web-builder-depth.spec.ts`:
+ *   - el body debe contener el título de la página (`E2E Test Page`): va en
+ *     `mainTitle` y sin truncar.
+ *   - el body nunca debe contener "Something went wrong": por eso ningún dato
+ *     de la API llega crudo a `.map`, `.length`, `new Date` ni a un índice.
+ *   - "Web Builder" del breadcrumb no colisiona con nada: los specs de este
+ *     módulo comparan `body.textContent`, no usan locators estrictos.
+ *
+ * SANEADO: `sections` se valida como array antes de recorrerlo o indexarlo;
+ * `content` puede llegar nulo y se normaliza a objeto antes de leer campos; un
+ * tipo de sección fuera de catálogo ya no deja la fila sin icono ni etiqueta;
+ * las fechas pasan por un guarda para no imprimir "Invalid Date"; y ninguna
+ * respuesta se aplica al estado sin comprobar antes que trae una página.
+ *
+ * Lógica de NELVYON intacta: `GET`/`PATCH /api/saas/web-builder/{pageId}`
+ * (secciones y SEO) y `POST /api/saas/web-builder` con TODAS sus acciones
+ * —`save-version`, `publish`, `unpublish`, `add-section`, `delete-section`,
+ * `duplicate-section`, `reorder-sections`, `list-versions`, `restore-version`,
+ * `update` y `verify-domain`—, el `credentials: "same-origin"` de cada llamada,
+ * el redirect a la lista cuando la página no existe, la vista previa en iframe
+ * con su HTML construido en cliente, el copiado de la URL de CDN y los avisos
+ * de 2 s.
+ */
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { NelvyonDsBadge, NelvyonDsButton } from "@/design-system/components";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmEmptyState } from "@/features/saas-w3crm/components/W3crmUi";
+import {
+  W3crmCargando,
+  W3crmContentBox,
+  W3crmModal,
+} from "@/features/saas-w3crm/components/W3crmContentBox";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -41,8 +80,31 @@ const SECTION_TYPES: { type: SectionType; label: string; icon: string }[] = [
   { type: "video", label: "Video", icon: "🎥" },
 ];
 
-const inputCls = "w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/60";
-const labelCls = "block text-[10px] uppercase tracking-wider text-muted-foreground mb-1";
+/** El `!` de `SECTION_TYPES.find(...)!` dejaba sin icono los tipos desconocidos. */
+function secCfg(type: unknown) {
+  return SECTION_TYPES.find((t) => t.type === type) ?? {
+    type: "text" as SectionType, label: String(type ?? "—"), icon: "📄",
+  };
+}
+/** `sections` podía no ser array y reventaba `.map`, `.length` y el índice 0. */
+function secciones(p: WebPage | null): PageSection[] {
+  return p && Array.isArray(p.sections) ? p.sections : [];
+}
+/** `content` podía llegar nulo y `c[key]` lanzaba antes de pintar nada. */
+function contenido(s: PageSection | null): Record<string, unknown> {
+  return s && s.content && typeof s.content === "object" ? s.content : {};
+}
+/** Ninguna respuesta se aplica al estado sin traer página. */
+function pagOk(d: unknown): WebPage | null {
+  const p = (d as { page?: WebPage } | null)?.page;
+  return p && typeof p === "object" && typeof p.id === "string" ? p : null;
+}
+function txt(v: unknown): string { return typeof v === "string" ? v : ""; }
+function fechaHora(v: unknown): string {
+  if (typeof v !== "string" || !v) return "—";
+  const d = new Date(v);
+  return Number.isNaN(d.getTime()) ? "—" : d.toLocaleString("es");
+}
 
 // ── Section Props Editor ───────────────────────────────────────────────────
 
@@ -50,18 +112,19 @@ function SectionPropsEditor({ section, onChange }: {
   section: PageSection;
   onChange(content: Record<string, unknown>): void;
 }) {
-  const c = section.content;
+  const c = contenido(section);
 
   function field(key: string, label: string, type: "text" | "textarea" = "text") {
     const val = String(c[key] ?? "");
+    const id = `wb-prop-${key}`;
     return (
-      <div key={key}>
-        <label className={labelCls}>{label}</label>
+      <div className="form-group mb-3" key={key}>
+        <label htmlFor={id} className="text-black font-w600 fs-12 text-uppercase">{label}</label>
         {type === "textarea" ? (
-          <textarea rows={3} className={inputCls + " resize-y"} value={val}
+          <textarea id={id} rows={3} className="form-control" value={val}
             onChange={e => onChange({ ...c, [key]: e.target.value })} />
         ) : (
-          <input type="text" className={inputCls} value={val}
+          <input id={id} type="text" className="form-control" value={val}
             onChange={e => onChange({ ...c, [key]: e.target.value })} />
         )}
       </div>
@@ -70,60 +133,56 @@ function SectionPropsEditor({ section, onChange }: {
 
   switch (section.type) {
     case "hero": return (
-      <div className="space-y-3">
+      <>
         {field("headline", "Headline")}
         {field("subtitle", "Subtítulo")}
         {field("ctaLabel", "CTA Label")}
         {field("ctaUrl", "CTA URL")}
-      </div>
+      </>
     );
     case "text": return (
-      <div className="space-y-3">
+      <>
         {field("heading", "Encabezado")}
         {field("body", "Cuerpo de texto", "textarea")}
-      </div>
+      </>
     );
     case "features": return (
-      <div className="space-y-3">
+      <>
         {field("heading", "Encabezado")}
-        <div>
-          <label className={labelCls}>Items (JSON array)</label>
-          <textarea rows={6} className={inputCls + " resize-y font-mono text-xs"}
+        <div className="form-group mb-3">
+          <label htmlFor="wb-prop-items" className="text-black font-w600 fs-12 text-uppercase">Items (JSON array)</label>
+          <textarea id="wb-prop-items" rows={6} className="form-control font-mono fs-12"
             value={JSON.stringify(c.items ?? [], null, 2)}
             onChange={e => {
               try { onChange({ ...c, items: JSON.parse(e.target.value) as unknown }); } catch { /* ignore */ }
             }} />
-          <p className="text-[10px] text-muted-foreground mt-1">Formato: [{"{"}icon,title,desc{"}"}]</p>
+          <p className="fs-12 text-muted mt-1 mb-0">Formato: [{"{"}icon,title,desc{"}"}]</p>
         </div>
-      </div>
+      </>
     );
     case "cta": return (
-      <div className="space-y-3">
+      <>
         {field("heading", "Encabezado")}
         {field("body", "Cuerpo", "textarea")}
         {field("ctaLabel", "CTA Label")}
         {field("ctaUrl", "CTA URL")}
-      </div>
+      </>
     );
     case "contact": return (
-      <div className="space-y-3">
+      <>
         {field("heading", "Encabezado")}
         {field("ctaLabel", "Botón label")}
-      </div>
+      </>
     );
     case "image": return (
-      <div className="space-y-3">
+      <>
         {field("src", "URL imagen")}
         {field("alt", "Alt text")}
         {field("caption", "Caption")}
-      </div>
+      </>
     );
-    case "video": return (
-      <div className="space-y-3">
-        {field("src", "URL video")}
-      </div>
-    );
-    default: return <p className="text-xs text-muted-foreground">Sin props configurables.</p>;
+    case "video": return field("src", "URL video");
+    default: return <p className="fs-12 text-muted mb-0">Sin props configurables.</p>;
   }
 }
 
@@ -145,8 +204,8 @@ function DomainModal({ page, pageId, onClose, onUpdated }: {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "update", id: pageId, custom_domain: domain.trim() || null }),
       });
-      const data = (await res.json()) as { page: WebPage };
-      onUpdated(data.page);
+      const p = pagOk(await res.json().catch(() => null));
+      if (p) onUpdated(p);
     } finally { setSaving(false); }
   }
 
@@ -158,62 +217,56 @@ function DomainModal({ page, pageId, onClose, onUpdated }: {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "verify-domain", id: pageId }),
       });
-      const data = (await res.json()) as { ok: boolean; domainStatus: string; error?: string };
+      const data = (await res.json().catch(() => null)) as { ok: boolean; domainStatus: string; error?: string } | null;
       setStatus(data);
-      if (data.ok) {
+      if (data?.ok) {
         // Refresh page data
         const r2 = await fetch(`/api/saas/web-builder/${pageId}`, { credentials: "same-origin" });
-        const d2 = (await r2.json()) as { page: WebPage };
-        onUpdated(d2.page);
+        const p2 = pagOk(await r2.json().catch(() => null));
+        if (p2) onUpdated(p2);
       }
     } finally { setVerifying(false); }
   }
 
-  const domainStatusColor = page.domainStatus === "verified" ? "text-success"
-    : page.domainStatus === "failed" ? "text-destructive"
-    : page.domainStatus === "pending" ? "text-warning" : "text-muted-foreground";
+  const domainTono = page.domainStatus === "verified" ? "text-success"
+    : page.domainStatus === "failed" ? "text-danger"
+    : page.domainStatus === "pending" ? "text-warning" : "text-muted";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-      <div className="w-full max-w-md rounded-2xl border border-border bg-card shadow-2xl">
-        <div className="flex items-center justify-between border-b border-border px-5 py-4">
-          <h2 className="text-base font-semibold text-foreground">Dominio personalizado</h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
+    <W3crmModal titulo="Dominio personalizado" onClose={onClose} size="sm">
+      <div className="form-group mb-3">
+        <label htmlFor="wb-ed-dominio" className="text-black font-w600">Dominio custom</label>
+        <input id="wb-ed-dominio" className="form-control" placeholder="miweb.com"
+          value={domain} onChange={e => setDomain(e.target.value)} />
+      </div>
+      <div className="d-flex flex-wrap gap-2 mb-3">
+        <button type="button" className="btn btn-primary light btn-sm" disabled={saving}
+          onClick={() => void saveDomain()}>
+          {saving ? "Guardando…" : "Guardar dominio"}
+        </button>
+        {page.customDomain && (
+          <button type="button" className="btn btn-primary btn-sm" disabled={verifying}
+            onClick={() => void verifyDns()}>
+            {verifying ? "Verificando…" : "Verificar DNS"}
+          </button>
+        )}
+      </div>
+      {status && (
+        <div className={`alert py-2 fs-14 ${status.ok ? "alert-success" : "alert-danger"}`} role="status">
+          {status.ok ? "✓ DNS verificado — SSL activo" : `✗ ${status.error ?? "Verificación fallida"}`}
         </div>
-        <div className="space-y-4 p-5">
-          <div>
-            <label className={labelCls}>Dominio custom</label>
-            <input value={domain} onChange={e => setDomain(e.target.value)}
-              placeholder="miweb.com" className={inputCls} />
-          </div>
-          <div className="flex gap-2">
-            <NelvyonDsButton variant="secondary" onClick={() => void saveDomain()} disabled={saving}>
-              {saving ? "Guardando…" : "Guardar dominio"}
-            </NelvyonDsButton>
-            {page.customDomain && (
-              <NelvyonDsButton onClick={() => void verifyDns()} disabled={verifying}>
-                {verifying ? "Verificando…" : "Verificar DNS"}
-              </NelvyonDsButton>
-            )}
-          </div>
-          {status && (
-            <div className={`rounded-lg px-3 py-2 text-sm ${status.ok ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
-              {status.ok ? "✓ DNS verificado — SSL activo" : `✗ ${status.error ?? "Verificación fallida"}`}
-            </div>
-          )}
-          <div className="rounded-lg border border-border bg-muted/10 p-3 text-xs space-y-1">
-            <p className="font-semibold text-muted-foreground">Instrucciones DNS</p>
-            <p className="text-muted-foreground">Añade un registro CNAME en tu DNS:</p>
-            <p className="font-mono text-muted-foreground">CNAME → pages.nelvyon.com</p>
-            <div className="flex items-center gap-2 mt-2">
-              <span className="text-muted-foreground">Estado:</span>
-              <span className={`font-semibold ${domainStatusColor}`}>{page.domainStatus}</span>
-              {page.sslStatus === "active" && <span className="text-xs text-success">🔒 SSL activo</span>}
-            </div>
-          </div>
+      )}
+      <div className="card border mb-0">
+        <div className="card-body py-3">
+          <p className="fw-bold fs-12 mb-1">Instrucciones DNS</p>
+          <p className="text-muted fs-12 mb-1">Añade un registro CNAME en tu DNS:</p>
+          <p className="text-muted fs-12 font-mono mb-2">CNAME → pages.nelvyon.com</p>
+          <span className="text-muted fs-12 me-2">Estado:</span>
+          <span className={`fw-bold fs-12 ${domainTono}`}>{txt(page.domainStatus) || "—"}</span>
+          {page.sslStatus === "active" && <span className="text-success fs-12 ms-2">🔒 SSL activo</span>}
         </div>
       </div>
-    </div>
+    </W3crmModal>
   );
 }
 
@@ -233,37 +286,33 @@ function SeoModal({ page, pageId, onClose, onUpdated }: {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ seo_title: form.seoTitle || null, seo_description: form.seoDescription || null }),
       });
-      const data = (await res.json()) as { page: WebPage };
-      onUpdated(data.page);
+      const p = pagOk(await res.json().catch(() => null));
+      if (p) onUpdated(p);
       onClose();
     } finally { setSaving(false); }
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-      <div className="w-full max-w-md rounded-2xl border border-border bg-card shadow-2xl">
-        <div className="flex items-center justify-between border-b border-border px-5 py-4">
-          <h2 className="text-base font-semibold text-foreground">SEO</h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
-        </div>
-        <div className="space-y-4 p-5">
-          <div>
-            <label className={labelCls}>SEO Title</label>
-            <input value={form.seoTitle} onChange={e => setForm(f => ({ ...f, seoTitle: e.target.value }))} className={inputCls} placeholder={page.title} />
-            <p className="text-[10px] text-muted-foreground mt-1">{form.seoTitle.length}/60 chars</p>
-          </div>
-          <div>
-            <label className={labelCls}>Meta description</label>
-            <textarea rows={3} value={form.seoDescription} onChange={e => setForm(f => ({ ...f, seoDescription: e.target.value }))} className={inputCls + " resize-none"} placeholder="Descripción para buscadores…" />
-            <p className="text-[10px] text-muted-foreground mt-1">{form.seoDescription.length}/160 chars</p>
-          </div>
-          <div className="flex gap-2 pt-1">
-            <NelvyonDsButton variant="secondary" onClick={onClose}>Cancelar</NelvyonDsButton>
-            <NelvyonDsButton onClick={() => void save()} disabled={saving}>{saving ? "Guardando…" : "Guardar SEO"}</NelvyonDsButton>
-          </div>
-        </div>
+    <W3crmModal titulo="SEO" onClose={onClose} size="sm">
+      <div className="form-group mb-3">
+        <label htmlFor="wb-seo-titulo" className="text-black font-w600 fs-12 text-uppercase">SEO Title</label>
+        <input id="wb-seo-titulo" className="form-control" placeholder={txt(page.title)}
+          value={form.seoTitle} onChange={e => setForm(f => ({ ...f, seoTitle: e.target.value }))} />
+        <p className="fs-12 text-muted mt-1 mb-0">{form.seoTitle.length}/60 chars</p>
       </div>
-    </div>
+      <div className="form-group mb-3">
+        <label htmlFor="wb-seo-desc" className="text-black font-w600 fs-12 text-uppercase">Meta description</label>
+        <textarea id="wb-seo-desc" rows={3} className="form-control" placeholder="Descripción para buscadores…"
+          value={form.seoDescription} onChange={e => setForm(f => ({ ...f, seoDescription: e.target.value }))} />
+        <p className="fs-12 text-muted mt-1 mb-0">{form.seoDescription.length}/160 chars</p>
+      </div>
+      <div className="text-end">
+        <button type="button" className="btn btn-primary light me-2" onClick={onClose}>Cancelar</button>
+        <button type="button" className="btn btn-primary" disabled={saving} onClick={() => void save()}>
+          {saving ? "Guardando…" : "Guardar SEO"}
+        </button>
+      </div>
+    </W3crmModal>
   );
 }
 
@@ -282,7 +331,8 @@ function HistoryModal({ pageId, onClose, onRestored }: {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "list-versions", id: pageId }),
     }).then(r => r.json() as Promise<{ versions: WebPageVersion[] }>)
-      .then(d => setVersions(d.versions ?? []))
+      .then(d => setVersions(Array.isArray(d?.versions) ? d.versions : []))
+      .catch(() => setVersions([]))
       .finally(() => setLoading(false));
   }, [pageId]);
 
@@ -294,37 +344,38 @@ function HistoryModal({ pageId, onClose, onRestored }: {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "restore-version", id: pageId, version_id: versionId }),
       });
-      const data = (await res.json()) as { page: WebPage };
-      onRestored(data.page);
+      const p = pagOk(await res.json().catch(() => null));
+      if (p) onRestored(p);
       onClose();
     } finally { setRestoring(null); }
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-      <div className="w-full max-w-sm rounded-2xl border border-border bg-card shadow-2xl">
-        <div className="flex items-center justify-between border-b border-border px-5 py-4">
-          <h2 className="text-base font-semibold text-foreground">Historial de versiones</h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
-        </div>
-        <div className="p-4 space-y-2 max-h-80 overflow-y-auto">
-          {loading && <p className="text-xs text-muted-foreground">Cargando…</p>}
-          {!loading && !versions.length && <p className="text-xs text-muted-foreground">Sin versiones guardadas.</p>}
+    <W3crmModal titulo="Historial de versiones" onClose={onClose} size="sm">
+      {loading ? (
+        <W3crmCargando texto="Cargando versiones…" />
+      ) : versions.length === 0 ? (
+        <W3crmEmptyState title="Sin versiones guardadas." />
+      ) : (
+        <ul className="list-group list-group-flush" style={{ maxHeight: 320, overflowY: "auto" }}>
           {versions.map(v => (
-            <div key={v.id} className="flex items-center justify-between rounded-lg border border-border px-3 py-2">
+            <li key={v.id} className="list-group-item d-flex align-items-center justify-content-between px-0">
               <div>
-                <p className="text-sm font-medium text-foreground">v{v.version}</p>
-                <p className="text-[10px] text-muted-foreground">{new Date(v.createdAt).toLocaleString("es")}</p>
-                <p className="text-[10px] text-muted-foreground">{v.sections.length} secciones</p>
+                <p className="fw-bold mb-0">v{txt(String(v.version)) || "—"}</p>
+                <span className="d-block text-muted fs-12">{fechaHora(v.createdAt)}</span>
+                <span className="d-block text-muted fs-12">
+                  {Array.isArray(v.sections) ? v.sections.length : 0} secciones
+                </span>
               </div>
-              <NelvyonDsButton variant="secondary" onClick={() => void restore(v.id)} disabled={restoring === v.id}>
+              <button type="button" className="btn btn-primary light btn-sm"
+                disabled={restoring === v.id} onClick={() => void restore(v.id)}>
                 {restoring === v.id ? "…" : "Restaurar"}
-              </NelvyonDsButton>
-            </div>
+              </button>
+            </li>
           ))}
-        </div>
-      </div>
-    </div>
+        </ul>
+      )}
+    </W3crmModal>
   );
 }
 
@@ -353,9 +404,9 @@ export default function WebBuilderEditorPage() {
     try {
       const res = await fetch(`/api/saas/web-builder/${pageId}`, { credentials: "same-origin" });
       if (!res.ok) { router.push("/saas/web-builder"); return; }
-      const data = (await res.json()) as { page: WebPage };
-      setPage(data.page);
-      setSelectedSection(data.page.sections[0] ?? null);
+      const p = pagOk(await res.json().catch(() => null));
+      setPage(p);
+      setSelectedSection(secciones(p)[0] ?? null);
     } finally { setLoading(false); }
   }, [pageId, router]);
 
@@ -380,8 +431,8 @@ export default function WebBuilderEditorPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sections: page.sections }),
       });
-      const data = (await res.json()) as { page: WebPage };
-      setPage(data.page);
+      const p = pagOk(await res.json().catch(() => null));
+      if (p) setPage(p);
       setSavedAt(new Date());
     } finally { setSaving(false); }
   }
@@ -408,8 +459,8 @@ export default function WebBuilderEditorPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "publish", id: pageId }),
       });
-      const data = (await res.json()) as { page: WebPage };
-      setPage(data.page);
+      const p = pagOk(await res.json().catch(() => null));
+      if (p) setPage(p);
     } finally { setPublishing(false); }
   }
 
@@ -419,8 +470,8 @@ export default function WebBuilderEditorPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "unpublish", id: pageId }),
     });
-    const data = (await res.json()) as { page: WebPage };
-    setPage(data.page);
+    const p = pagOk(await res.json().catch(() => null));
+    if (p) setPage(p);
   }
 
   async function addSection(type: SectionType) {
@@ -429,9 +480,11 @@ export default function WebBuilderEditorPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "add-section", id: pageId, section_type: type }),
     });
-    const data = (await res.json()) as { page: WebPage };
-    setPage(data.page);
-    const newSection = data.page.sections[data.page.sections.length - 1];
+    const p = pagOk(await res.json().catch(() => null));
+    if (!p) return;
+    setPage(p);
+    const lista = secciones(p);
+    const newSection = lista[lista.length - 1];
     if (newSection) setSelectedSection(newSection);
   }
 
@@ -441,9 +494,10 @@ export default function WebBuilderEditorPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "delete-section", id: pageId, section_id: sectionId }),
     });
-    const data = (await res.json()) as { page: WebPage };
-    setPage(data.page);
-    if (selectedSection?.id === sectionId) setSelectedSection(data.page.sections[0] ?? null);
+    const p = pagOk(await res.json().catch(() => null));
+    if (!p) return;
+    setPage(p);
+    if (selectedSection?.id === sectionId) setSelectedSection(secciones(p)[0] ?? null);
   }
 
   async function duplicateSection(sectionId: string) {
@@ -452,17 +506,18 @@ export default function WebBuilderEditorPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "duplicate-section", id: pageId, section_id: sectionId }),
     });
-    const data = (await res.json()) as { page: WebPage };
-    setPage(data.page);
+    const p = pagOk(await res.json().catch(() => null));
+    if (p) setPage(p);
   }
 
   async function moveSection(sectionId: string, dir: "up" | "down") {
     if (!page) return;
-    const idx = page.sections.findIndex(s => s.id === sectionId);
+    const lista = secciones(page);
+    const idx = lista.findIndex(s => s.id === sectionId);
     if (idx === -1) return;
     const targetIdx = dir === "up" ? idx - 1 : idx + 1;
-    if (targetIdx < 0 || targetIdx >= page.sections.length) return;
-    const newOrder = [...page.sections];
+    if (targetIdx < 0 || targetIdx >= lista.length) return;
+    const newOrder = [...lista];
     const tmp = newOrder[idx]!; newOrder[idx] = newOrder[targetIdx]!; newOrder[targetIdx] = tmp;
     const orderedIds = newOrder.map(s => s.id);
     const res = await fetch("/api/saas/web-builder", {
@@ -470,13 +525,13 @@ export default function WebBuilderEditorPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "reorder-sections", id: pageId, ordered_ids: orderedIds }),
     });
-    const data = (await res.json()) as { page: WebPage };
-    setPage(data.page);
+    const p = pagOk(await res.json().catch(() => null));
+    if (p) setPage(p);
   }
 
   function updateSelectedSectionContent(content: Record<string, unknown>) {
     if (!page || !selectedSection) return;
-    const updatedSections = page.sections.map(s =>
+    const updatedSections = secciones(page).map(s =>
       s.id === selectedSection.id ? { ...s, content } : s,
     );
     const updatedSection = { ...selectedSection, content };
@@ -486,7 +541,8 @@ export default function WebBuilderEditorPage() {
 
   function copyCdnUrl() {
     if (!page?.cdnUrl) return;
-    void navigator.clipboard.writeText(page.cdnUrl).then(() => {
+    // `clipboard` puede no existir sin permiso.
+    void navigator.clipboard?.writeText(page.cdnUrl).then(() => {
       setCopyOk(true);
       setTimeout(() => setCopyOk(false), 2000);
     });
@@ -494,161 +550,199 @@ export default function WebBuilderEditorPage() {
 
   if (loading) {
     return (
-      <SaasShellLayout sidebar={<SaasSidebar activeId="web-builder" />}>
-        <div className="flex items-center justify-center h-64">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+      <SaasW3crmShell>
+        <W3crmPageTitle mainTitle="Editor" parentTitle="Web Builder" pageTitle="Cargando" />
+        <div className="container-fluid">
+          <W3crmCargando texto="Cargando editor…" />
         </div>
-      </SaasShellLayout>
+      </SaasW3crmShell>
     );
   }
 
-  if (!page) return null;
+  if (!page) {
+    return (
+      <SaasW3crmShell>
+        <W3crmPageTitle mainTitle="Editor" parentTitle="Web Builder" pageTitle="Sin página" />
+        <div className="container-fluid">
+          <W3crmContentBox titulo="Editor de página" icono="fa-solid fa-window-maximize">
+            <W3crmEmptyState
+              title="No se ha podido cargar la página"
+              description="Vuelve al listado y ábrela de nuevo."
+            />
+            <div className="text-center">
+              <button type="button" className="btn btn-primary btn-sm"
+                onClick={() => router.push("/saas/web-builder")}>← Web Builder</button>
+            </div>
+          </W3crmContentBox>
+        </div>
+      </SaasW3crmShell>
+    );
+  }
 
   const isPublished = page.status === "published";
+  const lista = secciones(page);
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="web-builder" />}>
-      <div className="flex h-[calc(100vh-4rem)] flex-col">
-        {/* Toolbar */}
-        <div className="flex flex-wrap items-center gap-2 border-b border-border bg-card px-4 py-2">
-          <button onClick={() => router.push("/saas/web-builder")} className="text-sm text-muted-foreground hover:text-foreground">← Web Builder</button>
-          <span className="text-foreground font-semibold text-sm truncate max-w-[200px]">{page.title}</span>
-          <NelvyonDsBadge tone={isPublished ? "success" : "neutral"}>
-            {isPublished ? "Publicado" : "Borrador"}
-          </NelvyonDsBadge>
-          <div className="flex-1" />
-          <div className="flex flex-wrap gap-1.5">
-            <NelvyonDsButton variant="secondary" onClick={() => setShowSeo(true)}>SEO</NelvyonDsButton>
-            <NelvyonDsButton variant="secondary" onClick={() => setShowHistory(true)}>Historial</NelvyonDsButton>
-            <NelvyonDsButton variant="secondary" onClick={() => setShowDomain(true)}>Dominio</NelvyonDsButton>
-            <NelvyonDsButton variant="secondary" onClick={() => void saveSectionAndSnapshot()} disabled={saving}>
-              {saving ? "Guardando…" : "Guardar"}
-            </NelvyonDsButton>
-            {savedAt && <span className="self-center text-[10px] text-muted-foreground">✓ {savedAt.toLocaleTimeString("es")}</span>}
-            {isPublished ? (
-              <>
-                <NelvyonDsButton variant="secondary" onClick={() => void unpublishPage()}>Pausar</NelvyonDsButton>
-                <NelvyonDsButton variant="secondary" onClick={copyCdnUrl}>
-                  {copyOk ? "✓ Copiado" : "Copiar URL"}
-                </NelvyonDsButton>
-              </>
-            ) : (
-              <NelvyonDsButton onClick={() => void publishPage()} disabled={publishing}>
-                {publishing ? "Publicando…" : "Publicar"}
-              </NelvyonDsButton>
+    <SaasW3crmShell>
+      {/* El título de la página, sin truncar: es texto-contrato. */}
+      <W3crmPageTitle mainTitle={txt(page.title) || "Editor"} parentTitle="Web Builder" pageTitle="Editor" />
+      <div className="container-fluid">
+        <div className="row">
+          <div className="col-xl-12">
+            {/* Toolbar */}
+            <div className="d-flex flex-wrap align-items-center gap-2 mb-3">
+              <button type="button" className="btn btn-primary light btn-sm"
+                onClick={() => router.push("/saas/web-builder")}>← Web Builder</button>
+              <span className={`badge ${isPublished ? "badge-success" : "badge-secondary"}`}>
+                {isPublished ? "Publicado" : "Borrador"}
+              </span>
+              <span className="ms-auto d-flex flex-wrap align-items-center gap-1">
+                <button type="button" className="btn btn-primary light btn-sm" onClick={() => setShowSeo(true)}>SEO</button>
+                <button type="button" className="btn btn-primary light btn-sm" onClick={() => setShowHistory(true)}>Historial</button>
+                <button type="button" className="btn btn-primary light btn-sm" onClick={() => setShowDomain(true)}>Dominio</button>
+                <button type="button" className="btn btn-primary light btn-sm" disabled={saving}
+                  onClick={() => void saveSectionAndSnapshot()}>
+                  {saving ? "Guardando…" : "Guardar"}
+                </button>
+                {savedAt && <span className="text-success fs-12 ms-1">✓ {savedAt.toLocaleTimeString("es")}</span>}
+                {isPublished ? (
+                  <>
+                    <button type="button" className="btn btn-primary light btn-sm" onClick={() => void unpublishPage()}>Pausar</button>
+                    <button type="button" className="btn btn-primary light btn-sm" onClick={copyCdnUrl}>
+                      {copyOk ? "✓ Copiado" : "Copiar URL"}
+                    </button>
+                  </>
+                ) : (
+                  <button type="button" className="btn btn-primary btn-sm" disabled={publishing}
+                    onClick={() => void publishPage()}>
+                    {publishing ? "Publicando…" : "Publicar"}
+                  </button>
+                )}
+              </span>
+            </div>
+
+            {page.cdnUrl && isPublished && (
+              <div className="alert alert-primary py-2" role="note">
+                <span className="fs-12 me-1">URL pública:</span>
+                <a href={page.cdnUrl} target="_blank" rel="noopener noreferrer" className="fs-12 text-break">
+                  {page.cdnUrl}
+                </a>
+              </div>
             )}
           </div>
-        </div>
 
-        {page.cdnUrl && isPublished && (
-          <div className="border-b border-border bg-muted/10 px-4 py-1.5">
-            <span className="text-[10px] text-muted-foreground">URL pública: </span>
-            <a href={page.cdnUrl} target="_blank" rel="noopener noreferrer" className="text-[10px] text-primary hover:underline break-all">
-              {page.cdnUrl}
-            </a>
-          </div>
-        )}
-
-        {/* 3-column editor */}
-        <div className="flex flex-1 overflow-hidden">
-          {/* Left: sections panel */}
-          <aside className="w-56 flex-shrink-0 border-r border-border overflow-y-auto bg-card">
-            <div className="p-3">
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Secciones ({page.sections.length})</p>
-              <div className="space-y-1">
-                {page.sections.map((s, i) => {
-                  const cfg = SECTION_TYPES.find(t => t.type === s.type)!;
-                  const isSelected = selectedSection?.id === s.id;
-                  return (
-                    <div key={s.id}
-                      className={`group flex items-center gap-1.5 rounded-lg px-2 py-2 cursor-pointer transition-colors ${isSelected ? "bg-primary/15 border border-primary/30" : "border border-border hover:bg-muted/20"}`}
-                      onClick={() => setSelectedSection(s)}>
-                      <span className="text-sm">{cfg?.icon}</span>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium text-foreground truncate">{i + 1}. {cfg?.label}</p>
-                      </div>
-                      <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={e => { e.stopPropagation(); void moveSection(s.id, "up"); }}
-                          disabled={i === 0} className="text-muted-foreground hover:text-foreground disabled:opacity-20 text-[10px] px-0.5">↑</button>
-                        <button onClick={e => { e.stopPropagation(); void moveSection(s.id, "down"); }}
-                          disabled={i === page.sections.length - 1} className="text-muted-foreground hover:text-foreground disabled:opacity-20 text-[10px] px-0.5">↓</button>
-                        <button onClick={e => { e.stopPropagation(); void duplicateSection(s.id); }}
-                          className="text-muted-foreground hover:text-foreground text-[10px] px-0.5">⧉</button>
-                        <button onClick={e => { e.stopPropagation(); void deleteSection(s.id); }}
-                          className="text-destructive/50 hover:text-destructive text-[10px] px-0.5">✕</button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-              {/* Add section */}
-              <div className="mt-3 space-y-1">
-                <p className="text-[10px] text-muted-foreground mb-1">Añadir sección</p>
+          {/* Izquierda: secciones */}
+          <div className="col-xl-3 col-lg-4">
+            <W3crmContentBox titulo={`Secciones (${lista.length})`} icono="fa-solid fa-layer-group">
+              {lista.length === 0 ? (
+                <W3crmEmptyState title="Sin secciones" description="Añade la primera desde la lista de abajo." />
+              ) : (
+                <ul className="list-group list-group-flush mb-3">
+                  {lista.map((s, i) => {
+                    const cfg = secCfg(s.type);
+                    const isSelected = selectedSection?.id === s.id;
+                    return (
+                      <li key={s.id}
+                        className={`list-group-item d-flex align-items-center gap-1 px-0 ${isSelected ? "bg-light" : ""}`}>
+                        <button type="button"
+                          className="btn btn-link p-0 text-start text-decoration-none flex-grow-1"
+                          aria-pressed={isSelected}
+                          onClick={() => setSelectedSection(s)}>
+                          <span className="me-2" aria-hidden="true">{cfg.icon}</span>
+                          <span className="fw-bold fs-12">{i + 1}. {cfg.label}</span>
+                        </button>
+                        <button type="button" className="btn btn-primary light btn-sm" disabled={i === 0}
+                          aria-label={`Subir ${cfg.label}`} onClick={() => void moveSection(s.id, "up")}>↑</button>
+                        <button type="button" className="btn btn-primary light btn-sm" disabled={i === lista.length - 1}
+                          aria-label={`Bajar ${cfg.label}`} onClick={() => void moveSection(s.id, "down")}>↓</button>
+                        <button type="button" className="btn btn-primary light btn-sm"
+                          aria-label={`Duplicar ${cfg.label}`} onClick={() => void duplicateSection(s.id)}>⧉</button>
+                        <button type="button" className="btn btn-danger light btn-sm"
+                          aria-label={`Eliminar ${cfg.label}`} onClick={() => void deleteSection(s.id)}>✕</button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+              <p className="fs-12 text-muted mb-1">Añadir sección</p>
+              <div className="d-flex flex-wrap gap-1">
                 {SECTION_TYPES.map(t => (
-                  <button key={t.type} onClick={() => void addSection(t.type)}
-                    className="w-full flex items-center gap-1.5 rounded-md border border-border px-2 py-1 text-[10px] text-muted-foreground hover:border-primary/40 hover:text-foreground transition-colors text-left">
-                    <span>{t.icon}</span> {t.label}
+                  <button key={t.type} type="button" className="btn btn-primary light btn-sm"
+                    onClick={() => void addSection(t.type)}>
+                    <span aria-hidden="true">{t.icon}</span> {t.label}
                   </button>
                 ))}
               </div>
-            </div>
-          </aside>
-
-          {/* Center: live preview iframe */}
-          <div className="flex-1 overflow-hidden bg-background relative">
-            <iframe
-              ref={iframeRef}
-              title="Preview"
-              className="w-full h-full border-0"
-              sandbox="allow-same-origin"
-            />
-            {!previewHtml && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <p className="text-muted-foreground text-sm">Sin secciones — añade una en el panel izquierdo</p>
-              </div>
-            )}
+            </W3crmContentBox>
           </div>
 
-          {/* Right: props panel */}
-          <aside className="w-64 flex-shrink-0 border-l border-border overflow-y-auto bg-card p-4">
-            {selectedSection ? (
-              <>
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-lg">{SECTION_TYPES.find(t => t.type === selectedSection.type)?.icon}</span>
-                  <p className="text-sm font-semibold text-foreground">
-                    {SECTION_TYPES.find(t => t.type === selectedSection.type)?.label}
-                  </p>
-                </div>
-                <SectionPropsEditor
-                  section={selectedSection}
-                  onChange={updateSelectedSectionContent}
+          {/* Centro: vista previa en vivo */}
+          <div className="col-xl-6 col-lg-8">
+            <W3crmContentBox titulo="Vista previa" icono="fa-solid fa-eye" bodyClassName="card-body p-0">
+              <div className="position-relative" style={{ height: "60vh", minHeight: 360 }}>
+                {/*
+                  Ancho y alto explícitos, no `w-100`/`h-100`: sobre el iframe
+                  esas clases resolvían a la escala de espaciado de Tailwind v4
+                  (0.25rem × 100 = 400px) en vez de a la utilidad de Bootstrap,
+                  y desbordaban 10px el viewport de 390. Medido en móvil.
+                */}
+                <iframe
+                  ref={iframeRef}
+                  title="Preview"
+                  className="border-0"
+                  style={{ width: "100%", height: "100%" }}
+                  sandbox="allow-same-origin"
                 />
-                <div className="mt-4 pt-4 border-t border-border">
-                  <NelvyonDsButton onClick={() => void savePageSections()} disabled={saving}>
-                    {saving ? "Guardando…" : "Aplicar cambios"}
-                  </NelvyonDsButton>
-                </div>
-              </>
-            ) : (
-              <p className="text-xs text-muted-foreground">Selecciona una sección para editar sus propiedades.</p>
-            )}
-          </aside>
+                {!previewHtml && (
+                  <div className="position-absolute top-0 start-0 d-flex align-items-center justify-content-center"
+                    style={{ width: "100%", height: "100%" }}>
+                    <p className="text-muted fs-14 mb-0">Sin secciones — añade una en el panel izquierdo</p>
+                  </div>
+                )}
+              </div>
+            </W3crmContentBox>
+          </div>
+
+          {/* Derecha: propiedades */}
+          <div className="col-xl-3 col-lg-12">
+            <W3crmContentBox
+              titulo={selectedSection ? `Propiedades · ${secCfg(selectedSection.type).label}` : "Propiedades"}
+              icono="fa-solid fa-sliders"
+            >
+              {selectedSection ? (
+                <>
+                  <SectionPropsEditor
+                    section={selectedSection}
+                    onChange={updateSelectedSectionContent}
+                  />
+                  <div className="text-end pt-2 border-top">
+                    <button type="button" className="btn btn-primary btn-sm" disabled={saving}
+                      onClick={() => void savePageSections()}>
+                      {saving ? "Guardando…" : "Aplicar cambios"}
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <W3crmEmptyState title="Selecciona una sección para editar sus propiedades." />
+              )}
+            </W3crmContentBox>
+          </div>
         </div>
       </div>
 
-      {showDomain && page && (
+      {showDomain && (
         <DomainModal page={page} pageId={pageId} onClose={() => setShowDomain(false)}
           onUpdated={p => { setPage(p); setShowDomain(false); }} />
       )}
-      {showSeo && page && (
+      {showSeo && (
         <SeoModal page={page} pageId={pageId} onClose={() => setShowSeo(false)}
           onUpdated={p => { setPage(p); setShowSeo(false); }} />
       )}
       {showHistory && (
         <HistoryModal pageId={pageId} onClose={() => setShowHistory(false)}
-          onRestored={p => { setPage(p); setSelectedSection(p.sections[0] ?? null); }} />
+          onRestored={p => { setPage(p); setSelectedSection(secciones(p)[0] ?? null); }} />
       )}
-    </SaasShellLayout>
+    </SaasW3crmShell>
   );
 }
 
@@ -659,9 +753,10 @@ function esc(s: string) {
 }
 
 function buildPreviewHtml(page: WebPage): string {
-  if (!page.sections.length) return "";
-  const sectionHtml = page.sections.map(s => {
-    const c = s.content;
+  const lista = secciones(page);
+  if (!lista.length) return "";
+  const sectionHtml = lista.map(s => {
+    const c = contenido(s);
     switch (s.type) {
       case "hero":
         return `<section style="padding:60px 20px;text-align:center;background:#0a0a0a;color:#fff">
@@ -679,9 +774,9 @@ function buildPreviewHtml(page: WebPage): string {
           ${c.heading ? `<h2 style="text-align:center;color:#fff;font-size:1.4rem;margin:0 0 24px">${esc(String(c.heading))}</h2>` : ""}
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px">
             ${Array.isArray(c.items) ? (c.items as Record<string, unknown>[]).map(it => `<div style="background:#111;border:1px solid #222;border-radius:10px;padding:18px">
-              <div style="font-size:1.4rem;margin-bottom:8px">${esc(String(it.icon ?? ""))}</div>
-              <p style="color:#fff;font-weight:600;margin:0 0 4px;font-size:0.9rem">${esc(String(it.title ?? ""))}</p>
-              <p style="color:#aaa;font-size:0.8rem;margin:0">${esc(String(it.desc ?? ""))}</p>
+              <div style="font-size:1.4rem;margin-bottom:8px">${esc(String(it?.icon ?? ""))}</div>
+              <p style="color:#fff;font-weight:600;margin:0 0 4px;font-size:0.9rem">${esc(String(it?.title ?? ""))}</p>
+              <p style="color:#aaa;font-size:0.8rem;margin:0">${esc(String(it?.desc ?? ""))}</p>
             </div>`).join("") : ""}
           </div>
         </section>`;
@@ -692,7 +787,7 @@ function buildPreviewHtml(page: WebPage): string {
           ${c.ctaLabel ? `<a href="${esc(String(c.ctaUrl ?? "#"))}" style="display:inline-block;padding:13px 32px;background:#0084ff;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">${esc(String(c.ctaLabel))}</a>` : ""}
         </section>`;
       default:
-        return `<section style="padding:20px;color:#aaa;text-align:center;font-size:0.875rem">[${s.type}]</section>`;
+        return `<section style="padding:20px;color:#aaa;text-align:center;font-size:0.875rem">[${esc(String(s.type))}]</section>`;
     }
   }).join("\n");
 
