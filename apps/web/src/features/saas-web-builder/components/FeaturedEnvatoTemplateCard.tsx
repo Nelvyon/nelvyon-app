@@ -1,9 +1,21 @@
 "use client";
 
+/**
+ * Tarjeta de la plantilla premium, con el marcado de tarjeta de W3CRM
+ * (`card` > `row` > `col` con imagen a sangre y `card-body`).
+ *
+ * Estaba en la capa visual antigua de NELVYON (`NelvyonDsCard`,
+ * `NelvyonDsButton`, tokens Tailwind oscuros). Sus DOS únicos consumidores
+ * —/saas/web-builder y /saas/setup— ya están en W3CRM, así que mantenerla en la
+ * capa antigua dejaba una isla oscura dentro del shell claro. Se porta.
+ *
+ * La API pública (`FeaturedTemplateMeta`, props `template` y `onImported`) y la
+ * lógica —`POST /api/saas/web-builder` con `action: "import-template"` y el
+ * salto al editor de la página importada— quedan exactamente igual.
+ */
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { NelvyonDsButton, NelvyonDsCard } from "@/design-system/components";
 
 export type FeaturedTemplateMeta = {
   id: string;
@@ -45,37 +57,49 @@ export function FeaturedEnvatoTemplateCard({
     }
   }
 
+  const nombre = typeof template.name === "string" ? template.name : "";
+
   return (
-    <NelvyonDsCard className="overflow-hidden border-[#0084ff]/30 bg-gradient-to-br from-[#0084ff]/10 to-transparent">
-      <div className="grid gap-0 md:grid-cols-2">
-        <div className="relative aspect-[16/10] md:aspect-auto md:min-h-[280px] bg-[#0a1628]">
-          <Image
-            src={template.preview_url}
-            alt={template.name}
-            fill
-            className="object-cover object-top"
-            unoptimized
-          />
-          <span className="absolute left-3 top-3 rounded-full bg-black/60 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-white">
-            Plantilla premium
-          </span>
-        </div>
-        <div className="flex flex-col justify-center p-6">
-          <p className="text-xs font-semibold uppercase tracking-widest text-[#0084ff]">Plantilla premium oficial</p>
-          <h2 className="mt-2 text-xl font-bold text-foreground">{template.name}</h2>
-          <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{template.description}</p>
-          <p className="mt-2 text-xs text-muted-foreground">{template.headline}</p>
-          {error && <p className="mt-3 text-xs text-red-400">{error}</p>}
-          <div className="mt-5 flex flex-wrap gap-2">
-            <NelvyonDsButton disabled={loading} onClick={() => void importTemplate()}>
-              {loading ? "Importando…" : "Importar en 1 clic →"}
-            </NelvyonDsButton>
+    <div className="card mb-3 overflow-hidden">
+      <div className="row g-0">
+        <div className="col-md-5">
+          <div className="position-relative h-100" style={{ minHeight: 200 }}>
+            {template.preview_url ? (
+              <Image
+                src={template.preview_url}
+                alt={nombre}
+                fill
+                className="object-fit-cover"
+                style={{ objectPosition: "top" }}
+                unoptimized
+              />
+            ) : null}
+            <span className="badge badge-primary position-absolute" style={{ left: 12, top: 12 }}>
+              Plantilla premium
+            </span>
           </div>
-          <p className="mt-3 text-[10px] text-muted-foreground">
-            Licencia comercial incluida · Adaptación oficial Nelvyon · Lista para publicar
-          </p>
+        </div>
+        <div className="col-md-7">
+          <div className="card-body">
+            <p className="fs-12 text-primary text-uppercase fw-bold mb-1">Plantilla premium oficial</p>
+            <h4 className="card-title mb-2">{nombre || "—"}</h4>
+            <p className="text-muted fs-14 mb-1">
+              {typeof template.description === "string" ? template.description : ""}
+            </p>
+            <p className="text-muted fs-12 mb-2">
+              {typeof template.headline === "string" ? template.headline : ""}
+            </p>
+            {error ? <div className="alert alert-danger py-2 fs-12" role="alert">{error}</div> : null}
+            <button type="button" className="btn btn-primary btn-sm" disabled={loading}
+              onClick={() => void importTemplate()}>
+              {loading ? "Importando…" : "Importar en 1 clic →"}
+            </button>
+            <p className="text-muted fs-12 mt-3 mb-0">
+              Licencia comercial incluida · Adaptación oficial Nelvyon · Lista para publicar
+            </p>
+          </div>
         </div>
       </div>
-    </NelvyonDsCard>
+    </div>
   );
 }
