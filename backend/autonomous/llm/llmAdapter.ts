@@ -11,9 +11,29 @@ import {
   isInternetTaskAuthorized,
   isPrivateMode,
 } from "../../private-ai/privateMode";
+import {
+  LLM_BUDGET_MIN_CALL_MS,
+  claimLlmCallTimeoutMs,
+  markLlmBudgetExhausted,
+  remainingLlmBudgetMs,
+} from "./llmBudget";
 import { parseJsonFromLlm } from "./parseJson";
 import type { AgentRole } from "./promptTemplates";
 import { buildUserPrompt, getSystemPrompt } from "./promptTemplates";
+
+/**
+ * Timeout por defecto de una llamada a Ollama. Réplica de la regla de
+ * `OllamaClient.chat` para poder recortarla contra el presupuesto ANTES de
+ * entrar en el cliente: los modelos `8b` son notablemente más lentos.
+ */
+function resolveDefaultOllamaTimeoutMs(model: string | undefined): number {
+  const isHeavy = (model ?? "").includes("8b");
+  return Number(
+    isHeavy
+      ? (process.env.OLLAMA_STRATEGY_TIMEOUT_MS ?? 300_000)
+      : (process.env.OLLAMA_FAST_TIMEOUT_MS ?? 120_000),
+  );
+}
 
 export type LlmMode = "mock" | "real";
 
@@ -157,13 +177,24 @@ async function callOllama(
   system: string,
   user: string,
   modelOverride?: string,
+  label = "ollama_call",
 ): Promise<{ content: string; tokens: number; model: string }> {
+  /**
+   * El presupuesto agregado del SKU recorta el timeout de ESTA llamada, de modo
+   * que ninguna pueda desbordar lo que queda. Si ya no hay margen, lanza
+   * `LlmBudgetExhaustedError` inmediatamente en vez de esperar 120s/300s.
+   * Sin presupuesto instalado devuelve el timeout por defecto y nada cambia.
+   */
+  const budgetTimeoutMs = claimLlmCallTimeoutMs(
+    resolveDefaultOllamaTimeoutMs(modelOverride),
+    label,
+  );
   const result = await getOllamaClient().chat(
     [
       { role: "system", content: system },
       { role: "user", content: user },
     ],
-    { format: "json", numPredict: 3072, model: modelOverride },
+    { format: "json", numPredict: 3072, model: modelOverride, timeoutMs: budgetTimeoutMs },
   );
   const content = result.content?.trim() ?? "";
   if (!content) throw new Error("Ollama empty content");
@@ -278,17 +309,33 @@ export async function invokeLlm(req: LlmRequest): Promise<LlmResponse> {
   if (isAutonomousOllamaConfigured()) {
     try {
       const route = resolveAutonomousOllamaModel(req.agentId);
-      let { content, tokens, model } = await callOllama(system, user, route.model);
+      let { content, tokens, model } = await callOllama(
+        system,
+        user,
+        route.model,
+        `${req.agentId}:primary`,
+      );
       let parsed = parseJsonFromLlm(content);
       if (!parsed || typeof parsed !== "object") {
-        // One repair pass — still real Ollama, never silent mock.
-        const repairUser =
-          `${user}\n\nCRITICAL: previous output was not valid JSON. Respond with ONE JSON object only, no markdown.`;
-        const repaired = await callOllama(system, repairUser, route.model);
-        content = repaired.content;
-        tokens += repaired.tokens;
-        model = repaired.model || model;
-        parsed = parseJsonFromLlm(content);
+        /**
+         * El pase de reparación duplica el coste del agente y es el multiplicador
+         * que hacía impredecible la duración. Solo se intenta si queda margen:
+         * sin presupuesto útil se marca la degradación y se deja que el fallo de
+         * JSON siga su curso normal (el pipeline ya tiene soft-fail por agente).
+         */
+        const remaining = remainingLlmBudgetMs();
+        if (remaining !== null && remaining < LLM_BUDGET_MIN_CALL_MS) {
+          markLlmBudgetExhausted(`${req.agentId}: pase de reparación omitido por presupuesto`);
+        } else {
+          // One repair pass — still real Ollama, never silent mock.
+          const repairUser =
+            `${user}\n\nCRITICAL: previous output was not valid JSON. Respond with ONE JSON object only, no markdown.`;
+          const repaired = await callOllama(system, repairUser, route.model, `${req.agentId}:repair`);
+          content = repaired.content;
+          tokens += repaired.tokens;
+          model = repaired.model || model;
+          parsed = parseJsonFromLlm(content);
+        }
       }
       if (!parsed || typeof parsed !== "object") {
         throw new Error("Ollama response is not valid JSON object");

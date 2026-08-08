@@ -4,6 +4,15 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { resolveLlmMode } from "./llm/llmAdapter";
+import {
+  LLM_BUDGET_DEGRADED_MODEL,
+  configuredLlmBudgetMs,
+  hasBudgetForAnotherAttempt,
+  llmBudgetDegradationReason,
+  markLlmBudgetExhausted,
+  runWithLlmBudget,
+  wasLlmBudgetExhausted,
+} from "./llm/llmBudget";
 import { executePipelinePhaseC, initPhaseCProject } from "./pipelines/runPipelinePhaseC";
 import { buildOsPublishPayload } from "./publish/osPublishPayload";
 import { isAutonomousProductionPublish } from "./publish/productionDeliverableUrls";
@@ -96,20 +105,87 @@ export async function simulatePhaseC(options: PhaseCOptions): Promise<PhaseCResu
     return qa;
   }
 
-  let qa = await runAttempt();
-  project.qa = qa;
-  retryHistory.push(historyEntry(1, qa, project));
+  /**
+   * Presupuesto agregado. Sin él, el peor caso (4 intentos x 3 agentes x pase de
+   * reparación x timeout por llamada) llegaba a 48-120 min frente a los 35 min
+   * del job. El primer intento SIEMPRE se ejecuta: recortar antes de tener un
+   * resultado dejaría la ejecución sin artefactos.
+   */
+  const budgetMs = configuredLlmBudgetMs();
+  const attemptDurationsMs: number[] = [];
 
-  while (!qa.passed && qa.score < QA_PASS_THRESHOLD && project.retry_count < project.max_retries) {
-    project.retry_count += 1;
-    project.status = "RETRYING";
-    qa = await runAttempt();
+  return runWithLlmBudget(budgetMs, async () => {
+    const firstStarted = Date.now();
+    let qa = await runAttempt();
+    attemptDurationsMs.push(Date.now() - firstStarted);
     project.qa = qa;
-    retryHistory.push(historyEntry(project.retry_count + 1, qa, project));
-  }
+    retryHistory.push(historyEntry(1, qa, project));
 
-  project.retry_history = retryHistory;
+    while (
+      !qa.passed &&
+      qa.score < QA_PASS_THRESHOLD &&
+      project.retry_count < project.max_retries
+    ) {
+      /**
+       * Se comprueba ANTES de empezar el intento, usando la duración observada
+       * como estimación. Así nunca se arranca trabajo que no cabe, y no se
+       * repiten los side effects del intento anterior (`recordPostQaOutcome`
+       * ya se ejecutó y queda tal cual).
+       */
+      const estimate = Math.max(...attemptDurationsMs);
+      if (!hasBudgetForAnotherAttempt(estimate)) {
+        markLlmBudgetExhausted(
+          `reintento ${project.retry_count + 2} omitido: no cabe en el presupuesto restante`,
+        );
+        break;
+      }
+      project.retry_count += 1;
+      project.status = "RETRYING";
+      const started = Date.now();
+      qa = await runAttempt();
+      attemptDurationsMs.push(Date.now() - started);
+      project.qa = qa;
+      retryHistory.push(historyEntry(project.retry_count + 1, qa, project));
+    }
 
+    project.retry_history = retryHistory;
+
+    /**
+     * Degradación explícita. Si se recortó cualquier trabajo por presupuesto, la
+     * ejecución NO puede leerse como un resultado LLM normal: queda una entrada
+     * dedicada en `agent_log` y el estado se refleja en el bundle de salida.
+     */
+    if (wasLlmBudgetExhausted()) {
+      const reason = llmBudgetDegradationReason() ?? "presupuesto agotado";
+      const now = new Date().toISOString();
+      project.agent_log.push({
+        agent: "llm_budget_guard",
+        started_at: now,
+        ended_at: now,
+        input_artifact_versions: {},
+        output_artifact: `budget_degraded:${reason}`,
+        output_version: retryHistory.length,
+        model: LLM_BUDGET_DEGRADED_MODEL,
+        tokens: 0,
+        status: "failed",
+        llm_mode: "real",
+      });
+      project.llm_budget_degraded = true;
+      project.llm_budget_reason = reason;
+    }
+
+    return finalizePhaseC(project, qa, retryHistory, llmMode, options);
+  });
+}
+
+/** Cierre de la ejecución: publicación OS, escalado y bundle de salida. */
+function finalizePhaseC(
+  project: ReturnType<typeof initPhaseCProject>,
+  qa: QaResult,
+  retryHistory: RetryHistoryEntry[],
+  llmMode: "mock" | "real",
+  options: PhaseCOptions,
+): PhaseCResult {
   let os_publish = null;
   let escalated = false;
 
