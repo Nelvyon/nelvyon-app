@@ -46,10 +46,16 @@ function gitCommit() {
 }
 
 async function ollamaReachable() {
-  const host = (process.env.OLLAMA_HOST || process.env.OLLAMA_BASE_URL || "http://127.0.0.1:11434").replace(
+  const raw = (process.env.OLLAMA_HOST || process.env.OLLAMA_BASE_URL || "http://127.0.0.1:11434").replace(
     /\/$/,
     "",
   );
+  // `OLLAMA_HOST` es `host:port` SIN esquema en la convención oficial de Ollama.
+  // Consumirlo tal cual como base de `fetch` daba "Failed to parse URL from
+  // 127.0.0.1:11434/api/tags", que este gate reportaba como `unreachable`:
+  // indistinguible de que el servidor no estuviera levantado. Misma
+  // normalización que `backend/local-ai/config.ts`.
+  const host = /^[a-z][a-z0-9+.-]*:\/\//i.test(raw) ? raw : `http://${raw}`;
   try {
     const res = await fetch(`${host}/api/tags`, { signal: AbortSignal.timeout(5000) });
     if (!res.ok) return { ok: false, host, detail: `http_${res.status}` };

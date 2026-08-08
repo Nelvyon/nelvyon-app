@@ -28,13 +28,38 @@ function isLoopbackHostname(hostname: string): boolean {
   return h === "localhost" || h === "127.0.0.1" || h === "::1" || h === "0.0.0.0";
 }
 
+/**
+ * `OLLAMA_HOST` es, en la convención OFICIAL de Ollama, un `host:port` SIN
+ * esquema —`127.0.0.1:11434`, `100.64.0.1:11434`—, no una URL. Aquí se
+ * consumía tal cual como base de `fetch`, así que un valor perfectamente
+ * válido para el CLI de Ollama producía `Failed to parse URL from
+ * <host>:11434/api/tags` y el sistema lo reportaba como `ollama_unreachable`,
+ * indistinguible de "el servidor no está levantado".
+ *
+ * Peor en producción: el guardia anti-loopback hace `new URL(raw)`, que LANZA
+ * con un valor sin esquema y cae en el `catch` que devuelve "". Es decir, un
+ * `OLLAMA_HOST` escrito según la convención de Ollama desactivaba la IA local
+ * en silencio.
+ *
+ * Se normaliza: si no trae esquema, se antepone `http://`. Ambas formas quedan
+ * soportadas, `OLLAMA_BASE_URL` y `NELVYON_LOCAL_AI_URL` siguen aceptando URL
+ * completa como hasta ahora, y el guardia anti-loopback pasa a evaluarse sobre
+ * un valor siempre parseable. No se codifica ninguna dirección concreta.
+ */
+function normalizarBaseUrl(valor: string): string {
+  if (!valor) return "";
+  return /^[a-z][a-z0-9+.-]*:\/\//i.test(valor) ? valor : `http://${valor}`;
+}
+
 function resolveOllamaBaseUrl(env: NodeJS.ProcessEnv): string {
-  const raw = (
-    env.OLLAMA_HOST?.trim() ||
-    env.OLLAMA_BASE_URL?.trim() ||
-    env.NELVYON_LOCAL_AI_URL?.trim() ||
-    ""
-  ).replace(/\/$/, "");
+  const raw = normalizarBaseUrl(
+    (
+      env.OLLAMA_HOST?.trim() ||
+      env.OLLAMA_BASE_URL?.trim() ||
+      env.NELVYON_LOCAL_AI_URL?.trim() ||
+      ""
+    ).replace(/\/$/, ""),
+  );
   const { isProduction } = resolveDeployEnvironment(env);
   if (!raw) {
     // Owner machine only — production must set OLLAMA_HOST (Tailscale mesh).
