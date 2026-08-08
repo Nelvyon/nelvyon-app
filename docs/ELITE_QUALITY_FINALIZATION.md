@@ -40,7 +40,7 @@
 | Vitest principal `backend/saas` + `backend/email` + `src/features/saas-crm` | **193 passed, 2 skipped files** · **2401 passed, 4 skipped tests** (1 fallo previo: agent count 17→23, corregido) |
 | `node scripts/validate-post-elite-migrations.mjs` | **OK — 508–514 present** |
 | `node scripts/nelvyon-knowledge-sync.mjs` | **ok: true**, total **263**, orphans **0**, coverage **0.95**, claimComplete **false**; ingest skipped |
-| Workforce cert (sin re-soak) | `backend/local-ai/benchmarks/workforce_certification.json` → **verdict: PASS** (2026-07-19, commit dc62ebcb) |
+| Workforce cert (re-ejecutada completa, con soak) | `backend/local-ai/benchmarks/workforce_certification.json` → **verdict: PASS**, 10/10 required, 0 skipped (2026-08-08, commit c95134a0) |
 
 ---
 
