@@ -136,7 +136,7 @@
     "@vitejs/plugin-react": "^5.0.4",
     "autoprefixer": "^10.4.21",
     "cross-env": "^10.1.0",
-    "eslint": "^9.37.0",
+    "eslint": "^10.8.0",
     "eslint-config-next": "^15.5.6",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "jsdom": "^27.0.0",
