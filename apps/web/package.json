@@ -125,7 +125,7 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/mdx": "^2.0.13",
-    "@types/node": "^24.7.2",
+    "@types/node": "^26.1.2",
     "@types/pg": "^8.20.0",
     "@types/react": "^19.1.16",
     "@types/react-csv": "^1.1.10",
