@@ -47,6 +47,91 @@ Ollama as **private** Railway service (`*.railway.internal`) in the same project
 
 Ollama on `127.0.0.1:11434` for local gates, Phase C, pack gate. Staging/prod remain IA OFF until CEO + Option A/B.
 
+#### `OLLAMA_HOST` — formato aceptado
+
+`OLLAMA_HOST` admite la convención **oficial de Ollama**, `host:port` sin esquema, y también una URL completa. Ambas son equivalentes:
+
+```
+OLLAMA_HOST=127.0.0.1:11434            # convención Ollama
+OLLAMA_HOST=http://127.0.0.1:11434     # URL completa
+```
+
+`OLLAMA_BASE_URL` y `NELVYON_LOCAL_AI_URL` esperan URL completa. Si no hay ninguna definida, en desarrollo se asume `http://127.0.0.1:11434`; en producción queda vacío y la IA local se desactiva de forma explícita.
+
+#### Windows: el servidor solo escucha donde le diga `OLLAMA_HOST`
+
+`OLLAMA_HOST` cumple **dos papeles**: le dice al *cliente* a dónde conectarse y le dice al *servidor* en qué interfaz enlazarse. Si está fijado a la IP de Tailscale a nivel de usuario, el servidor escucha **solo** ahí y `127.0.0.1:11434` no responde:
+
+```powershell
+Get-NetTCPConnection -LocalPort 11434 -State Listen | Select LocalAddress
+# LocalAddress
+# 100.x.y.z          <- solo la interfaz mesh; loopback NO responde
+```
+
+Eso rompe los gates locales: `PRIVATE_MODE` solo permite hosts loopback/Docker privados, así que una IP CGNAT de Tailscale (`100.64.0.0/10`) es rechazada por el allowlist y el error aflora como `ollama_unreachable`, indistinguible de que el servidor esté caído.
+
+**La opción más segura, y la preferente, es loopback puro.** Si esta máquina no necesita servir el modelo a la mesh, deja `OLLAMA_HOST=127.0.0.1:11434` y termina aquí: el puerto no se publica en ninguna interfaz y no hace falta tocar el firewall. Todo lo que sigue solo aplica cuando además se necesita acceso Tailscale desde otra máquina.
+
+Para que **loopback y mesh convivan**, el servidor debe enlazarse al comodín:
+
+```powershell
+[Environment]::SetEnvironmentVariable('OLLAMA_HOST','0.0.0.0:11434','User')
+# reiniciar Ollama para que tome el nuevo bind
+```
+
+> ⚠️ **`0.0.0.0:11434` es exclusivamente dev/cert, y exige restricción de firewall.** Este documento prohíbe exponer Ollama en `0.0.0.0` (ver *What is forbidden*), y con razón: el comodín publica el 11434 en **todas** las interfaces, incluida la LAN. Ollama no admite enlazar varias direcciones concretas, así que el comodín es la única forma de tener loopback y mesh a la vez, y **solo es aceptable en la máquina del owner, para gates locales y certificación, acompañado de la regla de firewall de abajo**. Producción no expone Ollama públicamente en ningún caso: el acceso remoto va por Option A (mesh privada) u Option B (red interna de Railway), nunca por un puerto abierto. `PRIVATE_MODE` **no se toca**: su allowlist sigue rechazando cualquier host que no sea loopback o Docker privado, y este bind no la relaja — solo hace que el loopback que ya se permitía vuelva a responder.
+
+#### Restringir el 11434 por firewall (procedimiento seguro)
+
+No borres reglas por comodín. `Remove-NetFirewallRule` con un `-DisplayName '*llama*'` puede llevarse reglas ajenas que casen por accidente, y no es reversible. Identifica primero, borra después, y solo la regla concreta:
+
+```powershell
+# 1. Listar TODO lo relacionado con Ollama, sin borrar nada.
+Get-NetFirewallRule -DisplayName '*llama*' |
+  Select-Object Name, DisplayName, Direction, Action, Enabled, Profile
+```
+
+```powershell
+# 2. Inspeccionar la candidata: qué puerto abre y a quién se lo abre.
+#    Sustituye <NAME> por el campo Name EXACTO del paso 1 (no el DisplayName).
+$regla = Get-NetFirewallRule -Name '<NAME>'
+$regla | Get-NetFirewallPortFilter    | Select-Object Protocol, LocalPort
+$regla | Get-NetFirewallAddressFilter | Select-Object RemoteAddress
+```
+
+La regla amplia que hay que retirar es la que cumple **las tres** condiciones: `Direction = Inbound`, `Action = Allow`, y `RemoteAddress = Any` sobre el 11434. Si ninguna las cumple, no borres nada: salta al paso 4.
+
+```powershell
+# 3. Eliminar ÚNICAMENTE esa regla, por Name exacto. Ensaya primero con -WhatIf.
+Remove-NetFirewallRule -Name '<NAME>' -WhatIf
+Remove-NetFirewallRule -Name '<NAME>' -Confirm
+```
+
+```powershell
+# 4. Permitir el 11434 SOLO desde el rango CGNAT de Tailscale.
+New-NetFirewallRule -DisplayName "Ollama 11434 solo Tailscale" `
+  -Direction Inbound -LocalPort 11434 -Protocol TCP -Action Allow `
+  -RemoteAddress 100.64.0.0/10
+```
+
+```powershell
+# 5. Verificar: debe quedar UNA sola regla Inbound/Allow sobre el 11434,
+#    y su RemoteAddress debe ser 100.64.0.0/10 (nunca "Any").
+Get-NetFirewallRule -Direction Inbound -Action Allow -Enabled True |
+  Where-Object { ($_ | Get-NetFirewallPortFilter).LocalPort -eq 11434 } |
+  ForEach-Object {
+    [pscustomobject]@{
+      Name          = $_.Name
+      DisplayName   = $_.DisplayName
+      RemoteAddress = ($_ | Get-NetFirewallAddressFilter).RemoteAddress
+    }
+  }
+```
+
+No añadas una regla `-Action Block` de respaldo para el mismo puerto: en Windows Firewall las reglas de bloqueo tienen **prioridad sobre las de permitir**, así que anularía también el acceso mesh que se acaba de conceder. No hace falta: la acción por defecto del perfil de entrada ya es bloquear, de modo que lo que no se permite explícitamente queda fuera. El tráfico loopback no atraviesa el firewall, así que `127.0.0.1:11434` sigue funcionando sin ninguna regla.
+
+Sin esa regla, el bind en comodín **incumple la política de este documento** y debe revertirse a `OLLAMA_HOST=127.0.0.1:11434`.
+
 ---
 
 ## What is forbidden
