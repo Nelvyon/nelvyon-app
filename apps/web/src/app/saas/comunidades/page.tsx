@@ -1,9 +1,34 @@
 "use client";
 
+/**
+ * /saas/comunidades sobre `(cms)/content` de W3CRM, con las piezas ya portadas.
+ * Mapeo: listado de comunidades, composición y muro -> `W3crmContentBox`; los
+ * posts -> `list-group` con `W3crmAvatar`; el alta -> `W3crmModal`. Sin
+ * componentes nuevos.
+ *
+ * SANEADO: `communities` y `posts` se validan como array antes de mapearlos, y
+ * `timeAgo` deja de imprimir "Hace NaN min" cuando la fecha no es válida.
+ * `mapCommunity`/`mapPost` conservan su normalización original —incluidos los
+ * alias `membersCount`/`postsCount`/`repliesCount`— porque es la que absorbe las
+ * dos formas que devuelve el backend.
+ *
+ * Lógica de NELVYON intacta: `GET /api/saas/communities`, el mismo GET con
+ * `?communityId=…&posts=true`, `POST` para el alta y para las acciones
+ * `create_post` y `like_post`, y `GET /api/saas/profile` para el nombre de
+ * autor. Los dos botones deshabilitados (respuestas anidadas y compartir) se
+ * conservan con su `title`: siguen siendo funciones no disponibles, no se
+ * "arreglan" aquí.
+ */
 import { useCallback, useEffect, useState } from "react";
-import { NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmAvatar, W3crmEmptyState } from "@/features/saas-w3crm/components/W3crmUi";
+import {
+  W3crmCargando,
+  W3crmContentBox,
+  W3crmModal,
+} from "@/features/saas-w3crm/components/W3crmContentBox";
 
 interface Community {
   id: string;
@@ -58,54 +83,50 @@ function mapPost(raw: Record<string, unknown>): Post {
   };
 }
 
-function timeAgo(iso: string) {
-  const diff = Date.now() - new Date(iso).getTime();
+/** Una fecha inválida imprimía "Hace NaN min". */
+function timeAgo(iso: string): string {
+  const t = new Date(iso).getTime();
+  if (!Number.isFinite(t)) return "—";
+  const diff = Date.now() - t;
+  if (diff < 0) return "Ahora";
   if (diff < 3600000) return `Hace ${Math.floor(diff / 60000)} min`;
   if (diff < 86400000) return `Hace ${Math.floor(diff / 3600000)} h`;
   return `Hace ${Math.floor(diff / 86400000)} días`;
 }
 
+function miles(v: unknown): string {
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n.toLocaleString("es-ES") : "—";
+}
+
 function PostCard({ post, onLike, liking }: { post: Post; onLike: (postId: string) => void; liking: boolean }) {
   return (
-    <NelvyonDsCard className={`p-4 ${post.pinned ? "border-primary/30 bg-primary/5" : ""}`}>
-      {post.pinned && <p className="mb-2 text-xs font-medium text-primary">📌 Anclado</p>}
-      <div className="flex gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">{post.authorAvatar}</div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <p className="text-sm font-semibold text-foreground">{post.authorName}</p>
-            <p className="text-xs text-muted-foreground">{timeAgo(post.createdAt)}</p>
-          </div>
-          <p className="mt-1.5 text-sm text-foreground/90 leading-relaxed">{post.content}</p>
-          <div className="mt-3 flex gap-4">
-            <button
-              type="button"
-              onClick={() => onLike(post.id)}
-              disabled={liking}
-              className="flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-primary disabled:opacity-50"
-            >
-              ♡ {post.likes}
+    <li className={`list-group-item px-0 ${post.pinned ? "bg-light" : ""}`}>
+      {post.pinned && <p className="text-primary fs-12 fw-bold mb-1">📌 Anclado</p>}
+      <div className="d-flex gap-3">
+        <W3crmAvatar seed={post.id} label={post.authorName} />
+        <div className="flex-grow-1" style={{ minWidth: 0 }}>
+          <span className="fw-bold me-2">{post.authorName}</span>
+          <span className="text-muted fs-12">{timeAgo(post.createdAt)}</span>
+          <p className="mt-1 mb-2">{post.content}</p>
+          <div className="d-flex flex-wrap gap-3">
+            <button type="button" className="btn btn-link p-0 fs-12 text-muted text-decoration-none"
+              disabled={liking} aria-label={`Me gusta el post de ${post.authorName}`}
+              onClick={() => onLike(post.id)}>
+              ♡ {miles(post.likes)}
             </button>
-            <button
-              type="button"
-              disabled
-              title="Respuestas anidadas próximamente"
-              className="flex cursor-not-allowed items-center gap-1.5 text-xs text-muted-foreground/50"
-            >
-              💬 {post.replies} respuestas
+            <button type="button" className="btn btn-link p-0 fs-12 text-muted text-decoration-none" disabled
+              title="Respuestas anidadas próximamente">
+              💬 {miles(post.replies)} respuestas
             </button>
-            <button
-              type="button"
-              disabled
-              title="Comparte el enlace de la página desde el navegador"
-              className="flex cursor-not-allowed items-center gap-1.5 text-xs text-muted-foreground/50"
-            >
+            <button type="button" className="btn btn-link p-0 fs-12 text-muted text-decoration-none" disabled
+              title="Comparte el enlace de la página desde el navegador">
               ↗ Compartir
             </button>
           </div>
         </div>
       </div>
-    </NelvyonDsCard>
+    </li>
   );
 }
 
@@ -138,42 +159,47 @@ function CreateCommunityModal({ onClose, onCreated }: { onClose: () => void; onC
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm">
-      <div className="my-8 w-full max-w-lg rounded-2xl border border-border bg-card shadow-2xl">
-        <div className="flex items-center justify-between border-b border-border px-6 py-4">
-          <h2 className="text-lg font-semibold text-foreground">Nueva comunidad</h2>
-          <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
+    <W3crmModal titulo="Nueva comunidad" onClose={onClose} error={error}>
+      <form onSubmit={(e) => void save(e)}>
+        <div className="row">
+          <div className="col-3">
+            <div className="form-group mb-3">
+              <label htmlFor="cm-icono" className="text-black font-w600">Icono</label>
+              <input id="cm-icono" className="form-control fs-18" maxLength={2}
+                value={icon} onChange={e => setIcon(e.target.value)} />
+            </div>
+          </div>
+          <div className="col-9">
+            <div className="form-group mb-3">
+              <label htmlFor="cm-nombre" className="text-black font-w600">
+                Nombre <span className="required">*</span>
+              </label>
+              <input id="cm-nombre" className="form-control" placeholder="Ej: Clientes VIP"
+                value={name} onChange={e => setName(e.target.value)} />
+            </div>
+          </div>
         </div>
-        <form onSubmit={save} className="space-y-4 p-6">
-          {error && <p className="text-sm text-red-400">{error}</p>}
-          <div className="grid gap-4 sm:grid-cols-[72px_1fr]">
-            <div>
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">Icono</label>
-              <input value={icon} onChange={e => setIcon(e.target.value)} maxLength={2}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-2xl text-foreground focus:border-primary focus:outline-none" />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre *</label>
-              <input value={name} onChange={e => setName(e.target.value)} placeholder="Ej: Clientes VIP"
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
-            </div>
-          </div>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Descripción</label>
-            <textarea value={description} onChange={e => setDescription(e.target.value)} rows={3} placeholder="Para qué sirve esta comunidad…"
-              className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
-          </div>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" checked={isPrivate} onChange={e => setIsPrivate(e.target.checked)} className="accent-primary" />
-            <span className="text-sm text-foreground">Comunidad privada (solo por invitación)</span>
+        <div className="form-group mb-3">
+          <label htmlFor="cm-desc" className="text-black font-w600">Descripción</label>
+          <textarea id="cm-desc" className="form-control" rows={3}
+            placeholder="Para qué sirve esta comunidad…"
+            value={description} onChange={e => setDescription(e.target.value)} />
+        </div>
+        <div className="form-check mb-3">
+          <input className="form-check-input" type="checkbox" id="cm-privada"
+            checked={isPrivate} onChange={e => setIsPrivate(e.target.checked)} />
+          <label className="form-check-label" htmlFor="cm-privada">
+            Comunidad privada (solo por invitación)
           </label>
-          <div className="flex gap-3 pt-2">
-            <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
-            <NelvyonDsButton type="submit" disabled={saving || !name} className="flex-1">{saving ? "Creando…" : "Crear comunidad"}</NelvyonDsButton>
-          </div>
-        </form>
-      </div>
-    </div>
+        </div>
+        <div className="text-end">
+          <button type="button" className="btn btn-primary light me-2" onClick={onClose}>Cancelar</button>
+          <button type="submit" className="btn btn-primary" disabled={saving || !name}>
+            {saving ? "Creando…" : "Crear comunidad"}
+          </button>
+        </div>
+      </form>
+    </W3crmModal>
   );
 }
 
@@ -208,7 +234,7 @@ export default function SaasComunidadesPage() {
       const res = await fetch("/api/saas/communities");
       if (!res.ok) throw new Error(`Error ${res.status}`);
       const d = (await res.json()) as { communities?: Record<string, unknown>[] };
-      const list = (d.communities ?? []).map(mapCommunity);
+      const list = (Array.isArray(d.communities) ? d.communities : []).map(mapCommunity);
       setCommunities(list);
       if (list.length > 0) {
         setSelectedId(prev => prev ?? list[0]!.id);
@@ -227,7 +253,7 @@ export default function SaasComunidadesPage() {
       const res = await fetch(`/api/saas/communities?communityId=${communityId}&posts=true`);
       if (!res.ok) throw new Error(`Error ${res.status}`);
       const d = (await res.json()) as { posts?: Record<string, unknown>[] };
-      setPosts((d.posts ?? []).map(mapPost));
+      setPosts((Array.isArray(d.posts) ? d.posts : []).map(mapPost));
     } catch {
       setPosts([]);
     } finally {
@@ -289,97 +315,129 @@ export default function SaasComunidadesPage() {
   const visiblePosts = posts.filter(p => p.communityId === selectedId).sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="comunidades" />}>
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <NelvyonDsSectionHeader title="Comunidades" subtitle="Espacios privados para conectar con tus clientes y crear engagement duradero" />
-              <NelvyonDsButton onClick={() => setShowModal(true)}>+ Nueva comunidad</NelvyonDsButton>
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="Comunidades" parentTitle="Fidelización" pageTitle="Espacios" />
+      <div className="container-fluid">
+        <div className="row">
+          <div className="col-xl-12">
+            <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+              <p className="fs-14 text-muted mb-0">
+                Espacios privados para conectar con tus clientes y crear engagement duradero
+              </p>
+              <button type="button" className="btn btn-primary" onClick={() => setShowModal(true)}>
+                + Nueva comunidad
+              </button>
             </div>
 
             {error && (
-              <NelvyonDsCard className="p-4 border-red-500/30 bg-red-500/5">
-                <p className="text-sm text-red-400">{error}</p>
-                <button onClick={() => void loadCommunities()} className="mt-2 text-xs text-primary hover:underline">Reintentar</button>
-              </NelvyonDsCard>
-            )}
-
-            {loadingCommunities ? (
-              <div className="space-y-3">
-                {Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-16 animate-pulse rounded-xl bg-muted/30" />)}
+              <div className="alert alert-danger py-2" role="alert">
+                <span className="fs-14 d-block">{error}</span>
+                <button type="button" className="btn btn-primary light btn-sm mt-2"
+                  onClick={() => void loadCommunities()}>Reintentar</button>
               </div>
-            ) : communities.length === 0 && !error ? (
-              <NelvyonDsCard className="p-16 text-center">
-                <p className="text-4xl">🏘️</p>
-                <p className="mt-4 font-semibold text-foreground">Sin comunidades todavía</p>
-                <p className="mt-2 text-sm text-muted-foreground">Crea tu primera comunidad para conectar con tus clientes</p>
-                <NelvyonDsButton className="mt-5" onClick={() => setShowModal(true)}>+ Nueva comunidad</NelvyonDsButton>
-              </NelvyonDsCard>
-            ) : (
-              <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
-                <div className="space-y-2">
-                  {communities.map(c => (
-                    <button key={c.id} onClick={() => setSelectedId(c.id)}
-                      className={`flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-colors ${selectedId === c.id ? "border-primary bg-primary/10" : "border-border hover:bg-muted/20"}`}>
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-xl" style={{ backgroundColor: `${c.color}20` }}>{c.icon}</div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-1.5">
-                          <p className="text-sm font-semibold text-foreground truncate">{c.name}</p>
-                          {c.private && <span className="text-xs text-muted-foreground">🔒</span>}
-                        </div>
-                        <p className="text-xs text-muted-foreground">{c.memberCount} miembros · {c.postCount} posts</p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
+            )}
+          </div>
 
-                <div className="space-y-4">
-                  {selected && (
-                    <NelvyonDsCard className="p-4">
-                      <div className="mb-3 flex items-center gap-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-xl" style={{ backgroundColor: `${selected.color}20` }}>{selected.icon}</div>
-                        <div>
-                          <p className="font-semibold text-foreground">{selected.name}</p>
-                          <p className="text-xs text-muted-foreground">{selected.description}</p>
-                        </div>
-                      </div>
-                      <textarea value={newPost} onChange={e => setNewPost(e.target.value)} rows={3}
+          {loadingCommunities ? (
+            <div className="col-xl-12"><W3crmCargando texto="Cargando comunidades…" /></div>
+          ) : communities.length === 0 && !error ? (
+            <div className="col-xl-12">
+              <W3crmContentBox titulo="Comunidades" icono="fa-solid fa-users-rectangle">
+                <W3crmEmptyState
+                  title="Sin comunidades todavía"
+                  description="Crea tu primera comunidad para conectar con tus clientes"
+                />
+                <div className="text-center">
+                  <button type="button" className="btn btn-primary btn-sm" onClick={() => setShowModal(true)}>
+                    + Nueva comunidad
+                  </button>
+                </div>
+              </W3crmContentBox>
+            </div>
+          ) : (
+            <>
+              <div className="col-xl-4 col-lg-5">
+                <W3crmContentBox titulo={`Espacios (${communities.length})`} icono="fa-solid fa-users-rectangle">
+                  <ul className="list-group list-group-flush">
+                    {communities.map(c => (
+                      <li key={c.id} className={`list-group-item px-0 ${selectedId === c.id ? "bg-light" : ""}`}>
+                        <button type="button"
+                          className="btn btn-link p-0 text-start text-decoration-none d-flex align-items-center gap-2 w-100"
+                          aria-pressed={selectedId === c.id}
+                          onClick={() => setSelectedId(c.id)}>
+                          <span className="d-inline-flex align-items-center justify-content-center rounded fs-18"
+                            style={{ width: 40, height: 40, backgroundColor: `${c.color}20` }} aria-hidden="true">
+                            {c.icon}
+                          </span>
+                          <span className="flex-grow-1" style={{ minWidth: 0 }}>
+                            <span className="fw-bold d-block">
+                              {c.name}{c.private ? <span className="ms-1 fs-12">🔒</span> : null}
+                            </span>
+                            <span className="d-block text-muted fs-12">
+                              {miles(c.memberCount)} miembros · {miles(c.postCount)} posts
+                            </span>
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </W3crmContentBox>
+              </div>
+
+              <div className="col-xl-8 col-lg-7">
+                {selected && (
+                  <W3crmContentBox
+                    titulo={`${selected.icon} ${selected.name}`}
+                    icono="fa-solid fa-pen-to-square"
+                  >
+                    {selected.description ? (
+                      <p className="fs-12 text-muted">{selected.description}</p>
+                    ) : null}
+                    <div className="form-group mb-2">
+                      <label htmlFor="cm-post" className="visually-hidden">Nuevo post</label>
+                      <textarea id="cm-post" className="form-control" rows={3}
                         placeholder="Escribe algo para la comunidad…"
-                        className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
-                      {postError && <p className="mt-2 text-sm text-red-400">{postError}</p>}
-                      <div className="mt-2 flex justify-end">
-                        <NelvyonDsButton
-                          disabled={!newPost.trim() || publishing}
-                          onClick={() => void publishPost()}
-                          className="text-sm"
-                        >
-                          {publishing ? "Publicando…" : "Publicar"}
-                        </NelvyonDsButton>
-                      </div>
-                    </NelvyonDsCard>
-                  )}
-                  {loadingPosts ? (
-                    <div className="space-y-3">
-                      {Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-20 animate-pulse rounded-xl bg-muted/30" />)}
+                        value={newPost} onChange={e => setNewPost(e.target.value)} />
                     </div>
+                    {postError && <div className="alert alert-danger py-2 fs-14" role="alert">{postError}</div>}
+                    <div className="text-end">
+                      <button type="button" className="btn btn-primary"
+                        disabled={!newPost.trim() || publishing}
+                        onClick={() => void publishPost()}>
+                        {publishing ? "Publicando…" : "Publicar"}
+                      </button>
+                    </div>
+                  </W3crmContentBox>
+                )}
+
+                <W3crmContentBox titulo={`Muro (${visiblePosts.length})`} icono="fa-solid fa-comments">
+                  {loadingPosts ? (
+                    <W3crmCargando texto="Cargando posts…" />
                   ) : visiblePosts.length === 0 ? (
-                    <NelvyonDsCard className="p-16 text-center">
-                      <p className="text-4xl">💬</p>
-                      <p className="mt-4 font-semibold text-foreground">Sin posts aún</p>
-                      <p className="mt-2 text-sm text-muted-foreground">Sé el primero en publicar en esta comunidad</p>
-                    </NelvyonDsCard>
+                    <W3crmEmptyState
+                      title="Sin posts aún"
+                      description="Sé el primero en publicar en esta comunidad"
+                    />
                   ) : (
-                    visiblePosts.map(p => (
-                      <PostCard
-                        key={p.id}
-                        post={p}
-                        onLike={id => void likePost(id)}
-                        liking={likingId === p.id}
-                      />
-                    ))
+                    <ul className="list-group list-group-flush">
+                      {visiblePosts.map(p => (
+                        <PostCard
+                          key={p.id}
+                          post={p}
+                          onLike={id => void likePost(id)}
+                          liking={likingId === p.id}
+                        />
+                      ))}
+                    </ul>
                   )}
-                </div>
+                </W3crmContentBox>
               </div>
-            )}
+            </>
+          )}
+        </div>
+      </div>
+
       {showModal && <CreateCommunityModal onClose={() => setShowModal(false)} onCreated={() => void loadCommunities()} />}
-    </SaasShellLayout>
+    </SaasW3crmShell>
   );
 }

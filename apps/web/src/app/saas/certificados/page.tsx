@@ -1,9 +1,28 @@
 "use client";
 
+/**
+ * /saas/certificados sobre `(cms)/content` de W3CRM, con las piezas ya
+ * portadas. Mapeo: emitidos y pendientes -> `W3crmContentBox` +
+ * `W3crmDataTable`; iniciales del alumno -> `W3crmAvatar`; contadores ->
+ * `W3crmKpiTile`. Sin componentes nuevos.
+ *
+ * Inventario: sin `data-testid` y sin spec de UI dedicado. `launch.spec.ts:37`
+ * solo comprueba que `/api/saas/certificados` responde; ningún spec hace
+ * aserciones de texto ni de rol sobre esta pantalla.
+ *
+ * Lógica de NELVYON intacta: `GET /api/saas/certificados` con su mapeo de
+ * `issuedAt` a `completedAt` y el `issued: true` implícito de todo lo que
+ * devuelve la lista; la emisión secuencial —un `POST { enrollment_id }` por
+ * pendiente, contando fallos para distinguir éxito total de parcial—; el salto
+ * automático a la pestaña de emitidos solo cuando no hubo fallos; y el
+ * recuento de cursos distintos con certificado.
+ */
 import { useCallback, useEffect, useState } from "react";
-import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmAvatar, W3crmEmptyState, W3crmKpiTile } from "@/features/saas-w3crm/components/W3crmUi";
+import { W3crmCargando, W3crmContentBox, W3crmDataTable } from "@/features/saas-w3crm/components/W3crmContentBox";
 
 interface Certificate {
   id: string;
@@ -24,6 +43,16 @@ interface PendingCert {
   completedAt: string | null;
 }
 
+/** Una fecha corrupta pintaba "Invalid Date". */
+function fecha(iso: string | null | undefined): string {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? "—" : d.toLocaleDateString("es-ES");
+}
+function txt(v: unknown): string {
+  return typeof v === "string" ? v : "";
+}
+
 export default function SaasCertificadosPage() {
   const [certs, setCerts] = useState<Certificate[]>([]);
   const [pending, setPending] = useState<PendingCert[]>([]);
@@ -39,7 +68,7 @@ export default function SaasCertificadosPage() {
     try {
       const res = await fetch("/api/saas/certificados");
       if (!res.ok) throw new Error(`Error al cargar certificados (${res.status})`);
-      const d = (await res.json()) as {
+      const d = (await res.json().catch(() => ({}))) as {
         certificates?: Array<{
           id: string;
           recipientName: string;
@@ -51,8 +80,10 @@ export default function SaasCertificadosPage() {
         }>;
         pending?: PendingCert[];
       };
+      // Colecciones no-array reventaban el `.map`.
+      const lista = Array.isArray(d.certificates) ? d.certificates : [];
       setCerts(
-        (d.certificates ?? []).map((c) => ({
+        lista.map((c) => ({
           id: c.id,
           recipientName: c.recipientName,
           recipientEmail: c.recipientEmail,
@@ -63,7 +94,7 @@ export default function SaasCertificadosPage() {
           certificateUrl: c.certificateUrl,
         })),
       );
-      setPending(d.pending ?? []);
+      setPending(Array.isArray(d.pending) ? d.pending : []);
     } catch (err) {
       setCerts([]);
       setPending([]);
@@ -73,9 +104,7 @@ export default function SaasCertificadosPage() {
     }
   }, []);
 
-  useEffect(() => {
-    void load();
-  }, [load]);
+  useEffect(() => { void load(); }, [load]);
 
   async function issuePending() {
     if (pending.length === 0) return;
@@ -106,126 +135,139 @@ export default function SaasCertificadosPage() {
     }
   }
 
+  const cursosConCertificado = new Set(certs.map((c) => txt(c.courseName)).filter(Boolean)).size;
+
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="lms" />}>
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <NelvyonDsSectionHeader
-          title="Certificados"
-          subtitle="Certificados de finalización emitidos desde el LMS"
-        />
-        {pending.length > 0 && (
-          <NelvyonDsButton onClick={() => void issuePending()} disabled={issuing}>
-            {issuing ? "Emitiendo…" : `↗ Emitir ${pending.length} pendientes`}
-          </NelvyonDsButton>
-        )}
-      </div>
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="Certificados" parentTitle="Gestión" pageTitle="Certificados" />
+      <div className="container-fluid">
+        <div className="row">
+          <div className="col-xl-4 col-sm-6"><W3crmKpiTile label="Certificados emitidos" value={certs.length} accent /></div>
+          <div className="col-xl-4 col-sm-6"><W3crmKpiTile label="Pendientes de emitir" value={pending.length} /></div>
+          <div className="col-xl-4 col-sm-6"><W3crmKpiTile label="Cursos con certificado" value={cursosConCertificado} /></div>
 
-      {error ? (
-        <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400" role="alert">
-          {error}
-        </div>
-      ) : null}
-      {issueNotice ? (
-        <div className="rounded-lg border border-primary/30 bg-primary/10 px-4 py-3 text-sm text-primary" role="status">
-          {issueNotice}
-        </div>
-      ) : null}
+          <div className="col-xl-12">
+            <p className="fs-14 text-muted">Certificados de finalización emitidos desde el LMS</p>
 
-      <div className="grid grid-cols-3 gap-3">
-        {[
-          { label: "Certificados emitidos", value: certs.length },
-          { label: "Pendientes de emitir", value: pending.length },
-          { label: "Cursos con certificado", value: new Set(certs.map((c) => c.courseName)).size },
-        ].map(({ label, value }) => (
-          <NelvyonDsCard key={label} className="p-4">
-            <p className="text-xs text-muted-foreground">{label}</p>
-            <p className="mt-1 text-2xl font-bold text-foreground">{value}</p>
-          </NelvyonDsCard>
-        ))}
-      </div>
-
-      <div className="flex gap-2">
-        {(["certs", "pending"] as const).map((t) => (
-          <button
-            key={t}
-            type="button"
-            onClick={() => setTab(t)}
-            className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${tab === t ? "bg-primary text-primary-foreground" : "bg-muted/30 text-muted-foreground hover:text-foreground"}`}
-          >
-            {t === "certs" ? `Emitidos (${certs.length})` : `Pendientes (${pending.length})`}
-          </button>
-        ))}
-      </div>
-
-      {loading ? (
-        <NelvyonDsCard className="p-8 text-center text-sm text-muted-foreground">Cargando…</NelvyonDsCard>
-      ) : tab === "certs" ? (
-        certs.length === 0 ? (
-          <NelvyonDsCard className="p-16 text-center">
-            <p className="text-4xl">🎓</p>
-            <p className="mt-4 text-lg font-semibold text-foreground">Sin certificados emitidos</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Completa matriculaciones en LMS y emite certificados desde la pestaña Pendientes.
-            </p>
-          </NelvyonDsCard>
-        ) : (
-          <div className="space-y-3">
-            {certs.map((cert) => (
-              <NelvyonDsCard key={cert.id} className="p-4">
-                <div className="flex flex-wrap items-start gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-xl font-bold text-primary">
-                    {cert.recipientName[0]}
-                  </div>
-                  <div className="min-w-0 flex-1 space-y-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="font-semibold text-foreground">{cert.recipientName}</p>
-                      <NelvyonDsBadge tone="success">Emitido</NelvyonDsBadge>
-                    </div>
-                    <p className="text-sm text-muted-foreground">{cert.courseName}</p>
-                    <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
-                      <span>{cert.recipientEmail}</span>
-                      <span>
-                        Emitido: {new Date(cert.completedAt).toLocaleDateString("es-ES")}
-                      </span>
-                      <span className="font-mono">{cert.verificationCode}</span>
-                    </div>
-                  </div>
-                  {cert.certificateUrl && (
-                    <NelvyonDsButton variant="ghost" className="text-xs" asChild>
-                      <a href={cert.certificateUrl} target="_blank" rel="noreferrer">
-                        Ver / PDF
-                      </a>
-                    </NelvyonDsButton>
-                  )}
-                </div>
-              </NelvyonDsCard>
-            ))}
-          </div>
-        )
-      ) : pending.length === 0 ? (
-        <NelvyonDsCard className="p-16 text-center">
-          <p className="text-4xl">✓</p>
-          <p className="mt-4 text-lg font-semibold text-foreground">No hay pendientes</p>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Todas las matriculaciones completadas tienen certificado emitido.
-          </p>
-        </NelvyonDsCard>
-      ) : (
-        <div className="space-y-3">
-          {pending.map((p) => (
-            <NelvyonDsCard key={p.enrollmentId} className="p-4">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <p className="font-semibold text-foreground">{p.recipientName}</p>
-                  <p className="text-sm text-muted-foreground">{p.courseName}</p>
-                  <p className="text-xs text-muted-foreground">{p.recipientEmail}</p>
-                </div>
-                <NelvyonDsBadge tone="warning">Pendiente</NelvyonDsBadge>
+            {error ? (
+              <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                {error}
+                <button type="button" className="btn-close" aria-label="Cerrar" onClick={() => setError(null)} />
               </div>
-            </NelvyonDsCard>
-          ))}
+            ) : null}
+            {issueNotice ? (
+              <div className="alert alert-primary" role="status">{issueNotice}</div>
+            ) : null}
+
+            <ul className="nav nav-tabs mb-3">
+              {(["certs", "pending"] as const).map((t) => (
+                <li className="nav-item" key={t}>
+                  <button type="button" className={`nav-link ${tab === t ? "active" : ""}`}
+                    aria-pressed={tab === t} onClick={() => setTab(t)}>
+                    {t === "certs" ? `Emitidos (${certs.length})` : `Pendientes (${pending.length})`}
+                  </button>
+                </li>
+              ))}
+            </ul>
+
+            {tab === "certs" && (
+              <W3crmContentBox titulo="Certificados emitidos" icono="fa-solid fa-award">
+                {loading ? (
+                  <W3crmCargando texto="Cargando certificados…" />
+                ) : certs.length === 0 ? (
+                  <W3crmEmptyState
+                    title="Sin certificados emitidos"
+                    description="Completa matriculaciones en LMS y emite certificados desde la pestaña Pendientes."
+                  />
+                ) : (
+                  <W3crmDataTable
+                    filas={certs}
+                    etiqueta="certificados"
+                    wrapperId="cert_emitidos_wrapper"
+                    porPagina={10}
+                    columnas={[
+                      { titulo: "Alumno" },
+                      { titulo: "Curso" },
+                      { titulo: "Emitido" },
+                      { titulo: "Verificación" },
+                      { titulo: "Documento", alFinal: true },
+                    ]}
+                    render={(cert) => (
+                      <tr key={cert.id}>
+                        <td>
+                          <div className="d-flex align-items-center gap-2">
+                            {/* `recipientName[0]` reventaba con nombre nulo. */}
+                            <W3crmAvatar seed={cert.id} label={txt(cert.recipientName)} />
+                            <span>
+                              <span className="fw-bold d-block">{txt(cert.recipientName) || "—"}</span>
+                              <span className="text-muted fs-12">{txt(cert.recipientEmail) || "—"}</span>
+                            </span>
+                          </div>
+                        </td>
+                        <td>{txt(cert.courseName) || "—"}</td>
+                        <td>{fecha(cert.completedAt)}</td>
+                        <td><code className="fs-12">{txt(cert.verificationCode) || "—"}</code></td>
+                        <td className="text-end">
+                          {cert.certificateUrl ? (
+                            <a className="btn btn-primary light btn-sm" href={cert.certificateUrl}
+                              target="_blank" rel="noreferrer">
+                              Ver / PDF
+                            </a>
+                          ) : (
+                            <span className="badge badge-success">Emitido</span>
+                          )}
+                        </td>
+                      </tr>
+                    )}
+                  />
+                )}
+              </W3crmContentBox>
+            )}
+
+            {tab === "pending" && (
+              <W3crmContentBox
+                titulo="Pendientes de emitir"
+                icono="fa-solid fa-hourglass-half"
+                acciones={
+                  pending.length > 0 ? (
+                    <button type="button" className="btn btn-primary btn-sm me-2" disabled={issuing}
+                      onClick={() => void issuePending()}>
+                      {issuing ? "Emitiendo…" : `Emitir ${pending.length} pendientes`}
+                    </button>
+                  ) : undefined
+                }
+              >
+                {loading ? (
+                  <W3crmCargando texto="Cargando pendientes…" />
+                ) : pending.length === 0 ? (
+                  <W3crmEmptyState
+                    title="No hay pendientes"
+                    description="Todas las matriculaciones completadas tienen certificado emitido."
+                  />
+                ) : (
+                  <W3crmDataTable
+                    filas={pending}
+                    etiqueta="pendientes"
+                    wrapperId="cert_pendientes_wrapper"
+                    porPagina={10}
+                    columnas={[{ titulo: "Alumno" }, { titulo: "Curso" }, { titulo: "Estado", alFinal: true }]}
+                    render={(p) => (
+                      <tr key={p.enrollmentId}>
+                        <td>
+                          <span className="fw-bold d-block">{txt(p.recipientName) || "—"}</span>
+                          <span className="text-muted fs-12">{txt(p.recipientEmail) || "—"}</span>
+                        </td>
+                        <td>{txt(p.courseName) || "—"}</td>
+                        <td className="text-end"><span className="badge badge-warning">Pendiente</span></td>
+                      </tr>
+                    )}
+                  />
+                )}
+              </W3crmContentBox>
+            )}
+          </div>
         </div>
-      )}
-    </SaasShellLayout>
+      </div>
+    </SaasW3crmShell>
   );
 }

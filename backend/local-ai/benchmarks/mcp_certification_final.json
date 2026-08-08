@@ -1,0 +1,92 @@
+{
+  "timestamp": "2026-07-16T19:58:00.000Z",
+  "tag": "mcp_certification_final",
+  "completed": true,
+  "declaration": "MCP PRODUCTIVO NELVYON COMPLETADO",
+  "pendingGate": null,
+  "blockers": [],
+  "soak": {
+    "status": "passed",
+    "evidence": "backend/local-ai/benchmarks/mcp_soak_2026-07-16T19-56-30-289Z.json",
+    "checkpoint": "backend/local-ai/benchmarks/mcp_soak_checkpoint.json",
+    "passed": true,
+    "completed": true,
+    "durationMs": 7200040,
+    "targetDurationMs": 7200000,
+    "iterations": 121912,
+    "ok": 121912,
+    "fail": 0,
+    "errors": 0,
+    "criticalFail": 0,
+    "circuitState": "closed",
+    "resources": {
+      "rssMinMb": 72,
+      "rssMaxMb": 91,
+      "rssGrowthMb": 19
+    },
+    "gates": {
+      "soakComplete": true,
+      "zeroCriticalFail": true,
+      "zeroExecFail": true,
+      "errors0": true,
+      "circuitClosed": true,
+      "infraUp": true,
+      "poolNoLeak": true,
+      "noRamLeak": true,
+      "exitClean": true,
+      "noCrashes": true,
+      "noDeadlocks": true,
+      "noLostTasks": true,
+      "queueNotBlocked": true
+    }
+  },
+  "benchmark": {
+    "passed": true,
+    "selectionPct": 100,
+    "criticalPct": 100,
+    "approvalPct": 100,
+    "evidence": "backend/local-ai/benchmarks/mcp_benchmark_2026-07-16T10-08-54-343Z.json"
+  },
+  "tests": {
+    "file": "backend/saas/__tests__/mcpProductive.test.ts",
+    "passed": 23,
+    "failed": 0,
+    "reverifiedAt": "2026-07-16T19:58:40.000Z"
+  },
+  "gates": {
+    "toolSelection98": true,
+    "criticalBlocked100": true,
+    "approvalRouting100": true,
+    "tenantIsolation100": true,
+    "secretLeaks0": true,
+    "unauthorizedWrites0": true,
+    "auditCoverage100": true,
+    "offlineOperation100": true,
+    "recovery100": true,
+    "rollbackValidated": true,
+    "e2e": true,
+    "soak2h": true
+  },
+  "evidence": {
+    "benchmark": "backend/local-ai/benchmarks/mcp_benchmark_2026-07-16T10-08-54-343Z.json",
+    "soak": "backend/local-ai/benchmarks/mcp_soak_2026-07-16T19-56-30-289Z.json",
+    "unitTests": "backend/saas/__tests__/mcpProductive.test.ts",
+    "architecture": "docs/PHASE2_MCP_ARCHITECTURE.md",
+    "security": "docs/PHASE2_MCP_SECURITY.md",
+    "api": "apps/web/src/app/api/saas/mcp/route.ts",
+    "rollbackFlag": "NELVYON_MCP_PRODUCTIVE_ENABLED=0"
+  },
+  "remainingDebt": [
+    "Soak valida políticas/ejecución MCP bajo carga sostenida; no sustituye E2E HTTP SaaS completo (auth/CRM/billing) ni carga Ollama de inferencia",
+    "Tools destructivas siguen denied por diseño — ampliar superficie solo con approval + audit + tests",
+    "OpenClaw / orquestador / agentes productivos / panel — bloqueados por ADR-017 (orden obligatorio post-MCP)",
+    "Duplicidad Ollama/RAG (LocalOllamaProvider vs OllamaClient) y lead-scoring — post-cert, con plan de migración",
+    "Mig 512 citas authored pero no aplicada en DB soak"
+  ],
+  "nextBlocked": [
+    "Matriz E2E crítica OS/SaaS (auth, CRM, workflows, packs, billing, portal)",
+    "Shared Memory runtime (contratos ya en ADR-017; schema.proposed sin migrate)",
+    "OpenClaw / orquestador / agentes / panel — solo tras Shared Memory + decisión producto"
+  ],
+  "note": "Declaración solo con soak durationMs>=7128000 + gates verdes + tests 23/23 + benchmark 100%. No implica OS/SaaS COMPLETADOS ni OpenClaw."
+}

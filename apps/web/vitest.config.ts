@@ -13,6 +13,9 @@ export default defineConfig({
       "../../backend/os-core/__tests__/**/*.test.ts",
       "../../backend/saas/__tests__/**/*.test.ts",
       "../../backend/saas-reports/__tests__/**/*.test.ts",
+      // `backend/auth` no estaba cubierto por la suite: sus tests existían
+      // fuera del `include` y por tanto nunca corrían en CI.
+      "../../backend/auth/__tests__/**/*.test.ts",
       "../../backend/admin/__tests__/**/*.test.ts",
       "../../backend/email/__tests__/**/*.test.ts",
       "../../backend/monitoring/__tests__/**/*.test.ts",

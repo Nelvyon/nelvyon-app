@@ -104,6 +104,15 @@ jobs:
 
       - name: Autonomous workforce certification gate
         working-directory: .
+        env:
+          # GitHub runners cannot serve Ollama: local AI is scoped to the owner
+          # machine (ARCHITECTURE_LOCAL_AI_RUNTIME, Option C "Dev/cert only").
+          # Declared here so the gate verifies the 8 steps that ARE checkable in
+          # CI and reports CONDITIONAL_PASS, instead of failing by design. The
+          # flag only applies when Ollama is unreachable and can never yield
+          # certification: NELVYON_AUTONOMOUS_WORKFORCE_CERTIFIED still requires
+          # real live evidence, earned on the owner machine.
+          NELVYON_WORKFORCE_LIVE_REQUIRED: "0"
         run: node scripts/run-workforce-cert.mjs
         # Inventory + hierarchy + ephemeral workers + persistence. PASS not forced.
 

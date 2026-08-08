@@ -237,10 +237,35 @@ async function upstashIncrWithExpire(
  * Uses Upstash when configured; only non-critical routes (and staging) may fall back to per-instance memory.
  * Production critical routes without Upstash remain fail-closed.
  */
+/**
+ * Desactivacion del limitador SOLO para la suite E2E.
+ *
+ * Los 349 tests de Playwright corren contra un unico servidor desde una sola IP
+ * (127.0.0.1) con varios workers en menos de dos minutos, asi que cruzan
+ * inevitablemente el umbral de reglas como `public-api` (30 peticiones/minuto).
+ * El servidor entonces corta conexiones —`ECONNRESET`— y falla el test que
+ * casualmente cruce el limite, que cambia en cada ejecucion: ese era el origen
+ * del flaky rotatorio.
+ *
+ * Dos condiciones DEBEN cumplirse para omitir el limitador, y la de produccion
+ * es la que manda: en `NODE_ENV=production` la variable no desactiva nada, pase
+ * lo que pase. No se eximen IPs, no se tocan reglas, limites ni ventanas, y los
+ * valores por defecto quedan igual: sin la variable, el comportamiento es
+ * exactamente el de antes.
+ */
+export function isRateLimitDisabledForTests(): boolean {
+  if (process.env.NODE_ENV === "production") return false;
+  return process.env.RATE_LIMIT_DISABLED === "1";
+}
+
 export async function checkIpRateLimit(params: {
   ip: string;
   rule: RateLimitRule;
 }): Promise<RateLimitResult> {
+  if (isRateLimitDisabledForTests()) {
+    return { allowed: true, retryAfter: 0 };
+  }
+
   const memoryKey = `${params.rule.id}:${params.ip}`;
   const failClosed = (): RateLimitResult => ({
     allowed: false,

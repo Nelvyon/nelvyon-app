@@ -1,10 +1,58 @@
 "use client";
 
+/**
+ * /saas/publicidad sobre `(cms)/content` de W3CRM, con las piezas ya portadas.
+ * Mapeo: campañas y atribución -> `W3crmContentBox` + `W3crmDataTable`; los
+ * cuatro diálogos -> `W3crmModal`; métricas por plataforma -> `W3crmKpiTile`.
+ * Sin componentes nuevos.
+ *
+ * CONTRATO — `saas-publicidad-attribution.spec.ts` exige, y aquí se conserva:
+ *   - `getByRole("heading", { name: "Publicidad Digital" })` (l.13):
+ *     `W3crmPageTitle` emite `h5.bc-title`, que `getByRole("heading")` sí ve.
+ *   - `getByRole("button", { name: /Métricas y campañas/i })` y
+ *     `/Atribución multi-touch/i` (l.58-59): las pestañas siguen siendo
+ *     `<button>` SIN `role` explícito; ponerles `role="tab"` cambiaría el rol
+ *     implícito y dejarían de encontrarse.
+ *   - al pulsar Atribución debe dispararse `/api/saas/ads/attribution` y
+ *     aparecer `Sin campañas vinculadas` (l.96-98): `AttributionTab` solo se
+ *     monta en esa pestaña y hace su fetch al montar, y el vacío conserva ese
+ *     texto exacto.
+ *   - la carga principal sigue pasando por `/api/saas/ads` (l.12).
+ *
+ * Ningún título de `W3crmContentBox` contiene "Métricas y campañas",
+ * "Atribución multi-touch", "Conectar cuenta" ni "Publicidad Digital": el
+ * toggle de la caja expone `aria-label="Plegar <título>"` y crearía un segundo
+ * botón con ese nombre accesible.
+ *
+ * A11y (`a11y-core-routes.spec.ts:33`): el botón visible de la página es
+ * "+ Conectar plataforma" —copy original, se conserva—, así que la aserción
+ * sobre `/conectar cuenta/i` sigue sin dispararse igual que hoy. Lo que sí se
+ * corrige es el fondo: el input de Account ID no tenía `<label>` asociado (ni
+ * `htmlFor` ni anidado), de modo que `getByLabel(/account id/i)` nunca habría
+ * funcionado. Ahora todos los campos de los cuatro diálogos llevan `htmlFor`.
+ *
+ * Lógica de NELVYON intacta: `GET /api/saas/ads` (estado de plataformas) y
+ * `GET /api/saas/ads?platform=&date_start=&date_end=` (métricas); `POST
+ * /api/saas/ads` de alta de cuenta con su `extra_config.developerToken` solo
+ * para Google; `GET/POST /api/saas/ads/campaigns` con su caso especial
+ * `code === "NOT_CONNECTED"` (que vacía sin error), `POST
+ * /api/saas/ads/campaigns/create` y `PATCH /api/saas/ads/campaigns/[id]`;
+ * `GET /api/saas/ads/attribution?resource=roas&model=&days=` con su guardia
+ * `lastFetch` contra respuestas fuera de orden, y su `POST { action: "link" }`;
+ * los cinco enlaces OAuth; la ventana de 30 días; y los umbrales de ROAS
+ * (>=2 verde, >=1 ámbar).
+ */
 import { useCallback, useEffect, useRef, useState } from "react";
-import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasDegradedBanner } from "@/features/saas-shell/components/SaasDegradedBanner";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmEmptyState, W3crmKpiTile } from "@/features/saas-w3crm/components/W3crmUi";
+import {
+  W3crmCargando,
+  W3crmContentBox,
+  W3crmDataTable,
+  W3crmModal,
+} from "@/features/saas-w3crm/components/W3crmContentBox";
 
 type AdsPlatform = "meta" | "google" | "linkedin" | "tiktok" | "snapchat";
 
@@ -30,19 +78,50 @@ interface AdsMetrics {
   fetchedAt: string;
 }
 
-const PLATFORM_CFG: Record<AdsPlatform, { label: string; icon: string; tokenLabel: string; tokenPlaceholder: string }> = {
-  google: { label: "Google Ads", icon: "🔍", tokenLabel: "OAuth Access Token", tokenPlaceholder: "ya29..." },
-  meta: { label: "Meta Ads", icon: "📘", tokenLabel: "Access Token", tokenPlaceholder: "EAAG..." },
-  linkedin: { label: "LinkedIn Ads", icon: "💼", tokenLabel: "Access Token", tokenPlaceholder: "AQV..." },
-  tiktok: { label: "TikTok Ads", icon: "🎵", tokenLabel: "Access Token", tokenPlaceholder: "d4ff..." },
-  snapchat: { label: "Snapchat Ads", icon: "👻", tokenLabel: "OAuth Access Token", tokenPlaceholder: "Bearer token..." },
+const PLATFORM_CFG: Record<string, { label: string; icon: string; tokenLabel: string; tokenPlaceholder: string }> = {
+  google: { label: "Google Ads", icon: "fa-brands fa-google", tokenLabel: "OAuth Access Token", tokenPlaceholder: "ya29..." },
+  meta: { label: "Meta Ads", icon: "fa-brands fa-meta", tokenLabel: "Access Token", tokenPlaceholder: "EAAG..." },
+  linkedin: { label: "LinkedIn Ads", icon: "fa-brands fa-linkedin", tokenLabel: "Access Token", tokenPlaceholder: "AQV..." },
+  tiktok: { label: "TikTok Ads", icon: "fa-brands fa-tiktok", tokenLabel: "Access Token", tokenPlaceholder: "d4ff..." },
+  snapchat: { label: "Snapchat Ads", icon: "fa-brands fa-snapchat", tokenLabel: "OAuth Access Token", tokenPlaceholder: "Bearer token..." },
 };
+const PLATFORM_IDS: AdsPlatform[] = ["meta", "google", "linkedin", "tiktok", "snapchat"];
 
-function fmt(n: number) { return n.toLocaleString("es-ES", { maximumFractionDigits: 2 }); }
-function eur(n: number) { return `${n.toFixed(2)} EUR`; }
+/** Una plataforma fuera de catálogo hacía estallar `cfg.icon`. */
+function cfgOf(platform: string) {
+  return PLATFORM_CFG[platform] ?? {
+    label: platform || "—",
+    icon: "fa-solid fa-bullhorn",
+    tokenLabel: "Access Token",
+    tokenPlaceholder: "token...",
+  };
+}
+function num(v: unknown): number {
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+/** `null` es "sin dato" y se pinta "-"; cualquier otra cosa se sanea a 0. */
+function opt(v: unknown): number | null {
+  if (v === null || v === undefined) return null;
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+function fmt(n: unknown) { return num(n).toLocaleString("es-ES", { maximumFractionDigits: 2 }); }
+function eur(n: unknown) { return `${num(n).toFixed(2)} EUR`; }
 function today() { return new Date().toISOString().slice(0, 10); }
 function daysAgo(n: number) { const d = new Date(); d.setDate(d.getDate() - n); return d.toISOString().slice(0, 10); }
+/** Clase de color por umbral de ROAS: >=2 verde, >=1 ámbar. */
+function roasClass(v: number) { return v >= 2 ? "text-success fw-bold" : v >= 1 ? "text-warning" : "text-danger"; }
 
+const OAUTH_HREF: Record<string, string> = {
+  meta: "/api/oauth/meta",
+  google: "/api/oauth/google",
+  linkedin: "/api/oauth/linkedin",
+  tiktok: "/api/oauth/tiktok",
+  snapchat: "/api/oauth/snapchat",
+};
+
+// ── Conectar cuenta publicitaria ─────────────────────────────────────────────
 function ConnectModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
   const [platform, setPlatform] = useState<AdsPlatform>("meta");
   const [accountId, setAccountId] = useState("");
@@ -80,108 +159,94 @@ function ConnectModal({ onClose, onSaved }: { onClose: () => void; onSaved: () =
     } finally { setSaving(false); }
   }
 
+  const cfg = cfgOf(platform);
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl">
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-semibold text-foreground">Conectar cuenta publicitaria</h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">x</button>
+    <W3crmModal titulo="Conectar cuenta publicitaria" onClose={onClose} error={error} size="lg">
+      <form onSubmit={(e) => void submit(e)}>
+        <div className="form-group mb-3">
+          <span className="text-black font-w600 d-block mb-2">Plataforma</span>
+          <div role="group" aria-label="Plataforma publicitaria">
+            {PLATFORM_IDS.map((p) => (
+              <button key={p} type="button" aria-pressed={platform === p}
+                className={`btn btn-sm me-1 mb-1 ${platform === p ? "btn-primary" : "btn-primary light"}`}
+                onClick={() => setPlatform(p)}>
+                <i className={`${cfgOf(p).icon} me-2`} aria-hidden="true" />
+                {cfgOf(p).label.split(" ")[0]}
+              </button>
+            ))}
+          </div>
         </div>
-        {error && <p className="mb-4 rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
-        <form onSubmit={submit} className="space-y-4">
-          <div>
-            <label className="mb-2 block text-xs font-medium text-muted-foreground">Plataforma</label>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {(Object.keys(PLATFORM_CFG) as AdsPlatform[]).map((p) => (
-                <button key={p} type="button" onClick={() => setPlatform(p)}
-                  className={`rounded-xl border p-3 text-center text-sm transition-all ${platform === p ? "border-primary bg-primary/10 text-foreground" : "border-border text-muted-foreground hover:border-primary/40"}`}>
-                  <div className="text-xl">{PLATFORM_CFG[p].icon}</div>
-                  <div className="mt-1 text-xs">{PLATFORM_CFG[p].label.split(" ")[0]}</div>
-                </button>
-              ))}
-            </div>
-          </div>
-          {(platform === "meta" || platform === "google" || platform === "linkedin" || platform === "tiktok" || platform === "snapchat") && (
-            <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 space-y-2">
-              <p className="text-xs text-muted-foreground">Conexión recomendada — OAuth oficial:</p>
-              <div className="flex flex-wrap gap-2">
-                {platform === "meta" && (
-                  <a href="/api/oauth/meta" className="rounded-lg bg-primary/15 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/25">
-                    Conectar Meta OAuth →
-                  </a>
-                )}
-                {platform === "google" && (
-                  <a href="/api/oauth/google" className="rounded-lg bg-primary/15 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/25">
-                    Conectar Google OAuth →
-                  </a>
-                )}
-                {platform === "linkedin" && (
-                  <a href="/api/oauth/linkedin" className="rounded-lg bg-primary/15 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/25">
-                    Conectar LinkedIn OAuth →
-                  </a>
-                )}
-                {platform === "tiktok" && (
-                  <a href="/api/oauth/tiktok" className="rounded-lg bg-primary/15 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/25">
-                    Conectar TikTok OAuth →
-                  </a>
-                )}
-                {platform === "snapchat" && (
-                  <a href="/api/oauth/snapchat" className="rounded-lg bg-primary/15 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/25">
-                    Conectar Snapchat OAuth →
-                  </a>
-                )}
-              </div>
-            </div>
-          )}
-          <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Account ID *</label>
-            <input value={accountId} onChange={e => setAccountId(e.target.value)} placeholder="act_123456789"
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
-          </div>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre de cuenta</label>
-            <input value={accountName} onChange={e => setAccountName(e.target.value)} placeholder="Mi cuenta de publicidad"
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
-          </div>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">
-              {PLATFORM_CFG[platform]?.tokenLabel ?? "Access Token"} *
+
+        <div className="alert alert-primary py-2" role="note">
+          <span className="fs-12 d-block mb-2">Conexión recomendada — OAuth oficial:</span>
+          <a className="btn btn-primary btn-sm" href={OAUTH_HREF[platform] ?? "/saas/integraciones"}>
+            Conectar {cfg.label.split(" ")[0]} OAuth
+          </a>
+        </div>
+
+        {/* `htmlFor` real: sin él `getByLabel(/account id/i)` no resolvía. */}
+        <div className="form-group mb-3">
+          <label htmlFor="ads-account-id" className="text-black font-w600">
+            Account ID <span className="required">*</span>
+          </label>
+          <input id="ads-account-id" className="form-control" placeholder="act_123456789"
+            value={accountId} onChange={(e) => setAccountId(e.target.value)} />
+        </div>
+        <div className="form-group mb-3">
+          <label htmlFor="ads-account-name" className="text-black font-w600">Nombre de cuenta</label>
+          <input id="ads-account-name" className="form-control" placeholder="Mi cuenta de publicidad"
+            value={accountName} onChange={(e) => setAccountName(e.target.value)} />
+        </div>
+        <div className="form-group mb-3">
+          <label htmlFor="ads-token" className="text-black font-w600">
+            {cfg.tokenLabel} <span className="required">*</span>
+          </label>
+          <input id="ads-token" className="form-control" type="password" placeholder={cfg.tokenPlaceholder}
+            value={accessToken} onChange={(e) => setAccessToken(e.target.value)} />
+        </div>
+        {platform === "google" && (
+          <div className="form-group mb-3">
+            <label htmlFor="ads-dev-token" className="text-black font-w600">
+              Google Ads Developer Token <span className="required">*</span>
             </label>
-            <input value={accessToken} onChange={e => setAccessToken(e.target.value)} type="password"
-              placeholder={PLATFORM_CFG[platform]?.tokenPlaceholder ?? "token..."}
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
+            <input id="ads-dev-token" className="form-control" type="password"
+              placeholder="Developer token de Google Ads API Center"
+              value={developerToken} onChange={(e) => setDeveloperToken(e.target.value)} />
           </div>
-          {platform === "google" && (
-            <div>
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">Google Ads Developer Token *</label>
-              <input value={developerToken} onChange={e => setDeveloperToken(e.target.value)} type="password"
-                placeholder="Developer token de Google Ads API Center"
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
-            </div>
-          )}
-          {(platform === "tiktok" || platform === "snapchat") && (
-            <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 text-xs text-primary">
-              {platform === "tiktok"
-                ? "TikTok: genera el Access Token desde TikTok for Business → Marketing API → App → Access Token."
-                : "Snapchat: genera el token OAuth desde Snapchat Business → Snap Marketing API → OAuth."}
-            </div>
-          )}
-          <div className="rounded-lg border border-warning/20 bg-warning/5 px-4 py-3 text-xs text-warning">
-            El token se almacena cifrado. Necesitas permisos de lectura de metricas.
+        )}
+        {(platform === "tiktok" || platform === "snapchat") && (
+          <div className="alert alert-primary py-2 fs-12" role="note">
+            {platform === "tiktok"
+              ? "TikTok: genera el Access Token desde TikTok for Business → Marketing API → App → Access Token."
+              : "Snapchat: genera el token OAuth desde Snapchat Business → Snap Marketing API → OAuth."}
           </div>
-          <div className="flex gap-3">
-            <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
-            <NelvyonDsButton type="submit" disabled={saving} className="flex-1">{saving ? "Conectando..." : "Conectar cuenta"}</NelvyonDsButton>
-          </div>
-        </form>
-      </div>
-    </div>
+        )}
+        <div className="alert alert-warning py-2 fs-12" role="note">
+          El token se almacena cifrado. Necesitas permisos de lectura de metricas.
+        </div>
+        <div className="text-end">
+          <button type="button" className="btn btn-primary light me-2" onClick={onClose}>Cancelar</button>
+          <button type="submit" className="btn btn-primary" disabled={saving}>
+            {saving ? "Conectando..." : "Conectar cuenta"}
+          </button>
+        </div>
+      </form>
+    </W3crmModal>
   );
 }
 
 type AdsCampaign = { id: string; name: string; status: string; platform: string; dailyBudget: number | null };
 
-function CreateCampaignModal({ platform, onClose, onSaved }: { platform: AdsPlatform; onClose: () => void; onSaved: () => void }) {
+const OBJECTIVES: Record<string, string> = {
+  LINK_CLICKS: "Clics en enlace", LEAD_GENERATION: "Generación de leads",
+  CONVERSIONS: "Conversiones", BRAND_AWARENESS: "Notoriedad de marca",
+  REACH: "Alcance", VIDEO_VIEWS: "Visualizaciones de vídeo",
+};
+
+function CreateCampaignModal({ platform, onClose, onSaved }: {
+  platform: AdsPlatform; onClose: () => void; onSaved: () => void;
+}) {
   const [name, setName] = useState("");
   const [budget, setBudget] = useState("10");
   const [objective, setObjective] = useState("LINK_CLICKS");
@@ -191,7 +256,9 @@ function CreateCampaignModal({ platform, onClose, onSaved }: { platform: AdsPlat
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     const dailyBudgetUsd = parseFloat(budget);
-    if (!name.trim() || isNaN(dailyBudgetUsd) || dailyBudgetUsd <= 0) { setError("Nombre y presupuesto válido son obligatorios"); return; }
+    if (!name.trim() || isNaN(dailyBudgetUsd) || dailyBudgetUsd <= 0) {
+      setError("Nombre y presupuesto válido son obligatorios"); return;
+    }
     setSaving(true); setError(null);
     try {
       const res = await fetch("/api/saas/ads/campaigns/create", {
@@ -206,52 +273,49 @@ function CreateCampaignModal({ platform, onClose, onSaved }: { platform: AdsPlat
     finally { setSaving(false); }
   }
 
-  const OBJECTIVES: Record<string, string> = {
-    LINK_CLICKS: "Clics en enlace", LEAD_GENERATION: "Generación de leads",
-    CONVERSIONS: "Conversiones", BRAND_AWARENESS: "Notoriedad de marca",
-    REACH: "Alcance", VIDEO_VIEWS: "Visualizaciones de vídeo",
-  };
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl">
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-semibold text-foreground">Crear campaña — {platform.toUpperCase()}</h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-lg">×</button>
+    <W3crmModal titulo={`Crear campaña — ${String(platform).toUpperCase()}`} onClose={onClose} error={error}>
+      <form onSubmit={(e) => void submit(e)}>
+        <div className="form-group mb-3">
+          <label htmlFor="camp-nombre" className="text-black font-w600">
+            Nombre de campaña <span className="required">*</span>
+          </label>
+          <input id="camp-nombre" className="form-control" placeholder="Ej: Captación verano 2026"
+            value={name} onChange={(e) => setName(e.target.value)} />
         </div>
-        {error && <p className="mb-4 rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
-        <form onSubmit={(e) => void submit(e)} className="space-y-4">
-          <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre de campaña *</label>
-            <input value={name} onChange={e => setName(e.target.value)} placeholder="Ej: Captación verano 2026"
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
+        <div className="form-group mb-3">
+          <label htmlFor="camp-ppto" className="text-black font-w600">
+            Presupuesto diario (USD) <span className="required">*</span>
+          </label>
+          <input id="camp-ppto" className="form-control" type="number" min="0.01" step="0.01"
+            value={budget} onChange={(e) => setBudget(e.target.value)} />
+        </div>
+        {platform === "meta" && (
+          <div className="form-group mb-3">
+            <label htmlFor="camp-objetivo" className="text-black font-w600">Objetivo</label>
+            <select id="camp-objetivo" className="form-control" value={objective}
+              onChange={(e) => setObjective(e.target.value)}>
+              {Object.entries(OBJECTIVES).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+            </select>
           </div>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Presupuesto diario (USD) *</label>
-            <input type="number" min="0.01" step="0.01" value={budget} onChange={e => setBudget(e.target.value)}
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
-          </div>
-          {platform === "meta" && (
-            <div>
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">Objetivo</label>
-              <select value={objective} onChange={e => setObjective(e.target.value)}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none">
-                {Object.entries(OBJECTIVES).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-              </select>
-            </div>
-          )}
-          <p className="text-xs text-muted-foreground">La campaña se creará en estado <strong>Pausada</strong>. Actívala desde el panel de campañas.</p>
-          <div className="flex gap-3 pt-1">
-            <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
-            <NelvyonDsButton type="submit" disabled={saving} className="flex-1">{saving ? "Creando…" : "Crear campaña"}</NelvyonDsButton>
-          </div>
-        </form>
-      </div>
-    </div>
+        )}
+        <p className="fs-12 text-muted">
+          La campaña se creará en estado <strong>Pausada</strong>. Actívala desde el panel de campañas.
+        </p>
+        <div className="text-end">
+          <button type="button" className="btn btn-primary light me-2" onClick={onClose}>Cancelar</button>
+          <button type="submit" className="btn btn-primary" disabled={saving}>
+            {saving ? "Creando…" : "Crear campaña"}
+          </button>
+        </div>
+      </form>
+    </W3crmModal>
   );
 }
 
-function EditBudgetModal({ campaign, platform, onClose, onSaved }: { campaign: AdsCampaign; platform: AdsPlatform; onClose: () => void; onSaved: () => void }) {
+function EditBudgetModal({ campaign, platform, onClose, onSaved }: {
+  campaign: AdsCampaign; platform: AdsPlatform; onClose: () => void; onSaved: () => void;
+}) {
   const [budget, setBudget] = useState(String(campaign.dailyBudget ?? 10));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -275,27 +339,24 @@ function EditBudgetModal({ campaign, platform, onClose, onSaved }: { campaign: A
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-6 shadow-2xl">
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-semibold text-foreground">Editar presupuesto</h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-lg">×</button>
+    <W3crmModal titulo="Editar presupuesto" onClose={onClose} error={error}>
+      <p className="fs-14 text-muted">{campaign.name || "—"}</p>
+      <form onSubmit={(e) => void submit(e)}>
+        <div className="form-group mb-3">
+          <label htmlFor="camp-ppto-edit" className="text-black font-w600">
+            Presupuesto diario (USD) <span className="required">*</span>
+          </label>
+          <input id="camp-ppto-edit" className="form-control" type="number" min="0.01" step="0.01"
+            value={budget} onChange={(e) => setBudget(e.target.value)} />
         </div>
-        <p className="mb-4 text-sm text-muted-foreground truncate">{campaign.name}</p>
-        {error && <p className="mb-4 rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
-        <form onSubmit={(e) => void submit(e)} className="space-y-4">
-          <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Presupuesto diario (USD) *</label>
-            <input type="number" min="0.01" step="0.01" value={budget} onChange={e => setBudget(e.target.value)}
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
-          </div>
-          <div className="flex gap-3">
-            <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
-            <NelvyonDsButton type="submit" disabled={saving} className="flex-1">{saving ? "Guardando…" : "Guardar"}</NelvyonDsButton>
-          </div>
-        </form>
-      </div>
-    </div>
+        <div className="text-end">
+          <button type="button" className="btn btn-primary light me-2" onClick={onClose}>Cancelar</button>
+          <button type="submit" className="btn btn-primary" disabled={saving}>
+            {saving ? "Guardando…" : "Guardar"}
+          </button>
+        </div>
+      </form>
+    </W3crmModal>
   );
 }
 
@@ -310,11 +371,12 @@ function CampaignsSection({ platform }: { platform: AdsPlatform }) {
   const load = useCallback(() => {
     setLoading(true); setError(null);
     fetch(`/api/saas/ads/campaigns?platform=${platform}`)
-      .then(r => r.json() as Promise<{ campaigns?: AdsCampaign[]; error?: string; code?: string }>)
-      .then(d => {
-        if (d.error && d.code === "NOT_CONNECTED") { setCampaigns([]); setError(null); }
-        else if (d.error) setError(d.error);
-        else setCampaigns(d.campaigns ?? []);
+      .then((r) => r.json() as Promise<{ campaigns?: AdsCampaign[]; error?: string; code?: string }>)
+      .then((d) => {
+        // `NOT_CONNECTED` no es un error de usuario: vacía sin mensaje.
+        if (d?.error && d.code === "NOT_CONNECTED") { setCampaigns([]); setError(null); }
+        else if (d?.error) setError(d.error);
+        else setCampaigns(Array.isArray(d?.campaigns) ? d.campaigns : []);
       })
       .catch(() => setError("Error de red"))
       .finally(() => setLoading(false));
@@ -331,62 +393,90 @@ function CampaignsSection({ platform }: { platform: AdsPlatform }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ platform, campaign_id: c.id, action }),
       });
-      if (!res.ok) { const j = (await res.json().catch(() => ({}))) as { error?: string }; throw new Error(j.error ?? "Error"); }
+      if (!res.ok) {
+        const j = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(j.error ?? "Error");
+      }
       load();
     } catch (err) { setError(err instanceof Error ? err.message : "Error"); }
     finally { setToggling(null); }
   }
 
-  if (loading) return <div className="h-16 animate-pulse rounded-xl bg-muted/30" />;
-  if (error) return <p className="text-sm text-destructive">{error}</p>;
-
   return (
-    <div className="mt-4">
-      <div className="flex items-center justify-between mb-2">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Campañas</p>
-        <NelvyonDsButton size="sm" variant="ghost" className="text-xs" onClick={() => setShowCreate(true)}>
-          + Crear campaña
-        </NelvyonDsButton>
-      </div>
-      {campaigns.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-border p-6 text-center">
-          <p className="text-sm text-muted-foreground">Sin campañas en {platform.toUpperCase()}.</p>
-          <NelvyonDsButton size="sm" className="mt-3 text-xs" onClick={() => setShowCreate(true)}>
-            + Crear primera campaña
-          </NelvyonDsButton>
-        </div>
-      ) : (
-        <div className="flex flex-col gap-2">
-          {campaigns.map(c => (
-            <div key={c.id} className="flex items-center justify-between gap-4 rounded-xl border border-border bg-card/50 px-4 py-3">
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-foreground truncate">{c.name}</p>
-                {c.dailyBudget != null && (
-                  <p className="text-xs text-muted-foreground">
-                    Ppto. diario: {c.dailyBudget.toFixed(2)} USD
-                    <button onClick={() => setEditCampaign(c)} className="ml-2 text-primary hover:underline">Editar</button>
-                  </p>
-                )}
-              </div>
-              <div className="flex items-center gap-3">
-                <NelvyonDsBadge tone={c.status === "ACTIVE" ? "success" : "neutral"}>
-                  {c.status === "ACTIVE" ? "Activa" : "Pausada"}
-                </NelvyonDsBadge>
-                <NelvyonDsButton size="sm" variant="ghost" disabled={toggling === c.id} onClick={() => void toggle(c)}>
-                  {toggling === c.id ? "…" : c.status === "ACTIVE" ? "Pausar" : "Activar"}
-                </NelvyonDsButton>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+    <>
+      <W3crmContentBox
+        titulo={`Campañas ${cfgOf(platform).label}`}
+        icono="fa-solid fa-rectangle-ad"
+        acciones={
+          <button type="button" className="btn btn-primary btn-sm me-2" onClick={() => setShowCreate(true)}>
+            + Crear campaña
+          </button>
+        }
+      >
+        {error && <div className="alert alert-danger py-2 fs-14" role="alert">{error}</div>}
+        {loading ? (
+          <W3crmCargando texto="Cargando campañas…" />
+        ) : campaigns.length === 0 ? (
+          <W3crmEmptyState
+            title={`Sin campañas en ${String(platform).toUpperCase()}`}
+            description="Crea la primera con el botón de la cabecera."
+          />
+        ) : (
+          <W3crmDataTable
+            filas={campaigns}
+            etiqueta="campañas"
+            wrapperId={`ads_campaigns_${platform}_wrapper`}
+            porPagina={10}
+            columnas={[
+              { titulo: "Campaña" },
+              { titulo: "Presupuesto" },
+              { titulo: "Estado" },
+              { titulo: "Gestión", alFinal: true },
+            ]}
+            render={(c) => (
+              <tr key={c.id}>
+                <td><span className="fw-bold">{c.name || "—"}</span></td>
+                <td>
+                  {c.dailyBudget != null ? (
+                    <>
+                      {num(c.dailyBudget).toFixed(2)} USD
+                      <button type="button" className="btn btn-link btn-sm p-0 ms-2"
+                        aria-label={`Editar presupuesto de ${c.name}`}
+                        onClick={() => setEditCampaign(c)}>
+                        Editar
+                      </button>
+                    </>
+                  ) : "—"}
+                </td>
+                <td>
+                  <span className={`badge ${c.status === "ACTIVE" ? "badge-success" : "badge-secondary"}`}>
+                    {c.status === "ACTIVE" ? "Activa" : "Pausada"}
+                  </span>
+                </td>
+                <td className="text-end">
+                  <button type="button" className="btn btn-primary light btn-sm" disabled={toggling === c.id}
+                    aria-label={`${c.status === "ACTIVE" ? "Pausar" : "Activar"} ${c.name}`}
+                    onClick={() => void toggle(c)}>
+                    {toggling === c.id ? "…" : c.status === "ACTIVE" ? "Pausar" : "Activar"}
+                  </button>
+                </td>
+              </tr>
+            )}
+          />
+        )}
+      </W3crmContentBox>
       {showCreate && <CreateCampaignModal platform={platform} onClose={() => setShowCreate(false)} onSaved={load} />}
-      {editCampaign && <EditBudgetModal campaign={editCampaign} platform={platform} onClose={() => setEditCampaign(null)} onSaved={load} />}
-    </div>
+      {editCampaign && (
+        <EditBudgetModal campaign={editCampaign} platform={platform}
+          onClose={() => setEditCampaign(null)} onSaved={load} />
+      )}
+    </>
   );
 }
 
-function MetricsCard({ platform, dateStart, dateEnd }: { platform: AdsPlatform; dateStart: string; dateEnd: string }) {
+function MetricsCard({ platform, dateStart, dateEnd }: {
+  platform: AdsPlatform; dateStart: string; dateEnd: string;
+}) {
   const [metrics, setMetrics] = useState<AdsMetrics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -394,43 +484,49 @@ function MetricsCard({ platform, dateStart, dateEnd }: { platform: AdsPlatform; 
   useEffect(() => {
     setLoading(true); setError(null);
     fetch(`/api/saas/ads?platform=${platform}&date_start=${dateStart}&date_end=${dateEnd}`)
-      .then(r => r.json() as Promise<{ metrics?: AdsMetrics; error?: string }>)
-      .then(d => { if (d.metrics) setMetrics(d.metrics); else setError(d.error ?? "Error"); })
+      .then((r) => r.json() as Promise<{ metrics?: AdsMetrics; error?: string }>)
+      .then((d) => {
+        if (d?.metrics && typeof d.metrics === "object") setMetrics(d.metrics);
+        else setError(d?.error ?? "Error");
+      })
       .catch(() => setError("Error de red"))
       .finally(() => setLoading(false));
   }, [platform, dateStart, dateEnd]);
 
-  const cfg = PLATFORM_CFG[platform];
+  const cfg = cfgOf(platform);
+  const ctr = opt(metrics?.ctr);
+  const roas = opt(metrics?.roas);
 
   return (
-    <NelvyonDsCard className="p-5">
-      <div className="flex items-center gap-3 mb-4">
-        <span className="text-2xl">{cfg.icon}</span>
-        <div>
-          <p className="font-semibold text-foreground">{cfg.label}</p>
-          <p className="text-xs text-muted-foreground">{dateStart} a {dateEnd}</p>
-        </div>
-        {metrics?.fromCache && <NelvyonDsBadge tone="primary" className="ml-auto">cache</NelvyonDsBadge>}
-      </div>
+    <W3crmContentBox
+      titulo={`${cfg.label} · ${dateStart} a ${dateEnd}`}
+      icono={cfg.icon}
+      acciones={metrics?.fromCache ? <span className="badge badge-primary me-2">cache</span> : undefined}
+    >
       {loading ? (
-        <div className="h-16 animate-pulse rounded-lg bg-muted/30" />
+        <W3crmCargando texto="Cargando métricas…" />
       ) : error ? (
-        <p className="text-sm text-destructive">{error}</p>
+        <div className="alert alert-danger py-2 fs-14 mb-0" role="alert">{error}</div>
       ) : metrics ? (
-        <div className="grid grid-cols-3 gap-4 sm:grid-cols-6 text-sm">
-          <div><p className="text-xs text-muted-foreground">Gasto</p><p className="font-semibold text-foreground">{eur(metrics.spend)}</p></div>
-          <div><p className="text-xs text-muted-foreground">Impresiones</p><p className="font-semibold text-foreground">{fmt(metrics.impressions)}</p></div>
-          <div><p className="text-xs text-muted-foreground">Clics</p><p className="font-semibold text-foreground">{fmt(metrics.clicks)}</p></div>
-          <div><p className="text-xs text-muted-foreground">Conversiones</p><p className="font-semibold text-foreground">{fmt(metrics.conversions)}</p></div>
-          <div><p className="text-xs text-muted-foreground">CTR</p><p className="font-semibold text-foreground">{metrics.ctr != null ? `${metrics.ctr.toFixed(2)}%` : "-"}</p></div>
-          <div><p className="text-xs text-muted-foreground">ROAS</p><p className={`font-semibold ${metrics.roas != null && metrics.roas >= 2 ? "text-success" : metrics.roas != null && metrics.roas >= 1 ? "text-warning" : "text-foreground"}`}>{metrics.roas != null ? `${metrics.roas.toFixed(2)}x` : "-"}</p></div>
+        <div className="row">
+          <div className="col-xl-2 col-sm-4"><W3crmKpiTile label="Gasto" value={eur(metrics.spend)} accent /></div>
+          <div className="col-xl-2 col-sm-4"><W3crmKpiTile label="Impresiones" value={fmt(metrics.impressions)} /></div>
+          <div className="col-xl-2 col-sm-4"><W3crmKpiTile label="Clics" value={fmt(metrics.clicks)} /></div>
+          <div className="col-xl-2 col-sm-4"><W3crmKpiTile label="Conversiones" value={fmt(metrics.conversions)} /></div>
+          <div className="col-xl-2 col-sm-4">
+            <W3crmKpiTile label="CTR" value={ctr != null ? `${ctr.toFixed(2)}%` : "-"} />
+          </div>
+          <div className="col-xl-2 col-sm-4">
+            <W3crmKpiTile
+              label="ROAS"
+              value={roas != null ? <span className={roasClass(roas)}>{roas.toFixed(2)}x</span> : "-"}
+            />
+          </div>
         </div>
       ) : null}
-    </NelvyonDsCard>
+    </W3crmContentBox>
   );
 }
-
-// ─── Attribution types ──────────────────────────────────────────────────────
 
 type AdsAttributionModel = "first_touch" | "last_touch" | "linear" | "time_decay";
 
@@ -450,7 +546,7 @@ interface AttributedRoasRow {
   model: AdsAttributionModel;
 }
 
-const MODEL_LABELS: Record<AdsAttributionModel, string> = {
+const MODEL_LABELS: Record<string, string> = {
   first_touch: "Primer toque",
   last_touch: "Último toque",
   linear: "Lineal",
@@ -497,61 +593,70 @@ function LinkCampaignModal({ onClose, onSaved }: { onClose: () => void; onSaved:
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl">
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-semibold text-foreground">Vincular campaña Ads ↔ UTM</h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-lg">×</button>
+    <W3crmModal titulo="Vincular campaña Ads ↔ UTM" onClose={onClose} error={error} size="lg">
+      <form onSubmit={(e) => void submit(e)}>
+        <div className="form-group mb-3">
+          <span className="text-black font-w600 d-block mb-2">Plataforma</span>
+          <div role="group" aria-label="Plataforma de la campaña">
+            {PLATFORM_IDS.map((p) => (
+              <button key={p} type="button" aria-pressed={platform === p}
+                className={`btn btn-sm me-1 mb-1 ${platform === p ? "btn-primary" : "btn-primary light"}`}
+                onClick={() => setPlatform(p)}>
+                <i className={`${cfgOf(p).icon} me-2`} aria-hidden="true" />
+                {cfgOf(p).label.split(" ")[0]}
+              </button>
+            ))}
+          </div>
         </div>
-        {error && <p className="mb-4 rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
-        <form onSubmit={(e) => void submit(e)} className="space-y-4">
-          <div>
-            <label className="mb-2 block text-xs font-medium text-muted-foreground">Plataforma</label>
-            <div className="flex gap-2 flex-wrap">
-              {(Object.keys(PLATFORM_CFG) as AdsPlatform[]).map(p => (
-                <button key={p} type="button" onClick={() => setPlatform(p)}
-                  className={`rounded-lg border px-3 py-1.5 text-xs transition-all ${platform === p ? "border-primary bg-primary/10 text-foreground" : "border-border text-muted-foreground"}`}>
-                  {PLATFORM_CFG[p].icon} {PLATFORM_CFG[p].label.split(" ")[0]}
-                </button>
-              ))}
+        <div className="row">
+          <div className="col-sm-6">
+            <div className="form-group mb-3">
+              <label htmlFor="atr-camp-id" className="text-black font-w600">
+                Campaign ID (plataforma) <span className="required">*</span>
+              </label>
+              <input id="atr-camp-id" className="form-control" placeholder="12345678"
+                value={campaignId} onChange={(e) => setCampaignId(e.target.value)} />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">Campaign ID (plataforma) *</label>
-              <input value={campaignId} onChange={e => setCampaignId(e.target.value)} placeholder="12345678"
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre (opcional)</label>
-              <input value={campaignName} onChange={e => setCampaignName(e.target.value)} placeholder="Captación verano"
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
+          <div className="col-sm-6">
+            <div className="form-group mb-3">
+              <label htmlFor="atr-camp-nombre" className="text-black font-w600">Nombre (opcional)</label>
+              <input id="atr-camp-nombre" className="form-control" placeholder="Captación verano"
+                value={campaignName} onChange={(e) => setCampaignName(e.target.value)} />
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-3">
-            <div>
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">utm_campaign *</label>
-              <input value={utmCampaign} onChange={e => setUtmCampaign(e.target.value)} placeholder="verano_2026"
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">utm_source</label>
-              <input value={utmSource} onChange={e => setUtmSource(e.target.value)} placeholder="meta"
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">utm_medium</label>
-              <input value={utmMedium} onChange={e => setUtmMedium(e.target.value)} placeholder="cpc"
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
+          <div className="col-sm-4">
+            <div className="form-group mb-3">
+              <label htmlFor="atr-utm-camp" className="text-black font-w600">
+                utm_campaign <span className="required">*</span>
+              </label>
+              <input id="atr-utm-camp" className="form-control" placeholder="verano_2026"
+                value={utmCampaign} onChange={(e) => setUtmCampaign(e.target.value)} />
             </div>
           </div>
-          <div className="flex gap-3 pt-1">
-            <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
-            <NelvyonDsButton type="submit" disabled={saving} className="flex-1">{saving ? "Vinculando…" : "Vincular campaña"}</NelvyonDsButton>
+          <div className="col-sm-4">
+            <div className="form-group mb-3">
+              <label htmlFor="atr-utm-source" className="text-black font-w600">utm_source</label>
+              <input id="atr-utm-source" className="form-control" placeholder="meta"
+                value={utmSource} onChange={(e) => setUtmSource(e.target.value)} />
+            </div>
           </div>
-        </form>
-      </div>
-    </div>
+          <div className="col-sm-4">
+            <div className="form-group mb-3">
+              <label htmlFor="atr-utm-medium" className="text-black font-w600">utm_medium</label>
+              <input id="atr-utm-medium" className="form-control" placeholder="cpc"
+                value={utmMedium} onChange={(e) => setUtmMedium(e.target.value)} />
+            </div>
+          </div>
+        </div>
+        <div className="text-end">
+          <button type="button" className="btn btn-primary light me-2" onClick={onClose}>Cancelar</button>
+          <button type="submit" className="btn btn-primary" disabled={saving}>
+            {saving ? "Vinculando…" : "Vincular campaña"}
+          </button>
+        </div>
+      </form>
+    </W3crmModal>
   );
 }
 
@@ -569,11 +674,12 @@ function AttributionTab() {
     lastFetch.current = key;
     setLoading(true); setError(null);
     fetch(`/api/saas/ads/attribution?resource=roas&model=${model}&days=${days}`)
-      .then(r => r.json() as Promise<{ roas?: AttributedRoasRow[]; error?: string }>)
-      .then(d => {
+      .then((r) => r.json() as Promise<{ roas?: AttributedRoasRow[]; error?: string }>)
+      .then((d) => {
+        // Guardia contra respuestas fuera de orden.
         if (lastFetch.current !== key) return;
-        if (d.error) setError(d.error);
-        else setRows(d.roas ?? []);
+        if (d?.error) setError(d.error);
+        else setRows(Array.isArray(d?.roas) ? d.roas : []);
       })
       .catch(() => setError("Error de red"))
       .finally(() => setLoading(false));
@@ -582,93 +688,98 @@ function AttributionTab() {
   useEffect(() => { void load(); }, [load]);
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div>
-            <label className="mb-1 block text-xs text-muted-foreground">Modelo</label>
-            <select value={model} onChange={e => setModel(e.target.value as AdsAttributionModel)}
-              className="rounded-lg border border-border bg-card px-3 py-1.5 text-sm text-foreground focus:border-primary focus:outline-none">
-              {(Object.entries(MODEL_LABELS) as [AdsAttributionModel, string][]).map(([v, l]) => (
-                <option key={v} value={v}>{l}</option>
-              ))}
-            </select>
+    <>
+      <W3crmContentBox
+        titulo="ROAS atribuido"
+        icono="fa-solid fa-diagram-project"
+        acciones={
+          <button type="button" className="btn btn-primary btn-sm me-2" onClick={() => setShowLink(true)}>
+            + Vincular campaña
+          </button>
+        }
+      >
+        <div className="row">
+          <div className="col-sm-4">
+            <div className="form-group mb-3">
+              <label htmlFor="atr-modelo" className="text-black font-w600">Modelo</label>
+              <select id="atr-modelo" className="form-control" value={model}
+                onChange={(e) => setModel(e.target.value as AdsAttributionModel)}>
+                {Object.entries(MODEL_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+              </select>
+            </div>
           </div>
-          <div>
-            <label className="mb-1 block text-xs text-muted-foreground">Ventana</label>
-            <select value={days} onChange={e => setDays(Number(e.target.value))}
-              className="rounded-lg border border-border bg-card px-3 py-1.5 text-sm text-foreground focus:border-primary focus:outline-none">
-              <option value={7}>7 días</option>
-              <option value={30}>30 días</option>
-              <option value={90}>90 días</option>
-            </select>
+          <div className="col-sm-4">
+            <div className="form-group mb-3">
+              <label htmlFor="atr-ventana" className="text-black font-w600">Ventana</label>
+              <select id="atr-ventana" className="form-control" value={days}
+                onChange={(e) => setDays(Number(e.target.value))}>
+                <option value={7}>7 días</option>
+                <option value={30}>30 días</option>
+                <option value={90}>90 días</option>
+              </select>
+            </div>
           </div>
         </div>
-        <NelvyonDsButton size="sm" onClick={() => setShowLink(true)}>+ Vincular campaña</NelvyonDsButton>
-      </div>
 
-      {loading ? (
-        <div className="flex flex-col gap-2">{[1,2,3].map(i => <div key={i} className="h-12 animate-pulse rounded-xl bg-muted/30"/>)}</div>
-      ) : error ? (
-        <p className="text-sm text-destructive">{error}</p>
-      ) : rows.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-border p-12 text-center">
-          <p className="text-4xl mb-3">🔗</p>
-          <p className="text-sm font-medium text-foreground">Sin campañas vinculadas</p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Vincula una campaña de Ads con su <code className="text-primary">utm_campaign</code> para calcular ROAS atribuido.
-          </p>
-          <NelvyonDsButton size="sm" className="mt-4" onClick={() => setShowLink(true)}>+ Vincular primera campaña</NelvyonDsButton>
-        </div>
-      ) : (
-        <div className="overflow-x-auto rounded-xl border border-border">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border">
-                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Campaña</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Plataforma</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">UTM Campaign</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground">Gasto</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground">Conv. atrib.</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground">ROAS atrib.</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map(r => (
-                <tr key={r.link.id} className="border-b border-border/50 hover:bg-muted/20 transition-colors">
-                  <td className="px-4 py-3 text-foreground font-medium">
-                    {r.link.externalCampaignName ?? r.link.externalCampaignId}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className="text-xs font-medium text-muted-foreground uppercase">{r.link.platform}</span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <code className="text-xs text-primary">{r.link.utmCampaign}</code>
-                  </td>
-                  <td className="px-4 py-3 text-right text-foreground">{r.spend > 0 ? eur(r.spend) : "—"}</td>
-                  <td className="px-4 py-3 text-right text-foreground">{r.attributedConversions > 0 ? fmt(r.attributedConversions) : "—"}</td>
-                  <td className="px-4 py-3 text-right">
-                    {r.attributedRoas != null ? (
-                      <span className={r.attributedRoas >= 2 ? "font-semibold text-success" : r.attributedRoas >= 1 ? "text-warning" : "text-destructive"}>
-                        {r.attributedRoas.toFixed(2)}x
+        {loading ? (
+          <W3crmCargando texto="Calculando atribución…" />
+        ) : error ? (
+          <div className="alert alert-danger py-2 fs-14 mb-0" role="alert">{error}</div>
+        ) : rows.length === 0 ? (
+          // Texto de contrato: `getByText("Sin campañas vinculadas")`.
+          <W3crmEmptyState
+            title="Sin campañas vinculadas"
+            description="Vincula una campaña de Ads con su utm_campaign para calcular ROAS atribuido."
+          />
+        ) : (
+          <>
+            <W3crmDataTable
+              filas={rows}
+              etiqueta="campañas"
+              wrapperId="ads_attribution_wrapper"
+              porPagina={10}
+              reiniciarEn={`${model}-${days}`}
+              columnas={[
+                { titulo: "Campaña" },
+                { titulo: "Plataforma" },
+                { titulo: "UTM Campaign" },
+                { titulo: "Gasto" },
+                { titulo: "Conv. atrib." },
+                { titulo: "ROAS atrib.", alFinal: true },
+              ]}
+              render={(r) => {
+                // `link` podía faltar entero y reventaba todos los accesos.
+                const link = r.link ?? ({} as AdsCampaignLink);
+                const gasto = num(r.spend);
+                const conv = num(r.attributedConversions);
+                const roas = opt(r.attributedRoas);
+                return (
+                  <tr key={link.id ?? `${link.externalCampaignId}-${link.utmCampaign}`}>
+                    <td>
+                      <span className="fw-bold">
+                        {link.externalCampaignName ?? link.externalCampaignId ?? "—"}
                       </span>
-                    ) : <span className="text-muted-foreground">—</span>}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <div className="px-4 py-2 border-t border-border/50">
-            <p className="text-xs text-muted-foreground">
-              Modelo: <strong className="text-foreground">{MODEL_LABELS[model]}</strong> · Ventana: {days} días ·
-              Spend de métricas en caché · Conversiones de <code className="text-primary">saas_lead_attribution</code>
+                    </td>
+                    <td className="text-muted text-uppercase fs-12">{link.platform || "—"}</td>
+                    <td><code className="fs-12">{link.utmCampaign || "—"}</code></td>
+                    <td>{gasto > 0 ? eur(gasto) : "—"}</td>
+                    <td>{conv > 0 ? fmt(conv) : "—"}</td>
+                    <td className="text-end">
+                      {roas != null ? <span className={roasClass(roas)}>{roas.toFixed(2)}x</span> : "—"}
+                    </td>
+                  </tr>
+                );
+              }}
+            />
+            <p className="fs-12 text-muted mb-0">
+              Modelo: <strong>{MODEL_LABELS[model] ?? model}</strong> · Ventana: {days} días · Spend de
+              métricas en caché · Conversiones de <code>saas_lead_attribution</code>
             </p>
-          </div>
-        </div>
-      )}
-
+          </>
+        )}
+      </W3crmContentBox>
       {showLink && <LinkCampaignModal onClose={() => setShowLink(false)} onSaved={load} />}
-    </div>
+    </>
   );
 }
 
@@ -687,8 +798,8 @@ export default function SaasPublicidadPage() {
     try {
       const res = await fetch("/api/saas/ads");
       if (res.ok) {
-        const d = (await res.json()) as { status?: AdsStatusResult[] };
-        setStatus(d.status ?? []);
+        const d = (await res.json().catch(() => ({}))) as { status?: AdsStatusResult[] };
+        setStatus(Array.isArray(d.status) ? d.status : []);
       } else setStatus([]);
     } catch { setStatus([]); }
     finally { setLoading(false); }
@@ -696,84 +807,107 @@ export default function SaasPublicidadPage() {
 
   useEffect(() => { void load(); }, [load]);
 
-  const connected = status.filter(s => s.connected);
-  const disconnected = status.filter(s => !s.connected);
+  const connected = status.filter((s) => s.connected);
+  const disconnected = status.filter((s) => !s.connected);
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="publicidad" />}>
-      <div className="flex flex-col gap-6 pb-8">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <NelvyonDsSectionHeader
-            title="Publicidad Digital"
-            subtitle="Metricas reales de Google, Meta, LinkedIn y TikTok Ads"
-          />
-          <NelvyonDsButton onClick={() => setShowConnect(true)}>+ Conectar plataforma</NelvyonDsButton>
-        </div>
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="Publicidad Digital" parentTitle="Captación" pageTitle="Publicidad" />
+      <div className="container-fluid">
+        <div className="row">
+          <div className="col-xl-12">
+            <p className="fs-14 text-muted">Metricas reales de Google, Meta, LinkedIn y TikTok Ads</p>
 
-        {!loading && connected.length === 0 && (
-          <SaasDegradedBanner reason="oauth_not_configured">
-            Conecta Meta, Google, LinkedIn o TikTok Ads en Integraciones para métricas y campañas en vivo.
-            Sin OAuth configurado, las métricas y campañas no se sincronizan.
-          </SaasDegradedBanner>
-        )}
-
-        {/* Tabs */}
-        <div className="flex gap-1 rounded-xl border border-border bg-card/50 p-1 w-fit">
-          {([["metricas", "Métricas y campañas"], ["atribucion", "Atribución multi-touch"]] as [PublicidadTab, string][]).map(([id, label]) => (
-            <button key={id} onClick={() => setTab(id)}
-              className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${tab === id ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
-              {label}
-            </button>
-          ))}
-        </div>
-
-        {tab === "atribucion" ? (
-          <AttributionTab />
-        ) : loading ? (
-          <div className="flex flex-col gap-3">{[1, 2, 3].map(i => <div key={i} className="h-28 animate-pulse rounded-xl bg-muted/30" />)}</div>
-        ) : connected.length === 0 ? (
-          <NelvyonDsCard className="p-16 text-center">
-            <p className="text-5xl">📢</p>
-            <p className="mt-4 text-lg font-semibold text-foreground">Sin plataformas conectadas</p>
-            <p className="mt-2 text-sm text-muted-foreground">Conecta tu cuenta de Meta, Google, LinkedIn o TikTok para ver metricas reales aqui</p>
-            <NelvyonDsButton className="mt-5" onClick={() => setShowConnect(true)}>+ Conectar plataforma</NelvyonDsButton>
-          </NelvyonDsCard>
-        ) : (
-          <>
-            <div className="flex flex-col gap-3">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Ultimos 30 dias</p>
-              {connected.map(s => (
-                <div key={s.platform} className="flex flex-col gap-3">
-                  <MetricsCard platform={s.platform} dateStart={dateStart} dateEnd={dateEnd} />
-                  <CampaignsSection platform={s.platform} />
-                </div>
-              ))}
-            </div>
-            {disconnected.length > 0 && (
-              <div className="flex flex-col gap-2">
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">No conectadas</p>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {disconnected.map(s => {
-                    const cfg = PLATFORM_CFG[s.platform];
-                    return (
-                      <NelvyonDsCard key={s.platform} className="flex items-center gap-4 p-4 opacity-60">
-                        <span className="text-2xl">{cfg.icon}</span>
-                        <div className="flex-1">
-                          <p className="font-medium text-foreground">{cfg.label}</p>
-                          <p className="text-xs text-muted-foreground">No conectada</p>
-                        </div>
-                        <NelvyonDsButton variant="ghost" className="text-xs" onClick={() => setShowConnect(true)}>Conectar</NelvyonDsButton>
-                      </NelvyonDsCard>
-                    );
-                  })}
-                </div>
+            {!loading && connected.length === 0 && (
+              <div className="alert alert-warning" role="alert">
+                Conecta Meta, Google, LinkedIn o TikTok Ads en Integraciones para métricas y campañas en
+                vivo. Sin OAuth configurado, las métricas y campañas no se sincronizan.
               </div>
             )}
-          </>
-        )}
 
-        {showConnect && <ConnectModal onClose={() => setShowConnect(false)} onSaved={load} />}
+            {/* Pestañas: `<button>` sin `role`, para que sigan siendo
+                localizables con `getByRole("button", …)`. Los dos rótulos son
+                contrato literal. */}
+            <ul className="nav nav-tabs mb-3">
+              {([["metricas", "Métricas y campañas"], ["atribucion", "Atribución multi-touch"]] as [PublicidadTab, string][])
+                .map(([id, label]) => (
+                  <li className="nav-item" key={id}>
+                    <button type="button" className={`nav-link ${tab === id ? "active" : ""}`}
+                      aria-pressed={tab === id} onClick={() => setTab(id)}>
+                      {label}
+                    </button>
+                  </li>
+                ))}
+            </ul>
+
+            {tab === "atribucion" ? (
+              <AttributionTab />
+            ) : loading ? (
+              <W3crmContentBox titulo="Rendimiento por plataforma" icono="fa-solid fa-chart-column">
+                <W3crmCargando texto="Cargando plataformas…" />
+              </W3crmContentBox>
+            ) : connected.length === 0 ? (
+              <W3crmContentBox
+                titulo="Rendimiento por plataforma"
+                icono="fa-solid fa-chart-column"
+                acciones={
+                  <button type="button" className="btn btn-primary btn-sm me-2" onClick={() => setShowConnect(true)}>
+                    + Conectar plataforma
+                  </button>
+                }
+              >
+                <W3crmEmptyState
+                  title="Sin plataformas conectadas"
+                  description="Conecta tu cuenta de Meta, Google, LinkedIn o TikTok para ver metricas reales aqui."
+                />
+              </W3crmContentBox>
+            ) : (
+              <>
+                <div className="d-flex align-items-center justify-content-between mb-2">
+                  <span className="text-muted fs-12 text-uppercase">Ultimos 30 dias</span>
+                  <button type="button" className="btn btn-primary btn-sm" onClick={() => setShowConnect(true)}>
+                    + Conectar plataforma
+                  </button>
+                </div>
+                {connected.map((s) => (
+                  <div key={s.platform}>
+                    <MetricsCard platform={s.platform} dateStart={dateStart} dateEnd={dateEnd} />
+                    <CampaignsSection platform={s.platform} />
+                  </div>
+                ))}
+                {disconnected.length > 0 && (
+                  <W3crmContentBox titulo="Plataformas no conectadas" icono="fa-solid fa-plug-circle-xmark">
+                    <div className="row">
+                      {disconnected.map((s) => {
+                        const cfg = cfgOf(s.platform);
+                        return (
+                          <div className="col-xl-6" key={s.platform}>
+                            <div className="card border mb-3">
+                              <div className="card-body d-flex align-items-center gap-3">
+                                <i className={`${cfg.icon} fa-lg text-primary`} aria-hidden="true" />
+                                <div className="flex-grow-1">
+                                  <span className="fw-bold d-block">{cfg.label}</span>
+                                  <span className="text-muted fs-12">No conectada</span>
+                                </div>
+                                <button type="button" className="btn btn-primary light btn-sm"
+                                  aria-label={`Conectar ${cfg.label}`} onClick={() => setShowConnect(true)}>
+                                  Conectar
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </W3crmContentBox>
+                )}
+              </>
+            )}
+          </div>
+        </div>
       </div>
-    </SaasShellLayout>
+
+      {showConnect && <ConnectModal onClose={() => setShowConnect(false)} onSaved={load} />}
+    </SaasW3crmShell>
   );
 }

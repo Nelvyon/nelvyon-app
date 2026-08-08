@@ -1,9 +1,19 @@
 "use client";
 
+/**
+ * /saas/qr sobre `(cms)/content` de W3CRM, con las piezas ya portadas
+ * (`W3crmContentBox`, `W3crmDataTable`, `W3crmModal`, `W3crmKpiTile`).
+ *
+ * Logica de NELVYON intacta: `GET /api/saas/surveys?type=qr`, el `POST` con
+ * `resourceType: "qr"`, el tipo `QrCode`, el catalogo `QR_COLORS`, `QRCanvas`
+ * (QR real via api.qrserver.com) y `load` con su manejo de error.
+ */
 import { useCallback, useEffect, useState } from "react";
-import { NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmEmptyState, W3crmKpiTile } from "@/features/saas-w3crm/components/W3crmUi";
+import { W3crmCargando, W3crmContentBox, W3crmDataTable, W3crmModal } from "@/features/saas-w3crm/components/W3crmContentBox";
 
 interface QrCode {
   id: string;
@@ -18,19 +28,19 @@ interface QrCode {
 
 const QR_COLORS = ["#6366f1", "#10b981", "#f59e0b", "#ef4444", "#3b82f6", "#ec4899", "#000000"];
 
+function num(v: unknown): number {
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+
 function QRCanvas({ url, color, size = 180 }: { url: string; color: string; size?: number }) {
-  // Real scannable QR via QR Server (no fake hash pattern). Color as hex without '#'.
-  const fg = color.replace("#", "");
+  // QR real via QR Server (no un patron falso). Color en hex sin '#'.
+  const fg = (color || "#000000").replace("#", "");
   const src = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(url)}&color=${fg}&bgcolor=ffffff&margin=8`;
-  return (
-    <img
-      src={src}
-      alt={`Código QR para ${url}`}
-      width={size}
-      height={size}
-      className="rounded-lg border border-border bg-white"
-    />
-  );
+  // `<img>` directo: el QR lo genera un servicio externo y `next/image` no
+  // aporta nada aqui (no hay optimizacion posible sobre un PNG remoto ya
+  // dimensionado). Era asi antes de la migracion.
+  return <img src={src} alt={`Código QR para ${url}`} width={size} height={size} className="rounded border bg-white" />;
 }
 
 function CreateQRModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
@@ -62,49 +72,45 @@ function CreateQRModal({ onClose, onSaved }: { onClose: () => void; onSaved: () 
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm">
-      <div className="my-8 w-full max-w-lg rounded-2xl border border-border bg-card shadow-2xl">
-        <div className="flex items-center justify-between border-b border-border px-6 py-4">
-          <h2 className="text-lg font-semibold text-foreground">Nuevo codigo QR</h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">x</button>
+    <W3crmModal titulo="Nuevo código QR" onClose={onClose} error={error} testId="modal-qr">
+      <form onSubmit={save}>
+        <div className="row">
+          <div className="col-lg-8">
+            <div className="form-group mb-3">
+              <label htmlFor="qr-nombre" className="text-black font-w600">Nombre <span className="required">*</span></label>
+              <input id="qr-nombre" type="text" className="form-control" placeholder="Ej: Menú Restaurante"
+                value={name} onChange={(e) => setName(e.target.value)} />
+            </div>
+            <div className="form-group mb-3">
+              <label htmlFor="qr-url" className="text-black font-w600">URL de destino <span className="required">*</span></label>
+              <input id="qr-url" type="text" className="form-control" placeholder="https://tu-web.com/pagina"
+                value={url} onChange={(e) => setUrl(e.target.value)} />
+            </div>
+            <div className="form-group mb-3">
+              <label className="text-black font-w600 d-block">Color</label>
+              {QR_COLORS.map((c) => (
+                <button key={c} type="button" onClick={() => setColor(c)}
+                  aria-label={`Color ${c}`} aria-pressed={color === c}
+                  className={`btn btn-sm me-1 ${color === c ? "border border-dark" : ""}`}
+                  style={{ backgroundColor: c, width: 28, height: 28 }} />
+              ))}
+            </div>
+          </div>
+          <div className="col-lg-4 text-center">
+            <p className="fs-12 text-muted mb-2">Vista previa</p>
+            <QRCanvas url={preview} color={color} size={140} />
+          </div>
+          <div className="col-lg-12">
+            <div className="text-end">
+              <button type="button" className="btn btn-danger light me-2" onClick={onClose}>Cancelar</button>
+              <button type="submit" className="btn btn-primary" disabled={saving || !name || !url}>
+                {saving ? "Creando…" : "Crear QR"}
+              </button>
+            </div>
+          </div>
         </div>
-        <form onSubmit={save} className="p-6">
-          {error && <p className="mb-4 rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive" role="alert">{error}</p>}
-          <div className="flex gap-6">
-            <div className="flex-1 space-y-4">
-              <div>
-                <label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre *</label>
-                <input value={name} onChange={e => setName(e.target.value)} placeholder="Ej: Menu Restaurante"
-                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-medium text-muted-foreground">URL de destino *</label>
-                <input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://tu-web.com/pagina"
-                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
-              </div>
-              <div>
-                <label className="mb-2 block text-xs font-medium text-muted-foreground">Color</label>
-                <div className="flex gap-2 flex-wrap">
-                  {QR_COLORS.map(c => (
-                    <button key={c} type="button" onClick={() => setColor(c)}
-                      className={`h-7 w-7 rounded-full border-2 transition-transform ${color === c ? "scale-125 border-white" : "border-transparent"}`}
-                      style={{ backgroundColor: c }} />
-                  ))}
-                </div>
-              </div>
-            </div>
-            <div className="shrink-0">
-              <p className="mb-2 text-xs font-medium text-muted-foreground text-center">Vista previa</p>
-              <QRCanvas url={preview} color={color} size={140} />
-            </div>
-          </div>
-          <div className="mt-5 flex gap-3">
-            <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
-            <NelvyonDsButton type="submit" disabled={saving || !name || !url} className="flex-1">{saving ? "Creando..." : "Crear QR"}</NelvyonDsButton>
-          </div>
-        </form>
-      </div>
-    </div>
+      </form>
+    </W3crmModal>
   );
 }
 
@@ -123,8 +129,8 @@ export default function SaasQrPage() {
         const d = (await res.json().catch(() => ({}))) as { error?: string };
         throw new Error(d.error ?? `HTTP ${res.status}`);
       }
-      const d = (await res.json()) as { qrCodes?: QrCode[] };
-      setQrs(d.qrCodes ?? []);
+      const d = (await res.json().catch(() => ({}))) as { qrCodes?: QrCode[] };
+      setQrs(Array.isArray(d.qrCodes) ? d.qrCodes : []);
     } catch (e) {
       setQrs([]);
       setLoadError(e instanceof Error ? e.message : "Error al cargar");
@@ -136,64 +142,62 @@ export default function SaasQrPage() {
   useEffect(() => { void load(); }, [load]);
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="qr" />}>
-      <div className="flex flex-col gap-6 pb-8">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <NelvyonDsSectionHeader title="Codigos QR" subtitle="Genera QR personalizados con tu marca para campanas fisicas y digitales" />
-          <NelvyonDsButton onClick={() => setShowModal(true)}>+ Nuevo QR</NelvyonDsButton>
-        </div>
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="Códigos QR" parentTitle="Gestión" pageTitle="Códigos QR" />
+      <div className="container-fluid">
+        <div className="row">
+          {loadError && (
+            <div className="col-xl-12">
+              <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                {loadError}
+                <button type="button" className="btn-close" aria-label="Cerrar" onClick={() => setLoadError(null)} />
+              </div>
+            </div>
+          )}
+          <div className="col-xl-4 col-sm-6"><W3crmKpiTile label="QRs creados" value={qrs.length} accent /></div>
+          <div className="col-xl-4 col-sm-6"><W3crmKpiTile label="Escaneos totales" value={qrs.reduce((s, q) => s + num(q.scans), 0).toLocaleString("es-ES")} /></div>
+          <div className="col-xl-4 col-sm-6"><W3crmKpiTile label="Con actividad" value={qrs.filter((q) => num(q.scans) > 0).length} /></div>
 
-        {loadError && (
-          <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm text-destructive" role="alert">
-            {loadError}
-          </p>
-        )}
+          <div className="col-xl-12">
+            <div className="mb-3">
+              <ul className="d-flex align-items-center flex-wrap">
+                <li>
+                  <button type="button" className="btn btn-primary" onClick={() => setShowModal(true)}>+ Nuevo QR</button>
+                </li>
+              </ul>
+            </div>
 
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { label: "QRs creados", value: qrs.length },
-            { label: "Escaneos totales", value: qrs.reduce((s, q) => s + q.scans, 0).toLocaleString("es-ES") },
-            { label: "Con actividad", value: qrs.filter(q => q.scans > 0).length },
-          ].map(({ label, value }) => (
-            <NelvyonDsCard key={label} className="p-4">
-              <p className="text-xs text-muted-foreground">{label}</p>
-              <p className="mt-1 text-2xl font-bold text-foreground">{value}</p>
-            </NelvyonDsCard>
-          ))}
-        </div>
-
-        {loading ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map(i => <div key={i} className="h-64 animate-pulse rounded-xl bg-muted/30" />)}
+            <W3crmContentBox titulo="Códigos QR" icono="fa-solid fa-qrcode">
+              {loading ? (
+                <W3crmCargando texto="Cargando códigos QR…" />
+              ) : qrs.length === 0 ? (
+                <W3crmEmptyState title="Sin códigos QR" description="Crea tu primer QR para empezar a rastrear escaneos." />
+              ) : (
+                <W3crmDataTable
+                  filas={qrs}
+                  etiqueta="códigos"
+                  columnas={[{ titulo: "QR" }, { titulo: "Nombre" }, { titulo: "Destino" }, { titulo: "Escaneos" }, { titulo: "Último escaneo", alFinal: true }]}
+                  render={(qr) => (
+                    <tr key={qr.id}>
+                      <td><QRCanvas url={qr.destinationUrl} color={qr.color} size={64} /></td>
+                      <td><span className="fw-bold">{qr.name || "—"}</span></td>
+                      <td><span className="text-muted fs-12">{qr.destinationUrl || "—"}</span></td>
+                      <td>{num(qr.scans).toLocaleString("es-ES")}</td>
+                      <td className="text-end">
+                        {qr.lastScannedAt && !Number.isNaN(new Date(qr.lastScannedAt).getTime())
+                          ? new Date(qr.lastScannedAt).toLocaleDateString("es-ES")
+                          : "—"}
+                      </td>
+                    </tr>
+                  )}
+                />
+              )}
+            </W3crmContentBox>
           </div>
-        ) : qrs.length === 0 ? (
-          <NelvyonDsCard className="p-16 text-center">
-            <p className="text-5xl">📱</p>
-            <p className="mt-4 text-lg font-semibold text-foreground">Sin codigos QR</p>
-            <p className="mt-2 text-sm text-muted-foreground">Crea tu primer QR para empezar a rastrear escaneos</p>
-            <NelvyonDsButton className="mt-5" onClick={() => setShowModal(true)}>+ Nuevo QR</NelvyonDsButton>
-          </NelvyonDsCard>
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {qrs.map(qr => (
-              <NelvyonDsCard key={qr.id} className="flex flex-col items-center p-5 text-center gap-4 hover:border-primary/30 transition-colors">
-                <QRCanvas url={qr.destinationUrl} color={qr.color} size={160} />
-                <div>
-                  <p className="font-semibold text-foreground">{qr.name}</p>
-                  <p className="mt-0.5 text-xs text-muted-foreground truncate max-w-48">{qr.destinationUrl}</p>
-                  <p className="mt-2 text-lg font-bold text-foreground">{qr.scans.toLocaleString("es-ES")} <span className="text-sm font-normal text-muted-foreground">escaneos</span></p>
-                </div>
-              </NelvyonDsCard>
-            ))}
-            <NelvyonDsCard className="flex flex-col items-center justify-center p-5 text-center border-dashed min-h-64 hover:border-primary/50 transition-colors cursor-pointer" onClick={() => setShowModal(true)}>
-              <p className="text-4xl text-muted-foreground">+</p>
-              <p className="mt-2 text-sm font-medium text-muted-foreground">Nuevo codigo QR</p>
-            </NelvyonDsCard>
-          </div>
-        )}
-
-        {showModal && <CreateQRModal onClose={() => setShowModal(false)} onSaved={load} />}
+        </div>
       </div>
-    </SaasShellLayout>
+
+      {showModal && <CreateQRModal onClose={() => setShowModal(false)} onSaved={load} />}
+    </SaasW3crmShell>
   );
 }

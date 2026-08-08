@@ -2,7 +2,7 @@
  * S48 — E2E: Revenue per Deliverable
  */
 import { expect, test } from "@playwright/test";
-import { setupAuthedSaas, mockEntregablesList, mockEntregablesRevenue, gotoAwaitingApi } from "./fixtures";
+import { setupAuthedSaas, mockEntregablesList, mockEntregablesRevenue, gotoAwaitingApi, waitForStreamSettled } from "./fixtures";
 
 const FIXTURE_ENTREGABLES = {
   deliverables: [
@@ -102,6 +102,7 @@ test.describe("S48 — Reportes revenue section", () => {
 
   test("Revenue por entregable section visible in /saas/reportes", async ({ page }) => {
     await page.goto("/saas/reportes", { waitUntil: "domcontentloaded" });
+    await waitForStreamSettled(page);
     await expect(page.getByText(/Revenue por entregable/i)).toBeVisible({ timeout: 15_000 });
   });
 

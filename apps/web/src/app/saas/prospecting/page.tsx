@@ -1,53 +1,62 @@
 "use client";
 
+/**
+ * /saas/prospecting sobre `(cms)/content` de W3CRM, con las piezas ya portadas.
+ * Las dos pestanas (listas / nueva busqueda) usan el `nav nav-tabs` de la
+ * plantilla; la barra de enriquecimiento usa su `progress` de Bootstrap.
+ *
+ * Logica de NELVYON intacta: `GET /api/saas/prospecting` (con su bandera
+ * `configured` y su mensaje), `GET ?listId=`, `POST
+ * /api/saas/prospecting/search` y `POST /api/saas/prospecting/sync`; los tipos
+ * `ProspectFilter`, `Prospect` y `ProspectingList`, `STATUS_CONFIG`,
+ * `INDUSTRIES`, `COUNTRIES`, la carga perezosa de prospectos al seleccionar
+ * lista y `addToCrm` individual y masivo.
+ */
 import { useCallback, useEffect, useState } from "react";
-import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmAvatar, W3crmEmptyState, W3crmKpiTile } from "@/features/saas-w3crm/components/W3crmUi";
+import { W3crmCargando, W3crmContentBox, W3crmDataTable } from "@/features/saas-w3crm/components/W3crmContentBox";
 
 interface ProspectFilter {
-  industry: string;
-  country: string;
-  minEmployees: number;
-  maxEmployees: number;
-  jobTitle: string;
-  keywords: string;
+  industry: string; country: string; minEmployees: number; maxEmployees: number;
+  jobTitle: string; keywords: string;
 }
 
 interface Prospect {
-  id: string;
-  name: string;
-  title: string;
-  company: string;
-  industry: string;
-  country: string;
-  employees: number;
-  email: string | null;
-  linkedinUrl: string | null;
-  phone: string | null;
-  enriched: boolean;
-  addedToCrm: boolean;
+  id: string; name: string; title: string; company: string; industry: string;
+  country: string; employees: number; email: string | null; linkedinUrl: string | null;
+  phone: string | null; enriched: boolean; addedToCrm: boolean;
 }
 
 interface ProspectingList {
-  id: string;
-  name: string;
-  filter: ProspectFilter;
-  prospects: number;
-  enriched: number;
-  createdAt: string;
-  status: "running" | "done" | "paused";
+  id: string; name: string; filter: ProspectFilter; prospects: number;
+  enriched: number; createdAt: string; status: "running" | "done" | "paused";
 }
 
-
-const STATUS_CONFIG: Record<ProspectingList["status"], { label: string; tone: "primary" | "success" | "warning"; icon: string }> = {
-  running: { label: "Buscando…", tone: "warning", icon: "⟳" },
-  done: { label: "Completada", tone: "success", icon: "✓" },
-  paused: { label: "Pausada", tone: "primary", icon: "‖" },
+const STATUS_CONFIG: Record<ProspectingList["status"], { label: string; badge: string; icon: string }> = {
+  running: { label: "Buscando…", badge: "badge-warning", icon: "⟳" },
+  done: { label: "Completada", badge: "badge-success", icon: "✓" },
+  paused: { label: "Pausada", badge: "badge-primary", icon: "‖" },
 };
 
 const INDUSTRIES = ["Todos", "Tecnología", "Marketing", "Retail", "Finanzas", "Salud", "Educación", "Inmobiliaria", "Turismo"];
 const COUNTRIES = ["Todos", "ES", "MX", "AR", "CO", "US", "UK"];
+
+/** Estado fuera de catalogo -> badge neutro con la etiqueta cruda. */
+function estadoDe(s: ProspectingList["status"] | string) {
+  return STATUS_CONFIG[s as ProspectingList["status"]] ?? { label: String(s || "—"), badge: "badge-secondary", icon: "•" };
+}
+function num(v: unknown): number {
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+/** El filtro puede llegar ausente en listas antiguas. */
+const FILTRO_VACIO: ProspectFilter = { industry: "Todos", country: "Todos", minEmployees: 0, maxEmployees: 0, jobTitle: "", keywords: "" };
+function filtroDe(f: ProspectFilter | null | undefined): ProspectFilter {
+  return f ?? FILTRO_VACIO;
+}
 
 export default function SaasProspectingPage() {
   const [lists, setLists] = useState<ProspectingList[]>([]);
@@ -70,10 +79,7 @@ export default function SaasProspectingPage() {
     try {
       const res = await fetch("/api/saas/prospecting");
       const d = (await res.json().catch(() => ({}))) as {
-        lists?: ProspectingList[];
-        configured?: boolean;
-        message?: string;
-        error?: string;
+        lists?: ProspectingList[]; configured?: boolean; message?: string; error?: string;
       };
       if (!res.ok) {
         setConfigured(false);
@@ -83,7 +89,7 @@ export default function SaasProspectingPage() {
       }
       setConfigured(d.configured ?? false);
       setConfigMessage(d.message ?? null);
-      setLists(d.lists ?? []);
+      setLists(Array.isArray(d.lists) ? d.lists : []);
     } catch (err) {
       setLists([]);
       setConfigured(false);
@@ -101,8 +107,8 @@ export default function SaasProspectingPage() {
         const d = (await res.json().catch(() => null)) as { message?: string; error?: string } | null;
         throw new Error(d?.message ?? d?.error ?? `Error ${res.status}`);
       }
-      const d = (await res.json()) as { prospects?: Prospect[] };
-      setProspects(d.prospects ?? []);
+      const d = (await res.json().catch(() => ({}))) as { prospects?: Prospect[] };
+      setProspects(Array.isArray(d.prospects) ? d.prospects : []);
     } catch (err) {
       setProspects([]);
       setActionError(err instanceof Error ? err.message : "Error al cargar prospectos");
@@ -130,8 +136,8 @@ export default function SaasProspectingPage() {
         const d = (await res.json().catch(() => null)) as { message?: string; error?: string } | null;
         throw new Error(d?.message ?? d?.error ?? `Error ${res.status}`);
       }
-      const d = (await res.json()) as { prospects?: Prospect[]; list?: ProspectingList };
-      setProspects(d.prospects ?? []);
+      const d = (await res.json().catch(() => ({}))) as { prospects?: Prospect[]; list?: ProspectingList };
+      setProspects(Array.isArray(d.prospects) ? d.prospects : []);
       if (d.list) {
         setSelectedList(d.list.id);
         setLists((prev) => [d.list!, ...prev.filter((l) => l.id !== d.list!.id)]);
@@ -169,233 +175,235 @@ export default function SaasProspectingPage() {
     }
   }
 
-  return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="prospecting" />}>
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <NelvyonDsSectionHeader title="Prospección" subtitle="Encuentra y enriquece contactos B2B para tus campañas outbound" />
+  /** Tabla de prospectos, compartida por las dos pestañas. */
+  const tablaProspectos = (
+    <W3crmDataTable
+      filas={prospects}
+      etiqueta="prospectos"
+      porPagina={10}
+      columnas={[{ titulo: "Contacto" }, { titulo: "Empresa" }, { titulo: "Email" }, { titulo: "Teléfono" }, { titulo: "LinkedIn" }, { titulo: "Estado" }, { titulo: "Acciones", alFinal: true }]}
+      render={(p) => (
+        <tr key={p.id}>
+          <td>
+            <div className="d-flex align-items-center">
+              <W3crmAvatar seed={p.id} label={p.name} />
+              <div className="ms-2">
+                <span className="fw-bold">{p.name || "—"}</span>
+                <div className="text-muted fs-12">{p.title || "—"}</div>
+              </div>
             </div>
+          </td>
+          <td>
+            <span>{p.company || "—"}</span>
+            <div className="text-muted fs-12">{num(p.employees)} emp.</div>
+          </td>
+          <td><span className="text-muted fs-12">{p.email ?? "—"}</span></td>
+          <td><span className="text-muted fs-12">{p.phone ?? "—"}</span></td>
+          <td>
+            {p.linkedinUrl
+              ? <a href={p.linkedinUrl} target="_blank" rel="noreferrer" className="btn btn-primary light btn-sm">Perfil</a>
+              : <span className="text-muted">—</span>}
+          </td>
+          <td>{p.enriched ? <span className="badge badge-success">Enriquecido</span> : <span className="badge badge-secondary light">Sin enriquecer</span>}</td>
+          <td className="text-end">
+            {p.addedToCrm
+              ? <span className="badge badge-success">En CRM</span>
+              : (
+                <button type="button" className="btn btn-primary btn-sm" disabled={syncing} onClick={() => void addToCrm([p.id])}>
+                  + CRM
+                </button>
+              )}
+          </td>
+        </tr>
+      )}
+    />
+  );
 
-            {configured === false ? (
-              <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
+  const botonSincronizarTodos = (
+    <button type="button" className="btn btn-primary btn-sm me-2" disabled={syncing}
+      onClick={() => void addToCrm(prospects.filter((p) => !p.addedToCrm).map((p) => p.id))}>
+      {syncing ? "Sincronizando…" : "Añadir todos al CRM"}
+    </button>
+  );
+
+  return (
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="Prospección" parentTitle="Gestión" pageTitle="Prospección" />
+      <div className="container-fluid">
+        <div className="row">
+          {configured === false && (
+            <div className="col-xl-12">
+              <div className="alert alert-warning" role="alert">
                 <strong>Prospección no configurada:</strong>{" "}
                 {configMessage ?? "Define APOLLO_API_KEY en Railway para activar búsqueda B2B real."}
               </div>
-            ) : null}
-
-            {(error || actionError) && (
-              <NelvyonDsCard className="border-red-500/30 bg-red-500/5 p-4">
-                <p className="text-sm text-red-400">{error ?? actionError}</p>
-                <button
-                  type="button"
-                  onClick={() => { setError(null); setActionError(null); if (error) void load(); }}
-                  className="mt-2 text-xs text-primary hover:underline"
-                >
-                  {error ? "Reintentar" : "Cerrar"}
-                </button>
-              </NelvyonDsCard>
-            )}
-
-            {/* Tabs */}
-            <div className="flex gap-2">
-              {(["lists", "search"] as const).map(t => (
-                <button key={t} onClick={() => setTab(t)}
-                  className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${tab === t ? "bg-primary text-primary-foreground" : "bg-muted/30 text-muted-foreground hover:text-foreground"}`}>
-                  {t === "lists" ? "Mis listas" : "Nueva búsqueda"}
-                </button>
-              ))}
             </div>
+          )}
+          {(error || actionError) && (
+            <div className="col-xl-12">
+              <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                {error ?? actionError}
+                <button type="button" className="btn-close" aria-label="Cerrar"
+                  onClick={() => { const habiaError = !!error; setError(null); setActionError(null); if (habiaError) void load(); }} />
+              </div>
+            </div>
+          )}
+
+          <div className="col-xl-4 col-sm-6"><W3crmKpiTile label="Total prospectos" value={lists.reduce((s, l) => s + num(l.prospects), 0).toLocaleString("es-ES")} accent /></div>
+          <div className="col-xl-4 col-sm-6"><W3crmKpiTile label="Enriquecidos" value={lists.reduce((s, l) => s + num(l.enriched), 0).toLocaleString("es-ES")} /></div>
+          <div className="col-xl-4 col-sm-6"><W3crmKpiTile label="Listas activas" value={lists.filter((l) => l.status !== "paused").length} /></div>
+
+          <div className="col-xl-12">
+            <ul className="nav nav-tabs mb-3" role="tablist">
+              {(["lists", "search"] as const).map((t) => (
+                <li className="nav-item" key={t} role="presentation">
+                  <button type="button" role="tab" aria-selected={tab === t}
+                    className={`nav-link ${tab === t ? "active" : ""}`} onClick={() => setTab(t)}>
+                    {t === "lists" ? "Mis listas" : "Nueva búsqueda"}
+                  </button>
+                </li>
+              ))}
+            </ul>
 
             {tab === "lists" ? (
               loading ? (
-                <div className="space-y-3">{Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-24 animate-pulse rounded-xl bg-muted/30" />)}</div>
+                <W3crmContentBox titulo="Listas" icono="fa-solid fa-users">
+                  <W3crmCargando texto="Cargando listas…" />
+                </W3crmContentBox>
+              ) : lists.length === 0 ? (
+                <W3crmContentBox titulo="Listas" icono="fa-solid fa-users">
+                  <W3crmEmptyState title="Sin listas de prospección" description="Crea una búsqueda para empezar." />
+                </W3crmContentBox>
               ) : (
-                <div className="space-y-4">
-                  {/* Summary */}
-                  <div className="grid grid-cols-3 gap-3">
-                    {[
-                      { label: "Total prospectos", value: lists.reduce((s, l) => s + l.prospects, 0).toLocaleString("es-ES") },
-                      { label: "Enriquecidos", value: lists.reduce((s, l) => s + l.enriched, 0).toLocaleString("es-ES") },
-                      { label: "Listas activas", value: lists.filter(l => l.status !== "paused").length },
-                    ].map(({ label, value }) => (
-                      <NelvyonDsCard key={label} className="p-4">
-                        <p className="text-xs text-muted-foreground">{label}</p>
-                        <p className="mt-1 text-2xl font-bold text-foreground">{value}</p>
-                      </NelvyonDsCard>
-                    ))}
-                  </div>
-
-                  {lists.map(list => {
-                    const st = STATUS_CONFIG[list.status];
-                    const enrichedPct = list.prospects > 0 ? Math.round((list.enriched / list.prospects) * 100) : 0;
-                    return (
-                      <NelvyonDsCard key={list.id} className="p-4">
-                        <div className="flex flex-wrap items-start gap-3">
-                          <div className="flex-1 min-w-0 space-y-2">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <h3 className="font-semibold text-foreground">{list.name}</h3>
-                              <NelvyonDsBadge tone={st.tone}>{st.icon} {st.label}</NelvyonDsBadge>
-                            </div>
-                            <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                              {list.filter.industry !== "Todos" && <span className="rounded-md bg-muted/30 px-2 py-0.5">{list.filter.industry}</span>}
-                              {list.filter.country !== "Todos" && <span className="rounded-md bg-muted/30 px-2 py-0.5">{list.filter.country}</span>}
-                              {list.filter.jobTitle && <span className="rounded-md bg-muted/30 px-2 py-0.5">{list.filter.jobTitle}</span>}
-                              <span className="rounded-md bg-muted/30 px-2 py-0.5">{list.filter.minEmployees}–{list.filter.maxEmployees} emp.</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
-                                <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${enrichedPct}%` }} />
-                              </div>
-                              <span className="text-xs text-muted-foreground">{enrichedPct}% enriquecidos</span>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-xl font-bold text-foreground">{list.prospects.toLocaleString("es-ES")}</p>
-                            <p className="text-xs text-muted-foreground">prospectos</p>
-                            <NelvyonDsButton variant="ghost" className="mt-2 text-xs" onClick={() => { setSelectedList(list.id); void loadProspects(list.id); }}>
-                              Ver prospectos →
-                            </NelvyonDsButton>
-                          </div>
+                lists.map((list) => {
+                  const st = estadoDe(list.status);
+                  const f = filtroDe(list.filter);
+                  const total = num(list.prospects);
+                  const enrichedPct = total > 0 ? Math.round((num(list.enriched) / total) * 100) : 0;
+                  return (
+                    <W3crmContentBox
+                      key={list.id}
+                      testId="lista-prospeccion"
+                      icono="fa-solid fa-users"
+                      defaultOpen={false}
+                      titulo={
+                        <>
+                          {list.name || "—"}
+                          <span className={`badge ${st.badge} ms-2`}>{st.icon} {st.label}</span>
+                          <span className="text-muted fs-12 ms-2">{total.toLocaleString("es-ES")} prospectos</span>
+                        </>
+                      }
+                      acciones={
+                        <button type="button" className="btn btn-primary light btn-sm me-2"
+                          onClick={() => { setSelectedList(list.id); void loadProspects(list.id); }}>
+                          Ver prospectos
+                        </button>
+                      }
+                    >
+                      <div className="mb-3">
+                        {f.industry !== "Todos" && <span className="badge badge-secondary light me-1">{f.industry}</span>}
+                        {f.country !== "Todos" && <span className="badge badge-secondary light me-1">{f.country}</span>}
+                        {f.jobTitle && <span className="badge badge-secondary light me-1">{f.jobTitle}</span>}
+                        <span className="badge badge-secondary light me-1">{num(f.minEmployees)}–{num(f.maxEmployees)} emp.</span>
+                      </div>
+                      <div className="d-flex align-items-center mb-3">
+                        <div className="progress flex-grow-1 me-2" style={{ height: 6 }}>
+                          <div className="progress-bar bg-primary" style={{ width: `${enrichedPct}%` }}
+                            role="progressbar" aria-valuenow={enrichedPct} aria-valuemin={0} aria-valuemax={100} />
                         </div>
-                        {selectedList === list.id && (
-                          <div className="mt-4 border-t border-border pt-4">
-                            <div className="mb-3 flex items-center justify-between">
-                              <p className="text-sm font-medium text-foreground">Prospectos</p>
-                              <NelvyonDsButton className="text-xs" disabled={syncing} onClick={() => void addToCrm(prospects.filter(p => !p.addedToCrm).map(p => p.id))}>
-                                {syncing ? "Sincronizando…" : "Añadir todos al CRM"}
-                              </NelvyonDsButton>
-                            </div>
-                            <div className="space-y-2">
-                              {prospects.map(p => (
-                                <div key={p.id} className="flex items-center gap-3 rounded-lg border border-border p-3 hover:bg-muted/10 transition-colors">
-                                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">{p.name[0]}</div>
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium text-foreground">{p.name}</p>
-                                    <p className="text-xs text-muted-foreground">{p.title} · {p.company}</p>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    {p.email && <span className="text-xs text-green-400">✉</span>}
-                                    {p.phone && <span className="text-xs text-green-400">☎</span>}
-                                    {p.linkedinUrl && <span className="text-xs text-blue-400">in</span>}
-                                    {p.addedToCrm ? (
-                                      <span className="text-xs text-muted-foreground">En CRM</span>
-                                    ) : (
-                                      <NelvyonDsButton variant="ghost" className="text-xs" disabled={syncing} onClick={() => void addToCrm([p.id])}>+ CRM</NelvyonDsButton>
-                                    )}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </NelvyonDsCard>
-                    );
-                  })}
-                </div>
+                        <span className="text-muted fs-12">{enrichedPct}% enriquecidos</span>
+                      </div>
+                      {selectedList === list.id && (
+                        prospects.length === 0 ? (
+                          <W3crmEmptyState title="Sin prospectos en esta lista" />
+                        ) : (
+                          <>
+                            <div className="mb-3">{botonSincronizarTodos}</div>
+                            {tablaProspectos}
+                          </>
+                        )
+                      )}
+                    </W3crmContentBox>
+                  );
+                })
               )
             ) : (
-              <div className="grid gap-6 lg:grid-cols-[340px_minmax(0,1fr)]">
-                {/* Search form */}
-                <div>
-                  <NelvyonDsCard className="p-5">
-                    <h3 className="mb-4 text-sm font-semibold text-foreground">Filtros de búsqueda</h3>
-                    <form onSubmit={search} className="space-y-4">
-                      <div>
-                        <label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre de la lista *</label>
-                        <input value={listName} onChange={e => setListName(e.target.value)} placeholder="Ej: CMOs Tech España"
-                          className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
+              <div className="row">
+                <div className="col-xl-4">
+                  <W3crmContentBox titulo="Filtros de búsqueda" icono="fas fa-filter">
+                    <form onSubmit={search}>
+                      <div className="form-group mb-3">
+                        <label htmlFor="pr-lista" className="text-black font-w600">Nombre de la lista <span className="required">*</span></label>
+                        <input id="pr-lista" type="text" className="form-control" placeholder="Ej: CMOs Tech España"
+                          value={listName} onChange={(e) => setListName(e.target.value)} />
                       </div>
-                      <div>
-                        <label className="mb-1 block text-xs font-medium text-muted-foreground">Cargo / Título</label>
-                        <input value={filter.jobTitle} onChange={e => setFilter(f => ({ ...f, jobTitle: e.target.value }))} placeholder="CEO, CMO, Director…"
-                          className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
+                      <div className="form-group mb-3">
+                        <label htmlFor="pr-cargo" className="text-black font-w600">Cargo / Título</label>
+                        <input id="pr-cargo" type="text" className="form-control" placeholder="CEO, CMO, Director…"
+                          value={filter.jobTitle} onChange={(e) => setFilter((f) => ({ ...f, jobTitle: e.target.value }))} />
                       </div>
-                      <div>
-                        <label className="mb-1 block text-xs font-medium text-muted-foreground">Industria</label>
-                        <select value={filter.industry} onChange={e => setFilter(f => ({ ...f, industry: e.target.value }))}
-                          className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none">
-                          {INDUSTRIES.map(i => <option key={i}>{i}</option>)}
+                      <div className="form-group mb-3">
+                        <label htmlFor="pr-industria" className="text-black font-w600">Industria</label>
+                        <select id="pr-industria" className="form-control" value={filter.industry}
+                          onChange={(e) => setFilter((f) => ({ ...f, industry: e.target.value }))}>
+                          {INDUSTRIES.map((i) => <option key={i}>{i}</option>)}
                         </select>
                       </div>
-                      <div>
-                        <label className="mb-1 block text-xs font-medium text-muted-foreground">País</label>
-                        <select value={filter.country} onChange={e => setFilter(f => ({ ...f, country: e.target.value }))}
-                          className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none">
-                          {COUNTRIES.map(c => <option key={c}>{c}</option>)}
+                      <div className="form-group mb-3">
+                        <label htmlFor="pr-pais" className="text-black font-w600">País</label>
+                        <select id="pr-pais" className="form-control" value={filter.country}
+                          onChange={(e) => setFilter((f) => ({ ...f, country: e.target.value }))}>
+                          {COUNTRIES.map((c) => <option key={c}>{c}</option>)}
                         </select>
                       </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div>
-                          <label className="mb-1 block text-xs font-medium text-muted-foreground">Empleados mín.</label>
-                          <input type="number" min={1} value={filter.minEmployees} onChange={e => setFilter(f => ({ ...f, minEmployees: Number(e.target.value) }))}
-                            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
-                        </div>
-                        <div>
-                          <label className="mb-1 block text-xs font-medium text-muted-foreground">Empleados máx.</label>
-                          <input type="number" min={1} value={filter.maxEmployees} onChange={e => setFilter(f => ({ ...f, maxEmployees: Number(e.target.value) }))}
-                            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
-                        </div>
-                      </div>
-                      <div>
-                        <label className="mb-1 block text-xs font-medium text-muted-foreground">Palabras clave</label>
-                        <input value={filter.keywords} onChange={e => setFilter(f => ({ ...f, keywords: e.target.value }))} placeholder="SaaS, ecommerce, startup…"
-                          className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
-                      </div>
-                      <NelvyonDsButton type="submit" disabled={searching || !listName.trim() || configured !== true} className="w-full">
-                        {searching ? "Buscando…" : configured !== true ? "Prospección no configurada" : "🔍 Buscar prospectos"}
-                      </NelvyonDsButton>
-                    </form>
-                  </NelvyonDsCard>
-                </div>
-
-                {/* Results */}
-                <div>
-                  {prospects.length === 0 ? (
-                    <NelvyonDsCard className="p-16 text-center">
-                      <p className="text-5xl">🔍</p>
-                      <p className="mt-4 text-lg font-semibold text-foreground">Configura tus filtros</p>
-                      <p className="mt-2 text-sm text-muted-foreground">Define el perfil ideal de tu prospecto y haz clic en Buscar</p>
-                    </NelvyonDsCard>
-                  ) : (
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm text-muted-foreground">{prospects.length} prospectos encontrados</p>
-                        <NelvyonDsButton className="text-xs" disabled={syncing} onClick={() => void addToCrm(prospects.filter(p => !p.addedToCrm).map(p => p.id))}>
-                          {syncing ? "Sincronizando…" : "Añadir todos al CRM"}
-                        </NelvyonDsButton>
-                      </div>
-                      {prospects.map(p => (
-                        <NelvyonDsCard key={p.id} className="p-4">
-                          <div className="flex items-start gap-3">
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 font-bold text-primary">{p.name[0]}</div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex flex-wrap items-start gap-2">
-                                <div>
-                                  <p className="font-semibold text-foreground">{p.name}</p>
-                                  <p className="text-xs text-muted-foreground">{p.title} · {p.company} · {p.employees} emp.</p>
-                                </div>
-                                {p.enriched && <NelvyonDsBadge tone="success">Enriquecido</NelvyonDsBadge>}
-                              </div>
-                              <div className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground">
-                                {p.email && <span className="flex items-center gap-1"><span className="text-green-400">✉</span>{p.email}</span>}
-                                {p.phone && <span className="flex items-center gap-1"><span className="text-green-400">☎</span>{p.phone}</span>}
-                                {p.linkedinUrl && <a href={p.linkedinUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-blue-400 hover:underline"><span>in</span> LinkedIn</a>}
-                              </div>
-                            </div>
-                            <div className="shrink-0">
-                              {p.addedToCrm ? (
-                                <span className="text-xs text-muted-foreground">✓ En CRM</span>
-                              ) : (
-                                <NelvyonDsButton variant="ghost" className="text-xs" disabled={syncing} onClick={() => void addToCrm([p.id])}>+ CRM</NelvyonDsButton>
-                              )}
-                            </div>
+                      <div className="row">
+                        <div className="col-6">
+                          <div className="form-group mb-3">
+                            <label htmlFor="pr-min" className="text-black font-w600">Empleados mín.</label>
+                            <input id="pr-min" type="number" min={1} className="form-control" value={filter.minEmployees}
+                              onChange={(e) => setFilter((f) => ({ ...f, minEmployees: Number(e.target.value) }))} />
                           </div>
-                        </NelvyonDsCard>
-                      ))}
-                    </div>
-                  )}
+                        </div>
+                        <div className="col-6">
+                          <div className="form-group mb-3">
+                            <label htmlFor="pr-max" className="text-black font-w600">Empleados máx.</label>
+                            <input id="pr-max" type="number" min={1} className="form-control" value={filter.maxEmployees}
+                              onChange={(e) => setFilter((f) => ({ ...f, maxEmployees: Number(e.target.value) }))} />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="form-group mb-3">
+                        <label htmlFor="pr-keywords" className="text-black font-w600">Palabras clave</label>
+                        <input id="pr-keywords" type="text" className="form-control" placeholder="SaaS, ecommerce, startup…"
+                          value={filter.keywords} onChange={(e) => setFilter((f) => ({ ...f, keywords: e.target.value }))} />
+                      </div>
+                      <button type="submit" className="btn btn-primary w-100" disabled={searching || !listName.trim() || configured !== true}>
+                        {searching ? "Buscando…" : configured !== true ? "Prospección no configurada" : "Buscar prospectos"}
+                      </button>
+                    </form>
+                  </W3crmContentBox>
+                </div>
+                <div className="col-xl-8">
+                  <W3crmContentBox
+                    titulo="Resultados"
+                    icono="fa-solid fa-file-lines"
+                    acciones={prospects.length > 0 ? botonSincronizarTodos : undefined}
+                  >
+                    {prospects.length === 0 ? (
+                      <W3crmEmptyState
+                        title="Configura tus filtros"
+                        description="Define el perfil ideal de tu prospecto y pulsa Buscar."
+                      />
+                    ) : (
+                      tablaProspectos
+                    )}
+                  </W3crmContentBox>
                 </div>
               </div>
             )}
-    </SaasShellLayout>
+          </div>
+        </div>
+      </div>
+    </SaasW3crmShell>
   );
 }

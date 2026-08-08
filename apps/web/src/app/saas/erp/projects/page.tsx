@@ -1,15 +1,27 @@
 "use client";
 
+/**
+ * /saas/erp/projects sobre `(cms)/content` de W3CRM, con las piezas ya
+ * portadas. Mapeo: alta y listados -> `W3crmContentBox` + `W3crmDataTable`;
+ * el selector de modo -> `nav nav-tabs`; KPIs -> `W3crmKpiTile`. Sin
+ * componentes nuevos.
+ *
+ * Inventario: sin `data-testid`, sin spec dedicado (solo
+ * `saas-nav-full-coverage`) y sin textos-contrato. El modulo si traia ya un
+ * `role="tablist"` con `aria-label="Modo alta"` y dos `role="tab"`: se
+ * conservan tal cual, ahora sobre el `nav nav-tabs` de la plantilla.
+ *
+ * Logica de NELVYON intacta: `GET/POST /api/saas/erp/projects-fs` con sus dos
+ * acciones (`create_project`, `create_timesheet`), la preseleccion del primer
+ * proyecto al cargar, la fecha de hoy en formato ISO corto, el
+ * `rateInternalCents: 0` y el aviso de exito de 3 s.
+ */
 import { useCallback, useEffect, useState } from "react";
-import {
-  NelvyonDsBadge,
-  NelvyonDsButton,
-  NelvyonDsCard,
-  NelvyonDsSectionHeader,
-} from "@/design-system/components";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
-import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
+
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmEmptyState, W3crmKpiTile } from "@/features/saas-w3crm/components/W3crmUi";
+import { W3crmCargando, W3crmContentBox, W3crmDataTable } from "@/features/saas-w3crm/components/W3crmContentBox";
 
 type Project = { id: string; name: string; status: string; createdAt: string; tasks: unknown[] };
 type Timesheet = {
@@ -21,8 +33,10 @@ type Timesheet = {
   rateInternalCents: number;
 };
 
-const inputCls =
-  "w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none";
+function num(v: unknown): number {
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
 
 export default function ErpProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -42,20 +56,18 @@ export default function ErpProjectsPage() {
     setError(null);
     try {
       const res = await fetch("/api/saas/erp/projects-fs");
-      const data = (await res.json()) as {
-        projects?: Project[];
-        timesheets?: Timesheet[];
-        note?: string;
-        error?: string;
+      const data = (await res.json().catch(() => ({}))) as {
+        projects?: Project[]; timesheets?: Timesheet[]; note?: string; error?: string;
       };
       if (!res.ok) {
         setError(data.error ?? `HTTP ${res.status}`);
         return;
       }
-      setProjects(data.projects ?? []);
-      setTimesheets(data.timesheets ?? []);
+      const lista = Array.isArray(data.projects) ? data.projects : [];
+      setProjects(lista);
+      setTimesheets(Array.isArray(data.timesheets) ? data.timesheets : []);
       setNote(data.note ?? "");
-      setProjectId((prev) => prev || data.projects?.[0]?.id || "");
+      setProjectId((prev) => prev || lista[0]?.id || "");
     } catch (e) {
       setError(e instanceof Error ? e.message : "load failed");
     } finally {
@@ -63,9 +75,7 @@ export default function ErpProjectsPage() {
     }
   }, []);
 
-  useEffect(() => {
-    void load();
-  }, [load]);
+  useEffect(() => { void load(); }, [load]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -87,7 +97,7 @@ export default function ErpProjectsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-      const data = (await res.json()) as { error?: string };
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) {
         setError(data.error ?? `HTTP ${res.status}`);
         return;
@@ -101,136 +111,141 @@ export default function ErpProjectsPage() {
     }
   }
 
-  const totalHours = timesheets.reduce((s, t) => s + t.hours, 0);
+  const totalHours = timesheets.reduce((s, t) => s + num(t.hours), 0);
+  const nombrePorId = new Map(projects.map((p) => [p.id, p.name]));
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="erp-projects" />}>
-      <div className="flex flex-col gap-6 pb-8">
-        <NelvyonDsSectionHeader
-          title="Proyectos & field service"
-          subtitle={note || "Persistido vía API · firma bloqueada · margen NON-GL"}
-        />
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="Proyectos & field service" parentTitle="Gestión" pageTitle="Proyectos" />
+      <div className="container-fluid">
+        <div className="row">
+          {error && (
+            <div className="col-xl-12">
+              <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                {error}
+                <button type="button" className="btn-close" aria-label="Cerrar" onClick={() => setError(null)} />
+              </div>
+            </div>
+          )}
+          {ok && (
+            <div className="col-xl-12">
+              <div className="alert alert-success" role="status">{ok}</div>
+            </div>
+          )}
 
-        {error && (
-          <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm text-destructive" role="alert">
-            {error}
-          </p>
-        )}
-        {ok && (
-          <p className="rounded-lg border border-primary/30 bg-primary/10 px-4 py-2 text-sm text-primary" role="status">
-            {ok}
-          </p>
-        )}
+          <div className="col-xl-4 col-sm-6"><W3crmKpiTile label="Proyectos" value={projects.length} /></div>
+          <div className="col-xl-4 col-sm-6"><W3crmKpiTile label="Timesheets" value={timesheets.length} accent /></div>
+          <div className="col-xl-4 col-sm-6"><W3crmKpiTile label="Horas" value={totalHours} /></div>
 
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-          <KpiTile icon="📁" label="Proyectos" value={projects.length} />
-          <KpiTile icon="⏱️" label="Timesheets" value={timesheets.length} accent />
-          <KpiTile icon="⌛" label="Horas" value={totalHours} />
-        </div>
+          <div className="col-xl-12">
+            {/* `role="tablist"` y `aria-label="Modo alta"` venian del modulo original. */}
+            <ul className="nav nav-tabs mb-3" role="tablist" aria-label="Modo alta">
+              <li className="nav-item" role="presentation">
+                <button type="button" role="tab" aria-selected={mode === "project"}
+                  className={`nav-link ${mode === "project" ? "active" : ""}`}
+                  onClick={() => setMode("project")}>
+                  Nuevo proyecto
+                </button>
+              </li>
+              <li className="nav-item" role="presentation">
+                <button type="button" role="tab" aria-selected={mode === "timesheet"}
+                  className={`nav-link ${mode === "timesheet" ? "active" : ""}`}
+                  onClick={() => setMode("timesheet")}>
+                  Timesheet
+                </button>
+              </li>
+            </ul>
 
-        <div className="flex gap-2" role="tablist" aria-label="Modo alta">
-          <button
-            type="button"
-            role="tab"
-            aria-selected={mode === "project"}
-            onClick={() => setMode("project")}
-            className={`rounded-lg border px-3 py-1.5 text-xs font-medium ${
-              mode === "project"
-                ? "border-primary bg-primary/10 text-primary"
-                : "border-border text-muted-foreground"
-            }`}
-          >
-            Nuevo proyecto
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={mode === "timesheet"}
-            onClick={() => setMode("timesheet")}
-            className={`rounded-lg border px-3 py-1.5 text-xs font-medium ${
-              mode === "timesheet"
-                ? "border-primary bg-primary/10 text-primary"
-                : "border-border text-muted-foreground"
-            }`}
-          >
-            Timesheet
-          </button>
-        </div>
+            <W3crmContentBox titulo={mode === "project" ? "Nuevo proyecto" : "Nuevo timesheet"} icono="fa-solid fa-diagram-project">
+              {note ? <p className="fs-12 text-muted">{note}</p> : null}
+              <form onSubmit={(e) => void onSubmit(e)}>
+                <div className="row align-items-end">
+                  {mode === "project" ? (
+                    <div className="col-xl-8 col-sm-6">
+                      <div className="form-group mb-3">
+                        <label htmlFor="pr-nombre" className="text-black font-w600">Nombre proyecto <span className="required">*</span></label>
+                        <input id="pr-nombre" className="form-control" required value={name} onChange={(e) => setName(e.target.value)} />
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="col-xl-5 col-sm-6">
+                        <div className="form-group mb-3">
+                          <label htmlFor="pr-proyecto" className="text-black font-w600">Proyecto <span className="required">*</span></label>
+                          <select id="pr-proyecto" className="form-control" required
+                            value={projectId} onChange={(e) => setProjectId(e.target.value)}>
+                            <option value="">Proyecto…</option>
+                            {projects.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                          </select>
+                        </div>
+                      </div>
+                      <div className="col-xl-3 col-sm-6">
+                        <div className="form-group mb-3">
+                          <label htmlFor="pr-horas" className="text-black font-w600">Horas</label>
+                          <input id="pr-horas" className="form-control" type="number" min={0.25} step={0.25} required
+                            value={hours} onChange={(e) => setHours(e.target.value)} />
+                        </div>
+                      </div>
+                    </>
+                  )}
+                  <div className="col-xl-4 col-sm-6">
+                    <div className="form-group mb-3">
+                      <button type="submit" className="btn btn-primary w-100" disabled={saving}>
+                        {saving ? "Guardando…" : mode === "project" ? "Crear proyecto" : "Añadir timesheet"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </W3crmContentBox>
 
-        <NelvyonDsCard className="p-4">
-          <form onSubmit={(e) => void onSubmit(e)} className="grid gap-3 sm:grid-cols-3">
-            {mode === "project" ? (
-              <input
-                className={`${inputCls} sm:col-span-2`}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Nombre proyecto *"
-                required
-              />
-            ) : (
-              <>
-                <select className={inputCls} value={projectId} onChange={(e) => setProjectId(e.target.value)} required>
-                  <option value="">Proyecto…</option>
-                  {projects.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  className={inputCls}
-                  value={hours}
-                  onChange={(e) => setHours(e.target.value)}
-                  type="number"
-                  min={0.25}
-                  step={0.25}
-                  placeholder="Horas"
-                  required
+            <W3crmContentBox titulo="Proyectos" icono="fa-solid fa-folder">
+              {loading ? (
+                <W3crmCargando texto="Cargando proyectos…" />
+              ) : projects.length === 0 ? (
+                <W3crmEmptyState title="Sin proyectos" />
+              ) : (
+                <W3crmDataTable
+                  filas={projects}
+                  etiqueta="proyectos"
+                  wrapperId="projects_wrapper"
+                  porPagina={10}
+                  columnas={[{ titulo: "Proyecto" }, { titulo: "Tareas" }, { titulo: "Estado", alFinal: true }]}
+                  render={(p) => (
+                    <tr key={p.id}>
+                      <td><span className="fw-bold">{p.name || "—"}</span></td>
+                      <td>{Array.isArray(p.tasks) ? p.tasks.length : 0}</td>
+                      <td className="text-end"><span className="badge badge-secondary">{p.status || "—"}</span></td>
+                    </tr>
+                  )}
                 />
-              </>
-            )}
-            <NelvyonDsButton type="submit" disabled={saving} variant="primary">
-              {saving ? "Guardando…" : mode === "project" ? "Crear proyecto" : "Añadir timesheet"}
-            </NelvyonDsButton>
-          </form>
-        </NelvyonDsCard>
+              )}
+            </W3crmContentBox>
 
-        <section className="space-y-2">
-          <h2 className="text-sm font-medium text-muted-foreground">Proyectos</h2>
-          {loading ? (
-            <p className="text-sm text-muted-foreground" role="status">Cargando…</p>
-          ) : projects.length === 0 ? (
-            <NelvyonDsCard className="p-8 text-center text-sm text-muted-foreground">Sin proyectos.</NelvyonDsCard>
-          ) : (
-            <div className="flex flex-col gap-2">
-              {projects.map((p) => (
-                <NelvyonDsCard key={p.id} className="flex justify-between gap-3 p-4">
-                  <span className="text-sm text-foreground">{p.name}</span>
-                  <NelvyonDsBadge tone="neutral">{p.status}</NelvyonDsBadge>
-                </NelvyonDsCard>
-              ))}
-            </div>
-          )}
-        </section>
-
-        <section className="space-y-2">
-          <h2 className="text-sm font-medium text-muted-foreground">Timesheets</h2>
-          {timesheets.length === 0 ? (
-            <NelvyonDsCard className="p-8 text-center text-sm text-muted-foreground">Sin timesheets.</NelvyonDsCard>
-          ) : (
-            <div className="flex flex-col gap-2">
-              {timesheets.map((t) => (
-                <NelvyonDsCard key={t.id} className="flex justify-between gap-3 p-4">
-                  <span className="text-sm text-foreground">
-                    {t.hours}h · {t.date}
-                  </span>
-                  <NelvyonDsBadge tone="primary">{t.status}</NelvyonDsBadge>
-                </NelvyonDsCard>
-              ))}
-            </div>
-          )}
-        </section>
+            <W3crmContentBox titulo="Timesheets" icono="fa-solid fa-clock">
+              {timesheets.length === 0 ? (
+                <W3crmEmptyState title="Sin timesheets" />
+              ) : (
+                <W3crmDataTable
+                  filas={timesheets}
+                  etiqueta="timesheets"
+                  wrapperId="timesheets_wrapper"
+                  porPagina={10}
+                  columnas={[{ titulo: "Proyecto" }, { titulo: "Horas" }, { titulo: "Fecha" }, { titulo: "Estado", alFinal: true }]}
+                  render={(t) => (
+                    <tr key={t.id}>
+                      <td><span className="fw-bold">{nombrePorId.get(t.projectId) ?? "—"}</span></td>
+                      <td>{num(t.hours)} h</td>
+                      <td>{t.date || "—"}</td>
+                      <td className="text-end"><span className="badge badge-primary">{t.status || "—"}</span></td>
+                    </tr>
+                  )}
+                />
+              )}
+            </W3crmContentBox>
+          </div>
+        </div>
       </div>
-    </SaasShellLayout>
+    </SaasW3crmShell>
   );
 }

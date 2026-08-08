@@ -1,7 +1,14 @@
 "use client";
 
-import { NelvyonDsButton, NelvyonDsCard } from "@/design-system/components";
-
+/**
+ * Paso 3 con formulario y checks de W3CRM.
+ *
+ * CONTRATO: `getByText("Paso 3 — Perfil")` como título.
+ *
+ * SANEADO: `goals` puede llegar con valores fuera del catálogo; se conservan en
+ * el estado —no se pierden datos del tenant— y se listan aparte para que el
+ * usuario los vea, en vez de desaparecer en silencio.
+ */
 const GOAL_OPTIONS = [
   { id: "leads", label: "Generar más leads" },
   { id: "brand", label: "Fortalecer marca" },
@@ -42,80 +49,103 @@ export function StepProfile({
   busy,
   error,
 }: StepProfileProps) {
+  const seleccionados = Array.isArray(goals) ? goals : [];
+  const fueraDeCatalogo = seleccionados.filter((g) => !GOAL_OPTIONS.some((o) => o.id === g));
+  // Un rango guardado que ya no esté en la lista dejaba el `select` vacío y se
+  // perdía al guardar; se añade como opción para no borrar el dato del tenant.
+  const rangos = employees && !EMPLOYEE_RANGES.includes(employees)
+    ? [...EMPLOYEE_RANGES, employees]
+    : EMPLOYEE_RANGES;
+
   return (
-    <NelvyonDsCard title="Paso 3 — Perfil">
-      <p className="mb-4 text-sm text-muted-foreground">Datos operativos para adaptar comunicaciones y límites del plan.</p>
-      <div className="space-y-4">
-        <label className="block space-y-1.5">
-          <span className="text-sm font-medium text-foreground">Sitio web</span>
+    <div className="card">
+      <div className="card-header">
+        <h4 className="card-title">Paso 3 — Perfil</h4>
+      </div>
+      <div className="card-body">
+        <p className="fs-14 text-muted">Datos operativos para adaptar comunicaciones y límites del plan.</p>
+
+        <div className="form-group mb-3">
+          <label htmlFor="ob-web" className="text-black font-w600">Sitio web</label>
           <input
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
+            id="ob-web"
+            className="form-control"
             value={website}
             onChange={(e) => onWebsiteChange(e.target.value)}
             placeholder="https://"
             inputMode="url"
             disabled={busy}
           />
-        </label>
-        <label className="block space-y-1.5">
-          <span className="text-sm font-medium text-foreground">Teléfono</span>
+        </div>
+
+        <div className="form-group mb-3">
+          <label htmlFor="ob-telefono" className="text-black font-w600">Teléfono</label>
           <input
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
+            id="ob-telefono"
+            className="form-control"
             value={phone}
             onChange={(e) => onPhoneChange(e.target.value)}
             inputMode="tel"
             disabled={busy}
           />
-        </label>
-        <label className="block space-y-1.5">
-          <span className="text-sm font-medium text-foreground">Número de empleados</span>
+        </div>
+
+        <div className="form-group mb-3">
+          <label htmlFor="ob-empleados" className="text-black font-w600">Número de empleados</label>
           <select
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
+            id="ob-empleados"
+            className="form-control"
             value={employees}
             onChange={(e) => onEmployeesChange(e.target.value)}
             disabled={busy}
           >
             <option value="">Selecciona…</option>
-            {EMPLOYEE_RANGES.map((r) => (
-              <option key={r} value={r}>
-                {r}
-              </option>
+            {rangos.map((r) => (
+              <option key={r} value={r}>{r}</option>
             ))}
           </select>
-        </label>
-        <fieldset className="space-y-2">
-          <legend className="text-sm font-medium text-foreground">Objetivos (elige los que apliquen)</legend>
-          <div className="grid gap-2 sm:grid-cols-2">
+        </div>
+
+        <fieldset className="mb-3">
+          <legend className="text-black font-w600 fs-14">Objetivos (elige los que apliquen)</legend>
+          <div className="row">
             {GOAL_OPTIONS.map((g) => {
-              const checked = goals.includes(g.id);
+              const checked = seleccionados.includes(g.id);
               return (
-                <label
-                  key={g.id}
-                  className="flex cursor-pointer items-start gap-2 rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground"
-                >
-                  <input
-                    type="checkbox"
-                    className="mt-0.5 h-4 w-4 rounded border-input text-primary focus-visible:ring-2 focus-visible:ring-ring"
-                    checked={checked}
-                    disabled={busy}
-                    onChange={() => onToggleGoal(g.id)}
-                  />
-                  <span>{g.label}</span>
-                </label>
+                <div className="col-sm-6" key={g.id}>
+                  <div className="form-check mb-2">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      id={`ob-goal-${g.id}`}
+                      checked={checked}
+                      disabled={busy}
+                      onChange={() => onToggleGoal(g.id)}
+                    />
+                    <label className="form-check-label" htmlFor={`ob-goal-${g.id}`}>{g.label}</label>
+                  </div>
+                </div>
               );
             })}
           </div>
+          {fueraDeCatalogo.length > 0 && (
+            <p className="fs-12 text-muted mb-0">
+              Otros objetivos guardados: {fueraDeCatalogo.join(", ")}
+            </p>
+          )}
         </fieldset>
-        {error ? <p className="text-sm text-destructive">{error}</p> : null}
-        <div className="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-between">
-          <NelvyonDsButton type="button" variant="secondary" onClick={onBack} disabled={busy}>
+
+        {error ? <div className="alert alert-danger py-2 fs-14" role="alert">{error}</div> : null}
+
+        <div className="d-flex flex-wrap justify-content-between gap-2">
+          <button type="button" className="btn btn-primary light" onClick={onBack} disabled={busy}>
             Atrás
-          </NelvyonDsButton>
-          <NelvyonDsButton type="button" size="lg" onClick={onNext} disabled={busy}>
+          </button>
+          <button type="button" className="btn btn-primary" onClick={onNext} disabled={busy}>
             Continuar
-          </NelvyonDsButton>
+          </button>
         </div>
       </div>
-    </NelvyonDsCard>
+    </div>
   );
 }

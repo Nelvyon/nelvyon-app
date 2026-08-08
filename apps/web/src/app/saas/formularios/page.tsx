@@ -1,39 +1,41 @@
 "use client";
 
+/**
+ * /saas/formularios sobre `(cms)/content` de W3CRM, con las piezas ya portadas.
+ * El constructor, el embed y las respuestas usan el `<Modal>` de la plantilla;
+ * el listado, su tabla con paginacion.
+ *
+ * Logica de NELVYON intacta: `GET/POST /api/saas/formularios`,
+ * `PATCH/DELETE /api/saas/formularios/[id]`,
+ * `GET /api/saas/formularios/[id]/submissions` y
+ * `GET/POST /api/saas/formularios/templates`; los tipos `Form`, `FormField` y
+ * `FormSubmission`, `FIELD_TYPES` con sus nueve tipos, `uid`, el editor de
+ * campos con reordenacion (`moveField`), las etiquetas por defecto al anadir
+ * campo, la validacion (nombre + al menos un campo), `toggleActive`,
+ * `deleteForm` y la galeria de plantillas con su importacion.
+ */
 import { useCallback, useEffect, useState } from "react";
+import Alert from "sweetalert2";
 
-import {
-  NelvyonDsBadge,
-  NelvyonDsButton,
-  NelvyonDsCard,
-  NelvyonDsSectionHeader,
-} from "@/design-system/components";
-import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmEmptyState, W3crmKpiTile } from "@/features/saas-w3crm/components/W3crmUi";
+import { W3crmCargando, W3crmContentBox, W3crmDataTable, W3crmModal } from "@/features/saas-w3crm/components/W3crmContentBox";
 
 type FieldType = "text" | "email" | "phone" | "textarea" | "select" | "checkbox" | "number" | "url" | "date";
 
 interface FormField {
-  id: string;
-  type: FieldType;
-  label: string;
-  placeholder: string;
-  required: boolean;
-  options?: string[]; // for select
+  id: string; type: FieldType; label: string; placeholder: string; required: boolean; options?: string[];
 }
 
 interface Form {
-  id: string;
-  name: string;
-  description: string | null;
-  fields: FormField[];
-  submissions: number;
-  isActive: boolean;
-  embedCode: string | null;
-  createdAt: string;
+  id: string; name: string; description: string | null; fields: FormField[];
+  submissions: number; isActive: boolean; embedCode: string | null; createdAt: string;
+}
+
+interface FormSubmission {
+  id: string; data: Record<string, unknown>; ip: string | null; createdAt: string;
+  contactId: string | null; contactName: string | null; contactEmail: string | null;
 }
 
 const FIELD_TYPES: { type: FieldType; label: string; icon: string }[] = [
@@ -51,144 +53,47 @@ const FIELD_TYPES: { type: FieldType; label: string; icon: string }[] = [
 function uid() {
   return Math.random().toString(36).slice(2, 9);
 }
-
-// ─── Field preview in builder ─────────────────────────────────────────────────
-
-function FieldPreview({ field }: { field: FormField }) {
-  const cls = "w-full rounded-lg border border-border bg-background/50 px-3 py-2 text-sm text-muted-foreground";
-  switch (field.type) {
-    case "textarea":
-      return <textarea disabled rows={3} placeholder={field.placeholder} className={`${cls} resize-none`} />;
-    case "select":
-      return (
-        <select disabled className={cls}>
-          <option>{field.placeholder || "Selecciona…"}</option>
-          {field.options?.map((o) => <option key={o}>{o}</option>)}
-        </select>
-      );
-    case "checkbox":
-      return (
-        <label className="flex items-center gap-2 text-sm text-muted-foreground">
-          <input type="checkbox" disabled className="rounded" />
-          {field.placeholder || field.label}
-        </label>
-      );
-    default:
-      return <input disabled type={field.type} placeholder={field.placeholder} className={cls} />;
-  }
+function num(v: unknown): number {
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+function fecha(iso: string | null | undefined): string {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? "—" : d.toLocaleString("es-ES");
+}
+/** `fields` puede llegar nulo o no-array desde el backend. */
+function camposDe(f: Form): FormField[] {
+  return Array.isArray(f.fields) ? f.fields : [];
+}
+/** Tipo fuera de catalogo -> se muestra crudo, sin romper. */
+function tipoDe(t: FieldType | string) {
+  return FIELD_TYPES.find((x) => x.type === t) ?? { type: t as FieldType, label: String(t || "—"), icon: "?" };
 }
 
-// ─── Field editor row ─────────────────────────────────────────────────────────
-
-function FieldRow({
-  field,
-  index,
-  total,
-  onChange,
-  onRemove,
-  onMove,
-}: {
-  field: FormField;
-  index: number;
-  total: number;
-  onChange: (f: FormField) => void;
-  onRemove: () => void;
-  onMove: (dir: -1 | 1) => void;
-}) {
-  const [expanded, setExpanded] = useState(false);
-
-  return (
-    <div className="overflow-hidden rounded-xl border border-border bg-card">
-      <div className="flex items-center gap-3 px-4 py-3">
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-sm font-semibold text-primary">
-          {FIELD_TYPES.find((t) => t.type === field.type)?.icon ?? "T"}
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium text-foreground">{field.label || "(sin título)"}</p>
-          <p className="text-xs text-muted-foreground">{FIELD_TYPES.find((t) => t.type === field.type)?.label} {field.required && "· Obligatorio"}</p>
-        </div>
-        <div className="flex items-center gap-1">
-          <button onClick={() => onMove(-1)} disabled={index === 0} className="rounded p-1 text-muted-foreground hover:text-foreground disabled:opacity-30">▲</button>
-          <button onClick={() => onMove(1)} disabled={index === total - 1} className="rounded p-1 text-muted-foreground hover:text-foreground disabled:opacity-30">▼</button>
-          <button onClick={() => setExpanded((v) => !v)} className="rounded p-1 text-muted-foreground hover:text-foreground">✏️</button>
-          <button onClick={onRemove} className="rounded p-1 text-destructive/70 hover:text-destructive">✕</button>
-        </div>
-      </div>
-
-      {expanded && (
-        <div className="border-t border-border px-4 pb-4 pt-3">
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div>
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">Etiqueta</label>
-              <input
-                value={field.label}
-                onChange={(e) => onChange({ ...field, label: e.target.value })}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">Placeholder</label>
-              <input
-                value={field.placeholder}
-                onChange={(e) => onChange({ ...field, placeholder: e.target.value })}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
-              />
-            </div>
-            {field.type === "select" && (
-              <div className="sm:col-span-2">
-                <label className="mb-1 block text-xs font-medium text-muted-foreground">Opciones (una por línea)</label>
-                <textarea
-                  rows={3}
-                  value={(field.options ?? []).join("\n")}
-                  onChange={(e) => onChange({ ...field, options: e.target.value.split("\n").filter(Boolean) })}
-                  className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
-                />
-              </div>
-            )}
-            <label className="flex items-center gap-2 text-sm text-muted-foreground">
-              <input
-                type="checkbox"
-                checked={field.required}
-                onChange={(e) => onChange({ ...field, required: e.target.checked })}
-                className="rounded"
-              />
-              Campo obligatorio
-            </label>
-          </div>
-          <div className="mt-3">
-            <p className="mb-1 text-xs font-medium text-muted-foreground">Vista previa</p>
-            <FieldPreview field={field} />
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── Form builder modal ───────────────────────────────────────────────────────
+// ─── Constructor ──────────────────────────────────────────────────────────────
 
 function FormBuilderModal({ form, onClose, onSaved }: { form?: Form; onClose: () => void; onSaved: () => void }) {
   const [name, setName] = useState(form?.name ?? "");
   const [description, setDescription] = useState(form?.description ?? "");
-  const [fields, setFields] = useState<FormField[]>(form?.fields ?? []);
+  const [fields, setFields] = useState<FormField[]>(form ? camposDe(form) : []);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [editandoId, setEditandoId] = useState<string | null>(null);
 
   function addField(type: FieldType) {
     const defaultLabel: Record<FieldType, string> = {
-      text: "Nombre",
-      email: "Email",
-      phone: "Teléfono",
-      textarea: "Mensaje",
-      select: "¿Cómo nos encontraste?",
-      checkbox: "Acepto los términos",
-      number: "Número",
-      url: "Sitio web",
-      date: "Fecha",
+      text: "Nombre", email: "Email", phone: "Teléfono", textarea: "Mensaje",
+      select: "¿Cómo nos encontraste?", checkbox: "Acepto los términos",
+      number: "Número", url: "Sitio web", date: "Fecha",
     };
     setFields((prev) => [
       ...prev,
-      { id: uid(), type, label: defaultLabel[type], placeholder: "", required: type === "email", options: type === "select" ? ["Opción 1", "Opción 2"] : undefined },
+      {
+        id: uid(), type, label: defaultLabel[type], placeholder: "",
+        required: type === "email",
+        options: type === "select" ? ["Opción 1", "Opción 2"] : undefined,
+      },
     ]);
   }
 
@@ -229,127 +134,168 @@ function FormBuilderModal({ form, onClose, onSaved }: { form?: Form; onClose: ()
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm">
-      <div className="my-8 w-full max-w-2xl rounded-2xl border border-border bg-card shadow-2xl">
-        <div className="flex items-center justify-between border-b border-border px-6 py-4">
-          <h2 className="text-lg font-semibold text-foreground">{form ? "Editar formulario" : "Nuevo formulario"}</h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
-        </div>
-
-        <form onSubmit={save}>
-          <div className="space-y-5 px-6 py-5">
-            {error && <p className="rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre del formulario *</label>
-                <input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Formulario de contacto"
-                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-medium text-muted-foreground">Descripción</label>
-                <input
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Para solicitar presupuesto"
-                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
-                />
-              </div>
+    <W3crmModal titulo={form ? "Editar formulario" : "Nuevo formulario"} onClose={onClose} error={error} size="lg" testId="modal-formulario">
+      <form onSubmit={save}>
+        <div className="row">
+          <div className="col-lg-6">
+            <div className="form-group mb-3">
+              <label htmlFor="fm-nombre" className="text-black font-w600">Nombre del formulario <span className="required">*</span></label>
+              <input id="fm-nombre" type="text" className="form-control" placeholder="Formulario de contacto"
+                value={name} onChange={(e) => setName(e.target.value)} />
             </div>
-
-            {/* Field type palette */}
-            <div>
-              <p className="mb-2 text-xs font-medium text-muted-foreground">Añadir campo</p>
-              <div className="flex flex-wrap gap-2">
-                {FIELD_TYPES.map(({ type, label, icon }) => (
-                  <button
-                    key={type}
-                    type="button"
-                    onClick={() => addField(type)}
-                    className="flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary hover:text-foreground"
-                  >
-                    <span>{icon}</span> {label}
-                  </button>
-                ))}
-              </div>
+          </div>
+          <div className="col-lg-6">
+            <div className="form-group mb-3">
+              <label htmlFor="fm-descripcion" className="text-black font-w600">Descripción</label>
+              <input id="fm-descripcion" type="text" className="form-control" placeholder="Para solicitar presupuesto"
+                value={description} onChange={(e) => setDescription(e.target.value)} />
             </div>
+          </div>
 
-            {/* Fields */}
+          <div className="col-lg-12 mb-3">
+            <label className="text-black font-w600 d-block mb-2">Añadir campo</label>
+            {FIELD_TYPES.map(({ type, label, icon }) => (
+              <button key={type} type="button" className="btn btn-primary light btn-sm me-1 mb-1" onClick={() => addField(type)}>
+                {icon} {label}
+              </button>
+            ))}
+          </div>
+
+          <div className="col-lg-12">
             {fields.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-border py-12 text-center">
-                <p className="text-sm text-muted-foreground">Añade campos desde la paleta de arriba</p>
-              </div>
+              <W3crmEmptyState title="Sin campos" description="Añade campos desde la paleta de arriba." />
             ) : (
-              <div className="flex flex-col gap-2">
-                {fields.map((f, i) => (
-                  <FieldRow
-                    key={f.id}
-                    field={f}
-                    index={i}
-                    total={fields.length}
-                    onChange={(updated) => setFields((prev) => prev.map((x) => (x.id === updated.id ? updated : x)))}
-                    onRemove={() => setFields((prev) => prev.filter((x) => x.id !== f.id))}
-                    onMove={(dir) => moveField(i, dir)}
-                  />
-                ))}
+              <div className="table-responsive">
+                <div className="dataTables_wrapper no-footer">
+                  <table className="table table-responsive-lg table-striped table-condensed flip-content">
+                    <thead>
+                      <tr>
+                        <th className="text-black">Campo</th>
+                        <th className="text-black">Tipo</th>
+                        <th className="text-black">Obligatorio</th>
+                        <th className="text-black text-end">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {fields.map((f, i) => (
+                        <>
+                          <tr key={f.id}>
+                            <td>
+                              <span className="badge badge-secondary light me-2">{tipoDe(f.type).icon}</span>
+                              <span className="fw-bold">{f.label || "(sin título)"}</span>
+                            </td>
+                            <td>{tipoDe(f.type).label}</td>
+                            <td>{f.required ? <span className="badge badge-danger">Sí</span> : <span className="text-muted">No</span>}</td>
+                            <td className="text-end">
+                              <button type="button" className="btn btn-primary light btn-sm content-icon me-1" disabled={i === 0}
+                                aria-label={`Subir ${f.label || "campo"}`} onClick={() => moveField(i, -1)}>
+                                <i className="fa-solid fa-angle-up" />
+                              </button>
+                              <button type="button" className="btn btn-primary light btn-sm content-icon me-1" disabled={i === fields.length - 1}
+                                aria-label={`Bajar ${f.label || "campo"}`} onClick={() => moveField(i, 1)}>
+                                <i className="fa-solid fa-angle-down" />
+                              </button>
+                              <button type="button" className="btn btn-warning btn-sm content-icon me-1"
+                                aria-label={`Editar ${f.label || "campo"}`}
+                                onClick={() => setEditandoId(editandoId === f.id ? null : f.id)}>
+                                <i className="fa fa-edit" />
+                              </button>
+                              <button type="button" className="btn btn-danger btn-sm content-icon"
+                                aria-label={`Quitar ${f.label || "campo"}`}
+                                onClick={() => setFields((prev) => prev.filter((x) => x.id !== f.id))}>
+                                <i className="fa-solid fa-trash" />
+                              </button>
+                            </td>
+                          </tr>
+                          {editandoId === f.id && (
+                            <tr key={`${f.id}-edit`}>
+                              <td colSpan={4}>
+                                <div className="row">
+                                  <div className="col-lg-6">
+                                    <div className="form-group mb-3">
+                                      <label className="text-black font-w600" htmlFor={`fm-label-${f.id}`}>Etiqueta</label>
+                                      <input id={`fm-label-${f.id}`} type="text" className="form-control" value={f.label}
+                                        onChange={(e) => setFields((prev) => prev.map((x) => x.id === f.id ? { ...x, label: e.target.value } : x))} />
+                                    </div>
+                                  </div>
+                                  <div className="col-lg-6">
+                                    <div className="form-group mb-3">
+                                      <label className="text-black font-w600" htmlFor={`fm-ph-${f.id}`}>Placeholder</label>
+                                      <input id={`fm-ph-${f.id}`} type="text" className="form-control" value={f.placeholder}
+                                        onChange={(e) => setFields((prev) => prev.map((x) => x.id === f.id ? { ...x, placeholder: e.target.value } : x))} />
+                                    </div>
+                                  </div>
+                                  {f.type === "select" && (
+                                    <div className="col-lg-12">
+                                      <div className="form-group mb-3">
+                                        <label className="text-black font-w600" htmlFor={`fm-opts-${f.id}`}>Opciones (una por línea)</label>
+                                        <textarea id={`fm-opts-${f.id}`} className="form-control" rows={3}
+                                          value={(f.options ?? []).join("\n")}
+                                          onChange={(e) => setFields((prev) => prev.map((x) => x.id === f.id ? { ...x, options: e.target.value.split("\n").filter(Boolean) } : x))} />
+                                      </div>
+                                    </div>
+                                  )}
+                                  <div className="col-lg-12">
+                                    <div className="form-check mb-0">
+                                      <input className="form-check-input" type="checkbox" id={`fm-req-${f.id}`} checked={f.required}
+                                        onChange={(e) => setFields((prev) => prev.map((x) => x.id === f.id ? { ...x, required: e.target.checked } : x))} />
+                                      <label className="form-check-label" htmlFor={`fm-req-${f.id}`}>Campo obligatorio</label>
+                                    </div>
+                                  </div>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-border px-6 py-4">
-            <NelvyonDsButton type="button" variant="ghost" onClick={onClose}>Cancelar</NelvyonDsButton>
-            <NelvyonDsButton type="submit" disabled={saving}>
-              {saving ? "Guardando…" : "Guardar formulario"}
-            </NelvyonDsButton>
+          <div className="col-lg-12">
+            <div className="text-end">
+              <button type="button" className="btn btn-danger light me-2" onClick={onClose}>Cancelar</button>
+              <button type="submit" className="btn btn-primary" disabled={saving}>
+                {saving ? "Guardando…" : "Guardar formulario"}
+              </button>
+            </div>
           </div>
-        </form>
-      </div>
-    </div>
+        </div>
+      </form>
+    </W3crmModal>
   );
 }
 
-// ─── Embed code modal ─────────────────────────────────────────────────────────
+// ─── Embed ────────────────────────────────────────────────────────────────────
 
 function EmbedModal({ form, onClose }: { form: Form; onClose: () => void }) {
   const embedCode = `<script src="${typeof window !== "undefined" ? window.location.origin : "https://nelvyon.com"}/embed/form.js" data-form-id="${form.id}" async></script>`;
   const [copied, setCopied] = useState(false);
 
   async function copy() {
-    await navigator.clipboard.writeText(embedCode);
+    await navigator.clipboard?.writeText(embedCode);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl">
-        <h2 className="mb-1 text-lg font-semibold text-foreground">Integrar formulario</h2>
-        <p className="mb-4 text-sm text-muted-foreground">Pega este código donde quieras que aparezca el formulario</p>
-        <pre className="overflow-x-auto rounded-xl bg-muted/30 p-4 text-xs text-muted-foreground">{embedCode}</pre>
-        <div className="mt-4 flex gap-3">
-          <NelvyonDsButton className="flex-1" onClick={copy}>{copied ? "¡Copiado!" : "Copiar código"}</NelvyonDsButton>
-          <NelvyonDsButton variant="ghost" onClick={onClose}>Cerrar</NelvyonDsButton>
-        </div>
+    <W3crmModal titulo="Integrar formulario" onClose={onClose} testId="modal-embed">
+      <p className="fs-14 text-muted">Pega este código donde quieras que aparezca el formulario.</p>
+      <pre className="border rounded p-3 fs-12 text-break mb-3">{embedCode}</pre>
+      <div className="text-end">
+        <button type="button" className="btn btn-danger light me-2" onClick={onClose}>Cerrar</button>
+        <button type="button" className="btn btn-primary" onClick={() => void copy()}>
+          {copied ? "¡Copiado!" : "Copiar código"}
+        </button>
       </div>
-    </div>
+    </W3crmModal>
   );
 }
 
-// ─── Submissions viewer modal ─────────────────────────────────────────────────
-
-interface FormSubmission {
-  id: string;
-  data: Record<string, unknown>;
-  ip: string | null;
-  createdAt: string;
-  contactId: string | null;
-  contactName: string | null;
-  contactEmail: string | null;
-}
+// ─── Respuestas ───────────────────────────────────────────────────────────────
 
 function SubmissionsModal({ form, onClose }: { form: Form; onClose: () => void }) {
   const [submissions, setSubmissions] = useState<FormSubmission[]>([]);
@@ -358,61 +304,57 @@ function SubmissionsModal({ form, onClose }: { form: Form; onClose: () => void }
   useEffect(() => {
     fetch(`/api/saas/formularios/${form.id}/submissions`)
       .then((r) => r.json())
-      .then((d: { submissions?: FormSubmission[] }) => setSubmissions(d.submissions ?? []))
+      .then((d: { submissions?: FormSubmission[] }) => setSubmissions(Array.isArray(d.submissions) ? d.submissions : []))
+      .catch(() => setSubmissions([]))
       .finally(() => setLoading(false));
   }, [form.id]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm">
-      <div className="my-8 w-full max-w-3xl rounded-2xl border border-border bg-card shadow-2xl">
-        <div className="flex items-center justify-between border-b border-border px-6 py-4">
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">Respuestas · {form.name}</h2>
-            <p className="text-xs text-muted-foreground">{form.submissions} respuesta{form.submissions === 1 ? "" : "s"} registradas</p>
+    <W3crmModal titulo={`Respuestas · ${form.name}`} onClose={onClose} size="lg" testId="modal-respuestas-form">
+      {loading ? (
+        <W3crmCargando texto="Cargando respuestas…" />
+      ) : submissions.length === 0 ? (
+        <W3crmEmptyState title="Sin respuestas" description="Todavía no hay respuestas para este formulario." />
+      ) : (
+        <div className="table-responsive">
+          <div className="dataTables_wrapper no-footer">
+            <table className="table table-responsive-lg table-striped table-condensed flip-content">
+              <thead>
+                <tr>
+                  <th className="text-black">Fecha</th>
+                  <th className="text-black">Contacto</th>
+                  <th className="text-black">Datos</th>
+                </tr>
+              </thead>
+              <tbody>
+                {submissions.map((s) => (
+                  <tr key={s.id}>
+                    <td>{fecha(s.createdAt)}</td>
+                    <td>
+                      {s.contactId
+                        ? <span className="badge badge-success">{s.contactName ?? s.contactEmail ?? "Contacto vinculado"}</span>
+                        : <span className="badge badge-secondary light">Sin contacto</span>}
+                    </td>
+                    <td>
+                      {Object.entries(s.data ?? {}).map(([key, value]) => (
+                        <div key={key} className="fs-12">
+                          <span className="text-muted">{key}: </span>
+                          <span>{String(value)}</span>
+                        </div>
+                      ))}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
         </div>
-
-        <div className="max-h-[70vh] overflow-y-auto px-6 py-5">
-          {loading ? (
-            <div className="space-y-2">
-              {Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-14 animate-pulse rounded-lg bg-muted/30" />)}
-            </div>
-          ) : submissions.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-border py-12 text-center">
-              <p className="text-sm text-muted-foreground">Todavía no hay respuestas para este formulario.</p>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-3">
-              {submissions.map((s) => (
-                <div key={s.id} className="rounded-xl border border-border p-4">
-                  <div className="mb-2 flex items-center justify-between gap-2">
-                    <span className="text-xs text-muted-foreground">{new Date(s.createdAt).toLocaleString("es-ES")}</span>
-                    {s.contactId ? (
-                      <NelvyonDsBadge tone="success">{s.contactName ?? s.contactEmail ?? "Contacto vinculado"}</NelvyonDsBadge>
-                    ) : (
-                      <NelvyonDsBadge tone="neutral">Sin contacto</NelvyonDsBadge>
-                    )}
-                  </div>
-                  <dl className="grid gap-1.5 sm:grid-cols-2">
-                    {Object.entries(s.data).map(([key, value]) => (
-                      <div key={key} className="flex gap-2 text-sm">
-                        <dt className="shrink-0 font-medium text-muted-foreground">{key}:</dt>
-                        <dd className="truncate text-foreground">{String(value)}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
+      )}
+    </W3crmModal>
   );
 }
 
-// ─── Template gallery ─────────────────────────────────────────────────────────
+// ─── Galeria de plantillas ────────────────────────────────────────────────────
 
 function FormTemplateGallery({ onImported }: { onImported: () => void }) {
   const [templates, setTemplates] = useState<Array<{ id: string; name: string; description: string }>>([]);
@@ -421,7 +363,8 @@ function FormTemplateGallery({ onImported }: { onImported: () => void }) {
   useEffect(() => {
     fetch("/api/saas/formularios/templates")
       .then((r) => r.json())
-      .then((d: { templates?: Array<{ id: string; name: string; description: string }> }) => setTemplates(d.templates ?? []))
+      .then((d: { templates?: Array<{ id: string; name: string; description: string }> }) =>
+        setTemplates(Array.isArray(d.templates) ? d.templates : []))
       .catch(() => {});
   }, []);
 
@@ -442,25 +385,26 @@ function FormTemplateGallery({ onImported }: { onImported: () => void }) {
   if (!templates.length) return null;
 
   return (
-    <NelvyonDsCard className="p-4">
-      <p className="text-sm font-semibold text-foreground">Plantillas oficiales Nelvyon ({templates.length})</p>
-      <p className="text-xs text-muted-foreground mt-0.5">Lead capture, presupuesto, RSVP, NPS y más</p>
-      <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+    <W3crmContentBox titulo={`Plantillas oficiales Nelvyon (${templates.length})`} icono="fa-solid fa-file-lines">
+      <div className="row">
         {templates.map((t) => (
-          <div key={t.id} className="rounded-lg border border-border p-3">
-            <p className="text-xs font-medium text-foreground">{t.name}</p>
-            <p className="text-[10px] text-muted-foreground line-clamp-2 mt-0.5">{t.description}</p>
-            <NelvyonDsButton className="mt-2 w-full" size="sm" disabled={importing === t.id} onClick={() => void importTpl(t.id)}>
-              {importing === t.id ? "…" : "Importar"}
-            </NelvyonDsButton>
+          <div className="col-xl-3 col-md-6 mb-3" key={t.id}>
+            <div className="card mb-0 h-100">
+              <div className="card-body">
+                <h6 className="mb-1">{t.name}</h6>
+                <p className="fs-12 text-muted mb-3">{t.description}</p>
+                <button type="button" className="btn btn-primary btn-sm" disabled={importing === t.id}
+                  onClick={() => void importTpl(t.id)}>
+                  {importing === t.id ? "Importando…" : "Importar"}
+                </button>
+              </div>
+            </div>
           </div>
         ))}
       </div>
-    </NelvyonDsCard>
+    </W3crmContentBox>
   );
 }
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function SaasFormulariosPage() {
   const [forms, setForms] = useState<Form[]>([]);
@@ -476,8 +420,8 @@ export default function SaasFormulariosPage() {
     setLoading(true);
     try {
       const res = await fetch("/api/saas/formularios");
-      const data = (await res.json().catch(() => ({ forms: [] }))) as { forms: Form[] };
-      setForms(data.forms ?? []);
+      const data = (await res.json().catch(() => ({}))) as { forms?: Form[] };
+      setForms(Array.isArray(data.forms) ? data.forms : []);
     } finally {
       setLoading(false);
     }
@@ -500,7 +444,17 @@ export default function SaasFormulariosPage() {
   }
 
   async function deleteForm(f: Form) {
-    if (!window.confirm(`¿Eliminar el formulario "${f.name}"? Esta acción no se puede deshacer.`)) return;
+    const r = await Alert.fire({
+      title: `¿Eliminar el formulario "${f.name}"?`,
+      text: "Esta acción no se puede deshacer.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Eliminar",
+      cancelButtonText: "Cancelar",
+    });
+    if (!r.value) return;
     setDeletingId(f.id);
     try {
       const res = await fetch(`/api/saas/formularios/${f.id}`, { method: "DELETE" });
@@ -510,103 +464,91 @@ export default function SaasFormulariosPage() {
     }
   }
 
-  const totalSubmissions = forms.reduce((s, f) => s + f.submissions, 0);
+  const totalSubmissions = forms.reduce((s, f) => s + num(f.submissions), 0);
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="formularios" />}>
-      <div className="flex flex-col gap-6 pb-8">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <NelvyonDsSectionHeader
-            title="Formularios"
-            subtitle="Crea formularios inteligentes y embédalos en cualquier web"
-          />
-          <NelvyonDsButton onClick={() => { setEditingForm(undefined); setShowBuilder(true); }}>+ Nuevo formulario</NelvyonDsButton>
-        </div>
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="Formularios" parentTitle="Gestión" pageTitle="Formularios" />
+      <div className="container-fluid">
+        <div className="row">
+          <div className="col-xl-4 col-sm-6"><W3crmKpiTile label="Formularios" value={forms.length} accent /></div>
+          <div className="col-xl-4 col-sm-6"><W3crmKpiTile label="Activos" value={forms.filter((f) => f.isActive).length} /></div>
+          <div className="col-xl-4 col-sm-6"><W3crmKpiTile label="Respuestas totales" value={totalSubmissions.toLocaleString("es-ES")} /></div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          <KpiTile icon="📋" label="Formularios" value={forms.length} />
-          <KpiTile icon="✅" label="Activos" value={forms.filter((f) => f.isActive).length} accent />
-          <KpiTile icon="📨" label="Respuestas totales" value={totalSubmissions.toLocaleString("es-ES")} />
-        </div>
+          <div className="col-xl-12">
+            <div className="mb-3">
+              <ul className="d-flex align-items-center flex-wrap">
+                <li>
+                  <button type="button" className="btn btn-primary"
+                    onClick={() => { setEditingForm(undefined); setShowBuilder(true); }}>
+                    + Nuevo formulario
+                  </button>
+                </li>
+              </ul>
+            </div>
 
-        <FormTemplateGallery onImported={() => void load()} />
+            <FormTemplateGallery onImported={() => void load()} />
 
-        {/* Forms grid */}
-        {loading ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="h-40 animate-pulse rounded-xl bg-muted/30" />
-            ))}
+            <W3crmContentBox titulo="Formularios" icono="fa-solid fa-file-lines">
+              {loading ? (
+                <W3crmCargando texto="Cargando formularios…" />
+              ) : forms.length === 0 ? (
+                <W3crmEmptyState title="Sin formularios" description="Crea tu primer formulario de captación de leads." />
+              ) : (
+                <W3crmDataTable
+                  filas={forms}
+                  etiqueta="formularios"
+                  columnas={[{ titulo: "Nombre" }, { titulo: "Campos" }, { titulo: "Respuestas" }, { titulo: "Estado" }, { titulo: "Acciones", alFinal: true }]}
+                  render={(f) => (
+                    <tr key={f.id}>
+                      <td>
+                        <span className="fw-bold">{f.name || "—"}</span>
+                        {f.description ? <div className="text-muted fs-12">{f.description}</div> : null}
+                      </td>
+                      <td>{camposDe(f).length}</td>
+                      <td>
+                        <button type="button" className="btn btn-link p-0 fs-14" onClick={() => setSubmissionsForm(f)}>
+                          {num(f.submissions)}
+                        </button>
+                      </td>
+                      <td>
+                        <button type="button"
+                          className={`btn btn-sm ${f.isActive ? "btn-primary" : "btn-primary light"}`}
+                          disabled={togglingId === f.id}
+                          aria-pressed={f.isActive}
+                          aria-label={f.isActive ? `Desactivar ${f.name}` : `Activar ${f.name}`}
+                          onClick={() => void toggleActive(f)}>
+                          {togglingId === f.id ? "…" : f.isActive ? "Activo" : "Inactivo"}
+                        </button>
+                      </td>
+                      <td className="text-end">
+                        <button type="button" className="btn btn-primary light btn-sm content-icon me-1"
+                          aria-label={`Embed de ${f.name}`} onClick={() => setEmbedForm(f)}>
+                          <i className="fa-solid fa-code" />
+                        </button>
+                        <button type="button" className="btn btn-warning btn-sm content-icon me-1"
+                          aria-label={`Editar ${f.name}`} onClick={() => { setEditingForm(f); setShowBuilder(true); }}>
+                          <i className="fa fa-edit" />
+                        </button>
+                        <button type="button" className="btn btn-danger btn-sm content-icon" disabled={deletingId === f.id}
+                          aria-label={`Eliminar ${f.name}`} onClick={() => void deleteForm(f)}>
+                          <i className="fa-solid fa-trash" />
+                        </button>
+                      </td>
+                    </tr>
+                  )}
+                />
+              )}
+            </W3crmContentBox>
           </div>
-        ) : forms.length === 0 ? (
-          <NelvyonDsCard className="p-16 text-center">
-            <p className="text-5xl">📋</p>
-            <p className="mt-4 text-lg font-semibold text-foreground">Sin formularios</p>
-            <p className="mt-2 text-sm text-muted-foreground">Crea tu primer formulario de captación de leads</p>
-            <NelvyonDsButton className="mt-5" onClick={() => { setEditingForm(undefined); setShowBuilder(true); }}>
-              + Nuevo formulario
-            </NelvyonDsButton>
-          </NelvyonDsCard>
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {forms.map((f) => (
-              <NelvyonDsCard key={f.id} className="flex flex-col gap-3 p-5">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="truncate font-semibold text-foreground">{f.name}</p>
-                    {f.description && <p className="mt-0.5 truncate text-sm text-muted-foreground">{f.description}</p>}
-                  </div>
-                  <button
-                    onClick={() => void toggleActive(f)}
-                    disabled={togglingId === f.id}
-                    aria-pressed={f.isActive}
-                    aria-label={f.isActive ? "Desactivar formulario" : "Activar formulario"}
-                    className="shrink-0 disabled:opacity-50"
-                  >
-                    <NelvyonDsBadge tone={f.isActive ? "success" : "neutral"}>
-                      {togglingId === f.id ? "…" : f.isActive ? "Activo" : "Inactivo"}
-                    </NelvyonDsBadge>
-                  </button>
-                </div>
-                <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                  <span>{f.fields.length} campos</span>
-                  <span>·</span>
-                  <button onClick={() => setSubmissionsForm(f)} className="underline-offset-2 hover:text-foreground hover:underline">
-                    {f.submissions} respuestas
-                  </button>
-                </div>
-                <div className="flex gap-2">
-                  <NelvyonDsButton variant="ghost" className="flex-1" onClick={() => setEmbedForm(f)}>
-                    {"</>"} Embed
-                  </NelvyonDsButton>
-                  <NelvyonDsButton variant="ghost" className="flex-1" onClick={() => { setEditingForm(f); setShowBuilder(true); }}>
-                    Editar
-                  </NelvyonDsButton>
-                  <button
-                    onClick={() => void deleteForm(f)}
-                    disabled={deletingId === f.id}
-                    aria-label={`Eliminar formulario ${f.name}`}
-                    className="rounded-lg p-2 text-destructive/60 hover:bg-destructive/10 hover:text-destructive disabled:opacity-40 transition-colors"
-                  >
-                    {deletingId === f.id ? "…" : "🗑"}
-                  </button>
-                </div>
-              </NelvyonDsCard>
-            ))}
-          </div>
-        )}
+        </div>
       </div>
 
       {showBuilder && (
-        <FormBuilderModal
-          form={editingForm}
-          onClose={() => setShowBuilder(false)}
-          onSaved={load}
-        />
+        <FormBuilderModal form={editingForm} onClose={() => setShowBuilder(false)} onSaved={load} />
       )}
       {embedForm && <EmbedModal form={embedForm} onClose={() => setEmbedForm(null)} />}
       {submissionsForm && <SubmissionsModal form={submissionsForm} onClose={() => setSubmissionsForm(null)} />}
-    </SaasShellLayout>
+    </SaasW3crmShell>
   );
 }

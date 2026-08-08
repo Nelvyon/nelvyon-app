@@ -4,12 +4,21 @@ import { ModuleDetailPage, getModule, saasModules } from "@/features/public-web"
 
 type Props = { params: Promise<{ slug: string }> };
 
+/**
+ * Slugs de /producto/* que no tienen ficha propia y se resuelven a otra ruta.
+ *
+ * Antes apuntaban a Homes AIOR (`home-ai-agent.html`, `home-ai-chatbot.html`,
+ * `home-productivity-tools.html`, `home-ai-chatbot-tool.html`) que se
+ * consolidaron en Home 08 y SaaS 02 y devuelven 404. Ahora apuntan a rutas
+ * vigentes de NELVYON: `/saas` (que sirve SaaS 02) para lo generico y el
+ * modulo real cuando existe.
+ */
 const AIOR_SLUG: Record<string, string> = {
-  ia: "/www/home-ai-agent.html",
-  agentes: "/www/home-ai-agent.html",
-  inbox: "/www/home-ai-chatbot.html",
-  workflows: "/www/home-productivity-tools.html",
-  whatsapp: "/www/home-ai-chatbot-tool.html",
+  ia: "/saas",
+  agentes: "/saas",
+  inbox: "/saas/inbox",
+  workflows: "/saas/workflows",
+  whatsapp: "/saas/whatsapp",
 };
 
 export function generateStaticParams() {

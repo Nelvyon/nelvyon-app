@@ -1,0 +1,45 @@
+"use client"
+// import { ThemeContext } from "@/features/saas-w3crm/context/ThemeContext";
+import { useEffect, useState } from "react";
+import Nav  from "@/features/saas-w3crm/layouts/nav";
+import type { W3crmMenuItem } from "@/features/saas-w3crm/layouts/nav/Menu";
+import Footer from "@/features/saas-w3crm/layouts/Footer";
+import { usePathname } from "next/navigation";
+
+const Layout = ({ children, menuList }: { children: React.ReactNode; menuList?: W3crmMenuItem[] }) => {
+    // const { menuToggle } = useContext(ThemeContext);
+    const [minHeight, setMinHeight] = useState(0);
+    useEffect(() => {    
+        setMinHeight(window.screen.height - 45);
+    }, []);
+    const layoutdata = ["/page-error-400", "/page-error-403", 
+        "/page-error-404", "/page-error-500", "/page-error-503", "/login",
+        "/page-register", "/page-lock-screen"
+    ];
+    const cuurentpath = usePathname() ?? "";      
+    return (
+        <>
+            {!layoutdata.includes(cuurentpath) ?
+            <div id="main-wrapper"  
+                // className={`show ${ menuToggle ? "menu-toggle" : ""}`}
+                className={`show`}
+            >
+                <Nav menuList={menuList} />
+                <div className="content-body" style={{ minHeight: minHeight }}>
+                    {/* La plantilla usa <main> aqui, pero el layout raiz de NELVYON
+                        (app/layout.tsx) ya envuelve todo en <main>. Anidarlos daba
+                        dos landmarks `main` por documento, que es invalido y hacia
+                        fallar los tests de accesibilidad. Se usa <div>: ninguna regla
+                        del CSS del pack selecciona la etiqueta `main`, asi que el
+                        cambio es solo semantico y no altera el diseno. */}
+                    <div>{children}</div>
+                </div>
+                <Footer />
+            </div>
+            :
+                <main>{children}</main>
+            }
+        </>
+    );
+};
+export default Layout;

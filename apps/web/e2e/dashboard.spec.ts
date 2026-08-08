@@ -46,6 +46,22 @@ test.describe("Dashboard SaaS", () => {
         body: JSON.stringify(dashboardPayload),
       });
     });
+    // El shell lee los permisos de /api/saas/settings. Sin mock devuelve 401 y
+    // el filtro RBAC oculta los modulos que exigen permiso (CRM, Pipeline...).
+    await page.route("**/api/saas/settings", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          role: "owner",
+          permissions: [
+            "contacts.read", "contacts.write", "deals.read", "campanias.read",
+            "workflows.read", "analytics.read",
+          ],
+          tenant: { companyName: "NELVYON Labs", plan: "pro" },
+        }),
+      });
+    });
   });
 
   test("Dashboard muestra 4 KPI cards", async ({ page }) => {
@@ -61,11 +77,16 @@ test.describe("Dashboard SaaS", () => {
   test("Sidebar tiene todos los nav links", async ({ page }) => {
     await page.goto("/saas/dashboard");
     const nav = page.getByTestId("saas-sidebar");
-    await expect(nav.getByText("Dashboard", { exact: true })).toBeVisible();
-    await expect(nav.getByText("Setup", { exact: false })).toBeVisible();
-    await expect(nav.getByText("Unified Inbox", { exact: true })).toBeVisible();
-    await expect(nav.getByText("CRM", { exact: true })).toBeVisible();
-    await expect(nav.getByText("AI Panel", { exact: true })).toBeVisible();
+    // El sidebar de W3CRM es un ACORDEON: solo mantiene un grupo abierto y lo
+    // expande cuando llegan los permisos. Los modulos de los grupos cerrados
+    // siguen en el DOM. Este test verifica que el menu CONTIENE todos los
+    // modulos autorizados, no cual de ellos esta desplegado en un instante
+    // concreto: asi es determinista y no depende del momento de la animacion.
+    await expect(nav.locator('a[href="/saas/dashboard"]').first()).toBeAttached({ timeout: 30_000 });
+    await expect(nav.locator('a[href="/saas/setup"]').first()).toBeAttached();
+    await expect(nav.locator('a[href="/saas/inbox"]').first()).toBeAttached();
+    await expect(nav.locator('a[href="/saas/crm"]').first()).toBeAttached();
+    await expect(nav.locator('a[href="/saas/ai"]').first()).toBeAttached();
   });
 
   test("Empty state visible si no hay jobs", async ({ page }) => {

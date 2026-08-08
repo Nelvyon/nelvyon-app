@@ -1,0 +1,135 @@
+/**
+ * Correcciones de convivencia Tailwind v4 <-> Bootstrap 5 dentro de `.w3crm-scope`.
+ *
+ * NO es maquillaje visual ni un rediseño: aquí solo se neutralizan utilidades de
+ * Tailwind cuyo NOMBRE coincide con el de un componente de Bootstrap que la
+ * plantilla W3CRM usa tal cual. El marcado, las clases y la CSS de la plantilla
+ * quedan intactos.
+ *
+ * ---------------------------------------------------------------------------
+ * `.collapse` — incompatibilidad demostrada
+ *
+ * Tailwind v4 emite la utilidad `.collapse { visibility: collapse }` (sirve para
+ * ocultar filas y columnas de tabla). Bootstrap 5 usa `.collapse` como
+ * componente y solo gobierna `display`: al abrirse añade `.show`, que restaura
+ * `display`, pero NADA restaura `visibility`.
+ *
+ * El submenú del sidebar (`react-bootstrap/Collapse` -> `class="collapse show"`)
+ * quedaba entonces con `display: block` y `visibility: collapse`: ocupaba su
+ * altura real (635 px medidos) pero era invisible para el usuario y quedaba
+ * fuera del árbol de accesibilidad. De ahí que el sidebar mostrase los grupos
+ * y ningún enlace de módulo, y que las comprobaciones basadas en medir alturas
+ * no detectaran nada raro: `getBoundingClientRect()` no ve `visibility`.
+ *
+ * La especificidad (0,2,0 frente a 0,1,0) hace que esto gane sin depender del
+ * orden en que se carguen las hojas de estilo.
+ */
+.w3crm-scope .collapse {
+  visibility: visible;
+}
+
+/**
+ * ---------------------------------------------------------------------------
+ * Foco de los controles de XYFlow — regresión de accesibilidad demostrada
+ *
+ * La hoja de W3CRM trae dos reglas globales de Bootstrap sobre `button`:
+ *
+ *   button:focus { outline: 0; box-shadow: none }      (style.css:27546)
+ *   button:focus:not(:focus-visible) { outline: 0 }    (style.css:627)
+ *
+ * La primera no distingue `:focus-visible`, así que dentro del scope los
+ * botones de zoom, ajuste y bloqueo de `<Controls>` dejaban de mostrar CUALQUIER
+ * indicador de foco al recorrerlos con el teclado. XYFlow no define un foco
+ * propio para ellos: confía en el del navegador, que es justo el que se anula.
+ *
+ * Se restaura SOLO para esos botones y SOLO en navegación por teclado. No se
+ * toca la hoja de W3CRM ni la de XYFlow, ni se altera el foco de ningún otro
+ * botón de la plantilla: la especificidad (0,3,0) se limita a este caso.
+ */
+.w3crm-scope .react-flow__controls-button:focus-visible {
+  outline: 2px solid var(--primary, #0d99ff);
+  outline-offset: 2px;
+}
+
+/**
+ * ---------------------------------------------------------------------------
+ * CLS del primer render — geometria inicial del sidebar
+ *
+ * `ThemeContextProvider` decide `data-sidebar-style` en su efecto de montaje,
+ * leyendo `window.innerWidth`: `>=768 && <1024` -> mini, `<=768` -> overlay,
+ * resto -> full. Hasta que ese efecto corre, `body` no tiene el atributo y
+ * aplica el valor por defecto de la plantilla (`.content-body{margin-left:15rem}`),
+ * que en tablet y movil NO es el que acabara aplicandose. Medido: el margen
+ * pasaba de 210px a 53,2px (tablet) o a 0 (movil) hacia los ~127ms, y ese
+ * unico ajuste discreto era el CLS restante tras 3d886b38.
+ *
+ * Aqui se declara ESA MISMA geometria por media query, con los mismos umbrales
+ * que usa el efecto y los mismos valores que ya define W3CRM
+ * (`[data-sidebar-style="mini"] .content-body{margin-left:3.8rem}` en
+ * style.css:14415 y `[data-sidebar-style="overlay"] .content-body{margin-left:0}`
+ * en 15450), y SOLO mientras el atributo no existe: en cuanto el proveedor lo
+ * fija, estas reglas dejan de aplicar y manda la hoja de la plantilla.
+ *
+ * Sin JavaScript, sin leer `window` en SSR, sin tocar los valores finales y sin
+ * geometria unica para todos los viewports: no puede producir hydration
+ * mismatch ni cambiar la UX.
+ */
+@media (min-width: 48rem) and (max-width: 63.99rem) {
+  body:not([data-sidebar-style]) .content-body {
+    margin-left: 3.8rem;
+  }
+}
+@media (max-width: 47.99rem) {
+  body:not([data-sidebar-style]) .content-body {
+    margin-left: 0;
+  }
+}
+
+/**
+ * ---------------------------------------------------------------------------
+ * CLS vertical del primer render — cabecera fija
+ *
+ * Mismo patron que la geometria del sidebar, con otro atributo:
+ * `ThemeContextProvider` fija `data-header-position="fixed"` sobre `body` en su
+ * efecto de montaje. Hasta entonces `.header` NO es `position: fixed`, asi que
+ * ocupa 44px de flujo y empuja a `.content-body`, que ademas todavia no lleva el
+ * `padding-top` que compensa esa cabecera.
+ *
+ * Medido en /saas/dashboard, desktop 1440:
+ *   t=153ms  body sin `data-header-position`
+ *   t=316ms  div.content-body [y=44 h=138  ->  y=0 h=855]   shift 0,3991
+ *   t=317ms  body ya con "fixed"; .header position:fixed h=44;
+ *            .content-body y=0 padding-top=43.75px
+ *
+ * Ese salto vertical de 44px era el shift dominante que quedaba tras 006bf393.
+ *
+ * Se declaran aqui LAS MISMAS reglas que la plantilla aplica con el atributo
+ * (style.css:10410, 10791, 10796 y 10805), incluidas sus media queries, y SOLO
+ * mientras el atributo no existe: en cuanto el proveedor lo fija, estas dejan de
+ * aplicar y manda la hoja de W3CRM. Sin JavaScript, sin ocultar contenido, sin
+ * alturas arbitrarias y sin tocar ningun valor final.
+ */
+body:not([data-header-position]) .nav-header {
+  position: fixed;
+}
+body:not([data-header-position]) .header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+body:not([data-header-position]) .deznav {
+  margin-top: 0;
+}
+body:not([data-header-position]) .content-body {
+  padding-top: 3.125rem;
+}
+@media only screen and (max-width: 47.9375rem) {
+  body:not([data-header-position]) .content-body {
+    padding-top: 3.1rem;
+  }
+}
+@media only screen and (min-width: 48rem) and (max-width: 63.9375rem) {
+  body:not([data-header-position]) .content-body {
+    padding-top: 3.1rem;
+  }
+}

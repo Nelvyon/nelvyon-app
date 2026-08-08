@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
-import Link from "next/link";
+// Enlace que usa `<a>` para las rutas servidas por el pack estatico y
+// `next/link` para el resto. Ver EnlacePublico.tsx.
+import { EnlacePublico as Link } from "@/features/public-web/components/EnlacePublico";
 
 import type { PageContentEntry } from "../content/siteContent";
 import { BrandAsideNext, BrandCheckList, BrandSection, BrandTitle } from "./BrandBlocks";

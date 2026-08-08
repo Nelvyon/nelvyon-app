@@ -1,24 +1,40 @@
 "use client";
 
+/**
+ * /saas/social sobre `(cms)/content` de W3CRM, con las piezas ya portadas.
+ * Mapeo: cuentas conectadas y listado de posts -> `W3crmContentBox` +
+ * `W3crmDataTable`; alta de post -> `W3crmModal`; metricas -> `W3crmKpiTile`.
+ * Sin componentes nuevos.
+ *
+ * Inventario: sin `data-testid` y sin spec dedicado — lo cubre
+ * `saas-nav-full-coverage`. Verificado que ningun spec hace aserciones de
+ * texto sobre esta ruta.
+ *
+ * Logica de NELVYON intacta: `GET /api/saas/social/posts?limit=50` y
+ * `GET /api/saas/social/accounts` con `Promise.allSettled` (un fallo no tumba
+ * al otro); el alta que hace UN POST POR CUENTA seleccionada con
+ * `social_account_id`, `media_urls` y `scheduled_at`; `POST { action:
+ * "publish", id }`; `DELETE ?id=`; el agente de sugerencias
+ * `POST /api/saas/social/suggest` con su `topic`/`platform` y el pegado de
+ * hashtags; las plantillas elite (`listSocialElitePresets` /
+ * `formatSocialPresetContent`); el editor HTML alternativo (`EmailEditor`); el
+ * contador de caracteres que descuenta las etiquetas; y los enlaces OAuth a
+ * Meta y LinkedIn.
+ */
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmEmptyState, W3crmKpiTile } from "@/features/saas-w3crm/components/W3crmUi";
 import {
-  NelvyonDsBadge,
-  NelvyonDsButton,
-  NelvyonDsCard,
-  NelvyonDsSectionHeader,
-} from "@/design-system/components";
-import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasDegradedBanner } from "@/features/saas-shell/components/SaasDegradedBanner";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+  W3crmCargando,
+  W3crmContentBox,
+  W3crmDataTable,
+  W3crmModal,
+} from "@/features/saas-w3crm/components/W3crmContentBox";
 import { EmailEditor } from "@/features/email-editor/EmailEditor";
-import {
-  formatSocialPresetContent,
-  listSocialElitePresets,
-} from "@/lib/eliteTemplates/socialTemplates";
-
-// ─── Types (shaped to match /api/saas/social/* responses) ─────────────────────
+import { formatSocialPresetContent, listSocialElitePresets } from "@/lib/eliteTemplates/socialTemplates";
 
 type SocialPlatform = string;
 
@@ -39,36 +55,49 @@ interface SocialPost {
   errorMessage: string | null;
 }
 
-const PLATFORM_CONFIG: Record<string, { label: string; color: string; icon: string }> = {
-  instagram: { label: "Instagram", color: "bg-pink-500/10 text-pink-400 border-pink-500/20", icon: "📸" },
-  facebook: { label: "Facebook", color: "bg-blue-600/10 text-blue-400 border-blue-600/20", icon: "👤" },
-  twitter: { label: "X (Twitter)", color: "bg-sky-500/10 text-sky-400 border-sky-500/20", icon: "🐦" },
-  linkedin: { label: "LinkedIn", color: "bg-blue-700/10 text-blue-300 border-blue-700/20", icon: "💼" },
-  tiktok: { label: "TikTok", color: "bg-purple-500/10 text-purple-400 border-purple-500/20", icon: "🎵" },
-  meta: { label: "Meta", color: "bg-blue-600/10 text-blue-400 border-blue-600/20", icon: "🌐" },
+const PLATFORM_CONFIG: Record<string, { label: string; icon: string }> = {
+  instagram: { label: "Instagram", icon: "fa-brands fa-instagram" },
+  facebook: { label: "Facebook", icon: "fa-brands fa-facebook" },
+  twitter: { label: "X (Twitter)", icon: "fa-brands fa-x-twitter" },
+  linkedin: { label: "LinkedIn", icon: "fa-brands fa-linkedin" },
+  tiktok: { label: "TikTok", icon: "fa-brands fa-tiktok" },
+  meta: { label: "Meta", icon: "fa-brands fa-meta" },
 };
 
+/** Una red desconocida ya caia al generico; se mantiene ese contrato. */
 function getPlatformCfg(platform: string) {
-  return PLATFORM_CONFIG[platform] ?? { label: platform, color: "border-border text-muted-foreground", icon: "📱" };
+  return PLATFORM_CONFIG[platform] ?? { label: platform || "—", icon: "fa-solid fa-mobile-screen" };
 }
 
-const STATUS_TONE = {
-  draft: "primary",
-  scheduled: "warning",
-  published: "success",
-  failed: "danger",
-} as const;
-
-const STATUS_LABELS = {
+const STATUS_BADGE: Record<string, string> = {
+  draft: "badge-primary",
+  scheduled: "badge-warning",
+  published: "badge-success",
+  failed: "badge-danger",
+};
+const STATUS_LABELS: Record<string, string> = {
   draft: "Borrador",
   scheduled: "Programado",
   published: "Publicado",
   failed: "Error",
-} as const;
+};
 
-// ─── New post modal ───────────────────────────────────────────────────────────
+/** Un estado fuera de catalogo pintaba `undefined`. */
+function estadoLabel(s: string): string { return STATUS_LABELS[s] ?? (s ? String(s) : "—"); }
+function estadoBadge(s: string): string { return STATUS_BADGE[s] ?? "badge-secondary"; }
+/** El contenido puede no ser texto: `replace` reventaba. */
+function textoPlano(v: unknown): string {
+  return typeof v === "string" ? v.replace(/<[^>]+>/g, "") : "";
+}
+function fechaHora(iso: string | null | undefined): string {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? "—" : d.toLocaleString("es-ES");
+}
 
-function NewPostModal({ accounts, onClose, onSaved }: { accounts: SocialAccount[]; onClose: () => void; onSaved: () => void }) {
+function NewPostModal({ accounts, onClose, onSaved }: {
+  accounts: SocialAccount[]; onClose: () => void; onSaved: () => void;
+}) {
   const [selectedAccountIds, setSelectedAccountIds] = useState<string[]>([]);
   const [content, setContent] = useState("");
   const [mediaUrl, setMediaUrl] = useState("");
@@ -96,15 +125,14 @@ function NewPostModal({ accounts, onClose, onSaved }: { accounts: SocialAccount[
       const res = await fetch("/api/saas/social/suggest", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          topic: content.trim() || "promoción del negocio",
-          platform,
-        }),
+        body: JSON.stringify({ topic: content.trim() || "promoción del negocio", platform }),
       });
       if (!res.ok) throw new Error("No se pudo generar borrador");
-      const d = (await res.json()) as { draft?: { content: string; hashtags: string[] } };
+      const d = (await res.json().catch(() => ({}))) as { draft?: { content?: string; hashtags?: string[] } };
       if (d.draft?.content) {
-        const tags = d.draft.hashtags?.length ? `\n\n${d.draft.hashtags.join(" ")}` : "";
+        // `hashtags` podia no ser array y reventaba el `.join`.
+        const hashtags = Array.isArray(d.draft.hashtags) ? d.draft.hashtags : [];
+        const tags = hashtags.length ? `\n\n${hashtags.join(" ")}` : "";
         setContent(`${d.draft.content}${tags}`);
       }
     } catch (err) {
@@ -115,7 +143,7 @@ function NewPostModal({ accounts, onClose, onSaved }: { accounts: SocialAccount[
   }
 
   function toggleAccount(id: string) {
-    setSelectedAccountIds((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
+    setSelectedAccountIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   }
 
   async function submit(e: React.FormEvent) {
@@ -127,12 +155,14 @@ function NewPostModal({ accounts, onClose, onSaved }: { accounts: SocialAccount[
     try {
       const scheduledAt = scheduleAt ? new Date(scheduleAt).toISOString() : undefined;
       const mediaUrls = mediaUrl.trim() ? [mediaUrl.trim()] : undefined;
-      // One POST per selected account
+      // Un POST por cuenta seleccionada.
       await Promise.all(selectedAccountIds.map((social_account_id) =>
         fetch("/api/saas/social/posts", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ social_account_id, content: content.trim(), media_urls: mediaUrls, scheduled_at: scheduledAt }),
+          body: JSON.stringify({
+            social_account_id, content: content.trim(), media_urls: mediaUrls, scheduled_at: scheduledAt,
+          }),
         }).then(async (r) => {
           if (!r.ok) {
             const j = (await r.json().catch(() => ({}))) as { error?: string };
@@ -150,126 +180,94 @@ function NewPostModal({ accounts, onClose, onSaved }: { accounts: SocialAccount[
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm">
-      <div className="my-8 w-full max-w-xl rounded-2xl border border-border bg-card shadow-2xl">
-        <div className="flex items-center justify-between border-b border-border px-6 py-4">
-          <h2 className="text-lg font-semibold text-foreground">Nuevo post</h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
-        </div>
-        <form onSubmit={submit} className="space-y-5 p-6">
-          {error && <p className="rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
-
-          <div>
-            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-              <label className="text-xs font-medium text-muted-foreground">Plantillas élite</label>
-              <NelvyonDsButton
-                type="button"
-                variant="secondary"
-                size="sm"
-                disabled={aiLoading}
-                onClick={() => void suggestWithAgent()}
-              >
-                {aiLoading ? "…" : "✦ Agente redes (0€)"}
-              </NelvyonDsButton>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {templatePresets.map((p) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  onClick={() => applyPreset(p.id)}
-                  className="rounded-lg border border-border px-2 py-1 text-xs text-muted-foreground hover:border-primary/50 hover:text-foreground"
-                >
-                  {p.label}
-                </button>
-              ))}
-            </div>
+    <W3crmModal titulo="Nuevo post" onClose={onClose} error={error} size="lg">
+      <form onSubmit={(e) => void submit(e)}>
+        <div className="form-group mb-3">
+          <div className="d-flex align-items-center justify-content-between mb-2">
+            <span className="text-black font-w600">Plantillas élite</span>
+            <button type="button" className="btn btn-primary light btn-sm" disabled={aiLoading}
+              onClick={() => void suggestWithAgent()}>
+              {aiLoading ? "…" : "Agente redes (0€)"}
+            </button>
           </div>
+          <div className="d-flex flex-wrap gap-1">
+            {templatePresets.map((p) => (
+              <button key={p.id} type="button" className="btn btn-primary light btn-sm"
+                onClick={() => applyPreset(p.id)}>
+                {p.label}
+              </button>
+            ))}
+          </div>
+        </div>
 
-          {/* Account selector */}
-          <div>
-            <label className="mb-2 block text-xs font-medium text-muted-foreground">Cuentas *</label>
-            <div className="flex flex-wrap gap-2">
-              {connectedAccounts.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No hay cuentas conectadas. Ve a Configuración → Redes Sociales.</p>
-              ) : connectedAccounts.map((a) => {
+        <div className="form-group mb-3">
+          <span className="text-black font-w600 d-block mb-2">Cuentas <span className="required">*</span></span>
+          {connectedAccounts.length === 0 ? (
+            <p className="fs-14 text-muted mb-0">
+              No hay cuentas conectadas. Ve a Configuración → Redes Sociales.
+            </p>
+          ) : (
+            <div className="d-flex flex-wrap gap-1">
+              {connectedAccounts.map((a) => {
                 const cfg = getPlatformCfg(a.platform);
                 const sel = selectedAccountIds.includes(a.id);
                 return (
-                  <button
-                    key={a.id}
-                    type="button"
-                    onClick={() => toggleAccount(a.id)}
-                    className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition-all ${
-                      sel ? cfg.color + " ring-2 ring-primary/40" : "border-border text-muted-foreground hover:border-primary/40"
-                    }`}
-                  >
-                    {cfg.icon} {cfg.label}
-                    <span className="text-xs opacity-60">{a.accountName}</span>
+                  <button key={a.id} type="button" aria-pressed={sel}
+                    className={`btn btn-sm ${sel ? "btn-primary" : "btn-primary light"}`}
+                    onClick={() => toggleAccount(a.id)}>
+                    <i className={`${cfg.icon} me-2`} aria-hidden="true" />
+                    {cfg.label}
+                    <span className="ms-2 fs-12">{a.accountName}</span>
                   </button>
                 );
               })}
             </div>
-          </div>
+          )}
+        </div>
 
-          {/* Content */}
-          <div>
-            <div className="mb-2 flex items-center justify-between">
-              <label className="text-xs font-medium text-muted-foreground">Contenido *</label>
-              <button type="button" onClick={() => setUseRichEditor((v) => !v)} className="text-xs text-primary hover:underline">
-                {useRichEditor ? "Editor simple" : "Editor HTML"}
-              </button>
-            </div>
-            {useRichEditor ? (
-              <EmailEditor value={content} onChange={setContent} placeholder="Escribe tu post…" />
-            ) : (
-              <textarea
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                rows={5}
-                placeholder="Escribe tu post... Usa #hashtags y @menciones"
-                className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
-              />
-            )}
-            <p className="mt-1 text-right text-xs text-muted-foreground">{content.replace(/<[^>]+>/g, "").length} caracteres</p>
+        <div className="form-group mb-3">
+          <div className="d-flex align-items-center justify-content-between mb-1">
+            <label htmlFor="soc-contenido" className="text-black font-w600">
+              Contenido <span className="required">*</span>
+            </label>
+            <button type="button" className="btn btn-primary light btn-sm"
+              onClick={() => setUseRichEditor((v) => !v)}>
+              {useRichEditor ? "Editor simple" : "Editor HTML"}
+            </button>
           </div>
+          {useRichEditor ? (
+            <EmailEditor value={content} onChange={setContent} placeholder="Escribe tu post…" />
+          ) : (
+            <textarea id="soc-contenido" className="form-control" rows={5}
+              placeholder="Escribe tu post... Usa #hashtags y @menciones"
+              value={content} onChange={(e) => setContent(e.target.value)} />
+          )}
+          <p className="fs-12 text-muted text-end mt-1 mb-0">{textoPlano(content).length} caracteres</p>
+        </div>
 
-          {/* Media URL */}
-          <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">URL de imagen/vídeo</label>
-            <input
-              type="url"
-              value={mediaUrl}
-              onChange={(e) => setMediaUrl(e.target.value)}
-              placeholder="https://cdn.tudominio.com/imagen.jpg"
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
-            />
-          </div>
+        <div className="form-group mb-3">
+          <label htmlFor="soc-media" className="text-black font-w600">URL de imagen/vídeo</label>
+          <input id="soc-media" className="form-control" type="url"
+            placeholder="https://cdn.tudominio.com/imagen.jpg"
+            value={mediaUrl} onChange={(e) => setMediaUrl(e.target.value)} />
+        </div>
 
-          {/* Schedule */}
-          <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Publicar en (vacío = ahora)</label>
-            <input
-              type="datetime-local"
-              value={scheduleAt}
-              onChange={(e) => setScheduleAt(e.target.value)}
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
-            />
-          </div>
+        <div className="form-group mb-3">
+          <label htmlFor="soc-fecha" className="text-black font-w600">Publicar en (vacío = ahora)</label>
+          <input id="soc-fecha" className="form-control" type="datetime-local"
+            value={scheduleAt} onChange={(e) => setScheduleAt(e.target.value)} />
+        </div>
 
-          <div className="flex gap-3">
-            <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
-            <NelvyonDsButton type="submit" disabled={saving} className="flex-1">
-              {saving ? "Publicando…" : scheduleAt ? "Programar" : "Publicar ahora"}
-            </NelvyonDsButton>
-          </div>
-        </form>
-      </div>
-    </div>
+        <div className="text-end">
+          <button type="button" className="btn btn-primary light me-2" onClick={onClose}>Cancelar</button>
+          <button type="submit" className="btn btn-primary" disabled={saving}>
+            {saving ? "Publicando…" : scheduleAt ? "Programar" : "Publicar ahora"}
+          </button>
+        </div>
+      </form>
+    </W3crmModal>
   );
 }
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function SaasSocialPage() {
   const [posts, setPosts] = useState<SocialPost[]>([]);
@@ -290,12 +288,12 @@ export default function SaasSocialPage() {
       ]);
 
       if (postsRes.status === "fulfilled" && postsRes.value.ok) {
-        const data = (await postsRes.value.json().catch(() => ({ posts: [] }))) as { posts: SocialPost[] };
-        setPosts(data.posts ?? []);
+        const data = (await postsRes.value.json().catch(() => ({}))) as { posts?: SocialPost[] };
+        setPosts(Array.isArray(data.posts) ? data.posts : []);
       }
       if (accountsRes.status === "fulfilled" && accountsRes.value.ok) {
-        const data = (await accountsRes.value.json().catch(() => ({ accounts: [] }))) as { accounts: SocialAccount[] };
-        setAccounts(data.accounts ?? []);
+        const data = (await accountsRes.value.json().catch(() => ({}))) as { accounts?: SocialAccount[] };
+        setAccounts(Array.isArray(data.accounts) ? data.accounts : []);
       }
     } finally {
       setLoading(false);
@@ -341,151 +339,136 @@ export default function SaasSocialPage() {
   };
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="social" />}>
-      <div className="flex flex-col gap-6 pb-8">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <NelvyonDsSectionHeader
-            title="Redes Sociales"
-            subtitle="Programa y publica en todas tus redes desde un solo lugar"
-          />
-          <NelvyonDsButton onClick={() => setShowNew(true)}>+ Nuevo post</NelvyonDsButton>
-        </div>
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="Redes Sociales" parentTitle="Captación" pageTitle="Social" />
+      <div className="container-fluid">
+        <div className="row">
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Posts totales" value={stats.total} /></div>
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Publicados" value={stats.published} accent /></div>
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Programados" value={stats.scheduled} /></div>
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Cuentas activas" value={stats.connected} /></div>
 
-        {actionError && (
-          <p className="rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{actionError}</p>
-        )}
+          <div className="col-xl-12">
+            <p className="fs-14 text-muted">Programa y publica en todas tus redes desde un solo lugar</p>
 
-        {/* No-account warning */}
-        {!loading && accounts.length === 0 && (
-          <SaasDegradedBanner>
-            <div className="space-y-3">
-              <p>
-                Sin cuentas de redes sociales conectadas. Conecta Meta o LinkedIn con OAuth para programar y publicar posts en vivo.
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <a
-                  href="/api/oauth/meta"
-                  className="rounded-lg bg-primary/15 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/25"
-                >
-                  Conectar Meta →
-                </a>
-                <a
-                  href="/api/oauth/linkedin"
-                  className="rounded-lg bg-primary/15 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/25"
-                >
-                  Conectar LinkedIn →
-                </a>
-                <a href="/saas/integraciones" className="text-xs text-muted-foreground underline hover:text-foreground">
-                  Ver todas las integraciones
-                </a>
+            {actionError && (
+              <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                {actionError}
+                <button type="button" className="btn-close" aria-label="Cerrar" onClick={() => setActionError(null)} />
               </div>
-            </div>
-          </SaasDegradedBanner>
-        )}
+            )}
 
-        {/* Connected accounts */}
-        {accounts.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {accounts.map((a) => {
-              const cfg = getPlatformCfg(a.platform);
-              return (
-                <div key={a.id} className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm ${a.isActive ? cfg.color : "border-border text-muted-foreground"}`}>
-                  {cfg.icon}
-                  <span className="font-medium">{a.accountName}</span>
-                  <span className="text-xs opacity-70">{a.isActive ? "Conectado" : "Desconectado"}</span>
+            {!loading && accounts.length === 0 && (
+              <div className="alert alert-warning" role="alert">
+                <p>
+                  Sin cuentas de redes sociales conectadas. Conecta Meta o LinkedIn con OAuth para
+                  programar y publicar posts en vivo.
+                </p>
+                <a className="btn btn-primary btn-sm me-2" href="/api/oauth/meta">Conectar Meta</a>
+                <a className="btn btn-primary btn-sm me-2" href="/api/oauth/linkedin">Conectar LinkedIn</a>
+                <Link href="/saas/integraciones">Ver todas las integraciones</Link>
+              </div>
+            )}
+
+            {accounts.length > 0 && (
+              <W3crmContentBox titulo="Cuentas conectadas" icono="fa-solid fa-link">
+                <div className="d-flex flex-wrap gap-2">
+                  {accounts.map((a) => {
+                    const cfg = getPlatformCfg(a.platform);
+                    return (
+                      <span key={a.id} className="border rounded px-3 py-2 d-inline-flex align-items-center gap-2">
+                        <i className={`${cfg.icon} text-primary`} aria-hidden="true" />
+                        <span className="fw-bold">{a.accountName || "—"}</span>
+                        <span className={`badge ${a.isActive ? "badge-success" : "badge-secondary"}`}>
+                          {a.isActive ? "Conectado" : "Desconectado"}
+                        </span>
+                      </span>
+                    );
+                  })}
                 </div>
-              );
-            })}
-          </div>
-        )}
+              </W3crmContentBox>
+            )}
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <KpiTile icon="📱" label="Posts totales" value={stats.total} />
-          <KpiTile icon="✅" label="Publicados" value={stats.published} accent />
-          <KpiTile icon="📅" label="Programados" value={stats.scheduled} />
-          <KpiTile icon="🔗" label="Cuentas activas" value={stats.connected} />
-        </div>
-
-        {/* Status filters */}
-        <div className="flex flex-wrap gap-2">
-          {(["all", "draft", "scheduled", "published", "failed"] as const).map((s) => (
-            <button
-              key={s}
-              onClick={() => setFilterStatus(s)}
-              className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${filterStatus === s ? "bg-primary text-primary-foreground" : "bg-muted/30 text-muted-foreground hover:bg-muted/50"}`}
+            <W3crmContentBox
+              titulo="Publicaciones"
+              icono="fa-solid fa-share-nodes"
+              acciones={
+                <button type="button" className="btn btn-primary btn-sm me-2" onClick={() => setShowNew(true)}>
+                  + Nuevo post
+                </button>
+              }
             >
-              {s === "all" ? "Todos" : STATUS_LABELS[s]}
-            </button>
-          ))}
-        </div>
+              <div className="mb-3" role="group" aria-label="Filtrar publicaciones">
+                {(["all", "draft", "scheduled", "published", "failed"] as const).map((s) => (
+                  <button key={s} type="button" aria-pressed={filterStatus === s}
+                    className={`btn btn-sm me-1 mb-1 ${filterStatus === s ? "btn-primary" : "btn-primary light"}`}
+                    onClick={() => setFilterStatus(s)}>
+                    {s === "all" ? "Todos" : STATUS_LABELS[s]}
+                  </button>
+                ))}
+              </div>
 
-        {/* Posts */}
-        {loading ? (
-          <div className="flex flex-col gap-3">
-            {Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-24 animate-pulse rounded-xl bg-muted/30" />)}
+              {loading ? (
+                <W3crmCargando texto="Cargando publicaciones…" />
+              ) : filtered.length === 0 ? (
+                <W3crmEmptyState title="Sin posts" description="Crea tu primer contenido para redes sociales." />
+              ) : (
+                <W3crmDataTable
+                  filas={filtered}
+                  etiqueta="publicaciones"
+                  wrapperId="social_posts_wrapper"
+                  porPagina={10}
+                  reiniciarEn={filterStatus}
+                  columnas={[
+                    { titulo: "Red" },
+                    { titulo: "Contenido" },
+                    { titulo: "Programado" },
+                    { titulo: "Estado" },
+                    { titulo: "Gestión", alFinal: true },
+                  ]}
+                  render={(p) => {
+                    const cfg = getPlatformCfg(p.platform);
+                    return (
+                      <tr key={p.id}>
+                        <td>
+                          <i className={`${cfg.icon} me-2 text-primary`} aria-hidden="true" />
+                          <span className="fw-bold">{cfg.label}</span>
+                        </td>
+                        <td>
+                          <span className="text-muted">{textoPlano(p.content) || "—"}</span>
+                          {p.errorMessage ? (
+                            <div className="text-danger fs-12 mt-1">{p.errorMessage}</div>
+                          ) : null}
+                        </td>
+                        <td>{fechaHora(p.scheduledAt)}</td>
+                        <td><span className={`badge ${estadoBadge(p.status)}`}>{estadoLabel(p.status)}</span></td>
+                        <td className="text-end">
+                          {(p.status === "draft" || p.status === "failed") && (
+                            <button type="button" className="btn btn-primary light btn-sm me-1"
+                              disabled={publishing === p.id}
+                              aria-label={`Publicar ahora en ${cfg.label}`}
+                              onClick={() => void handlePublishNow(p.id)}>
+                              {publishing === p.id ? "Publicando…" : "Publicar ahora"}
+                            </button>
+                          )}
+                          <button type="button" className="btn btn-danger light btn-sm"
+                            disabled={deleting === p.id}
+                            aria-label={`Eliminar publicación de ${cfg.label}`}
+                            onClick={() => void handleDelete(p.id)}>
+                            {deleting === p.id ? "…" : "Eliminar"}
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  }}
+                />
+              )}
+            </W3crmContentBox>
           </div>
-        ) : filtered.length === 0 ? (
-          <NelvyonDsCard className="p-16 text-center">
-            <p className="text-5xl">📱</p>
-            <p className="mt-4 text-lg font-semibold text-foreground">Sin posts</p>
-            <p className="mt-2 text-sm text-muted-foreground">Crea tu primer contenido para redes sociales</p>
-            <NelvyonDsButton className="mt-5" onClick={() => setShowNew(true)}>+ Nuevo post</NelvyonDsButton>
-          </NelvyonDsCard>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {filtered.map((p) => {
-              const cfg = getPlatformCfg(p.platform);
-              return (
-                <NelvyonDsCard key={p.id} className="p-4">
-                  <div className="flex items-start gap-4">
-                    <span className="text-2xl">{cfg.icon}</span>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-sm font-medium text-foreground">{cfg.label}</span>
-                        <NelvyonDsBadge tone={STATUS_TONE[p.status]}>{STATUS_LABELS[p.status]}</NelvyonDsBadge>
-                        {p.scheduledAt && (
-                          <span className="text-xs text-muted-foreground">
-                            📅 {new Date(p.scheduledAt).toLocaleString("es-ES")}
-                          </span>
-                        )}
-                      </div>
-                      <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{p.content.replace(/<[^>]+>/g, "")}</p>
-                      {p.errorMessage && (
-                        <p className="mt-1.5 rounded-lg bg-destructive/10 px-3 py-1.5 text-xs text-destructive">
-                          ❌ {p.errorMessage}
-                        </p>
-                      )}
-                      <div className="mt-3 flex gap-2">
-                        {(p.status === "draft" || p.status === "failed") && (
-                          <NelvyonDsButton
-                            variant="ghost"
-                            className="text-xs"
-                            onClick={() => void handlePublishNow(p.id)}
-                            disabled={publishing === p.id}
-                          >
-                            {publishing === p.id ? "Publicando…" : "↑ Publicar ahora"}
-                          </NelvyonDsButton>
-                        )}
-                        <NelvyonDsButton
-                          variant="ghost"
-                          className="text-xs text-destructive hover:text-destructive/80"
-                          onClick={() => void handleDelete(p.id)}
-                          disabled={deleting === p.id}
-                        >
-                          {deleting === p.id ? "…" : "Eliminar"}
-                        </NelvyonDsButton>
-                      </div>
-                    </div>
-                  </div>
-                </NelvyonDsCard>
-              );
-            })}
-          </div>
-        )}
+        </div>
       </div>
 
       {showNew && <NewPostModal accounts={accounts} onClose={() => setShowNew(false)} onSaved={load} />}
-    </SaasShellLayout>
+    </SaasW3crmShell>
   );
 }

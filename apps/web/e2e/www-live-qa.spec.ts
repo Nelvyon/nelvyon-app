@@ -8,14 +8,17 @@ const PAGES = [
   "/www/contact.html",
   "/www/about.html",
   "/www/features.html",
-  "/www/home-ai-agent.html",
-  "/www/home-saas-product-showcase.html",
+  // Home 08 (`index.html`) y SaaS 02 (`saas.html`) son las dos paginas AIOR
+  // vigentes. `home-ai-agent.html` y `home-saas-product-showcase.html` se
+  // consolidaron en ellas y ya no existen.
+  "/www/saas.html",
   "/www/blog.html",
   "/www/team.html",
   "/www/faq.html",
 ];
 
-const results: any[] = [];
+type QaResult = Record<string, unknown>;
+const results: QaResult[] = [];
 
 for (const route of PAGES) {
   test(`QA live ${route}`, async ({ page }) => {
@@ -82,7 +85,7 @@ for (const route of PAGES) {
 }
 
 test.afterAll(() => {
-  const outDir = path.join(process.cwd(), "..", "..", "docs", "evidence", "public-web-aior-nelvyon");
+  const _outDir = path.join(process.cwd(), "..", "..", "docs", "evidence", "public-web-aior-nelvyon");
   // when cwd is apps/web
   const candidates = [
     path.join(process.cwd(), "docs", "evidence", "public-web-aior-nelvyon"),

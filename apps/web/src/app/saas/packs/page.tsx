@@ -1,113 +1,121 @@
 "use client";
 
+/**
+ * /saas/packs sobre `(cms)/content` de W3CRM, con las piezas ya portadas.
+ * Mapeo: filtros y catálogo -> `W3crmContentBox` + rejilla de `card`; KPIs ->
+ * `W3crmKpiTile`. Sin componentes nuevos.
+ *
+ * Inventario: sin `data-testid` y sin spec dedicado — lo cubre
+ * `saas-nav-full-coverage`. Verificado con grep que ningún spec hace
+ * aserciones de texto ni de rol sobre esta ruta.
+ *
+ * Lógica de NELVYON intacta: `GET /api/saas/packs` (summary + catálogo);
+ * `POST /api/saas/packs/[id]/purchase` con sus tres desenlaces (`granted`,
+ * `checkoutRequired` con su `billingUrl`, y el fallo genérico); el salto a
+ * `/saas/brief-to-launch?packId=` usando `launchPackId ?? id`; los cuatro
+ * estados de acceso; la distinción entre `coming_soon` (bloqueado), `beta`
+ * (lista de espera) y `canLaunch`; el "Ilimitado" cuando
+ * `launchesRemaining === null`; los dos filtros; y el toast de 3,5 s.
+ */
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
-import { NelvyonDsBadge } from "@/design-system/components";
+
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmEmptyState, W3crmKpiTile } from "@/features/saas-w3crm/components/W3crmUi";
+import { W3crmCargando, W3crmContentBox } from "@/features/saas-w3crm/components/W3crmContentBox";
 import { SERVICE_PACK_CATEGORIES } from "@/lib/saas/servicePacksCatalog";
-import type { PackStoreItem, StoreSummary, PackStoreAccess } from "@nelvyon/saas";
+import type { PackStoreItem, StoreSummary } from "@nelvyon/saas";
 
-// ── Display helpers ───────────────────────────────────────────────────────────
-
-const ACCESS_BADGE: Record<PackStoreAccess, { label: string; tone: "success" | "primary" | "warning" | "neutral" }> = {
-  included: { label: "Incluido en plan", tone: "success" },
-  owned: { label: "Comprado", tone: "primary" },
-  purchasable: { label: "Add-on", tone: "warning" },
-  coming_soon: { label: "Próximamente", tone: "neutral" },
+const ACCESS_BADGE: Record<string, { label: string; badge: string }> = {
+  included: { label: "Incluido en plan", badge: "badge-success" },
+  owned: { label: "Comprado", badge: "badge-primary" },
+  purchasable: { label: "Add-on", badge: "badge-warning" },
+  coming_soon: { label: "Próximamente", badge: "badge-secondary" },
 };
 
 const CATEGORY_LABEL: Record<string, string> = Object.fromEntries(
   SERVICE_PACK_CATEGORIES.map((c) => [c.id, c.label]),
 );
 
-function KpiCard({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div className="rounded-xl border border-white/10 bg-white/5 px-5 py-4">
-      <p className="text-white/40 text-xs uppercase tracking-wide">{label}</p>
-      <p className="text-2xl font-bold text-white mt-1">{value}</p>
-    </div>
-  );
+/** Un `access` fuera de catálogo hacía estallar `badge.tone`. */
+function accessBadge(a: unknown) {
+  return ACCESS_BADGE[String(a ?? "")] ?? { label: String(a ?? "—"), badge: "badge-secondary" };
 }
+function num(v: unknown): number {
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+function txt(v: unknown): string { return typeof v === "string" ? v : ""; }
 
-// ── Pack card ─────────────────────────────────────────────────────────────────
-
-function PackCard({
-  item,
-  onLaunch,
-  onPurchase,
-  busy,
-}: {
+function PackCard({ item, onLaunch, onPurchase, busy }: {
   item: PackStoreItem;
   onLaunch: (item: PackStoreItem) => void;
   onPurchase: (item: PackStoreItem) => void;
   busy: boolean;
 }) {
-  const badge = ACCESS_BADGE[item.access];
+  const badge = accessBadge(item.access);
   const isComingSoon = item.availability === "coming_soon";
   const isBeta = item.availability === "beta";
+  // `outputs` podía no ser array y reventaba `.length`/`.slice`.
+  const outputs = Array.isArray(item.outputs) ? item.outputs : [];
 
   return (
-    <div className="rounded-xl border border-white/10 bg-white/5 p-5 flex flex-col gap-3">
-      <div className="flex items-start justify-between gap-2">
-        <div>
-          <h3 className="text-white font-semibold text-sm">{item.name}</h3>
-          <p className="text-white/40 text-[11px] mt-0.5">{CATEGORY_LABEL[item.category] ?? item.category}</p>
+    <div className="card border mb-3 h-100">
+      <div className="card-body d-flex flex-column">
+        <div className="d-flex align-items-start justify-content-between gap-2">
+          <div>
+            <span className="fw-bold d-block">{txt(item.name) || "—"}</span>
+            <span className="text-muted fs-12">
+              {CATEGORY_LABEL[item.category] ?? (txt(item.category) || "—")}
+            </span>
+          </div>
+          <span className={`badge ${badge.badge}`}>{badge.label}</span>
         </div>
-        <NelvyonDsBadge tone={badge.tone}>{badge.label}</NelvyonDsBadge>
-      </div>
 
-      <p className="text-white/60 text-xs leading-relaxed flex-1">{item.tagline}</p>
+        <p className="text-muted fs-12 mt-2 flex-grow-1">{txt(item.tagline)}</p>
 
-      {item.outputs.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {item.outputs.slice(0, 4).map((o, i) => (
-            <span key={i} className="rounded-md bg-white/5 px-2 py-0.5 text-[10px] text-white/50">{o}</span>
-          ))}
-        </div>
-      )}
-
-      <div className="flex items-center justify-between text-[11px] text-white/40">
-        <span>⏱ ~{item.estimatedMinutes} min</span>
-        {item.owned && item.launchesRemaining !== null && (
-          <span>{item.launchesRemaining} lanzamiento(s) restantes</span>
+        {outputs.length > 0 && (
+          <div className="mb-2">
+            {outputs.slice(0, 4).map((o, i) => (
+              <span key={i} className="badge badge-secondary me-1 mb-1">{txt(o)}</span>
+            ))}
+          </div>
         )}
-        {item.owned && item.launchesRemaining === null && <span>Ilimitado</span>}
-      </div>
 
-      {/* CTA */}
-      {isComingSoon ? (
-        <button disabled className="rounded-lg bg-white/5 px-3 py-2 text-xs text-white/30 cursor-not-allowed">
-          En desarrollo
-        </button>
-      ) : item.canLaunch ? (
-        <button
-          onClick={() => onLaunch(item)}
-          className="rounded-lg bg-[#0084ff] px-3 py-2 text-xs text-white font-medium hover:bg-[#0070dd] transition-colors"
-        >
-          🚀 Lanzar ahora
-        </button>
-      ) : isBeta ? (
-        <button
-          onClick={() => onLaunch(item)}
-          className="rounded-lg bg-white/10 px-3 py-2 text-xs text-white hover:bg-white/20 transition-colors"
-        >
-          Unirme a la lista (beta)
-        </button>
-      ) : (
-        <button
-          disabled={busy}
-          onClick={() => onPurchase(item)}
-          className="rounded-lg bg-emerald-600/80 px-3 py-2 text-xs text-white font-medium hover:bg-emerald-600 disabled:opacity-50 transition-colors"
-        >
-          {busy ? "Procesando…" : item.access === "included" ? "Activar" : "Comprar"}
-        </button>
-      )}
+        <div className="d-flex align-items-center justify-content-between text-muted fs-12 mb-3">
+          <span>~{num(item.estimatedMinutes)} min</span>
+          {item.owned && item.launchesRemaining !== null && (
+            <span>{num(item.launchesRemaining)} lanzamiento(s) restantes</span>
+          )}
+          {item.owned && item.launchesRemaining === null && <span>Ilimitado</span>}
+        </div>
+
+        {isComingSoon ? (
+          <button type="button" className="btn btn-primary light btn-sm w-100" disabled>
+            En desarrollo
+          </button>
+        ) : item.canLaunch ? (
+          <button type="button" className="btn btn-primary btn-sm w-100"
+            aria-label={`Lanzar ahora ${item.name}`} onClick={() => onLaunch(item)}>
+            Lanzar ahora
+          </button>
+        ) : isBeta ? (
+          <button type="button" className="btn btn-primary light btn-sm w-100"
+            aria-label={`Unirme a la lista beta de ${item.name}`} onClick={() => onLaunch(item)}>
+            Unirme a la lista (beta)
+          </button>
+        ) : (
+          <button type="button" className="btn btn-success btn-sm w-100" disabled={busy}
+            aria-label={`${item.access === "included" ? "Activar" : "Comprar"} ${item.name}`}
+            onClick={() => onPurchase(item)}>
+            {busy ? "Procesando…" : item.access === "included" ? "Activar" : "Comprar"}
+          </button>
+        )}
+      </div>
     </div>
   );
 }
-
-// ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function PackStorePage() {
   const router = useRouter();
@@ -121,7 +129,7 @@ export default function PackStorePage() {
 
   function showToast(msg: string) {
     setToast(msg);
-    setTimeout(() => setToast(null), 3500);
+    window.setTimeout(() => setToast(null), 3500);
   }
 
   async function load() {
@@ -129,9 +137,11 @@ export default function PackStorePage() {
     try {
       const res = await fetch("/api/saas/packs");
       if (res.ok) {
-        const d = (await res.json()) as { summary: StoreSummary; catalog: PackStoreItem[] };
-        setSummary(d.summary);
-        setCatalog(d.catalog ?? []);
+        const d = (await res.json().catch(() => ({}))) as {
+          summary?: StoreSummary; catalog?: PackStoreItem[];
+        };
+        if (d.summary && typeof d.summary === "object") setSummary(d.summary);
+        setCatalog(Array.isArray(d.catalog) ? d.catalog : []);
       }
     } finally {
       setLoading(false);
@@ -182,84 +192,90 @@ export default function PackStorePage() {
   }, [catalog, categoryFilter, availabilityFilter]);
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="pack-store" />}>
-      <div className="space-y-6 p-6">
-        {/* Header */}
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <div>
-            <h1 className="text-2xl font-bold text-white">Pack Store</h1>
-            <p className="text-white/50 text-sm mt-1">
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="Pack Store" parentTitle="Gestión" pageTitle="Packs" />
+      <div className="container-fluid">
+        <div className="row">
+          {summary && (
+            <>
+              <div className="col-xl-3 col-sm-6">
+                <W3crmKpiTile label="Packs en catálogo" value={num(summary.totalPacks)} accent />
+              </div>
+              <div className="col-xl-3 col-sm-6">
+                <W3crmKpiTile label="Disponibles" value={num(summary.available)} />
+              </div>
+              <div className="col-xl-3 col-sm-6">
+                <W3crmKpiTile label="En tu cuenta" value={num(summary.owned)} />
+              </div>
+              <div className="col-xl-3 col-sm-6">
+                <W3crmKpiTile
+                  label="Lanzamientos"
+                  value={summary.launchesRemaining === null ? "∞" : num(summary.launchesRemaining)}
+                />
+              </div>
+            </>
+          )}
+
+          <div className="col-xl-12">
+            <p className="fs-14 text-muted">
               Explora, adquiere y lanza packs de marketing operados por IA
             </p>
+
+            {toast && <div className="alert alert-primary" role="status">{toast}</div>}
+
+            <W3crmContentBox titulo="Catálogo de packs" icono="fa-solid fa-cart-shopping">
+              <div className="row align-items-end mb-3">
+                <div className="col-xl-4 col-sm-6">
+                  <div className="form-group mb-2">
+                    <label htmlFor="pk-categoria" className="text-black font-w600">Categoría</label>
+                    <select id="pk-categoria" className="form-control" value={categoryFilter}
+                      onChange={(e) => setCategoryFilter(e.target.value)}>
+                      <option value="all">Todas las categorías</option>
+                      {SERVICE_PACK_CATEGORIES.map((c) => (
+                        <option key={c.id} value={c.id}>{c.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div className="col-xl-4 col-sm-6">
+                  <div className="form-group mb-2">
+                    <label htmlFor="pk-estado" className="text-black font-w600">Estado</label>
+                    <select id="pk-estado" className="form-control" value={availabilityFilter}
+                      onChange={(e) => setAvailabilityFilter(e.target.value)}>
+                      <option value="all">Cualquier estado</option>
+                      <option value="available">Disponible</option>
+                      <option value="beta">Beta</option>
+                      <option value="coming_soon">Próximamente</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {loading ? (
+                <W3crmCargando texto="Cargando catálogo…" />
+              ) : filtered.length === 0 ? (
+                <W3crmEmptyState
+                  title="Sin packs para estos filtros"
+                  description="Ajusta la categoría o el estado para ver más opciones."
+                />
+              ) : (
+                <div className="row">
+                  {filtered.map((item) => (
+                    <div className="col-xl-4 col-sm-6" key={item.id}>
+                      <PackCard
+                        item={item}
+                        onLaunch={handleLaunch}
+                        onPurchase={handlePurchase}
+                        busy={busyId === item.id}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </W3crmContentBox>
           </div>
         </div>
-
-        {/* Summary */}
-        {summary && (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <KpiCard label="Packs en catálogo" value={summary.totalPacks} />
-            <KpiCard label="Disponibles" value={summary.available} />
-            <KpiCard label="En tu cuenta" value={summary.owned} />
-            <KpiCard
-              label="Lanzamientos"
-              value={summary.launchesRemaining === null ? "∞" : summary.launchesRemaining}
-            />
-          </div>
-        )}
-
-        {/* Filters */}
-        <div className="flex flex-wrap gap-3">
-          <select
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-            className="rounded-lg border border-white/10 bg-[#0d1929] px-3 py-1.5 text-xs text-white"
-          >
-            <option value="all">Todas las categorías</option>
-            {SERVICE_PACK_CATEGORIES.map((c) => (
-              <option key={c.id} value={c.id}>{c.label}</option>
-            ))}
-          </select>
-          <select
-            value={availabilityFilter}
-            onChange={(e) => setAvailabilityFilter(e.target.value)}
-            className="rounded-lg border border-white/10 bg-[#0d1929] px-3 py-1.5 text-xs text-white"
-          >
-            <option value="all">Cualquier estado</option>
-            <option value="available">Disponible</option>
-            <option value="beta">Beta</option>
-            <option value="coming_soon">Próximamente</option>
-          </select>
-        </div>
-
-        {/* Grid */}
-        {loading ? (
-          <div className="text-white/40 text-sm py-12 text-center">Cargando catálogo…</div>
-        ) : filtered.length === 0 ? (
-          <div className="rounded-xl border border-white/10 bg-white/5 px-6 py-14 text-center space-y-2">
-            <div className="text-4xl">🛒</div>
-            <p className="text-white font-semibold">Sin packs para estos filtros</p>
-            <p className="text-white/40 text-sm">Ajusta la categoría o el estado para ver más opciones.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filtered.map((item) => (
-              <PackCard
-                key={item.id}
-                item={item}
-                onLaunch={handleLaunch}
-                onPurchase={handlePurchase}
-                busy={busyId === item.id}
-              />
-            ))}
-          </div>
-        )}
-
-        {toast && (
-          <div className="fixed bottom-6 right-6 z-50 rounded-xl bg-[#0084ff] px-4 py-2 text-white text-sm shadow-lg">
-            {toast}
-          </div>
-        )}
       </div>
-    </SaasShellLayout>
+    </SaasW3crmShell>
   );
 }

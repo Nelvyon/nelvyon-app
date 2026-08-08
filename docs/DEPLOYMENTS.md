@@ -1,6 +1,20 @@
 # DEPLOYMENTS — Historial
 
-> Actualizado: **2026-08-02** tip prod `92b2b462` · deploy `df882d11` SUCCESS · AIOR visual restaurado + contenido NELVYON · canary KILL · `claimReady: false`.
+> Actualizado: **2026-08-03** tip prod `f3c01c54` · deploy `32f7c8ac` SUCCESS · raíz `/` = AIOR 200 · canary KILL · `claimReady: false`.
+
+## 2026-08-03 — Root `/` AIOR 200 rewrite (production)
+
+| Campo | Valor |
+|-------|-------|
+| **Tip remoto** | `f3c01c54fe008af7fe6b86bc2f84a099f37fe77f` |
+| **Env** | Railway production `@nelvyon/web` · https://nelvyon.com · https://app.nelvyon.com |
+| **Deploy** | `32f7c8ac-fa11-477b-bc71-8de1678a88db` **SUCCESS** |
+| **Prev tip** | `92b2b462` / `df882d11` (AIOR en `/www` OK; raíz era 307+RSC) |
+| **Health** | `git_sha=f3c01c54fe00` |
+| **Smokes** | `/` y `app/` → **200** AIOR (`preloader`, hero, `base=/www/`, saas-shots=0, sin `_next`) |
+| **Causa** | `redirect()` Next devolvía 307 + cuerpo RSC marketing |
+| **claimReady** | **false** |
+| **Canary** | **KILL ON** |
 
 ## 2026-08-02 — Public web AIOR visual restore (production)
 

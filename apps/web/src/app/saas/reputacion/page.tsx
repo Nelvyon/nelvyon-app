@@ -1,13 +1,40 @@
 "use client";
 
+/**
+ * /saas/reputacion sobre `(cms)/content` de W3CRM, con las piezas ya portadas.
+ * Mapeo: reseñas, menciones y alertas -> `W3crmContentBox` + `W3crmDataTable`;
+ * los dos dialogos -> `W3crmModal`; KPIs -> `W3crmKpiTile`. Sin componentes
+ * nuevos.
+ *
+ * Inventario: sin `data-testid` y sin spec dedicado — lo cubre
+ * `saas-nav-full-coverage`.
+ *
+ * Colision `/Reputaci/i` — MEDIDA antes de tocar codigo: el sidebar expone un
+ * enlace "Reputación" (`saasNav.ts:106`), pero NINGUN spec hace aserciones de
+ * texto sobre esta ruta; la unica del repo vive en `saas-autopilot.spec.ts` y
+ * apunta a `/saas/autopilot`. No hay locator ambiguo que acomodar, asi que el
+ * producto se conserva tal cual, incluido el titulo "Reputación & Reseñas".
+ *
+ * Logica de NELVYON intacta: los tres GET de `/api/saas/reputation`
+ * (por defecto = menciones, `?resource=reviews`, `?resource=alerts`) cargados
+ * en paralelo, y el POST con sus cuatro acciones (`sync`, `reply`, `ignore`,
+ * `check_alerts`); el banner de reseñas negativas sin responder (rating <= 2 y
+ * `pending`); el score de menciones como porcentaje de positivas; el bloqueo
+ * de la sincronizacion sin `placesConfigured`; y el mensaje de sync con su
+ * recuento de negativas nuevas.
+ */
 import { useCallback, useEffect, useState } from "react";
-import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
-import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasDegradedBanner } from "@/features/saas-shell/components/SaasDegradedBanner";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
 
-// ── Types ──────────────────────────────────────────────────────────────────────
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmEmptyState, W3crmKpiTile } from "@/features/saas-w3crm/components/W3crmUi";
+import {
+  W3crmCargando,
+  W3crmContentBox,
+  W3crmDataTable,
+  W3crmModal,
+} from "@/features/saas-w3crm/components/W3crmContentBox";
+
 type Sentiment = "positive" | "neutral" | "negative";
 type ReplyStatus = "pending" | "replied" | "ignored";
 
@@ -19,78 +46,125 @@ interface GbpConfig { placesConfigured: boolean; oauthConfigured: boolean }
 
 type Tab = "reviews" | "mentions" | "alerts";
 
-const STAR = "★"; const STAR_EMPTY = "☆";
-function Stars({ n }: { n: number }) {
-  return <span className={n <= 2 ? "text-destructive" : n >= 4 ? "text-warning" : "text-muted-foreground"}>
-    {Array.from({ length: 5 }, (_, i) => i < n ? STAR : STAR_EMPTY).join("")}
-  </span>;
+function num(v: unknown): number {
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+function fecha(iso: string | null | undefined): string {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? "—" : d.toLocaleDateString("es-ES");
 }
 
-// ── Reply Modal ────────────────────────────────────────────────────────────────
+const STAR = "★"; const STAR_EMPTY = "☆";
+function Stars({ n }: { n: number }) {
+  // Un rating corrupto pintaba cinco huecos raros; se acota a 0..5.
+  const llenas = Math.min(5, Math.max(0, Math.round(num(n))));
+  return (
+    <span className={llenas <= 2 ? "text-danger" : llenas >= 4 ? "text-warning" : "text-muted"}>
+      {Array.from({ length: 5 }, (_, i) => (i < llenas ? STAR : STAR_EMPTY)).join("")}
+    </span>
+  );
+}
+
+const REPLY_LABEL: Record<string, string> = { replied: "Respondida", ignored: "Ignorada", pending: "Pendiente" };
+const SENTIMENT_LABEL: Record<string, string> = { positive: "Positivo", negative: "Negativo", neutral: "Neutral" };
+const SENTIMENT_BADGE: Record<string, string> = { positive: "badge-success", negative: "badge-warning", neutral: "badge-primary" };
+
+/** Estados fuera de catalogo pintaban `undefined`. */
+function replyLabel(s: string): string { return REPLY_LABEL[s] ?? (s ? String(s) : "—"); }
+function sentimentLabel(s: string): string { return SENTIMENT_LABEL[s] ?? (s ? String(s) : "—"); }
+function sentimentBadge(s: string): string { return SENTIMENT_BADGE[s] ?? "badge-secondary"; }
+
 function ReplyModal({ review, onClose, onSaved }: { review: GbpReview; onClose: () => void; onSaved: () => void }) {
   const [comment, setComment] = useState(review.replyText ?? "");
-  const [saving, setSaving] = useState(false); const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
     if (!comment.trim()) { setError("La respuesta no puede estar vacía"); return; }
     setSaving(true);
     try {
-      const res = await fetch("/api/saas/reputation", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "reply", review_id: review.id, comment: comment.trim() }) });
-      if (!res.ok) { const d = await res.json() as { error?: string }; throw new Error(d.error ?? "Error"); }
+      const res = await fetch("/api/saas/reputation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "reply", review_id: review.id, comment: comment.trim() }),
+      });
+      if (!res.ok) {
+        const d = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(d.error ?? "Error");
+      }
       onSaved(); onClose();
-    } catch (err) { setError(err instanceof Error ? err.message : "Error"); } finally { setSaving(false); }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error");
+    } finally { setSaving(false); }
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl">
-        <h2 className="mb-2 text-lg font-semibold text-foreground">Responder reseña</h2>
-        <div className="mb-4 rounded-lg bg-muted/20 p-3">
-          <p className="text-xs text-muted-foreground mb-1"><span className="font-medium text-foreground">{review.authorName}</span> · <Stars n={review.rating} /></p>
-          <p className="text-sm text-foreground line-clamp-3">{review.reviewText ?? "Sin comentario"}</p>
-        </div>
-        {error && <p className="mb-4 rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
-        <form onSubmit={save} className="space-y-4">
-          <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Tu respuesta *</label>
-            <textarea value={comment} onChange={e => setComment(e.target.value)} rows={4} placeholder="Gracias por tu reseña…" className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" /></div>
-          <div className="flex gap-3">
-            <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
-            <NelvyonDsButton type="submit" disabled={saving} className="flex-1">{saving ? "Enviando…" : "Publicar respuesta"}</NelvyonDsButton>
-          </div>
-        </form>
+    <W3crmModal titulo="Responder reseña" onClose={onClose} error={error} size="lg">
+      <div className="border rounded bg-light p-3 mb-3">
+        <p className="fs-12 text-muted mb-1">
+          <span className="fw-bold text-black">{review.authorName || "—"}</span> · <Stars n={review.rating} />
+        </p>
+        <p className="mb-0">{review.reviewText ?? "Sin comentario"}</p>
       </div>
-    </div>
+      <form onSubmit={(e) => void save(e)}>
+        <div className="form-group mb-3">
+          <label htmlFor="rep-reply" className="text-black font-w600">
+            Tu respuesta <span className="required">*</span>
+          </label>
+          <textarea id="rep-reply" className="form-control" rows={4} placeholder="Gracias por tu reseña…"
+            value={comment} onChange={(e) => setComment(e.target.value)} />
+        </div>
+        <div className="text-end">
+          <button type="button" className="btn btn-primary light me-2" onClick={onClose}>Cancelar</button>
+          <button type="submit" className="btn btn-primary" disabled={saving}>
+            {saving ? "Enviando…" : "Publicar respuesta"}
+          </button>
+        </div>
+      </form>
+    </W3crmModal>
   );
 }
 
-// ── Alert Monitor Modal ────────────────────────────────────────────────────────
 function NewAlertModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
-  const [saving, setSaving] = useState(false); const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   async function save(e: React.FormEvent) {
-    e.preventDefault(); setSaving(true);
+    e.preventDefault();
+    setSaving(true);
     try {
-      const res = await fetch("/api/saas/reputation", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "check_alerts" }) });
+      const res = await fetch("/api/saas/reputation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "check_alerts" }),
+      });
       if (!res.ok) throw new Error("Error");
       onSaved(); onClose();
-    } catch (err) { setError(err instanceof Error ? err.message : "Error"); } finally { setSaving(false); }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error");
+    } finally { setSaving(false); }
   }
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-6 shadow-2xl">
-        <h2 className="mb-4 text-lg font-semibold text-foreground">Verificar alertas</h2>
-        <p className="text-sm text-muted-foreground mb-5">Ejecuta el análisis de sentiment para detectar alertas negativas (score 24h &lt; -0.3).</p>
-        {error && <p className="mb-4 rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
-        <form onSubmit={save} className="flex gap-3">
-          <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
-          <NelvyonDsButton type="submit" disabled={saving} className="flex-1">{saving ? "Ejecutando…" : "Ejecutar"}</NelvyonDsButton>
-        </form>
-      </div>
-    </div>
+    <W3crmModal titulo="Verificar alertas" onClose={onClose} error={error}>
+      <p className="fs-14 text-muted">
+        Ejecuta el análisis de sentiment para detectar alertas negativas (score 24h &lt; -0.3).
+      </p>
+      <form onSubmit={(e) => void save(e)}>
+        <div className="text-end">
+          <button type="button" className="btn btn-primary light me-2" onClick={onClose}>Cancelar</button>
+          <button type="submit" className="btn btn-primary" disabled={saving}>
+            {saving ? "Ejecutando…" : "Ejecutar"}
+          </button>
+        </div>
+      </form>
+    </W3crmModal>
   );
 }
 
-// ── Main Page ──────────────────────────────────────────────────────────────────
 export default function SaasReputacionPage() {
   const [tab, setTab] = useState<Tab>("reviews");
   const [reviews, setReviews] = useState<GbpReview[]>([]);
@@ -107,212 +181,303 @@ export default function SaasReputacionPage() {
   const loadReviews = useCallback(async () => {
     const res = await fetch("/api/saas/reputation?resource=reviews");
     if (!res.ok) return;
-    const d = await res.json() as { reviews?: GbpReview[]; stats?: GbpStats; gbp_config?: GbpConfig };
-    setReviews(d.reviews ?? []); if (d.stats) setGbpStats(d.stats); if (d.gbp_config) setGbpConfig(d.gbp_config);
+    const d = (await res.json().catch(() => ({}))) as { reviews?: GbpReview[]; stats?: GbpStats; gbp_config?: GbpConfig };
+    setReviews(Array.isArray(d.reviews) ? d.reviews : []);
+    if (d.stats && typeof d.stats === "object") setGbpStats(d.stats);
+    if (d.gbp_config && typeof d.gbp_config === "object") setGbpConfig(d.gbp_config);
   }, []);
 
   const loadMentions = useCallback(async () => {
     const res = await fetch("/api/saas/reputation");
     if (!res.ok) return;
-    const d = await res.json() as { mentions?: Mention[]; gbp_config?: GbpConfig };
-    setMentions(d.mentions ?? []); if (d.gbp_config) setGbpConfig(d.gbp_config);
+    const d = (await res.json().catch(() => ({}))) as { mentions?: Mention[]; gbp_config?: GbpConfig };
+    setMentions(Array.isArray(d.mentions) ? d.mentions : []);
+    if (d.gbp_config && typeof d.gbp_config === "object") setGbpConfig(d.gbp_config);
   }, []);
 
   const loadAlerts = useCallback(async () => {
     const res = await fetch("/api/saas/reputation?resource=alerts");
     if (!res.ok) return;
-    const d = await res.json() as { alerts?: SentimentAlert[] };
-    setSentAlerts(d.alerts ?? []);
+    const d = (await res.json().catch(() => ({}))) as { alerts?: SentimentAlert[] };
+    setSentAlerts(Array.isArray(d.alerts) ? d.alerts : []);
   }, []);
 
   useEffect(() => {
     setLoading(true);
-    void Promise.all([loadReviews(), loadMentions(), loadAlerts()]).finally(() => setLoading(false));
+    // `.catch` para que un fallo de red no deje la pantalla colgada en carga.
+    void Promise.all([loadReviews(), loadMentions(), loadAlerts()])
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, [loadReviews, loadMentions, loadAlerts]);
 
   async function syncReviews() {
     setSyncing(true); setSyncMsg(null);
     try {
-      const res = await fetch("/api/saas/reputation", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "sync" }) });
-      const d = await res.json() as { result?: { synced: number; newNegative: number }; error?: string };
+      const res = await fetch("/api/saas/reputation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "sync" }),
+      });
+      const d = (await res.json().catch(() => ({}))) as { result?: { synced?: number; newNegative?: number }; error?: string };
       if (!res.ok) { setSyncMsg(`Error: ${d.error ?? "desconocido"}`); return; }
-      setSyncMsg(`✓ ${d.result?.synced ?? 0} reseñas sincronizadas · ${d.result?.newNegative ?? 0} negativas nuevas`);
+      setSyncMsg(`✓ ${num(d.result?.synced)} reseñas sincronizadas · ${num(d.result?.newNegative)} negativas nuevas`);
       void loadReviews();
     } finally { setSyncing(false); }
   }
 
   async function ignoreReview(id: string) {
-    await fetch("/api/saas/reputation", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "ignore", review_id: id }) });
+    await fetch("/api/saas/reputation", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "ignore", review_id: id }),
+    });
     void loadReviews();
   }
 
-  const negativeReviews = reviews.filter(r => r.rating <= 2 && r.replyStatus === "pending");
-  const positive = mentions.filter(m => m.label === "positive").length;
+  const negativeReviews = reviews.filter((r) => num(r.rating) <= 2 && r.replyStatus === "pending");
+  const positive = mentions.filter((m) => m.label === "positive").length;
   const sentScore = mentions.length > 0 ? Math.round((positive / mentions.length) * 100) : 0;
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="reputacion" />}>
-      <div className="flex flex-col gap-6 pb-8">
-        {/* Header */}
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <NelvyonDsSectionHeader title="Reputación & Reseñas" subtitle="Google Business Profile sync bidireccional, menciones y alertas de sentiment" />
-          <div className="flex items-center gap-2">
-            {tab === "reviews" && (
-              <NelvyonDsButton onClick={syncReviews} disabled={syncing || !gbpConfig.placesConfigured}>
-                {syncing ? "Sincronizando…" : "🔄 Sincronizar GBP"}
-              </NelvyonDsButton>
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="Reputación & Reseñas" parentTitle="Captación" pageTitle="Reputación" />
+      <div className="container-fluid">
+        <div className="row">
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Reseñas GBP" value={num(gbpStats?.total)} /></div>
+          <div className="col-xl-3 col-sm-6">
+            <W3crmKpiTile label="Rating promedio" value={gbpStats ? `${num(gbpStats.avgRating)}★` : "—"} accent />
+          </div>
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Sin responder" value={num(gbpStats?.pendingReplies)} /></div>
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Score menciones" value={`${sentScore}%`} /></div>
+
+          <div className="col-xl-12">
+            <p className="fs-14 text-muted">
+              Google Business Profile sync bidireccional, menciones y alertas de sentiment
+            </p>
+
+            {negativeReviews.length > 0 && (
+              <div className="alert alert-danger d-flex align-items-center justify-content-between" role="alert">
+                <span>
+                  {negativeReviews.length} reseña{negativeReviews.length > 1 ? "s" : ""} negativa
+                  {negativeReviews.length > 1 ? "s" : ""} sin responder
+                </span>
+                <button type="button" className="btn btn-primary btn-sm" onClick={() => setTab("reviews")}>
+                  Ver reseñas
+                </button>
+              </div>
             )}
-            {tab === "alerts" && <NelvyonDsButton variant="ghost" onClick={() => setShowAlertModal(true)}>Verificar alertas</NelvyonDsButton>}
-          </div>
-        </div>
 
-        {/* Negative reviews alert banner */}
-        {negativeReviews.length > 0 && (
-          <div className="flex items-center gap-3 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3">
-            <span className="text-xl">⚠️</span>
-            <p className="text-sm text-destructive font-medium">{negativeReviews.length} reseña{negativeReviews.length > 1 ? "s" : ""} negativa{negativeReviews.length > 1 ? "s" : ""} sin responder</p>
-            <NelvyonDsButton variant="ghost" className="ml-auto text-xs" onClick={() => setTab("reviews")}>Ver reseñas →</NelvyonDsButton>
-          </div>
-        )}
+            {!loading && !gbpConfig.placesConfigured && (
+              <div className="alert alert-warning" role="alert">
+                Conecta Google Business Profile: añade credenciales OAuth y Place IDs en Integraciones
+                (<code>GOOGLE_PLACES_API_KEY</code>, <code>GBP_PLACE_ID</code>) para sincronizar reseñas en vivo.
+              </div>
+            )}
 
-        {/* GBP config banner when not configured */}
-        {!loading && !gbpConfig.placesConfigured && (
-          <SaasDegradedBanner>
-            Conecta Google Business Profile: añade credenciales OAuth y Place IDs en Integraciones
-            (<code className="text-warning">GOOGLE_PLACES_API_KEY</code>, <code className="text-warning">GBP_PLACE_ID</code>)
-            para sincronizar reseñas en vivo.
-          </SaasDegradedBanner>
-        )}
+            {syncMsg && (
+              <div className={`alert ${syncMsg.startsWith("Error") ? "alert-danger" : "alert-success"}`} role="status">
+                {syncMsg}
+              </div>
+            )}
 
-        {syncMsg && (
-          <p className={`text-sm px-4 py-2 rounded-lg ${syncMsg.startsWith("Error") ? "bg-destructive/10 text-destructive" : "bg-success/10 text-success"}`}>{syncMsg}</p>
-        )}
+            <ul className="nav nav-tabs mb-3">
+              {(["reviews", "mentions", "alerts"] as Tab[]).map((t) => (
+                <li className="nav-item" key={t}>
+                  <button type="button" className={`nav-link ${tab === t ? "active" : ""}`}
+                    aria-pressed={tab === t} onClick={() => setTab(t)}>
+                    {t === "reviews"
+                      ? `Reseñas Google (${reviews.length})`
+                      : t === "mentions"
+                        ? `Menciones (${mentions.length})`
+                        : `Alertas (${sentAlerts.length})`}
+                  </button>
+                </li>
+              ))}
+            </ul>
 
-        {/* KPIs */}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <KpiTile icon="⭐" label="Reseñas GBP" value={gbpStats?.total ?? 0} />
-          <KpiTile icon="📊" label="Rating promedio" value={gbpStats ? `${gbpStats.avgRating}★` : "—"} accent />
-          <KpiTile icon="✉️" label="Sin responder" value={gbpStats?.pendingReplies ?? 0} />
-          <KpiTile icon="👁️" label="Score menciones" value={`${sentScore}%`} />
-        </div>
-
-        {/* Tabs */}
-        <div className="flex gap-1 border-b border-border">
-          {(["reviews", "mentions", "alerts"] as Tab[]).map(t => (
-            <button key={t} onClick={() => setTab(t)}
-              className={`px-4 py-2 text-sm font-medium transition-colors ${tab === t ? "border-b-2 border-primary text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
-              {t === "reviews" ? `Reseñas Google (${reviews.length})` : t === "mentions" ? `Menciones (${mentions.length})` : `Alertas (${sentAlerts.length})`}
-            </button>
-          ))}
-        </div>
-
-        {/* Tab: Reseñas GBP */}
-        {tab === "reviews" && (
-          loading ? <div className="space-y-3">{Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-28 animate-pulse rounded-xl bg-muted/30" />)}</div> :
-          reviews.length === 0 ? (
-            <NelvyonDsCard className="p-16 text-center">
-              <p className="text-5xl">⭐</p>
-              <p className="mt-4 text-lg font-semibold text-foreground">Sin reseñas sincronizadas</p>
-              <p className="mt-2 text-sm text-muted-foreground">{gbpConfig.placesConfigured ? "Pulsa «Sincronizar GBP» para importar tus reseñas de Google" : "Configura GOOGLE_PLACES_API_KEY + GBP_PLACE_ID en Railway"}</p>
-              {gbpConfig.placesConfigured && <NelvyonDsButton className="mt-5" onClick={syncReviews} disabled={syncing}>🔄 Sincronizar ahora</NelvyonDsButton>}
-            </NelvyonDsCard>
-          ) : (
-            <div className="space-y-3">
-              {reviews.map(r => (
-                <NelvyonDsCard key={r.id} className={`p-4 ${r.rating <= 2 && r.replyStatus === "pending" ? "border-destructive/30" : ""}`}>
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <p className="font-medium text-foreground text-sm">{r.authorName}</p>
-                        <Stars n={r.rating} />
-                        <NelvyonDsBadge tone={r.replyStatus === "replied" ? "success" : r.replyStatus === "ignored" ? "primary" : r.rating <= 2 ? "warning" : "primary"}>
-                          {r.replyStatus === "replied" ? "Respondida" : r.replyStatus === "ignored" ? "Ignorada" : "Pendiente"}
-                        </NelvyonDsBadge>
-                        {r.reviewTime && <span className="text-xs text-muted-foreground">{new Date(r.reviewTime).toLocaleDateString("es-ES")}</span>}
-                      </div>
-                      <p className="mt-2 text-sm text-foreground line-clamp-3">{r.reviewText ?? "Sin comentario"}</p>
-                      {r.replyText && (
-                        <div className="mt-2 border-l-2 border-primary pl-3">
-                          <p className="text-xs text-muted-foreground mb-0.5">Tu respuesta</p>
-                          <p className="text-sm text-foreground line-clamp-2">{r.replyText}</p>
-                        </div>
-                      )}
-                    </div>
-                    {r.replyStatus !== "replied" && (
-                      <div className="flex gap-2 shrink-0">
-                        <NelvyonDsButton variant="ghost" className="text-xs px-3 py-1.5" onClick={() => setReplyReview(r)}>Responder</NelvyonDsButton>
-                        {r.replyStatus === "pending" && <button onClick={() => void ignoreReview(r.id)} className="text-xs text-muted-foreground hover:text-foreground px-2">Ignorar</button>}
-                      </div>
+            {tab === "reviews" && (
+              <W3crmContentBox
+                titulo="Reseñas sincronizadas"
+                icono="fa-solid fa-star"
+                acciones={
+                  <button type="button" className="btn btn-primary btn-sm me-2"
+                    disabled={syncing || !gbpConfig.placesConfigured} onClick={() => void syncReviews()}>
+                    {syncing ? "Sincronizando…" : "Sincronizar GBP"}
+                  </button>
+                }
+              >
+                {loading ? (
+                  <W3crmCargando texto="Cargando reseñas…" />
+                ) : reviews.length === 0 ? (
+                  <W3crmEmptyState
+                    title="Sin reseñas sincronizadas"
+                    description={gbpConfig.placesConfigured
+                      ? "Pulsa «Sincronizar GBP» para importar tus reseñas de Google."
+                      : "Configura GOOGLE_PLACES_API_KEY + GBP_PLACE_ID en Railway."}
+                  />
+                ) : (
+                  <W3crmDataTable
+                    filas={reviews}
+                    etiqueta="reseñas"
+                    wrapperId="rep_reviews_wrapper"
+                    porPagina={10}
+                    columnas={[
+                      { titulo: "Autor" },
+                      { titulo: "Reseña" },
+                      { titulo: "Fecha" },
+                      { titulo: "Estado" },
+                      { titulo: "Gestión", alFinal: true },
+                    ]}
+                    render={(r) => (
+                      <tr key={r.id}>
+                        <td>
+                          <span className="fw-bold">{r.authorName || "—"}</span>
+                          <div><Stars n={r.rating} /></div>
+                        </td>
+                        <td>
+                          <span className="text-muted">{r.reviewText ?? "Sin comentario"}</span>
+                          {r.replyText ? (
+                            <div className="border-start border-primary ps-2 mt-2">
+                              <div className="text-muted fs-12">Tu respuesta</div>
+                              <div className="fs-12">{r.replyText}</div>
+                            </div>
+                          ) : null}
+                        </td>
+                        <td>{fecha(r.reviewTime)}</td>
+                        <td>
+                          <span className={`badge ${
+                            r.replyStatus === "replied" ? "badge-success"
+                              : r.replyStatus === "ignored" ? "badge-primary"
+                                : num(r.rating) <= 2 ? "badge-warning" : "badge-primary"
+                          }`}>
+                            {replyLabel(r.replyStatus)}
+                          </span>
+                        </td>
+                        <td className="text-end">
+                          {r.replyStatus !== "replied" && (
+                            <>
+                              <button type="button" className="btn btn-primary light btn-sm me-1"
+                                aria-label={`Responder a ${r.authorName}`} onClick={() => setReplyReview(r)}>
+                                Responder
+                              </button>
+                              {r.replyStatus === "pending" && (
+                                <button type="button" className="btn btn-primary light btn-sm"
+                                  aria-label={`Ignorar reseña de ${r.authorName}`}
+                                  onClick={() => void ignoreReview(r.id)}>
+                                  Ignorar
+                                </button>
+                              )}
+                            </>
+                          )}
+                        </td>
+                      </tr>
                     )}
-                  </div>
-                </NelvyonDsCard>
-              ))}
-            </div>
-          )
-        )}
+                  />
+                )}
+              </W3crmContentBox>
+            )}
 
-        {/* Tab: Menciones sentiment */}
-        {tab === "mentions" && (
-          loading ? <div className="space-y-3">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-20 animate-pulse rounded-xl bg-muted/30" />)}</div> :
-          mentions.length === 0 ? (
-            <NelvyonDsCard className="p-16 text-center">
-              <p className="text-5xl">👁️</p>
-              <p className="mt-4 text-lg font-semibold text-foreground">Sin menciones detectadas</p>
-              <p className="mt-2 text-sm text-muted-foreground">Las menciones guardadas via API aparecerán aquí con análisis de sentiment</p>
-            </NelvyonDsCard>
-          ) : (
-            <div className="space-y-2">
-              {mentions.map(m => (
-                <NelvyonDsCard key={m.id} className="p-4">
-                  <div className="flex flex-wrap items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <NelvyonDsBadge tone={m.label === "positive" ? "success" : m.label === "negative" ? "warning" : "primary"}>
-                          {m.label === "positive" ? "Positivo" : m.label === "negative" ? "Negativo" : "Neutral"}
-                        </NelvyonDsBadge>
-                        <span className="text-xs text-muted-foreground">{m.channel} · score {m.score.toFixed(2)}</span>
-                      </div>
-                      <p className="text-sm text-foreground line-clamp-2">{m.text}</p>
-                      {m.topics && m.topics.length > 0 && (
-                        <div className="mt-1 flex gap-1 flex-wrap">{m.topics.map(t => <span key={t} className="rounded bg-muted/30 px-1.5 py-0.5 text-xs text-muted-foreground">{t}</span>)}</div>
-                      )}
-                    </div>
-                    <span className="text-xs text-muted-foreground shrink-0">{new Date(m.createdAt).toLocaleDateString("es-ES")}</span>
-                  </div>
-                </NelvyonDsCard>
-              ))}
-            </div>
-          )
-        )}
+            {tab === "mentions" && (
+              <W3crmContentBox titulo="Menciones con sentiment" icono="fa-solid fa-eye">
+                {loading ? (
+                  <W3crmCargando texto="Cargando menciones…" />
+                ) : mentions.length === 0 ? (
+                  <W3crmEmptyState
+                    title="Sin menciones detectadas"
+                    description="Las menciones guardadas vía API aparecerán aquí con análisis de sentiment."
+                  />
+                ) : (
+                  <W3crmDataTable
+                    filas={mentions}
+                    etiqueta="menciones"
+                    wrapperId="rep_mentions_wrapper"
+                    porPagina={10}
+                    columnas={[{ titulo: "Sentiment" }, { titulo: "Mención" }, { titulo: "Fecha", alFinal: true }]}
+                    render={(m) => {
+                      // `topics` podia no ser array y reventaba el `.map`.
+                      const topics = Array.isArray(m.topics) ? m.topics : [];
+                      return (
+                        <tr key={m.id}>
+                          <td>
+                            <span className={`badge ${sentimentBadge(m.label)}`}>{sentimentLabel(m.label)}</span>
+                            <div className="text-muted fs-12">{m.channel || "—"} · score {num(m.score).toFixed(2)}</div>
+                          </td>
+                          <td>
+                            <span>{m.text || "—"}</span>
+                            {topics.length > 0 && (
+                              <div className="mt-1">
+                                {topics.map((t) => (
+                                  <span key={t} className="badge badge-secondary me-1">{t}</span>
+                                ))}
+                              </div>
+                            )}
+                          </td>
+                          <td className="text-end">{fecha(m.createdAt)}</td>
+                        </tr>
+                      );
+                    }}
+                  />
+                )}
+              </W3crmContentBox>
+            )}
 
-        {/* Tab: Alertas */}
-        {tab === "alerts" && (
-          loading ? <div className="h-24 animate-pulse rounded-xl bg-muted/30" /> :
-          sentAlerts.length === 0 ? (
-            <NelvyonDsCard className="p-16 text-center">
-              <p className="text-5xl">🔔</p>
-              <p className="mt-4 text-lg font-semibold text-foreground">Sin alertas activas</p>
-              <p className="mt-2 text-sm text-muted-foreground">Las alertas se disparan automáticamente cuando el score de sentiment cae por debajo de -0.3 en 24h</p>
-              <NelvyonDsButton className="mt-5" variant="ghost" onClick={() => setShowAlertModal(true)}>Verificar ahora</NelvyonDsButton>
-            </NelvyonDsCard>
-          ) : (
-            <div className="space-y-2">
-              {sentAlerts.map(a => (
-                <NelvyonDsCard key={a.id} className="flex items-center justify-between gap-4 px-5 py-3 border-destructive/30">
-                  <div>
-                    <p className="font-medium text-destructive">Alerta de sentiment negativo</p>
-                    <p className="text-xs text-muted-foreground">Score promedio {a.avgScore.toFixed(2)} · ventana {a.windowHours}h · {new Date(a.createdAt).toLocaleDateString("es-ES")}</p>
-                  </div>
-                  <NelvyonDsBadge tone={a.status === "active" ? "warning" : "primary"}>{a.status === "active" ? "Activa" : "Resuelta"}</NelvyonDsBadge>
-                </NelvyonDsCard>
-              ))}
-            </div>
-          )
-        )}
+            {tab === "alerts" && (
+              <W3crmContentBox
+                titulo="Alertas de sentiment"
+                icono="fa-solid fa-bell"
+                acciones={
+                  <button type="button" className="btn btn-primary light btn-sm me-2"
+                    onClick={() => setShowAlertModal(true)}>
+                    Verificar alertas
+                  </button>
+                }
+              >
+                {loading ? (
+                  <W3crmCargando texto="Cargando alertas…" />
+                ) : sentAlerts.length === 0 ? (
+                  <W3crmEmptyState
+                    title="Sin alertas activas"
+                    description="Las alertas se disparan automáticamente cuando el score de sentiment cae por debajo de -0.3 en 24h."
+                  />
+                ) : (
+                  <W3crmDataTable
+                    filas={sentAlerts}
+                    etiqueta="alertas"
+                    wrapperId="rep_alerts_wrapper"
+                    porPagina={10}
+                    columnas={[{ titulo: "Alerta" }, { titulo: "Fecha" }, { titulo: "Estado", alFinal: true }]}
+                    render={(a) => (
+                      <tr key={a.id}>
+                        <td>
+                          <span className="fw-bold text-danger">Alerta de sentiment negativo</span>
+                          <div className="text-muted fs-12">
+                            Score promedio {num(a.avgScore).toFixed(2)} · ventana {num(a.windowHours)}h
+                          </div>
+                        </td>
+                        <td>{fecha(a.createdAt)}</td>
+                        <td className="text-end">
+                          <span className={`badge ${a.status === "active" ? "badge-warning" : "badge-primary"}`}>
+                            {a.status === "active" ? "Activa" : "Resuelta"}
+                          </span>
+                        </td>
+                      </tr>
+                    )}
+                  />
+                )}
+              </W3crmContentBox>
+            )}
+          </div>
+        </div>
       </div>
 
-      {replyReview && <ReplyModal review={replyReview} onClose={() => setReplyReview(null)} onSaved={() => { void loadReviews(); setReplyReview(null); }} />}
-      {showAlertModal && <NewAlertModal onClose={() => setShowAlertModal(false)} onSaved={() => { void loadAlerts(); setShowAlertModal(false); }} />}
-    </SaasShellLayout>
+      {replyReview && (
+        <ReplyModal review={replyReview} onClose={() => setReplyReview(null)}
+          onSaved={() => { void loadReviews(); setReplyReview(null); }} />
+      )}
+      {showAlertModal && (
+        <NewAlertModal onClose={() => setShowAlertModal(false)}
+          onSaved={() => { void loadAlerts(); setShowAlertModal(false); }} />
+      )}
+    </SaasW3crmShell>
   );
 }

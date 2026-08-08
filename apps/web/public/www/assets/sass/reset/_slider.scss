@@ -117,7 +117,7 @@
         transition: all 0.4s ease-in-out;
 
         &.swiper-pagination-bullet-active {
-            background: linear-gradient(116.7deg, #0084FF 0%, #B35DFF 100%);
+            background: linear-gradient(116.7deg, #7B5DFF 0%, #B35DFF 100%);
             border-color: $theme-color;
         }
 
@@ -213,7 +213,7 @@
         transition: all 0.4s ease;
 
         &:hover {
-            background: linear-gradient(261.14deg, #0066FF 20.53%, #0084FF 69.42%);
+            background: linear-gradient(261.14deg, #C726FD 20.53%, #FF1CA4 69.42%);
             border: 4px solid #F7F7F7;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.06);
             border-radius: 40px;
@@ -263,7 +263,7 @@
         }
 
         &:hover {
-            background: linear-gradient(261.14deg, #0066FF 20.53%, #0084FF 69.42%);
+            background: linear-gradient(261.14deg, #C726FD 20.53%, #FF1CA4 69.42%);
             border: none;
 
         }
@@ -282,8 +282,8 @@
         transition: all 0.4s ease;
 
         &:hover {
-            background: linear-gradient(261.14deg, #0066FF 20.53%, #0084FF 69.42%);
-            border: 1px solid #0084FF;
+            background: linear-gradient(261.14deg, #C726FD 20.53%, #FF1CA4 69.42%);
+            border: 1px solid #FF1CA4;
         }
 
         &.slider-next {

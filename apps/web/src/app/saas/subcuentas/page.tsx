@@ -1,11 +1,34 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+/**
+ * /saas/subcuentas sobre la pantalla `(apps)/user-roles` de la plantilla
+ * oficial W3CRM.
+ *
+ * Marcado de la plantilla: `container-fluid` > `row` > cabecera
+ * `d-flex align-items-center justify-content-between` con `h4.heading mb-3` y
+ * `btn btn-primary btn-sm mb-3`; columna izquierda `col-xl-3 col-lg-4` con las
+ * `card` de `ul.personal-info`; columna derecha `col-xl-9 col-lg-8` con las dos
+ * listas (`W3crmJobList`, portado de `JobManagementList`); y el offcanvas
+ * `offcanvas-end customeoff` con `table role-tble` y sus
+ * `form-check custom-checkbox checkbox-primary` / `checkbox-warning`.
+ *
+ * Logica de NELVYON intacta: tipos `Subcuenta` y `SubcuentaUsage`, `PLAN_CFG`,
+ * `STATUS_CFG`, `CreateModal`, `UsagePanel`, `TwilioRebillingPanel`, los seis
+ * `useState`, `load`, `doAction` y `doCancel`, con los endpoints
+ * `/api/saas/subcuentas`, `/api/saas/subcuentas?id={id}` y
+ * `/api/saas/twilio/rebilling`.
+ */
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Modal } from "react-bootstrap";
 
-// ── Types (mirror SaasSubcuentasService) ──────────────────────────────────────
+import {
+  W3crmEmployeeOffcanvas,
+  type W3crmOffcanvasHandle,
+} from "@/features/saas-w3crm/components/W3crmUserTabs";
+import { W3crmIconButton, W3crmJobList, type W3crmJobListRow } from "@/features/saas-w3crm/components/W3crmJobList";
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+
 type SubcuentaPlan = "starter" | "pro" | "agency";
 type SubcuentaStatus = "active" | "suspended" | "cancelled";
 
@@ -32,19 +55,41 @@ interface SubcuentaUsage {
   meter?: { emailsSent: number; smsSent: number; apiCalls: number; workflowRuns: number };
 }
 
+/** `color` traducido a las clases de badge de W3CRM. */
 const PLAN_CFG: Record<SubcuentaPlan, { label: string; color: string }> = {
-  starter: { label: "Starter", color: "bg-primary/10 text-primary border-primary/20" },
-  pro:     { label: "Pro",     color: "bg-primary/10 text-primary border-primary/20" },
-  agency:  { label: "Agency",  color: "bg-warning/10 text-warning border-warning/20" },
+  starter: { label: "Starter", color: "badge-primary" },
+  pro:     { label: "Pro",     color: "badge-primary" },
+  agency:  { label: "Agency",  color: "badge-warning" },
 };
 
-const STATUS_CFG: Record<SubcuentaStatus, { label: string; tone: "success" | "danger" | "warning" }> = {
-  active:    { label: "Activa",     tone: "success" },
-  suspended: { label: "Suspendida", tone: "warning" },
-  cancelled: { label: "Cancelada",  tone: "danger" },
+const STATUS_CFG: Record<SubcuentaStatus, { label: string; tone: string }> = {
+  active:    { label: "Activa",     tone: "badge-success" },
+  suspended: { label: "Suspendida", tone: "badge-warning" },
+  cancelled: { label: "Cancelada",  tone: "badge-danger" },
 };
 
-// ── Create modal ───────────────────────────────────────────────────────────────
+/** Un plan o estado fuera de catalogo no puede dejar la pantalla en blanco. */
+const PLAN_DESCONOCIDO = { label: "Sin plan", color: "badge-secondary" };
+const ESTADO_DESCONOCIDO = { label: "Desconocido", tone: "badge-secondary" };
+
+function planDe(plan: SubcuentaPlan | string) {
+  return PLAN_CFG[plan as SubcuentaPlan] ?? PLAN_DESCONOCIDO;
+}
+function estadoDe(status: SubcuentaStatus | string) {
+  return STATUS_CFG[status as SubcuentaStatus] ?? ESTADO_DESCONOCIDO;
+}
+/** Importes y contadores que pueden llegar ausentes en un payload degradado. */
+function num(v: unknown): number {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+function fmtFecha(s: string): string {
+  if (!s) return "—";
+  const d = new Date(s);
+  return Number.isNaN(d.getTime()) ? "—" : d.toLocaleDateString("es-ES");
+}
+
+// ── Create modal — formulario real dentro del offcanvas de la plantilla ────────
 function CreateModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -70,47 +115,67 @@ function CreateModal({ onClose, onCreated }: { onClose: () => void; onCreated: (
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-lg rounded-2xl border border-border bg-card shadow-2xl">
-        <div className="flex items-center justify-between border-b border-border px-6 py-4">
-          <h2 className="text-lg font-semibold text-foreground">Nueva subcuenta</h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
-        </div>
-        <form onSubmit={save} className="space-y-4 p-6">
-          {error && <p className="rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
-          <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre de la cuenta *</label>
-            <input value={name} onChange={e => setName(e.target.value)} placeholder="Ej: Agencia Cliente SL"
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
-          </div>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Email de contacto *</label>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="contacto@cliente.com"
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
-          </div>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Plan</label>
-            <div className="grid grid-cols-3 gap-2">
-              {(Object.keys(PLAN_CFG) as SubcuentaPlan[]).map(p => (
-                <button key={p} type="button" onClick={() => setPlan(p)}
-                  className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${plan === p ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:text-foreground"}`}>
-                  {PLAN_CFG[p].label}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Notas internas</label>
-            <input value={notes} onChange={e => setNotes(e.target.value)} placeholder="Notas opcionales…"
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
-          </div>
-          <div className="flex gap-3 pt-2">
-            <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
-            <NelvyonDsButton type="submit" disabled={saving} className="flex-1">{saving ? "Creando…" : "Crear subcuenta"}</NelvyonDsButton>
-          </div>
-        </form>
+    <form onSubmit={save} data-testid="form-subcuenta">
+      {error && <div className="alert alert-danger" role="alert">{error}</div>}
+      <div className="col-xl-12 mb-3">
+        <label htmlFor="sub-nombre" className="form-label font-w500">
+          Nombre de la cuenta<span className="text-danger">*</span>
+        </label>
+        <input id="sub-nombre" type="text" className="form-control" value={name} onChange={e => setName(e.target.value)} placeholder="Ej: Agencia Cliente SL" />
       </div>
-    </div>
+      <div className="col-xl-12 mb-3">
+        <label htmlFor="sub-email" className="form-label font-w500">
+          Email de contacto<span className="text-danger">*</span>
+        </label>
+        <input id="sub-email" type="email" className="form-control" value={email} onChange={e => setEmail(e.target.value)} placeholder="contacto@cliente.com" />
+      </div>
+
+      {/* Plan y limites — `table role-tble` de la plantilla */}
+      <h4 className="heading">Plan de la subcuenta</h4>
+      <div className="table-responsive">
+        <table id="role" className="table role-tble">
+          <thead>
+            <tr>
+              <th>Plan</th>
+              <th className="text-end">Seleccionar</th>
+            </tr>
+          </thead>
+          <tbody>
+            {(Object.keys(PLAN_CFG) as SubcuentaPlan[]).map((p, ind) => (
+              <tr key={p}>
+                <td>{planDe(p).label}</td>
+                <td>
+                  <div className={`form-check custom-checkbox ${plan === p ? "checkbox-primary" : "checkbox-warning"}`}>
+                    <input
+                      type="radio"
+                      name="sub-plan"
+                      className="form-check-input"
+                      id={`planinputcheck${ind + 11}`}
+                      checked={plan === p}
+                      onChange={() => setPlan(p)}
+                    />
+                    <label className="form-check-label" htmlFor={`planinputcheck${ind + 11}`}>
+                      {planDe(p).label}
+                    </label>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="col-xl-12 mb-3">
+        <label htmlFor="sub-notas" className="form-label font-w500">Notas internas</label>
+        <input id="sub-notas" type="text" className="form-control" value={notes} onChange={e => setNotes(e.target.value)} placeholder="Notas opcionales…" />
+      </div>
+      <div>
+        <button type="submit" className="btn btn-primary btn-sm" disabled={saving}>
+          {saving ? "Creando…" : "Crear subcuenta"}
+        </button>{" "}
+        <button type="button" className="btn btn-light btn-sm" onClick={onClose}>Descartar</button>
+      </div>
+    </form>
   );
 }
 
@@ -123,48 +188,63 @@ function UsagePanel({ sub, onClose }: { sub: Subcuenta; onClose: () => void }) {
     void fetch("/api/saas/subcuentas", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "usage", id: sub.id }) })
       .then(r => r.json() as Promise<{ usage?: SubcuentaUsage }>)
       .then(d => setUsage(d.usage ?? null))
+      .catch(() => setUsage(null))
       .finally(() => setLoading(false));
   }, [sub.id]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-      <NelvyonDsCard className="w-full max-w-sm p-6 space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-foreground">Uso: {sub.name}</h3>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
-        </div>
-        {loading ? <div className="h-24 animate-pulse rounded-lg bg-muted/30" /> : (
-          <div className="space-y-3">
-            {[
-              { label: "Contactos",      value: usage?.contacts ?? 0,  max: sub.maxContacts },
-              { label: "Campañas",       value: usage?.campaigns ?? 0, max: sub.maxCampaigns },
-              { label: "Workflows activos", value: usage?.workflows ?? 0, max: null },
-              { label: "Emails (mes)",   value: usage?.meter?.emailsSent ?? 0, max: null },
-              { label: "SMS (mes)",      value: usage?.meter?.smsSent ?? 0, max: null },
-              { label: "Workflows (mes)", value: usage?.meter?.workflowRuns ?? 0, max: null },
-              { label: "API calls (mes)", value: usage?.meter?.apiCalls ?? 0, max: null },
-            ].map(({ label, value, max }) => (
-              <div key={label}>
-                <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                  <span>{label}</span>
-                  <span>{value.toLocaleString("es-ES")}{max != null ? ` / ${max.toLocaleString("es-ES")}` : ""}</span>
-                </div>
-                {max != null && (
-                  <div className="h-1.5 rounded-full bg-muted/30">
-                    <div className="h-1.5 rounded-full bg-primary transition-all" style={{ width: `${Math.min(100, (value / max) * 100)}%` }} />
-                  </div>
-                )}
-              </div>
-            ))}
+    <Modal className="modal fade" show onHide={onClose} centered>
+      <div className="modal-header">
+        <h5 className="modal-title">Uso: {sub.name}</h5>
+        <button type="button" className="btn-close" onClick={onClose} aria-label="Cerrar" />
+      </div>
+      <div className="modal-body" data-testid="panel-uso">
+        {loading ? (
+          <div className="d-flex align-items-center justify-content-center py-4" role="status">
+            <div className="spinner-border text-primary me-3" aria-hidden="true" />
+            <span className="text-muted">Cargando…</span>
           </div>
+        ) : (
+          [
+            { label: "Contactos", value: num(usage?.contacts), max: num(sub.maxContacts) },
+            { label: "Campañas", value: num(usage?.campaigns), max: num(sub.maxCampaigns) },
+            { label: "Workflows activos", value: num(usage?.workflows), max: null },
+            { label: "Emails (mes)", value: num(usage?.meter?.emailsSent), max: null },
+            { label: "SMS (mes)", value: num(usage?.meter?.smsSent), max: null },
+            { label: "Workflows (mes)", value: num(usage?.meter?.workflowRuns), max: null },
+            { label: "API calls (mes)", value: num(usage?.meter?.apiCalls), max: null },
+          ].map(({ label, value, max }) => (
+            <div className="mb-3" key={label}>
+              <div className="d-flex justify-content-between fs-13 text-muted mb-1">
+                <span>{label}</span>
+                <span>
+                  {value.toLocaleString("es-ES")}
+                  {max ? ` / ${max.toLocaleString("es-ES")}` : ""}
+                </span>
+              </div>
+              {max ? (
+                <div className="progress" style={{ height: 6 }}>
+                  <div
+                    className="progress-bar bg-primary"
+                    style={{ width: `${Math.min(100, (value / max) * 100)}%`, height: 6 }}
+                    role="progressbar"
+                    aria-valuenow={Math.min(100, Math.round((value / max) * 100))}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label={`Uso de ${label}`}
+                  />
+                </div>
+              ) : null}
+            </div>
+          ))
         )}
-        <NelvyonDsButton variant="ghost" onClick={onClose} className="w-full">Cerrar</NelvyonDsButton>
-      </NelvyonDsCard>
-    </div>
+        <button type="button" className="btn btn-primary light w-100" onClick={onClose}>Cerrar</button>
+      </div>
+    </Modal>
   );
 }
 
-// ── Twilio rebilling panel ─────────────────────────────────────────────────────
+// ── Twilio rebilling panel — segunda lista de `(apps)/user-roles` ──────────────
 function TwilioRebillingPanel() {
   const [summary, setSummary] = useState<{ pendingRetail: number; totalSms: number } | null>(null);
   const [entries, setEntries] = useState<Array<{ subcuentaId: string; period: string; smsCount: number; retailEur: number; status: string }>>([]);
@@ -178,23 +258,36 @@ function TwilioRebillingPanel() {
       if (res.ok) {
         const d = await res.json() as { summary?: { pendingRetail: number; totalSms: number }; entries?: typeof entries };
         setSummary(d.summary ?? null);
-        setEntries(d.entries ?? []);
+        setEntries(Array.isArray(d.entries) ? d.entries : []);
       }
     } finally { setLoading(false); }
   }, []);
 
   useEffect(() => { void load(); }, [load]);
 
+  const filas: W3crmJobListRow[] = entries.map((e, i) => ({
+    clave: `${e.subcuentaId}-${e.period}-${i}`,
+    iniciales: (e.subcuentaId || "?").slice(0, 2).toUpperCase(),
+    nombre: e.subcuentaId,
+    subtitulo: `${num(e.smsCount).toLocaleString("es-ES")} SMS`,
+    fecha: e.period,
+    ultimaActividad: (
+      <span className={`badge badge-sm ${e.status === "pending" ? "badge-warning" : "badge-success"}`}>
+        €{num(e.retailEur).toFixed(2)}
+      </span>
+    ),
+    acciones: null,
+  }));
+
   return (
-    <NelvyonDsCard className="p-5 border-warning/20 bg-warning/5">
-      <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
-        <div>
-          <p className="font-semibold text-foreground">📱 Twilio rebilling (3× markup)</p>
-          <p className="text-xs text-muted-foreground mt-1">SMS/voice subcuentas — factura al cliente, no a la plataforma</p>
-        </div>
-        <NelvyonDsButton
-          variant="ghost"
-          className="text-xs"
+    <>
+      <div className="d-flex align-items-center justify-content-between">
+        <h4 className="heading mb-0">
+          <i className="fa-solid fa-comment-sms text-primary me-3 mb-3"></i> Twilio rebilling (3× markup)
+        </h4>
+        <button
+          type="button"
+          className="btn btn-primary btn-sm mb-3"
           disabled={rolling}
           onClick={async () => {
             setRolling(true);
@@ -205,27 +298,38 @@ function TwilioRebillingPanel() {
           }}
         >
           {rolling ? "Calculando…" : "Rollup mes actual"}
-        </NelvyonDsButton>
+        </button>
       </div>
-      {loading ? (
-        <div className="h-12 animate-pulse rounded-lg bg-muted/30" />
-      ) : (
-        <div className="flex flex-wrap gap-6 text-sm">
-          <div>
-            <p className="text-xs text-muted-foreground">Retail pendiente</p>
-            <p className="text-xl font-bold text-foreground">€{(summary?.pendingRetail ?? 0).toFixed(2)}</p>
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground">SMS totales</p>
-            <p className="text-xl font-bold text-foreground">{(summary?.totalSms ?? 0).toLocaleString("es-ES")}</p>
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground">Entradas ledger</p>
-            <p className="text-xl font-bold text-foreground">{entries.length}</p>
+      <div className="card h-auto">
+        <div className="card-body">
+          <div className="row">
+            {[
+              { label: "Retail pendiente", value: `€${num(summary?.pendingRetail).toFixed(2)}` },
+              { label: "SMS totales", value: num(summary?.totalSms).toLocaleString("es-ES") },
+              { label: "Entradas ledger", value: String(entries.length) },
+            ].map(({ label, value }) => (
+              <div className="col-sm-4" key={label}>
+                <span className="d-block text-muted fs-13 text-uppercase mb-1">{label}</span>
+                <h3 className="mb-0">{loading ? "…" : value}</h3>
+              </div>
+            ))}
           </div>
         </div>
-      )}
-    </NelvyonDsCard>
+      </div>
+      <W3crmJobList
+        titulo="Ledger de rebilling"
+        icono="fa-solid fa-file-invoice"
+        columnas={["Subcuenta", "Periodo", "Retail", "Acción"]}
+        filas={filas}
+        cargando={loading}
+        vacio={
+          <>
+            <h5 className="mb-1">Sin entradas de rebilling</h5>
+            <p className="mb-0 text-muted fs-14">Ejecuta el rollup del mes para generarlas.</p>
+          </>
+        }
+      />
+    </>
   );
 }
 
@@ -237,6 +341,7 @@ export default function SaasSubcuentasPage() {
   const [usageSub, setUsageSub] = useState<Subcuenta | null>(null);
   const [filterStatus, setFilterStatus] = useState<SubcuentaStatus | "all">("all");
   const [actioning, setActioning] = useState<string | null>(null);
+  const offcanvasRef = useRef<W3crmOffcanvasHandle>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -244,7 +349,7 @@ export default function SaasSubcuentasPage() {
       const res = await fetch("/api/saas/subcuentas");
       if (res.ok) {
         const d = await res.json() as { subcuentas?: Subcuenta[] };
-        setSubcuentas(d.subcuentas ?? []);
+        setSubcuentas(Array.isArray(d.subcuentas) ? d.subcuentas : []);
       }
     } finally { setLoading(false); }
   }, []);
@@ -268,104 +373,160 @@ export default function SaasSubcuentasPage() {
     } finally { setActioning(null); }
   }
 
+  function abrirAlta() {
+    setShowCreate(true);
+    offcanvasRef.current?.showEmployeModal();
+  }
+  function cerrarAlta() {
+    setShowCreate(false);
+    offcanvasRef.current?.hideEmployeModal();
+  }
+
   const filtered = subcuentas.filter(s => filterStatus === "all" || s.status === filterStatus);
 
+  const filas: W3crmJobListRow[] = filtered.map((sub) => {
+    const pc = planDe(sub.plan);
+    const sc = estadoDe(sub.status);
+    const isBusy = actioning === sub.id;
+    return {
+      clave: sub.id,
+      iniciales: (sub.name || "?").slice(0, 2).toUpperCase(),
+      nombre: sub.name,
+      subtitulo: sub.email,
+      fecha: fmtFecha(sub.createdAt),
+      ultimaActividad: (
+        <>
+          <span className={`badge badge-sm ${pc.color} me-1`}>{pc.label}</span>
+          <span className={`badge badge-sm ${sc.tone}`}>{sc.label}</span>
+          {sub.stripeConnectPaymentEnabled && <span className="badge badge-sm badge-primary ms-1">Connect</span>}
+          <span className="d-block text-muted fs-13 mt-1">
+            {num(sub.maxContacts).toLocaleString("es-ES")} contactos · {num(sub.maxCampaigns)} campañas
+          </span>
+        </>
+      ),
+      acciones: (
+        <>
+          <W3crmIconButton icono="fas fa-chart-simple" etiqueta={`Ver uso de ${sub.name}`} onClick={() => setUsageSub(sub)} />{" "}
+          {sub.status === "active" && (
+            <W3crmIconButton
+              tono="warning"
+              icono="fas fa-pause"
+              etiqueta={`Suspender ${sub.name}`}
+              disabled={isBusy}
+              onClick={() => void doAction("suspend", sub.id)}
+            />
+          )}
+          {sub.status === "suspended" && (
+            <>
+              <W3crmIconButton
+                tono="success"
+                icono="fas fa-play"
+                etiqueta={`Reactivar ${sub.name}`}
+                disabled={isBusy}
+                onClick={() => void doAction("reactivate", sub.id)}
+              />{" "}
+              <W3crmIconButton
+                tono="danger"
+                icono="fas fa-trash-alt"
+                etiqueta={`Cancelar ${sub.name}`}
+                disabled={isBusy}
+                onClick={() => void doCancel(sub.id)}
+              />
+            </>
+          )}
+        </>
+      ),
+    };
+  });
+
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="subcuentas" />}>
-      <div className="flex flex-col gap-6 pb-8">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <NelvyonDsSectionHeader title="Gestión de Subcuentas" subtitle="Administra las cuentas de clientes bajo tu agencia white-label" />
-          <NelvyonDsButton onClick={() => setShowCreate(true)}>+ Nueva subcuenta</NelvyonDsButton>
-        </div>
-
-        {/* KPIs */}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {[
-            { label: "Total",            value: subcuentas.length },
-            { label: "Activas",          value: subcuentas.filter(s => s.status === "active").length },
-            { label: "Suspendidas",      value: subcuentas.filter(s => s.status === "suspended").length },
-            { label: "Stripe Connect",   value: subcuentas.filter(s => s.stripeConnectPaymentEnabled).length },
-          ].map(({ label, value }) => (
-            <NelvyonDsCard key={label} className="p-4">
-              <p className="text-xs text-muted-foreground">{label}</p>
-              <p className="mt-1 text-2xl font-bold text-foreground">{value}</p>
-            </NelvyonDsCard>
-          ))}
-        </div>
-
-        <TwilioRebillingPanel />
-
-        {/* Filter chips */}
-        <div className="flex gap-2 flex-wrap">
-          {(["all", "active", "suspended", "cancelled"] as const).map(s => (
-            <button key={s} onClick={() => setFilterStatus(s)}
-              className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${filterStatus === s ? "bg-primary text-primary-foreground" : "bg-muted/30 text-muted-foreground hover:text-foreground"}`}>
-              {s === "all" ? "Todas" : STATUS_CFG[s as SubcuentaStatus].label}
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="Gestión de Subcuentas" parentTitle="Cuenta" pageTitle="Subcuentas" />
+      <div className="container-fluid">
+        <div className="row">
+          <div className="d-flex align-items-center justify-content-between">
+            <h4 className="heading mb-3">Subcuentas de la agencia</h4>
+            <button type="button" className="btn btn-primary btn-sm mb-3" onClick={abrirAlta}>
+              + Nueva subcuenta
             </button>
-          ))}
-        </div>
-
-        {/* List */}
-        {loading ? (
-          <div className="space-y-3">{Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-28 animate-pulse rounded-xl bg-muted/30" />)}</div>
-        ) : filtered.length === 0 ? (
-          <NelvyonDsCard className="p-16 text-center">
-            <p className="text-5xl">🏢</p>
-            <p className="mt-4 text-lg font-semibold text-foreground">Sin subcuentas</p>
-            <p className="mt-2 text-sm text-muted-foreground">Crea la primera subcuenta para tu cliente</p>
-            <NelvyonDsButton className="mt-5" onClick={() => setShowCreate(true)}>+ Nueva subcuenta</NelvyonDsButton>
-          </NelvyonDsCard>
-        ) : (
-          <div className="space-y-3">
-            {filtered.map(sub => {
-              const pc = PLAN_CFG[sub.plan];
-              const sc = STATUS_CFG[sub.status];
-              const isBusy = actioning === sub.id;
-              return (
-                <NelvyonDsCard key={sub.id} className="p-4">
-                  <div className="flex flex-wrap items-start gap-4">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-lg font-bold text-primary">
-                      {sub.name[0]?.toUpperCase()}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <p className="font-semibold text-foreground">{sub.name}</p>
-                        <span className={`rounded-md border px-2 py-0.5 text-xs font-medium ${pc.color}`}>{pc.label}</span>
-                        <NelvyonDsBadge tone={sc.tone}>{sc.label}</NelvyonDsBadge>
-                        {sub.stripeConnectPaymentEnabled && <NelvyonDsBadge tone="primary">Connect</NelvyonDsBadge>}
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-0.5">{sub.email}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">Límite: {sub.maxContacts.toLocaleString("es-ES")} contactos · {sub.maxCampaigns} campañas</p>
-                      {sub.notes && <p className="text-xs text-muted-foreground mt-1 italic">{sub.notes}</p>}
-                    </div>
-                    <div className="flex flex-col gap-1.5 shrink-0">
-                      <NelvyonDsButton variant="ghost" className="text-xs" onClick={() => setUsageSub(sub)}>Ver uso</NelvyonDsButton>
-                      {sub.status === "active" && (
-                        <NelvyonDsButton variant="ghost" className="text-xs" disabled={isBusy} onClick={() => void doAction("suspend", sub.id)}>
-                          {isBusy ? "…" : "Suspender"}
-                        </NelvyonDsButton>
-                      )}
-                      {sub.status === "suspended" && (
-                        <>
-                          <NelvyonDsButton className="text-xs" disabled={isBusy} onClick={() => void doAction("reactivate", sub.id)}>
-                            {isBusy ? "…" : "Reactivar"}
-                          </NelvyonDsButton>
-                          <button className="text-xs text-destructive hover:text-destructive/80" disabled={isBusy} onClick={() => void doCancel(sub.id)}>
-                            Cancelar
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </NelvyonDsCard>
-              );
-            })}
           </div>
-        )}
+
+          {/* Columna izquierda — `ul.personal-info` de la plantilla */}
+          <div className="col-xl-3 col-lg-4">
+            <div className="row">
+              <div className="col-xl-12">
+                <div className="card">
+                  <div className="card-header">
+                    <h4 className="heading mb-0">Resumen</h4>
+                  </div>
+                  <div className="card-body px-0">
+                    <ul className="personal-info">
+                      <li><i className="fa-solid fa-building text-primary me-3"></i> Total: {subcuentas.length}</li>
+                      <li><i className="fa-solid fa-circle-check text-primary me-3"></i> Activas: {subcuentas.filter(s => s.status === "active").length}</li>
+                      <li><i className="fa-solid fa-pause text-primary me-3"></i> Suspendidas: {subcuentas.filter(s => s.status === "suspended").length}</li>
+                      <li><i className="fa-brands fa-stripe text-primary me-3"></i> Stripe Connect: {subcuentas.filter(s => s.stripeConnectPaymentEnabled).length}</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div className="col-xl-12">
+                <div className="card">
+                  <div className="card-header">
+                    <h4 className="heading mb-0">Filtrar</h4>
+                  </div>
+                  <div className="card-body px-0">
+                    <ul className="personal-info">
+                      {(["all", "active", "suspended", "cancelled"] as const).map(s => (
+                        <li key={s}>
+                          <button
+                            type="button"
+                            className={`btn btn-sm ${filterStatus === s ? "btn-primary" : "btn-primary light"}`}
+                            onClick={() => setFilterStatus(s)}
+                          >
+                            {s === "all" ? "Todas" : estadoDe(s).label}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Columna derecha — las dos listas de la plantilla */}
+          <div className="col-xl-9 col-lg-8">
+            <div className="row">
+              <div className="col-xl-12">
+                <W3crmJobList
+                  titulo="Subcuentas"
+                  icono="fa-solid fa-user-plus"
+                  columnas={["Cuenta", "Alta", "Plan y estado", "Acción"]}
+                  filas={filas}
+                  cargando={loading}
+                  vacio={
+                    <>
+                      <h5 className="mb-1">Sin subcuentas</h5>
+                      <p className="mb-3 text-muted fs-14">Crea la primera subcuenta para tu cliente.</p>
+                      <button type="button" className="btn btn-primary" onClick={abrirAlta}>+ Nueva subcuenta</button>
+                    </>
+                  }
+                />
+              </div>
+              <div className="col-xl-12">
+                <TwilioRebillingPanel />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {showCreate && <CreateModal onClose={() => setShowCreate(false)} onCreated={() => void load()} />}
+      {/* Alta — offcanvas de la plantilla con el formulario real */}
+      <W3crmEmployeeOffcanvas ref={offcanvasRef} title="Nueva subcuenta">
+        {showCreate ? <CreateModal onClose={cerrarAlta} onCreated={() => void load()} /> : null}
+      </W3crmEmployeeOffcanvas>
+
       {usageSub && <UsagePanel sub={usageSub} onClose={() => setUsageSub(null)} />}
-    </SaasShellLayout>
+    </SaasW3crmShell>
   );
 }

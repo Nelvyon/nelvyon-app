@@ -1,0 +1,297 @@
+
+/* NELVYON × NELVYON skin — brand skin (overrides template tells) */
+:root {
+  --theme-color: #0084FF !important;
+  --theme-color2: #33A1FF !important;
+  --nv-ink: #06050b;
+  --nv-muted: #5b6170;
+  --nv-line: rgba(6, 5, 11, 0.08);
+  --nv-surface: #ffffff;
+  --nv-surface-soft: #f5f8fc;
+  --nv-radius: 14px;
+}
+
+.nv-brand {
+  font-family: var(--font-nv-sans), system-ui, sans-serif;
+  color: var(--nv-ink);
+  background: var(--nv-surface);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.nv-brand .sec-title,
+.nv-brand .hero-title,
+.nv-brand h1,
+.nv-brand h2,
+.nv-brand h3 {
+  font-family: var(--font-nv-display), var(--font-nv-sans), system-ui, sans-serif;
+  letter-spacing: -0.02em;
+  color: var(--nv-ink);
+}
+
+.nv-brand .th-header {
+  z-index: 50;
+}
+
+.nv-brand .header-layout9 .menu-area {
+  min-height: 72px;
+}
+
+.nv-brand .header-layout9.sticky .sticky-wrapper {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--nv-line);
+  box-shadow: none;
+}
+
+.nv-brand .header-layout9 .main-menu > ul > li > a {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #1a1f2c;
+}
+
+.nv-brand .header-layout9 .main-menu > ul > li > a[aria-current="page"],
+.nv-brand .header-layout9 .main-menu > ul > li > a:hover {
+  color: #0084ff;
+}
+
+/* Kill template gradient CTAs → solid NELVYON blue */
+.nv-brand .th-btn2,
+.nv-brand .btn-gradient2,
+.nv-brand a.th-btn2 {
+  border-radius: 999px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em;
+  box-shadow: none !important;
+  background-image: none !important;
+  transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+
+.nv-brand .btn-gradient2,
+.nv-brand a.btn-gradient2 {
+  background: #0084ff !important;
+  border: 1px solid #0084ff !important;
+  color: #fff !important;
+}
+
+.nv-brand .btn-gradient2:hover,
+.nv-brand a.btn-gradient2:hover {
+  background: #006fd6 !important;
+  border-color: #006fd6 !important;
+  color: #fff !important;
+  transform: translateY(-1px);
+}
+
+.nv-brand .th-btn2.style5,
+.nv-brand a.th-btn2.style5 {
+  background: transparent !important;
+  border: 1px solid rgba(6, 5, 11, 0.18) !important;
+  color: var(--nv-ink) !important;
+}
+
+.nv-brand .th-btn2.style5:hover,
+.nv-brand a.th-btn2.style5:hover {
+  border-color: #0084ff !important;
+  color: #0084ff !important;
+}
+
+.nv-brand .hero-style9 {
+  padding-top: 2.5rem;
+  padding-bottom: 1rem;
+}
+
+.nv-brand .hero-style9 .sub-title,
+.nv-brand .nv-brand-inner-hero .sub-title {
+  color: #0084ff !important;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+}
+
+.nv-brand .hero-style9 .hero-title {
+  max-width: 18ch;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.08;
+}
+
+.nv-brand .hero-style9 .hero-text {
+  max-width: 42rem;
+  margin-left: auto;
+  margin-right: auto;
+  color: var(--nv-muted);
+  font-size: 1.125rem;
+  line-height: 1.65;
+}
+
+.nv-brand .hero-list {
+  justify-content: center;
+  gap: 1.25rem 1.75rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1.75rem;
+}
+
+.nv-brand .hero-list li {
+  color: #2a3140;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.nv-brand .hero-list .fa-circle-check {
+  color: #0084ff !important;
+}
+
+.nv-brand .hero-image4 img,
+.nv-brand .nv-brand-product-shot {
+  border-radius: 18px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.6) inset,
+    0 24px 80px rgba(2, 8, 23, 0.16);
+  width: 100%;
+  height: auto;
+  border: 1px solid rgba(2, 8, 23, 0.06);
+}
+
+.nv-brand .nv-brand-no-fake-social-proof {
+  display: none !important;
+}
+
+/* Interior heroes */
+.nv-brand .nv-brand-inner-hero {
+  background: linear-gradient(180deg, #f5f8fc 0%, #ffffff 100%) !important;
+  padding-top: 88px !important;
+  padding-bottom: 56px !important;
+}
+
+.nv-brand .nv-brand-inner-hero.nv-brand-hero-centered {
+  text-align: center;
+}
+
+.nv-brand .nv-brand-inner-hero.nv-brand-hero-centered .btn-group {
+  justify-content: center;
+}
+
+.nv-brand .nv-brand-inner-hero.nv-brand-hero-centered p {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Cards / grids — less “Envato card soup” */
+.nv-brand .price-card-wrap,
+.nv-brand .process-card,
+.nv-brand .feature-card,
+.nv-brand .service-card,
+.nv-brand [class*="card-"] {
+  border-radius: var(--nv-radius);
+}
+
+.nv-brand .space,
+.nv-brand .space-extra {
+  padding-top: clamp(4rem, 8vw, 6.5rem);
+  padding-bottom: clamp(4rem, 8vw, 6.5rem);
+}
+
+.nv-brand .sec-title.h2,
+.nv-brand .sec-title.h3 {
+  line-height: 1.15;
+}
+
+.nv-brand .footer-wrapper {
+  background: #020817 !important;
+}
+
+.nv-brand .footer-wrapper a {
+  color: rgba(255, 255, 255, 0.72);
+  text-decoration: none;
+}
+
+.nv-brand .footer-wrapper a:hover {
+  color: #33a1ff;
+}
+
+.nv-brand .footer-wrapper .menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nv-brand .footer-wrapper .menu li {
+  margin-bottom: 10px;
+}
+
+.nv-brand .copyright-wrap p {
+  letter-spacing: 0.01em;
+}
+
+.nv-brand .th-menu-wrapper.th-body-visible {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Contact form within NELVYON skin pages */
+.nv-brand .nv-public-panel,
+.nv-brand form {
+  max-width: 100%;
+}
+
+.nv-brand .nv-public-panel {
+  border: 1px solid var(--nv-line);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 18px 50px rgba(2, 8, 23, 0.06);
+}
+
+/* Soften template icon boxes */
+.nv-brand .icon-box,
+.nv-brand .feature-icon {
+  border-radius: 14px;
+}
+
+@media (max-width: 991px) {
+  .nv-brand .hero-style9 .hero-title {
+    max-width: none;
+  }
+
+  .nv-brand .hero-list {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+.nv-brand .th-menu-toggle {
+  width: 42px !important;
+  height: 42px !important;
+  background: transparent !important;
+  border: 1px solid rgba(6, 5, 11, 0.14) !important;
+  border-radius: 999px !important;
+  color: #06050b !important;
+  box-shadow: none !important;
+}
+
+.nv-brand .th-menu-toggle:hover {
+  border-color: #0084ff !important;
+  color: #0084ff !important;
+}
+
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  vertical-align: middle;
+  margin-right: 0.4rem;
+}
+
+.nv-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #0084ff;
+  margin-right: 0.45rem;
+  vertical-align: middle;
+}
+
+.nv-brand .hero-list .nv-check {
+  margin-right: 0.55rem;
+}
+

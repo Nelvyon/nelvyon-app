@@ -1,30 +1,17 @@
 /**
  * Rutas limpias NELVYON → plantillas AIOR íntegras en /www
+ * Estructura publicada: Home 08 (Inicio/Agencia) + Home 02 (SaaS) + interiores.
  * Usado por next.config redirects y páginas marketing.
  */
 export const AIOR_NELVYON_ROUTES = [
   { source: "/", destination: "/www/index.html" },
-  { source: "/agencia-ia", destination: "/www/home-ai-startup.html" },
-  { source: "/landing/agencia-ia", destination: "/www/home-ai-startup-op.html" },
-  { source: "/producto/inbox", destination: "/www/home-ai-chatbot.html" },
-  { source: "/landing/inbox", destination: "/www/home-ai-chatbot-op.html" },
-  { source: "/agencia/contenido", destination: "/www/home-ai-writer-tool.html" },
-  { source: "/landing/contenido", destination: "/www/home-ai-writer-tool-op.html" },
-  { source: "/enterprise", destination: "/www/home-business-intelligence.html" },
-  { source: "/landing/enterprise", destination: "/www/home-business-intelligence-op.html" },
-  { source: "/producto/ia", destination: "/www/home-ai-agent.html" },
-  { source: "/producto/agentes", destination: "/www/home-ai-agent.html" },
-  { source: "/landing/ia", destination: "/www/home-ai-agent-op.html" },
-  { source: "/producto/workflows", destination: "/www/home-productivity-tools.html" },
-  { source: "/landing/automatizaciones", destination: "/www/home-productivity-tools-op.html" },
-  { source: "/producto/whatsapp", destination: "/www/home-ai-chatbot-tool.html" },
-  { source: "/landing/comms", destination: "/www/home-ai-chatbot-tool-op.html" },
-  { source: "/producto/cloud", destination: "/www/home-cloud-based-saas.html" },
-  { source: "/landing/cloud", destination: "/www/home-cloud-based-saas-op.html" },
-  { source: "/producto", destination: "/www/home-saas-product-showcase.html" },
-  { source: "/landing/producto", destination: "/www/home-saas-product-showcase-op.html" },
+  { source: "/saas", destination: "/www/saas.html" },
+  { source: "/producto", destination: "/www/saas.html" },
   { source: "/agencia", destination: "/www/about.html" },
+  { source: "/servicios", destination: "/www/features.html" },
   { source: "/soluciones", destination: "/www/features.html" },
+  { source: "/automatizaciones", destination: "/www/features.html" },
+  { source: "/ia", destination: "/www/features.html" },
   { source: "/precios", destination: "/www/pricing.html" },
   { source: "/contacto", destination: "/www/contact.html" },
   { source: "/faq", destination: "/www/faq.html" },
@@ -34,7 +21,10 @@ export const AIOR_NELVYON_ROUTES = [
   { source: "/casos-de-uso/detalle", destination: "/www/case-studies-details.html" },
   { source: "/casos-de-uso/lista", destination: "/www/cases.html" },
   { source: "/blog", destination: "/www/blog.html" },
+  { source: "/blog/detalle", destination: "/www/blog-details.html" },
+  { source: "/recursos", destination: "/www/blog.html" },
   { source: "/nosotros", destination: "/www/team.html" },
   { source: "/nosotros/detalle", destination: "/www/team-details.html" },
-  { source: "/producto/hechos", destination: "/www/testimonial.html" },
+  { source: "/testimonios", destination: "/www/testimonial.html" },
+  { source: "/tipografia", destination: "/www/typography.html" },
 ] as const;

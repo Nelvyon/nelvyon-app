@@ -1,11 +1,52 @@
 "use client";
 
+/**
+ * /saas/web-builder (listado) sobre `(cms)/content` de W3CRM, con las piezas ya
+ * portadas. Mapeo: plantillas y listado -> `W3crmContentBox`; páginas ->
+ * `W3crmDataTable`; alta y dominio -> `W3crmModal`; KPIs -> `W3crmKpiTile`.
+ * Sin componentes nuevos.
+ *
+ * CONTRATO — `saas-web-builder-depth.spec.ts` y `saas-nav-full-coverage`:
+ *   - el texto "Web Builder" debe estar en el body. Va en `mainTitle`. NINGUNA
+ *     caja puede titularse así: el toggle de `W3crmContentBox` emite
+ *     `aria-label="Plegar <título>"` y el sidebar ya expone "🌐 Web Builder",
+ *     de modo que un `getByRole`/`getByText` futuro vería varios.
+ *   - el body nunca debe contener "Something went wrong": de ahí que todo dato
+ *     de la API pase por un guarda antes de tocar `.map`, `.reduce`,
+ *     `.toLocaleString` o `new Date`.
+ *
+ * SANEADO — `nviews()` de f89c198c se conserva INTACTO y se sigue usando para
+ * el total. Para el dato por página se usa `opt()`, que distingue "sin dato"
+ * (se pinta "—") de un cero real: sumar nulos como 0 es correcto, pero
+ * mostrarlos como "0 visitas" sería inventar un dato. Además `pages` y
+ * `templates` se validan como array antes de recorrerlos, y las fechas pasan
+ * por `fecha()` para no imprimir "Invalid Date".
+ *
+ * Lógica de NELVYON intacta: `GET /api/saas/web-builder`,
+ * `GET /api/saas/web-builder/templates`, `POST /api/saas/web-builder` para el
+ * alta y para las acciones `update` (dominio), `publish` y `render` —que
+ * devuelve HTML y se abre en una pestaña con un blob—, y
+ * `DELETE /api/saas/web-builder/{id}`. Se respeta que estas llamadas NO llevan
+ * `credentials` (a diferencia del editor); no se "corrige" nada de eso.
+ * `FeaturedEnvatoTemplateCard` se reutiliza tal cual porque lo comparte
+ * `/saas/setup`, que todavía no está migrado.
+ *
+ * Único cambio de comportamiento: el `window.confirm()` del borrado pasa al
+ * diálogo de sweetalert2 que ya usa el resto del SaaS migrado.
+ */
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
-import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+import Alert from "sweetalert2";
+
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmEmptyState, W3crmKpiTile } from "@/features/saas-w3crm/components/W3crmUi";
+import {
+  W3crmCargando,
+  W3crmContentBox,
+  W3crmDataTable,
+  W3crmModal,
+} from "@/features/saas-w3crm/components/W3crmContentBox";
 import {
   FeaturedEnvatoTemplateCard,
   type FeaturedTemplateMeta,
@@ -25,6 +66,48 @@ const PAGE_TYPES = [
   { type: "custom", label: "Personalizada", icon: "⚙️", desc: "Diseño libre" },
 ] as const;
 
+/** Un tipo fuera de catálogo dejaba la fila sin icono ni etiqueta. */
+function tipoCfg(type: unknown) {
+  return PAGE_TYPES.find((t) => t.type === type) ?? {
+    type: "custom" as WebPage["type"], label: String(type ?? "—"), icon: "📄", desc: "",
+  };
+}
+
+/**
+ * f89c198c — SIN CAMBIOS. La API podía devolver texto o ausencia y
+ * `.toLocaleString()` sobre eso tumbaba la página al hidratar.
+ */
+function nviews(v: unknown): number {
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+
+/** `null` = sin dato. Se pinta "—", nunca 0: sumar nulos sí, mostrarlos no. */
+function opt(v: unknown): number | null {
+  if (v === null || v === undefined) return null;
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+function miles(v: unknown): string {
+  const n = opt(v);
+  return n === null ? "—" : n.toLocaleString("es-ES");
+}
+function txt(v: unknown): string { return typeof v === "string" ? v : ""; }
+/** Una fecha corrupta imprimía "Invalid Date" en la tarjeta. */
+function fecha(v: unknown): string | null {
+  if (typeof v !== "string" || !v) return null;
+  const d = new Date(v);
+  return Number.isNaN(d.getTime()) ? null : d.toLocaleDateString("es-ES");
+}
+
+function estadoBadge(s: unknown): string {
+  return s === "published" ? "badge-success" : s === "archived" ? "badge-secondary" : "badge-primary";
+}
+function estadoLabel(s: unknown): string {
+  return s === "published" ? "Publicado" : s === "archived" ? "Archivado" : "Borrador";
+}
+
+// ── Nueva página ─────────────────────────────────────────────────────────────
 function NewPageModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
@@ -60,52 +143,57 @@ function NewPageModal({ onClose, onSaved }: { onClose: () => void; onSaved: () =
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl">
-        <h2 className="mb-5 text-lg font-semibold text-foreground">Nueva página web</h2>
-        {error && <p className="mb-4 rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
-        <form onSubmit={save} className="space-y-4">
-          <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Título *</label>
-            <input value={title} onChange={e => handleTitle(e.target.value)} placeholder="Servicios de Marketing Digital con IA"
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
+    <W3crmModal titulo="Nueva página web" onClose={onClose} error={error}>
+      <form onSubmit={(e) => void save(e)}>
+        <div className="form-group mb-3">
+          <label htmlFor="wb-titulo" className="text-black font-w600">
+            Título <span className="required">*</span>
+          </label>
+          <input id="wb-titulo" className="form-control" autoFocus
+            placeholder="Servicios de Marketing Digital con IA"
+            value={title} onChange={(e) => handleTitle(e.target.value)} />
+        </div>
+        <div className="form-group mb-3">
+          <label htmlFor="wb-slug" className="text-black font-w600">Slug (URL)</label>
+          <div className="input-group">
+            <span className="input-group-text">/</span>
+            <input id="wb-slug" className="form-control" placeholder="servicios-marketing-ia"
+              value={slug} onChange={(e) => setSlug(e.target.value)} />
           </div>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Slug (URL)</label>
-            <div className="flex items-center rounded-lg border border-border bg-background">
-              <span className="px-3 text-xs text-muted-foreground">/</span>
-              <input value={slug} onChange={e => setSlug(e.target.value)} placeholder="servicios-marketing-ia"
-                className="flex-1 bg-transparent py-2 pr-3 text-sm text-foreground focus:outline-none" />
-            </div>
-          </div>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Dominio personalizado (opcional)</label>
-            <input value={customDomain} onChange={e => setCustomDomain(e.target.value)} placeholder="landing.miempresa.com"
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
-          </div>
-          <div>
-            <label className="mb-2 block text-xs font-medium text-muted-foreground">Tipo de página</label>
-            <div className="grid grid-cols-3 gap-2">
-              {PAGE_TYPES.map(pt => (
-                <button key={pt.type} type="button" onClick={() => setType(pt.type as WebPage["type"])}
-                  className={`rounded-xl border p-3 text-left transition-colors ${type === pt.type ? "border-primary bg-primary/10" : "border-border hover:border-primary/40"}`}>
-                  <p className="text-lg">{pt.icon}</p>
-                  <p className="mt-1 text-xs font-medium text-foreground">{pt.label}</p>
-                  <p className="text-xs text-muted-foreground">{pt.desc}</p>
+        </div>
+        <div className="form-group mb-3">
+          <label htmlFor="wb-dominio" className="text-black font-w600">Dominio personalizado (opcional)</label>
+          <input id="wb-dominio" className="form-control" placeholder="landing.miempresa.com"
+            value={customDomain} onChange={(e) => setCustomDomain(e.target.value)} />
+        </div>
+        <div className="form-group mb-3">
+          <span className="text-black font-w600 d-block mb-2">Tipo de página</span>
+          <div className="row" role="group" aria-label="Tipo de página">
+            {PAGE_TYPES.map((pt) => (
+              <div className="col-4 mb-2" key={pt.type}>
+                <button type="button" aria-pressed={type === pt.type}
+                  className={`btn btn-sm w-100 text-start ${type === pt.type ? "btn-primary" : "btn-primary light"}`}
+                  onClick={() => setType(pt.type)}>
+                  <span className="d-block fs-18">{pt.icon}</span>
+                  <span className="d-block fw-bold fs-12">{pt.label}</span>
+                  <span className="d-block fs-12 opacity-75">{pt.desc}</span>
                 </button>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
-          <div className="flex gap-3">
-            <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
-            <NelvyonDsButton type="submit" disabled={saving} className="flex-1">{saving ? "Creando…" : "Crear página"}</NelvyonDsButton>
-          </div>
-        </form>
-      </div>
-    </div>
+        </div>
+        <div className="text-end">
+          <button type="button" className="btn btn-primary light me-2" onClick={onClose}>Cancelar</button>
+          <button type="submit" className="btn btn-primary" disabled={saving}>
+            {saving ? "Creando…" : "Crear página"}
+          </button>
+        </div>
+      </form>
+    </W3crmModal>
   );
 }
 
+// ── Dominio personalizado ────────────────────────────────────────────────────
 function DomainModal({ page, onClose, onSaved }: { page: WebPage; onClose: () => void; onSaved: () => void }) {
   const [domain, setDomain] = useState(page.customDomain ?? "");
   const [saving, setSaving] = useState(false);
@@ -127,24 +215,28 @@ function DomainModal({ page, onClose, onSaved }: { page: WebPage; onClose: () =>
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl">
-        <h2 className="mb-4 text-lg font-semibold text-foreground">Dominio personalizado</h2>
-        <p className="mb-4 text-sm text-muted-foreground">Apunta tu dominio con un CNAME a <code className="text-primary">pages.nelvyon.com</code></p>
-        {error && <p className="mb-4 rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
-        <form onSubmit={save} className="space-y-4">
-          <input value={domain} onChange={e => setDomain(e.target.value)} placeholder="landing.miempresa.com"
-            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
-          <div className="flex gap-3">
-            <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
-            <NelvyonDsButton type="submit" disabled={saving} className="flex-1">{saving ? "Guardando…" : "Guardar"}</NelvyonDsButton>
-          </div>
-        </form>
-      </div>
-    </div>
+    <W3crmModal titulo="Dominio personalizado" onClose={onClose} error={error} size="sm">
+      <p className="fs-14 text-muted">
+        Apunta tu dominio con un CNAME a <code className="text-primary">pages.nelvyon.com</code>
+      </p>
+      <form onSubmit={(e) => void save(e)}>
+        <div className="form-group mb-3">
+          <label htmlFor="wb-dominio-custom" className="text-black font-w600">Dominio</label>
+          <input id="wb-dominio-custom" className="form-control" placeholder="landing.miempresa.com"
+            value={domain} onChange={(e) => setDomain(e.target.value)} />
+        </div>
+        <div className="text-end">
+          <button type="button" className="btn btn-primary light me-2" onClick={onClose}>Cancelar</button>
+          <button type="submit" className="btn btn-primary" disabled={saving}>
+            {saving ? "Guardando…" : "Guardar"}
+          </button>
+        </div>
+      </form>
+    </W3crmModal>
   );
 }
 
+// ── Listado ──────────────────────────────────────────────────────────────────
 export default function SaasWebBuilderPage() {
   const [pages, setPages] = useState<WebPage[]>([]);
   const [templates, setTemplates] = useState<FeaturedTemplateMeta[]>([]);
@@ -162,10 +254,11 @@ export default function SaasWebBuilderPage() {
         fetch("/api/saas/web-builder/templates"),
       ]);
       const data = (await pagesRes.json().catch(() => ({ pages: [] }))) as { pages: WebPage[] };
-      setPages(data.pages ?? []);
+      // `pages` podía no ser array y reventaba `.map`/`.filter`/`.reduce`.
+      setPages(Array.isArray(data.pages) ? data.pages : []);
       if (tplRes.ok) {
         const tpl = (await tplRes.json()) as { templates: FeaturedTemplateMeta[] };
-        setTemplates(tpl.templates ?? []);
+        setTemplates(Array.isArray(tpl.templates) ? tpl.templates : []);
       }
     } finally { setLoading(false); }
   }, []);
@@ -185,7 +278,17 @@ export default function SaasWebBuilderPage() {
   }
 
   async function deletePage(p: WebPage) {
-    if (!window.confirm(`¿Eliminar la página "${p.title}"? Esta acción no se puede deshacer.`)) return;
+    const r = await Alert.fire({
+      title: `¿Eliminar la página "${txt(p.title)}"?`,
+      text: "Esta acción no se puede deshacer.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Eliminar",
+      cancelButtonText: "Cancelar",
+    });
+    if (!r.isConfirmed) return;
     setDeletingId(p.id);
     try {
       const res = await fetch(`/api/saas/web-builder/${p.id}`, { method: "DELETE" });
@@ -208,86 +311,128 @@ export default function SaasWebBuilderPage() {
     }
   }
 
+  const totalVisitas = pages.reduce((s, p) => s + nviews(p.views), 0);
+
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="web-builder" />}>
-      <div className="flex flex-col gap-6 pb-8">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <NelvyonDsSectionHeader title="Web Builder" subtitle="Crea y publica páginas web sin código, directamente desde Nelvyon" />
-          <NelvyonDsButton onClick={() => setShowNew(true)}>+ Nueva página</NelvyonDsButton>
-        </div>
-
-        {templates.length > 0 && (
-          <div className="grid gap-4 sm:grid-cols-2">
-            {templates.map((tpl) => (
-              <FeaturedEnvatoTemplateCard key={tpl.id} template={tpl} onImported={load} />
-            ))}
+    <SaasW3crmShell>
+      {/* "Web Builder" vive aquí y solo aquí dentro del contenido. */}
+      <W3crmPageTitle mainTitle="Web Builder" parentTitle="Captación" pageTitle="Páginas" />
+      <div className="container-fluid">
+        <div className="row">
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile icon="🌐" label="Páginas" value={pages.length} /></div>
+          <div className="col-xl-3 col-sm-6">
+            <W3crmKpiTile icon="🚀" label="Publicadas" value={pages.filter(p => p.status === "published").length} accent />
           </div>
-        )}
+          <div className="col-xl-3 col-sm-6">
+            <W3crmKpiTile icon="📝" label="Borradores" value={pages.filter(p => p.status === "draft").length} />
+          </div>
+          <div className="col-xl-3 col-sm-6">
+            <W3crmKpiTile icon="👀" label="Visitas totales" value={totalVisitas.toLocaleString("es-ES")} />
+          </div>
 
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <KpiTile icon="🌐" label="Páginas" value={pages.length} />
-          <KpiTile icon="🚀" label="Publicadas" value={pages.filter(p => p.status === "published").length} accent />
-          <KpiTile icon="📝" label="Borradores" value={pages.filter(p => p.status === "draft").length} />
-          <KpiTile icon="👀" label="Visitas totales" value={pages.reduce((s, p) => s + p.views, 0).toLocaleString()} />
-        </div>
+          <div className="col-xl-12">
+            <p className="fs-14 text-muted">
+              Crea y publica páginas web sin código, directamente desde Nelvyon
+            </p>
 
-        {loading ? (
-          <div className="grid gap-4 sm:grid-cols-2">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-36 animate-pulse rounded-xl bg-muted/30" />)}</div>
-        ) : pages.length === 0 ? (
-          <NelvyonDsCard className="p-16 text-center">
-            <p className="text-5xl">🌐</p>
-            <p className="mt-4 text-lg font-semibold text-foreground">Sin páginas propias aún</p>
-            <p className="mt-2 text-sm text-muted-foreground">Importa la plantilla premium oficial arriba o crea una página desde cero</p>
-            <NelvyonDsButton className="mt-5" onClick={() => setShowNew(true)}>+ Crear página en blanco</NelvyonDsButton>
-          </NelvyonDsCard>
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2">
-            {pages.map(p => {
-              const cfg = PAGE_TYPES.find(t => t.type === p.type);
-              return (
-                <NelvyonDsCard key={p.id} className="flex flex-col gap-3 p-5">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-2xl">{cfg?.icon ?? "📄"}</span>
-                      <div>
-                        <p className="font-semibold text-foreground">{p.title}</p>
-                        <p className="text-xs text-muted-foreground">/{p.slug}</p>
-                        {p.customDomain && <p className="text-xs text-primary">{p.customDomain}</p>}
-                      </div>
+            {templates.length > 0 && (
+              <W3crmContentBox titulo={`Plantillas destacadas (${templates.length})`} icono="fa-solid fa-star">
+                <div className="row">
+                  {templates.map((tpl) => (
+                    <div className="col-xl-6" key={tpl.id}>
+                      {/* Compartido con /saas/setup, sin migrar: no se toca. */}
+                      <FeaturedEnvatoTemplateCard template={tpl} onImported={load} />
                     </div>
-                    <NelvyonDsBadge tone={p.status === "published" ? "success" : "primary"}>
-                      {p.status === "published" ? "Publicado" : "Borrador"}
-                    </NelvyonDsBadge>
-                  </div>
-                  <p className="text-xs text-muted-foreground">{p.views.toLocaleString()} visitas{p.publishedAt ? ` · publicado ${new Date(p.publishedAt).toLocaleDateString("es-ES")}` : ""}</p>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Link href={`/saas/web-builder/${p.id}`}>
-                      <NelvyonDsButton variant="secondary" className="text-xs px-2 py-1">✏️ Editar</NelvyonDsButton>
-                    </Link>
-                    <NelvyonDsButton variant="ghost" onClick={() => previewHtml(p.id)} className="text-xs px-2 py-1">👁 Preview</NelvyonDsButton>
-                    {p.status === "draft" && (
-                      <NelvyonDsButton variant="ghost" onClick={() => publishPage(p.id)} disabled={publishing === p.id} className="text-xs px-2 py-1">
-                        {publishing === p.id ? "Publicando…" : "🚀 Publicar"}
-                      </NelvyonDsButton>
-                    )}
-                    <NelvyonDsButton variant="ghost" onClick={() => setDomainPage(p)} className="text-xs px-2 py-1">🌐 Dominio</NelvyonDsButton>
-                    <button
-                      onClick={() => void deletePage(p)}
-                      disabled={deletingId === p.id}
-                      aria-label={`Eliminar página ${p.title}`}
-                      className="ml-auto rounded-lg p-1.5 text-destructive/60 hover:bg-destructive/10 hover:text-destructive disabled:opacity-40 transition-colors"
-                    >
-                      {deletingId === p.id ? "…" : "🗑"}
+                  ))}
+                </div>
+              </W3crmContentBox>
+            )}
+
+            <W3crmContentBox
+              titulo="Páginas web"
+              icono="fa-solid fa-window-maximize"
+              acciones={
+                <button type="button" className="btn btn-primary btn-sm me-2" onClick={() => setShowNew(true)}>
+                  + Nueva página
+                </button>
+              }
+            >
+              {loading ? (
+                <W3crmCargando texto="Cargando páginas…" />
+              ) : pages.length === 0 ? (
+                <>
+                  <W3crmEmptyState
+                    title="Sin páginas propias aún"
+                    description="Importa la plantilla premium oficial arriba o crea una página desde cero"
+                  />
+                  <div className="text-center">
+                    <button type="button" className="btn btn-primary btn-sm" onClick={() => setShowNew(true)}>
+                      + Crear página en blanco
                     </button>
                   </div>
-                </NelvyonDsCard>
-              );
-            })}
+                </>
+              ) : (
+                <W3crmDataTable
+                  filas={pages}
+                  etiqueta="páginas"
+                  wrapperId="wb_paginas_wrapper"
+                  porPagina={10}
+                  columnas={[
+                    { titulo: "Página" }, { titulo: "Tipo" }, { titulo: "Visitas" },
+                    { titulo: "Estado" }, { titulo: "Gestión", alFinal: true },
+                  ]}
+                  render={(p) => {
+                    const cfg = tipoCfg(p.type);
+                    const publicada = fecha(p.publishedAt);
+                    return (
+                      <tr key={p.id}>
+                        <td>
+                          <span className="me-2" aria-hidden="true">{cfg.icon}</span>
+                          <span className="fw-bold">{txt(p.title) || "—"}</span>
+                          <span className="d-block text-muted fs-12">/{txt(p.slug)}</span>
+                          {p.customDomain ? (
+                            <span className="d-block text-primary fs-12">{txt(p.customDomain)}</span>
+                          ) : null}
+                        </td>
+                        <td className="text-muted fs-12">{cfg.label}</td>
+                        <td className="text-muted fs-12">
+                          <div>{miles(p.views)} visitas</div>
+                          {publicada ? <div>publicado {publicada}</div> : null}
+                        </td>
+                        <td><span className={`badge ${estadoBadge(p.status)}`}>{estadoLabel(p.status)}</span></td>
+                        <td className="text-end" style={{ minWidth: 240 }}>
+                          <Link href={`/saas/web-builder/${p.id}`} className="btn btn-primary light btn-sm me-1">
+                            ✏️ Editar
+                          </Link>
+                          <button type="button" className="btn btn-primary light btn-sm me-1"
+                            onClick={() => void previewHtml(p.id)}>👁 Preview</button>
+                          {p.status === "draft" && (
+                            <button type="button" className="btn btn-primary light btn-sm me-1"
+                              disabled={publishing === p.id} onClick={() => void publishPage(p.id)}>
+                              {publishing === p.id ? "Publicando…" : "🚀 Publicar"}
+                            </button>
+                          )}
+                          <button type="button" className="btn btn-primary light btn-sm me-1"
+                            onClick={() => setDomainPage(p)}>🌐 Dominio</button>
+                          <button type="button" className="btn btn-danger light btn-sm"
+                            disabled={deletingId === p.id}
+                            aria-label={`Eliminar página ${p.title}`}
+                            onClick={() => void deletePage(p)}>
+                            {deletingId === p.id ? "…" : "🗑"}
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  }}
+                />
+              )}
+            </W3crmContentBox>
           </div>
-        )}
+        </div>
       </div>
+
       {showNew && <NewPageModal onClose={() => setShowNew(false)} onSaved={load} />}
       {domainPage && <DomainModal page={domainPage} onClose={() => setDomainPage(null)} onSaved={load} />}
-    </SaasShellLayout>
+    </SaasW3crmShell>
   );
 }

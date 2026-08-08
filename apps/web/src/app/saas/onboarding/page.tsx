@@ -3,12 +3,20 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
+import { W3crmCargando } from "@/features/saas-w3crm/components/W3crmContentBox";
+
 import { OnboardingLayout } from "./components/OnboardingLayout";
 import { StepConfirm } from "./components/StepConfirm";
 import { StepPlan } from "./components/StepPlan";
 import { StepProfile } from "./components/StepProfile";
 import { StepWelcome } from "./components/StepWelcome";
 import type { SaasPlan, SaasTenantDto } from "./components/types";
+
+/** `onboardingStep` podía llegar como NaN y dejaba el wizard sin paso que pintar. */
+function pasoSeguro(v: unknown): number {
+  const n = Number(v);
+  return Number.isFinite(n) ? Math.min(4, Math.max(1, Math.trunc(n))) : 1;
+}
 
 function parseTenant(raw: unknown): SaasTenantDto | null {
   if (typeof raw !== "object" || raw === null) return null;
@@ -86,7 +94,7 @@ export default function SaasOnboardingPage() {
         setPhone(t.phone ?? "");
         setEmployees(t.employees ?? "");
         setGoals(t.goals);
-        setUiStep(Math.min(4, Math.max(1, t.onboardingStep)));
+        setUiStep(pasoSeguro(t.onboardingStep));
       } else {
         setUiStep(1);
       }
@@ -125,7 +133,12 @@ export default function SaasOnboardingPage() {
       const tRaw =
         typeof body === "object" && body !== null && "tenant" in body ? (body as { tenant: unknown }).tenant : null;
       const t = parseTenant(tRaw);
-      if (t) {
+      if (!t) {
+        // Un 2xx sin tenant utilizable dejaba el wizard clavado sin decir nada.
+        setError("La respuesta del servidor no traía los datos esperados. Vuelve a intentarlo.");
+        return;
+      }
+      {
         setTenant(t);
         setCompanyName(t.companyName);
         setIndustry(t.industry);
@@ -134,7 +147,7 @@ export default function SaasOnboardingPage() {
         setPhone(t.phone ?? "");
         setEmployees(t.employees ?? "");
         setGoals(t.goals);
-        setUiStep(Math.min(4, Math.max(1, t.onboardingStep)));
+        setUiStep(pasoSeguro(t.onboardingStep));
       }
     } finally {
       setBusy(false);
@@ -169,8 +182,12 @@ export default function SaasOnboardingPage() {
   }
 
   if (loading) {
+    // Dentro del marco W3CRM: así la carga ya no era una pantalla suelta con
+    // los tokens del design-system antiguo.
     return (
-      <div className="flex min-h-[50vh] items-center justify-center px-4 text-sm text-muted-foreground">Cargando…</div>
+      <OnboardingLayout step={uiStep}>
+        <W3crmCargando texto="Cargando…" />
+      </OnboardingLayout>
     );
   }
 

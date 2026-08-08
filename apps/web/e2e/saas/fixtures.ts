@@ -334,6 +334,39 @@ export const FIXTURE_WHATSAPP = {
   messages: [{ id: "m1", to: "+34600000001", body: "Hola!", status: "sent", createdAt: new Date().toISOString() }],
 };
 
+/**
+ * Espera a que la app este realmente lista para interactuar.
+ *
+ * Causa raiz del flaky rotatorio de la suite: los tests navegaban con
+ * `waitUntil: "domcontentloaded"` y acto seguido pulsaban o asertaban.
+ * `domcontentloaded` se dispara cuando el HTML esta parseado, mucho antes de
+ * que React haya descargado sus chunks e hidratado, asi que:
+ *
+ *   - un `click()` caia sobre el HTML del servidor, sin manejador enganchado:
+ *     la pestana no cambiaba, el fetch nunca salia y el `waitForResponse`
+ *     expiraba (`saas-partner-zone > ledger tab shows totals`);
+ *   - una assert podia leer el DOM mientras React aun estaba transmitiendo,
+ *     con el contenido duplicado en el contenedor temporal `div#S:1`
+ *     (`a11y-core-routes`, `saas-auth`);
+ *   - un `pageerror` tardio caia fuera de la ventana observada
+ *     (`saas-pipeline > vista Kanban no produce error JS`).
+ *
+ * `toBeEnabled()` no sirve como puerta: pasa sobre el boton renderizado en
+ * servidor. La senal fiable es que la red se haya quedado quieta, que en una
+ * pagina Next implica chunks descargados e hidratacion ejecutada.
+ *
+ * No amplia timeouts, no reintenta y no relaja ninguna asercion: solo espera al
+ * estado que el test ya daba por supuesto.
+ */
+export async function esperarAppLista(page: Page): Promise<void> {
+  await page.waitForLoadState("networkidle");
+  // El contenedor de streaming de React desaparece cuando el documento esta
+  // completo; mientras existe, el contenido esta duplicado en el DOM.
+  await page
+    .waitForFunction(() => !document.querySelector("body > div[id^='S:']"), null, { timeout: 15_000 })
+    .catch(() => undefined);
+}
+
 /** Cookie + default SaaS API mocks — use in beforeEach for authenticated pages. */
 export async function setupAuthedSaas(page: Page, context: BrowserContext): Promise<void> {
   await setAuthCookie(context);
@@ -764,4 +797,25 @@ export async function mockSaasFunnelsDepth(
     }
     return route.fulfill({ json: FIXTURE_FUNNELS });
   });
+}
+
+
+/**
+ * Espera a que React termine de transmitir la pagina, SIN tocar la red.
+ *
+ * Mientras el documento se transmite, el contenido existe por duplicado: en su
+ * posicion real y en el contenedor temporal `body > div#S:n` que React mueve al
+ * completar. En esa ventana un `getByText`/`getByTestId` resuelve a 2 elementos
+ * y Playwright NO reintenta las violaciones de modo estricto, asi que el assert
+ * falla en su primer intento. Mismo criterio que `a11y-core-routes.spec.ts`.
+ *
+ * No espera respuestas HTTP: no altera el flujo de red del test ni depende de
+ * mocks. No usa `.first()`, ni reintentos, ni amplia el timeout del assert, y
+ * no oculta ningun error real del producto: solo espera a que el DOM deje de
+ * estar duplicado.
+ */
+export async function waitForStreamSettled(page: Page): Promise<void> {
+  await page
+    .waitForFunction(() => !document.querySelector("body > div[id^='S:']"), null, { timeout: 15_000 })
+    .catch(() => undefined);
 }

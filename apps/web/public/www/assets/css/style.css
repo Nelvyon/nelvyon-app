@@ -85,8 +85,8 @@ Version: 1.0.0
 /*------------------- 1.2. Function -------------------*/
 /*------------------- 1.3. Variable-------------------*/
 :root {
-  --theme-color: #7B5DFF;
-  --theme-color2: #D4FF12;
+  --theme-color: #0084FF;
+  --theme-color2: #33A1FF;
   --title-color: #06050B;
   --body-color: #484848;
   --smoke-color: #D4D4D4;
@@ -132,7 +132,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 body.theme {
-  --theme-color: #456FF8;
+  --theme-color: #0084FF;
 }
 body.theme2 {
   background-color: #06050B;
@@ -145,15 +145,15 @@ body.theme4 {
   --theme-color: #4E0055;
 }
 body.theme5 {
-  --theme-color: #CCFF66;
+  --theme-color: #0084FF;
   background-color: #F5F5F5;
 }
 body.theme6 {
   --theme-color: #DBD2FE;
 }
 body.theme7 {
-  --theme-color: #AEFF5D;
-  --theme-color2: #5DFFD9;
+  --theme-color: #0084FF;
+  --theme-color2: #33A1FF;
 }
 body.theme8 {
   --theme-color: #7B5DFF;
@@ -2640,7 +2640,7 @@ input[type=time]::-webkit-calendar-picker-indicator {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: radial-gradient(circle at 50% 50%, #7B5DFF 0%, transparent 50%), radial-gradient(circle at 45% 45%, #D4FF12 0%, transparent 45%), radial-gradient(circle at 55% 55%, #FF1CA4 0%, transparent 45%), radial-gradient(circle at 45% 55%, #C726FD 0%, transparent 45%), radial-gradient(circle at 55% 45%, #4E0055 0%, transparent 45%);
+  background-image: radial-gradient(circle at 50% 50%, #7B5DFF 0%, transparent 50%), radial-gradient(circle at 45% 45%, #33A1FF 0%, transparent 45%), radial-gradient(circle at 55% 55%, #FF1CA4 0%, transparent 45%), radial-gradient(circle at 45% 55%, #C726FD 0%, transparent 45%), radial-gradient(circle at 55% 45%, #4E0055 0%, transparent 45%);
   -webkit-mask: radial-gradient(circle at 50% 50%, transparent 0%, transparent 10%, black 25%);
           mask: radial-gradient(circle at 50% 50%, transparent 0%, transparent 10%, black 25%);
   -webkit-animation: transform-animation 2s infinite alternate, opacity-animation 4s infinite;
@@ -23124,7 +23124,7 @@ span.select2-selection.select2-selection--single:focus {
 }
 .award-item:nth-child(4) {
   background: #F3FFFC;
-  border: 1px solid #5DFFD9;
+  border: 1px solid #33A1FF;
   border-radius: 50px;
   -webkit-transform: rotate(-15deg);
           transform: rotate(-15deg);
@@ -28329,7 +28329,7 @@ span.select2-selection.select2-selection--single:focus {
   left: 63%;
 }
 .pricing-tabs.style8 .toggler.toggler--is-active {
-  background: linear-gradient(122.43deg, #AEFF5D 4.09%, #5DFFD9 100.57%);
+  background: linear-gradient(122.43deg, #0084FF 4.09%, #33A1FF 100.57%);
   border-radius: 48px;
   color: var(--title-color);
 }
@@ -32490,7 +32490,7 @@ span.select2-selection.select2-selection--single:focus {
   left: -5px;
   width: 29px;
   height: 29px;
-  background: linear-gradient(122.43deg, #AEFF5D 4.09%, #5DFFD9 100.57%);
+  background: linear-gradient(122.43deg, #0084FF 4.09%, #33A1FF 100.57%);
   border-radius: 50%;
   z-index: -1;
 }

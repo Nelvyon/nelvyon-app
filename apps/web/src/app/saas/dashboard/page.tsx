@@ -5,14 +5,20 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { NelvyonDsStatusDot, type NelvyonDsStatus } from "@/design-system/components";
 import { CommercialPipelineSection } from "@/features/saas-deals/components/CommercialPipelineSection";
-import { SaasEmptyState, SAAS_EMPTY_DESCRIPTION, SAAS_EMPTY_TITLE } from "@/features/saas-shell/components/SaasEmptyState";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
-import { SaasShellLayout, DarkCard, StatCard } from "@/features/saas-shell/components/SaasShellLayout";
+import { SAAS_EMPTY_DESCRIPTION, SAAS_EMPTY_TITLE } from "@/features/saas-shell/components/SaasEmptyState";
 import { ActivationChecklist } from "@/features/saas-shell/components/ActivationChecklist";
 import { AccountHealthScore } from "@/features/saas-shell/components/PlatformHealthBanner";
-import { SaasWidgetHeader, SaasAvatarBubble, KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import {
+  W3crmAvatar,
+  W3crmCard,
+  W3crmEmptyState,
+  W3crmKpiTile,
+  W3crmSectionTitle,
+  W3crmStatCard,
+  W3crmStatusBadge,
+} from "@/features/saas-w3crm/components/W3crmUi";
 import { trackEvent } from "@/lib/analytics";
 import type { SaasTenantDto } from "../onboarding/components/types";
 
@@ -77,7 +83,7 @@ type GeoSummary = {
   id: string;
 } | null;
 
-function activityStatus(type: string): NelvyonDsStatus {
+function activityStatus(type: string): string {
   const v = type.toLowerCase();
   if (v.includes("error") || v.includes("fail")) return "crit";
   if (v.includes("warn")) return "warn";
@@ -192,19 +198,30 @@ export default function SaasDashboardPage() {
 
   if (loading) {
     return (
-      <SaasShellLayout sidebar={<SaasSidebar activeId="dashboard" />}>
-        <div className="flex min-h-[50vh] items-center justify-center px-4 text-sm text-muted-foreground" role="status">
-          {t("common.loading")}…
+      <SaasW3crmShell>
+        <div className="container-fluid">
+          <div className="d-flex align-items-center justify-content-center py-5" role="status">
+            <div className="spinner-border text-primary me-3" aria-hidden="true" />
+            <span className="text-muted">{t("common.loading")}…</span>
+          </div>
         </div>
-      </SaasShellLayout>
+      </SaasW3crmShell>
     );
   }
 
-  if (!summary) {
+  // `!summary.tenant` ademas de `!summary`: si la API devolvia un payload sin
+  // `tenant` (respuesta malformada o degradada), la linea `tenant.onboarding
+  // Completed` de mas abajo lanzaba y desmontaba el arbol entero, dejando la
+  // pantalla en blanco sin shell ni mensaje. Ahora cae en el estado vacio.
+  if (!summary || !summary.tenant) {
     return (
-      <div className="px-4 py-10">
-        <SaasEmptyState title={SAAS_EMPTY_TITLE} description={error ?? SAAS_EMPTY_DESCRIPTION} />
-      </div>
+      <SaasW3crmShell>
+        <div className="container-fluid">
+          <W3crmCard>
+            <W3crmEmptyState title={SAAS_EMPTY_TITLE} description={error ?? SAAS_EMPTY_DESCRIPTION} />
+          </W3crmCard>
+        </div>
+      </SaasW3crmShell>
     );
   }
 
@@ -262,279 +279,276 @@ export default function SaasDashboardPage() {
   }
 
   return (
-    <SaasShellLayout
-      sidebar={
-        <SaasSidebar
-          activeId="dashboard"
-          tenantCompany={tenant.companyName}
-          tenantPlan={tenant.plan}
-          showLanguageSelector
-        />
-      }
-    >
-      {/* Header */}
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-[#0084ff]/70">SaaS Dashboard</p>
-          <h1 className="mt-1 text-2xl font-bold text-white">{t("dashboard.welcome", { company: tenant.companyName })}</h1>
-          <p className="mt-0.5 text-sm text-white/40">{now}</p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            className="rounded-lg border border-white/10 px-3 py-1.5 text-xs text-white/60 hover:border-[#0084ff]/40 hover:text-white"
-            onClick={() => setShowCustomize((v) => !v)}
-          >
-            {showCustomize ? "Cerrar widgets" : "Personalizar widgets"}
-          </button>
-          {show("health") ? <AccountHealthScore /> : null}
-        </div>
-      </div>
-
-      {summary.degraded ? (
-        <div
-          className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200"
-          role="status"
-        >
-          Algunas métricas pueden estar incompletas o en cero por un fallo parcial de datos
-          {summary.degraded_reason ? ` (${summary.degraded_reason})` : ""}. No interpretes estos valores como KPIs reales.
-        </div>
-      ) : null}
-
-      {showCustomize && (
-        <DarkCard>
-          <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-white/30">
-            Orden widgets (arrastra) {savingLayout ? "· guardando…" : ""}
-          </p>
-          <ul className="mb-4 space-y-1">
-            {widgets.map((id, index) => (
-              <li
-                key={id}
-                draggable
-                onDragStart={() => { (window as unknown as { __dragIdx?: number }).__dragIdx = index; }}
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={() => {
-                  const from = (window as unknown as { __dragIdx?: number }).__dragIdx;
-                  if (typeof from === "number") moveWidget(from, index);
-                }}
-                className="flex cursor-grab items-center justify-between rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/70 active:cursor-grabbing"
-              >
-                <span>⋮⋮ {WIDGET_LABELS[id]}</span>
-                <button type="button" className="text-xs text-white/30 hover:text-red-400" onClick={() => toggleWidget(id)}>Ocultar</button>
-              </li>
-            ))}
-          </ul>
-          <p className="mb-2 text-xs text-white/30">Añadir widget</p>
-          <div className="flex flex-wrap gap-2">
-            {(Object.keys(WIDGET_LABELS) as DashboardWidgetId[])
-              .filter((id) => !show(id))
-              .map((id) => (
-              <button
-                key={id}
-                type="button"
-                onClick={() => toggleWidget(id)}
-                className="rounded-full border border-white/10 px-3 py-1 text-xs text-white/40 hover:border-[#0084ff]/40"
-              >
-                + {WIDGET_LABELS[id]}
-              </button>
-            ))}
+    <SaasW3crmShell>
+      <div className="container-fluid">
+        {/* Cabecera de página — patrón `page-titles` de W3CRM */}
+        <div className="row page-titles mx-0">
+          <div className="col-sm-6 p-md-0">
+            <div className="welcome-text">
+              <span className="d-block text-primary fs-13 fw-bold text-uppercase">SaaS Dashboard</span>
+              <h4 className="mb-0">{t("dashboard.welcome", { company: tenant.companyName })}</h4>
+              <span className="text-muted fs-14">{now}</span>
+            </div>
           </div>
-        </DarkCard>
-      )}
+          <div className="col-sm-6 p-md-0 d-flex justify-content-sm-end align-items-center gap-2">
+            <button
+              type="button"
+              className="btn btn-outline-primary btn-sm"
+              onClick={() => setShowCustomize((v) => !v)}
+            >
+              {showCustomize ? "Cerrar widgets" : "Personalizar widgets"}
+            </button>
+            {show("health") ? <AccountHealthScore /> : null}
+          </div>
+        </div>
 
-      {orderedWidgets.map((id, idx) => {
-        if (id === "activity" || id === "quickActions") {
-          if (idx !== activityQuickAt) return null;
-          if (!show("activity") && !show("quickActions")) return null;
-          return (
-            <section key="activity-quick" className="grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-              {show("activity") && (
-              <DarkCard>
-                <SaasWidgetHeader title={t("dashboard.recent_activity")} />
-                {summary.recentActivity.length === 0 ? (
-                  <SaasEmptyState title={SAAS_EMPTY_TITLE} description="Cuando haya jobs o eventos del tenant aparecerán aquí." />
-                ) : (
-                  <ul className="space-y-3">
-                    {summary.recentActivity.slice(0, 10).map((a) => (
-                      <li key={a.id} className="flex items-start gap-3 border-b border-white/[0.05] pb-3 text-sm last:border-none">
-                        <SaasAvatarBubble seed={a.id} label={a.eventType} />
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
-                            <NelvyonDsStatusDot status={activityStatus(a.eventType)} label={a.eventType} />
-                            <p className="font-medium text-white/80">{a.description}</p>
-                          </div>
-                          <p className="mt-0.5 text-white/35">{a.eventType} · {formatDate(a.createdAt)}</p>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </DarkCard>
-              )}
-              {show("quickActions") && (
-              <DarkCard>
-                <SaasWidgetHeader title={t("dashboard.quick_actions")} />
-                <div className="space-y-1.5">
-                  {[
-                    { label: "🛒 Explorar packs", href: "/saas/packs" },
-                    { label: "📋 Ver playbooks recomendados", href: "/saas/playbooks" },
-                    { label: "🤝 Abrir Partner Zone", href: "/saas/partner" },
-                    { label: "Abrir CRM", href: "/saas/crm" },
-                    { label: "Ver pipeline", href: "/saas/crm?tab=pipeline" },
-                    { label: "Campañas de email", href: "/saas/campanias" },
-                    { label: "Workflows", href: "/saas/workflows" },
-                    { label: "Formularios", href: "/saas/formularios" },
-                    { label: "Agenda y citas", href: "/saas/citas" },
-                    { label: "Facturación", href: "/saas/billing" },
-                  ].map((a) => (
-                    <Link
-                      key={a.href}
-                      href={a.href}
-                      className="block rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-sm text-white/60 transition-all hover:border-[#0084ff]/30 hover:bg-[#0084ff]/5 hover:text-white/90"
-                    >
-                      {a.label}
-                    </Link>
-                  ))}
-                  <button
-                    className="mt-2 w-full rounded-lg bg-gradient-to-r from-[#0084ff] to-[#0047ab] px-3 py-2 text-sm font-medium text-white shadow-[0_0_16px_rgba(0,132,255,0.3)] transition-all hover:shadow-[0_0_24px_rgba(0,132,255,0.4)] disabled:opacity-50"
-                    disabled={exportingReport}
-                    onClick={async () => {
-                      setExportingReport(true);
-                      try {
-                        const res = await fetch("/api/saas/reports/generate", { method: "POST", credentials: "same-origin" });
-                        if (res.status === 401) { router.replace(`/auth/login?next=${encodeURIComponent("/saas/dashboard")}`); return; }
-                        if (!res.ok) return;
-                        const body = (await res.json()) as { downloadUrl?: string };
-                        if (body.downloadUrl) window.location.href = body.downloadUrl;
-                      } finally { setExportingReport(false); }
-                    }}
-                  >
-                    {exportingReport ? `${t("common.loading")}…` : "Exportar informe (ZIP)"}
+        {summary.degraded ? (
+          <div className="alert alert-warning" role="status">
+            Algunas métricas pueden estar incompletas o en cero por un fallo parcial de datos
+            {summary.degraded_reason ? ` (${summary.degraded_reason})` : ""}. No interpretes estos valores como KPIs reales.
+          </div>
+        ) : null}
+
+        {showCustomize && (
+          <W3crmCard title={`Orden widgets (arrastra)${savingLayout ? " · guardando…" : ""}`}>
+            <ul className="list-group mb-4">
+              {widgets.map((id, index) => (
+                <li
+                  key={id}
+                  draggable
+                  onDragStart={() => { (window as unknown as { __dragIdx?: number }).__dragIdx = index; }}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={() => {
+                    const from = (window as unknown as { __dragIdx?: number }).__dragIdx;
+                    if (typeof from === "number") moveWidget(from, index);
+                  }}
+                  className="list-group-item d-flex align-items-center justify-content-between"
+                  style={{ cursor: "grab" }}
+                >
+                  <span>⋮⋮ {WIDGET_LABELS[id]}</span>
+                  <button type="button" className="btn btn-link btn-sm text-danger p-0" onClick={() => toggleWidget(id)}>
+                    Ocultar
                   </button>
-                </div>
-                {hasNoJobs && (
-                  <div className="mt-4">
-                    <SaasEmptyState title={SAAS_EMPTY_TITLE} description="Conecta datos o crea el primer registro." />
-                  </div>
-                )}
-              </DarkCard>
-              )}
-            </section>
-          );
-        }
-
-        if (!show(id)) return null;
-
-        if (id === "activation") return <ActivationChecklist key={id} />;
-        if (id === "competitorGap") {
-          return (
-            <DarkCard key={id}>
-              <SaasWidgetHeader title="Competitor Gap (semanal)" />
-              {gapSummary ? (
-                <div className="flex flex-wrap items-center justify-between gap-4">
-                  <div>
-                    <p className="text-3xl font-bold text-white tabular-nums">{gapSummary.gapScore ?? "—"}</p>
-                    <p className="text-sm text-white/50">vs {gapSummary.competitorDomain ?? "competidor"}</p>
-                    {gapSummary.recommendedPackId && (
-                      <p className="text-xs text-[#0084ff] mt-1">Pack recomendado: {gapSummary.recommendedPackId}</p>
-                    )}
-                  </div>
-                  <Link href="/saas/brief-to-launch" className="rounded-lg bg-[#0084ff]/20 px-4 py-2 text-sm text-[#0084ff] hover:bg-[#0084ff]/30">
-                    Lanzar pack →
-                  </Link>
-                </div>
-              ) : (
-                <p className="text-sm text-white/40">Configura tu dominio en ajustes y ejecuta un análisis de gap.</p>
-              )}
-            </DarkCard>
-          );
-        }
-        if (id === "geoVisibility") {
-          return (
-            <DarkCard key={id}>
-              <SaasWidgetHeader title="GEO / AI Visibility" />
-              {geoSummary ? (
-                <div className="flex flex-wrap items-center justify-between gap-4">
-                  <div>
-                    <p className="text-3xl font-bold text-white tabular-nums">{geoSummary.score ?? "—"}<span className="text-lg text-white/40">/100</span></p>
-                    <p className="text-sm text-white/50">{geoSummary.domain}</p>
-                    <p className="text-xs text-white/30 mt-1">Schema · FAQ · llms.txt — 0€ sin LLM</p>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <a
-                      href={`/api/saas/geo-visibility/${geoSummary.id}/pdf`}
-                      className="rounded-lg border border-white/10 px-4 py-2 text-sm text-white/70 hover:border-[#0084ff]/40 text-center"
-                    >
-                      PDF informe
-                    </a>
-                    <Link href="/saas/setup" className="rounded-lg bg-[#0084ff]/20 px-4 py-2 text-sm text-[#0084ff] hover:bg-[#0084ff]/30 text-center">
-                      Re-analizar →
-                    </Link>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex flex-wrap items-center justify-between gap-4">
-                  <p className="text-sm text-white/40">Audita citación en ChatGPT/Perplexity (determinístico).</p>
+                </li>
+              ))}
+            </ul>
+            <p className="mb-2 text-muted fs-14">Añadir widget</p>
+            <div className="d-flex flex-wrap gap-2">
+              {(Object.keys(WIDGET_LABELS) as DashboardWidgetId[])
+                .filter((id) => !show(id))
+                .map((id) => (
                   <button
+                    key={id}
                     type="button"
-                    disabled={geoAnalyzing}
-                    onClick={async () => {
-                      setGeoAnalyzing(true);
-                      try {
-                        const res = await fetch("/api/saas/geo-visibility", { method: "POST", credentials: "same-origin" });
-                        if (res.ok) {
-                          const body = (await res.json()) as { run?: { id: string; domain: string; score: number | null } };
-                          if (body.run) setGeoSummary({ id: body.run.id, domain: body.run.domain, score: body.run.score });
-                        }
-                      } finally {
-                        setGeoAnalyzing(false);
-                      }
-                    }}
-                    className="rounded-lg bg-[#0084ff]/20 px-4 py-2 text-sm text-[#0084ff] hover:bg-[#0084ff]/30 disabled:opacity-50"
+                    onClick={() => toggleWidget(id)}
+                    className="btn btn-outline-primary btn-xs"
                   >
-                    {geoAnalyzing ? "Analizando…" : "Analizar GEO"}
+                    + {WIDGET_LABELS[id]}
                   </button>
+                ))}
+            </div>
+          </W3crmCard>
+        )}
+
+        {orderedWidgets.map((id, idx) => {
+          if (id === "activity" || id === "quickActions") {
+            if (idx !== activityQuickAt) return null;
+            if (!show("activity") && !show("quickActions")) return null;
+            return (
+              <div key="activity-quick" className="row">
+                {show("activity") && (
+                  <div className="col-xl-8 col-lg-7">
+                    <W3crmCard title={t("dashboard.recent_activity")}>
+                      {summary.recentActivity.length === 0 ? (
+                        <W3crmEmptyState
+                          title={SAAS_EMPTY_TITLE}
+                          description="Cuando haya jobs o eventos del tenant aparecerán aquí."
+                        />
+                      ) : (
+                        <ul className="list-unstyled mb-0">
+                          {summary.recentActivity.slice(0, 10).map((a) => (
+                            <li key={a.id} className="d-flex align-items-start gap-3 border-bottom py-3">
+                              <W3crmAvatar seed={a.id} label={a.eventType} />
+                              <div className="flex-grow-1 min-w-0">
+                                <div className="d-flex align-items-center">
+                                  <W3crmStatusBadge status={activityStatus(a.eventType)} label={a.eventType} />
+                                  <span className="fw-medium">{a.description}</span>
+                                </div>
+                                <p className="mb-0 text-muted fs-13">
+                                  {a.eventType} · {formatDate(a.createdAt)}
+                                </p>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </W3crmCard>
+                  </div>
+                )}
+                {show("quickActions") && (
+                  <div className="col-xl-4 col-lg-5">
+                    <W3crmCard title={t("dashboard.quick_actions")}>
+                      <div className="list-group list-group-flush">
+                        {[
+                          { label: "Explorar packs", href: "/saas/packs" },
+                          { label: "Ver playbooks recomendados", href: "/saas/playbooks" },
+                          { label: "Abrir Partner Zone", href: "/saas/partner" },
+                          { label: "Abrir CRM", href: "/saas/crm" },
+                          { label: "Ver pipeline", href: "/saas/crm?tab=pipeline" },
+                          { label: "Campañas de email", href: "/saas/campanias" },
+                          { label: "Workflows", href: "/saas/workflows" },
+                          { label: "Formularios", href: "/saas/formularios" },
+                          { label: "Agenda y citas", href: "/saas/citas" },
+                          { label: "Facturación", href: "/saas/billing" },
+                        ].map((a) => (
+                          <Link key={a.href} href={a.href} className="list-group-item list-group-item-action">
+                            {a.label}
+                          </Link>
+                        ))}
+                      </div>
+                      <button
+                        className="btn btn-primary w-100 mt-3"
+                        disabled={exportingReport}
+                        onClick={async () => {
+                          setExportingReport(true);
+                          try {
+                            const res = await fetch("/api/saas/reports/generate", { method: "POST", credentials: "same-origin" });
+                            if (res.status === 401) { router.replace(`/auth/login?next=${encodeURIComponent("/saas/dashboard")}`); return; }
+                            if (!res.ok) return;
+                            const body = (await res.json()) as { downloadUrl?: string };
+                            if (body.downloadUrl) window.location.href = body.downloadUrl;
+                          } finally { setExportingReport(false); }
+                        }}
+                      >
+                        {exportingReport ? `${t("common.loading")}…` : "Exportar informe (ZIP)"}
+                      </button>
+                      {hasNoJobs && (
+                        <div className="mt-4">
+                          <W3crmEmptyState title={SAAS_EMPTY_TITLE} description="Conecta datos o crea el primer registro." />
+                        </div>
+                      )}
+                    </W3crmCard>
+                  </div>
+                )}
+              </div>
+            );
+          }
+
+          if (!show(id)) return null;
+
+          if (id === "activation") return <ActivationChecklist key={id} />;
+          if (id === "competitorGap") {
+            return (
+              <W3crmCard key={id} title="Competitor Gap (semanal)">
+                {gapSummary ? (
+                  <div className="d-flex flex-wrap align-items-center justify-content-between gap-4">
+                    <div>
+                      <h2 className="mb-0">{gapSummary.gapScore ?? "—"}</h2>
+                      <p className="mb-0 text-muted">vs {gapSummary.competitorDomain ?? "competidor"}</p>
+                      {gapSummary.recommendedPackId && (
+                        <p className="mb-0 text-primary fs-13">Pack recomendado: {gapSummary.recommendedPackId}</p>
+                      )}
+                    </div>
+                    <Link href="/saas/brief-to-launch" className="btn btn-primary">
+                      Lanzar pack →
+                    </Link>
+                  </div>
+                ) : (
+                  <p className="mb-0 text-muted">Configura tu dominio en ajustes y ejecuta un análisis de gap.</p>
+                )}
+              </W3crmCard>
+            );
+          }
+          if (id === "geoVisibility") {
+            return (
+              <W3crmCard key={id} title="GEO / AI Visibility">
+                {geoSummary ? (
+                  <div className="d-flex flex-wrap align-items-center justify-content-between gap-4">
+                    <div>
+                      <h2 className="mb-0">
+                        {geoSummary.score ?? "—"}
+                        <span className="fs-16 text-muted">/100</span>
+                      </h2>
+                      <p className="mb-0 text-muted">{geoSummary.domain}</p>
+                      <p className="mb-0 text-muted fs-13">Schema · FAQ · llms.txt — 0€ sin LLM</p>
+                    </div>
+                    <div className="d-flex flex-column gap-2">
+                      <a href={`/api/saas/geo-visibility/${geoSummary.id}/pdf`} className="btn btn-outline-primary">
+                        PDF informe
+                      </a>
+                      <Link href="/saas/setup" className="btn btn-primary">
+                        Re-analizar →
+                      </Link>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="d-flex flex-wrap align-items-center justify-content-between gap-4">
+                    <p className="mb-0 text-muted">Audita citación en ChatGPT/Perplexity (determinístico).</p>
+                    <button
+                      type="button"
+                      disabled={geoAnalyzing}
+                      onClick={async () => {
+                        setGeoAnalyzing(true);
+                        try {
+                          const res = await fetch("/api/saas/geo-visibility", { method: "POST", credentials: "same-origin" });
+                          if (res.ok) {
+                            const body = (await res.json()) as { run?: { id: string; domain: string; score: number | null } };
+                            if (body.run) setGeoSummary({ id: body.run.id, domain: body.run.domain, score: body.run.score });
+                          }
+                        } finally {
+                          setGeoAnalyzing(false);
+                        }
+                      }}
+                      className="btn btn-primary"
+                    >
+                      {geoAnalyzing ? "Analizando…" : "Analizar GEO"}
+                    </button>
+                  </div>
+                )}
+              </W3crmCard>
+            );
+          }
+          if (id === "pipeline") return show("pipeline") ? <CommercialPipelineSection key={id} /> : null;
+
+          if (id === "modules" && summary.moduleStats) {
+            return (
+              <section key={id}>
+                <W3crmSectionTitle title="Módulos activos" />
+                <div className="row">
+                  {[
+                    { label: "Contactos CRM", value: summary.moduleStats.contacts, href: "/saas/crm", accent: true },
+                    { label: "Campañas", value: summary.moduleStats.campaigns, href: "/saas/campanias", accent: false },
+                    { label: "Workflows", value: summary.moduleStats.activeWorkflows, href: "/saas/workflows", accent: false },
+                    { label: "Formularios", value: summary.moduleStats.forms, href: "/saas/formularios", accent: false },
+                    { label: "Citas próximas", value: summary.moduleStats.upcomingAppointments, href: "/saas/citas", accent: false },
+                  ].map((s) => (
+                    <div key={s.label} className="col-xl-3 col-lg-4 col-sm-6">
+                      <W3crmStatCard label={s.label} value={s.value} href={s.href} accent={s.accent} />
+                    </div>
+                  ))}
                 </div>
-              )}
-            </DarkCard>
-          );
-        }
-        if (id === "pipeline") return show("pipeline") ? <CommercialPipelineSection key={id} /> : null;
+              </section>
+            );
+          }
 
-        if (id === "modules" && summary.moduleStats) {
-          return (
-            <section key={id}>
-              <SaasWidgetHeader title="Módulos activos" />
-              <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-5">
-                {[
-                  { label: "Contactos CRM", value: summary.moduleStats.contacts, href: "/saas/crm", accent: true },
-                  { label: "Campañas", value: summary.moduleStats.campaigns, href: "/saas/campanias", accent: false },
-                  { label: "Workflows", value: summary.moduleStats.activeWorkflows, href: "/saas/workflows", accent: false },
-                  { label: "Formularios", value: summary.moduleStats.forms, href: "/saas/formularios", accent: false },
-                  { label: "Citas próximas", value: summary.moduleStats.upcomingAppointments, href: "/saas/citas", accent: false },
-                ].map((s) => (
-                  <StatCard key={s.label} label={s.label} value={s.value} href={s.href} accent={s.accent} />
-                ))}
-              </div>
-            </section>
-          );
-        }
+          if (id === "kpis") {
+            return (
+              <section key={id}>
+                <W3crmSectionTitle title="Operaciones" />
+                <div className="row">
+                  {kpis.map((k, i) => (
+                    <div key={k.label} className="col-xl-3 col-lg-6 col-sm-6">
+                      <W3crmKpiTile icon={k.icon} label={k.label} value={k.value} accent={i === 0} />
+                    </div>
+                  ))}
+                </div>
+              </section>
+            );
+          }
 
-        if (id === "kpis") {
-          return (
-            <section key={id}>
-              <SaasWidgetHeader title="Operaciones" />
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                {kpis.map((k, i) => (
-                  <KpiTile key={k.label} icon={k.icon} label={k.label} value={k.value} accent={i === 0} />
-                ))}
-              </div>
-            </section>
-          );
-        }
-
-        return null;
-      })}
-    </SaasShellLayout>
+          return null;
+        })}
+      </div>
+    </SaasW3crmShell>
   );
 }

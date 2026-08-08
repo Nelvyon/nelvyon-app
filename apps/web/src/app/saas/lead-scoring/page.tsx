@@ -1,9 +1,35 @@
 "use client";
 
+/**
+ * /saas/lead-scoring sobre `(cms)/content` de W3CRM, con las piezas ya portadas.
+ * Mapeo: leads y reglas -> `W3crmContentBox`; la tabla de reglas ->
+ * `W3crmDataTable`; el alta -> `W3crmModal`; los grados -> `W3crmKpiTile`.
+ * Sin componentes nuevos.
+ *
+ * SANEADO — "protege métricas y catálogos desconocidos": TODOS los diccionarios
+ * (`FIELD_LABELS`, `OP_LABELS`, `CAT_LABEL`, `CAT_BADGE`, `GRADE_*`) se leen con
+ * salida por defecto, de modo que un campo, operador, categoría o grado que el
+ * backend añada mañana se pinta con su clave en crudo en vez de dejar la celda
+ * vacía o el badge sin clase. El recuento por grado solo suma grados del
+ * catálogo, así que un valor desconocido ya no crea claves fantasma. `rules`,
+ * `scores` y `reasons` se validan como array antes de recorrerlos, y la barra
+ * de progreso no divide por un máximo no numérico.
+ *
+ * Lógica de NELVYON intacta: `GET /api/saas/lead-scoring` con sus tres
+ * `resource` (`rules`, `scores`, `max-score`) y `POST` con las cuatro acciones
+ * —alta de regla, `update-rule`, `delete-rule` y `score-contact`—.
+ */
 import { useCallback, useEffect, useState } from "react";
-import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmEmptyState, W3crmKpiTile } from "@/features/saas-w3crm/components/W3crmUi";
+import {
+  W3crmCargando,
+  W3crmContentBox,
+  W3crmDataTable,
+  W3crmModal,
+} from "@/features/saas-w3crm/components/W3crmContentBox";
 
 type RuleField    = "contact.has_email" | "contact.has_phone" | "contact.has_company" | "contact.has_notes" | "contact.status" | "contact.pipeline_stage" | "contact.email_opens" | "contact.email_clicks" | "contact.activity_count" | "contact.value";
 type RuleOperator = "equals" | "not_equals" | "greater_than" | "less_than" | "contains" | "not_contains" | "is_true" | "is_false";
@@ -21,32 +47,44 @@ interface LeadScore {
   reasons: string[]; scoredAt: string;
 }
 
-const GRADE_COLOR: Record<LeadGrade, string> = {
-  A: "text-green-400 bg-green-500/10 border-green-500/20",
-  B: "text-blue-400 bg-blue-500/10 border-blue-500/20",
-  C: "text-yellow-400 bg-yellow-500/10 border-yellow-500/20",
-  D: "text-red-400 bg-red-500/10 border-red-500/20",
-};
-const CAT_LABEL: Record<RuleCategory, string> = {
+const GRADES: LeadGrade[] = ["A", "B", "C", "D"];
+const GRADE_TEXTO: Record<string, string> = { A: "text-success", B: "text-primary", C: "text-warning", D: "text-danger" };
+const GRADE_BADGE: Record<string, string> = { A: "badge-success", B: "badge-primary", C: "badge-warning", D: "badge-danger" };
+const CAT_LABEL: Record<string, string> = {
   demographic: "Demográfico", behavioral: "Comportamiento",
   engagement: "Engagement", firmographic: "Firmográfico",
 };
-const CAT_BADGE: Record<LeadCategory, "success" | "warning" | "danger"> = {
-  hot: "success", warm: "warning", cold: "danger",
+const CAT_BADGE: Record<string, string> = {
+  hot: "badge-success", warm: "badge-warning", cold: "badge-danger",
 };
-const FIELD_LABELS: Record<RuleField, string> = {
+const CAT_TEXTO: Record<string, string> = { hot: "Hot", warm: "Warm", cold: "Cold" };
+const FIELD_LABELS: Record<string, string> = {
   "contact.has_email": "Tiene email", "contact.has_phone": "Tiene teléfono",
   "contact.has_company": "Tiene empresa", "contact.has_notes": "Tiene notas",
   "contact.status": "Estado", "contact.pipeline_stage": "Etapa pipeline",
   "contact.email_opens": "Emails abiertos", "contact.email_clicks": "Clics en email",
   "contact.activity_count": "Actividades totales", "contact.value": "Valor contacto",
 };
-const OP_LABELS: Record<RuleOperator, string> = {
+const OP_LABELS: Record<string, string> = {
   equals: "=", not_equals: "≠", greater_than: ">", less_than: "<",
   contains: "contiene", not_contains: "no contiene", is_true: "es verdadero", is_false: "es falso",
 };
 
-const inp = "w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none";
+function txt(v: unknown): string { return typeof v === "string" ? v : ""; }
+function num(v: unknown): number {
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+function opt(v: unknown): number | null {
+  if (v === null || v === undefined) return null;
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+/** Catálogo desconocido: se muestra la clave, nunca un hueco. */
+function etiqueta(dicc: Record<string, string>, clave: unknown): string {
+  const k = txt(clave);
+  return dicc[k] ?? (k || "—");
+}
 
 // --- Rule Create Modal ---
 function RuleModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
@@ -71,35 +109,46 @@ function RuleModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => v
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: name.trim(), field, operator, value, points, category }),
       });
-      const d = await res.json() as { error?: string };
+      const d = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) { setError(d.error ?? "Error al crear regla"); return; }
       onSaved(); onClose();
     } finally { setSaving(false); }
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl">
-        <h2 className="mb-4 text-lg font-semibold text-foreground">Nueva regla de scoring</h2>
-        {error && <p className="mb-3 rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>}
-        <form onSubmit={save} className="space-y-4">
-          <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre *</label>
-            <input value={name} onChange={e => setName(e.target.value)} placeholder="Abrió email" className={inp} /></div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Campo</label>
-              <select value={field} onChange={e => { setField(e.target.value as RuleField); setOperator(e.target.value.startsWith("contact.has_") ? "is_true" : "equals"); }} className={inp}>
-                {(Object.entries(FIELD_LABELS) as [RuleField, string][]).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-              </select>
-            </div>
-            <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Categoría</label>
-              <select value={category} onChange={e => setCategory(e.target.value as RuleCategory)} className={inp}>
-                {(Object.entries(CAT_LABEL) as [RuleCategory, string][]).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+    <W3crmModal titulo="Nueva regla de scoring" onClose={onClose} error={error}>
+      <form onSubmit={(e) => void save(e)}>
+        <div className="form-group mb-3">
+          <label htmlFor="ls-nombre" className="text-black font-w600">
+            Nombre <span className="required">*</span>
+          </label>
+          <input id="ls-nombre" className="form-control" autoFocus placeholder="Abrió email"
+            value={name} onChange={e => setName(e.target.value)} />
+        </div>
+        <div className="row">
+          <div className="col-sm-6">
+            <div className="form-group mb-3">
+              <label htmlFor="ls-campo" className="text-black font-w600">Campo</label>
+              <select id="ls-campo" className="form-control" value={field}
+                onChange={e => { setField(e.target.value as RuleField); setOperator(e.target.value.startsWith("contact.has_") ? "is_true" : "equals"); }}>
+                {Object.entries(FIELD_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
               </select>
             </div>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Operador</label>
-              <select value={operator} onChange={e => setOperator(e.target.value as RuleOperator)} className={inp}>
+          <div className="col-sm-6">
+            <div className="form-group mb-3">
+              <label htmlFor="ls-categoria" className="text-black font-w600">Categoría</label>
+              <select id="ls-categoria" className="form-control" value={category}
+                onChange={e => setCategory(e.target.value as RuleCategory)}>
+                {Object.entries(CAT_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+              </select>
+            </div>
+          </div>
+          <div className="col-sm-6">
+            <div className="form-group mb-3">
+              <label htmlFor="ls-operador" className="text-black font-w600">Operador</label>
+              <select id="ls-operador" className="form-control" value={operator}
+                onChange={e => setOperator(e.target.value as RuleOperator)}>
                 {booleanField
                   ? [<option key="is_true" value="is_true">es verdadero</option>, <option key="is_false" value="is_false">es falso</option>]
                   : numericField
@@ -108,20 +157,30 @@ function RuleModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => v
                 }
               </select>
             </div>
-            {!booleanField && (
-              <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Valor</label>
-                <input value={value} onChange={e => setValue(e.target.value)} placeholder={numericField ? "5" : "qualified"} className={inp} /></div>
-            )}
           </div>
-          <div><label className="mb-1 block text-xs font-medium text-muted-foreground">Puntos (negativo = penalización)</label>
-            <input type="number" value={points} onChange={e => setPoints(Number(e.target.value))} className={inp} /></div>
-          <div className="flex gap-3 pt-2">
-            <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
-            <NelvyonDsButton type="submit" disabled={saving} className="flex-1">{saving ? "Guardando…" : "Crear regla"}</NelvyonDsButton>
-          </div>
-        </form>
-      </div>
-    </div>
+          {!booleanField && (
+            <div className="col-sm-6">
+              <div className="form-group mb-3">
+                <label htmlFor="ls-valor" className="text-black font-w600">Valor</label>
+                <input id="ls-valor" className="form-control" placeholder={numericField ? "5" : "qualified"}
+                  value={value} onChange={e => setValue(e.target.value)} />
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="form-group mb-3">
+          <label htmlFor="ls-puntos" className="text-black font-w600">Puntos (negativo = penalización)</label>
+          <input id="ls-puntos" type="number" className="form-control" value={points}
+            onChange={e => setPoints(Number(e.target.value))} />
+        </div>
+        <div className="text-end">
+          <button type="button" className="btn btn-primary light me-2" onClick={onClose}>Cancelar</button>
+          <button type="submit" className="btn btn-primary" disabled={saving}>
+            {saving ? "Guardando…" : "Crear regla"}
+          </button>
+        </div>
+      </form>
+    </W3crmModal>
   );
 }
 
@@ -143,9 +202,9 @@ export default function SaasLeadScoringPage() {
         fetch("/api/saas/lead-scoring?resource=scores"),
         fetch("/api/saas/lead-scoring?resource=max-score"),
       ]);
-      if (rulesRes.ok)  { const d = await rulesRes.json()  as { rules?: ScoringRule[] }; setRules(d.rules ?? []); }
-      if (scoresRes.ok) { const d = await scoresRes.json() as { scores?: LeadScore[] };  setScores(d.scores ?? []); }
-      if (maxRes.ok)    { const d = await maxRes.json()    as { max?: number };           setMax(d.max ?? 0); }
+      if (rulesRes.ok)  { const d = await rulesRes.json()  as { rules?: ScoringRule[] }; setRules(Array.isArray(d.rules) ? d.rules : []); }
+      if (scoresRes.ok) { const d = await scoresRes.json() as { scores?: LeadScore[] };  setScores(Array.isArray(d.scores) ? d.scores : []); }
+      if (maxRes.ok)    { const d = await maxRes.json()    as { max?: number };          setMax(num(d.max)); }
     } finally { setLoading(false); }
   }, []);
 
@@ -168,147 +227,188 @@ export default function SaasLeadScoringPage() {
     void load();
   }
 
-  const gradeCount: Record<LeadGrade, number> = { A: 0, B: 0, C: 0, D: 0 };
-  scores.forEach(s => gradeCount[s.grade]++);
+  // Solo se cuentan grados del catálogo: un valor desconocido ya no crea claves.
+  const gradeCount: Record<string, number> = { A: 0, B: 0, C: 0, D: 0 };
+  scores.forEach(s => {
+    const g = txt(s.grade);
+    if (g in gradeCount) gradeCount[g] = (gradeCount[g] ?? 0) + 1;
+  });
   const activeRules = rules.filter(r => r.active).length;
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="lead-scoring" />}>
-      <div className="flex flex-col gap-6 pb-8">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <NelvyonDsSectionHeader title="Lead Scoring" subtitle="Puntúa leads automáticamente con reglas configurables por campo y comportamiento" />
-          <div className="flex gap-2">
-            {tab === "rules" && <NelvyonDsButton onClick={() => setShowModal(true)}>+ Nueva regla</NelvyonDsButton>}
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="Lead Scoring" parentTitle="Captación" pageTitle="Scoring" />
+      <div className="container-fluid">
+        <div className="row">
+          <div className="col-xl-4 col-sm-12">
+            <W3crmKpiTile icon="🎯" label={`Score máximo · ${activeRules} reglas activas`}
+              value={maxScore.toLocaleString("es-ES")} accent />
           </div>
-        </div>
-
-        {/* KPIs */}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-          <NelvyonDsCard className="p-4">
-            <p className="text-xs text-muted-foreground">Score máximo</p>
-            <p className="mt-1 text-2xl font-bold text-foreground">{maxScore}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">{activeRules} reglas activas</p>
-          </NelvyonDsCard>
-          {(["A","B","C","D"] as LeadGrade[]).map(g => (
-            <NelvyonDsCard key={g} className={`p-4 border ${GRADE_COLOR[g].split(" ").slice(1).join(" ")}`}>
-              <p className="text-xs text-muted-foreground">Grado {g}</p>
-              <p className={`mt-1 text-2xl font-bold ${GRADE_COLOR[g].split(" ")[0]}`}>{gradeCount[g]}</p>
-            </NelvyonDsCard>
+          {GRADES.map(g => (
+            <div className="col-xl-2 col-sm-3" key={g}>
+              <W3crmKpiTile label={`Grado ${g}`}
+                value={<span className={GRADE_TEXTO[g]}>{gradeCount[g] ?? 0}</span>} />
+            </div>
           ))}
-        </div>
 
-        {/* Tabs */}
-        <div className="flex gap-1 border-b border-border">
-          {(["leads","rules"] as const).map(t => (
-            <button key={t} onClick={() => setTab(t)}
-              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${tab === t ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
-              {t === "leads" ? `Leads puntuados (${scores.length})` : `Reglas (${activeRules}/${rules.length})`}
-            </button>
-          ))}
-        </div>
+          <div className="col-xl-12">
+            <p className="fs-14 text-muted">
+              Puntúa leads automáticamente con reglas configurables por campo y comportamiento
+            </p>
 
-        {loading ? (
-          <div className="space-y-3">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-20 animate-pulse rounded-xl bg-muted/30" />)}</div>
-        ) : tab === "leads" ? (
-          scores.length === 0 ? (
-            <NelvyonDsCard className="p-14 text-center">
-              <p className="text-3xl">•</p>
-              <p className="mt-3 text-lg font-semibold text-foreground">Sin scores aún</p>
-              <p className="mt-1 text-sm text-muted-foreground">Los contacts se puntúan automáticamente al crearse o al pulsar &quot;Puntuar&quot; en el detalle del CRM.</p>
-            </NelvyonDsCard>
-          ) : (
-            <div className="space-y-3">
-              {scores.map(lead => (
-                <NelvyonDsCard key={lead.id} className="p-4">
-                  <div className="flex flex-wrap items-start gap-4">
-                    <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 text-lg font-bold ${GRADE_COLOR[lead.grade]}`}>
-                      {lead.grade}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <p className="font-semibold text-foreground">{lead.contactName || "Sin nombre"}</p>
-                        {lead.contactCompany && <span className="text-xs text-muted-foreground">· {lead.contactCompany}</span>}
-                        <NelvyonDsBadge tone={CAT_BADGE[lead.category]}>{lead.category === "hot" ? "Hot" : lead.category === "warm" ? "Warm" : "Cold"}</NelvyonDsBadge>
-                      </div>
-                      <p className="text-xs text-muted-foreground">{lead.contactEmail}</p>
-                      {lead.reasons.length > 0 && (
-                        <div className="mt-2 flex flex-wrap gap-1">
-                          {lead.reasons.slice(0, 4).map(r => <span key={r} className="rounded-md bg-primary/10 px-2 py-0.5 text-xs text-primary">{r}</span>)}
-                        </div>
-                      )}
-                    </div>
-                    <div className="text-right shrink-0">
-                      <p className="text-2xl font-bold text-foreground">{lead.score}</p>
-                      <p className="text-xs text-muted-foreground">/ {maxScore} pts</p>
-                      {maxScore > 0 && (
-                        <div className="mt-1 h-1.5 w-24 rounded-full bg-muted overflow-hidden">
-                          <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${Math.min(100, (lead.score / maxScore) * 100)}%` }} />
-                        </div>
-                      )}
-                      <button onClick={() => void scoreContact(lead.contactId)} disabled={scoringId === lead.contactId}
-                        className="mt-1.5 text-xs text-muted-foreground hover:text-primary transition-colors">
-                        {scoringId === lead.contactId ? "Puntuando…" : "Repuntuar"}
+            <ul className="nav nav-tabs mb-3" aria-label="Secciones de lead scoring">
+              {(["leads", "rules"] as const).map(t => (
+                <li className="nav-item" key={t}>
+                  <button type="button" className={`nav-link ${tab === t ? "active" : ""}`}
+                    aria-pressed={tab === t} onClick={() => setTab(t)}>
+                    {t === "leads" ? `Leads puntuados (${scores.length})` : `Reglas (${activeRules}/${rules.length})`}
+                  </button>
+                </li>
+              ))}
+            </ul>
+
+            {loading ? (
+              <W3crmCargando texto="Cargando scoring…" />
+            ) : tab === "leads" ? (
+              <W3crmContentBox titulo={`Leads puntuados (${scores.length})`} icono="fa-solid fa-ranking-star">
+                {scores.length === 0 ? (
+                  <W3crmEmptyState
+                    title="Sin scores aún"
+                    description={'Los contacts se puntúan automáticamente al crearse o al pulsar "Puntuar" en el detalle del CRM.'}
+                  />
+                ) : (
+                  <ul className="list-group list-group-flush">
+                    {scores.map(lead => {
+                      const puntos = opt(lead.score);
+                      const razones = Array.isArray(lead.reasons) ? lead.reasons : [];
+                      const pct = maxScore > 0 && puntos !== null
+                        ? Math.min(100, Math.max(0, (puntos / maxScore) * 100))
+                        : 0;
+                      return (
+                        <li key={lead.id} className="list-group-item px-0">
+                          <div className="d-flex flex-wrap align-items-start gap-3">
+                            <span className={`badge ${GRADE_BADGE[txt(lead.grade)] ?? "badge-secondary"} fs-16`}
+                              style={{ width: 40, height: 40, lineHeight: "28px" }}>
+                              {txt(lead.grade) || "?"}
+                            </span>
+                            <div className="flex-grow-1" style={{ minWidth: 0 }}>
+                              <span className="fw-bold me-2">{txt(lead.contactName) || "Sin nombre"}</span>
+                              {lead.contactCompany && (
+                                <span className="text-muted fs-12 me-2">· {txt(lead.contactCompany)}</span>
+                              )}
+                              <span className={`badge ${CAT_BADGE[txt(lead.category)] ?? "badge-secondary"}`}>
+                                {etiqueta(CAT_TEXTO, lead.category)}
+                              </span>
+                              <span className="d-block text-muted fs-12">{txt(lead.contactEmail)}</span>
+                              {razones.length > 0 && (
+                                <span className="d-block mt-1">
+                                  {razones.slice(0, 4).map(r => (
+                                    <span key={txt(r)} className="badge badge-primary light me-1 mb-1">{txt(r)}</span>
+                                  ))}
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-end" style={{ minWidth: 110 }}>
+                              <span className="d-block fs-18 fw-bold">{puntos === null ? "—" : puntos}</span>
+                              <span className="d-block text-muted fs-12">/ {maxScore} pts</span>
+                              {maxScore > 0 && (
+                                <div className="progress mt-1" style={{ height: 6 }}>
+                                  <div className="progress-bar bg-primary" role="progressbar"
+                                    style={{ width: `${pct}%` }}
+                                    aria-valuenow={Math.round(pct)} aria-valuemin={0} aria-valuemax={100}
+                                    aria-label={`Puntuación de ${txt(lead.contactName)}`} />
+                                </div>
+                              )}
+                              <button type="button" className="btn btn-primary light btn-sm mt-1"
+                                disabled={scoringId === lead.contactId}
+                                onClick={() => void scoreContact(lead.contactId)}>
+                                {scoringId === lead.contactId ? "Puntuando…" : "Repuntuar"}
+                              </button>
+                            </div>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </W3crmContentBox>
+            ) : (
+              <W3crmContentBox
+                titulo={`Reglas (${activeRules}/${rules.length})`}
+                icono="fa-solid fa-scale-balanced"
+                acciones={
+                  <button type="button" className="btn btn-primary btn-sm me-2" onClick={() => setShowModal(true)}>
+                    + Nueva regla
+                  </button>
+                }
+              >
+                {rules.length === 0 ? (
+                  <>
+                    <W3crmEmptyState
+                      title="Sin reglas configuradas"
+                      description="Las reglas determinan qué acciones o datos del contacto suman o restan puntos."
+                    />
+                    <div className="text-center">
+                      <button type="button" className="btn btn-primary btn-sm" onClick={() => setShowModal(true)}>
+                        + Crear primera regla
                       </button>
                     </div>
-                  </div>
-                </NelvyonDsCard>
-              ))}
-            </div>
-          )
-        ) : (
-          rules.length === 0 ? (
-            <NelvyonDsCard className="p-14 text-center">
-              <p className="text-3xl">•</p>
-              <p className="mt-3 text-lg font-semibold text-foreground">Sin reglas configuradas</p>
-              <p className="mt-1 text-sm text-muted-foreground">Las reglas determinan qué acciones o datos del contacto suman o restan puntos.</p>
-              <NelvyonDsButton className="mt-5" onClick={() => setShowModal(true)}>+ Crear primera regla</NelvyonDsButton>
-            </NelvyonDsCard>
-          ) : (
-            <NelvyonDsCard className="overflow-hidden p-0">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border bg-muted/20">
-                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Regla</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Condición</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Categoría</th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground">Puntos</th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground">Activa</th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rules.map(r => (
-                    <tr key={r.id} className="border-b border-border hover:bg-muted/10 transition-colors">
-                      <td className="px-4 py-3 font-medium text-foreground">{r.name}</td>
-                      <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
-                        {FIELD_LABELS[r.field]} {OP_LABELS[r.operator]}{r.value ? ` ${r.value}` : ""}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className="rounded-md bg-muted/30 px-2 py-0.5 text-xs text-muted-foreground">{CAT_LABEL[r.category]}</span>
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <span className={`text-sm font-bold ${r.points > 0 ? "text-green-400" : "text-red-400"}`}>
-                          {r.points > 0 ? "+" : ""}{r.points}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <button onClick={() => void toggleRule(r)}
-                          className={`relative inline-flex h-5 w-9 cursor-pointer rounded-full transition-colors ${r.active ? "bg-primary" : "bg-muted"}`}>
-                          <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${r.active ? "translate-x-4" : "translate-x-0.5"}`} />
-                        </button>
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <button onClick={() => void deleteRule(r.id)} className="text-xs text-muted-foreground hover:text-red-400">Eliminar</button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </NelvyonDsCard>
-          )
-        )}
+                  </>
+                ) : (
+                  <W3crmDataTable
+                    filas={rules}
+                    etiqueta="reglas"
+                    wrapperId="ls_reglas_wrapper"
+                    porPagina={10}
+                    columnas={[
+                      { titulo: "Regla" }, { titulo: "Condición" }, { titulo: "Categoría" },
+                      { titulo: "Puntos", alFinal: true }, { titulo: "Activa" }, { titulo: "Gestión", alFinal: true },
+                    ]}
+                    render={(r) => {
+                      const puntos = opt(r.points);
+                      return (
+                        <tr key={r.id}>
+                          <td className="fw-bold">{txt(r.name) || "—"}</td>
+                          <td className="text-muted fs-12 font-mono">
+                            {etiqueta(FIELD_LABELS, r.field)} {etiqueta(OP_LABELS, r.operator)}
+                            {r.value ? ` ${txt(r.value)}` : ""}
+                          </td>
+                          <td>
+                            <span className="badge badge-secondary">{etiqueta(CAT_LABEL, r.category)}</span>
+                          </td>
+                          <td className="text-end">
+                            {puntos === null ? (
+                              <span className="text-muted">—</span>
+                            ) : (
+                              <span className={`fw-bold ${puntos > 0 ? "text-success" : "text-danger"}`}>
+                                {puntos > 0 ? "+" : ""}{puntos}
+                              </span>
+                            )}
+                          </td>
+                          <td>
+                            <div className="form-check form-switch mb-0">
+                              <input className="form-check-input" type="checkbox" checked={!!r.active}
+                                aria-label={`Activar regla ${r.name}`}
+                                onChange={() => void toggleRule(r)} />
+                            </div>
+                          </td>
+                          <td className="text-end">
+                            <button type="button" className="btn btn-danger light btn-sm"
+                              aria-label={`Eliminar regla ${r.name}`}
+                              onClick={() => void deleteRule(r.id)}>Eliminar</button>
+                          </td>
+                        </tr>
+                      );
+                    }}
+                  />
+                )}
+              </W3crmContentBox>
+            )}
+          </div>
+        </div>
       </div>
+
       {showModal && <RuleModal onClose={() => setShowModal(false)} onSaved={() => void load()} />}
-    </SaasShellLayout>
+    </SaasW3crmShell>
   );
 }

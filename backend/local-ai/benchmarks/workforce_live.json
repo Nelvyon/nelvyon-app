@@ -1,37 +1,37 @@
 {
   "schema": "nelvyon.workforce.live.v1",
-  "generatedAt": "2026-07-19T12:17:53.034Z",
+  "generatedAt": "2026-08-08T14:21:32.760Z",
   "ollama": {
     "available": true,
     "model": "llama3.1:8b-instruct-q4_K_M",
-    "ms": 4054
+    "ms": 5105
   },
   "elite": {
     "ollama": {
       "available": true,
       "model": "llama3.1:8b-instruct-q4_K_M",
-      "ms": 568
+      "ms": 547
     },
     "workflows": [
       {
         "id": "seo_audit",
         "ok": true,
         "sloMet": true,
-        "latencyMs": 40779,
+        "latencyMs": 37620,
         "errors": []
       },
       {
         "id": "support_triage",
         "ok": true,
         "sloMet": true,
-        "latencyMs": 41254,
+        "latencyMs": 38408,
         "errors": []
       },
       {
         "id": "crm_followup",
         "ok": true,
         "sloMet": true,
-        "latencyMs": 29375,
+        "latencyMs": 27242,
         "errors": []
       }
     ],
@@ -46,15 +46,15 @@
         "precisionAtK": 1,
         "recallAtK": 1,
         "coverage": 1,
-        "latencyMsP50": 42,
-        "latencyMsP95": 52,
+        "latencyMsP50": 44,
+        "latencyMsP95": 60,
         "cases": [
           {
             "query": "tenant isolation RLS privacy",
             "expect": "doc-nelvyon-privacy",
             "hit": true,
             "topSourceId": "doc-nelvyon-privacy",
-            "latencyMs": 42,
+            "latencyMs": 60,
             "via": "hybrid"
           },
           {
@@ -62,7 +62,7 @@
             "expect": "doc-nelvyon-seo-basics",
             "hit": true,
             "topSourceId": "doc-nelvyon-seo-basics",
-            "latencyMs": 52,
+            "latencyMs": 44,
             "via": "hybrid"
           },
           {
@@ -70,7 +70,7 @@
             "expect": "doc-nelvyon-support-sla",
             "hit": true,
             "topSourceId": "doc-nelvyon-support-sla",
-            "latencyMs": 43,
+            "latencyMs": 33,
             "via": "hybrid"
           },
           {
@@ -78,7 +78,7 @@
             "expect": "doc-nelvyon-crm-followup",
             "hit": true,
             "topSourceId": "doc-nelvyon-crm-followup",
-            "latencyMs": 37,
+            "latencyMs": 46,
             "via": "hybrid"
           }
         ],

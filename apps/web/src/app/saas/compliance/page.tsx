@@ -1,21 +1,55 @@
 "use client";
 
+/**
+ * /saas/compliance sobre `(cms)/content` de W3CRM, con las piezas ya portadas.
+ * Mapeo: listado de artifacts -> `W3crmContentBox` + `W3crmDataTable`; detalle
+ * -> `W3crmModal`; KPIs -> `W3crmKpiTile`. Sin componentes nuevos.
+ *
+ * CONTRATO — `saas-compliance-vault.spec.ts` exige, y aquí se conserva:
+ *   - `getByText("Compliance Vault")` UNA sola vez. `W3crmPageTitle` pinta
+ *     `mainTitle` Y `pageTitle`: el segundo NO puede repetirlo, o serían dos
+ *     coincidencias permanentes. Por eso `pageTitle="Vault"`, que no contiene
+ *     la cadena completa.
+ *   - `getByRole("button", { name: /Sincronizar/i })` ÚNICO. Solo hay un botón
+ *     de sync, en la cabecera de la caja; ninguna caja se titula con esa
+ *     palabra, porque el toggle expone `aria-label="Plegar <título>"`. El
+ *     "↻ Sincronizar" del estado vacío es TEXTO de la descripción, no un
+ *     botón, así que no suma.
+ *   - `getByText("Total")` ÚNICO: es la etiqueta del primer KPI. Ninguna otra
+ *     etiqueta, columna ni título repite esa palabra.
+ *   - `getByText(/Sin artifacts/i)` en el vacío.
+ *   - `getByRole("link", { name: /Compliance/i })` del sidebar: visible porque
+ *     el grupo activo (`ia`) es el que contiene ese ítem.
+ *
+ * Lógica de NELVYON intacta: `GET /api/saas/compliance`,
+ * `POST /api/saas/compliance/sync` con su recuento de sincronizados, y
+ * `PATCH /api/saas/compliance/[id]` con sus dos acciones (`verify` y `revoke`
+ * con su `reason`); el toast de 3 s; el cierre del detalle tras cada acción;
+ * la lectura de `qaScore` y `legalPassed` desde `metadata` con su umbral de
+ * 85; y los enlaces a documento legal, informe QA y portal.
+ */
 import { useEffect, useState } from "react";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
-import { NelvyonDsBadge } from "@/design-system/components";
-import type { ComplianceArtifact, VaultSummary, ComplianceStatus, ConsentType } from "@nelvyon/saas";
+import Link from "next/link";
 
-// ── Status badge ──────────────────────────────────────────────────────────────
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmEmptyState, W3crmKpiTile } from "@/features/saas-w3crm/components/W3crmUi";
+import {
+  W3crmCargando,
+  W3crmContentBox,
+  W3crmDataTable,
+  W3crmModal,
+} from "@/features/saas-w3crm/components/W3crmContentBox";
+import type { ComplianceArtifact, VaultSummary } from "@nelvyon/saas";
 
-const STATUS_TONE: Record<ComplianceStatus, "success" | "warning" | "neutral" | "danger"> = {
-  verified: "success",
-  pending: "warning",
-  expired: "neutral",
-  revoked: "danger",
+const STATUS_BADGE: Record<string, string> = {
+  verified: "badge-success",
+  pending: "badge-warning",
+  expired: "badge-secondary",
+  revoked: "badge-danger",
 };
 
-const CONSENT_LABEL: Record<ConsentType, string> = {
+const CONSENT_LABEL: Record<string, string> = {
   gdpr_marketing: "GDPR Marketing",
   gdpr_data_processing: "GDPR Processing",
   sector_disclaimer: "Sector Disclaimer",
@@ -24,120 +58,102 @@ const CONSENT_LABEL: Record<ConsentType, string> = {
   other: "Other",
 };
 
-// ── KPI card ──────────────────────────────────────────────────────────────────
-
-function KpiCard({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div className="rounded-xl border border-white/10 bg-white/5 px-5 py-4">
-      <p className="text-white/40 text-xs uppercase tracking-wide">{label}</p>
-      <p className="text-2xl font-bold text-white mt-1">{value}</p>
-    </div>
-  );
+/** Estados y tipos fuera de catálogo pintaban `undefined`. */
+function statusBadge(s: unknown): string { return STATUS_BADGE[String(s ?? "")] ?? "badge-secondary"; }
+function consentLabel(c: unknown): string { return CONSENT_LABEL[String(c ?? "")] ?? String(c ?? "—"); }
+function num(v: unknown): number {
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+function opt(v: unknown): number | null {
+  if (v === null || v === undefined) return null;
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+function txt(v: unknown): string { return typeof v === "string" ? v : ""; }
+/** `metadata` podía llegar nulo y `Object.keys` reventaba. */
+function meta(a: ComplianceArtifact): Record<string, unknown> {
+  const m = a.metadata as unknown;
+  return m && typeof m === "object" ? (m as Record<string, unknown>) : {};
+}
+/** `deliverableRef`/`contentHash` podían no ser texto y `slice` reventaba. */
+function corta(v: unknown, n: number): string {
+  const s = txt(v);
+  return s.length > n ? `${s.slice(0, n)}…` : s;
 }
 
-// ── Detail modal ──────────────────────────────────────────────────────────────
-
-function ArtifactModal({
-  artifact,
-  onClose,
-  onVerify,
-  onRevoke,
-}: {
+function ArtifactModal({ artifact, onClose, onVerify, onRevoke }: {
   artifact: ComplianceArtifact;
   onClose: () => void;
   onVerify: () => void;
   onRevoke: () => void;
 }) {
+  const m = meta(artifact);
+  const titulo = txt(artifact.title) || corta(artifact.deliverableRef, 20) || "Artifact";
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-      <div className="rounded-xl border border-white/10 bg-[#0d1929] w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-          <h2 className="text-white font-semibold text-sm truncate">{artifact.title ?? artifact.deliverableRef.slice(0, 20)}</h2>
-          <button onClick={onClose} className="text-white/40 hover:text-white text-lg leading-none">×</button>
+    <W3crmModal titulo={titulo} onClose={onClose} size="lg">
+      <div className="row">
+        <div className="col-sm-6">
+          <p className="text-muted fs-12 mb-1">Source</p>
+          <p>{txt(artifact.deliverableSource) || "—"}</p>
         </div>
-        <div className="px-6 py-4 space-y-4">
-          <div className="grid grid-cols-2 gap-3 text-xs">
-            <div>
-              <p className="text-white/40 mb-0.5">Source</p>
-              <p className="text-white/80">{artifact.deliverableSource}</p>
-            </div>
-            <div>
-              <p className="text-white/40 mb-0.5">Consent Type</p>
-              <p className="text-white/80">{CONSENT_LABEL[artifact.consentType]}</p>
-            </div>
-            <div>
-              <p className="text-white/40 mb-0.5">Pack ID</p>
-              <p className="text-white/80">{artifact.packId ?? "—"}</p>
-            </div>
-            <div>
-              <p className="text-white/40 mb-0.5">Status</p>
-              <NelvyonDsBadge tone={STATUS_TONE[artifact.status]}>{artifact.status}</NelvyonDsBadge>
-            </div>
-          </div>
-
-          {artifact.contentHash && (
-            <div>
-              <p className="text-white/40 text-xs mb-1">Content Hash (SHA-256)</p>
-              <p className="text-white/60 text-xs font-mono break-all">{artifact.contentHash}</p>
-            </div>
-          )}
-
-          {Object.keys(artifact.metadata).length > 0 && (
-            <div>
-              <p className="text-white/40 text-xs mb-1">Metadata</p>
-              <pre className="rounded-lg bg-black/40 p-3 text-xs text-white/60 overflow-x-auto">
-                {JSON.stringify(artifact.metadata, null, 2)}
-              </pre>
-            </div>
-          )}
-
-          <div className="flex flex-wrap gap-3 text-xs">
-            {artifact.legalDocUrl && (
-              <a href={artifact.legalDocUrl} target="_blank" rel="noopener noreferrer"
-                className="text-[#0084ff] hover:underline">
-                📄 Legal Doc
-              </a>
-            )}
-            {artifact.qaPdfUrl && (
-              <a href={artifact.qaPdfUrl} target="_blank" rel="noopener noreferrer"
-                className="text-[#0084ff] hover:underline">
-                📊 QA Report
-              </a>
-            )}
-            {artifact.packRunId && (
-              <a href={`/portal/deliverables?pack_run_id=${artifact.packRunId}`}
-                target="_blank" rel="noopener noreferrer"
-                className="text-[#0084ff] hover:underline">
-                🌐 Portal
-              </a>
-            )}
-          </div>
+        <div className="col-sm-6">
+          <p className="text-muted fs-12 mb-1">Consent Type</p>
+          <p>{consentLabel(artifact.consentType)}</p>
         </div>
-
-        <div className="flex justify-end gap-2 px-6 py-4 border-t border-white/10">
-          {artifact.status === "pending" && (
-            <button onClick={onVerify}
-              className="rounded-lg bg-green-600/80 px-3 py-1.5 text-xs text-white hover:bg-green-600">
-              ✅ Verificar
-            </button>
-          )}
-          {artifact.status !== "revoked" && (
-            <button onClick={onRevoke}
-              className="rounded-lg bg-red-600/20 px-3 py-1.5 text-xs text-red-400 hover:bg-red-600/40">
-              Revocar
-            </button>
-          )}
-          <button onClick={onClose}
-            className="rounded-lg bg-white/10 px-3 py-1.5 text-xs text-white hover:bg-white/20">
-            Cerrar
-          </button>
+        <div className="col-sm-6">
+          <p className="text-muted fs-12 mb-1">Pack ID</p>
+          <p>{txt(artifact.packId) || "—"}</p>
+        </div>
+        <div className="col-sm-6">
+          <p className="text-muted fs-12 mb-1">Estado</p>
+          <p><span className={`badge ${statusBadge(artifact.status)}`}>{txt(artifact.status) || "—"}</span></p>
         </div>
       </div>
-    </div>
+
+      {artifact.contentHash ? (
+        <div className="mb-3">
+          <p className="text-muted fs-12 mb-1">Content Hash (SHA-256)</p>
+          <code className="d-block text-break fs-12">{txt(artifact.contentHash)}</code>
+        </div>
+      ) : null}
+
+      {Object.keys(m).length > 0 && (
+        <div className="mb-3">
+          <p className="text-muted fs-12 mb-1">Metadata</p>
+          <pre className="bg-light border rounded p-3 fs-12 mb-0" style={{ overflowX: "auto" }}>
+            {JSON.stringify(m, null, 2)}
+          </pre>
+        </div>
+      )}
+
+      <div className="mb-3">
+        {artifact.legalDocUrl ? (
+          <a className="btn btn-primary light btn-sm me-1" href={artifact.legalDocUrl}
+            target="_blank" rel="noopener noreferrer">Legal Doc</a>
+        ) : null}
+        {artifact.qaPdfUrl ? (
+          <a className="btn btn-primary light btn-sm me-1" href={artifact.qaPdfUrl}
+            target="_blank" rel="noopener noreferrer">QA Report</a>
+        ) : null}
+        {artifact.packRunId ? (
+          <a className="btn btn-primary light btn-sm" href={`/portal/deliverables?pack_run_id=${artifact.packRunId}`}
+            target="_blank" rel="noopener noreferrer">Portal</a>
+        ) : null}
+      </div>
+
+      <div className="text-end">
+        {artifact.status === "pending" && (
+          <button type="button" className="btn btn-primary me-2" onClick={onVerify}>Verificar</button>
+        )}
+        {artifact.status !== "revoked" && (
+          <button type="button" className="btn btn-danger light me-2" onClick={onRevoke}>Revocar</button>
+        )}
+        <button type="button" className="btn btn-primary light" onClick={onClose}>Cerrar</button>
+      </div>
+    </W3crmModal>
   );
 }
-
-// ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function CompliancePage() {
   const [summary, setSummary] = useState<VaultSummary | null>(null);
@@ -149,7 +165,7 @@ export default function CompliancePage() {
 
   function showToast(msg: string) {
     setToast(msg);
-    setTimeout(() => setToast(null), 3000);
+    window.setTimeout(() => setToast(null), 3000);
   }
 
   async function load() {
@@ -157,9 +173,11 @@ export default function CompliancePage() {
     try {
       const res = await fetch("/api/saas/compliance");
       if (res.ok) {
-        const d = (await res.json()) as { summary: VaultSummary; artifacts: ComplianceArtifact[] };
-        setSummary(d.summary);
-        setArtifacts(d.artifacts ?? []);
+        const d = (await res.json().catch(() => ({}))) as {
+          summary?: VaultSummary; artifacts?: ComplianceArtifact[];
+        };
+        if (d.summary && typeof d.summary === "object") setSummary(d.summary);
+        setArtifacts(Array.isArray(d.artifacts) ? d.artifacts : []);
       }
     } finally {
       setLoading(false);
@@ -173,8 +191,8 @@ export default function CompliancePage() {
     try {
       const res = await fetch("/api/saas/compliance/sync", { method: "POST" });
       if (res.ok) {
-        const d = (await res.json()) as { synced: number };
-        showToast(`${d.synced} artifact(s) sincronizados`);
+        const d = (await res.json().catch(() => ({}))) as { synced?: number };
+        showToast(`${num(d.synced)} artifact(s) sincronizados`);
         void load();
       }
     } finally {
@@ -215,139 +233,126 @@ export default function CompliancePage() {
   }
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="compliance" />}>
-      <div className="space-y-6 p-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-white">Compliance Vault</h1>
-            <p className="text-white/50 text-sm mt-1">
+    <SaasW3crmShell>
+      {/* `pageTitle` NO repite "Compliance Vault": serían dos coincidencias. */}
+      <W3crmPageTitle mainTitle="Compliance Vault" parentTitle="Inteligencia" pageTitle="Vault" />
+      <div className="container-fluid">
+        <div className="row">
+          {summary && (
+            <>
+              {/* "Total" debe ser único en toda la página. */}
+              <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Total" value={num(summary.total)} accent /></div>
+              <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Pendientes" value={num(summary.pending)} /></div>
+              <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Verificados" value={num(summary.verified)} /></div>
+              <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Expiran pronto" value={num(summary.expiringSoon)} /></div>
+            </>
+          )}
+
+          <div className="col-xl-12">
+            <p className="fs-14 text-muted">
               Artifacts legales, QA certificates y audit trail por entregable
             </p>
-          </div>
-          <button
-            disabled={syncing || loading}
-            onClick={() => { void handleSync(); }}
-            className="rounded-xl bg-[#0084ff] px-4 py-2 text-sm text-white font-medium disabled:opacity-50 hover:bg-[#0070dd] transition-colors"
-          >
-            {syncing ? "Sincronizando…" : "↻ Sincronizar"}
-          </button>
-        </div>
 
-        {/* KPI strip */}
-        {summary && (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <KpiCard label="Total" value={summary.total} />
-            <KpiCard label="Pendientes" value={summary.pending} />
-            <KpiCard label="Verificados" value={summary.verified} />
-            <KpiCard label="Expiran pronto" value={summary.expiringSoon} />
-          </div>
-        )}
+            {toast && <div className="alert alert-primary" role="status">{toast}</div>}
 
-        {/* Table */}
-        {loading ? (
-          <div className="text-white/40 text-sm py-12 text-center">Cargando artifacts…</div>
-        ) : artifacts.length === 0 ? (
-          <div className="rounded-xl border border-white/10 bg-white/5 px-6 py-14 text-center space-y-3">
-            <div className="text-4xl">🔒</div>
-            <p className="text-white font-semibold">Sin artifacts en el Vault</p>
-            <p className="text-white/40 text-sm max-w-md mx-auto">
-              Lanza un pack desde{" "}
-              <a href="/saas/brief-to-launch" className="text-[#0084ff] hover:underline">Lanzar Pack</a>
-              {" "}o sincroniza tus entregables usando el botón{" "}
-              <strong className="text-white/60">↻ Sincronizar</strong>.
-            </p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto rounded-xl border border-white/10">
-            <table className="min-w-full text-sm">
-              <thead>
-                <tr className="border-b border-white/10 text-white/40 text-xs uppercase tracking-wide">
-                  <th className="px-4 py-3 text-left">Título / Ref</th>
-                  <th className="px-4 py-3 text-left">Pack</th>
-                  <th className="px-4 py-3 text-left">Tipo</th>
-                  <th className="px-4 py-3 text-right">QA</th>
-                  <th className="px-4 py-3 text-center">Legal</th>
-                  <th className="px-4 py-3 text-left">Estado</th>
-                  <th className="px-4 py-3 text-left">Hash</th>
-                  <th className="px-4 py-3 text-left">Docs</th>
-                </tr>
-              </thead>
-              <tbody>
-                {artifacts.map((a) => {
-                  const qaScore = (a.metadata as { qaScore?: number }).qaScore ?? null;
-                  const legalPassed = (a.metadata as { legalPassed?: boolean }).legalPassed ?? null;
-                  return (
-                    <tr
-                      key={a.id}
-                      className="border-b border-white/5 hover:bg-white/5 cursor-pointer transition-colors"
-                      onClick={() => setSelectedArtifact(a)}
-                    >
-                      <td className="px-4 py-3">
-                        <p className="text-white text-xs font-medium truncate max-w-[160px]">
-                          {a.title ?? a.deliverableRef.slice(0, 16) + "…"}
-                        </p>
-                        <p className="text-white/30 text-[10px]">{a.deliverableSource}</p>
-                      </td>
-                      <td className="px-4 py-3 text-white/50 text-xs">{a.packId ?? "—"}</td>
-                      <td className="px-4 py-3">
-                        <span className="text-xs text-white/60">{CONSENT_LABEL[a.consentType]}</span>
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        {qaScore !== null ? (
-                          <span className={`text-xs font-semibold ${qaScore >= 85 ? "text-green-400" : "text-yellow-400"}`}>
-                            {qaScore}%
+            {/* Título sin "Sincronizar" ni "Total": ver cabecera. */}
+            <W3crmContentBox
+              titulo="Artifacts del Vault"
+              icono="fa-solid fa-lock"
+              acciones={
+                <button type="button" className="btn btn-primary btn-sm me-2" disabled={syncing || loading}
+                  onClick={() => { void handleSync(); }}>
+                  {syncing ? "Sincronizando…" : "↻ Sincronizar"}
+                </button>
+              }
+            >
+              {loading ? (
+                <W3crmCargando texto="Cargando artifacts…" />
+              ) : artifacts.length === 0 ? (
+                <>
+                  <W3crmEmptyState
+                    title="Sin artifacts en el Vault"
+                    description="Lanza un pack o sincroniza tus entregables usando el botón ↻ Sincronizar."
+                  />
+                  <div className="text-center">
+                    <Link href="/saas/brief-to-launch" className="btn btn-primary light btn-sm">
+                      Ir a lanzar un pack
+                    </Link>
+                  </div>
+                </>
+              ) : (
+                <W3crmDataTable
+                  filas={artifacts}
+                  etiqueta="artifacts"
+                  wrapperId="compliance_wrapper"
+                  porPagina={10}
+                  columnas={[
+                    { titulo: "Título / Ref" },
+                    { titulo: "Pack" },
+                    { titulo: "Tipo" },
+                    { titulo: "QA" },
+                    { titulo: "Legal" },
+                    { titulo: "Estado" },
+                    { titulo: "Hash" },
+                    { titulo: "Detalle", alFinal: true },
+                  ]}
+                  render={(a) => {
+                    const m = meta(a);
+                    const qaScore = opt(m.qaScore);
+                    const legalPassed = typeof m.legalPassed === "boolean" ? m.legalPassed : null;
+                    return (
+                      <tr key={a.id}>
+                        <td>
+                          <span className="fw-bold d-block">
+                            {txt(a.title) || corta(a.deliverableRef, 16) || "—"}
                           </span>
-                        ) : <span className="text-white/20">—</span>}
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        {legalPassed === true ? "✅" : legalPassed === false ? "❌" : <span className="text-white/20">—</span>}
-                      </td>
-                      <td className="px-4 py-3">
-                        <NelvyonDsBadge tone={STATUS_TONE[a.status]}>{a.status}</NelvyonDsBadge>
-                      </td>
-                      <td className="px-4 py-3 text-white/30 text-xs font-mono">
-                        {a.contentHash ? a.contentHash.slice(0, 8) + "…" : "—"}
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex gap-2">
-                          {a.legalDocUrl && (
-                            <a href={a.legalDocUrl} target="_blank" rel="noopener noreferrer"
-                              onClick={(e) => e.stopPropagation()}
-                              className="text-[#0084ff] text-xs hover:underline">📄</a>
-                          )}
-                          {a.qaPdfUrl && (
-                            <a href={a.qaPdfUrl} target="_blank" rel="noopener noreferrer"
-                              onClick={(e) => e.stopPropagation()}
-                              className="text-[#0084ff] text-xs hover:underline">📊</a>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                          <span className="text-muted fs-12">{txt(a.deliverableSource) || "—"}</span>
+                        </td>
+                        <td className="text-muted fs-12">{txt(a.packId) || "—"}</td>
+                        <td className="text-muted fs-12">{consentLabel(a.consentType)}</td>
+                        <td>
+                          {qaScore !== null ? (
+                            <span className={qaScore >= 85 ? "text-success fw-bold" : "text-warning fw-bold"}>
+                              {qaScore}%
+                            </span>
+                          ) : <span className="text-muted">—</span>}
+                        </td>
+                        <td>
+                          {legalPassed === true ? (
+                            <span className="badge badge-success">OK</span>
+                          ) : legalPassed === false ? (
+                            <span className="badge badge-danger">KO</span>
+                          ) : <span className="text-muted">—</span>}
+                        </td>
+                        <td><span className={`badge ${statusBadge(a.status)}`}>{txt(a.status) || "—"}</span></td>
+                        <td className="text-muted fs-12">
+                          <code>{a.contentHash ? corta(a.contentHash, 8) : "—"}</code>
+                        </td>
+                        <td className="text-end">
+                          <button type="button" className="btn btn-primary light btn-sm"
+                            aria-label={`Ver detalle de ${txt(a.title) || txt(a.deliverableRef) || a.id}`}
+                            onClick={() => setSelectedArtifact(a)}>
+                            Ver
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  }}
+                />
+              )}
+            </W3crmContentBox>
           </div>
-        )}
-
-        {/* Toast */}
-        {toast && (
-          <div className="fixed bottom-6 right-6 z-50 rounded-xl bg-[#0084ff] px-4 py-2 text-white text-sm shadow-lg">
-            {toast}
-          </div>
-        )}
-
-        {/* Detail modal */}
-        {selectedArtifact && (
-          <ArtifactModal
-            artifact={selectedArtifact}
-            onClose={() => setSelectedArtifact(null)}
-            onVerify={() => { void handleVerify(selectedArtifact.id); }}
-            onRevoke={() => { void handleRevoke(selectedArtifact.id); }}
-          />
-        )}
+        </div>
       </div>
-    </SaasShellLayout>
+
+      {selectedArtifact && (
+        <ArtifactModal
+          artifact={selectedArtifact}
+          onClose={() => setSelectedArtifact(null)}
+          onVerify={() => { void handleVerify(selectedArtifact.id); }}
+          onRevoke={() => { void handleRevoke(selectedArtifact.id); }}
+        />
+      )}
+    </SaasW3crmShell>
   );
 }

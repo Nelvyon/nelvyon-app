@@ -1,10 +1,19 @@
 "use client";
 
+/**
+ * /saas/snippets sobre `(cms)/content` de W3CRM, con las piezas ya portadas.
+ *
+ * Logica de NELVYON intacta: `GET/POST/PUT /api/saas/snippets`, el tipo
+ * `Snippet`, `TYPE_CONFIG` con sus cinco canales, `primaryChannel`,
+ * `detectVariables`, el copiado al portapapeles con su aviso de 1,5 s y el
+ * filtrado por canal y texto.
+ */
 import { useCallback, useEffect, useState } from "react";
-import { NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
-import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
+
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmEmptyState, W3crmKpiTile } from "@/features/saas-w3crm/components/W3crmUi";
+import { W3crmCargando, W3crmContentBox, W3crmDataTable, W3crmModal } from "@/features/saas-w3crm/components/W3crmContentBox";
 
 type SnippetChannel = "email" | "sms" | "whatsapp" | "social" | "call";
 
@@ -19,18 +28,24 @@ interface Snippet {
   updatedAt: string;
 }
 
-const TYPE_CONFIG: Record<SnippetChannel, { label: string; icon: string; color: string }> = {
-  email: { label: "Email", icon: "📧", color: "bg-primary/10 text-primary border-primary/20" },
-  sms: { label: "SMS", icon: "💬", color: "bg-success/10 text-success border-success/20" },
-  whatsapp: { label: "WhatsApp", icon: "📱", color: "bg-success/10 text-success border-success/20" },
-  social: { label: "Redes Sociales", icon: "📣", color: "bg-warning/10 text-warning border-warning/20" },
-  call: { label: "Llamada", icon: "📞", color: "bg-muted text-muted-foreground border-border" },
+const TYPE_CONFIG: Record<SnippetChannel, { label: string; icon: string; badge: string }> = {
+  email: { label: "Email", icon: "📧", badge: "badge-primary" },
+  sms: { label: "SMS", icon: "💬", badge: "badge-success" },
+  whatsapp: { label: "WhatsApp", icon: "📱", badge: "badge-success" },
+  social: { label: "Redes Sociales", icon: "📣", badge: "badge-warning" },
+  call: { label: "Llamada", icon: "📞", badge: "badge-secondary" },
 };
 
 function primaryChannel(s: Snippet): SnippetChannel {
-  const c = s.channels[0];
+  const c = (s.channels ?? [])[0];
   if (c === "email" || c === "sms" || c === "whatsapp" || c === "social" || c === "call") return c;
   return "email";
+}
+
+function fecha(iso: string | null | undefined): string {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? "—" : d.toLocaleDateString("es-ES");
 }
 
 function SnippetModal({ snippet, onClose }: { snippet?: Snippet; onClose: () => void }) {
@@ -53,13 +68,7 @@ function SnippetModal({ snippet, onClose }: { snippet?: Snippet; onClose: () => 
     setSaving(true);
     setError(null);
     try {
-      const payload = {
-        id: snippet?.id,
-        name: name.trim(),
-        content,
-        channels: [type],
-        variables,
-      };
+      const payload = { id: snippet?.id, name: name.trim(), content, channels: [type], variables };
       const res = await fetch("/api/saas/snippets", {
         method: snippet ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
@@ -78,64 +87,68 @@ function SnippetModal({ snippet, onClose }: { snippet?: Snippet; onClose: () => 
   }
 
   function copyContent() {
-    void navigator.clipboard.writeText(content);
+    void navigator.clipboard?.writeText(content);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm">
-      <div className="my-8 w-full max-w-2xl rounded-2xl border border-border bg-card shadow-2xl">
-        <div className="flex items-center justify-between border-b border-border px-6 py-4">
-          <h2 className="text-lg font-semibold text-foreground">{snippet ? "Editar snippet" : "Nuevo snippet"}</h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
-        </div>
-        <form onSubmit={(e) => void save(e)} className="space-y-4 p-6">
-          {error && (
-            <p className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
-              {error}
-            </p>
-          )}
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre *</label>
-              <input value={name} onChange={e => setName(e.target.value)} placeholder="Ej: Bienvenida lead frío"
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
+    <W3crmModal titulo={snippet ? "Editar snippet" : "Nuevo snippet"} onClose={onClose} error={error} size="lg" testId="modal-snippet">
+      <form onSubmit={(e) => void save(e)}>
+        <div className="row">
+          <div className="col-lg-6">
+            <div className="form-group mb-3">
+              <label htmlFor="sn-nombre" className="text-black font-w600">Nombre <span className="required">*</span></label>
+              <input id="sn-nombre" type="text" className="form-control" placeholder="Ej: Bienvenida lead frío"
+                value={name} onChange={(e) => setName(e.target.value)} />
             </div>
-            <div>
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">Canal</label>
-              <select value={type} onChange={e => setType(e.target.value as SnippetChannel)}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none">
-                {(Object.keys(TYPE_CONFIG) as SnippetChannel[]).map(t => (
+          </div>
+          <div className="col-lg-6">
+            <div className="form-group mb-3">
+              <label htmlFor="sn-canal" className="text-black font-w600">Canal</label>
+              <select id="sn-canal" className="form-control" value={type} onChange={(e) => setType(e.target.value as SnippetChannel)}>
+                {(Object.keys(TYPE_CONFIG) as SnippetChannel[]).map((t) => (
                   <option key={t} value={t}>{TYPE_CONFIG[t].icon} {TYPE_CONFIG[t].label}</option>
                 ))}
               </select>
             </div>
           </div>
-          <div>
-            <div className="mb-1 flex items-center justify-between">
-              <label className="text-xs font-medium text-muted-foreground">Contenido * — usa {"{{variable}}"} para personalizar</label>
-              <button type="button" onClick={copyContent} className="text-xs text-primary hover:underline">{copied ? "✓ Copiado" : "Copiar"}</button>
+          <div className="col-lg-12">
+            <div className="form-group mb-3">
+              <div className="d-flex align-items-center justify-content-between">
+                <label htmlFor="sn-contenido" className="text-black font-w600">
+                  Contenido <span className="required">*</span>
+                </label>
+                <button type="button" className="btn btn-primary light btn-xs" onClick={copyContent}>
+                  {copied ? "✓ Copiado" : "Copiar"}
+                </button>
+              </div>
+              <textarea id="sn-contenido" className="form-control" rows={6} placeholder="Hola {{nombre}}, gracias por…"
+                value={content} onChange={(e) => setContent(e.target.value)} />
+              <div className="form-text">Usa <code>{"{{variable}}"}</code> para personalizar.</div>
             </div>
-            <textarea value={content} onChange={e => setContent(e.target.value)} rows={6}
-              placeholder="Hola {{nombre}}, gracias por..."
-              className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none font-mono" />
           </div>
           {variables.length > 0 && (
-            <div>
-              <p className="mb-2 text-xs font-medium text-muted-foreground">Variables detectadas</p>
-              <div className="flex flex-wrap gap-1.5">
-                {variables.map(v => <span key={v} className="rounded-md bg-primary/10 px-2 py-0.5 text-xs font-mono text-primary">{`{{${v}}}`}</span>)}
+            <div className="col-lg-12">
+              <div className="mb-3">
+                <p className="fs-12 text-muted mb-1">Variables detectadas</p>
+                {variables.map((v) => (
+                  <span key={v} className="badge badge-primary light me-1">{`{{${v}}}`}</span>
+                ))}
               </div>
             </div>
           )}
-          <div className="flex gap-3 pt-2">
-            <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
-            <NelvyonDsButton type="submit" disabled={saving} className="flex-1">{saving ? "Guardando…" : "Guardar snippet"}</NelvyonDsButton>
+          <div className="col-lg-12">
+            <div className="text-end">
+              <button type="button" className="btn btn-danger light me-2" onClick={onClose}>Cancelar</button>
+              <button type="submit" className="btn btn-primary" disabled={saving}>
+                {saving ? "Guardando…" : "Guardar snippet"}
+              </button>
+            </div>
           </div>
-        </form>
-      </div>
-    </div>
+        </div>
+      </form>
+    </W3crmModal>
   );
 }
 
@@ -158,8 +171,8 @@ export default function SaasSnippetsPage() {
         const d = (await res.json().catch(() => ({}))) as { error?: string };
         throw new Error(d.error ?? `HTTP ${res.status}`);
       }
-      const d = (await res.json()) as { snippets?: Snippet[] };
-      setSnippets(d.snippets ?? []);
+      const d = (await res.json().catch(() => ({}))) as { snippets?: Snippet[] };
+      setSnippets(Array.isArray(d.snippets) ? d.snippets : []);
     } catch (e) {
       setSnippets([]);
       setLoadError(e instanceof Error ? e.message : "Error al cargar");
@@ -171,91 +184,117 @@ export default function SaasSnippetsPage() {
   useEffect(() => { void load(); }, [load]);
 
   function copySnippet(s: Snippet) {
-    void navigator.clipboard.writeText(s.content);
+    void navigator.clipboard?.writeText(s.content);
     setCopiedId(s.id);
     setTimeout(() => setCopiedId(null), 1500);
   }
 
-  const filtered = snippets.filter(s => {
+  const filtered = snippets.filter((s) => {
     if (filterType !== "all" && primaryChannel(s) !== filterType) return false;
-    if (search && !s.name.toLowerCase().includes(search.toLowerCase()) && !s.content.toLowerCase().includes(search.toLowerCase())) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      if (!(s.name ?? "").toLowerCase().includes(q) && !(s.content ?? "").toLowerCase().includes(q)) return false;
+    }
     return true;
   });
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="snippets" />}>
-      <div className="flex flex-col gap-6 pb-8">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <NelvyonDsSectionHeader title="Snippets" subtitle="Biblioteca de textos reutilizables para email, SMS, WhatsApp y llamadas" />
-              <NelvyonDsButton onClick={() => { setEditing(undefined); setShowModal(true); }}>+ Nuevo snippet</NelvyonDsButton>
-            </div>
-
-            {loadError && (
-              <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm text-destructive" role="alert">
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="Snippets" parentTitle="Gestión" pageTitle="Snippets" />
+      <div className="container-fluid">
+        <div className="row">
+          {loadError && (
+            <div className="col-xl-12">
+              <div className="alert alert-danger alert-dismissible fade show" role="alert">
                 {loadError}
-              </p>
-            )}
-
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-              <KpiTile icon="✂️" label="Total snippets" value={snippets.length} />
-              <KpiTile icon="📡" label="Canales" value={new Set(snippets.flatMap(s => s.channels)).size} accent />
-              <KpiTile icon="🧩" label="Con variables" value={snippets.filter(s => (s.variables?.length ?? 0) > 0).length} />
+                <button type="button" className="btn-close" aria-label="Cerrar" onClick={() => setLoadError(null)} />
+              </div>
             </div>
+          )}
+          <div className="col-xl-4 col-sm-6"><W3crmKpiTile label="Total snippets" value={snippets.length} accent /></div>
+          <div className="col-xl-4 col-sm-6"><W3crmKpiTile label="Canales" value={new Set(snippets.flatMap((s) => s.channels ?? [])).size} /></div>
+          <div className="col-xl-4 col-sm-6"><W3crmKpiTile label="Con variables" value={snippets.filter((s) => (s.variables?.length ?? 0) > 0).length} /></div>
 
-            <div className="flex flex-wrap gap-3">
-              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar snippet..."
-                className="h-9 flex-1 min-w-48 rounded-lg border border-border bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none" />
-              <div className="flex gap-1.5 flex-wrap">
-                <button type="button" onClick={() => setFilterType("all")} className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${filterType === "all" ? "bg-primary text-primary-foreground" : "bg-muted/30 text-muted-foreground hover:bg-muted/50"}`}>Todos</button>
-                {(Object.keys(TYPE_CONFIG) as SnippetChannel[]).map(t => (
-                  <button type="button" key={t} onClick={() => setFilterType(t)} className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${filterType === t ? "bg-primary text-primary-foreground" : "bg-muted/30 text-muted-foreground hover:bg-muted/50"}`}>
-                    {TYPE_CONFIG[t].icon} {TYPE_CONFIG[t].label}
+          <div className="col-xl-12">
+            <W3crmContentBox titulo="Filtro" icono="fas fa-filter" bodyClassName="card-body pb-3">
+              <div className="row">
+                <div className="col-xl-4 col-sm-6">
+                  <label className="visually-hidden" htmlFor="sn-buscar">Buscar snippet</label>
+                  <input id="sn-buscar" type="text" className="form-control mb-3 mb-xl-0" placeholder="Buscar snippet…"
+                    value={search} onChange={(e) => setSearch(e.target.value)} />
+                </div>
+                <div className="col-xl-4 col-sm-6 mb-3 mb-xl-0">
+                  <label className="visually-hidden" htmlFor="sn-filtro-canal">Canal</label>
+                  <select id="sn-filtro-canal" className="form-control" value={filterType}
+                    onChange={(e) => setFilterType(e.target.value as SnippetChannel | "all")}>
+                    <option value="all">Todos los canales</option>
+                    {(Object.keys(TYPE_CONFIG) as SnippetChannel[]).map((t) => (
+                      <option key={t} value={t}>{TYPE_CONFIG[t].icon} {TYPE_CONFIG[t].label}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="col-xl-4 col-sm-6">
+                  <button type="button" className="btn btn-danger light" onClick={() => { setSearch(""); setFilterType("all"); }}>
+                    Quitar filtros
                   </button>
-                ))}
+                </div>
               </div>
+            </W3crmContentBox>
+
+            <div className="mb-3">
+              <ul className="d-flex align-items-center flex-wrap">
+                <li>
+                  <button type="button" className="btn btn-primary" onClick={() => { setEditing(undefined); setShowModal(true); }}>
+                    + Nuevo snippet
+                  </button>
+                </li>
+              </ul>
             </div>
 
-            {loading ? (
-              <div className="grid gap-3 sm:grid-cols-2">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-40 animate-pulse rounded-xl bg-muted/30" />)}</div>
-            ) : filtered.length === 0 ? (
-              <NelvyonDsCard className="p-16 text-center">
-                <p className="mt-4 text-lg font-semibold text-foreground">Sin snippets</p>
-                <p className="mt-2 text-sm text-muted-foreground">Crea textos reutilizables para ahorrar tiempo en tus comunicaciones</p>
-                <NelvyonDsButton className="mt-5" onClick={() => { setEditing(undefined); setShowModal(true); }}>+ Primer snippet</NelvyonDsButton>
-              </NelvyonDsCard>
-            ) : (
-              <div className="grid gap-3 sm:grid-cols-2">
-                {filtered.map(s => {
-                  const cfg = TYPE_CONFIG[primaryChannel(s)];
-                  return (
-                    <NelvyonDsCard key={s.id} className="flex flex-col gap-3 p-4 transition-colors hover:border-primary/30">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          <span className={`rounded-lg border px-2 py-1 text-xs font-medium ${cfg.color}`}>{cfg.icon} {cfg.label}</span>
-                          {(s.variables?.length ?? 0) > 0 && <span className="text-xs text-muted-foreground">{s.variables.length} var.</span>}
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <button type="button" onClick={() => copySnippet(s)} className="rounded p-1 text-xs text-muted-foreground transition-colors hover:text-primary">
-                            {copiedId === s.id ? "✓" : "⎘"}
+            <W3crmContentBox titulo="Snippets" icono="fa-solid fa-file-lines">
+              {loading ? (
+                <W3crmCargando texto="Cargando snippets…" />
+              ) : filtered.length === 0 ? (
+                <W3crmEmptyState
+                  title="Sin snippets"
+                  description="Crea textos reutilizables para ahorrar tiempo en tus comunicaciones."
+                />
+              ) : (
+                <W3crmDataTable
+                  filas={filtered}
+                  etiqueta="snippets"
+                  reiniciarEn={`${filterType}|${search}`}
+                  columnas={[{ titulo: "Nombre" }, { titulo: "Canal" }, { titulo: "Contenido" }, { titulo: "Variables" }, { titulo: "Modificado" }, { titulo: "Acciones", alFinal: true }]}
+                  render={(s) => {
+                    const cfg = TYPE_CONFIG[primaryChannel(s)];
+                    return (
+                      <tr key={s.id}>
+                        <td><span className="fw-bold">{s.name || "—"}</span></td>
+                        <td><span className={`badge ${cfg.badge}`}>{cfg.icon} {cfg.label}</span></td>
+                        <td><span className="text-muted fs-12">{(s.content ?? "").slice(0, 80)}</span></td>
+                        <td>{s.variables?.length ?? 0}</td>
+                        <td>{fecha(s.updatedAt)}</td>
+                        <td className="text-end">
+                          <button type="button" className="btn btn-primary light btn-sm content-icon me-1"
+                            aria-label={`Copiar ${s.name || "snippet"}`} onClick={() => copySnippet(s)}>
+                            <i className={`fa-solid ${copiedId === s.id ? "fa-check" : "fa-copy"}`} />
                           </button>
-                          <button type="button" onClick={() => { setEditing(s); setShowModal(true); }} className="rounded p-1 text-xs text-muted-foreground transition-colors hover:text-primary">✎</button>
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-foreground">{s.name}</p>
-                        <p className="mt-1 line-clamp-3 font-mono text-xs text-muted-foreground">{s.content}</p>
-                      </div>
-                      <div className="mt-auto flex items-center justify-between text-xs text-muted-foreground">
-                        <span>{s.channels.join(", ") || "sin canal"}</span>
-                        <span>{new Date(s.updatedAt).toLocaleDateString("es-ES")}</span>
-                      </div>
-                    </NelvyonDsCard>
-                  );
-                })}
-              </div>
-            )}
-      {showModal && <SnippetModal snippet={editing} onClose={() => { setShowModal(false); void load(); }} />}
+                          <button type="button" className="btn btn-warning btn-sm content-icon"
+                            aria-label={`Editar ${s.name || "snippet"}`} onClick={() => { setEditing(s); setShowModal(true); }}>
+                            <i className="fa fa-edit" />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  }}
+                />
+              )}
+            </W3crmContentBox>
+          </div>
+        </div>
       </div>
-    </SaasShellLayout>
+
+      {showModal && <SnippetModal snippet={editing} onClose={() => { setShowModal(false); void load(); }} />}
+    </SaasW3crmShell>
   );
 }

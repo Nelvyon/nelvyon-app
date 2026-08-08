@@ -1,14 +1,25 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+/**
+ * /saas/crm sobre la pantalla `customer` de la plantilla oficial W3CRM
+ * (`src/app/(apps)/customer/page.jsx`): `page-titles`, cabecera con
+ * `h4.heading` y botones, `card > card-body p-0`,
+ * `table-responsive active-projects style-1 dt-filter exports`, `tbl-caption`
+ * con exportacion CSV, `table.shorting` con checkboxes y `products` en la
+ * celda de nombre, badges `badge light border-0`, paginacion
+ * `dataTables_paginate paging_simple_numbers` y `Offcanvas` para el panel
+ * lateral (patron de `EmployeeOffcanvas`).
+ *
+ * Dentro va la logica REAL de NELVYON, sin cambios: los 7 endpoints, filtros,
+ * pestanas, copilot, notas y deduplicacion.
+ */
+import Link from "next/link";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { CSVLink } from "react-csv";
+import { Offcanvas } from "react-bootstrap";
 
-import {
-  NelvyonDsBadge,
-  NelvyonDsButton,
-  NelvyonDsCard,
-} from "@/design-system/components";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
-import { SaasShellLayout, StatCard } from "@/features/saas-shell/components/SaasShellLayout";
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -56,12 +67,15 @@ const STAGE_LABELS: Record<PipelineStage, string> = {
 
 const STAGES: PipelineStage[] = ["new", "contacted", "qualified", "proposal", "won", "lost"];
 
-const STATUS_TONE = {
+/** Tonos de badge de W3CRM (`badge light border-0 badge-*`). */
+const STATUS_TONE: Record<ContactStatus, string> = {
   lead: "primary",
   prospect: "warning",
   client: "success",
   churned: "danger",
-} as const;
+};
+
+const REGISTROS_POR_PAGINA = 9;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -73,13 +87,15 @@ function initials(name: string) {
   return name.split(" ").slice(0, 2).map((w) => w[0] ?? "").join("").toUpperCase();
 }
 
-// ─── Avatar ───────────────────────────────────────────────────────────────────
-
+/** Avatar con las clases de avatar de la plantilla. */
 function Avatar({ name }: { name: string }) {
   return (
-    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/20 text-xs font-bold text-primary">
+    <span
+      className="avatar avatar-md rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center"
+      aria-hidden="true"
+    >
       {initials(name)}
-    </div>
+    </span>
   );
 }
 
@@ -88,25 +104,20 @@ function Avatar({ name }: { name: string }) {
 function PipelineBoard({ pipeline }: { pipeline: PipelineItem[] }) {
   const map = Object.fromEntries(pipeline.map((p) => [p.stage, p]));
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+    <div className="row">
       {STAGES.map((stage) => {
         const d = map[stage] ?? { count: 0, totalValue: 0 };
         return (
-          <div
-            key={stage}
-            className={`rounded-xl border p-4 text-center ${
-              stage === "won"
-                ? "border-green-500/30 bg-green-500/5"
-                : stage === "lost"
-                  ? "border-red-500/30 bg-red-500/5"
-                  : "border-border bg-card"
-            }`}
-          >
-            <p className="text-xs text-muted-foreground">{STAGE_LABELS[stage]}</p>
-            <p className="mt-2 text-3xl font-bold text-foreground">{d.count}</p>
-            {d.totalValue > 0 && (
-              <p className="mt-1 text-xs font-medium text-primary">{eur(d.totalValue)}</p>
-            )}
+          <div key={stage} className="col-xl-2 col-lg-4 col-sm-6">
+            <div className="card">
+              <div className="card-body text-center">
+                <p className="mb-1 text-muted fs-14">{STAGE_LABELS[stage]}</p>
+                <h2 className="mb-0">{d.count}</h2>
+                {d.totalValue > 0 && (
+                  <p className="mb-0 text-primary fs-13">{eur(d.totalValue)}</p>
+                )}
+              </div>
+            </div>
           </div>
         );
       })}
@@ -114,9 +125,17 @@ function PipelineBoard({ pipeline }: { pipeline: PipelineItem[] }) {
   );
 }
 
-// ─── New Contact Modal ────────────────────────────────────────────────────────
+// ─── New Contact Offcanvas ────────────────────────────────────────────────────
 
-function NewContactModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
+function NewContactOffcanvas({
+  show,
+  onClose,
+  onSaved,
+}: {
+  show: boolean;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
   const [form, setForm] = useState({ name: "", email: "", phone: "", company: "", position: "", value: "" });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -155,86 +174,90 @@ function NewContactModal({ onClose, onSaved }: { onClose: () => void; onSaved: (
     }
   }
 
+  const campos = [
+    { k: "name", label: "Nombre", req: true, type: "text", placeholder: "Nombre completo" },
+    { k: "email", label: "Email", req: false, type: "email", placeholder: "email@empresa.com" },
+    { k: "phone", label: "Teléfono", req: false, type: "tel", placeholder: "+34 600 000 000" },
+    { k: "company", label: "Empresa", req: false, type: "text", placeholder: "Nombre de la empresa" },
+    { k: "position", label: "Cargo", req: false, type: "text", placeholder: "CEO, Director de Marketing…" },
+    { k: "value", label: "Valor estimado (€)", req: false, type: "number", placeholder: "0" },
+  ] as const;
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl">
-        <h2 className="mb-5 text-lg font-semibold text-foreground">Nuevo contacto</h2>
-        {error && (
-          <p className="mb-4 rounded-lg bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</p>
-        )}
-        <form onSubmit={submit} className="space-y-3">
-          {(
-            [
-              { k: "name", label: "Nombre *", type: "text", placeholder: "Nombre completo" },
-              { k: "email", label: "Email", type: "email", placeholder: "email@empresa.com" },
-              { k: "phone", label: "Teléfono", type: "tel", placeholder: "+34 600 000 000" },
-              { k: "company", label: "Empresa", type: "text", placeholder: "Nombre de la empresa" },
-              { k: "position", label: "Cargo", type: "text", placeholder: "CEO, Director de Marketing…" },
-            ] as const
-          ).map(({ k, label, type, placeholder }) => (
-            <div key={k}>
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">{label}</label>
-              <input
-                type={type}
-                value={form[k]}
-                onChange={set(k)}
-                placeholder={placeholder}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30"
-              />
-            </div>
-          ))}
-          <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Valor estimado (€)</label>
-            <input
-              type="number"
-              min="0"
-              value={form.value}
-              onChange={set("value")}
-              placeholder="0"
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30"
-            />
-          </div>
-          <div className="flex gap-3 pt-2">
-            <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">
-              Cancelar
-            </NelvyonDsButton>
-            <NelvyonDsButton type="submit" disabled={saving} className="flex-1">
-              {saving ? "Guardando…" : "Crear contacto"}
-            </NelvyonDsButton>
-          </div>
-        </form>
+    <Offcanvas show={show} onHide={onClose} className="offcanvas-end customeoff" placement="end">
+      <div className="offcanvas-header">
+        <h5 className="modal-title">Nuevo contacto</h5>
+        <button type="button" className="btn-close" onClick={onClose} aria-label="Cerrar">
+          <i className="fa-solid fa-xmark"></i>
+        </button>
       </div>
-    </div>
+      <div className="offcanvas-body">
+        <div className="container-fluid">
+          {error && <div className="alert alert-danger">{error}</div>}
+          <form onSubmit={submit}>
+            <div className="row">
+              {campos.map(({ k, label, req, type, placeholder }) => (
+                <div className="col-xl-6 mb-3" key={k}>
+                  <label className="form-label" htmlFor={`crm-${k}`}>
+                    {label}{req ? <span className="text-danger">*</span> : null}
+                  </label>
+                  <input
+                    id={`crm-${k}`}
+                    type={type}
+                    className="form-control"
+                    placeholder={placeholder}
+                    value={form[k]}
+                    onChange={set(k)}
+                    {...(type === "number" ? { min: 0 } : {})}
+                  />
+                </div>
+              ))}
+            </div>
+            <div>
+              <button type="submit" className="btn btn-primary me-1" disabled={saving}>
+                {saving ? "Guardando…" : "Crear contacto"}
+              </button>
+              <button type="button" className="btn btn-danger light ms-1" onClick={onClose}>
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </Offcanvas>
   );
 }
 
-// ─── Contact Detail Panel ─────────────────────────────────────────────────────
+// ─── Contact Detail Offcanvas ─────────────────────────────────────────────────
 
-function ContactDetail({ contact, onClose }: { contact: Contact; onClose: () => void }) {
+function ContactDetailOffcanvas({ contact, onClose }: { contact: Contact | null; onClose: () => void }) {
   const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
   const [copilot, setCopilot] = useState<{ summary: string; nextBestAction: string; emailDraft: string; score: number } | null>(null);
   const [copilotLoading, setCopilotLoading] = useState(true);
 
+  const contactId = contact?.id;
+
   useEffect(() => {
+    if (!contactId) return;
     setCopilotLoading(true);
     fetch("/api/saas/crm/copilot", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ contactId: contact.id }),
+      body: JSON.stringify({ contactId }),
     })
       .then((r) => r.json())
       .then((d: { suggestion?: typeof copilot }) => { if (d.suggestion) setCopilot(d.suggestion); })
       .catch(() => {})
       .finally(() => setCopilotLoading(false));
-  }, [contact.id]);
+  }, [contactId]);
 
   async function addNote(e: React.FormEvent) {
     e.preventDefault();
-    if (!note.trim()) return;
+    if (!note.trim() || !contactId) return;
     setSaving(true);
     try {
-      await fetch(`/api/saas/crm/contacts/${contact.id}/activities`, {
+      await fetch(`/api/saas/crm/contacts/${contactId}/activities`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ activityType: "note", description: note.trim() }),
@@ -246,86 +269,102 @@ function ContactDetail({ contact, onClose }: { contact: Contact; onClose: () => 
   }
 
   return (
-    <div className="flex h-full flex-col gap-4">
-      <div className="flex items-start justify-between">
-        <div className="flex items-center gap-3">
-          <Avatar name={contact.name} />
-          <div>
-            <h3 className="font-semibold text-foreground">{contact.name}</h3>
-            {contact.company && <p className="text-sm text-muted-foreground">{contact.company}</p>}
-          </div>
-        </div>
-        <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
+    <Offcanvas show={Boolean(contact)} onHide={onClose} className="offcanvas-end customeoff" placement="end">
+      <div className="offcanvas-header">
+        <h5 className="modal-title">{contact?.name ?? ""}</h5>
+        <button type="button" className="btn-close" onClick={onClose} aria-label="Cerrar">
+          <i className="fa-solid fa-xmark"></i>
+        </button>
       </div>
+      <div className="offcanvas-body">
+        {contact ? (
+          <div className="container-fluid">
+            <div className="d-flex align-items-center mb-3 gap-3">
+              <Avatar name={contact.name} />
+              <div>
+                <h6 className="mb-0">{contact.name}</h6>
+                {contact.company && <span className="text-muted fs-13">{contact.company}</span>}
+              </div>
+            </div>
 
-      <div className="grid grid-cols-2 gap-2">
-        {[
-          { label: "Estado", value: STATUS_LABELS[contact.status] },
-          { label: "Etapa", value: STAGE_LABELS[contact.pipelineStage] },
-          { label: "Email", value: contact.email ?? "—" },
-          { label: "Teléfono", value: contact.phone ?? "—" },
-          { label: "Cargo", value: contact.position ?? "—" },
-          { label: "Valor", value: contact.value > 0 ? eur(contact.value) : "—" },
-        ].map(({ label, value }) => (
-          <div key={label} className="rounded-lg bg-muted/20 p-2">
-            <p className="text-xs text-muted-foreground">{label}</p>
-            <p className="mt-0.5 truncate text-sm font-medium text-foreground">{value}</p>
+            <div className="row">
+              {[
+                { label: "Estado", value: STATUS_LABELS[contact.status] },
+                { label: "Etapa", value: STAGE_LABELS[contact.pipelineStage] },
+                { label: "Email", value: contact.email ?? "—" },
+                { label: "Teléfono", value: contact.phone ?? "—" },
+                { label: "Cargo", value: contact.position ?? "—" },
+                { label: "Valor", value: contact.value > 0 ? eur(contact.value) : "—" },
+              ].map(({ label, value }) => (
+                <div className="col-6 mb-3" key={label}>
+                  <span className="text-muted fs-13 d-block">{label}</span>
+                  <span className="fw-medium">{value}</span>
+                </div>
+              ))}
+            </div>
+
+            {contact.tags.length > 0 && (
+              <div className="mb-3">
+                {contact.tags.map((tag) => (
+                  <span key={tag} className="badge light border-0 badge-primary me-1">{tag}</span>
+                ))}
+              </div>
+            )}
+
+            <div className="card">
+              <div className="card-header">
+                <h4 className="card-title">IA Copilot</h4>
+              </div>
+              <div className="card-body">
+                {copilotLoading ? (
+                  <p className="mb-0 text-muted fs-13">Analizando contacto…</p>
+                ) : copilot ? (
+                  <>
+                    <p className="mb-2">{copilot.summary}</p>
+                    <p className="mb-2 text-muted fs-13"><strong>Siguiente acción:</strong> {copilot.nextBestAction}</p>
+                    <pre className="bg-light p-2 fs-13" style={{ maxHeight: 120, overflow: "auto", whiteSpace: "pre-wrap" }}>{copilot.emailDraft}</pre>
+                    <button
+                      type="button"
+                      className="btn btn-primary light btn-sm"
+                      onClick={() => void navigator.clipboard.writeText(copilot.emailDraft)}
+                    >
+                      Copiar email
+                    </button>
+                  </>
+                ) : (
+                  <p className="mb-0 text-muted fs-13">Sin sugerencias</p>
+                )}
+              </div>
+            </div>
+
+            {contact.notes && (
+              <div className="card">
+                <div className="card-header"><h4 className="card-title">Notas</h4></div>
+                <div className="card-body"><p className="mb-0">{contact.notes}</p></div>
+              </div>
+            )}
+
+            <form onSubmit={addNote}>
+              <label className="form-label" htmlFor="crm-nota">Añadir nota</label>
+              <div className="input-group">
+                <input
+                  id="crm-nota"
+                  className="form-control"
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  placeholder="Escribe una nota sobre este contacto…"
+                />
+                <button type="submit" className="btn btn-primary" disabled={saving || !note.trim()}>
+                  Añadir
+                </button>
+              </div>
+            </form>
           </div>
-        ))}
+        ) : null}
       </div>
-
-      {contact.tags.length > 0 && (
-        <div className="flex flex-wrap gap-1">
-          {contact.tags.map((tag) => (
-            <span key={tag} className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">{tag}</span>
-          ))}
-        </div>
-      )}
-
-      <NelvyonDsCard className="border-primary/20 bg-primary/5 p-3">
-        <p className="text-xs font-semibold uppercase tracking-wide text-primary">IA Copilot</p>
-        {copilotLoading ? (
-          <p className="mt-2 text-xs text-muted-foreground">Analizando contacto…</p>
-        ) : copilot ? (
-          <div className="mt-2 space-y-2 text-sm">
-            <p className="text-foreground">{copilot.summary}</p>
-            <p className="text-xs text-muted-foreground"><strong>Siguiente acción:</strong> {copilot.nextBestAction}</p>
-            <pre className="max-h-24 overflow-auto rounded bg-muted/20 p-2 text-xs text-muted-foreground whitespace-pre-wrap">{copilot.emailDraft}</pre>
-            <NelvyonDsButton size="sm" variant="ghost" onClick={() => void navigator.clipboard.writeText(copilot.emailDraft)}>
-              Copiar email
-            </NelvyonDsButton>
-          </div>
-        ) : (
-          <p className="mt-2 text-xs text-muted-foreground">Sin sugerencias</p>
-        )}
-      </NelvyonDsCard>
-
-      {contact.notes && (
-        <div className="rounded-lg bg-muted/10 p-3">
-          <p className="mb-1 text-xs text-muted-foreground">Notas</p>
-          <p className="text-sm text-foreground">{contact.notes}</p>
-        </div>
-      )}
-
-      <form onSubmit={addNote} className="mt-auto border-t border-border pt-4">
-        <p className="mb-2 text-xs font-medium text-muted-foreground">Añadir nota</p>
-        <div className="flex gap-2">
-          <input
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            placeholder="Escribe una nota sobre este contacto…"
-            className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
-          />
-          <NelvyonDsButton type="submit" disabled={saving || !note.trim()}>
-            Añadir
-          </NelvyonDsButton>
-        </div>
-      </form>
-    </div>
+    </Offcanvas>
   );
 }
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
 
 // ─── Dedupe panel ─────────────────────────────────────────────────────────────
 
@@ -378,42 +417,52 @@ function CrmDedupePanel({ onMerged }: { onMerged: () => void }) {
 
   if (loading) {
     return (
-      <NelvyonDsCard className="p-8">
-        <div className="h-24 animate-pulse rounded-xl bg-muted/30" />
-      </NelvyonDsCard>
+      <div className="card">
+        <div className="card-body d-flex align-items-center" role="status">
+          <div className="spinner-border text-primary me-3" aria-hidden="true" />
+          <span className="text-muted">Cargando duplicados…</span>
+        </div>
+      </div>
     );
   }
 
   if (groups.length === 0) {
     return (
-      <NelvyonDsCard className="p-10 text-center">
-        <p className="text-4xl">✨</p>
-        <p className="mt-3 text-lg font-semibold text-foreground">Sin duplicados detectados</p>
-        <p className="mt-1 text-sm text-muted-foreground">Los contactos se agrupan por email, teléfono o nombre normalizado.</p>
-      </NelvyonDsCard>
+      <div className="card">
+        <div className="card-body text-center py-4">
+          <h5 className="mb-1">Sin duplicados detectados</h5>
+          <p className="mb-0 text-muted fs-14">Los contactos se agrupan por email, teléfono o nombre normalizado.</p>
+        </div>
+      </div>
     );
   }
 
   return (
-    <div className="space-y-3">
-      <p className="text-sm text-muted-foreground">{groups.length} grupos de duplicados · fusiona para limpiar el CRM</p>
+    <>
+      <p className="text-muted fs-14">{groups.length} grupos de duplicados · fusiona para limpiar el CRM</p>
       {groups.map((g) => (
-        <NelvyonDsCard key={g.dedupeKey} className="flex flex-wrap items-center justify-between gap-3 p-4">
-          <div>
-            <p className="font-medium text-foreground">{g.email ?? g.dedupeKey}</p>
-            <p className="text-xs text-muted-foreground">{g.count} contactos · IDs: {g.contactIds.join(", ")}</p>
+        <div className="card" key={g.dedupeKey}>
+          <div className="card-body d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div>
+              <h6 className="mb-0">{g.email ?? g.dedupeKey}</h6>
+              <span className="text-muted fs-13">{g.count} contactos · IDs: {g.contactIds.join(", ")}</span>
+            </div>
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              disabled={merging === g.dedupeKey}
+              onClick={() => void mergeGroup(g)}
+            >
+              {merging === g.dedupeKey ? "Fusionando…" : "Fusionar (conservar el más antiguo)"}
+            </button>
           </div>
-          <NelvyonDsButton
-            disabled={merging === g.dedupeKey}
-            onClick={() => void mergeGroup(g)}
-          >
-            {merging === g.dedupeKey ? "Fusionando…" : "Fusionar (conservar el más antiguo)"}
-          </NelvyonDsButton>
-        </NelvyonDsCard>
+        </div>
       ))}
-    </div>
+    </>
   );
 }
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function SaasCrmPage() {
   const [contacts, setContacts] = useState<Contact[]>([]);
@@ -424,6 +473,10 @@ export default function SaasCrmPage() {
   const [selected, setSelected] = useState<Contact | null>(null);
   const [showNew, setShowNew] = useState(false);
   const [tab, setTab] = useState<"contacts" | "pipeline" | "dedupe">("contacts");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isClient, setIsClient] = useState(false);
+  const filtroRef = useRef<HTMLDivElement>(null);
+  const [mostrarFiltro, setMostrarFiltro] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -445,154 +498,254 @@ export default function SaasCrmPage() {
   }, [search, statusFilter]);
 
   useEffect(() => { void load(); }, [load]);
+  useEffect(() => { setIsClient(true); }, []);
+  useEffect(() => { setCurrentPage(1); }, [search, statusFilter, tab]);
 
   const totalValue = contacts.reduce((s, c) => s + (c.value ?? 0), 0);
 
+  // Paginacion de la plantilla (`recordsPage`, `prePage`, `changeCPage`, `nextPage`).
+  const lastIndex = currentPage * REGISTROS_POR_PAGINA;
+  const firstIndex = lastIndex - REGISTROS_POR_PAGINA;
+  const records = contacts.slice(firstIndex, lastIndex);
+  const npage = Math.max(1, Math.ceil(contacts.length / REGISTROS_POR_PAGINA));
+  const number = [...Array(npage + 1).keys()].slice(1);
+  function prePage() { if (currentPage !== 1) setCurrentPage(currentPage - 1); }
+  function changeCPage(id: number) { setCurrentPage(id); }
+  function nextPage() { if (currentPage !== npage) setCurrentPage(currentPage + 1); }
+
+  const csvlink = {
+    headers: [
+      { label: "Nombre", key: "name" },
+      { label: "Email", key: "email" },
+      { label: "Teléfono", key: "phone" },
+      { label: "Empresa", key: "company" },
+      { label: "Cargo", key: "position" },
+      { label: "Estado", key: "status" },
+      { label: "Etapa", key: "pipelineStage" },
+      { label: "Valor", key: "value" },
+    ],
+    data: contacts,
+    filename: "nelvyon-crm-contactos.csv",
+  };
+
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="crm" />}>
-      <div className="flex h-full flex-col gap-6 pb-8">
-        {/* Header */}
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-[#0084ff]/70">CRM</p>
-            <h1 className="mt-1 text-2xl font-bold text-white">Contactos</h1>
-            <p className="mt-0.5 text-sm text-white/40">{contacts.length} contactos · {eur(totalValue)} en pipeline</p>
-          </div>
-          <button
-            onClick={() => setShowNew(true)}
-            className="rounded-lg bg-gradient-to-r from-[#0084ff] to-[#0047ab] px-4 py-2 text-sm font-medium text-white shadow-[0_0_16px_rgba(0,132,255,0.3)] hover:shadow-[0_0_24px_rgba(0,132,255,0.4)] transition-all"
-          >
-            + Nuevo contacto
-          </button>
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {[
-            { label: "Total", value: contacts.length, accent: true },
-            { label: "Clientes", value: contacts.filter((c) => c.status === "client").length, accent: false },
-            { label: "Leads", value: contacts.filter((c) => c.status === "lead").length, accent: false },
-            { label: "Pipeline €", value: eur(totalValue), accent: false },
-          ].map(({ label, value, accent }) => (
-            <StatCard key={label} label={label} value={value} accent={accent} />
-          ))}
-        </div>
-
-        {/* Tabs */}
-        <div className="flex gap-0 border-b border-white/[0.07]">
-          {(["contacts", "pipeline", "dedupe"] as const).map((t) => (
-            <button
-              key={t}
-              type="button"
-              onClick={() => setTab(t)}
-              className={`px-5 py-2.5 text-sm font-medium transition-colors ${
-                tab === t
-                  ? "border-b-2 border-[#0084ff] text-[#0084ff]"
-                  : "text-white/40 hover:text-white/70"
-              }`}
-            >
-              {t === "contacts" ? "Contactos" : t === "pipeline" ? "Pipeline" : "Duplicados"}
-            </button>
-          ))}
-        </div>
-
-        {/* Dedupe view */}
-        {tab === "dedupe" && (
-          <CrmDedupePanel onMerged={() => void load()} />
-        )}
-
-        {/* Pipeline view */}
-        {tab === "pipeline" && (
-          <NelvyonDsCard className="p-5">
-            <PipelineBoard pipeline={pipeline} />
-          </NelvyonDsCard>
-        )}
-
-        {/* Contacts view */}
-        {tab === "contacts" && (
-          <>
-            <div className="flex flex-wrap gap-3">
-              <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Buscar por nombre, empresa o email…"
-                className="min-w-[220px] flex-1 rounded-lg border border-border bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
-              />
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as ContactStatus | "")}
-                className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
-              >
-                <option value="">Todos los estados</option>
-                {(Object.keys(STATUS_LABELS) as ContactStatus[]).map((s) => (
-                  <option key={s} value={s}>{STATUS_LABELS[s]}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="flex flex-1 gap-4 overflow-hidden">
-              <div className={`flex flex-col gap-2 overflow-y-auto ${selected ? "w-1/2" : "w-full"}`}>
-                {loading ? (
-                  Array.from({ length: 5 }).map((_, i) => (
-                    <div key={i} className="h-20 animate-pulse rounded-xl bg-muted/30" />
-                  ))
-                ) : contacts.length === 0 ? (
-                  <NelvyonDsCard className="p-16 text-center">
-                    <p className="text-5xl">👥</p>
-                    <p className="mt-4 text-lg font-semibold text-foreground">Sin contactos todavía</p>
-                    <p className="mt-2 text-sm text-muted-foreground">Añade tu primer contacto para empezar</p>
-                    <NelvyonDsButton className="mt-5" onClick={() => setShowNew(true)}>
-                      + Añadir contacto
-                    </NelvyonDsButton>
-                  </NelvyonDsCard>
-                ) : (
-                  contacts.map((c) => (
-                    <button
-                      key={c.id}
-                      type="button"
-                      onClick={() => setSelected(c)}
-                      className={`w-full rounded-xl border p-4 text-left transition-all ${
-                        selected?.id === c.id
-                          ? "border-primary bg-primary/5"
-                          : "border-border bg-card hover:border-primary/40 hover:bg-muted/20"
-                      }`}
-                    >
-                      <div className="flex items-start gap-3">
-                        <Avatar name={c.name} />
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center justify-between gap-2">
-                            <p className="truncate font-medium text-foreground">{c.name}</p>
-                            <NelvyonDsBadge tone={STATUS_TONE[c.status]}>
-                              {STATUS_LABELS[c.status]}
-                            </NelvyonDsBadge>
-                          </div>
-                          {c.company && (
-                            <p className="mt-0.5 truncate text-sm text-muted-foreground">{c.company}</p>
-                          )}
-                          {c.email && (
-                            <p className="mt-0.5 truncate text-xs text-muted-foreground">{c.email}</p>
-                          )}
-                          {c.value > 0 && (
-                            <p className="mt-1 text-xs font-semibold text-primary">{eur(c.value)}</p>
-                          )}
-                        </div>
-                      </div>
-                    </button>
-                  ))
-                )}
+    <SaasW3crmShell>
+      <W3crmPageTitle
+        mainTitle="CRM"
+        parentTitle="SaaS"
+        pageTitle="Contactos"
+        actionLabel="+ Nuevo contacto"
+        onAction={() => setShowNew(true)}
+      />
+      <div className="container-fluid">
+        <div className="row">
+          <div className="col-xl-12 bst-seller">
+            <div className="d-flex align-items-center justify-content-between mb-4">
+              <h4 className="heading mb-0">
+                Contactos <span className="text-muted fs-14">· {contacts.length} · {eur(totalValue)} en pipeline</span>
+              </h4>
+              <div className="d-flex align-items-center">
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm me-2"
+                  aria-expanded={mostrarFiltro}
+                  onClick={() => setMostrarFiltro((v) => !v)}
+                >
+                  <i className="fa-solid fa-filter me-2"></i>Filtrar
+                </button>
+                <Link
+                  href="#"
+                  scroll={false}
+                  className="btn btn-primary btn-sm ms-2"
+                  onClick={(e) => { e.preventDefault(); setShowNew(true); }}
+                >
+                  + Nuevo contacto
+                </Link>
               </div>
-
-              {selected && (
-                <NelvyonDsCard className="w-1/2 overflow-y-auto p-5">
-                  <ContactDetail contact={selected} onClose={() => setSelected(null)} />
-                </NelvyonDsCard>
-              )}
             </div>
-          </>
-        )}
+
+            {mostrarFiltro && (
+              <div className="card" ref={filtroRef}>
+                <div className="card-body">
+                  <div className="row">
+                    <div className="col-xl-8 mb-2">
+                      <label className="form-label" htmlFor="crm-buscar">Buscar</label>
+                      <input
+                        id="crm-buscar"
+                        className="form-control"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        placeholder="Buscar por nombre, empresa o email…"
+                      />
+                    </div>
+                    <div className="col-xl-4 mb-2">
+                      <label className="form-label" htmlFor="crm-estado">Estado</label>
+                      <select
+                        id="crm-estado"
+                        className="form-control"
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value as ContactStatus | "")}
+                      >
+                        <option value="">Todos los estados</option>
+                        {(Object.keys(STATUS_LABELS) as ContactStatus[]).map((s) => (
+                          <option key={s} value={s}>{STATUS_LABELS[s]}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <ul className="nav nav-tabs mb-3" role="tablist">
+              {([
+                ["contacts", "Contactos"],
+                ["pipeline", "Pipeline"],
+                ["dedupe", "Duplicados"],
+              ] as const).map(([id, label]) => (
+                <li className="nav-item" key={id} role="presentation">
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={tab === id}
+                    className={`nav-link ${tab === id ? "active" : ""}`}
+                    onClick={() => setTab(id)}
+                  >
+                    {label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+
+            {tab === "dedupe" && <CrmDedupePanel onMerged={() => void load()} />}
+
+            {tab === "pipeline" && <PipelineBoard pipeline={pipeline} />}
+
+            {tab === "contacts" && (
+              <div className="card">
+                <div className="card-body p-0">
+                  <div className="table-responsive active-projects style-1 dt-filter exports">
+                    <div className="tbl-caption">
+                      <div>
+                        {isClient && contacts.length > 0 && (
+                          <CSVLink {...csvlink} className="btn btn-primary light btn-sm me-2">
+                            <i className="fa-solid fa-file-excel" /> Exportar
+                          </CSVLink>
+                        )}
+                      </div>
+                    </div>
+                    <div id="contacts-tbl_wrapper" className="dataTables_wrapper no-footer">
+                      {loading ? (
+                        <div className="d-flex align-items-center justify-content-center py-5" role="status">
+                          <div className="spinner-border text-primary me-3" aria-hidden="true" />
+                          <span className="text-muted">Cargando contactos…</span>
+                        </div>
+                      ) : contacts.length === 0 ? (
+                        <div className="text-center py-5">
+                          <h5 className="mb-1">Sin contactos todavía</h5>
+                          <p className="text-muted fs-14">Añade tu primer contacto para empezar</p>
+                          <button type="button" className="btn btn-primary btn-sm" onClick={() => setShowNew(true)}>
+                            + Añadir contacto
+                          </button>
+                        </div>
+                      ) : (
+                        <>
+                          <table id="crm-tbl" className="table shorting">
+                            <thead>
+                              <tr>
+                                <th>Contacto</th>
+                                <th>Email</th>
+                                <th>Teléfono</th>
+                                <th>Empresa</th>
+                                <th>Etapa</th>
+                                <th>Valor</th>
+                                <th>Estado</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {records.map((item) => (
+                                <tr key={item.id} onClick={() => setSelected(item)} style={{ cursor: "pointer" }}>
+                                  <td>
+                                    <div className="products">
+                                      <Avatar name={item.name} />
+                                      <div>
+                                        <h6>{item.name}</h6>
+                                        <span>{item.position ?? "—"}</span>
+                                      </div>
+                                    </div>
+                                  </td>
+                                  <td>
+                                    {item.email ? (
+                                      <span className="text-primary">{item.email}</span>
+                                    ) : (
+                                      <span>—</span>
+                                    )}
+                                  </td>
+                                  <td><span>{item.phone ?? "—"}</span></td>
+                                  <td><span>{item.company ?? "—"}</span></td>
+                                  <td><span>{STAGE_LABELS[item.pipelineStage]}</span></td>
+                                  <td><span>{item.value > 0 ? eur(item.value) : "—"}</span></td>
+                                  <td>
+                                    <span className={`badge light border-0 badge-${STATUS_TONE[item.status]}`}>
+                                      {STATUS_LABELS[item.status]}
+                                    </span>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                          <div className="d-sm-flex text-center justify-content-between align-items-center">
+                            <div className="dataTables_info">
+                              Mostrando {firstIndex + 1} a {Math.min(lastIndex, contacts.length)} de {contacts.length} contactos
+                            </div>
+                            <div
+                              className="dataTables_paginate paging_simple_numbers justify-content-center"
+                              id="crm-tbl_paginate"
+                            >
+                              <Link
+                                className={`paginate_button previous ${currentPage === 1 ? "disabled" : ""}`}
+                                href="#"
+                                scroll={false}
+                                onClick={(e) => { e.preventDefault(); prePage(); }}
+                              >
+                                <i className="fa-solid fa-angle-left" />
+                              </Link>
+                              <span>
+                                {number.map((n) => (
+                                  <Link
+                                    href="#"
+                                    scroll={false}
+                                    key={n}
+                                    className={`paginate_button ${currentPage === n ? "current" : ""} `}
+                                    onClick={(e) => { e.preventDefault(); changeCPage(n); }}
+                                  >
+                                    {n}
+                                  </Link>
+                                ))}
+                              </span>
+                              <Link
+                                className={`paginate_button next ${currentPage === npage ? "disabled" : ""}`}
+                                href="#"
+                                scroll={false}
+                                onClick={(e) => { e.preventDefault(); nextPage(); }}
+                              >
+                                <i className="fa-solid fa-angle-right" />
+                              </Link>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
-      {showNew && <NewContactModal onClose={() => setShowNew(false)} onSaved={load} />}
-    </SaasShellLayout>
+      <NewContactOffcanvas show={showNew} onClose={() => setShowNew(false)} onSaved={load} />
+      <ContactDetailOffcanvas contact={selected} onClose={() => setSelected(null)} />
+    </SaasW3crmShell>
   );
 }

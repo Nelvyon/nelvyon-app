@@ -30,12 +30,12 @@ export function ChatbotWidget() {
     <>
       <button
         aria-label="Abrir chat de ayuda"
-        className="nelvyon-glow-btn fixed bottom-6 right-6 z-[100] flex h-14 w-14 items-center justify-center rounded-full text-white shadow-lg transition hover:scale-105"
+        className="fixed bottom-6 right-6 z-[100] flex h-12 w-12 items-center justify-center rounded-full text-white transition hover:scale-[1.03]"
         onClick={() => setOpen(true)}
-        style={{ backgroundColor: BRAND.blue }}
+        style={{ backgroundColor: "#0084FF", boxShadow: "0 10px 28px rgba(0,132,255,0.35)" }}
         type="button"
       >
-        <MessageCircle className="h-6 w-6" />
+        <MessageCircle className="h-5 w-5" />
       </button>
 
       {open ? (

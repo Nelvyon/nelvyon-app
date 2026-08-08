@@ -1,13 +1,56 @@
 "use client";
 
+/**
+ * /saas/funnels sobre `(cms)/content` de W3CRM, con las piezas ya portadas.
+ * Mapeo: listado, plantillas, pasos, editor, A/B y analytics ->
+ * `W3crmContentBox`; listado y rendimiento -> `W3crmDataTable`; alta ->
+ * `W3crmModal`; KPIs -> `W3crmKpiTile`. Sin componentes nuevos.
+ *
+ * CONTRATO — `saas-funnels-depth.spec.ts`:
+ *   - `getByText("E2E Test Funnel")`: el nombre del funnel se pinta sin truncar.
+ *   - `getByRole("button", { name: "Abrir builder" })` ÚNICO.
+ *   - `getByRole("button", { name: "Analytics" })` ÚNICO: es la pestaña del
+ *     builder. Por eso NINGUNA caja se titula "Analytics" — el toggle expone
+ *     `aria-label="Plegar <título>"` y sería un segundo botón con ese nombre.
+ *   - `getByText("Visitas totales")` ÚNICO. Ese texto existe en DOS sitios: el
+ *     KPI del listado y el panel de rendimiento. Se conserva la exclusión mutua
+ *     original —el builder hace `return` antes del listado—, así que nunca
+ *     coexisten. Tampoco hay ninguna caja titulada así.
+ *   - Los pasos se verifican por fila de tabla (`getByRole("row", …)`): el
+ *     sidebar expone un enlace "Formularios" que contiene "Formulario" como
+ *     subcadena, y el panel de rendimiento es ahora una tabla W3CRM real.
+ *
+ * SANEADO — mismo criterio que `f89c198c`: `null` es "sin dato" y se pinta
+ * "—"; no se inventan ceros; ningún `.toLocaleString()` ni `.toFixed()` recae
+ * sobre datos sin normalizar. Cubre `analytics.totalVisitors`,
+ * `analytics.totalConversions`, `f.totalVisitors`, `f.totalConversions`,
+ * `totalVisitors` y `overallCvr`, que eran el crash latente auditado.
+ *
+ * Lógica de NELVYON intacta: `GET/POST /api/saas/funnels`,
+ * `GET/POST/DELETE /api/saas/funnels/{id}` con TODAS sus acciones (`step`,
+ * `update_step` —también para reordenar—, `delete_step`, `add-variant`,
+ * `update-variant-weight`, `publish`, `pause`), `?resource=variants&stepId=`,
+ * `?resource=analytics`, `GET/POST /api/saas/funnels/templates` con su
+ * `action: "import"`; el `credentials: "same-origin"` de cada llamada; la
+ * apertura del builder por `?id=` y su sincronización con la URL; el copiado
+ * de la URL pública `/f/{slug}`; los seis tipos de paso; y los avisos de 2 s.
+ *
+ * Único cambio de comportamiento: el `window.confirm()` del borrado pasa al
+ * diálogo de sweetalert2 que ya usa el resto del SaaS migrado.
+ */
 import { useCallback, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard } from "@/design-system/components";
-import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+import Alert from "sweetalert2";
 
-// ─── Types ──────────────────────────────────────────────────────────────────
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmEmptyState, W3crmKpiTile } from "@/features/saas-w3crm/components/W3crmUi";
+import {
+  W3crmCargando,
+  W3crmContentBox,
+  W3crmDataTable,
+  W3crmModal,
+} from "@/features/saas-w3crm/components/W3crmContentBox";
 
 type FunnelStatus = "draft" | "active" | "paused" | "archived";
 type StepType = "landing" | "form" | "video" | "checkout" | "upsell" | "thankyou";
@@ -38,23 +81,53 @@ interface Analytics {
   steps: AnalyticsStep[];
 }
 
-// ─── Constants ───────────────────────────────────────────────────────────────
-
-const STEP_TYPES: { type: StepType; label: string; icon: string }[] = [
-  { type: "landing", label: "Landing Page", icon: "🏠" },
-  { type: "form", label: "Formulario", icon: "📋" },
-  { type: "video", label: "Video VSL", icon: "🎥" },
-  { type: "checkout", label: "Checkout", icon: "💳" },
-  { type: "upsell", label: "Upsell", icon: "⬆️" },
-  { type: "thankyou", label: "Gracias", icon: "✅" },
+const STEP_TYPES: { type: StepType; label: string; icono: string }[] = [
+  { type: "landing", label: "Landing Page", icono: "fa-solid fa-house" },
+  { type: "form", label: "Formulario", icono: "fa-solid fa-clipboard-list" },
+  { type: "video", label: "Video VSL", icono: "fa-solid fa-video" },
+  { type: "checkout", label: "Checkout", icono: "fa-solid fa-credit-card" },
+  { type: "upsell", label: "Upsell", icono: "fa-solid fa-arrow-up" },
+  { type: "thankyou", label: "Gracias", icono: "fa-solid fa-circle-check" },
 ];
 
-const inputCls = "w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/60";
-const labelCls = "block text-[10px] uppercase tracking-wider text-muted-foreground mb-1";
-const statusTone = (s: FunnelStatus) => s === "active" ? "success" : s === "paused" ? "warning" : "neutral";
+/** Un tipo fuera de catálogo hacía estallar el `!` de `STEP_TYPES.find`. */
+function stepCfg(type: unknown) {
+  return STEP_TYPES.find((s) => s.type === type) ?? {
+    type: "landing" as StepType, label: String(type ?? "—"), icono: "fa-solid fa-file",
+  };
+}
+function statusBadge(s: FunnelStatus): string {
+  return s === "active" ? "badge-success" : s === "paused" ? "badge-warning" : "badge-secondary";
+}
+function statusLabel(s: FunnelStatus): string {
+  return s === "active" ? "Activo" : s === "paused" ? "Pausado" : "Borrador";
+}
+/** Saneado de `f89c198c`: nada llega crudo a `toLocaleString`/`toFixed`. */
+function num(v: unknown): number {
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+/** `null` = sin dato. Se pinta "—", nunca 0. */
+function opt(v: unknown): number | null {
+  if (v === null || v === undefined) return null;
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+function miles(v: unknown): string {
+  const n = opt(v);
+  return n === null ? "—" : n.toLocaleString("es-ES");
+}
+function pct(v: unknown): string {
+  const n = opt(v);
+  return n === null ? "—" : `${n}%`;
+}
+function txt(v: unknown): string { return typeof v === "string" ? v : ""; }
+function barra(v: unknown, max: number): number {
+  const p = (num(v) / (max || 1)) * 100;
+  return Number.isFinite(p) ? Math.min(100, Math.max(0, p)) : 0;
+}
 
-// ─── New Funnel Modal ─────────────────────────────────────────────────────────
-
+// ── Nuevo funnel ─────────────────────────────────────────────────────────────
 function NewFunnelModal({ onClose, onSaved }: { onClose(): void; onSaved(id: string): void }) {
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
@@ -79,8 +152,10 @@ function NewFunnelModal({ onClose, onSaved }: { onClose(): void; onSaved(id: str
           ],
         }),
       });
-      if (!res.ok) throw new Error((await res.json() as { error?: string }).error ?? "Error al crear funnel");
-      const data = (await res.json()) as { funnel: Funnel };
+      // El cuerpo solo puede leerse una vez: se lee y luego se decide.
+      const data = (await res.json().catch(() => ({}))) as { funnel?: Funnel; error?: string };
+      if (!res.ok) throw new Error(data.error ?? "Error al crear funnel");
+      if (!data.funnel?.id) throw new Error("Respuesta sin funnel");
       onSaved(data.funnel.id);
       onClose();
     } catch (err) { setError(err instanceof Error ? err.message : "Error"); }
@@ -88,44 +163,48 @@ function NewFunnelModal({ onClose, onSaved }: { onClose(): void; onSaved(id: str
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm">
-      <div className="my-8 w-full max-w-md rounded-2xl border border-border bg-card shadow-2xl">
-        <div className="flex items-center justify-between border-b border-border px-5 py-4">
-          <h2 className="text-base font-semibold text-foreground">Nuevo funnel</h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
+    <W3crmModal titulo="Nuevo funnel" onClose={onClose} error={error}>
+      <form onSubmit={(e) => void save(e)}>
+        <div className="form-group mb-3">
+          <label htmlFor="fn-nombre" className="text-black font-w600">
+            Nombre <span className="required">*</span>
+          </label>
+          <input id="fn-nombre" className="form-control" autoFocus
+            placeholder="Funnel de captación de leads"
+            value={name} onChange={(e) => setName(e.target.value)} />
         </div>
-        <form onSubmit={save} className="space-y-4 p-5">
-          {error && <p className="rounded-lg bg-destructive/10 px-3 py-2 text-xs text-destructive">{error}</p>}
-          <div>
-            <label className={labelCls}>Nombre *</label>
-            <input value={name} onChange={e => setName(e.target.value)} placeholder="Funnel de captación de leads" className={inputCls} autoFocus />
-          </div>
-          <div>
-            <label className={labelCls}>Descripción</label>
-            <input value={desc} onChange={e => setDesc(e.target.value)} placeholder="Descripción opcional" className={inputCls} />
-          </div>
-          <div className="flex gap-3 pt-2">
-            <NelvyonDsButton type="button" variant="secondary" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
-            <NelvyonDsButton type="submit" disabled={saving} className="flex-1">{saving ? "Creando…" : "Crear funnel"}</NelvyonDsButton>
-          </div>
-        </form>
-      </div>
-    </div>
+        <div className="form-group mb-3">
+          <label htmlFor="fn-desc" className="text-black font-w600">Descripción</label>
+          <input id="fn-desc" className="form-control" placeholder="Descripción opcional"
+            value={desc} onChange={(e) => setDesc(e.target.value)} />
+        </div>
+        <div className="text-end">
+          <button type="button" className="btn btn-primary light me-2" onClick={onClose}>Cancelar</button>
+          <button type="submit" className="btn btn-primary" disabled={saving}>
+            {saving ? "Creando…" : "Crear funnel"}
+          </button>
+        </div>
+      </form>
+    </W3crmModal>
   );
 }
 
-// ─── Step Editor Panel ────────────────────────────────────────────────────────
-
-function StepEditor({
-  step, funnelId, onUpdated,
-}: { step: FunnelStep; funnelId: string; onUpdated(s: FunnelStep): void }) {
-  const [form, setForm] = useState({ name: step.name, content: step.content ?? "", ctaLabel: step.ctaLabel ?? "", ctaUrl: step.ctaUrl ?? "" });
+// ── Editor de un paso ────────────────────────────────────────────────────────
+function StepEditor({ step, funnelId, onUpdated }: {
+  step: FunnelStep; funnelId: string; onUpdated(s: FunnelStep): void;
+}) {
+  const [form, setForm] = useState({
+    name: txt(step.name), content: step.content ?? "",
+    ctaLabel: step.ctaLabel ?? "", ctaUrl: step.ctaUrl ?? "",
+  });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  // Sync when step changes
   useEffect(() => {
-    setForm({ name: step.name, content: step.content ?? "", ctaLabel: step.ctaLabel ?? "", ctaUrl: step.ctaUrl ?? "" });
+    setForm({
+      name: txt(step.name), content: step.content ?? "",
+      ctaLabel: step.ctaLabel ?? "", ctaUrl: step.ctaUrl ?? "",
+    });
   }, [step.id, step.name, step.content, step.ctaLabel, step.ctaUrl]);
 
   async function saveStep() {
@@ -142,64 +221,61 @@ function StepEditor({
         }),
       });
       if (!res.ok) throw new Error("Error al guardar");
-      const data = (await res.json()) as { step: FunnelStep };
-      onUpdated(data.step);
+      const data = (await res.json().catch(() => ({}))) as { step?: FunnelStep };
+      if (data.step) onUpdated(data.step);
       setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
+      window.setTimeout(() => setSaved(false), 2000);
     } finally { setSaving(false); }
   }
 
-  const cfg = STEP_TYPES.find(s => s.type === step.type)!;
+  const cfg = stepCfg(step.type);
 
   return (
-    <NelvyonDsCard className="space-y-3">
-      <div className="flex items-center gap-2 mb-1">
-        <span className="text-xl">{cfg.icon}</span>
-        <span className="text-sm font-semibold text-foreground">{cfg.label}</span>
-        <span className="ml-auto text-[10px] text-muted-foreground">Paso {step.stepOrder + 1}</span>
+    /* El título no puede ser "Analytics" ni "Visitas totales" (ver cabecera). */
+    <W3crmContentBox titulo={`Configuración del paso · ${cfg.label}`} icono={cfg.icono}>
+      <p className="fs-12 text-muted">Paso {num(step.stepOrder) + 1}</p>
+      <div className="form-group mb-3">
+        <label htmlFor="fn-step-nombre" className="text-black font-w600">Nombre del paso</label>
+        <input id="fn-step-nombre" className="form-control"
+          value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
       </div>
-      <div>
-        <label className={labelCls}>Nombre del paso</label>
-        <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} className={inputCls} />
-      </div>
-      <div>
-        <label className={labelCls}>
+      <div className="form-group mb-3">
+        <label htmlFor="fn-step-contenido" className="text-black font-w600">
           {step.type === "checkout" ? "Configuración checkout (JSON)" : "Contenido HTML"}
         </label>
-        <textarea
-          value={form.content}
-          onChange={e => setForm(f => ({ ...f, content: e.target.value }))}
-          rows={5}
-          placeholder={
-            step.type === "checkout"
-              ? '{"amount":9900,"currency":"eur","productName":"Oferta"}'
-              : "<h1>Tu oferta</h1><p>Descripción…</p>"
-          }
-          className={inputCls + " resize-y font-mono text-xs"}
-        />
+        <textarea id="fn-step-contenido" className="form-control" rows={5}
+          placeholder={step.type === "checkout"
+            ? '{"amount":9900,"currency":"eur","productName":"Oferta"}'
+            : "<h1>Tu oferta</h1><p>Descripción…</p>"}
+          value={form.content} onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))} />
       </div>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div>
-          <label className={labelCls}>CTA Label</label>
-          <input value={form.ctaLabel} onChange={e => setForm(f => ({ ...f, ctaLabel: e.target.value }))} placeholder="Siguiente →" className={inputCls} />
+      <div className="row">
+        <div className="col-sm-6">
+          <div className="form-group mb-3">
+            <label htmlFor="fn-step-cta" className="text-black font-w600">CTA Label</label>
+            <input id="fn-step-cta" className="form-control" placeholder="Siguiente →"
+              value={form.ctaLabel} onChange={(e) => setForm((f) => ({ ...f, ctaLabel: e.target.value }))} />
+          </div>
         </div>
-        <div>
-          <label className={labelCls}>CTA URL (opcional)</label>
-          <input value={form.ctaUrl} onChange={e => setForm(f => ({ ...f, ctaUrl: e.target.value }))} placeholder="https://…" className={inputCls} />
+        <div className="col-sm-6">
+          <div className="form-group mb-3">
+            <label htmlFor="fn-step-url" className="text-black font-w600">CTA URL (opcional)</label>
+            <input id="fn-step-url" className="form-control" placeholder="https://…"
+              value={form.ctaUrl} onChange={(e) => setForm((f) => ({ ...f, ctaUrl: e.target.value }))} />
+          </div>
         </div>
       </div>
-      <div className="flex items-center gap-3 pt-1">
-        <NelvyonDsButton onClick={() => void saveStep()} disabled={saving}>
+      <div className="text-end">
+        {saved && <span className="text-success fs-12 me-2">Guardado</span>}
+        <button type="button" className="btn btn-primary" disabled={saving} onClick={() => void saveStep()}>
           {saving ? "Guardando…" : "Guardar paso"}
-        </NelvyonDsButton>
-        {saved && <span className="text-xs text-success">✓ Guardado</span>}
+        </button>
       </div>
-    </NelvyonDsCard>
+    </W3crmContentBox>
   );
 }
 
-// ─── AB Variant Panel ─────────────────────────────────────────────────────────
-
+// ── Variantes A/B ────────────────────────────────────────────────────────────
 function AbVariantPanel({ step, funnelId }: { step: FunnelStep; funnelId: string }) {
   const [variants, setVariants] = useState<FunnelVariant[]>([]);
   const [loading, setLoading] = useState(true);
@@ -208,27 +284,28 @@ function AbVariantPanel({ step, funnelId }: { step: FunnelStep; funnelId: string
   useEffect(() => {
     setLoading(true);
     void fetch(`/api/saas/funnels/${funnelId}?resource=variants&stepId=${step.id}`, { credentials: "same-origin" })
-      .then(r => r.json() as Promise<{ variants: FunnelVariant[] }>)
-      .then(d => setVariants(d.variants ?? []))
+      .then((r) => r.json() as Promise<{ variants?: FunnelVariant[] }>)
+      .then((d) => setVariants(Array.isArray(d?.variants) ? d.variants : []))
+      .catch(() => setVariants([]))
       .finally(() => setLoading(false));
   }, [step.id, funnelId]);
 
   async function enableAb() {
     setSaving(true);
     try {
-      await fetch(`/api/saas/funnels/${funnelId}`, {
-        method: "POST", credentials: "same-origin",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "add-variant", step_id: step.id, variant_key: "A", weight_pct: 50, content: { html: "", ctaLabel: "", ctaUrl: "" } }),
-      });
-      await fetch(`/api/saas/funnels/${funnelId}`, {
-        method: "POST", credentials: "same-origin",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "add-variant", step_id: step.id, variant_key: "B", weight_pct: 50, content: { html: "", ctaLabel: "", ctaUrl: "" } }),
-      });
+      for (const variantKey of ["A", "B"] as const) {
+        await fetch(`/api/saas/funnels/${funnelId}`, {
+          method: "POST", credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "add-variant", step_id: step.id, variant_key: variantKey,
+            weight_pct: 50, content: { html: "", ctaLabel: "", ctaUrl: "" },
+          }),
+        });
+      }
       const res = await fetch(`/api/saas/funnels/${funnelId}?resource=variants&stepId=${step.id}`, { credentials: "same-origin" });
-      const data = (await res.json()) as { variants: FunnelVariant[] };
-      setVariants(data.variants ?? []);
+      const data = (await res.json().catch(() => ({}))) as { variants?: FunnelVariant[] };
+      setVariants(Array.isArray(data.variants) ? data.variants : []);
     } finally { setSaving(false); }
   }
 
@@ -238,131 +315,162 @@ function AbVariantPanel({ step, funnelId }: { step: FunnelStep; funnelId: string
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "update-variant-weight", variant_id: variantId, weight_pct: weightPct }),
     });
-    setVariants(vs => vs.map(v => v.id === variantId ? { ...v, weightPct } : v));
-  }
-
-  if (loading) return <NelvyonDsCard><p className="text-xs text-muted-foreground">Cargando variantes…</p></NelvyonDsCard>;
-
-  if (!variants.length) {
-    return (
-      <NelvyonDsCard>
-        <p className="text-xs text-muted-foreground mb-3">A/B testing no activado para este paso.</p>
-        <NelvyonDsButton onClick={() => void enableAb()} disabled={saving} variant="secondary">
-          {saving ? "Activando…" : "Activar A/B para este paso"}
-        </NelvyonDsButton>
-      </NelvyonDsCard>
-    );
+    setVariants((vs) => vs.map((v) => (v.id === variantId ? { ...v, weightPct } : v)));
   }
 
   return (
-    <NelvyonDsCard className="space-y-4">
-      <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">A/B Testing activo</p>
-      {variants.map(v => (
-        <div key={v.id} className="space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold text-foreground">Variante {v.variantKey}</span>
-            <span className="text-xs text-muted-foreground">{v.visitors} vis · {v.conversions} conv</span>
+    <W3crmContentBox titulo="A/B Testing del paso" icono="fa-solid fa-code-compare">
+      {loading ? (
+        <W3crmCargando texto="Cargando variantes…" />
+      ) : variants.length === 0 ? (
+        <>
+          <W3crmEmptyState title="A/B testing no activado" description="Este paso sirve una única versión." />
+          <div className="text-center">
+            <button type="button" className="btn btn-primary light btn-sm" disabled={saving}
+              onClick={() => void enableAb()}>
+              {saving ? "Activando…" : "Activar A/B para este paso"}
+            </button>
           </div>
-          <div className="flex items-center gap-3">
-            <input
-              type="range" min={0} max={100} value={v.weightPct}
-              onChange={e => void updateWeight(v.id, Number(e.target.value))}
-              className="flex-1 accent-primary"
-            />
-            <span className="w-10 text-right text-sm font-semibold text-foreground">{v.weightPct}%</span>
-          </div>
-        </div>
-      ))}
-      <p className="text-[10px] text-muted-foreground">
-        Los pesos determinan la distribución de tráfico. Suma recomendada: 100%.
-      </p>
-    </NelvyonDsCard>
+        </>
+      ) : (
+        <>
+          {variants.map((v) => (
+            <div className="mb-3" key={v.id}>
+              <div className="d-flex align-items-center justify-content-between">
+                <span className="fw-bold">Variante {txt(v.variantKey) || "—"}</span>
+                <span className="text-muted fs-12">
+                  {miles(v.visitors)} vis · {miles(v.conversions)} conv
+                </span>
+              </div>
+              <div className="d-flex align-items-center gap-2">
+                <input type="range" className="form-range flex-grow-1" min={0} max={100}
+                  value={num(v.weightPct)}
+                  aria-label={`Peso de la variante ${v.variantKey}`}
+                  onChange={(e) => void updateWeight(v.id, Number(e.target.value))} />
+                <span className="fw-bold" style={{ minWidth: 46, textAlign: "right" }}>{num(v.weightPct)}%</span>
+              </div>
+            </div>
+          ))}
+          <p className="fs-12 text-muted mb-0">
+            Los pesos determinan la distribución de tráfico. Suma recomendada: 100%.
+          </p>
+        </>
+      )}
+    </W3crmContentBox>
   );
 }
 
-// ─── Analytics Tab ────────────────────────────────────────────────────────────
-
+// ── Rendimiento del embudo ───────────────────────────────────────────────────
 function AnalyticsPanel({ funnelId }: { funnelId: string }) {
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     void fetch(`/api/saas/funnels/${funnelId}?resource=analytics`, { credentials: "same-origin" })
-      .then(r => r.json() as Promise<{ analytics: Analytics }>)
-      .then(d => setAnalytics(d.analytics ?? null))
+      .then((r) => r.json() as Promise<{ analytics?: Analytics }>)
+      .then((d) => setAnalytics(d?.analytics && typeof d.analytics === "object" ? d.analytics : null))
+      .catch(() => setAnalytics(null))
       .finally(() => setLoading(false));
   }, [funnelId]);
 
-  if (loading) return <NelvyonDsCard><div className="h-24 animate-pulse rounded-lg bg-muted/20" /></NelvyonDsCard>;
-  if (!analytics) return <NelvyonDsCard><p className="text-sm text-muted-foreground">No hay datos de analytics.</p></NelvyonDsCard>;
-
-  const maxVisitors = Math.max(...analytics.steps.map(s => s.visitors), 1);
+  // `steps` podía no ser array y reventaba `.map`.
+  const steps = Array.isArray(analytics?.steps) ? analytics.steps : [];
+  const maxVisitors = Math.max(...steps.map((s) => num(s.visitors)), 1);
 
   return (
-    <NelvyonDsCard className="space-y-4">
-      <div className="flex gap-6">
-        <div>
-          <p className="text-[10px] uppercase text-muted-foreground">Visitas totales</p>
-          <p className="text-xl font-bold text-foreground">{analytics.totalVisitors.toLocaleString()}</p>
-        </div>
-        <div>
-          <p className="text-[10px] uppercase text-muted-foreground">Conversiones</p>
-          <p className="text-xl font-bold text-foreground">{analytics.totalConversions.toLocaleString()}</p>
-        </div>
-        <div>
-          <p className="text-[10px] uppercase text-muted-foreground">CVR global</p>
-          <p className="text-xl font-bold text-primary">{analytics.overallCvr}%</p>
-        </div>
-      </div>
-      <div className="space-y-2">
-        {analytics.steps.map(s => (
-          <div key={s.id} className="space-y-1">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-muted-foreground font-medium">{s.name}</span>
-              <span className="text-muted-foreground">{s.visitors} · CVR {s.cvr}% {s.dropOff > 0 && <span className="text-destructive">· ↓{s.dropOff}%</span>}</span>
+    /* NUNCA titular esta caja "Analytics" ni "Visitas totales". */
+    <W3crmContentBox titulo="Rendimiento del embudo" icono="fa-solid fa-chart-line">
+      {loading ? (
+        <W3crmCargando texto="Cargando analytics…" />
+      ) : !analytics ? (
+        <W3crmEmptyState title="Sin datos de analytics" />
+      ) : (
+        <>
+          <div className="row">
+            {/* "Visitas totales" solo existe aquí cuando el builder está
+                montado; el KPI del listado no se renderiza a la vez. */}
+            <div className="col-xl-4 col-sm-4">
+              <W3crmKpiTile label="Visitas totales" value={miles(analytics.totalVisitors)} />
             </div>
-            <div className="h-2 rounded-full bg-muted/20 overflow-hidden">
-              <div
-                className="h-full rounded-full bg-primary"
-                style={{ width: `${(s.visitors / maxVisitors) * 100}%` }}
-              />
+            <div className="col-xl-4 col-sm-4">
+              <W3crmKpiTile label="Conversiones" value={miles(analytics.totalConversions)} accent />
             </div>
-            {s.variants.length > 0 && (
-              <div className="flex gap-3 pl-2 mt-0.5">
-                {s.variants.map(v => (
-                  <span key={v.variantKey} className="text-[10px] text-muted-foreground">
-                    {v.variantKey}: {v.visitors} vis · CVR {v.cvr}%
-                  </span>
-                ))}
-              </div>
-            )}
+            <div className="col-xl-4 col-sm-4">
+              <W3crmKpiTile label="CVR global" value={pct(analytics.overallCvr)} />
+            </div>
           </div>
-        ))}
-      </div>
-    </NelvyonDsCard>
+
+          {steps.length === 0 ? (
+            <W3crmEmptyState title="Sin pasos medidos" />
+          ) : (
+            <W3crmDataTable
+              filas={steps}
+              etiqueta="pasos"
+              wrapperId="fn_analytics_wrapper"
+              porPagina={10}
+              columnas={[
+                { titulo: "Paso" }, { titulo: "Visitas" }, { titulo: "CVR" },
+                { titulo: "Variantes" }, { titulo: "Peso", alFinal: true },
+              ]}
+              render={(s) => {
+                const vars = Array.isArray(s.variants) ? s.variants : [];
+                const drop = opt(s.dropOff);
+                return (
+                  <tr key={s.id}>
+                    <td>
+                      <span className="fw-bold">{txt(s.name) || "—"}</span>
+                      {drop !== null && drop > 0 ? (
+                        <div className="text-danger fs-12">↓{drop}% abandono</div>
+                      ) : null}
+                    </td>
+                    <td>{miles(s.visitors)}</td>
+                    <td>{pct(s.cvr)}</td>
+                    <td className="text-muted fs-12">
+                      {vars.length === 0 ? "—" : vars.map((v) => (
+                        <div key={v.variantKey}>
+                          {txt(v.variantKey)}: {miles(v.visitors)} vis · CVR {pct(v.cvr)}
+                        </div>
+                      ))}
+                    </td>
+                    <td className="text-end" style={{ minWidth: 90 }}>
+                      <div className="progress" style={{ height: 6 }}>
+                        <div className="progress-bar bg-primary" role="progressbar"
+                          style={{ width: `${barra(s.visitors, maxVisitors)}%` }}
+                          aria-valuenow={Math.round(barra(s.visitors, maxVisitors))}
+                          aria-valuemin={0} aria-valuemax={100}
+                          aria-label={`Peso de ${txt(s.name)}`} />
+                      </div>
+                    </td>
+                  </tr>
+                );
+              }}
+            />
+          )}
+        </>
+      )}
+    </W3crmContentBox>
   );
 }
 
-// ─── Builder View ─────────────────────────────────────────────────────────────
-
+// ── Builder ──────────────────────────────────────────────────────────────────
 function BuilderView({ funnel, onBack, onFunnelUpdated }: {
   funnel: Funnel; onBack(): void; onFunnelUpdated(f: Funnel): void;
 }) {
-  const [selectedStep, setSelectedStep] = useState<FunnelStep | null>(funnel.steps[0] ?? null);
+  const pasosIniciales = Array.isArray(funnel.steps) ? funnel.steps : [];
+  const [selectedStep, setSelectedStep] = useState<FunnelStep | null>(pasosIniciales[0] ?? null);
   const [builderTab, setBuilderTab] = useState<BuilderTab>("steps");
   const [abStep, setAbStep] = useState<FunnelStep | null>(null);
-  const [localSteps, setLocalSteps] = useState<FunnelStep[]>(funnel.steps);
+  const [localSteps, setLocalSteps] = useState<FunnelStep[]>(pasosIniciales);
   const [publishing, setPublishing] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
 
   async function moveStep(stepId: string, dir: "up" | "down") {
-    const idx = localSteps.findIndex(s => s.id === stepId);
+    const idx = localSteps.findIndex((s) => s.id === stepId);
     if (idx === -1) return;
     const targetIdx = dir === "up" ? idx - 1 : idx + 1;
     if (targetIdx < 0 || targetIdx >= localSteps.length) return;
     const newOrder = [...localSteps];
     const tmp = newOrder[idx]!; newOrder[idx] = newOrder[targetIdx]!; newOrder[targetIdx] = tmp;
-    // Update step orders
     await Promise.all(newOrder.map((s, i) =>
       fetch(`/api/saas/funnels/${funnel.id}`, {
         method: "POST", credentials: "same-origin",
@@ -371,19 +479,20 @@ function BuilderView({ funnel, onBack, onFunnelUpdated }: {
       }),
     ));
     setLocalSteps(newOrder.map((s, i) => ({ ...s, stepOrder: i })));
-    if (selectedStep?.id === stepId) setSelectedStep(prev => prev ? { ...prev, stepOrder: targetIdx } : prev);
+    if (selectedStep?.id === stepId) setSelectedStep((prev) => (prev ? { ...prev, stepOrder: targetIdx } : prev));
   }
 
   async function addStep(type: StepType) {
-    const cfg = STEP_TYPES.find(s => s.type === type)!;
+    const cfg = stepCfg(type);
     const res = await fetch(`/api/saas/funnels/${funnel.id}`, {
       method: "POST", credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "step", type, name: cfg.label }),
     });
     if (res.ok) {
-      const data = (await res.json()) as { step: FunnelStep };
-      setLocalSteps(prev => [...prev, data.step]);
+      const data = (await res.json().catch(() => ({}))) as { step?: FunnelStep };
+      const nuevo = data.step;
+      if (nuevo) setLocalSteps((prev) => [...prev, nuevo]);
     }
   }
 
@@ -394,7 +503,7 @@ function BuilderView({ funnel, onBack, onFunnelUpdated }: {
       body: JSON.stringify({ action: "delete_step", step_id: stepId }),
     });
     if (res.ok) {
-      setLocalSteps(prev => prev.filter(s => s.id !== stepId));
+      setLocalSteps((prev) => prev.filter((s) => s.id !== stepId));
       if (selectedStep?.id === stepId) setSelectedStep(null);
     }
   }
@@ -408,8 +517,8 @@ function BuilderView({ funnel, onBack, onFunnelUpdated }: {
         body: JSON.stringify({ action: "publish" }),
       });
       if (res.ok) {
-        const data = (await res.json()) as { funnel: Funnel };
-        onFunnelUpdated(data.funnel);
+        const data = (await res.json().catch(() => ({}))) as { funnel?: Funnel };
+        if (data.funnel) onFunnelUpdated(data.funnel);
       }
     } finally { setPublishing(false); }
   }
@@ -421,8 +530,8 @@ function BuilderView({ funnel, onBack, onFunnelUpdated }: {
       body: JSON.stringify({ action: "pause" }),
     });
     if (res.ok) {
-      const data = (await res.json()) as { funnel: Funnel };
-      onFunnelUpdated(data.funnel);
+      const data = (await res.json().catch(() => ({}))) as { funnel?: Funnel };
+      if (data.funnel) onFunnelUpdated(data.funnel);
     }
   }
 
@@ -430,144 +539,147 @@ function BuilderView({ funnel, onBack, onFunnelUpdated }: {
     const slug = funnel.publicSlug;
     if (!slug) return;
     const url = `${window.location.origin}/f/${slug}`;
-    void navigator.clipboard.writeText(url).then(() => {
+    // `clipboard` puede no existir sin permiso.
+    void navigator.clipboard?.writeText(url).then(() => {
       setCopySuccess(true);
-      setTimeout(() => setCopySuccess(false), 2000);
+      window.setTimeout(() => setCopySuccess(false), 2000);
     });
   }
 
   return (
-    <div className="space-y-4">
-      {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-3">
-        <button onClick={onBack} className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1">
-          ← Funnels
-        </button>
-        <h1 className="text-lg font-bold text-foreground flex-1">{funnel.name}</h1>
-        <NelvyonDsBadge tone={statusTone(funnel.status)}>
-          {funnel.status === "active" ? "Activo" : funnel.status === "paused" ? "Pausado" : "Borrador"}
-        </NelvyonDsBadge>
-        <div className="flex gap-2">
-          {funnel.status === "draft" && (
-            <NelvyonDsButton onClick={() => void publishFunnel()} disabled={publishing}>
-              {publishing ? "Publicando…" : "Publicar"}
-            </NelvyonDsButton>
-          )}
-          {funnel.status === "active" && (
-            <>
-              <NelvyonDsButton variant="secondary" onClick={() => void pauseFunnel()}>Pausar</NelvyonDsButton>
-              <NelvyonDsButton variant="secondary" onClick={copyPublicUrl}>
-                {copySuccess ? "✓ Copiado" : "Copiar URL pública"}
-              </NelvyonDsButton>
-            </>
-          )}
-        </div>
-      </div>
+    <>
+      <W3crmPageTitle mainTitle={txt(funnel.name) || "Funnel"} parentTitle="Captación" pageTitle="Builder" />
+      <div className="container-fluid">
+        <div className="row">
+          <div className="col-xl-12">
+            <div className="d-flex flex-wrap align-items-center gap-2 mb-3">
+              <button type="button" className="btn btn-primary light btn-sm" onClick={onBack}>← Funnels</button>
+              <span className={`badge ${statusBadge(funnel.status)}`}>{statusLabel(funnel.status)}</span>
+              <span className="ms-auto">
+                {funnel.status === "draft" && (
+                  <button type="button" className="btn btn-primary btn-sm me-1" disabled={publishing}
+                    onClick={() => void publishFunnel()}>
+                    {publishing ? "Publicando…" : "Publicar"}
+                  </button>
+                )}
+                {funnel.status === "active" && (
+                  <>
+                    <button type="button" className="btn btn-primary light btn-sm me-1"
+                      onClick={() => void pauseFunnel()}>Pausar</button>
+                    <button type="button" className="btn btn-primary light btn-sm" onClick={copyPublicUrl}>
+                      {copySuccess ? "Copiado" : "Copiar URL pública"}
+                    </button>
+                  </>
+                )}
+              </span>
+            </div>
 
-      {funnel.publicSlug && (
-        <NelvyonDsCard className="py-2">
-          <p className="text-[10px] uppercase text-muted-foreground mb-0.5">URL pública</p>
-          <code className="text-xs text-primary break-all">
-            {typeof window !== "undefined" ? window.location.origin : "https://app.nelvyon.com"}/f/{funnel.publicSlug}
-          </code>
-        </NelvyonDsCard>
-      )}
+            {funnel.publicSlug ? (
+              <div className="alert alert-primary py-2" role="note">
+                <span className="fs-12 d-block">URL pública</span>
+                <code className="text-break">
+                  {typeof window !== "undefined" ? window.location.origin : "https://app.nelvyon.com"}/f/{funnel.publicSlug}
+                </code>
+              </div>
+            ) : null}
 
-      {/* Tabs */}
-      <div className="flex gap-1 rounded-lg border border-border bg-muted/10 p-1 w-fit">
-        {(["steps", "analytics"] as BuilderTab[]).map(t => (
-          <button key={t} onClick={() => setBuilderTab(t)}
-            className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${builderTab === t ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground"}`}>
-            {t === "steps" ? "Editor de pasos" : "Analytics"}
-          </button>
-        ))}
-      </div>
+            {/* Pestañas: `<button>` sin `role`. "Analytics" es texto-contrato. */}
+            <ul className="nav nav-tabs mb-3">
+              {(["steps", "analytics"] as BuilderTab[]).map((t) => (
+                <li className="nav-item" key={t}>
+                  <button type="button" className={`nav-link ${builderTab === t ? "active" : ""}`}
+                    aria-pressed={builderTab === t} onClick={() => setBuilderTab(t)}>
+                    {t === "steps" ? "Editor de pasos" : "Analytics"}
+                  </button>
+                </li>
+              ))}
+            </ul>
 
-      {builderTab === "analytics" && <AnalyticsPanel funnelId={funnel.id} />}
+            {builderTab === "analytics" && <AnalyticsPanel funnelId={funnel.id} />}
 
-      {builderTab === "steps" && (
-        <div className="grid gap-4 lg:grid-cols-[280px_minmax(0,1fr)]">
-          {/* Steps sidebar */}
-          <div className="space-y-2">
-            <NelvyonDsCard>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3">Pasos ({localSteps.length})</p>
-              {localSteps.length === 0 && (
-                <p className="text-xs text-muted-foreground">Sin pasos — añade el primero abajo.</p>
-              )}
-              <div className="space-y-1.5">
-                {localSteps.map((s, i) => {
-                  const cfg = STEP_TYPES.find(t => t.type === s.type)!;
-                  const isSelected = selectedStep?.id === s.id;
-                  return (
-                    <div key={s.id} className={`group flex items-center gap-2 rounded-lg px-3 py-2 cursor-pointer transition-colors ${isSelected ? "bg-primary/15 border border-primary/30" : "border border-border hover:bg-muted/20"}`}
-                      onClick={() => { setSelectedStep(s); setAbStep(null); }}>
-                      <span className="text-base">{cfg.icon}</span>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium text-foreground truncate">{i + 1}. {s.name}</p>
-                        <p className="text-[10px] text-muted-foreground">{cfg.label}</p>
-                      </div>
-                      <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={e => { e.stopPropagation(); void moveStep(s.id, "up"); }}
-                          disabled={i === 0} className="text-muted-foreground hover:text-foreground disabled:opacity-20 text-[10px] px-1">↑</button>
-                        <button onClick={e => { e.stopPropagation(); void moveStep(s.id, "down"); }}
-                          disabled={i === localSteps.length - 1} className="text-muted-foreground hover:text-foreground disabled:opacity-20 text-[10px] px-1">↓</button>
-                        <button onClick={e => { e.stopPropagation(); void removeStep(s.id); }}
-                          className="text-destructive/60 hover:text-destructive text-[10px] px-1">✕</button>
-                      </div>
+            {builderTab === "steps" && (
+              <div className="row">
+                <div className="col-xl-4">
+                  <W3crmContentBox titulo={`Pasos del embudo (${localSteps.length})`} icono="fa-solid fa-list-ol">
+                    {localSteps.length === 0 ? (
+                      <W3crmEmptyState title="Sin pasos" description="Añade el primero con los botones de abajo." />
+                    ) : (
+                      <ul className="list-group list-group-flush mb-3">
+                        {localSteps.map((s, i) => {
+                          const cfg = stepCfg(s.type);
+                          const isSelected = selectedStep?.id === s.id;
+                          return (
+                            <li key={s.id}
+                              className={`list-group-item d-flex align-items-center gap-2 px-0 ${isSelected ? "bg-light" : ""}`}>
+                              <button type="button"
+                                className="btn btn-link p-0 text-start text-decoration-none flex-grow-1"
+                                aria-pressed={isSelected}
+                                onClick={() => { setSelectedStep(s); setAbStep(null); }}>
+                                <i className={`${cfg.icono} me-2 text-primary`} aria-hidden="true" />
+                                <span className="fw-bold">{i + 1}. {txt(s.name) || "—"}</span>
+                                <span className="text-muted fs-12 d-block">{cfg.label}</span>
+                              </button>
+                              <button type="button" className="btn btn-primary light btn-sm" disabled={i === 0}
+                                aria-label={`Subir ${s.name}`} onClick={() => void moveStep(s.id, "up")}>↑</button>
+                              <button type="button" className="btn btn-primary light btn-sm"
+                                disabled={i === localSteps.length - 1}
+                                aria-label={`Bajar ${s.name}`} onClick={() => void moveStep(s.id, "down")}>↓</button>
+                              <button type="button" className="btn btn-danger light btn-sm"
+                                aria-label={`Eliminar ${s.name}`} onClick={() => void removeStep(s.id)}>✕</button>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
+                    <div className="d-flex flex-wrap gap-1">
+                      {STEP_TYPES.map((t) => (
+                        <button key={t.type} type="button" className="btn btn-primary light btn-sm"
+                          onClick={() => void addStep(t.type)}>
+                          <i className={`${t.icono} me-1`} aria-hidden="true" />+ {t.label}
+                        </button>
+                      ))}
                     </div>
-                  );
-                })}
-              </div>
-              {/* Add step buttons */}
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {STEP_TYPES.map(t => (
-                  <button key={t.type} onClick={() => void addStep(t.type)}
-                    className="rounded-md border border-border px-2 py-1 text-[10px] text-muted-foreground hover:border-primary/40 hover:text-foreground transition-colors">
-                    + {t.icon} {t.label}
-                  </button>
-                ))}
-              </div>
-            </NelvyonDsCard>
-          </div>
+                  </W3crmContentBox>
+                </div>
 
-          {/* Step editor */}
-          <div className="space-y-4">
-            {selectedStep ? (
-              <>
-                <StepEditor
-                  step={selectedStep}
-                  funnelId={funnel.id}
-                  onUpdated={updated => {
-                    setLocalSteps(prev => prev.map(s => s.id === updated.id ? { ...s, ...updated } : s));
-                    setSelectedStep(updated);
-                  }}
-                />
-                {/* A/B toggle */}
-                <div>
-                  <button
-                    onClick={() => setAbStep(prev => prev?.id === selectedStep.id ? null : selectedStep)}
-                    className="mb-2 text-xs text-primary hover:underline">
-                    {abStep?.id === selectedStep.id ? "▲ Ocultar A/B" : "▼ Configurar A/B Testing"}
-                  </button>
-                  {abStep?.id === selectedStep.id && (
-                    <AbVariantPanel step={selectedStep} funnelId={funnel.id} />
+                <div className="col-xl-8">
+                  {selectedStep ? (
+                    <>
+                      <StepEditor
+                        step={selectedStep}
+                        funnelId={funnel.id}
+                        onUpdated={(updated) => {
+                          setLocalSteps((prev) => prev.map((s) => (s.id === updated.id ? { ...s, ...updated } : s)));
+                          setSelectedStep(updated);
+                        }}
+                      />
+                      <div className="mb-2">
+                        <button type="button" className="btn btn-primary light btn-sm"
+                          aria-expanded={abStep?.id === selectedStep.id}
+                          onClick={() => setAbStep((prev) => (prev?.id === selectedStep.id ? null : selectedStep))}>
+                          {abStep?.id === selectedStep.id ? "Ocultar A/B" : "Configurar A/B Testing"}
+                        </button>
+                      </div>
+                      {abStep?.id === selectedStep.id && (
+                        <AbVariantPanel step={selectedStep} funnelId={funnel.id} />
+                      )}
+                    </>
+                  ) : (
+                    <W3crmContentBox titulo="Configuración del paso" icono="fa-solid fa-sliders">
+                      <W3crmEmptyState title="Selecciona un paso para editarlo" />
+                    </W3crmContentBox>
                   )}
                 </div>
-              </>
-            ) : (
-              <NelvyonDsCard>
-                <p className="text-sm text-muted-foreground text-center py-8">Selecciona un paso para editarlo.</p>
-              </NelvyonDsCard>
+              </div>
             )}
           </div>
         </div>
-      )}
-    </div>
+      </div>
+    </>
   );
 }
 
-// ─── List View ────────────────────────────────────────────────────────────────
-
+// ── Listado ──────────────────────────────────────────────────────────────────
 export default function SaasFunnelsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -586,8 +698,8 @@ export default function SaasFunnelsPage() {
     setLoading(true);
     try {
       const res = await fetch("/api/saas/funnels", { credentials: "same-origin" });
-      const data = (await res.json().catch(() => ({ funnels: [] }))) as { funnels: Funnel[] };
-      setFunnels(data.funnels ?? []);
+      const data = (await res.json().catch(() => ({}))) as { funnels?: Funnel[] };
+      setFunnels(Array.isArray(data.funnels) ? data.funnels : []);
     } finally { setLoading(false); }
   }, []);
 
@@ -596,7 +708,8 @@ export default function SaasFunnelsPage() {
   useEffect(() => {
     fetch("/api/saas/funnels/templates")
       .then((r) => r.json())
-      .then((d: { templates?: Array<{ id: string; name: string; description: string }> }) => setFunnelTemplates(d.templates ?? []))
+      .then((d: { templates?: Array<{ id: string; name: string; description: string }> }) =>
+        setFunnelTemplates(Array.isArray(d?.templates) ? d.templates : []))
       .catch(() => {});
   }, []);
 
@@ -614,10 +727,9 @@ export default function SaasFunnelsPage() {
     }
   }
 
-  // Open builder if ?id= is set
   useEffect(() => {
     if (!funnelId || !funnels.length) return;
-    const f = funnels.find(x => x.id === funnelId);
+    const f = funnels.find((x) => x.id === funnelId);
     if (f) setBuilderFunnel(f);
   }, [funnelId, funnels]);
 
@@ -632,148 +744,183 @@ export default function SaasFunnelsPage() {
   }
 
   async function deleteFunnel(id: string, name: string) {
-    if (!window.confirm(`¿Eliminar el funnel "${name}"? Esta acción no se puede deshacer.`)) return;
+    const r = await Alert.fire({
+      title: `¿Eliminar el funnel "${name}"?`,
+      text: "Esta acción no se puede deshacer.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Eliminar",
+      cancelButtonText: "Cancelar",
+    });
+    if (!r.isConfirmed) return;
     setDeletingId(id);
     try {
       const res = await fetch(`/api/saas/funnels/${id}`, { method: "DELETE", credentials: "same-origin" });
-      if (res.ok) setFunnels(prev => prev.filter(f => f.id !== id));
+      if (res.ok) setFunnels((prev) => prev.filter((f) => f.id !== id));
     } finally {
       setDeletingId(null);
     }
   }
 
-  const filtered = statusFilter === "all" ? funnels : funnels.filter(f => f.status === statusFilter);
-  const totalVisitors = funnels.reduce((s, f) => s + f.totalVisitors, 0);
-  const totalConversions = funnels.reduce((s, f) => s + f.totalConversions, 0);
+  const filtered = statusFilter === "all" ? funnels : funnels.filter((f) => f.status === statusFilter);
+  const totalVisitors = funnels.reduce((s, f) => s + num(f.totalVisitors), 0);
+  const totalConversions = funnels.reduce((s, f) => s + num(f.totalConversions), 0);
   const overallCvr = totalVisitors > 0 ? ((totalConversions / totalVisitors) * 100).toFixed(1) : "0.0";
 
-  return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="funnels" />}>
-      {builderFunnel ? (
+  // Exclusión mutua original: builder y listado NUNCA se montan a la vez, que
+  // es lo que mantiene único el texto "Visitas totales".
+  if (builderFunnel) {
+    return (
+      <SaasW3crmShell>
         <BuilderView
           funnel={builderFunnel}
           onBack={closeBuilder}
-          onFunnelUpdated={updated => {
+          onFunnelUpdated={(updated) => {
             setBuilderFunnel(updated);
-            setFunnels(prev => prev.map(f => f.id === updated.id ? updated : f));
+            setFunnels((prev) => prev.map((f) => (f.id === updated.id ? updated : f)));
           }}
         />
-      ) : (
-        <div className="space-y-6 pb-8">
-          {/* Header */}
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-primary/70">Marketing</p>
-              <h1 className="mt-1 text-2xl font-bold text-foreground">Funnel Builder</h1>
-              <p className="mt-0.5 text-sm text-muted-foreground">Editor visual de embudos con A/B testing y analytics.</p>
-            </div>
-            <NelvyonDsButton onClick={() => setShowNew(true)}>+ Nuevo funnel</NelvyonDsButton>
-          </div>
+      </SaasW3crmShell>
+    );
+  }
 
-          {/* KPIs */}
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <KpiTile icon="🚀" label="Funnels" value={funnels.length} />
-            <KpiTile icon="✅" label="Activos" value={funnels.filter(f => f.status === "active").length} accent />
-            <KpiTile icon="👀" label="Visitas totales" value={totalVisitors.toLocaleString()} />
-            <KpiTile icon="📈" label="CVR global" value={`${overallCvr}%`} />
+  return (
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="Funnel Builder" parentTitle="Captación" pageTitle="Funnels" />
+      <div className="container-fluid">
+        <div className="row">
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Funnels" value={funnels.length} /></div>
+          <div className="col-xl-3 col-sm-6">
+            <W3crmKpiTile label="Activos" value={funnels.filter((f) => f.status === "active").length} accent />
           </div>
+          <div className="col-xl-3 col-sm-6">
+            <W3crmKpiTile label="Visitas totales" value={totalVisitors.toLocaleString("es-ES")} />
+          </div>
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="CVR global" value={`${overallCvr}%`} /></div>
 
-          {funnelTemplates.length > 0 && (
-            <NelvyonDsCard className="p-4">
-              <p className="text-sm font-semibold text-foreground">Plantillas funnel Nelvyon ({funnelTemplates.length})</p>
-              <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                {funnelTemplates.map((t) => (
-                  <div key={t.id} className="rounded-lg border border-border p-3">
-                    <p className="text-sm font-medium text-foreground">{t.name}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">{t.description}</p>
-                    <NelvyonDsButton className="mt-2 w-full" size="sm" disabled={importingFunnelTpl === t.id}
-                      onClick={() => void importFunnelTemplate(t.id)}>
-                      {importingFunnelTpl === t.id ? "…" : "Importar funnel"}
-                    </NelvyonDsButton>
-                  </div>
+          <div className="col-xl-12">
+            <p className="fs-14 text-muted">Editor visual de embudos con A/B testing y analytics.</p>
+
+            {funnelTemplates.length > 0 && (
+              <W3crmContentBox
+                titulo={`Plantillas funnel Nelvyon (${funnelTemplates.length})`}
+                icono="fa-solid fa-layer-group"
+                defaultOpen={false}
+              >
+                <div className="row">
+                  {funnelTemplates.map((t) => (
+                    <div className="col-xl-4 col-sm-6" key={t.id}>
+                      <div className="card border mb-3 h-100">
+                        <div className="card-body d-flex flex-column">
+                          <span className="fw-bold">{txt(t.name) || "—"}</span>
+                          <p className="text-muted fs-12 mt-1 flex-grow-1">{txt(t.description)}</p>
+                          <button type="button" className="btn btn-primary btn-sm w-100"
+                            disabled={importingFunnelTpl === t.id}
+                            aria-label={`Importar plantilla ${t.name}`}
+                            onClick={() => void importFunnelTemplate(t.id)}>
+                            {importingFunnelTpl === t.id ? "…" : "Importar funnel"}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </W3crmContentBox>
+            )}
+
+            <W3crmContentBox
+              titulo="Embudos"
+              icono="fa-solid fa-filter-circle-dollar"
+              acciones={
+                <button type="button" className="btn btn-primary btn-sm me-2" onClick={() => setShowNew(true)}>
+                  + Nuevo funnel
+                </button>
+              }
+            >
+              <div className="mb-3" role="group" aria-label="Filtrar por estado">
+                {(["all", "draft", "active", "paused"] as const).map((s) => (
+                  <button key={s} type="button" aria-pressed={statusFilter === s}
+                    className={`btn btn-sm me-1 mb-1 ${statusFilter === s ? "btn-primary" : "btn-primary light"}`}
+                    onClick={() => setStatusFilter(s)}>
+                    {s === "all" ? "Todos" : s === "draft" ? "Borrador" : s === "active" ? "Activos" : "Pausados"}
+                  </button>
                 ))}
               </div>
-            </NelvyonDsCard>
-          )}
 
-          {/* Status filter tabs */}
-          <div className="flex gap-1 rounded-lg border border-border bg-muted/10 p-1 w-fit">
-            {(["all", "draft", "active", "paused"] as const).map(s => (
-              <button key={s} onClick={() => setStatusFilter(s)}
-                className={`px-3 py-1.5 text-xs font-medium rounded-md capitalize transition-colors ${statusFilter === s ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground"}`}>
-                {s === "all" ? "Todos" : s === "draft" ? "Borrador" : s === "active" ? "Activos" : "Pausados"}
-              </button>
-            ))}
+              {loading ? (
+                <W3crmCargando texto="Cargando funnels…" />
+              ) : filtered.length === 0 ? (
+                <W3crmEmptyState
+                  title={`Sin funnels${statusFilter !== "all" ? ` (${statusFilter})` : ""}`}
+                  description="Crea tu primer embudo de ventas o captación de leads."
+                />
+              ) : (
+                <W3crmDataTable
+                  filas={filtered}
+                  etiqueta="funnels"
+                  wrapperId="fn_lista_wrapper"
+                  porPagina={10}
+                  reiniciarEn={statusFilter}
+                  columnas={[
+                    { titulo: "Funnel" }, { titulo: "Pasos" }, { titulo: "Métricas" },
+                    { titulo: "Estado" }, { titulo: "Gestión", alFinal: true },
+                  ]}
+                  render={(f) => {
+                    const pasos = Array.isArray(f.steps) ? f.steps : [];
+                    return (
+                      <tr key={f.id}>
+                        <td>
+                          {/* Nombre sin truncar: `E2E Test Funnel` es contrato. */}
+                          <span className="fw-bold">{txt(f.name) || "—"}</span>
+                          {f.description ? <div className="text-muted fs-12">{txt(f.description)}</div> : null}
+                        </td>
+                        <td className="text-muted fs-12">
+                          {pasos.length === 0 ? "—" : pasos.slice(0, 6).map((s) => (
+                            <span key={s.id} className="badge badge-secondary me-1 mb-1">
+                              {txt(s.name) || stepCfg(s.type).label}
+                            </span>
+                          ))}
+                        </td>
+                        <td className="text-muted fs-12">
+                          <div>{miles(f.totalVisitors)} visitas</div>
+                          <div>{miles(f.totalConversions)} conv.</div>
+                        </td>
+                        <td><span className={`badge ${statusBadge(f.status)}`}>{statusLabel(f.status)}</span></td>
+                        <td className="text-end">
+                          <button type="button" className="btn btn-primary light btn-sm me-1"
+                            onClick={() => openBuilder(f)}>
+                            Abrir builder
+                          </button>
+                          <button type="button" className="btn btn-danger light btn-sm"
+                            disabled={deletingId === f.id}
+                            aria-label={`Eliminar funnel ${f.name}`}
+                            onClick={() => void deleteFunnel(f.id, f.name)}>
+                            {deletingId === f.id ? "…" : "Eliminar"}
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  }}
+                />
+              )}
+            </W3crmContentBox>
           </div>
-
-          {/* List */}
-          {loading ? (
-            <div className="space-y-3">{Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-20 animate-pulse rounded-xl bg-muted/10" />)}</div>
-          ) : filtered.length === 0 ? (
-            <NelvyonDsCard className="py-16 text-center">
-              <p className="text-4xl">🚀</p>
-              <p className="mt-3 text-base font-semibold text-foreground">Sin funnels{statusFilter !== "all" ? ` (${statusFilter})` : ""}</p>
-              <p className="mt-1 text-sm text-muted-foreground">Crea tu primer embudo de ventas o captación de leads</p>
-              <div className="mt-5"><NelvyonDsButton onClick={() => setShowNew(true)}>+ Nuevo funnel</NelvyonDsButton></div>
-            </NelvyonDsCard>
-          ) : (
-            <div className="space-y-3">
-              {filtered.map(f => (
-                <NelvyonDsCard key={f.id} className="flex flex-wrap items-start justify-between gap-4 p-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-semibold text-foreground truncate">{f.name}</p>
-                      <NelvyonDsBadge tone={statusTone(f.status)}>
-                        {f.status === "active" ? "Activo" : f.status === "paused" ? "Pausado" : "Borrador"}
-                      </NelvyonDsBadge>
-                    </div>
-                    {f.description && <p className="mt-0.5 text-xs text-muted-foreground truncate">{f.description}</p>}
-                    <div className="mt-2 flex flex-wrap gap-1">
-                      {f.steps.slice(0, 6).map((s, i) => {
-                        const cfg = STEP_TYPES.find(t => t.type === s.type)!;
-                        return (
-                          <span key={s.id} className="flex items-center gap-1 rounded-md bg-muted/20 px-2 py-0.5 text-[10px] text-muted-foreground">
-                            {i > 0 && <span className="text-foreground/20">→</span>}
-                            {cfg.icon} {s.name}
-                          </span>
-                        );
-                      })}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="text-right text-xs text-muted-foreground">
-                      <p>{f.totalVisitors.toLocaleString()} visitas</p>
-                      <p>{f.totalConversions.toLocaleString()} conv.</p>
-                    </div>
-                    <NelvyonDsButton variant="secondary" onClick={() => openBuilder(f)}>
-                      Abrir builder
-                    </NelvyonDsButton>
-                    <button
-                      onClick={() => void deleteFunnel(f.id, f.name)}
-                      disabled={deletingId === f.id}
-                      aria-label={`Eliminar funnel ${f.name}`}
-                      className="rounded-md p-2 text-destructive/60 hover:bg-destructive/10 hover:text-destructive disabled:opacity-40 transition-colors"
-                    >
-                      {deletingId === f.id ? "…" : "🗑"}
-                    </button>
-                  </div>
-                </NelvyonDsCard>
-              ))}
-            </div>
-          )}
         </div>
-      )}
+      </div>
+
       {showNew && (
         <NewFunnelModal
           onClose={() => setShowNew(false)}
-          onSaved={id => {
+          onSaved={(id) => {
             void load().then(() => {
-              const f = funnels.find(x => x.id === id);
+              const f = funnels.find((x) => x.id === id);
               if (f) openBuilder(f);
             });
           }}
         />
       )}
-    </SaasShellLayout>
+    </SaasW3crmShell>
   );
 }

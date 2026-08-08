@@ -1,42 +1,43 @@
 "use client";
 
+/**
+ * /saas/ab-testing sobre `(cms)/content` de W3CRM, con las piezas ya portadas.
+ * Cada test es una caja plegable de la plantilla; sus variantes van en la
+ * tabla `table table-responsive-lg table-striped table-condensed flip-content`
+ * y la barra de progreso usa el `progress` de Bootstrap que trae W3CRM.
+ *
+ * Logica de NELVYON intacta: `GET/POST /api/saas/ab-testing`, los tipos
+ * `ABTest`/`ABVariant`, `STATUS_CONFIG`, `TYPE_LABEL`, los mapeos
+ * `UI_TO_API_TYPE`/`API_TO_UI_TYPE`, `mapAbTest`, `pct`, el filtro por estado,
+ * `declareWinner` y el calculo de confianza media.
+ */
 import { useCallback, useEffect, useState } from "react";
-import { NelvyonDsBadge, NelvyonDsButton, NelvyonDsCard, NelvyonDsSectionHeader } from "@/design-system/components";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
-import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
+
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmEmptyState, W3crmKpiTile } from "@/features/saas-w3crm/components/W3crmUi";
+import { W3crmContentBox, W3crmModal } from "@/features/saas-w3crm/components/W3crmContentBox";
 
 type ABStatus = "running" | "winner" | "paused";
 type ABType = "email_subject" | "email_content" | "landing" | "cta";
 
 interface ABVariant {
-  id: string;
-  name: string;
-  label: string;
-  sent: number;
-  opens: number;
-  clicks: number;
-  conversions: number;
-  winner: boolean;
+  id: string; name: string; label: string;
+  sent: number; opens: number; clicks: number; conversions: number; winner: boolean;
 }
 
 interface ABTest {
-  id: string;
-  name: string;
-  type: ABType;
-  status: ABStatus;
-  variants: ABVariant[];
-  splitPercent: number;
-  startedAt: string | null;
-  endedAt: string | null;
+  id: string; name: string; type: ABType; status: ABStatus;
+  variants: ABVariant[]; splitPercent: number;
+  startedAt: string | null; endedAt: string | null;
   winnerMetric: "open_rate" | "click_rate" | "conversion_rate";
   confidence: number | null;
 }
 
-const STATUS_CONFIG: Record<ABStatus, { label: string; tone: "primary" | "success" | "warning" | "danger"; icon: string }> = {
-  running: { label: "En ejecución", tone: "success", icon: "▶" },
-  winner: { label: "Ganador declarado", tone: "primary", icon: "🏆" },
-  paused: { label: "Pausado", tone: "warning", icon: "‖" },
+const STATUS_CONFIG: Record<ABStatus, { label: string; badge: string; icon: string }> = {
+  running: { label: "En ejecución", badge: "badge-success", icon: "▶" },
+  winner: { label: "Ganador declarado", badge: "badge-primary", icon: "🏆" },
+  paused: { label: "Pausado", badge: "badge-warning", icon: "‖" },
 };
 
 const TYPE_LABEL: Record<ABType, string> = {
@@ -44,29 +45,30 @@ const TYPE_LABEL: Record<ABType, string> = {
 };
 
 const UI_TO_API_TYPE: Record<ABType, string> = {
-  email_subject: "subject_line",
-  email_content: "content",
-  landing: "content",
-  cta: "from_name",
+  email_subject: "subject_line", email_content: "content", landing: "content", cta: "from_name",
 };
 
 const API_TO_UI_TYPE: Record<string, ABType> = {
-  subject_line: "email_subject",
-  send_time: "email_subject",
-  content: "email_content",
-  from_name: "cta",
+  subject_line: "email_subject", send_time: "email_subject", content: "email_content", from_name: "cta",
 };
+
+/** Catalogos que pueden crecer sin dejar la pantalla en blanco. */
+function estadoDe(s: ABStatus | string) {
+  return STATUS_CONFIG[s as ABStatus] ?? { label: String(s || "—"), badge: "badge-secondary", icon: "•" };
+}
+function tipoDe(t: ABType | string) {
+  return TYPE_LABEL[t as ABType] ?? String(t || "—");
+}
 
 function mapAbTest(raw: Record<string, unknown>): ABTest {
   const variants = Array.isArray(raw.variants) ? raw.variants : [];
   const winnerId = raw.winnerVariantId ?? raw.winner_variant_id;
   const apiStatus = String(raw.status ?? "running");
-  const status: ABStatus =
-    apiStatus === "completed" ? "winner" : apiStatus === "paused" ? "paused" : "running";
+  const status: ABStatus = apiStatus === "completed" ? "winner" : apiStatus === "paused" ? "paused" : "running";
 
   return {
     id: String(raw.id),
-    name: String(raw.name),
+    name: String(raw.name ?? ""),
     type: API_TO_UI_TYPE[String(raw.type)] ?? "email_subject",
     status,
     variants: variants.map((v: Record<string, unknown>, i: number) => ({
@@ -86,6 +88,8 @@ function mapAbTest(raw: Record<string, unknown>): ABTest {
     confidence: raw.confidence != null ? Number(raw.confidence) : null,
   };
 }
+
+function pct(n: number, d: number) { return d > 0 ? `${((n / d) * 100).toFixed(1)}%` : "—"; }
 
 function CreateAbTestModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
   const [name, setName] = useState("");
@@ -126,98 +130,49 @@ function CreateAbTestModal({ onClose, onCreated }: { onClose: () => void; onCrea
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm">
-      <div className="my-8 w-full max-w-lg rounded-2xl border border-border bg-card shadow-2xl">
-        <div className="flex items-center justify-between border-b border-border px-6 py-4">
-          <h2 className="text-lg font-semibold text-foreground">Nuevo test A/B</h2>
-          <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
-        </div>
-        <form onSubmit={save} className="space-y-4 p-6">
-          {error && <p className="text-sm text-destructive" role="alert">{error}</p>}
-          <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Nombre *</label>
-            <input
-              value={name}
-              onChange={e => setName(e.target.value)}
-              placeholder="Ej: Asunto newsletter Q3"
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
-            />
-          </div>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Tipo</label>
-            <select
-              value={type}
-              onChange={e => setType(e.target.value as ABType)}
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
-            >
-              {(Object.keys(TYPE_LABEL) as ABType[]).map(t => (
-                <option key={t} value={t}>{TYPE_LABEL[t]}</option>
-              ))}
-            </select>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div>
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">Variante A *</label>
-              <input
-                value={variantA}
-                onChange={e => setVariantA(e.target.value)}
-                placeholder="Texto variante A"
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">Variante B *</label>
-              <input
-                value={variantB}
-                onChange={e => setVariantB(e.target.value)}
-                placeholder="Texto variante B"
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
-              />
+    <W3crmModal titulo="Nuevo test A/B" onClose={onClose} error={error} testId="modal-ab">
+      <form onSubmit={save}>
+        <div className="row">
+          <div className="col-lg-6">
+            <div className="form-group mb-3">
+              <label htmlFor="ab-nombre" className="text-black font-w600">Nombre <span className="required">*</span></label>
+              <input id="ab-nombre" type="text" className="form-control" placeholder="Ej: Asunto newsletter Q3"
+                value={name} onChange={(e) => setName(e.target.value)} />
             </div>
           </div>
-          <div className="flex gap-3 pt-2">
-            <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
-            <NelvyonDsButton type="submit" disabled={saving || !name.trim() || !variantA.trim() || !variantB.trim()} className="flex-1">
-              {saving ? "Creando…" : "Crear test"}
-            </NelvyonDsButton>
+          <div className="col-lg-6">
+            <div className="form-group mb-3">
+              <label htmlFor="ab-tipo" className="text-black font-w600">Tipo</label>
+              <select id="ab-tipo" className="form-control" value={type} onChange={(e) => setType(e.target.value as ABType)}>
+                {(Object.keys(TYPE_LABEL) as ABType[]).map((t) => <option key={t} value={t}>{TYPE_LABEL[t]}</option>)}
+              </select>
+            </div>
           </div>
-        </form>
-      </div>
-    </div>
-  );
-}
-
-function pct(n: number, d: number) { return d > 0 ? `${((n / d) * 100).toFixed(1)}%` : "—"; }
-
-function VariantBar({ variant, metric, total: _total, isWinner }: { variant: ABVariant; metric: "open_rate" | "click_rate" | "conversion_rate"; total: number; isWinner: boolean }) {
-  const value = metric === "open_rate" ? variant.opens / variant.sent : metric === "click_rate" ? variant.clicks / variant.opens || 0 : variant.conversions / variant.sent;
-  const display = metric === "open_rate" ? pct(variant.opens, variant.sent) : metric === "click_rate" ? pct(variant.clicks, variant.opens) : pct(variant.conversions, variant.sent);
-  const pctWidth = Math.min(100, value * 100 * 2);
-
-  return (
-    <div className={`rounded-xl border p-4 transition-all ${isWinner ? "border-primary bg-primary/10" : "border-border"}`}>
-      <div className="flex items-start justify-between gap-2 mb-3">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className={`flex h-7 w-7 items-center justify-center rounded-lg text-xs font-bold ${isWinner ? "bg-primary text-primary-foreground" : "bg-muted/30 text-muted-foreground"}`}>
-              {variant.name}
-            </span>
-            {isWinner && <span className="text-xs text-primary font-medium">🏆 Ganador</span>}
+          <div className="col-lg-6">
+            <div className="form-group mb-3">
+              <label htmlFor="ab-a" className="text-black font-w600">Variante A <span className="required">*</span></label>
+              <input id="ab-a" type="text" className="form-control" placeholder="Texto variante A"
+                value={variantA} onChange={(e) => setVariantA(e.target.value)} />
+            </div>
           </div>
-          <p className="mt-1.5 text-xs text-muted-foreground max-w-72 italic">&ldquo;{variant.label}&rdquo;</p>
+          <div className="col-lg-6">
+            <div className="form-group mb-3">
+              <label htmlFor="ab-b" className="text-black font-w600">Variante B <span className="required">*</span></label>
+              <input id="ab-b" type="text" className="form-control" placeholder="Texto variante B"
+                value={variantB} onChange={(e) => setVariantB(e.target.value)} />
+            </div>
+          </div>
+          <div className="col-lg-12">
+            <div className="text-end">
+              <button type="button" className="btn btn-danger light me-2" onClick={onClose}>Cancelar</button>
+              <button type="submit" className="btn btn-primary" disabled={saving || !name.trim() || !variantA.trim() || !variantB.trim()}>
+                {saving ? "Creando…" : "Crear test"}
+              </button>
+            </div>
+          </div>
         </div>
-        <p className={`text-2xl font-bold ${isWinner ? "text-primary" : "text-foreground"}`}>{display}</p>
-      </div>
-      <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-        <div className={`h-full rounded-full transition-all ${isWinner ? "bg-primary" : "bg-muted-foreground/40"}`} style={{ width: `${pctWidth}%` }} />
-      </div>
-      <div className="mt-2 flex gap-4 text-xs text-muted-foreground">
-        <span>{variant.sent.toLocaleString()} enviados</span>
-        <span>{variant.opens.toLocaleString()} aperturas</span>
-        <span>{variant.clicks} clics</span>
-        <span>{variant.conversions} conv.</span>
-      </div>
-    </div>
+      </form>
+    </W3crmModal>
   );
 }
 
@@ -237,8 +192,8 @@ export default function SaasABTestingPage() {
         const body = (await res.json().catch(() => null)) as { error?: string } | null;
         throw new Error(body?.error ?? `HTTP ${res.status}`);
       }
-      const d = (await res.json()) as { tests?: Record<string, unknown>[] };
-      setTests((d.tests ?? []).map(mapAbTest));
+      const d = (await res.json().catch(() => ({}))) as { tests?: Record<string, unknown>[] };
+      setTests(Array.isArray(d.tests) ? d.tests.map(mapAbTest) : []);
     } catch (e) {
       setTests([]);
       setLoadError(e instanceof Error ? e.message : "Error al cargar tests");
@@ -268,98 +223,151 @@ export default function SaasABTestingPage() {
     }
   }
 
-  const filtered = tests.filter(t => filterStatus === "all" || t.status === filterStatus);
-  const completed = tests.filter(t => t.status === "winner");
-  const avgConfidence =
-    completed.length > 0
-      ? Math.round(
-          completed.reduce((s, t) => s + (t.confidence ?? 0), 0) / completed.length,
-        )
-      : null;
+  const filtered = tests.filter((t) => filterStatus === "all" || t.status === filterStatus);
+  const completed = tests.filter((t) => t.status === "winner");
+  const avgConfidence = completed.length > 0
+    ? Math.round(completed.reduce((s, t) => s + (t.confidence ?? 0), 0) / completed.length)
+    : null;
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="ab-testing" />}>
-      <div className="flex flex-col gap-6 pb-8">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <NelvyonDsSectionHeader title="A/B Testing" subtitle="Prueba variantes de emails, landings y CTAs para optimizar conversiones" />
-              <NelvyonDsButton onClick={() => setShowModal(true)}>+ Nuevo test</NelvyonDsButton>
-            </div>
-
-            {(loadError || actionError) && (
-              <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm text-destructive" role="alert">
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="A/B Testing" parentTitle="Gestión" pageTitle="A/B Testing" />
+      <div className="container-fluid">
+        <div className="row">
+          {(loadError || actionError) && (
+            <div className="col-xl-12">
+              <div className="alert alert-danger alert-dismissible fade show" role="alert">
                 {actionError ?? loadError}
-              </p>
-            )}
+                <button type="button" className="btn-close" aria-label="Cerrar"
+                  onClick={() => { setActionError(null); setLoadError(null); }} />
+              </div>
+            </div>
+          )}
 
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              <KpiTile icon="▶" label="Tests activos" value={tests.filter(t => t.status === "running").length} accent />
-              <KpiTile icon="🏆" label="Completados" value={completed.length} />
-              <KpiTile icon="🧬" label="Total variantes" value={tests.reduce((s, t) => s + t.variants.length, 0)} />
-              <KpiTile
-                icon="📊"
-                label="Confianza media"
-                value={avgConfidence != null ? `${avgConfidence}%` : "—"}
-              />
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Tests activos" value={tests.filter((t) => t.status === "running").length} accent /></div>
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Completados" value={completed.length} /></div>
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Total variantes" value={tests.reduce((s, t) => s + t.variants.length, 0)} /></div>
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Confianza media" value={avgConfidence != null ? `${avgConfidence}%` : "—"} /></div>
+
+          <div className="col-xl-12">
+            <W3crmContentBox titulo="Filtro" icono="fas fa-filter" bodyClassName="card-body pb-3">
+              <div className="row">
+                <div className="col-xl-4 col-sm-6">
+                  <label className="visually-hidden" htmlFor="ab-filtro">Estado</label>
+                  <select id="ab-filtro" className="form-control" value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value as ABStatus | "all")}>
+                    <option value="all">Todos los estados</option>
+                    {(["running", "winner", "paused"] as const).map((s) => (
+                      <option key={s} value={s}>{STATUS_CONFIG[s].label}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="col-xl-4 col-sm-6">
+                  <button type="button" className="btn btn-danger light mt-3 mt-xl-0" onClick={() => setFilterStatus("all")}>
+                    Quitar filtros
+                  </button>
+                </div>
+              </div>
+            </W3crmContentBox>
+
+            <div className="mb-3">
+              <ul className="d-flex align-items-center flex-wrap">
+                <li><button type="button" className="btn btn-primary" onClick={() => setShowModal(true)}>+ Nuevo test</button></li>
+              </ul>
             </div>
 
-            <div className="flex gap-2 flex-wrap">
-              {(["all", "running", "winner", "paused"] as const).map(s => (
-                <button key={s} type="button" onClick={() => setFilterStatus(s)}
-                  className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${filterStatus === s ? "bg-primary text-primary-foreground" : "bg-muted/30 text-muted-foreground hover:text-foreground"}`}>
-                  {s === "all" ? "Todos" : STATUS_CONFIG[s].label}
-                </button>
-              ))}
-            </div>
-
-            <div className="space-y-5">
-              {filtered.length === 0 ? (
-                <NelvyonDsCard className="p-12 text-center text-sm text-muted-foreground">
-                  {tests.length === 0 ? "Sin tests A/B. Crea el primero." : "Ningún test en este filtro."}
-                </NelvyonDsCard>
-              ) : filtered.map(test => {
-                const sc = STATUS_CONFIG[test.status];
+            {filtered.length === 0 ? (
+              <W3crmContentBox titulo="Tests A/B" icono="fa-solid fa-flask">
+                <W3crmEmptyState
+                  title={tests.length === 0 ? "Sin tests A/B" : "Ningún test en este filtro"}
+                  description={tests.length === 0 ? "Crea el primero para empezar a comparar variantes." : "Prueba con otro estado."}
+                />
+              </W3crmContentBox>
+            ) : (
+              filtered.map((test) => {
+                const sc = estadoDe(test.status);
                 return (
-                  <NelvyonDsCard key={test.id} className="overflow-hidden p-0">
-                    <div className="flex flex-wrap items-start gap-3 p-5">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="font-semibold text-foreground">{test.name}</h3>
-                          <NelvyonDsBadge tone={sc.tone}>{sc.icon} {sc.label}</NelvyonDsBadge>
-                          <span className="rounded-md bg-muted/30 px-2 py-0.5 text-xs text-muted-foreground">{TYPE_LABEL[test.type]}</span>
-                        </div>
-                        <p className="mt-1 text-xs text-muted-foreground">
-                          Métrica: <strong className="text-foreground">{test.winnerMetric === "open_rate" ? "Tasa apertura" : test.winnerMetric === "click_rate" ? "Tasa clic" : "Tasa conversión"}</strong>
-                          {test.confidence !== null && <> · Confianza: <strong className={test.confidence >= 95 ? "text-success" : "text-warning"}>{test.confidence}%</strong></>}
-                        </p>
-                      </div>
-                      <div className="flex gap-2">
-                        {test.status === "running" && (
-                          <NelvyonDsButton
-                            className="text-xs"
-                            disabled={busyId === test.id}
-                            onClick={() => void declareWinner(test.id)}
-                          >
-                            🏆 Declarar ganador
-                          </NelvyonDsButton>
+                  <W3crmContentBox
+                    key={test.id}
+                    testId="test-ab"
+                    icono="fa-solid fa-flask"
+                    titulo={
+                      <>
+                        {test.name || "—"}
+                        <span className={`badge ${sc.badge} ms-2`}>{sc.icon} {sc.label}</span>
+                        <span className="badge badge-secondary light ms-1">{tipoDe(test.type)}</span>
+                        {test.confidence !== null && (
+                          <span className={`ms-2 fs-12 ${test.confidence >= 95 ? "text-success" : "text-warning"}`}>
+                            Confianza: {test.confidence}%
+                          </span>
                         )}
+                      </>
+                    }
+                    acciones={test.status === "running" ? (
+                      <button type="button" className="btn btn-primary btn-sm me-2" disabled={busyId === test.id}
+                        onClick={() => void declareWinner(test.id)}>
+                        Declarar ganador
+                      </button>
+                    ) : undefined}
+                  >
+                    <div className="table-responsive">
+                      <div className="dataTables_wrapper no-footer">
+                        <table className="table table-responsive-lg table-striped table-condensed flip-content">
+                          <thead>
+                            <tr>
+                              <th className="text-black">Variante</th>
+                              <th className="text-black">Texto</th>
+                              <th className="text-black">Enviados</th>
+                              <th className="text-black">Aperturas</th>
+                              <th className="text-black">Clics</th>
+                              <th className="text-black">Tasa apertura</th>
+                              <th className="text-black text-end">Resultado</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {test.variants.map((v) => {
+                              const ratio = v.sent > 0 ? (v.opens / v.sent) * 100 : 0;
+                              return (
+                                <tr key={v.id}>
+                                  <td><span className={`badge ${v.winner ? "badge-primary" : "badge-secondary"}`}>{v.name}</span></td>
+                                  <td><span className="text-muted fs-12">{v.label || "—"}</span></td>
+                                  <td>{v.sent.toLocaleString("es-ES")}</td>
+                                  <td>{v.opens.toLocaleString("es-ES")}</td>
+                                  <td>{v.clicks.toLocaleString("es-ES")}</td>
+                                  <td style={{ minWidth: 140 }}>
+                                    <div className="d-flex align-items-center">
+                                      <span className="me-2 fw-bold">{pct(v.opens, v.sent)}</span>
+                                      <div className="progress flex-grow-1" style={{ height: 6 }}>
+                                        <div
+                                          className={`progress-bar ${v.winner ? "bg-primary" : "bg-secondary"}`}
+                                          style={{ width: `${Math.min(100, ratio * 2)}%` }}
+                                          role="progressbar"
+                                          aria-valuenow={Math.round(ratio)}
+                                          aria-valuemin={0}
+                                          aria-valuemax={100}
+                                        />
+                                      </div>
+                                    </div>
+                                  </td>
+                                  <td className="text-end">
+                                    {v.winner ? <span className="badge badge-primary">🏆 Ganador</span> : <span className="text-muted">—</span>}
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
                       </div>
                     </div>
-                    <div className="grid gap-3 border-t border-border p-5 sm:grid-cols-2">
-                      {test.variants.map(v => (
-                        <VariantBar key={v.id} variant={v} metric={test.winnerMetric} total={v.sent} isWinner={v.winner} />
-                      ))}
-                    </div>
-                  </NelvyonDsCard>
+                  </W3crmContentBox>
                 );
-              })}
-            </div>
-      {showModal && (
-        <CreateAbTestModal
-          onClose={() => setShowModal(false)}
-          onCreated={() => void load()}
-        />
-      )}
+              })
+            )}
+          </div>
+        </div>
       </div>
-    </SaasShellLayout>
+
+      {showModal && <CreateAbTestModal onClose={() => setShowModal(false)} onCreated={() => void load()} />}
+    </SaasW3crmShell>
   );
 }

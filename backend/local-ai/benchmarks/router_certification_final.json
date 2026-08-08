@@ -1,0 +1,79 @@
+{
+  "timestamp": "2026-07-15T19:10:00.000Z",
+  "tag": "router_certification_final",
+  "completed": true,
+  "declaration": "ROUTER DE MODELOS NELVYON COMPLETADO",
+  "phase2RouterPct": 100,
+  "blockers": [],
+  "gates": {
+    "routingBenchmark100": true,
+    "e2eExecuteTask": true,
+    "recoveryTests": true,
+    "unitTests25": true,
+    "soak2hPassed": true,
+    "soak2hAllGatesGreen": true,
+    "latencyByClassStable": true,
+    "enterpriseFixesApplied": true
+  },
+  "soakSummary": {
+    "evidence": "backend/local-ai/benchmarks/router_soak_2026-07-15T19-09-13-073Z.json",
+    "passed": true,
+    "errors": 0,
+    "durationMs": 7201732,
+    "targetDurationMs": 7200000,
+    "soakComplete": true,
+    "execSuccess": 20,
+    "execFail": 0,
+    "maxPoolWaiting": 0,
+    "gates": {
+      "soakComplete": true,
+      "zeroErrors": true,
+      "poolNoLeak": true,
+      "execZeroFail": true,
+      "infraUp": true,
+      "circuitClosed": true,
+      "noRamLeak": true,
+      "noVramLeak": true,
+      "latencyStable": true,
+      "latencyFastSimple": true,
+      "latencyFastRag": true,
+      "latencyStrategy": true,
+      "latencyFallback": true,
+      "latencyQueue": true,
+      "exitClean": true
+    },
+    "latencyByClass": {
+      "latencyStable": true,
+      "note": "Per-class steady-state gates; aggregate legacy mixed 3B/8B intentionally not used for pass/fail"
+    }
+  },
+  "evidence": {
+    "routing": "backend/local-ai/benchmarks/router_benchmark_cert_v1_2026-07-14T22-13-53-216Z.json",
+    "e2e": "backend/local-ai/benchmarks/router_e2e_cert_e2e_pre_soak_2026-07-15T17-08-54-368Z.json",
+    "recovery": "backend/local-ai/benchmarks/router_recovery_2026-07-14T21-59-34-957Z.json",
+    "soak": "backend/local-ai/benchmarks/router_soak_2026-07-15T19-09-13-073Z.json",
+    "latencyDiagnostic": "backend/local-ai/benchmarks/router_latency_diagnostic_2026-07-15T17-06-42-301Z.json",
+    "unitTests": "backend/saas/__tests__/localAiModelRouter.test.ts + routerLatencyMetrics.test.ts"
+  },
+  "instrumentationFix": {
+    "problem": "Global p95/avg mixed fast 3B with strategy 8B cold starts → false latencyStable fail",
+    "fix": "Per-class buckets + steady-state latency (excludes modelLoad/queue/gate wait)",
+    "files": [
+      "backend/local-ai/router/latencyMetrics.ts",
+      "backend/local-ai/router/LocalModelRouter.ts",
+      "scripts/local-ai-router-soak.ts"
+    ]
+  },
+  "remainingDebt": [
+    "Sin wiring HTTP SaaS (requireSaasContext) — post-certificación",
+    "recoverFromRestart no persiste entre procesos reales",
+    "Circuit half-open sin single-flight probe",
+    "VRAM reclaim heurístico por nombre de modelo"
+  ],
+  "nextBlocked": [
+    "OpenClaw / orquestador / agentes — NO hasta política MCP productiva + decisión producto",
+    "Wiring Router SaaS PrivateAi — permitido (sin OpenClaw)"
+  ],
+  "labsBlock1Security": "closed",
+  "labsReserves46": "closed_with_final_decisions"
+}

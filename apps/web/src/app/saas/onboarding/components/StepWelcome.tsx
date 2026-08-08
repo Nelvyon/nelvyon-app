@@ -1,7 +1,14 @@
 "use client";
 
-import { NelvyonDsButton, NelvyonDsCard } from "@/design-system/components";
-
+/**
+ * Paso 1 con el marcado de tarjeta y formulario de W3CRM.
+ *
+ * CONTRATO — `e2e/onboarding.spec.ts`:
+ *   - `getByText("Paso 1 — Bienvenida")` como título de la tarjeta.
+ *   - `getByLabel("Nombre de la empresa")` y `getByLabel("Industria")`: los
+ *     `label` se asocian por `htmlFor`/`id`, que es lo que resuelve `getByLabel`.
+ *   - `getByRole("button", { name: "Continuar" })` con ese nombre EXACTO.
+ */
 export type StepWelcomeProps = {
   companyName: string;
   industry: string;
@@ -22,36 +29,45 @@ export function StepWelcome({
   error,
 }: StepWelcomeProps) {
   return (
-    <NelvyonDsCard title="Paso 1 — Bienvenida">
-      <p className="mb-4 text-sm text-muted-foreground">Cuéntanos quién eres para personalizar tu experiencia.</p>
-      <div className="space-y-4">
-        <label className="block space-y-1.5">
-          <span className="text-sm font-medium text-foreground">Nombre de la empresa</span>
+    <div className="card">
+      <div className="card-header">
+        <h4 className="card-title">Paso 1 — Bienvenida</h4>
+      </div>
+      <div className="card-body">
+        <p className="fs-14 text-muted">Cuéntanos quién eres para personalizar tu experiencia.</p>
+
+        <div className="form-group mb-3">
+          <label htmlFor="ob-empresa" className="text-black font-w600">Nombre de la empresa</label>
           <input
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
+            id="ob-empresa"
+            className="form-control"
             value={companyName}
             onChange={(e) => onCompanyNameChange(e.target.value)}
             autoComplete="organization"
             disabled={busy}
           />
-        </label>
-        <label className="block space-y-1.5">
-          <span className="text-sm font-medium text-foreground">Industria</span>
+        </div>
+
+        <div className="form-group mb-3">
+          <label htmlFor="ob-industria" className="text-black font-w600">Industria</label>
           <input
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
+            id="ob-industria"
+            className="form-control"
             value={industry}
             onChange={(e) => onIndustryChange(e.target.value)}
             placeholder="Ej. Retail, SaaS B2B, Salud…"
             disabled={busy}
           />
-        </label>
-        {error ? <p className="text-sm text-destructive">{error}</p> : null}
-        <div className="flex justify-end pt-2">
-          <NelvyonDsButton type="button" size="lg" onClick={onNext} disabled={busy}>
+        </div>
+
+        {error ? <div className="alert alert-danger py-2 fs-14" role="alert">{error}</div> : null}
+
+        <div className="text-end">
+          <button type="button" className="btn btn-primary" onClick={onNext} disabled={busy}>
             Continuar
-          </NelvyonDsButton>
+          </button>
         </div>
       </div>
-    </NelvyonDsCard>
+    </div>
   );
 }

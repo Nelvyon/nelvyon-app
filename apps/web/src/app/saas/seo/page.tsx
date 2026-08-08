@@ -1,18 +1,36 @@
 "use client";
 
+/**
+ * /saas/seo sobre `(cms)/content` de W3CRM, con las piezas ya portadas.
+ * Mapeo: keywords -> `W3crmContentBox` + `W3crmDataTable` con cabeceras
+ * ordenables; problemas -> `W3crmContentBox` + `W3crmDataTable`; alta de
+ * keywords -> `W3crmModal`; metricas -> `W3crmKpiTile`. Sin componentes
+ * nuevos.
+ *
+ * Inventario: sin `data-testid` y sin spec dedicado — lo cubre
+ * `saas-nav-full-coverage`. Verificado que ningun spec hace aserciones de
+ * texto sobre esta ruta, asi que no hay textos-contrato ni riesgo de strict
+ * mode. Aun asi ningun titulo de caja repite el texto de un KPI o de un boton,
+ * porque el toggle de `W3crmContentBox` expone `aria-label="Plegar <titulo>"`.
+ *
+ * Logica de NELVYON intacta: `GET /api/saas/seo` con su manejo diferenciado
+ * del 503 y del modo `degraded` (que prioriza `error` sobre `message`), el
+ * `POST` con `{ keywords: [...] }` partiendo por lineas, `configured`,
+ * `trackingEnabled` que gobierna el alta, los tres criterios de orden
+ * (posicion, volumen, dificultad), los umbrales de dificultad (>=70 / >=40) y
+ * de posicion (<=3 / <=10), y el delta contra `previousPosition`.
+ */
 import { useCallback, useEffect, useState } from "react";
 
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmEmptyState, W3crmKpiTile } from "@/features/saas-w3crm/components/W3crmUi";
 import {
-  NelvyonDsBadge,
-  NelvyonDsButton,
-  NelvyonDsCard,
-  NelvyonDsSectionHeader,
-} from "@/design-system/components";
-import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
+  W3crmCargando,
+  W3crmContentBox,
+  W3crmDataTable,
+  W3crmModal,
+} from "@/features/saas-w3crm/components/W3crmContentBox";
 
 interface Keyword {
   id: string;
@@ -43,37 +61,29 @@ interface SeoSummary {
   crawledAt: string | null;
 }
 
-// ─── Keyword row ──────────────────────────────────────────────────────────────
-
-function KeywordRow({ kw }: { kw: Keyword }) {
-  const delta = kw.previousPosition !== null ? kw.previousPosition - kw.position : null;
-  const diffColor = kw.difficulty >= 70 ? "text-destructive" : kw.difficulty >= 40 ? "text-warning" : "text-success";
-
-  return (
-    <div className="grid grid-cols-[minmax(0,2fr)_60px_80px_80px_80px_80px] items-center gap-3 border-b border-border py-3 last:border-none text-sm">
-      <div>
-        <p className="font-medium text-foreground">{kw.keyword}</p>
-        {kw.url && <p className="truncate text-xs text-muted-foreground">{kw.url}</p>}
-      </div>
-      <div className="text-center">
-        <span className={`font-semibold ${kw.position <= 3 ? "text-success" : kw.position <= 10 ? "text-warning" : "text-foreground"}`}>
-          #{kw.position}
-        </span>
-        {delta !== null && (
-          <p className={`text-xs ${delta > 0 ? "text-success" : delta < 0 ? "text-destructive" : "text-muted-foreground"}`}>
-            {delta > 0 ? `▲${delta}` : delta < 0 ? `▼${Math.abs(delta)}` : "—"}
-          </p>
-        )}
-      </div>
-      <p className="text-center text-muted-foreground">{kw.searchVolume.toLocaleString("es-ES")}</p>
-      <p className={`text-center font-medium ${diffColor}`}>{kw.difficulty}</p>
-      <p className="text-center text-muted-foreground">{kw.cpc.toFixed(2)} €</p>
-      <p className="text-center text-xs text-muted-foreground">{new Date(kw.updatedAt).toLocaleDateString("es-ES")}</p>
-    </div>
-  );
+function num(v: unknown): number {
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+/** `toLocaleString` sobre un no-numero producia "NaN". */
+function miles(v: unknown): string {
+  return num(v).toLocaleString("es-ES");
+}
+function fecha(iso: string | null | undefined): string {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? "—" : d.toLocaleDateString("es-ES");
 }
 
-// ─── Add keyword modal ────────────────────────────────────────────────────────
+const ISSUE_BADGE: Record<string, string> = {
+  error: "badge-danger",
+  warning: "badge-warning",
+  info: "badge-primary",
+};
+/** Un tipo fuera de catalogo pintaba `undefined`. */
+function issueBadge(t: string): string {
+  return ISSUE_BADGE[t] ?? "badge-secondary";
+}
 
 function AddKeywordModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
   const [keywords, setKeywords] = useState("");
@@ -106,32 +116,24 @@ function AddKeywordModal({ onClose, onSaved }: { onClose: () => void; onSaved: (
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl">
-        <h2 className="mb-5 text-lg font-semibold text-foreground">Añadir keywords</h2>
-        {error && <p className="mb-4 rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
-        <form onSubmit={submit} className="space-y-4">
-          <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Keywords (una por línea)</label>
-            <textarea
-              value={keywords}
-              onChange={(e) => setKeywords(e.target.value)}
-              rows={8}
-              placeholder={"agencia marketing digital\nposicionamiento seo madrid\ngestión redes sociales empresa"}
-              className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
-            />
-          </div>
-          <div className="flex gap-3">
-            <NelvyonDsButton type="button" variant="ghost" onClick={onClose} className="flex-1">Cancelar</NelvyonDsButton>
-            <NelvyonDsButton type="submit" disabled={saving} className="flex-1">{saving ? "Añadiendo…" : "Añadir keywords"}</NelvyonDsButton>
-          </div>
-        </form>
-      </div>
-    </div>
+    <W3crmModal titulo="Añadir keywords" onClose={onClose} error={error}>
+      <form onSubmit={(e) => void submit(e)}>
+        <div className="form-group mb-3">
+          <label htmlFor="seo-kws" className="text-black font-w600">Keywords (una por línea)</label>
+          <textarea id="seo-kws" className="form-control" rows={8}
+            placeholder={"agencia marketing digital\nposicionamiento seo madrid\ngestión redes sociales empresa"}
+            value={keywords} onChange={(e) => setKeywords(e.target.value)} />
+        </div>
+        <div className="text-end">
+          <button type="button" className="btn btn-primary light me-2" onClick={onClose}>Cancelar</button>
+          <button type="submit" className="btn btn-primary" disabled={saving}>
+            {saving ? "Añadiendo…" : "Añadir keywords"}
+          </button>
+        </div>
+      </form>
+    </W3crmModal>
   );
 }
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function SaasSeoPage() {
   const [keywords, setKeywords] = useState<Keyword[]>([]);
@@ -156,10 +158,15 @@ export default function SaasSeoPage() {
       if (seoRes.ok) {
         setConfigured(d.configured ?? false);
         setTrackingEnabled(d.trackingEnabled ?? true);
-        setConfigMessage(d.degraded ? (d.error ?? d.message ?? "Proveedor SEO temporalmente no disponible.") : (d.message ?? null));
-        setKeywords(d.keywords ?? []);
-        setIssues(d.issues ?? []);
-        if (d.summary) setSummary(d.summary);
+        setConfigMessage(
+          d.degraded
+            ? (d.error ?? d.message ?? "Proveedor SEO temporalmente no disponible.")
+            : (d.message ?? null),
+        );
+        // Colecciones no-array reventaban `.filter`/`.map`.
+        setKeywords(Array.isArray(d.keywords) ? d.keywords : []);
+        setIssues(Array.isArray(d.issues) ? d.issues : []);
+        if (d.summary && typeof d.summary === "object") setSummary(d.summary);
       } else if (seoRes.status === 503) {
         setConfigured(false);
         setConfigMessage(d.error ?? d.message ?? "Proveedor SEO no disponible.");
@@ -175,130 +182,190 @@ export default function SaasSeoPage() {
   useEffect(() => { void load(); }, [load]);
 
   const sorted = [...keywords].sort((a, b) => {
-    if (sort === "position") return a.position - b.position;
-    if (sort === "volume") return b.searchVolume - a.searchVolume;
-    return b.difficulty - a.difficulty;
+    if (sort === "position") return num(a.position) - num(b.position);
+    if (sort === "volume") return num(b.searchVolume) - num(a.searchVolume);
+    return num(b.difficulty) - num(a.difficulty);
   });
 
-  const top3 = keywords.filter((k) => k.position <= 3).length;
-  const top10 = keywords.filter((k) => k.position <= 10).length;
+  const top3 = keywords.filter((k) => num(k.position) <= 3).length;
+  const top10 = keywords.filter((k) => num(k.position) <= 10).length;
   const errors = issues.filter((i) => i.type === "error").length;
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="seo" />}>
-      <div className="flex flex-col gap-6 pb-8">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <NelvyonDsSectionHeader
-            title="SEO"
-            subtitle="Monitoriza posiciones, audita errores y optimiza tu presencia orgánica"
-          />
-          <NelvyonDsButton onClick={() => setShowAdd(true)} disabled={!trackingEnabled}>+ Añadir keywords</NelvyonDsButton>
-        </div>
-
-        {configured === false ? (
-          <div className="rounded-xl border border-warning/30 bg-warning/10 px-4 py-3 text-sm text-warning">
-            <strong>SEMrush no configurado:</strong>{" "}
-            {configMessage ?? "Configura SEMRUSH_API_KEY y SEO_DOMAIN en Railway para posiciones en vivo. Puedes añadir keywords manualmente."}
-          </div>
-        ) : null}
-
-        {/* Stats */}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
-          <KpiTile icon="🔑" label="Keywords rastreadas" value={keywords.length} />
-          <KpiTile icon="🥇" label="Top 3" value={top3} accent />
-          <KpiTile icon="🏅" label="Top 10" value={top10} />
-          <KpiTile icon="❌" label="Errores SEO" value={errors} />
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="SEO" parentTitle="Captación" pageTitle="SEO" />
+      <div className="container-fluid">
+        <div className="row">
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Keywords rastreadas" value={keywords.length} /></div>
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Top 3" value={top3} accent /></div>
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Top 10" value={top10} /></div>
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Errores SEO" value={errors} /></div>
           {summary && (
             <>
-              <KpiTile icon="📈" label="Tráfico orgánico" value={summary.organicTraffic.toLocaleString("es-ES")} />
-              <KpiTile icon="🔗" label="Backlinks" value={summary.backlinks.toLocaleString("es-ES")} />
+              <div className="col-xl-3 col-sm-6">
+                <W3crmKpiTile label="Tráfico orgánico" value={miles(summary.organicTraffic)} />
+              </div>
+              <div className="col-xl-3 col-sm-6">
+                <W3crmKpiTile label="Backlinks" value={miles(summary.backlinks)} />
+              </div>
             </>
           )}
-        </div>
 
-        {/* GSC hint */}
-        <NelvyonDsCard className="border-primary/20 bg-primary/5 p-4">
-          <p className="text-sm font-medium text-primary">💡 Conecta Google Search Console</p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Añade <code className="rounded bg-muted px-1 text-xs">GOOGLE_SEARCH_CONSOLE_*</code> en Railway para importar datos reales de GSC automáticamente.
-          </p>
-        </NelvyonDsCard>
+          <div className="col-xl-12">
+            <p className="fs-14 text-muted">
+              Monitoriza posiciones, audita errores y optimiza tu presencia orgánica
+            </p>
 
-        {/* Tabs */}
-        <div className="flex gap-2 border-b border-border">
-          {(["keywords", "issues"] as const).map((t) => (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={`border-b-2 px-4 py-2 text-sm font-medium transition-colors ${tab === t ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}
-            >
-              {t === "keywords" ? `Keywords (${keywords.length})` : `Problemas SEO (${issues.length})`}
-            </button>
-          ))}
-        </div>
-
-        {loading ? (
-          <div className="flex flex-col gap-3">
-            {Array.from({ length: 5 }).map((_, i) => <div key={i} className="h-14 animate-pulse rounded-xl bg-muted/30" />)}
-          </div>
-        ) : tab === "keywords" ? (
-          keywords.length === 0 ? (
-            <NelvyonDsCard className="p-16 text-center">
-              <p className="text-5xl">🔍</p>
-              <p className="mt-4 text-lg font-semibold text-foreground">Sin keywords rastreadas</p>
-              <p className="mt-2 text-sm text-muted-foreground">Añade las palabras clave que quieres posicionar</p>
-              <NelvyonDsButton className="mt-5" onClick={() => setShowAdd(true)}>+ Añadir keywords</NelvyonDsButton>
-            </NelvyonDsCard>
-          ) : (
-            <NelvyonDsCard className="overflow-hidden p-0">
-              {/* Table header */}
-              <div className="grid grid-cols-[minmax(0,2fr)_60px_80px_80px_80px_80px] items-center gap-3 border-b border-border bg-muted/20 px-5 py-3 text-xs font-medium text-muted-foreground">
-                <span>Keyword</span>
-                <button className={`text-center hover:text-foreground ${sort === "position" ? "text-primary" : ""}`} onClick={() => setSort("position")}>Pos. ▾</button>
-                <button className={`text-center hover:text-foreground ${sort === "volume" ? "text-primary" : ""}`} onClick={() => setSort("volume")}>Búsq/mes</button>
-                <button className={`text-center hover:text-foreground ${sort === "difficulty" ? "text-primary" : ""}`} onClick={() => setSort("difficulty")}>KD</button>
-                <span className="text-center">CPC</span>
-                <span className="text-center">Actualiz.</span>
+            {configured === false ? (
+              <div className="alert alert-warning" role="alert">
+                <strong>SEMrush no configurado:</strong>{" "}
+                {configMessage ?? "Configura SEMRUSH_API_KEY y SEO_DOMAIN en Railway para posiciones en vivo. Puedes añadir keywords manualmente."}
               </div>
-              <div className="px-5">
-                {sorted.map((kw) => <KeywordRow key={kw.id} kw={kw} />)}
-              </div>
-            </NelvyonDsCard>
-          )
-        ) : (
-          issues.length === 0 ? (
-            <NelvyonDsCard className="p-16 text-center">
-              <p className="text-5xl">✅</p>
-              <p className="mt-4 text-lg font-semibold text-foreground">Sin problemas SEO detectados</p>
-              <p className="mt-2 text-sm text-muted-foreground">Ejecuta un crawler para detectar problemas on-page</p>
-            </NelvyonDsCard>
-          ) : (
-            <div className="flex flex-col gap-3">
-              {issues.map((issue) => (
-                <NelvyonDsCard key={issue.id} className="p-4">
-                  <div className="flex items-start gap-3">
-                    <span className="text-xl">{issue.type === "error" ? "❌" : issue.type === "warning" ? "⚠️" : "ℹ️"}</span>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <p className="font-medium text-foreground">{issue.title}</p>
-                        <NelvyonDsBadge tone={issue.type === "error" ? "danger" : issue.type === "warning" ? "warning" : "primary"}>
-                          {issue.count} páginas
-                        </NelvyonDsBadge>
-                      </div>
-                      <p className="mt-0.5 text-sm text-muted-foreground">{issue.description}</p>
-                      {issue.affectedUrls.slice(0, 2).map((url) => (
-                        <p key={url} className="mt-0.5 truncate font-mono text-xs text-muted-foreground">{url}</p>
+            ) : null}
+
+            <div className="alert alert-primary" role="note">
+              <strong>Conecta Google Search Console.</strong> Añade <code>GOOGLE_SEARCH_CONSOLE_*</code> en
+              Railway para importar datos reales de GSC automáticamente.
+            </div>
+
+            <ul className="nav nav-tabs mb-3">
+              {(["keywords", "issues"] as const).map((t) => (
+                <li className="nav-item" key={t}>
+                  <button type="button" className={`nav-link ${tab === t ? "active" : ""}`}
+                    aria-pressed={tab === t} onClick={() => setTab(t)}>
+                    {t === "keywords" ? `Keywords (${keywords.length})` : `Problemas SEO (${issues.length})`}
+                  </button>
+                </li>
+              ))}
+            </ul>
+
+            {tab === "keywords" && (
+              <W3crmContentBox
+                titulo="Posiciones rastreadas"
+                icono="fa-solid fa-key"
+                acciones={
+                  <button type="button" className="btn btn-primary btn-sm me-2" disabled={!trackingEnabled}
+                    onClick={() => setShowAdd(true)}>
+                    + Añadir keywords
+                  </button>
+                }
+              >
+                {loading ? (
+                  <W3crmCargando texto="Cargando keywords…" />
+                ) : keywords.length === 0 ? (
+                  <W3crmEmptyState
+                    title="Sin keywords rastreadas"
+                    description="Añade las palabras clave que quieres posicionar."
+                  />
+                ) : (
+                  <>
+                    <div className="mb-2" role="group" aria-label="Ordenar keywords">
+                      {([
+                        ["position", "Posición"],
+                        ["volume", "Búsquedas/mes"],
+                        ["difficulty", "Dificultad"],
+                      ] as const).map(([k, label]) => (
+                        <button key={k} type="button" aria-pressed={sort === k}
+                          className={`btn btn-sm me-1 mb-1 ${sort === k ? "btn-primary" : "btn-primary light"}`}
+                          onClick={() => setSort(k)}>
+                          {label}
+                        </button>
                       ))}
                     </div>
-                  </div>
-                </NelvyonDsCard>
-              ))}
-            </div>
-          )
-        )}
+                    <W3crmDataTable
+                      filas={sorted}
+                      etiqueta="keywords"
+                      wrapperId="seo_keywords_wrapper"
+                      porPagina={10}
+                      reiniciarEn={sort}
+                      columnas={[
+                        { titulo: "Keyword" },
+                        { titulo: "Pos." },
+                        { titulo: "Búsq/mes" },
+                        { titulo: "KD" },
+                        { titulo: "CPC" },
+                        { titulo: "Actualiz.", alFinal: true },
+                      ]}
+                      render={(kw) => {
+                        const pos = num(kw.position);
+                        const kd = num(kw.difficulty);
+                        const delta = kw.previousPosition !== null && kw.previousPosition !== undefined
+                          ? num(kw.previousPosition) - pos
+                          : null;
+                        return (
+                          <tr key={kw.id}>
+                            <td>
+                              <span className="fw-bold">{kw.keyword || "—"}</span>
+                              {kw.url ? <div className="text-muted fs-12 text-break">{kw.url}</div> : null}
+                            </td>
+                            <td>
+                              <span className={`fw-bold ${pos <= 3 ? "text-success" : pos <= 10 ? "text-warning" : ""}`}>
+                                #{pos}
+                              </span>
+                              {delta !== null && (
+                                <div className={`fs-12 ${delta > 0 ? "text-success" : delta < 0 ? "text-danger" : "text-muted"}`}>
+                                  {delta > 0 ? `▲${delta}` : delta < 0 ? `▼${Math.abs(delta)}` : "—"}
+                                </div>
+                              )}
+                            </td>
+                            <td>{miles(kw.searchVolume)}</td>
+                            <td className={kd >= 70 ? "text-danger" : kd >= 40 ? "text-warning" : "text-success"}>{kd}</td>
+                            <td>{num(kw.cpc).toFixed(2)} €</td>
+                            <td className="text-end">{fecha(kw.updatedAt)}</td>
+                          </tr>
+                        );
+                      }}
+                    />
+                  </>
+                )}
+              </W3crmContentBox>
+            )}
+
+            {tab === "issues" && (
+              <W3crmContentBox titulo="Auditoría on-page" icono="fa-solid fa-triangle-exclamation">
+                {loading ? (
+                  <W3crmCargando texto="Cargando auditoría…" />
+                ) : issues.length === 0 ? (
+                  <W3crmEmptyState
+                    title="Sin problemas SEO detectados"
+                    description="Ejecuta un crawler para detectar problemas on-page."
+                  />
+                ) : (
+                  <W3crmDataTable
+                    filas={issues}
+                    etiqueta="problemas"
+                    wrapperId="seo_issues_wrapper"
+                    porPagina={10}
+                    columnas={[{ titulo: "Problema" }, { titulo: "URLs afectadas" }, { titulo: "Alcance", alFinal: true }]}
+                    render={(issue) => {
+                      // `affectedUrls` podia no ser array y reventaba el `slice`.
+                      const urls = Array.isArray(issue.affectedUrls) ? issue.affectedUrls : [];
+                      return (
+                        <tr key={issue.id}>
+                          <td>
+                            <span className="fw-bold">{issue.title || "—"}</span>
+                            <div className="text-muted fs-12">{issue.description}</div>
+                          </td>
+                          <td className="text-muted fs-12">
+                            {urls.length === 0
+                              ? "—"
+                              : urls.slice(0, 2).map((url) => <div key={url} className="text-break">{url}</div>)}
+                          </td>
+                          <td className="text-end">
+                            <span className={`badge ${issueBadge(issue.type)}`}>{num(issue.count)} páginas</span>
+                          </td>
+                        </tr>
+                      );
+                    }}
+                  />
+                )}
+              </W3crmContentBox>
+            )}
+          </div>
+        </div>
       </div>
 
       {showAdd && <AddKeywordModal onClose={() => setShowAdd(false)} onSaved={load} />}
-    </SaasShellLayout>
+    </SaasW3crmShell>
   );
 }

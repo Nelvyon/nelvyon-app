@@ -146,3 +146,22 @@ backend/data/voice_pilot*/
 
 # Raw SaaS marketing PNGs (regen via Playwright; keep WebP only)
 apps/web/public/brand/public/saas-shots/raw/
+
+# --- Snapshots locales y scratch (nunca al repo) ---
+# .backup/ = snapshot manual pre-reset del pack /www; .tmp/ = runs Lighthouse
+.backup/
+.tmp/
+/Demo
+
+# Scripts ad-hoc de crawling/auditoría puntual (no son de producto)
+scripts/_tmp-*.mjs
+
+# Árbol de evidencias duplicado por bug de ruta; el canónico es docs/evidence/
+# (además contiene JWTs de sesión de staging — no debe versionarse)
+scripts/docs/
+
+# Artefactos crudos de crawl de Envato Elements
+docs/ops/_elements_*
+
+# Salida de build Capacitor
+apps/mobile/android/www/

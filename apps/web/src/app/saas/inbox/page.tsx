@@ -1,10 +1,27 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { NelvyonDsButton, NelvyonDsCard } from "@/design-system/components";
-import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+/**
+ * /saas/inbox sobre las pantallas `email-inbox` y `email-read` de la plantilla
+ * oficial W3CRM (`src/app/(email)/email-inbox/page.jsx` y `email-read/page.jsx`).
+ *
+ * Marcado y clases de la plantilla, tal cual: `container-fluid p-0` >
+ * `row gx-0` > `card mb-0 h-auto` > `card-body py-0 pe-0`; panel izquierdo
+ * `email-left-box dlab-scroll` con `mail-list rounded` y `list-group-item`;
+ * panel derecho `email-right-box` con `Tab.Container`, `toolbar`, `nav-pills`,
+ * `mail-tools`, `email-list` > `message` > `message-single` / `col-mail
+ * col-mail-2` (`hader`, `subject`, `date`) y la paginacion
+ * `dataTables_paginate paging_simple_numbers`.
+ *
+ * Dentro va la logica REAL de NELVYON sin cambios: los 11 endpoints, vistas de
+ * conversaciones e hilos, filtros de canal y SLA, busqueda, agente IA con sus
+ * skills, sugerencia de respuesta, envio, asignacion y cierre.
+ */
+import Link from "next/link";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { Nav, Tab } from "react-bootstrap";
+
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
 
 type Channel = "email" | "sms" | "whatsapp" | "instagram" | "facebook" | "chat";
 type Priority = "low" | "normal" | "high" | "urgent";
@@ -56,21 +73,24 @@ interface Thread {
 
 interface TeamMember { id: string; name: string | null; email: string; role: string; status: string; }
 
-const CH: Record<Channel, { label: string; icon: string; color: string }> = {
-  email: { label: "Email", icon: "📧", color: "text-blue-400" },
-  sms: { label: "SMS", icon: "💬", color: "text-green-400" },
-  whatsapp: { label: "WhatsApp", icon: "📱", color: "text-emerald-400" },
-  instagram: { label: "Instagram", icon: "📸", color: "text-pink-400" },
-  facebook: { label: "Facebook", icon: "👥", color: "text-blue-500" },
-  chat: { label: "Chat", icon: "💭", color: "text-purple-400" },
+const CH: Record<Channel, { label: string; icono: string }> = {
+  email: { label: "Email", icono: "fa-regular fa-envelope" },
+  sms: { label: "SMS", icono: "fa-regular fa-comment" },
+  whatsapp: { label: "WhatsApp", icono: "fa-brands fa-whatsapp" },
+  instagram: { label: "Instagram", icono: "fa-brands fa-instagram" },
+  facebook: { label: "Facebook", icono: "fa-brands fa-facebook" },
+  chat: { label: "Chat", icono: "fa-regular fa-comments" },
 };
 
+/** Tonos de badge de W3CRM para la prioridad. */
 const PRIORITY_BADGE: Record<Priority, string> = {
-  low: "bg-gray-500/20 text-gray-400",
-  normal: "bg-blue-500/20 text-blue-400",
-  high: "bg-yellow-500/20 text-yellow-400",
-  urgent: "bg-red-500/20 text-red-400",
+  low: "badge-secondary",
+  normal: "badge-primary",
+  high: "badge-warning",
+  urgent: "badge-danger",
 };
+
+const REGISTROS_POR_PAGINA = 15;
 
 function timeAgo(iso: string) {
   const d = Date.now() - new Date(iso).getTime();
@@ -84,20 +104,21 @@ function fmtTime(iso: string) {
   return new Date(iso).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
 }
 
-function slaColor(conv: Conversation): string {
-  if (conv.slaBreached) return "bg-red-500/20 text-red-400";
-  if (!conv.slaDueAt) return "bg-muted/20 text-muted-foreground";
+/** Mismo criterio de SLA que la version anterior, con badges de la plantilla. */
+function slaTone(conv: Conversation): string {
+  if (conv.slaBreached) return "badge-danger";
+  if (!conv.slaDueAt) return "badge-secondary";
   const diff = new Date(conv.slaDueAt).getTime() - Date.now();
-  if (diff < 0) return "bg-red-500/20 text-red-400";
-  if (diff < 30 * 60_000) return "bg-yellow-500/20 text-yellow-400";
-  return "bg-green-500/20 text-green-400";
+  if (diff < 0) return "badge-danger";
+  if (diff < 30 * 60_000) return "badge-warning";
+  return "badge-success";
 }
 
 function slaLabel(conv: Conversation): string {
-  if (conv.slaBreached) return "SLA ❌";
+  if (conv.slaBreached) return "SLA vencido";
   if (!conv.slaDueAt) return "";
   const diff = new Date(conv.slaDueAt).getTime() - Date.now();
-  if (diff < 0) return "SLA ❌";
+  if (diff < 0) return "SLA vencido";
   const mins = Math.floor(diff / 60_000);
   if (mins < 60) return `SLA ${mins}m`;
   return `SLA ${Math.floor(mins / 60)}h`;
@@ -118,13 +139,16 @@ export default function SaasInboxPage() {
   const [filterChannel, setFilterChannel] = useState<Channel | "all">("all");
   const [filterSla, setFilterSla] = useState(false);
   const [search, setSearch] = useState("");
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+
   const [agentEnabled, setAgentEnabled] = useState(false);
   const [agentAuto, setAgentAuto] = useState(false);
   const [agentLoading, setAgentLoading] = useState(false);
   const [aiHint, setAiHint] = useState<string | null>(null);
   const [skills, setSkills] = useState<Array<{ id: string; name: string; description: string }>>([]);
   const [skillsOpen, setSkillsOpen] = useState(false);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // KPI counters
   const totalOpen = convs.filter(c => c.status === "open").length;
@@ -194,6 +218,7 @@ export default function SaasInboxPage() {
   }, [view, loadConvs, loadThreads]);
 
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
+  useEffect(() => { setCurrentPage(1); }, [view, filterChannel, filterSla, search]);
 
   async function selectConv(conv: Conversation) {
     setSelected(conv);
@@ -315,322 +340,457 @@ export default function SaasInboxPage() {
 
   const displayName = (c: Conversation) => c.contactName ?? c.contactEmail ?? c.contactPhone ?? "Desconocido";
 
+  // Paginacion de la plantilla (recordsPage / prePage / changeCPage / nextPage).
+  const listado: Array<Conversation | Thread> = view === "conversations" ? filtered : threads;
+  const lastIndex = currentPage * REGISTROS_POR_PAGINA;
+  const firstIndex = lastIndex - REGISTROS_POR_PAGINA;
+  const records = listado.slice(firstIndex, lastIndex);
+  const npage = Math.max(1, Math.ceil(listado.length / REGISTROS_POR_PAGINA));
+  const number = [...Array(npage + 1).keys()].slice(1);
+  function prePage() { if (currentPage !== 1) setCurrentPage(currentPage - 1); }
+  function changeCPage(id: number) { setCurrentPage(id); }
+  function nextPage() { if (currentPage !== npage) setCurrentPage(currentPage + 1); }
+
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="inbox" />}>
-      {/* Header */}
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-bold text-foreground">Bandeja unificada</h1>
-          <p className="text-xs text-muted-foreground">Email, SMS, WhatsApp, Instagram y más — hilos por contacto, SLA en tiempo real</p>
-        </div>
-        {error && <span className="text-xs text-red-400">{error}</span>}
-      </div>
-
-      {/* SLA KPIs */}
-      <div className="mb-4 grid grid-cols-3 gap-3">
-        <KpiTile icon="💬" label="Abiertas" value={totalOpen} />
-        <KpiTile icon="⏱" label="En riesgo SLA" value={totalAtRisk} accent={totalAtRisk > 0} />
-        <KpiTile icon="❌" label="SLA incumplido" value={totalBreached} accent={totalBreached > 0} />
-      </div>
-
-      {/* Nelvyon AI Agent (skills nativos — email, WA, redes) */}
-      <NelvyonDsCard className="mb-4 flex flex-wrap items-center gap-4 p-3">
-        <div>
-          <p className="text-sm font-semibold text-foreground">🤖 Agente Nelvyon</p>
-          <p className="text-[11px] text-muted-foreground">Responde inbox con skills especializados (0€ sin API key)</p>
-        </div>
-        <label className="flex items-center gap-2 text-xs text-foreground">
-          <input type="checkbox" checked={agentEnabled} onChange={(e) => void toggleAgent(e.target.checked)} />
-          Activo
-        </label>
-        <label className="flex items-center gap-2 text-xs text-foreground">
-          <input type="checkbox" checked={agentAuto} disabled={!agentEnabled} onChange={(e) => void toggleAgentAuto(e.target.checked)} />
-          Auto-respuesta
-        </label>
-        <button
-          type="button"
-          onClick={() => setSkillsOpen((o) => !o)}
-          className="ml-auto text-[11px] text-primary hover:underline"
-        >
-          {skillsOpen ? "Ocultar skills" : `Ver ${skills.length || 6} skills →`}
-        </button>
-      </NelvyonDsCard>
-      {skillsOpen && skills.length > 0 && (
-        <NelvyonDsCard className="mb-4 grid gap-2 p-3 sm:grid-cols-2 lg:grid-cols-3">
-          {skills.map((s) => (
-            <div key={s.id} className="rounded-lg border border-border/40 bg-muted/10 p-2">
-              <p className="text-xs font-semibold text-foreground">{s.name}</p>
-              <p className="text-[10px] text-muted-foreground">{s.description}</p>
-              <p className="mt-1 text-[9px] text-emerald-500">0€ modo ahorro</p>
-            </div>
-          ))}
-        </NelvyonDsCard>
-      )}
-
-      {/* View tabs */}
-      <div className="mb-3 flex gap-2">
-        <button onClick={() => setView("conversations")} className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${view === "conversations" ? "bg-primary text-primary-foreground" : "bg-muted/30 text-muted-foreground hover:text-foreground"}`}>
-          💬 Conversaciones
-        </button>
-        <button onClick={() => setView("threads")} className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${view === "threads" ? "bg-primary text-primary-foreground" : "bg-muted/30 text-muted-foreground hover:text-foreground"}`}>
-          🧵 Hilos por contacto
-        </button>
-        <div className="ml-auto flex gap-2">
-          <button onClick={() => setFilterSla(f => !f)} className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${filterSla ? "bg-yellow-500/20 text-yellow-400" : "bg-muted/30 text-muted-foreground hover:text-foreground"}`}>
-            ⏱ SLA en riesgo
-          </button>
-        </div>
-      </div>
-
-      {loading ? (
-        <div className="space-y-3">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="h-16 animate-pulse rounded-xl bg-muted/30" />
-          ))}
-        </div>
-      ) : view === "threads" ? (
-        /* ── THREADS VIEW ─────────────────────────────────────────── */
-        <div className="space-y-2">
-          {threads.length === 0 ? (
-            <NelvyonDsCard className="p-16 text-center">
-              <p className="text-4xl">🧵</p>
-              <p className="mt-4 font-semibold text-foreground">Sin hilos</p>
-              <p className="mt-2 text-sm text-muted-foreground">Los hilos se crean automáticamente al agrupar conversaciones por contacto.</p>
-            </NelvyonDsCard>
-          ) : threads.map(t => (
-            <NelvyonDsCard key={t.threadId} className="flex items-center gap-4 p-4">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
-                {(t.contactName ?? t.contactEmail ?? "?")[0]?.toUpperCase()}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <p className="font-semibold text-foreground">{t.contactName ?? t.contactEmail ?? "Desconocido"}</p>
-                  {t.hasBreached && <span className="rounded-md bg-red-500/20 px-1.5 py-0.5 text-[10px] text-red-400">SLA ❌</span>}
-                  {t.earliestSlaDue && !t.hasBreached && (
-                    <span className="rounded-md bg-yellow-500/20 px-1.5 py-0.5 text-[10px] text-yellow-400">
-                      ⏱ {Math.floor((new Date(t.earliestSlaDue).getTime() - Date.now()) / 60_000)}m
-                    </span>
-                  )}
-                </div>
-                <div className="mt-0.5 flex flex-wrap gap-1">
-                  {t.channels.map(ch => (
-                    <span key={ch} className="text-[11px]" title={CH[ch]?.label ?? ch}>{CH[ch]?.icon ?? ch}</span>
-                  ))}
-                  <span className="text-[11px] text-muted-foreground">{t.conversationCount} conv.</span>
-                </div>
-                <p className="mt-0.5 truncate text-[11px] text-muted-foreground">{t.lastMessage ?? "—"}</p>
-              </div>
-              <div className="text-right text-[11px] text-muted-foreground">
-                {t.lastMessageAt ? timeAgo(t.lastMessageAt) : "—"}
-              </div>
-            </NelvyonDsCard>
-          ))}
-        </div>
-      ) : convs.length === 0 ? (
-        <NelvyonDsCard className="p-16 text-center">
-          <p className="text-4xl">📭</p>
-          <p className="mt-4 font-semibold text-foreground">Bandeja vacía</p>
-          <p className="mt-2 text-sm text-muted-foreground">No hay conversaciones todavía.</p>
-        </NelvyonDsCard>
-      ) : (
-        /* ── CONVERSATIONS VIEW ───────────────────────────────────── */
-        <div className="flex h-[calc(100vh-330px)] overflow-hidden rounded-2xl border border-border">
-          {/* List panel */}
-          <div className="flex w-80 shrink-0 flex-col border-r border-border">
-            <div className="space-y-2 border-b border-border p-3">
-              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar…"
-                className="h-8 w-full rounded-lg border border-border bg-background px-3 text-xs text-foreground focus:border-primary focus:outline-none" />
-              <div className="flex flex-wrap gap-1">
-                <button onClick={() => setFilterChannel("all")} className={`rounded-lg px-2 py-1 text-[11px] font-medium transition-colors ${filterChannel === "all" ? "bg-primary text-primary-foreground" : "bg-muted/30 text-muted-foreground"}`}>Todos</button>
-                {(Object.keys(CH) as Channel[]).map(ch => (
-                  <button key={ch} onClick={() => setFilterChannel(ch)} className={`rounded-lg px-2 py-1 text-[11px] font-medium transition-colors ${filterChannel === ch ? "bg-primary text-primary-foreground" : "bg-muted/30 text-muted-foreground"}`}>
-                    {CH[ch].icon}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="flex-1 overflow-y-auto">
-              {filtered.length === 0 ? (
-                <p className="p-4 text-center text-xs text-muted-foreground">Sin resultados</p>
-              ) : filtered.map(c => (
-                <button key={c.id} onClick={() => void selectConv(c)}
-                  className={`flex w-full items-start gap-3 border-b border-border p-3 text-left transition-colors ${selected?.id === c.id ? "bg-primary/10" : "hover:bg-muted/10"}`}>
-                  <div className="relative mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
-                    {displayName(c)[0]?.toUpperCase()}
-                    <span className={`absolute -bottom-0.5 -right-0.5 text-[10px] ${CH[c.channel]?.color ?? ""}`}>{CH[c.channel]?.icon}</span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-1">
-                      <p className="truncate text-xs font-semibold text-foreground">{displayName(c)}</p>
-                      <p className="shrink-0 text-[10px] text-muted-foreground">{c.lastMessageAt ? timeAgo(c.lastMessageAt) : ""}</p>
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="Bandeja unificada" parentTitle="SaaS" pageTitle="Bandeja unificada" />
+      <Fragment>
+        <div className="container-fluid p-0">
+          <div className="row gx-0">
+            <div className="col-lg-12">
+              <div className="card mb-0 h-auto">
+                <div className="card-body py-0 pe-0">
+                  <div className="row gx-0">
+                    <div className="col-xl-2 col-xxl-3 col-lg-3">
+                      <div className="email-left-box dlab-scroll pt-3 ps-0">
+                        <div className="p-0">
+                          <Link
+                            href="#"
+                            scroll={false}
+                            className={`btn text-white btn-block ${filterSla ? "active" : ""}`}
+                            onClick={(e) => { e.preventDefault(); setFilterSla(v => !v); }}
+                          >
+                            <i className="fa-solid fa-bolt me-2"></i>
+                            {filterSla ? "Ver todo" : "Solo SLA en riesgo"}
+                          </Link>
+                        </div>
+                        <div className="mail-list rounded">
+                          <Link
+                            href="#"
+                            scroll={false}
+                            className={`list-group-item ${view === "conversations" && filterChannel === "all" ? "active" : ""}`}
+                            onClick={(e) => { e.preventDefault(); setView("conversations"); setFilterChannel("all"); }}
+                          >
+                            <i className="fa-regular fa-envelope align-middle"></i>
+                            Conversaciones
+                            <span className="badge badge-purple badge-sm float-end rounded">{totalOpen}</span>
+                          </Link>
+                          <Link
+                            href="#"
+                            scroll={false}
+                            className={`list-group-item ${view === "threads" ? "active" : ""}`}
+                            onClick={(e) => { e.preventDefault(); setView("threads"); }}
+                          >
+                            <i className="fa-regular fa-comments align-middle"></i>
+                            Hilos por contacto
+                          </Link>
+                          {(Object.keys(CH) as Channel[]).map((ch) => (
+                            <Link
+                              key={ch}
+                              href="#"
+                              scroll={false}
+                              className={`list-group-item ${view === "conversations" && filterChannel === ch ? "active" : ""}`}
+                              onClick={(e) => { e.preventDefault(); setView("conversations"); setFilterChannel(ch); }}
+                            >
+                              <i className={`${CH[ch].icono} align-middle`}></i>
+                              {" "}{CH[ch].label}
+                            </Link>
+                          ))}
+                        </div>
+                        <div className="mail-list rounded overflow-hidden mt-4">
+                          <div className="intro-title d-flex justify-content-between my-0">
+                            <h5>Agente IA</h5>
+                          </div>
+                          <div className="list-group-item">
+                            <div className="form-check form-switch">
+                              <input
+                                className="form-check-input"
+                                type="checkbox"
+                                id="agente-activo"
+                                checked={agentEnabled}
+                                onChange={(e) => void toggleAgent(e.target.checked)}
+                              />
+                              <label className="form-check-label" htmlFor="agente-activo">Activado</label>
+                            </div>
+                          </div>
+                          <div className="list-group-item">
+                            <div className="form-check form-switch">
+                              <input
+                                className="form-check-input"
+                                type="checkbox"
+                                id="agente-auto"
+                                checked={agentAuto}
+                                onChange={(e) => void toggleAgentAuto(e.target.checked)}
+                              />
+                              <label className="form-check-label" htmlFor="agente-auto">Respuesta automática</label>
+                            </div>
+                          </div>
+                          <Link
+                            href="#"
+                            scroll={false}
+                            className="list-group-item change"
+                            onClick={(e) => { e.preventDefault(); setSkillsOpen(v => !v); }}
+                          >
+                            Skills ({skills.length})
+                          </Link>
+                          {skillsOpen && skills.map((s) => (
+                            <span className="list-group-item" key={s.id}>
+                              <strong>{s.name}</strong>
+                              <span className="d-block text-muted fs-13">{s.description}</span>
+                            </span>
+                          ))}
+                        </div>
+                      </div>
                     </div>
-                    <p className="mt-0.5 truncate text-[11px] text-muted-foreground">{c.lastMessage ?? "—"}</p>
-                    <div className="mt-1 flex gap-1">
-                      {c.unreadCount > 0 && (
-                        <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">{c.unreadCount}</span>
-                      )}
-                      {slaLabel(c) && (
-                        <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-medium ${slaColor(c)}`}>{slaLabel(c)}</span>
-                      )}
-                      <span className={`rounded-md px-1.5 py-0.5 text-[10px] ${PRIORITY_BADGE[c.priority]}`}>{c.priority}</span>
+                    <div className="col-xl-10 col-xxl-9 col-lg-9">
+                      <div className="email-right-box">
+                        <Tab.Container defaultActiveKey="Bandeja">
+                          <div role="toolbar" className="toolbar ms-1 ms-sm-0">
+                            <div className="saprat">
+                              <div className="d-flex align-items-center">
+                                <Nav as="ul" className="nav nav-pills" role="tablist">
+                                  <Nav.Item as="li" className="nav-item btn-group" role="presentation">
+                                    <Nav.Link as="button" type="button" className="btn effect mx-2 nav-link" eventKey="Bandeja">
+                                      Abiertas {totalOpen}
+                                    </Nav.Link>
+                                  </Nav.Item>
+                                  <Nav.Item as="li" className="nav-item btn-group" role="presentation">
+                                    <Nav.Link as="button" type="button" className="btn effect mx-2 nav-link" eventKey="Riesgo">
+                                      En riesgo {totalAtRisk}
+                                    </Nav.Link>
+                                  </Nav.Item>
+                                  <Nav.Item as="li" className="nav-item btn-group" role="presentation">
+                                    <Nav.Link as="button" type="button" className="btn effect mx-2 nav-link" eventKey="Vencidas">
+                                      SLA vencido {totalBreached}
+                                    </Nav.Link>
+                                  </Nav.Item>
+                                </Nav>
+                              </div>
+                              <div className="mail-tools d-flex align-items-center">
+                                <input
+                                  className="form-control me-2"
+                                  style={{ minWidth: 200 }}
+                                  value={search}
+                                  onChange={(e) => setSearch(e.target.value)}
+                                  placeholder="Buscar…"
+                                  aria-label="Buscar en la bandeja"
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          <Tab.Content>
+                            {error && <div className="alert alert-danger m-3">{error}</div>}
+                            {loading ? (
+                              <div className="d-flex align-items-center justify-content-center py-5" role="status">
+                                <div className="spinner-border text-primary me-3" aria-hidden="true" />
+                                <span className="text-muted">Cargando…</span>
+                              </div>
+                            ) : listado.length === 0 ? (
+                              <div className="text-center py-5">
+                                <h5 className="mb-1">Sin conversaciones</h5>
+                                <p className="mb-0 text-muted fs-14">Cuando lleguen mensajes aparecerán aquí.</p>
+                              </div>
+                            ) : (
+                              <div className="email-list">
+                                {view === "conversations"
+                                  ? (records as Conversation[]).map((c) => (
+                                    <div className="message" key={c.id}>
+                                      <div>
+                                        <div className="d-flex message-single">
+                                          <div className="ps-1 align-self-center">
+                                            <span className={`badge light border-0 ${PRIORITY_BADGE[c.priority]}`}>
+                                              {c.priority}
+                                            </span>
+                                          </div>
+                                          <div className="ms-2">
+                                            <i className={`${CH[c.channel].icono} align-middle`} title={CH[c.channel].label}></i>
+                                          </div>
+                                        </div>
+                                        <Link
+                                          href="#"
+                                          scroll={false}
+                                          className="col-mail col-mail-2"
+                                          onClick={(e) => { e.preventDefault(); void selectConv(c); }}
+                                        >
+                                          <div className="hader">
+                                            {displayName(c)}
+                                            {c.unreadCount > 0 && (
+                                              <span className="badge badge-purple badge-sm ms-2 rounded">{c.unreadCount}</span>
+                                            )}
+                                          </div>
+                                          <div className="subject">
+                                            {c.subject ?? CH[c.channel].label}
+                                            <span> {c.lastMessage ?? ""}</span>
+                                          </div>
+                                          <div className="date">{c.lastMessageAt ? timeAgo(c.lastMessageAt) : ""}</div>
+                                        </Link>
+                                        <div className="icon d-flex align-items-center">
+                                          {slaLabel(c) && (
+                                            <span className={`badge light border-0 ${slaTone(c)} me-2`}>{slaLabel(c)}</span>
+                                          )}
+                                          {c.status === "open" && (
+                                            <Link
+                                              href="#"
+                                              scroll={false}
+                                              className="ms-2"
+                                              title="Cerrar conversación"
+                                              onClick={(e) => { e.preventDefault(); void closeConv(c.id); }}
+                                            >
+                                              <i className="fa-regular fa-circle-check"></i>
+                                            </Link>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))
+                                  : (records as Thread[]).map((t) => (
+                                    <div className="message" key={t.threadId}>
+                                      <div>
+                                        <div className="d-flex message-single">
+                                          <div className="ps-1 align-self-center">
+                                            <span className="badge light border-0 badge-primary">{t.conversationCount}</span>
+                                          </div>
+                                        </div>
+                                        <span className="col-mail col-mail-2">
+                                          <div className="hader">{t.contactName ?? t.contactEmail ?? t.contactPhone ?? "Desconocido"}</div>
+                                          <div className="subject">
+                                            {t.channels.map((ch) => CH[ch].label).join(" · ")}
+                                            <span> {t.lastMessage ?? ""}</span>
+                                          </div>
+                                          <div className="date">{t.lastMessageAt ? timeAgo(t.lastMessageAt) : ""}</div>
+                                        </span>
+                                        <div className="icon">
+                                          {t.hasBreached && <span className="badge light border-0 badge-danger">SLA vencido</span>}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
+                              </div>
+                            )}
+                          </Tab.Content>
+
+                          {/* `gx-0` (unico anadido a la plantilla): el `card-body pe-0`
+                              no absorbe el gutter negativo de esta `row` y sobresalian
+                              12px por la derecha en todos los anchos. */}
+                          <div className="row gx-0">
+                            <div className="col-12 ps-3">
+                              <div className="d-sm-flex text-center justify-content-between align-items-center">
+                                <div className="dataTables_info">
+                                  Mostrando {listado.length === 0 ? 0 : firstIndex + 1} a {Math.min(lastIndex, listado.length)} de {listado.length}
+                                </div>
+                                <div
+                                  className="dataTables_paginate paging_simple_numbers justify-content-center"
+                                  id="inbox_paginate"
+                                >
+                                  <Link
+                                    className={`paginate_button previous ${currentPage === 1 ? "disabled" : ""}`}
+                                    href="#" scroll={false}
+                                    onClick={(e) => { e.preventDefault(); prePage(); }}
+                                  >
+                                    <i className="fa-solid fa-angle-left" />
+                                  </Link>
+                                  <span>
+                                    {number.map((n) => (
+                                      <Link
+                                        href="#" scroll={false} key={n}
+                                        className={`paginate_button ${currentPage === n ? "current" : ""} `}
+                                        onClick={(e) => { e.preventDefault(); changeCPage(n); }}
+                                      >
+                                        {n}
+                                      </Link>
+                                    ))}
+                                  </span>
+                                  <Link
+                                    className={`paginate_button next ${currentPage === npage ? "disabled" : ""}`}
+                                    href="#" scroll={false}
+                                    onClick={(e) => { e.preventDefault(); nextPage(); }}
+                                  >
+                                    <i className="fa-solid fa-angle-right" />
+                                  </Link>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </Tab.Container>
+                      </div>
                     </div>
                   </div>
-                </button>
-              ))}
+                </div>
+              </div>
             </div>
           </div>
+        </div>
 
-          {/* Thread/chat panel */}
-          {selected ? (
-            <div className="flex flex-1 flex-col min-w-0">
-              {/* Header */}
-              <div className="flex items-center gap-3 border-b border-border px-5 py-3">
-                <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 font-bold text-primary">
-                  {displayName(selected)[0]?.toUpperCase()}
-                  <span className={`absolute -bottom-0.5 -right-0.5 text-sm ${CH[selected.channel]?.color ?? ""}`}>{CH[selected.channel]?.icon}</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-foreground">{displayName(selected)}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {selected.contactEmail ?? selected.contactPhone ?? CH[selected.channel]?.label}
-                    {selected.subject && ` · ${selected.subject}`}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  {slaLabel(selected) && (
-                    <span className={`rounded-md px-2 py-1 text-xs font-medium ${slaColor(selected)}`}>{slaLabel(selected)}</span>
-                  )}
-                  <NelvyonDsButton variant="ghost" className="text-xs" onClick={() => void closeConv(selected.id)}>✓ Cerrar</NelvyonDsButton>
-                </div>
-              </div>
-
-              {/* Messages */}
-              <div className="flex-1 overflow-y-auto space-y-3 p-5">
-                {loadingMsgs ? (
-                  <div className="space-y-2">
-                    {Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-10 animate-pulse rounded-xl bg-muted/20" />)}
-                  </div>
-                ) : messages.length === 0 ? (
-                  <p className="text-center text-xs text-muted-foreground">Sin mensajes aún</p>
-                ) : messages.map(msg => (
-                  <div key={msg.id} className={`flex ${msg.direction === "outbound" ? "justify-end" : "justify-start"}`}>
-                    <div className={`max-w-md rounded-2xl px-4 py-2.5 text-sm ${msg.direction === "outbound" ? "bg-primary text-primary-foreground rounded-br-sm" : "bg-muted/30 text-foreground rounded-bl-sm"}`}>
-                      {msg.channel && msg.channel !== selected.channel && (
-                        <span className="mb-1 block text-[10px] opacity-70">{CH[msg.channel as Channel]?.icon ?? msg.channel}</span>
-                      )}
-                      <p className="leading-relaxed">{msg.body}</p>
-                      <p className={`mt-1 text-[10px] ${msg.direction === "outbound" ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
-                        {fmtTime(msg.createdAt)}
-                      </p>
+        {/* Lectura del hilo — pantalla `email-read` de W3CRM
+            (`app/(email)/email-read/page.jsx`): `card h-auto` > `card-body` >
+            `row gx-0` > `email-right-box` con `toolbar`/`saprat`/`mail-tools`,
+            `right-box-padding border-start p-0` > `read-wapper dz-scroll` >
+            `read-content` con `media`, `read-content-body` y el `textarea` +
+            boton `text-end`. */}
+        {selected && (
+          <div className="container-fluid p-0">
+            <div className="row gx-0">
+              <div className="col-xl-12">
+                <div className="card h-auto">
+                  <div className="card-body">
+                    <div className="row gx-0">
+                      <div className="col-12">
+                        <div className="email-right-box">
+                          <div role="toolbar" className="toolbar ms-1 ms-sm-0">
+                            <div className="saprat ps-3">
+                              <div className="mail-tools ms-0 d-flex align-items-center">
+                                <select
+                                  className="form-control me-2"
+                                  style={{ maxWidth: 220 }}
+                                  value={selected.assignedTo ?? ""}
+                                  onChange={(e) => void assignMember(e.target.value || null)}
+                                  aria-label="Asignar a"
+                                >
+                                  <option value="">Sin asignar</option>
+                                  {members.map((m) => (
+                                    <option key={m.id} value={m.id}>{m.name ?? m.email}</option>
+                                  ))}
+                                </select>
+                                {selected.status === "open" && (
+                                  <Link
+                                    href="#" scroll={false}
+                                    className="btn btn-primary px-3 light me-2"
+                                    title="Cerrar conversación"
+                                    onClick={(e) => { e.preventDefault(); void closeConv(selected.id); }}
+                                  >
+                                    <i className="fa-regular fa-circle-check"></i>
+                                  </Link>
+                                )}
+                                <Link
+                                  href="#" scroll={false}
+                                  className="btn btn-primary px-3 light"
+                                  title="Cerrar panel"
+                                  onClick={(e) => { e.preventDefault(); setSelected(null); }}
+                                >
+                                  <i className="fa-solid fa-xmark"></i>
+                                </Link>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="row gx-0">
+                            <div className="col-12">
+                              <div className="right-box-padding border-start p-0">
+                                <div className="read-wapper dz-scroll" id="read-content">
+                                  <div className="read-content">
+                                    <div className="media pt-3 d-sm-flex d-block justify-content-between">
+                                      <div className="clearfix mb-3 d-flex">
+                                        <div className="media-body me-2">
+                                          <h5 className="text-primary mb-0 mt-1">{displayName(selected)}</h5>
+                                          <p className="mb-0">
+                                            {CH[selected.channel].label}
+                                            {selected.lastMessageAt ? ` · ${timeAgo(selected.lastMessageAt)}` : ""}
+                                          </p>
+                                        </div>
+                                      </div>
+                                      <div className="clearfix mb-3">
+                                        <span className={`badge light border-0 ${PRIORITY_BADGE[selected.priority]} me-2`}>
+                                          {selected.priority}
+                                        </span>
+                                        {slaLabel(selected) && (
+                                          <span className={`badge light border-0 ${slaTone(selected)}`}>{slaLabel(selected)}</span>
+                                        )}
+                                      </div>
+                                    </div>
+                                    <hr />
+                                    <div className="media mb-2 mt-3">
+                                      <div className="media-body">
+                                        <h5 className="my-1 text-primary">{selected.subject ?? CH[selected.channel].label}</h5>
+                                        <p className="read-content-email">
+                                          {selected.contactEmail ?? selected.contactPhone ?? ""}
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <div className="read-content-body">
+                                      {loadingMsgs ? (
+                                        <div className="d-flex align-items-center" role="status">
+                                          <div className="spinner-border text-primary me-3" aria-hidden="true" />
+                                          <span className="text-muted">Cargando mensajes…</span>
+                                        </div>
+                                      ) : (
+                                        messages.map((m) => (
+                                          <div key={m.id} className="media mb-2">
+                                            <div className="media-body">
+                                              <span className="float-end">{fmtTime(m.createdAt)}</span>
+                                              <p className="mb-1">{m.body}</p>
+                                              <span className="text-muted fs-13">
+                                                {m.direction === "outbound" ? "Enviado" : "Recibido"} · {m.status}
+                                              </span>
+                                            </div>
+                                          </div>
+                                        ))
+                                      )}
+                                      <div ref={messagesEndRef} />
+                                      <hr />
+                                    </div>
+                                    {aiHint && <p className="text-primary fs-13 mb-2">{aiHint}</p>}
+                                    {replyInfo && (
+                                      <p className={`fs-13 mb-2 ${replyInfo.dispatched ? "text-success" : "text-danger"}`}>
+                                        {replyInfo.dispatched
+                                          ? "Enviado por el canal"
+                                          : `No enviado${replyInfo.error ? `: ${replyInfo.error}` : ""}`}
+                                      </p>
+                                    )}
+                                    <div className="mb-3 pt-3">
+                                      <textarea
+                                        name="write-email"
+                                        id="write-email"
+                                        rows={5}
+                                        className="form-control"
+                                        value={reply}
+                                        onChange={(e) => setReply(e.target.value)}
+                                        placeholder="Escribe una respuesta…"
+                                        aria-label="Respuesta"
+                                      />
+                                    </div>
+                                  </div>
+                                  <div className="text-end">
+                                    <button
+                                      className="btn btn-primary light me-2"
+                                      type="button"
+                                      disabled={agentLoading}
+                                      onClick={() => void suggestAiReply()}
+                                    >
+                                      {agentLoading ? "Sugiriendo…" : "Sugerir con IA"}
+                                    </button>
+                                    <button
+                                      className="btn btn-primary"
+                                      type="button"
+                                      disabled={!reply.trim()}
+                                      onClick={() => void sendReply()}
+                                    >
+                                      Enviar
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                ))}
-                <div ref={messagesEndRef} />
-              </div>
-
-              {/* Reply feedback */}
-              {replyInfo && (
-                <div className={`mx-4 rounded-lg px-3 py-1.5 text-xs ${replyInfo.error ? "bg-yellow-500/10 text-yellow-400" : "bg-green-500/10 text-green-400"}`}>
-                  {replyInfo.error ? `⚠ ${replyInfo.error}` : replyInfo.dispatched ? `✓ Enviado vía ${CH[selected.channel]?.label}` : "✓ Guardado"}
-                </div>
-              )}
-
-              {/* Reply box */}
-              <div className="border-t border-border p-4">
-                {aiHint && <p className="mb-2 text-[11px] text-primary">{aiHint}</p>}
-                <div className="flex items-end gap-3">
-                  <NelvyonDsButton
-                    variant="ghost"
-                    className="h-10 shrink-0 text-xs"
-                    disabled={!agentEnabled || agentLoading}
-                    onClick={() => void suggestAiReply()}
-                  >
-                    {agentLoading ? "…" : "✦ IA"}
-                  </NelvyonDsButton>
-                  <div className="flex-1 rounded-xl border border-border bg-background focus-within:border-primary">
-                    <textarea
-                      value={reply}
-                      onChange={e => setReply(e.target.value)}
-                      onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); void sendReply(); } }}
-                      placeholder={`Responder vía ${CH[selected.channel]?.label}… (Enter para enviar)`}
-                      rows={2}
-                      className="w-full resize-none rounded-xl bg-transparent px-4 py-3 text-sm text-foreground focus:outline-none"
-                    />
-                  </div>
-                  <NelvyonDsButton onClick={() => void sendReply()} disabled={!reply.trim()} className="h-10 px-5">↗ Enviar</NelvyonDsButton>
                 </div>
               </div>
             </div>
-          ) : (
-            <div className="flex flex-1 items-center justify-center text-muted-foreground text-sm">
-              Selecciona una conversación
-            </div>
-          )}
-
-          {/* Right info panel */}
-          {selected && (
-            <div className="hidden w-64 shrink-0 flex-col gap-4 border-l border-border p-4 xl:flex overflow-y-auto">
-              <div className="text-center">
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary">
-                  {displayName(selected)[0]?.toUpperCase()}
-                </div>
-                <p className="mt-2 font-semibold text-foreground">{displayName(selected)}</p>
-                {selected.contactEmail && <p className="text-xs text-muted-foreground">{selected.contactEmail}</p>}
-                {selected.contactPhone && <p className="text-xs text-muted-foreground">{selected.contactPhone}</p>}
-              </div>
-
-              {/* SLA info */}
-              {selected.slaDueAt && (
-                <div className="space-y-1">
-                  <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">SLA</p>
-                  <span className={`inline-block rounded-md px-2 py-1 text-xs font-medium ${slaColor(selected)}`}>{slaLabel(selected)}</span>
-                  {selected.firstResponseAt && (
-                    <p className="text-[11px] text-green-400">✓ 1ª resp. {timeAgo(selected.firstResponseAt)}</p>
-                  )}
-                </div>
-              )}
-
-              {/* Assign */}
-              <div className="space-y-2">
-                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Asignado a</p>
-                <select
-                  value={selected.assignedTo ?? ""}
-                  onChange={e => void assignMember(e.target.value || null)}
-                  className="w-full rounded-lg border border-border bg-background px-2 py-1.5 text-xs text-foreground"
-                >
-                  <option value="">Sin asignar</option>
-                  {members.filter(m => m.status === "active").map(m => (
-                    <option key={m.id} value={m.id}>{m.name ?? m.email}</option>
-                  ))}
-                </select>
-                <NelvyonDsButton variant="ghost" className="w-full text-xs" onClick={() => void assignMember(null)}>
-                  🔄 Round-robin
-                </NelvyonDsButton>
-              </div>
-
-              {/* Channel */}
-              <div className="space-y-1">
-                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Canal</p>
-                <p className={`text-sm font-medium ${CH[selected.channel]?.color ?? ""}`}>
-                  {CH[selected.channel]?.icon} {CH[selected.channel]?.label}
-                </p>
-              </div>
-
-              {/* Priority */}
-              <div className="space-y-1">
-                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Prioridad</p>
-                <span className={`inline-block rounded-md px-2 py-1 text-xs font-medium ${PRIORITY_BADGE[selected.priority]}`}>
-                  {selected.priority}
-                </span>
-              </div>
-
-              <div className="space-y-1.5 mt-2">
-                <NelvyonDsButton variant="ghost" className="w-full text-xs" onClick={() => void closeConv(selected.id)}>✓ Cerrar conversación</NelvyonDsButton>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-    </SaasShellLayout>
+          </div>
+        )}
+      </Fragment>
+    </SaasW3crmShell>
   );
 }

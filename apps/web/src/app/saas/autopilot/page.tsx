@@ -1,19 +1,49 @@
 "use client";
 
+/**
+ * /saas/autopilot sobre `(cms)/content` de W3CRM, con las piezas ya portadas.
+ * Mapeo: rejilla de servicios -> `W3crmContentBox` + `card` de Bootstrap;
+ * KPIs -> `W3crmKpiTile`; espera -> `W3crmCargando`. Sin componentes nuevos.
+ *
+ * CONTRATO — `saas-autopilot.spec.ts` exige, y aqui se conserva:
+ *   - `getByText("SEO mensual")` UNICO (l.14). Por eso ninguna caja se titula
+ *     con ese texto: el toggle de `W3crmContentBox` expone
+ *     `aria-label="Plegar <titulo>"` y entraria en el conteo.
+ *   - `Calendario social` y `/Ads snapshot/i` visibles (l.62,66).
+ *   - la tarjeta de reputacion, localizada por su control accesible
+ *     `/^Toggle Reputaci/i` (l.65). El rotulo "Reputación GBP" se conserva
+ *     intacto: el sidebar declara un enlace "Reputación" (`saasNav.ts:106`)
+ *     que `SaasW3crmShell` SI expone a `getByText` —el shell anterior no—, de
+ *     ahi que el spec localice la tarjeta por su boton y no por texto suelto.
+ *   - el body debe casar con `/Servicios activos|activos/i` y
+ *     `/Entregables este mes/i` (l.72-73): son las dos etiquetas de KPI.
+ *   - un `<a>` con texto `/Ver entregables/i` y `href="/saas/entregables"`
+ *     exacto (l.78-79).
+ *   - el PRIMER `<button>` con `/Ejecutar ahora/i` deshabilitado cuando SEO
+ *     esta OFF (l.84-85): de ahi que `SERVICES` conserve su orden, con `seo`
+ *     primero.
+ *   - `getByRole("button", { name: "Toggle SEO mensual" })` disparando
+ *     `PATCH /api/saas/autopilot` (l.94): el toggle sigue siendo un `<button>`
+ *     con ese `aria-label` y SIN `role` explicito. Ponerle `role="switch"`
+ *     sobrescribe el rol implicito y `getByRole("button", ...)` deja de
+ *     encontrarlo.
+ *
+ * Logica de NELVYON intacta: `GET /api/saas/autopilot` y
+ * `GET /api/saas/entregables?days=30` en paralelo; `PATCH
+ * /api/saas/autopilot` con el `fieldMap` de los cuatro servicios; `POST
+ * /api/saas/autopilot/run` en sus dos formas (`{ service }` y
+ * `{ runAll: true }`); el toast de 4 s con su criterio de exito; la recarga de
+ * timestamps tras ejecutar; el `activeCount > 0` que gobierna "Ejecutar todo";
+ * y el `nextRunField` nulo de reputacion y ads.
+ */
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
-import {
-  NelvyonDsBadge,
-  NelvyonDsButton,
-  NelvyonDsCard,
-  NelvyonDsSectionHeader,
-} from "@/design-system/components";
-import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmKpiTile } from "@/features/saas-w3crm/components/W3crmUi";
+import { W3crmCargando, W3crmContentBox } from "@/features/saas-w3crm/components/W3crmContentBox";
 import type { AutopilotStatus, AutopilotService } from "@nelvyon/saas";
-
-// ── Service card config ────────────────────────────────────────────────────────
 
 interface ServiceCard {
   key: AutopilotService;
@@ -26,6 +56,8 @@ interface ServiceCard {
   hint?: string;
 }
 
+/** El orden importa: `seo` va primero porque el spec toma el PRIMER
+ *  "Ejecutar ahora" y lo espera deshabilitado con SEO en OFF. */
 const SERVICES: ServiceCard[] = [
   {
     key: "seo",
@@ -33,7 +65,7 @@ const SERVICES: ServiceCard[] = [
     lastRunField: "lastSeoRunAt",
     nextRunField: "nextSeoRun",
     label: "SEO mensual",
-    icon: "🔍",
+    icon: "fa-solid fa-magnifying-glass",
     description: "Informe SEO automático: posiciones, keywords y acciones recomendadas",
     hint: "Conecta Google Search Console para datos reales de posicionamiento",
   },
@@ -43,7 +75,7 @@ const SERVICES: ServiceCard[] = [
     lastRunField: "lastSocialRunAt",
     nextRunField: "nextSocialRun",
     label: "Calendario social",
-    icon: "📅",
+    icon: "fa-solid fa-calendar-days",
     description: "Genera calendario de 12 posts/mes para Instagram, LinkedIn y Stories",
   },
   {
@@ -52,7 +84,7 @@ const SERVICES: ServiceCard[] = [
     lastRunField: "lastReputationRunAt",
     nextRunField: null as unknown as keyof AutopilotStatus,
     label: "Reputación GBP",
-    icon: "⭐",
+    icon: "fa-solid fa-star",
     description: "Sincroniza reviews de Google Business Profile y detecta negativas",
     hint: "Requiere OAuth con Google My Business para sincronización automática",
   },
@@ -62,27 +94,27 @@ const SERVICES: ServiceCard[] = [
     lastRunField: "lastAdsRunAt",
     nextRunField: null as unknown as keyof AutopilotStatus,
     label: "Ads snapshot",
-    icon: "📣",
+    icon: "fa-solid fa-bullhorn",
     description: "Refresca métricas de Meta Ads y Google Ads: ROAS, clicks, conversiones",
     hint: "Conecta al menos una plataforma de Ads en Integraciones",
   },
 ];
 
-// ── Helpers ────────────────────────────────────────────────────────────────────
-
+function num(v: unknown): number {
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+/** Una fecha corrupta pintaba "Invalid Date". */
 function fmtDate(iso: string | null | undefined): string {
   if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("es-ES", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime())
+    ? "—"
+    : d.toLocaleDateString("es-ES", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
 }
 
-// ── Toggle card ────────────────────────────────────────────────────────────────
-
 function ServiceToggleCard({
-  card,
-  status,
-  onToggle,
-  onRunNow,
-  running,
+  card, status, onToggle, onRunNow, running,
 }: {
   card: ServiceCard;
   status: AutopilotStatus;
@@ -96,61 +128,55 @@ function ServiceToggleCard({
   const isRunning = running === card.key;
 
   return (
-    <NelvyonDsCard className={enabled ? "border-primary/40 bg-primary/5" : undefined}>
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <span className="text-2xl" aria-hidden="true">{card.icon}</span>
-          <div>
-            <div className="flex items-center gap-2">
-              <p className="font-semibold text-foreground text-sm">{card.label}</p>
-              <NelvyonDsBadge tone={enabled ? "success" : "neutral"}>{enabled ? "Activo" : "Inactivo"}</NelvyonDsBadge>
+    <div className={`card border mb-3 h-100 ${enabled ? "border-primary" : ""}`}>
+      <div className="card-body">
+        <div className="d-flex align-items-start justify-content-between gap-3">
+          <div className="d-flex align-items-start gap-3">
+            <i className={`${card.icon} fa-lg text-primary mt-1`} aria-hidden="true" />
+            <div>
+              <div className="d-flex align-items-center gap-2">
+                <span className="fw-bold">{card.label}</span>
+                <span className={`badge ${enabled ? "badge-success" : "badge-secondary"}`}>
+                  {enabled ? "Activo" : "Inactivo"}
+                </span>
+              </div>
+              <p className="text-muted fs-12 mt-1 mb-0">{card.description}</p>
             </div>
-            <p className="mt-0.5 text-xs text-muted-foreground">{card.description}</p>
           </div>
+          {/* `<button>` sin `role` explicito y con este `aria-label` exacto: el
+              spec lo localiza con `getByRole("button", { name: ... })`. */}
+          <button
+            type="button"
+            aria-pressed={enabled}
+            aria-label={`Toggle ${card.label}`}
+            onClick={() => onToggle(card.key, !enabled)}
+            className={`btn btn-sm flex-shrink-0 ${enabled ? "btn-primary" : "btn-primary light"}`}
+          >
+            {enabled ? "ON" : "OFF"}
+          </button>
         </div>
-        {/* Toggle */}
-        <button
-          aria-label={`Toggle ${card.label}`}
-          onClick={() => onToggle(card.key, !enabled)}
-          className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ${
-            enabled ? "bg-primary" : "bg-muted"
-          }`}
-        >
-          <span
-            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow transition ${
-              enabled ? "translate-x-5" : "translate-x-0"
-            }`}
-          />
-        </button>
-      </div>
 
-      {/* Last / next run */}
-      <div className="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-xs text-muted-foreground">
-        <span>Última ejecución: <span className="text-foreground/80">{fmtDate(lastRun)}</span></span>
-        {nextRun && <span>Próxima: <span className="text-foreground/80">{fmtDate(nextRun)}</span></span>}
-      </div>
+        <div className="d-flex flex-wrap gap-3 text-muted fs-12 mt-3">
+          <span>Última ejecución: <span className="text-black">{fmtDate(lastRun)}</span></span>
+          {nextRun ? <span>Próxima: <span className="text-black">{fmtDate(nextRun)}</span></span> : null}
+        </div>
 
-      {/* Hint if not connected */}
-      {card.hint && !enabled && (
-        <p className="mt-2 text-xs text-warning">{card.hint}</p>
-      )}
+        {card.hint && !enabled ? <p className="text-warning fs-12 mt-2 mb-0">{card.hint}</p> : null}
 
-      {/* Run now */}
-      <div className="mt-4">
-        <NelvyonDsButton
-          size="sm"
-          variant={enabled && !isRunning ? "primary" : "secondary"}
-          disabled={!enabled || isRunning}
-          onClick={() => onRunNow(card.key)}
-        >
-          {isRunning ? "Ejecutando…" : "Ejecutar ahora"}
-        </NelvyonDsButton>
+        <div className="mt-3">
+          <button
+            type="button"
+            className={`btn btn-sm ${enabled && !isRunning ? "btn-primary" : "btn-primary light"}`}
+            disabled={!enabled || isRunning}
+            onClick={() => onRunNow(card.key)}
+          >
+            {isRunning ? "Ejecutando…" : "Ejecutar ahora"}
+          </button>
+        </div>
       </div>
-    </NelvyonDsCard>
+    </div>
   );
 }
-
-// ── Main page ──────────────────────────────────────────────────────────────────
 
 export default function AutopilotPage() {
   const [status, setStatus] = useState<AutopilotStatus | null>(null);
@@ -167,12 +193,14 @@ export default function AutopilotPage() {
         fetch("/api/saas/entregables?days=30"),
       ]);
       if (autopilotRes.ok) {
-        const d = await autopilotRes.json() as { status: AutopilotStatus };
-        setStatus(d.status);
+        const d = (await autopilotRes.json().catch(() => ({}))) as { status?: AutopilotStatus };
+        // Un payload sin `status` dejaba la pantalla en blanco para siempre.
+        if (d.status && typeof d.status === "object") setStatus(d.status);
       }
       if (entRes.ok) {
-        const d = await entRes.json() as { summary: { total: number } };
-        setEntregablesThisMonth(d.summary.total);
+        const d = (await entRes.json().catch(() => ({}))) as { summary?: { total?: number } };
+        // `summary` ausente reventaba al leer `.total`.
+        setEntregablesThisMonth(d.summary && d.summary.total != null ? num(d.summary.total) : null);
       }
     } finally {
       setLoading(false);
@@ -195,8 +223,11 @@ export default function AutopilotPage() {
         body: JSON.stringify({ [fieldMap[service]]: enabled }),
       });
       if (res.ok) {
-        const d = await res.json() as { settings: AutopilotStatus };
-        setStatus((prev) => prev ? { ...prev, ...d.settings } : d.settings);
+        const d = (await res.json().catch(() => ({}))) as { settings?: AutopilotStatus };
+        if (d.settings && typeof d.settings === "object") {
+          const settings = d.settings;
+          setStatus((prev) => (prev ? { ...prev, ...settings } : settings));
+        }
       }
     } catch {
       // Silently ignore — state remains unchanged
@@ -211,14 +242,14 @@ export default function AutopilotPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ service }),
       });
-      const d = await res.json() as { result?: { message: string; success: boolean } };
+      const d = (await res.json().catch(() => ({}))) as { result?: { message?: string; success?: boolean } };
       const msg = d.result?.message ?? (res.ok ? "Ejecutado" : "Error");
       setToast({ msg, ok: res.ok && (d.result?.success ?? false) });
-      setTimeout(() => setToast(null), 4000);
-      void load(); // Refresh last_run timestamps
+      window.setTimeout(() => setToast(null), 4000);
+      void load();
     } catch {
       setToast({ msg: "Error al ejecutar", ok: false });
-      setTimeout(() => setToast(null), 4000);
+      window.setTimeout(() => setToast(null), 4000);
     } finally {
       setRunning(null);
     }
@@ -232,83 +263,93 @@ export default function AutopilotPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ runAll: true }),
       });
-      const d = await res.json() as { results?: Array<{ message: string; success: boolean }> };
-      const ok = res.ok && (d.results?.every((r) => r.success) ?? res.ok);
+      const d = (await res.json().catch(() => ({}))) as { results?: Array<{ success?: boolean }> };
+      const ok = res.ok && (Array.isArray(d.results) ? d.results.every((r) => r?.success) : res.ok);
       setToast({ msg: ok ? "Todos los servicios activos ejecutados" : "Algunos servicios fallaron", ok });
-      setTimeout(() => setToast(null), 4000);
+      window.setTimeout(() => setToast(null), 4000);
       void load();
     } catch {
       setToast({ msg: "Error al ejecutar", ok: false });
-      setTimeout(() => setToast(null), 4000);
+      window.setTimeout(() => setToast(null), 4000);
     } finally {
       setRunning(null);
     }
   }
 
-  const sidebar = <SaasSidebar activeId="autopilot" />;
+  const activos = num(status?.activeCount);
 
   return (
-    <SaasShellLayout sidebar={sidebar}>
-      <div className="space-y-6 pb-8">
-        {/* Header */}
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <NelvyonDsSectionHeader
-            title="🤖 Autopilot"
-            subtitle="Activa los servicios recurrentes de IA que se ejecutan automáticamente cada mes"
-          />
-          {status && status.activeCount > 0 && (
-            <NelvyonDsButton disabled={running !== null} onClick={() => void handleRunAll()}>
-              {running ? "Ejecutando…" : "▶ Ejecutar todo"}
-            </NelvyonDsButton>
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="Autopilot" parentTitle="Inteligencia" pageTitle="Autopilot" />
+      <div className="container-fluid">
+        <div className="row">
+          {status && (
+            <>
+              <div className="col-xl-4 col-sm-6">
+                <W3crmKpiTile label="Servicios activos" value={`${activos} / 4`} accent />
+              </div>
+              <div className="col-xl-4 col-sm-6">
+                <W3crmKpiTile
+                  label="Entregables este mes"
+                  value={entregablesThisMonth !== null ? entregablesThisMonth : "—"}
+                />
+              </div>
+              <div className="col-xl-4 col-sm-6">
+                <div className="card">
+                  <div className="card-body p-4 d-flex align-items-center">
+                    {/* href literal `/saas/entregables`: el spec compara el
+                        atributo exacto. */}
+                    <Link href="/saas/entregables">Ver entregables →</Link>
+                  </div>
+                </div>
+              </div>
+            </>
           )}
+
+          <div className="col-xl-12">
+            <p className="fs-14 text-muted">
+              Activa los servicios recurrentes de IA que se ejecutan automáticamente cada mes
+            </p>
+
+            {toast && (
+              <div className={`alert ${toast.ok ? "alert-success" : "alert-danger"}`} role="status">
+                {toast.msg}
+              </div>
+            )}
+
+            <W3crmContentBox
+              titulo="Servicios recurrentes"
+              icono="fa-solid fa-robot"
+              acciones={
+                status && activos > 0 ? (
+                  <button type="button" className="btn btn-primary btn-sm me-2"
+                    disabled={running !== null} onClick={() => void handleRunAll()}>
+                    {running ? "Ejecutando…" : "Ejecutar todo"}
+                  </button>
+                ) : undefined
+              }
+            >
+              {loading || !status ? (
+                <W3crmCargando texto="Cargando servicios…" />
+              ) : (
+                <div className="row">
+                  {SERVICES.map((card) => (
+                    <div className="col-xl-6" key={card.key}>
+                      <ServiceToggleCard
+                        card={card}
+                        status={status}
+                        onToggle={handleToggle}
+                        onRunNow={handleRunNow}
+                        running={running}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </W3crmContentBox>
+          </div>
         </div>
-
-        {/* KPI strip */}
-        {status && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            <KpiTile icon="🤖" label="Servicios activos" value={`${status.activeCount} / 4`} accent />
-            <KpiTile icon="📦" label="Entregables este mes" value={entregablesThisMonth !== null ? entregablesThisMonth : "—"} />
-            <div className="col-span-2 flex items-center rounded-xl border border-border bg-card px-5 py-4 sm:col-span-1">
-              <a href="/saas/entregables" className="text-sm text-primary hover:underline">
-                Ver entregables →
-              </a>
-            </div>
-          </div>
-        )}
-
-        {/* Toast */}
-        {toast && (
-          <div
-            className={`rounded-lg px-4 py-2 text-sm font-medium ${
-              toast.ok ? "bg-success/15 text-success" : "bg-destructive/15 text-destructive"
-            }`}
-          >
-            {toast.msg}
-          </div>
-        )}
-
-        {/* Service cards */}
-        {loading || !status ? (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="h-40 animate-pulse rounded-xl bg-muted/20" />
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {SERVICES.map((card) => (
-              <ServiceToggleCard
-                key={card.key}
-                card={card}
-                status={status}
-                onToggle={handleToggle}
-                onRunNow={handleRunNow}
-                running={running}
-              />
-            ))}
-          </div>
-        )}
       </div>
-    </SaasShellLayout>
+    </SaasW3crmShell>
   );
 }

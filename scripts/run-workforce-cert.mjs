@@ -46,10 +46,16 @@ function gitCommit() {
 }
 
 async function ollamaReachable() {
-  const host = (process.env.OLLAMA_HOST || process.env.OLLAMA_BASE_URL || "http://127.0.0.1:11434").replace(
+  const raw = (process.env.OLLAMA_HOST || process.env.OLLAMA_BASE_URL || "http://127.0.0.1:11434").replace(
     /\/$/,
     "",
   );
+  // `OLLAMA_HOST` es `host:port` SIN esquema en la convención oficial de Ollama.
+  // Consumirlo tal cual como base de `fetch` daba "Failed to parse URL from
+  // 127.0.0.1:11434/api/tags", que este gate reportaba como `unreachable`:
+  // indistinguible de que el servidor no estuviera levantado. Misma
+  // normalización que `backend/local-ai/config.ts`.
+  const host = /^[a-z][a-z0-9+.-]*:\/\//i.test(raw) ? raw : `http://${raw}`;
   try {
     const res = await fetch(`${host}/api/tags`, { signal: AbortSignal.timeout(5000) });
     if (!res.ok) return { ok: false, host, detail: `http_${res.status}` };
@@ -199,15 +205,40 @@ function addStep(id, required, ok, detail) {
   }
 }
 
-// Ollama + RAG live — auto when reachable
+/**
+ * `ollama_live` y `rag_live` exigen un Ollama servido en la propia máquina.
+ * La arquitectura lo acota a la máquina del owner (ARCHITECTURE_LOCAL_AI_RUNTIME,
+ * Option C: "Dev/cert only"), y un runner de GitHub no lo tiene ni puede
+ * tenerlo. Con ambos pasos marcados `required` sin condición, este gate no
+ * podía pasar NUNCA en CI: fallaba por diseño, no por un defecto del producto.
+ *
+ * El entorno declara que no puede hospedar IA local con
+ * `NELVYON_WORKFORCE_LIVE_REQUIRED=0` — mismo patrón que `NELVYON_ELITE_LIVE`
+ * en `run-phase2-elite-cert.mjs`, que ya emite CONDITIONAL_PASS en CI. La
+ * bandera NO relaja ningún control:
+ *
+ *   - solo actúa cuando Ollama es INALCANZABLE. Si está levantado y los tests
+ *     live fallan, se ignora y sigue siendo fallo duro (rama `else`);
+ *   - no puede producir certificación: `certified` pasa a exigir evidencia
+ *     live real de forma explícita, más abajo, al margen de `required`;
+ *   - queda registrada en `externalNotes`, así que el artefacto dice por qué
+ *     no se reclamó la certificación.
+ */
+const liveRequired = process.env.NELVYON_WORKFORCE_LIVE_REQUIRED !== "0";
 const ollama = await ollamaReachable();
 {
   if (!ollama.ok) {
     // External ops: start Ollama — not a silent skip; required step fails → no PASS
-    addStep("ollama_live", true, false, `unreachable:${ollama.detail}`);
-    addStep("rag_live", true, false, "blocked_by_ollama");
-    externalNotes.push("ollama_not_running_start_local_service");
+    addStep("ollama_live", liveRequired, false, `unreachable:${ollama.detail}`);
+    addStep("rag_live", liveRequired, false, "blocked_by_ollama");
+    externalNotes.push(
+      liveRequired
+        ? "ollama_not_running_start_local_service"
+        : "live_ai_unavailable_in_this_environment_cert_not_claimed",
+    );
   } else {
+    // Ollama levantado: la evidencia live es obligatoria SIEMPRE. La bandera
+    // de entorno no aplica aquí — un live roto no se degrada a condicional.
     const r = run(
       "pnpm",
       ["-C", "apps/web", "exec", "vitest", "run", "backend/saas/__tests__/workforceLive.test.ts", "--reporter=dot"],
@@ -247,6 +278,17 @@ const requiredOk = steps.filter((s) => s.required).every((s) => s.ok);
 const internalBlockers = steps.filter((s) => s.required && !s.ok).map((s) => s.id);
 if (internalBlockers.length) blockers.push(...internalBlockers);
 
+/**
+ * La certificación exige evidencia live REAL, con independencia de si el
+ * entorno marcó esos pasos como `required`. Sin esta comprobación explícita,
+ * declarar un entorno sin IA local convertiría "8 de 8 requeridos en verde" en
+ * un PASS falso: exactamente el fraude que el gate existe para impedir.
+ */
+const liveEvidenceOk = ["ollama_live", "rag_live"].every(
+  (id) => steps.find((s) => s.id === id)?.ok === true,
+);
+if (!liveEvidenceOk) blockers.push("live_evidence_missing_cert_not_claimed");
+
 // Phase-1 prod residuals — documented, do NOT block workforce PASS
 externalNotes.push(
   "phase1_ses_stripe_prod_ops_separate",
@@ -261,7 +303,7 @@ let rationale = "Required workforce gates failed.";
 if (forcePass) {
   verdict = "FAIL";
   rationale = "NELVYON_WORKFORCE_FORCE_PASS is forbidden; cert must be earned.";
-} else if (requiredOk && skipped.length === 0 && internalBlockers.length === 0) {
+} else if (requiredOk && liveEvidenceOk && skipped.length === 0 && internalBlockers.length === 0) {
   verdict = "PASS";
   certified = true;
   rationale =

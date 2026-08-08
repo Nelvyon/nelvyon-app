@@ -1,17 +1,31 @@
 "use client";
 
+/**
+ * /saas/affiliates sobre `(cms)/content` de W3CRM, con las piezas ya portadas.
+ * Mapeo: alta de enlace, listados y configuracion -> `W3crmContentBox` +
+ * `W3crmDataTable`; las tres secciones -> `nav nav-tabs`; KPIs ->
+ * `W3crmKpiTile`. Sin componentes nuevos.
+ *
+ * Inventario: sin `data-testid`; lo cubre `saas-modules.spec.ts` (la ruta carga
+ * sin 500) y `expectUnauthorizedApi(request, "/api/saas/affiliates")`. El modulo
+ * ya traia un `role="tablist"` con `aria-label="Secciones afiliados"` y tres
+ * `role="tab"` ("Enlaces", "Comisiones", "Configuración"): se conservan tal
+ * cual, ahora sobre el `nav nav-tabs` de la plantilla.
+ *
+ * Logica de NELVYON intacta: `/api/saas/affiliates` con sus dos recursos
+ * (`?resource=stats`, `?resource=commissions`) y sus cinco acciones POST
+ * (`create-link`, `set-link-active`, `approve-commission`, `mark-paid`,
+ * `update-program`); `apiFetch` propagando el `code` del error; el mensaje
+ * especifico de `CEO_GATE` al marcar pagada; el filtro de comisiones por
+ * estado; el copiado con aviso de 2 s; el aviso de exito de 3,5 s y el bloqueo
+ * del alta cuando el programa esta pausado.
+ */
 import { useCallback, useEffect, useState } from "react";
-import {
-  NelvyonDsBadge,
-  NelvyonDsButton,
-  NelvyonDsCard,
-  NelvyonDsSectionHeader,
-} from "@/design-system/components";
-import { SaasShellLayout } from "@/features/saas-shell/components/SaasShellLayout";
-import { SaasSidebar } from "@/features/saas-shell/components/SaasSidebar";
-import { KpiTile } from "@/features/saas-shell/components/SaasDashboardWidgets";
 
-// ── Types ────────────────────────────────────────────────────────────────────
+import { SaasW3crmShell } from "@/features/saas-w3crm/components/SaasW3crmShell";
+import { W3crmPageTitle } from "@/features/saas-w3crm/components/W3crmPageTitle";
+import { W3crmEmptyState, W3crmKpiTile } from "@/features/saas-w3crm/components/W3crmUi";
+import { W3crmCargando, W3crmContentBox, W3crmDataTable } from "@/features/saas-w3crm/components/W3crmContentBox";
 
 interface AffiliateProgram {
   id: string;
@@ -48,7 +62,6 @@ interface ProgramStats {
   totalConversions: number;
 }
 
-type BadgeTone = "neutral" | "primary" | "success" | "warning" | "danger";
 type Tab = "links" | "commissions" | "settings";
 type CommissionFilter = "all" | "pending" | "approved" | "paid";
 
@@ -57,14 +70,32 @@ const STATUS_LABEL: Record<string, string> = {
   approved: "Aprobada",
   paid: "Pagada",
 };
-const STATUS_TONE: Record<string, BadgeTone> = {
-  pending: "warning",
-  approved: "primary",
-  paid: "success",
+const STATUS_BADGE: Record<string, string> = {
+  pending: "badge-warning",
+  approved: "badge-primary",
+  paid: "badge-success",
 };
 
-const inputCls =
-  "w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none";
+/** Un estado fuera de catalogo pintaba `undefined`. */
+function etiquetaEstado(s: string): string {
+  return STATUS_LABEL[s] ?? (s ? String(s) : "—");
+}
+function badgeEstado(s: string): string {
+  return STATUS_BADGE[s] ?? "badge-secondary";
+}
+function num(v: unknown): number {
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+/** Importes que pueden llegar nulos o como texto: `toFixed` reventaba. */
+function eur(v: unknown): string {
+  return `${num(v).toFixed(2)} €`;
+}
+function fecha(iso: string | null | undefined): string {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? "—" : d.toLocaleDateString("es-ES");
+}
 
 async function apiFetch<T>(url: string, opts?: RequestInit): Promise<T> {
   const r = await fetch(url, {
@@ -106,10 +137,10 @@ export default function SaasAffiliatesPage() {
         apiFetch<AffiliateCommission[]>("/api/saas/affiliates?resource=commissions"),
       ]);
       setStats(s);
-      setComms(c);
-      setCfgCommPct(String(s.program.commissionPct));
-      setCfgCookieDays(String(s.program.cookieDays));
-      setCfgActive(s.program.active);
+      setComms(Array.isArray(c) ? c : []);
+      setCfgCommPct(String(num(s?.program?.commissionPct)));
+      setCfgCookieDays(String(num(s?.program?.cookieDays)));
+      setCfgActive(Boolean(s?.program?.active));
     } catch (e) {
       setError(String((e as Error).message));
     } finally {
@@ -226,7 +257,8 @@ export default function SaasAffiliatesPage() {
 
   async function copyUrl(link: AffiliateLink) {
     try {
-      await navigator.clipboard.writeText(link.affiliateUrl);
+      // En contextos sin permiso el objeto `clipboard` ni siquiera existe.
+      await navigator.clipboard?.writeText(link.affiliateUrl ?? "");
       setCopiedId(link.id);
       window.setTimeout(() => setCopiedId((cur) => (cur === link.id ? null : cur)), 2000);
     } catch {
@@ -234,260 +266,335 @@ export default function SaasAffiliatesPage() {
     }
   }
 
+  const enlaces = Array.isArray(stats?.links) ? stats.links : [];
   const filteredCommissions =
     commFilter === "all" ? commissions : commissions.filter((c) => c.status === commFilter);
 
   if (loading) {
     return (
-      <SaasShellLayout sidebar={<SaasSidebar activeId="affiliates" />}>
-        <p className="p-8 text-sm text-muted-foreground" role="status">
-          Cargando programa de afiliados…
-        </p>
-      </SaasShellLayout>
+      <SaasW3crmShell>
+        <W3crmPageTitle mainTitle="Programa de Afiliados" parentTitle="Gestión" pageTitle="Afiliados" />
+        <div className="container-fluid">
+          <div className="row">
+            <div className="col-xl-12">
+              <W3crmContentBox titulo="Afiliados" icono="fa-solid fa-handshake">
+                <W3crmCargando texto="Cargando programa de afiliados…" />
+              </W3crmContentBox>
+            </div>
+          </div>
+        </div>
+      </SaasW3crmShell>
     );
   }
 
   if (error || !stats) {
     return (
-      <SaasShellLayout sidebar={<SaasSidebar activeId="affiliates" />}>
-        <div className="flex flex-col gap-4 p-8">
-          <p className="text-sm text-destructive" role="alert">
-            {error ?? "No se pudo cargar el programa"}
-          </p>
-          <NelvyonDsButton variant="secondary" onClick={() => void load()}>
-            Reintentar
-          </NelvyonDsButton>
+      <SaasW3crmShell>
+        <W3crmPageTitle mainTitle="Programa de Afiliados" parentTitle="Gestión" pageTitle="Afiliados" />
+        <div className="container-fluid">
+          <div className="row">
+            <div className="col-xl-12">
+              <div className="alert alert-danger" role="alert">
+                {error ?? "No se pudo cargar el programa"}
+              </div>
+              <button type="button" className="btn btn-primary" onClick={() => void load()}>
+                Reintentar
+              </button>
+            </div>
+          </div>
         </div>
-      </SaasShellLayout>
+      </SaasW3crmShell>
     );
   }
 
   const s = stats;
+  const programaActivo = Boolean(s.program?.active);
 
   return (
-    <SaasShellLayout sidebar={<SaasSidebar activeId="affiliates" />}>
-      <div className="flex flex-col gap-6 pb-8">
-        <NelvyonDsSectionHeader
-          title="Programa de Afiliados"
-          subtitle={`Comisión ${s.program.commissionPct}% · Cookie ${s.program.cookieDays} días · ${s.links.length} enlaces · ${s.program.active ? "Activo" : "Pausado"}`}
-        />
-
-        {actionError && (
-          <p className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm text-destructive" role="alert">
-            {actionError}
-          </p>
-        )}
-        {actionOk && (
-          <p className="rounded-lg border border-primary/30 bg-primary/10 px-4 py-2 text-sm text-primary" role="status">
-            {actionOk}
-          </p>
-        )}
-
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          <KpiTile icon="🔗" label="Conversiones" value={s.totalConversions} />
-          <KpiTile icon="⏳" label="Pendiente pago" value={`${s.pendingAmount.toFixed(2)} €`} />
-          <KpiTile icon="✅" label="Aprobado" value={`${s.approvedAmount.toFixed(2)} €`} accent />
-          <KpiTile icon="💶" label="Pagado" value={`${s.paidAmount.toFixed(2)} €`} />
-        </div>
-
-        <div className="flex gap-2 border-b border-border" role="tablist" aria-label="Secciones afiliados">
-          {(["links", "commissions", "settings"] as const).map((t) => (
-            <button
-              key={t}
-              type="button"
-              role="tab"
-              aria-selected={tab === t}
-              onClick={() => setTab(t)}
-              className={`border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
-                tab === t
-                  ? "border-primary text-primary"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {t === "links" ? "Enlaces" : t === "commissions" ? "Comisiones" : "Configuración"}
-            </button>
-          ))}
-        </div>
-
-        {tab === "links" && (
-          <div className="flex flex-col gap-4">
-            <NelvyonDsCard className="flex flex-col items-stretch gap-3 p-4 sm:flex-row sm:items-end">
-              <div className="min-w-0 flex-1">
-                <label htmlFor="aff-user" className="mb-1 block text-xs text-muted-foreground">
-                  ID del afiliado (email, user_id…)
-                </label>
-                <input
-                  id="aff-user"
-                  className={inputCls}
-                  value={newUserId}
-                  onChange={(ev) => setNewUserId(ev.target.value)}
-                  placeholder="john@empresa.com"
-                  aria-label="ID del afiliado"
-                />
+    <SaasW3crmShell>
+      <W3crmPageTitle mainTitle="Programa de Afiliados" parentTitle="Gestión" pageTitle="Afiliados" />
+      <div className="container-fluid">
+        <div className="row">
+          {actionError && (
+            <div className="col-xl-12">
+              <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                {actionError}
+                <button type="button" className="btn-close" aria-label="Cerrar" onClick={() => setActionError(null)} />
               </div>
-              <NelvyonDsButton
-                onClick={() => void createLink()}
-                disabled={creating || !newUserId.trim() || !s.program.active}
-                variant="primary"
-              >
-                {creating ? "Creando…" : "Crear enlace"}
-              </NelvyonDsButton>
-            </NelvyonDsCard>
-            {!s.program.active && (
-              <p className="text-xs text-muted-foreground">
-                El programa está pausado. Reactívalo en Configuración para crear nuevos enlaces.
-              </p>
-            )}
-            {s.links.length === 0 ? (
-              <NelvyonDsCard className="p-8 text-center text-sm text-muted-foreground">
-                Sin enlaces. Crea el primero arriba.
-              </NelvyonDsCard>
-            ) : (
-              s.links.map((link) => (
-                <NelvyonDsCard key={link.id} className="flex flex-col gap-3 p-4 md:flex-row md:items-center">
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-mono text-sm text-foreground">{link.affiliateUrl}</p>
-                    <p className="mt-0.5 text-xs text-muted-foreground">
-                      Afiliado: {link.affiliateUserId} · Código {link.code}
-                    </p>
-                  </div>
-                  <div className="flex shrink-0 gap-4 text-xs text-muted-foreground">
-                    <span>{link.clicks} clics</span>
-                    <span>{link.conversions} conv.</span>
-                  </div>
-                  <NelvyonDsBadge tone={link.active ? "success" : "neutral"}>
-                    {link.active ? "Activo" : "Pausado"}
-                  </NelvyonDsBadge>
+            </div>
+          )}
+          {actionOk && (
+            <div className="col-xl-12">
+              <div className="alert alert-success" role="status">{actionOk}</div>
+            </div>
+          )}
+
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Conversiones" value={num(s.totalConversions)} /></div>
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Pendiente pago" value={eur(s.pendingAmount)} /></div>
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Aprobado" value={eur(s.approvedAmount)} accent /></div>
+          <div className="col-xl-3 col-sm-6"><W3crmKpiTile label="Pagado" value={eur(s.paidAmount)} /></div>
+
+          <div className="col-xl-12">
+            <p className="fs-14 text-muted">
+              Comisión {num(s.program?.commissionPct)}% · Cookie {num(s.program?.cookieDays)} días ·{" "}
+              {enlaces.length} enlaces · {programaActivo ? "Activo" : "Pausado"}
+            </p>
+
+            {/* `role="tablist"` y `aria-label="Secciones afiliados"` venian del modulo original. */}
+            <ul className="nav nav-tabs mb-3" role="tablist" aria-label="Secciones afiliados">
+              {(["links", "commissions", "settings"] as const).map((t) => (
+                <li className="nav-item" key={t} role="presentation">
                   <button
                     type="button"
-                    onClick={() => void copyUrl(link)}
-                    className="shrink-0 text-xs text-primary hover:underline"
+                    role="tab"
+                    aria-selected={tab === t}
+                    className={`nav-link ${tab === t ? "active" : ""}`}
+                    onClick={() => setTab(t)}
                   >
-                    {copiedId === link.id ? "Copiado" : "Copiar"}
+                    {t === "links" ? "Enlaces" : t === "commissions" ? "Comisiones" : "Configuración"}
                   </button>
-                  <NelvyonDsButton
-                    size="sm"
-                    variant="secondary"
-                    disabled={busyId === link.id}
-                    onClick={() => void toggleLink(link)}
-                  >
-                    {link.active ? "Pausar" : "Reactivar"}
-                  </NelvyonDsButton>
-                </NelvyonDsCard>
-              ))
-            )}
-          </div>
-        )}
-
-        {tab === "commissions" && (
-          <div className="flex flex-col gap-3">
-            <div className="flex flex-wrap gap-2" role="group" aria-label="Filtrar comisiones">
-              {(["all", "pending", "approved", "paid"] as const).map((f) => (
-                <button
-                  key={f}
-                  type="button"
-                  onClick={() => setCommFilter(f)}
-                  className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
-                    commFilter === f
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-border text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {f === "all" ? "Todas" : STATUS_LABEL[f]}
-                </button>
+                </li>
               ))}
-            </div>
-            {filteredCommissions.length === 0 ? (
-              <NelvyonDsCard className="p-8 text-center text-sm text-muted-foreground">
-                Sin comisiones{commFilter !== "all" ? ` en estado «${STATUS_LABEL[commFilter]}»` : " registradas"}.
-              </NelvyonDsCard>
-            ) : (
-              filteredCommissions.map((c) => (
-                <NelvyonDsCard key={c.id} className="flex flex-col gap-3 p-4 md:flex-row md:items-center">
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-foreground">{c.affiliateUserId}</p>
-                    <p className="text-xs text-muted-foreground">
-                      Importe: {c.amount.toFixed(2)} € · Comisión: {c.commissionAmount.toFixed(2)} € ({c.commissionPct}%)
-                      {" · "}
-                      {new Date(c.createdAt).toLocaleDateString("es-ES")}
-                      {c.stripeTransferId ? ` · Transfer ${c.stripeTransferId}` : ""}
-                    </p>
+            </ul>
+
+            {tab === "links" && (
+              <>
+                <W3crmContentBox titulo="Nuevo enlace de afiliado" icono="fa-solid fa-link">
+                  <div className="row align-items-end">
+                    <div className="col-xl-8 col-sm-6">
+                      <div className="form-group mb-3">
+                        <label htmlFor="aff-user" className="text-black font-w600">
+                          ID del afiliado (email, user_id…)
+                        </label>
+                        <input
+                          id="aff-user"
+                          className="form-control"
+                          placeholder="john@empresa.com"
+                          value={newUserId}
+                          onChange={(ev) => setNewUserId(ev.target.value)}
+                        />
+                      </div>
+                    </div>
+                    <div className="col-xl-4 col-sm-6">
+                      <div className="form-group mb-3">
+                        <button
+                          type="button"
+                          className="btn btn-primary w-100"
+                          disabled={creating || !newUserId.trim() || !programaActivo}
+                          onClick={() => void createLink()}
+                        >
+                          {creating ? "Creando…" : "Crear enlace"}
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                  <NelvyonDsBadge tone={STATUS_TONE[c.status] ?? "neutral"}>
-                    {STATUS_LABEL[c.status] ?? c.status}
-                  </NelvyonDsBadge>
-                  {c.status === "pending" && (
-                    <NelvyonDsButton
-                      size="sm"
-                      variant="secondary"
-                      disabled={busyId === c.id}
-                      onClick={() => void approveCommission(c.id)}
-                    >
-                      Aprobar
-                    </NelvyonDsButton>
+                  {!programaActivo && (
+                    <p className="fs-12 text-muted mb-0">
+                      El programa está pausado. Reactívalo en Configuración para crear nuevos enlaces.
+                    </p>
                   )}
-                  {c.status === "approved" && (
-                    <NelvyonDsButton
-                      size="sm"
-                      variant="primary"
-                      disabled={busyId === c.id}
-                      onClick={() => void markPaid(c.id)}
-                    >
-                      Marcar pagada
-                    </NelvyonDsButton>
+                </W3crmContentBox>
+
+                <W3crmContentBox titulo="Enlaces" icono="fa-solid fa-share-nodes">
+                  {enlaces.length === 0 ? (
+                    <W3crmEmptyState title="Sin enlaces" description="Crea el primero con el formulario de arriba." />
+                  ) : (
+                    <W3crmDataTable
+                      filas={enlaces}
+                      etiqueta="enlaces"
+                      wrapperId="links_wrapper"
+                      porPagina={10}
+                      columnas={[
+                        { titulo: "Enlace" },
+                        { titulo: "Afiliado" },
+                        { titulo: "Clics" },
+                        { titulo: "Conversiones" },
+                        { titulo: "Estado" },
+                        { titulo: "Gestión", alFinal: true },
+                      ]}
+                      render={(link) => (
+                        <tr key={link.id}>
+                          <td><code className="fs-12 text-break">{link.affiliateUrl || "—"}</code></td>
+                          <td>
+                            <span className="fw-bold">{link.affiliateUserId || "—"}</span>
+                            <div className="text-muted fs-12">Código {link.code || "—"}</div>
+                          </td>
+                          <td>{num(link.clicks)}</td>
+                          <td>{num(link.conversions)}</td>
+                          <td>
+                            <span className={`badge ${link.active ? "badge-success" : "badge-secondary"}`}>
+                              {link.active ? "Activo" : "Pausado"}
+                            </span>
+                          </td>
+                          <td className="text-end">
+                            <button
+                              type="button"
+                              className="btn btn-primary light btn-sm me-1"
+                              aria-label={`Copiar enlace de ${link.affiliateUserId || link.code}`}
+                              onClick={() => void copyUrl(link)}
+                            >
+                              {copiedId === link.id ? "Copiado" : "Copiar"}
+                            </button>
+                            <button
+                              type="button"
+                              className="btn btn-primary light btn-sm"
+                              disabled={busyId === link.id}
+                              aria-label={`${link.active ? "Pausar" : "Reactivar"} enlace de ${link.affiliateUserId || link.code}`}
+                              onClick={() => void toggleLink(link)}
+                            >
+                              {link.active ? "Pausar" : "Reactivar"}
+                            </button>
+                          </td>
+                        </tr>
+                      )}
+                    />
                   )}
-                </NelvyonDsCard>
-              ))
+                </W3crmContentBox>
+              </>
+            )}
+
+            {tab === "commissions" && (
+              <W3crmContentBox titulo="Comisiones" icono="fa-solid fa-money-bill">
+                <div className="mb-3" role="group" aria-label="Filtrar comisiones">
+                  {(["all", "pending", "approved", "paid"] as const).map((f) => (
+                    <button
+                      key={f}
+                      type="button"
+                      aria-pressed={commFilter === f}
+                      className={`btn btn-sm me-1 mb-1 ${commFilter === f ? "btn-primary" : "btn-primary light"}`}
+                      onClick={() => setCommFilter(f)}
+                    >
+                      {f === "all" ? "Todas" : STATUS_LABEL[f]}
+                    </button>
+                  ))}
+                </div>
+                {filteredCommissions.length === 0 ? (
+                  <W3crmEmptyState
+                    title="Sin comisiones"
+                    description={
+                      commFilter !== "all"
+                        ? `No hay comisiones en estado «${STATUS_LABEL[commFilter]}».`
+                        : "Todavía no hay comisiones registradas."
+                    }
+                  />
+                ) : (
+                  <W3crmDataTable
+                    filas={filteredCommissions}
+                    etiqueta="comisiones"
+                    wrapperId="commissions_wrapper"
+                    porPagina={10}
+                    reiniciarEn={commFilter}
+                    columnas={[
+                      { titulo: "Afiliado" },
+                      { titulo: "Importe" },
+                      { titulo: "Comisión" },
+                      { titulo: "Fecha" },
+                      { titulo: "Estado" },
+                      { titulo: "Gestión", alFinal: true },
+                    ]}
+                    render={(c) => (
+                      <tr key={c.id}>
+                        <td>
+                          <span className="fw-bold">{c.affiliateUserId || "—"}</span>
+                          {c.stripeTransferId ? (
+                            <div className="text-muted fs-12">Transfer {c.stripeTransferId}</div>
+                          ) : null}
+                        </td>
+                        <td>{eur(c.amount)}</td>
+                        <td>
+                          {eur(c.commissionAmount)}{" "}
+                          <span className="text-muted fs-12">({num(c.commissionPct)}%)</span>
+                        </td>
+                        <td>{fecha(c.createdAt)}</td>
+                        <td><span className={`badge ${badgeEstado(c.status)}`}>{etiquetaEstado(c.status)}</span></td>
+                        <td className="text-end">
+                          {c.status === "pending" && (
+                            <button
+                              type="button"
+                              className="btn btn-primary light btn-sm"
+                              disabled={busyId === c.id}
+                              aria-label={`Aprobar comisión de ${c.affiliateUserId || c.id}`}
+                              onClick={() => void approveCommission(c.id)}
+                            >
+                              Aprobar
+                            </button>
+                          )}
+                          {c.status === "approved" && (
+                            <button
+                              type="button"
+                              className="btn btn-primary btn-sm"
+                              disabled={busyId === c.id}
+                              aria-label={`Marcar pagada la comisión de ${c.affiliateUserId || c.id}`}
+                              onClick={() => void markPaid(c.id)}
+                            >
+                              Marcar pagada
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    )}
+                  />
+                )}
+              </W3crmContentBox>
+            )}
+
+            {tab === "settings" && (
+              <W3crmContentBox titulo="Configuración del programa" icono="fa-solid fa-gear">
+                <div className="row">
+                  <div className="col-xl-4 col-sm-6">
+                    <div className="form-group mb-3">
+                      <label htmlFor="cfg-pct" className="text-black font-w600">Comisión (%)</label>
+                      <input
+                        id="cfg-pct"
+                        className="form-control"
+                        type="number"
+                        min={0}
+                        max={100}
+                        step={0.01}
+                        value={cfgCommPct}
+                        onChange={(ev) => setCfgCommPct(ev.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <div className="col-xl-4 col-sm-6">
+                    <div className="form-group mb-3">
+                      <label htmlFor="cfg-cookie" className="text-black font-w600">Ventana de cookie (días)</label>
+                      <input
+                        id="cfg-cookie"
+                        className="form-control"
+                        type="number"
+                        min={1}
+                        max={3650}
+                        value={cfgCookieDays}
+                        onChange={(ev) => setCfgCookieDays(ev.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <div className="col-xl-4 col-sm-6">
+                    <div className="form-check mt-4 mb-3">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        id="cfg-activo"
+                        checked={cfgActive}
+                        onChange={(ev) => setCfgActive(ev.target.checked)}
+                      />
+                      <label className="form-check-label" htmlFor="cfg-activo">Programa activo</label>
+                    </div>
+                  </div>
+                  <div className="col-xl-12">
+                    <div className="text-end">
+                      <button type="button" className="btn btn-primary" disabled={saving} onClick={() => void saveConfig()}>
+                        {saving ? "Guardando…" : "Guardar configuración"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </W3crmContentBox>
             )}
           </div>
-        )}
-
-        {tab === "settings" && (
-          <NelvyonDsCard className="flex max-w-sm flex-col gap-4 p-6">
-            <div>
-              <label htmlFor="cfg-pct" className="mb-1 block text-xs text-muted-foreground">
-                Comisión (%)
-              </label>
-              <input
-                id="cfg-pct"
-                className={inputCls}
-                type="number"
-                value={cfgCommPct}
-                onChange={(ev) => setCfgCommPct(ev.target.value)}
-                min={0}
-                max={100}
-                step={0.01}
-              />
-            </div>
-            <div>
-              <label htmlFor="cfg-cookie" className="mb-1 block text-xs text-muted-foreground">
-                Ventana de cookie (días)
-              </label>
-              <input
-                id="cfg-cookie"
-                className={inputCls}
-                type="number"
-                value={cfgCookieDays}
-                onChange={(ev) => setCfgCookieDays(ev.target.value)}
-                min={1}
-                max={3650}
-              />
-            </div>
-            <label className="flex items-center gap-2 text-sm text-foreground">
-              <input
-                type="checkbox"
-                checked={cfgActive}
-                onChange={(ev) => setCfgActive(ev.target.checked)}
-                className="rounded border-border"
-              />
-              Programa activo
-            </label>
-            <NelvyonDsButton onClick={() => void saveConfig()} disabled={saving} variant="primary">
-              {saving ? "Guardando…" : "Guardar configuración"}
-            </NelvyonDsButton>
-          </NelvyonDsCard>
-        )}
+        </div>
       </div>
-    </SaasShellLayout>
+    </SaasW3crmShell>
   );
 }

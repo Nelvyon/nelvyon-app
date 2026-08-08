@@ -1,0 +1,34 @@
+.i-false:after {
+    content: none !important;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    display: inline-block;
+}
+
+.rating-stars ul > li.star.selected > i.fa {
+    color: #FF912C;
+}  
+
+
+.nest_style  .nestable-item-name{
+    color: var(--secondary);
+    background: #fff;
+    border-radius: 0.3125rem;
+    padding: 0.5rem 1rem;
+    height: auto;
+    border: 1px solid #CCCCCC;
+    cursor: all-scroll;
+}
+
+.react-datepicker-wrapper{
+    width: 100%;
+}
+
+.dz-card .code-area{
+    background: var(--secondary);
+}
+
+.toltip-popover .tooltip-inner{
+    overflow: hidden;
+    max-width: 250px;
+}

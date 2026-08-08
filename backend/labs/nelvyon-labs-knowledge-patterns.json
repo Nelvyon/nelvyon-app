@@ -1,0 +1,1944 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-07-16T09:43:44.641Z",
+  "totalPatterns": 138,
+  "patterns": [
+    {
+      "patternId": "harvest-aceternity-ui",
+      "projectId": "aceternity-ui",
+      "projectName": "Aceternity UI",
+      "license": "MIT",
+      "primaryCapability": "ui_paneles",
+      "patternType": "ux_ui",
+      "insight": "Premium landing effects for NELVYON-LANDING pack SKU.",
+      "nelvyonApplication": [
+        "apps/web/src/features/saas-shell/"
+      ],
+      "repository": "https://github.com/shadcn-ui/ui"
+    },
+    {
+      "patternId": "harvest-allure",
+      "projectId": "allure",
+      "projectName": "Allure Report",
+      "license": "Apache-2.0",
+      "primaryCapability": "testing",
+      "patternType": "testing",
+      "insight": "E2E and benchmark test reporting for router certification.",
+      "nelvyonApplication": [
+        "apps/web/vitest.config.ts",
+        "scripts/run-staging-p0-smokes.mjs"
+      ],
+      "repository": "https://github.com/allure-framework/allure2"
+    },
+    {
+      "patternId": "harvest-animatediff",
+      "projectId": "animatediff",
+      "projectName": "AnimateDiff",
+      "license": "Apache-2.0",
+      "primaryCapability": "video",
+      "patternType": "pipeline",
+      "insight": "Short-form video generation for social pack experiments.",
+      "nelvyonApplication": [
+        "backend/labs/NelvyonLabsOptionalAdapter.ts"
+      ],
+      "repository": "https://github.com/guoyww/AnimateDiff"
+    },
+    {
+      "patternId": "harvest-apache-superset",
+      "projectId": "apache-superset",
+      "projectName": "Apache Superset",
+      "license": "Apache-2.0",
+      "primaryCapability": "reporting",
+      "patternType": "data_model",
+      "insight": "Advanced BI for agency data teams; Metabase simpler for SaaS embed.",
+      "nelvyonApplication": [
+        "apps/web/src/components/platform/PackReportDashboard.tsx"
+      ],
+      "repository": "https://github.com/apache/superset"
+    },
+    {
+      "patternId": "harvest-apache-tika",
+      "projectId": "apache-tika",
+      "projectName": "Apache Tika",
+      "license": "Apache-2.0",
+      "primaryCapability": "documentos",
+      "patternType": "pipeline",
+      "insight": "Universal MIME detection and text extraction in ingest pipeline.",
+      "nelvyonApplication": [
+        "backend/local-ai/KnowledgeIngestService.ts"
+      ],
+      "repository": "https://github.com/apache/tika"
+    },
+    {
+      "patternId": "harvest-apprise",
+      "projectId": "apprise",
+      "projectName": "Apprise",
+      "license": "BSD-2-Clause",
+      "primaryCapability": "redes_sociales",
+      "patternType": "integration",
+      "insight": "Multi-channel alert router for ops and client notifications.",
+      "nelvyonApplication": [
+        "backend/os-agents/sectors/",
+        "backend/saas/SaasCampaniasService.ts",
+        "backend/email/sesClient.ts"
+      ],
+      "repository": "https://github.com/caronc/apprise"
+    },
+    {
+      "patternId": "harvest-argo-workflows",
+      "projectId": "argo-workflows",
+      "projectName": "Argo Workflows",
+      "license": "Apache-2.0",
+      "primaryCapability": "agentes",
+      "patternType": "pipeline",
+      "insight": "Future K8s GPU batch for pack generation.",
+      "nelvyonApplication": [
+        "backend/os-agents/",
+        "apps/web/src/lib/packs/packOrchestrator.ts",
+        "backend/db/migrations/",
+        "backend/local-ai/docker-compose.yml"
+      ],
+      "repository": "https://github.com/argoproj/argo-workflows"
+    },
+    {
+      "patternId": "harvest-argocd",
+      "projectId": "argocd",
+      "projectName": "Argo CD",
+      "license": "Apache-2.0",
+      "primaryCapability": "devops",
+      "patternType": "automation",
+      "insight": "GitOps when K8s adopted for GPU workloads.",
+      "nelvyonApplication": [
+        ".github/workflows/",
+        "scripts/run-phase1-audit.mjs",
+        "backend/db/migrations/",
+        "backend/local-ai/docker-compose.yml"
+      ],
+      "repository": "https://github.com/argoproj/argo-cd"
+    },
+    {
+      "patternId": "harvest-ast-grep",
+      "projectId": "ast-grep",
+      "projectName": "ast-grep",
+      "license": "MIT",
+      "primaryCapability": "seo",
+      "patternType": "algorithm",
+      "insight": "Pattern-based refactors across TS/Python monorepo.",
+      "nelvyonApplication": [
+        "backend/autonomous/analytics/ga4RealAdapter.ts"
+      ],
+      "repository": "https://github.com/ast-grep/ast-grep"
+    },
+    {
+      "patternId": "harvest-audiocraft",
+      "projectId": "audiocraft",
+      "projectName": "AudioCraft",
+      "license": "MIT",
+      "primaryCapability": "audio_voz",
+      "patternType": "pipeline",
+      "insight": "Background music generation for video pack deliverables.",
+      "nelvyonApplication": [
+        "backend/main.py",
+        "backend/labs/NelvyonLabsOptionalAdapter.ts"
+      ],
+      "repository": "https://github.com/facebookresearch/audiocraft"
+    },
+    {
+      "patternId": "harvest-botpress",
+      "projectId": "botpress",
+      "projectName": "Botpress",
+      "license": "MIT",
+      "primaryCapability": "redes_sociales",
+      "patternType": "integration",
+      "insight": "Advanced chatbot NLU for NELVYON-CHATBOT pack SKU.",
+      "nelvyonApplication": [
+        "backend/os-agents/sectors/"
+      ],
+      "repository": "https://github.com/botpress/botpress"
+    },
+    {
+      "patternId": "harvest-browser-use",
+      "projectId": "browser-use",
+      "projectName": "browser-use",
+      "license": "MIT",
+      "primaryCapability": "navegacion",
+      "patternType": "algorithm",
+      "insight": "Agent browser tool for pack research and form automation.",
+      "nelvyonApplication": [
+        "apps/web/e2e/",
+        "backend/os-agents/",
+        "apps/web/src/lib/packs/packOrchestrator.ts"
+      ],
+      "repository": "https://github.com/browser-use/browser-use"
+    },
+    {
+      "patternId": "harvest-cadvisor",
+      "projectId": "cadvisor",
+      "projectName": "cAdvisor",
+      "license": "Apache-2.0",
+      "primaryCapability": "observabilidad",
+      "patternType": "observability",
+      "insight": "Docker metrics for local-ai stack containers.",
+      "nelvyonApplication": [
+        "backend/observability/NelvyonObservabilityAdapter.ts",
+        "apps/web/src/app/api/health/",
+        "backend/db/migrations/",
+        "backend/local-ai/docker-compose.yml"
+      ],
+      "repository": "https://github.com/google/cadvisor"
+    },
+    {
+      "patternId": "harvest-clickhouse",
+      "projectId": "clickhouse",
+      "projectName": "ClickHouse",
+      "license": "Apache-2.0",
+      "primaryCapability": "infraestructura",
+      "patternType": "architecture",
+      "insight": "CEO metrics, campaign analytics, Langfuse/SigNoz backend.",
+      "nelvyonApplication": [
+        "backend/db/migrations/",
+        "backend/local-ai/docker-compose.yml"
+      ],
+      "repository": "https://github.com/ClickHouse/ClickHouse"
+    },
+    {
+      "patternId": "harvest-codeql",
+      "projectId": "codeql",
+      "projectName": "CodeQL",
+      "license": "MIT",
+      "primaryCapability": "testing",
+      "patternType": "testing",
+      "insight": "GitHub Advanced Security-style SAST for monorepo CI gates.",
+      "nelvyonApplication": [
+        "apps/web/vitest.config.ts",
+        "scripts/run-staging-p0-smokes.mjs",
+        "backend/security/NelvyonSecurityScanAdapter.ts",
+        "backend/local-ai/specialization/SecurityGuard.ts"
+      ],
+      "repository": "https://github.com/github/codeql"
+    },
+    {
+      "patternId": "harvest-conduit",
+      "projectId": "conduit",
+      "projectName": "Conduit",
+      "license": "Apache-2.0",
+      "primaryCapability": "redes_sociales",
+      "patternType": "integration",
+      "insight": "Low-resource Matrix for PRIVATE_MODE single-tenant.",
+      "nelvyonApplication": [
+        "backend/os-agents/sectors/"
+      ],
+      "repository": "https://github.com/conduit-rust/conduit"
+    },
+    {
+      "patternId": "harvest-coolify",
+      "projectId": "coolify",
+      "projectName": "Coolify",
+      "license": "Apache-2.0",
+      "primaryCapability": "devops",
+      "patternType": "automation",
+      "insight": "PRIVATE_MODE PaaS for agency client instances on VPS.",
+      "nelvyonApplication": [
+        ".github/workflows/",
+        "scripts/run-phase1-audit.mjs",
+        "backend/db/migrations/",
+        "backend/local-ai/docker-compose.yml"
+      ],
+      "repository": "https://github.com/coollabsio/coolify"
+    },
+    {
+      "patternId": "harvest-creatomate",
+      "projectId": "creatomate",
+      "projectName": "Creatomate API Pattern",
+      "license": "MIT",
+      "primaryCapability": "video",
+      "patternType": "pipeline",
+      "insight": "Template video API design reference for Remotion integration.",
+      "nelvyonApplication": [
+        "backend/labs/NelvyonLabsOptionalAdapter.ts"
+      ],
+      "repository": "https://github.com/creatomate/creatomate-node"
+    },
+    {
+      "patternId": "harvest-diffusers",
+      "projectId": "diffusers",
+      "projectName": "Diffusers",
+      "license": "Apache-2.0",
+      "primaryCapability": "video",
+      "patternType": "pipeline",
+      "insight": "Python API for image gen in FastAPI pack agents.",
+      "nelvyonApplication": [
+        "backend/labs/NelvyonLabsOptionalAdapter.ts"
+      ],
+      "repository": "https://github.com/huggingface/diffusers"
+    },
+    {
+      "patternId": "harvest-dify",
+      "projectId": "dify",
+      "projectName": "Dify",
+      "license": "Apache-2.0",
+      "primaryCapability": "agentes",
+      "patternType": "pipeline",
+      "insight": "Rapid internal prototyping; overlaps SaaS OS.",
+      "nelvyonApplication": [
+        "backend/os-agents/",
+        "apps/web/src/lib/packs/packOrchestrator.ts"
+      ],
+      "repository": "https://github.com/langgenius/dify"
+    },
+    {
+      "patternId": "harvest-docling",
+      "projectId": "docling",
+      "projectName": "Docling",
+      "license": "MIT",
+      "primaryCapability": "documentos",
+      "patternType": "pipeline",
+      "insight": "High-quality PDF→MD for knowledge ingest beyond Unstructured.",
+      "nelvyonApplication": [
+        "backend/local-ai/KnowledgeIngestService.ts"
+      ],
+      "repository": "https://github.com/docling-project/docling"
+    },
+    {
+      "patternId": "harvest-dokku",
+      "projectId": "dokku",
+      "projectName": "Dokku",
+      "license": "MIT",
+      "primaryCapability": "devops",
+      "patternType": "automation",
+      "insight": "Lightweight client deploys; Coolify preferred for UI.",
+      "nelvyonApplication": [
+        ".github/workflows/",
+        "scripts/run-phase1-audit.mjs",
+        "backend/db/migrations/",
+        "backend/local-ai/docker-compose.yml"
+      ],
+      "repository": "https://github.com/dokku/dokku"
+    },
+    {
+      "patternId": "harvest-duckdb",
+      "projectId": "duckdb",
+      "projectName": "DuckDB",
+      "license": "MIT",
+      "primaryCapability": "infraestructura",
+      "patternType": "architecture",
+      "insight": "Local analytics on pack reports and benchmark JSON exports.",
+      "nelvyonApplication": [
+        "backend/db/migrations/",
+        "backend/local-ai/docker-compose.yml"
+      ],
+      "repository": "https://github.com/duckdb/duckdb"
+    },
+    {
+      "patternId": "harvest-emissary",
+      "projectId": "emissary",
+      "projectName": "Emissary-Ingress",
+      "license": "Apache-2.0",
+      "primaryCapability": "integraciones",
+      "patternType": "integration",
+      "insight": "Future K8s API routing; Traefik/Kong for current Railway.",
+      "nelvyonApplication": [
+        "apps/web/src/app/api/",
+        "backend/saas/",
+        "backend/db/migrations/",
+        "backend/local-ai/docker-compose.yml"
+      ],
+      "repository": "https://github.com/emissary-ingress/emissary"
+    },
+    {
+      "patternId": "harvest-esbuild",
+      "projectId": "esbuild",
+      "projectName": "esbuild",
+      "license": "MIT",
+      "primaryCapability": "saas_core",
+      "patternType": "architecture",
+      "insight": "Fast bundling for scripts and tooling in monorepo.",
+      "nelvyonApplication": [
+        "apps/web/",
+        "backend/saas/"
+      ],
+      "repository": "https://github.com/evanw/esbuild"
+    },
+    {
+      "patternId": "harvest-eslint",
+      "projectId": "eslint",
+      "projectName": "ESLint",
+      "license": "MIT",
+      "primaryCapability": "saas_core",
+      "patternType": "architecture",
+      "insight": "Core lint for Next.js 15 monorepo — zero TS errors policy.",
+      "nelvyonApplication": [
+        "apps/web/",
+        "backend/saas/"
+      ],
+      "repository": "https://github.com/eslint/eslint"
+    },
+    {
+      "patternId": "harvest-evolution-api",
+      "projectId": "evolution-api",
+      "projectName": "Evolution API",
+      "license": "Apache-2.0",
+      "primaryCapability": "redes_sociales",
+      "patternType": "integration",
+      "insight": "WhatsApp channel for SaasInbox and campaign notifications.",
+      "nelvyonApplication": [
+        "backend/os-agents/sectors/"
+      ],
+      "repository": "https://github.com/EvolutionAPI/evolution-api"
+    },
+    {
+      "patternId": "harvest-fluxcd",
+      "projectId": "fluxcd",
+      "projectName": "Flux",
+      "license": "Apache-2.0",
+      "primaryCapability": "devops",
+      "patternType": "automation",
+      "insight": "Alternative to Argo CD — pick one GitOps tool.",
+      "nelvyonApplication": [
+        ".github/workflows/",
+        "scripts/run-phase1-audit.mjs",
+        "backend/db/migrations/",
+        "backend/local-ai/docker-compose.yml"
+      ],
+      "repository": "https://github.com/fluxcd/flux2"
+    },
+    {
+      "patternId": "harvest-framer-motion",
+      "projectId": "framer-motion",
+      "projectName": "Framer Motion",
+      "license": "MIT",
+      "primaryCapability": "ui_paneles",
+      "patternType": "ux_ui",
+      "insight": "SaaS shell transitions and Magic UI animation backbone.",
+      "nelvyonApplication": [
+        "apps/web/src/features/saas-shell/"
+      ],
+      "repository": "https://github.com/motiondivision/motion"
+    },
+    {
+      "patternId": "harvest-gotenberg",
+      "projectId": "gotenberg",
+      "projectName": "Gotenberg",
+      "license": "MIT",
+      "primaryCapability": "documentos",
+      "patternType": "pipeline",
+      "insight": "Pack deliverable PDF generation for OS landing and reports.",
+      "nelvyonApplication": [
+        "backend/local-ai/KnowledgeIngestService.ts"
+      ],
+      "repository": "https://github.com/gotenberg/gotenberg"
+    },
+    {
+      "patternId": "harvest-gotify",
+      "projectId": "gotify",
+      "projectName": "Gotify",
+      "license": "MIT",
+      "primaryCapability": "redes_sociales",
+      "patternType": "integration",
+      "insight": "Internal push for pack completion and workflow events.",
+      "nelvyonApplication": [
+        "backend/os-agents/sectors/",
+        "backend/saas/SaasCampaniasService.ts",
+        "backend/email/sesClient.ts"
+      ],
+      "repository": "https://github.com/gotify/server"
+    },
+    {
+      "patternId": "harvest-grapesjs",
+      "projectId": "grapesjs",
+      "projectName": "GrapesJS",
+      "license": "BSD-3-Clause",
+      "primaryCapability": "diseno",
+      "patternType": "ux_ui",
+      "insight": "Email and landing page visual builder for OS packs.",
+      "nelvyonApplication": [
+        "apps/web/",
+        "apps/web/src/lib/packs/"
+      ],
+      "repository": "https://github.com/GrapesJS/grapesjs"
+    },
+    {
+      "patternId": "harvest-gravitee",
+      "projectId": "gravitee",
+      "projectName": "Gravitee APIM",
+      "license": "Apache-2.0",
+      "primaryCapability": "integraciones",
+      "patternType": "integration",
+      "insight": "Enterprise API management for multi-tenant SaaS APIs.",
+      "nelvyonApplication": [
+        "apps/web/src/app/api/",
+        "backend/saas/"
+      ],
+      "repository": "https://github.com/gravitee-io/gravitee-api-management"
+    },
+    {
+      "patternId": "harvest-greenmail",
+      "projectId": "greenmail",
+      "projectName": "GreenMail",
+      "license": "Apache-2.0",
+      "primaryCapability": "email",
+      "patternType": "integration",
+      "insight": "Reference pattern for email integration tests in CI.",
+      "nelvyonApplication": [
+        "backend/saas/SaasCampaniasService.ts",
+        "backend/email/sesClient.ts",
+        "apps/web/vitest.config.ts",
+        "scripts/run-staging-p0-smokes.mjs"
+      ],
+      "repository": "https://github.com/greenmail-mail-test/greenmail"
+    },
+    {
+      "patternId": "harvest-guardrails-ai",
+      "projectId": "guardrails-ai",
+      "projectName": "Guardrails AI",
+      "license": "Apache-2.0",
+      "primaryCapability": "agentes",
+      "patternType": "pipeline",
+      "insight": "Complement RouterValidator for pack QA.",
+      "nelvyonApplication": [
+        "backend/os-agents/",
+        "apps/web/src/lib/packs/packOrchestrator.ts",
+        "backend/security/NelvyonSecurityScanAdapter.ts",
+        "backend/local-ai/specialization/SecurityGuard.ts"
+      ],
+      "repository": "https://github.com/guardrails-ai/guardrails"
+    },
+    {
+      "patternId": "harvest-hasura",
+      "projectId": "hasura",
+      "projectName": "Hasura",
+      "license": "Apache-2.0",
+      "primaryCapability": "integraciones",
+      "patternType": "integration",
+      "insight": "GraphQL layer for tenant CRM data with row-level permissions.",
+      "nelvyonApplication": [
+        "apps/web/src/app/api/",
+        "backend/saas/",
+        "backend/db/migrations/",
+        "backend/local-ai/docker-compose.yml"
+      ],
+      "repository": "https://github.com/hasura/graphql-engine"
+    },
+    {
+      "patternId": "harvest-hatchet",
+      "projectId": "hatchet",
+      "projectName": "Hatchet",
+      "license": "MIT",
+      "primaryCapability": "agentes",
+      "patternType": "pipeline",
+      "insight": "Lightweight Temporal alternative for pack retry logic.",
+      "nelvyonApplication": [
+        "backend/os-agents/",
+        "apps/web/src/lib/packs/packOrchestrator.ts",
+        "backend/saas/SaasWorkflowService.ts"
+      ],
+      "repository": "https://github.com/hatchet-dev/hatchet"
+    },
+    {
+      "patternId": "harvest-helm",
+      "projectId": "helm",
+      "projectName": "Helm",
+      "license": "Apache-2.0",
+      "primaryCapability": "devops",
+      "patternType": "automation",
+      "insight": "Deploy observability and local-ai stacks on K8s.",
+      "nelvyonApplication": [
+        ".github/workflows/",
+        "scripts/run-phase1-audit.mjs",
+        "backend/db/migrations/",
+        "backend/local-ai/docker-compose.yml"
+      ],
+      "repository": "https://github.com/helm/helm"
+    },
+    {
+      "patternId": "harvest-husky",
+      "projectId": "husky",
+      "projectName": "Husky",
+      "license": "MIT",
+      "primaryCapability": "saas_core",
+      "patternType": "architecture",
+      "insight": "Pre-commit tsc + vitest on changed files.",
+      "nelvyonApplication": [
+        "apps/web/",
+        "backend/saas/"
+      ],
+      "repository": "https://github.com/typicode/husky"
+    },
+    {
+      "patternId": "harvest-imagemagick",
+      "projectId": "imagemagick",
+      "projectName": "ImageMagick",
+      "license": "Apache-2.0",
+      "primaryCapability": "documentos",
+      "patternType": "pipeline",
+      "insight": "Thumbnail and format conversion in media pack pipeline.",
+      "nelvyonApplication": [
+        "backend/local-ai/KnowledgeIngestService.ts"
+      ],
+      "repository": "https://github.com/ImageMagick/ImageMagick"
+    },
+    {
+      "patternId": "harvest-imagMagick-wand",
+      "projectId": "imagMagick-wand",
+      "projectName": "Wand",
+      "license": "MIT",
+      "primaryCapability": "video",
+      "patternType": "pipeline",
+      "insight": "Image transforms in FastAPI media pack pipeline.",
+      "nelvyonApplication": [
+        "backend/labs/NelvyonLabsOptionalAdapter.ts"
+      ],
+      "repository": "https://github.com/emcconville/wand"
+    },
+    {
+      "patternId": "harvest-infinity",
+      "projectId": "infinity",
+      "projectName": "Infinity",
+      "license": "MIT",
+      "primaryCapability": "ia_llm",
+      "patternType": "architecture",
+      "insight": "Scale embedding beyond Ollama for RAG ingest.",
+      "nelvyonApplication": [
+        "backend/local-ai/",
+        "backend/local-ai/specialization/",
+        "backend/local-ai/LocalRagRetriever.ts",
+        "backend/local-ai/KnowledgeIngestService.ts"
+      ],
+      "repository": "https://github.com/michaelfeil/infinity"
+    },
+    {
+      "patternId": "harvest-invokeai",
+      "projectId": "invokeai",
+      "projectName": "InvokeAI",
+      "license": "Apache-2.0",
+      "primaryCapability": "video",
+      "patternType": "pipeline",
+      "insight": "Apache-licensed image gen API for OS creative packs.",
+      "nelvyonApplication": [
+        "backend/labs/NelvyonLabsOptionalAdapter.ts"
+      ],
+      "repository": "https://github.com/invoke-ai/InvokeAI"
+    },
+    {
+      "patternId": "harvest-jenkins",
+      "projectId": "jenkins",
+      "projectName": "Jenkins",
+      "license": "MIT",
+      "primaryCapability": "automatizaciones",
+      "patternType": "automation",
+      "insight": "Legacy CI; GitHub Actions primary — Jenkins for client on-prem.",
+      "nelvyonApplication": [
+        "backend/saas/SaasWorkflowService.ts"
+      ],
+      "repository": "https://github.com/jenkinsci/jenkins"
+    },
+    {
+      "patternId": "harvest-jitsi",
+      "projectId": "jitsi",
+      "projectName": "Jitsi",
+      "license": "Apache-2.0",
+      "primaryCapability": "productividad",
+      "patternType": "architecture",
+      "insight": "Meeting scheduling via Cal.com + Jitsi video rooms.",
+      "nelvyonApplication": [
+        "docs/HANDOVER.md",
+        "docs/AI_CONTEXT.md"
+      ],
+      "repository": "https://github.com/jitsi/jitsi-meet"
+    },
+    {
+      "patternId": "harvest-jitsi-meet",
+      "projectId": "jitsi-meet",
+      "projectName": "Jitsi Meet",
+      "license": "Apache-2.0",
+      "primaryCapability": "redes_sociales",
+      "patternType": "integration",
+      "insight": "Client kickoff calls and agency team meetings self-hosted.",
+      "nelvyonApplication": [
+        "backend/os-agents/sectors/"
+      ],
+      "repository": "https://github.com/jitsi/jitsi-meet"
+    },
+    {
+      "patternId": "harvest-k3s",
+      "projectId": "k3s",
+      "projectName": "K3s",
+      "license": "Apache-2.0",
+      "primaryCapability": "agentes",
+      "patternType": "pipeline",
+      "insight": "Single-node K8s for GPU host without full cluster ops.",
+      "nelvyonApplication": [
+        "backend/os-agents/",
+        "apps/web/src/lib/packs/packOrchestrator.ts",
+        "backend/db/migrations/",
+        "backend/local-ai/docker-compose.yml"
+      ],
+      "repository": "https://github.com/k3s-io/k3s"
+    },
+    {
+      "patternId": "harvest-katana",
+      "projectId": "katana",
+      "projectName": "Katana",
+      "license": "MIT",
+      "primaryCapability": "scraping",
+      "patternType": "algorithm",
+      "insight": "Site discovery for SEO audits and broken link detection.",
+      "nelvyonApplication": [
+        "backend/labs/NelvyonLabsOptionalAdapter.ts",
+        "backend/security/NelvyonSecurityScanAdapter.ts",
+        "backend/local-ai/specialization/SecurityGuard.ts"
+      ],
+      "repository": "https://github.com/projectdiscovery/katana"
+    },
+    {
+      "patternId": "harvest-kestra",
+      "projectId": "kestra",
+      "projectName": "Kestra",
+      "license": "Apache-2.0",
+      "primaryCapability": "agentes",
+      "patternType": "pipeline",
+      "insight": "YAML-first workflows for ops; alternative to Temporal for simpler jobs.",
+      "nelvyonApplication": [
+        "backend/os-agents/",
+        "apps/web/src/lib/packs/packOrchestrator.ts",
+        "backend/saas/SaasWorkflowService.ts"
+      ],
+      "repository": "https://github.com/kestra-io/kestra"
+    },
+    {
+      "patternId": "harvest-keystonejs",
+      "projectId": "keystonejs",
+      "projectName": "KeystoneJS",
+      "license": "MIT",
+      "primaryCapability": "contenido",
+      "patternType": "ux_ui",
+      "insight": "GraphQL CMS option for TypeScript-first client projects.",
+      "nelvyonApplication": [
+        "apps/web/src/lib/packs/"
+      ],
+      "repository": "https://github.com/keystonejs/keystone"
+    },
+    {
+      "patternId": "harvest-kohya-ss",
+      "projectId": "kohya-ss",
+      "projectName": "kohya_ss",
+      "license": "Apache-2.0",
+      "primaryCapability": "video",
+      "patternType": "pipeline",
+      "insight": "Brand-specific LoRA training for client creative packs.",
+      "nelvyonApplication": [
+        "backend/labs/NelvyonLabsOptionalAdapter.ts"
+      ],
+      "repository": "https://github.com/bmaltais/kohya_ss"
+    },
+    {
+      "patternId": "harvest-kubernetes",
+      "projectId": "kubernetes",
+      "projectName": "Kubernetes",
+      "license": "Apache-2.0",
+      "primaryCapability": "agentes",
+      "patternType": "pipeline",
+      "insight": "Future GPU cluster for pack batch; Railway handles current scale.",
+      "nelvyonApplication": [
+        "backend/os-agents/",
+        "apps/web/src/lib/packs/packOrchestrator.ts",
+        "backend/db/migrations/",
+        "backend/local-ai/docker-compose.yml"
+      ],
+      "repository": "https://github.com/kubernetes/kubernetes"
+    },
+    {
+      "patternId": "harvest-langfuse",
+      "projectId": "langfuse",
+      "projectName": "Langfuse",
+      "license": "MIT",
+      "primaryCapability": "observabilidad",
+      "patternType": "observability",
+      "insight": "Trace router + specialization pipeline; complements RAGAS eval.",
+      "nelvyonApplication": [
+        "backend/observability/NelvyonObservabilityAdapter.ts",
+        "apps/web/src/app/api/health/"
+      ],
+      "repository": "https://github.com/langfuse/langfuse"
+    },
+    {
+      "patternId": "harvest-lightdash",
+      "projectId": "lightdash",
+      "projectName": "Lightdash",
+      "license": "MIT",
+      "primaryCapability": "reporting",
+      "patternType": "data_model",
+      "insight": "dbt + Lightdash for agency client data warehouse BI.",
+      "nelvyonApplication": [
+        "apps/web/src/components/platform/PackReportDashboard.tsx"
+      ],
+      "repository": "https://github.com/lightdash/lightdash"
+    },
+    {
+      "patternId": "harvest-linkchecker",
+      "projectId": "linkchecker",
+      "projectName": "LinkChecker",
+      "license": "LGPL-3.0",
+      "primaryCapability": "scraping",
+      "patternType": "algorithm",
+      "insight": "Broken link reports for NELVYON-SEO pack deliverables.",
+      "nelvyonApplication": [
+        "backend/labs/NelvyonLabsOptionalAdapter.ts",
+        "backend/autonomous/analytics/ga4RealAdapter.ts"
+      ],
+      "repository": "https://github.com/linkchecker/linkchecker"
+    },
+    {
+      "patternId": "harvest-lint-staged",
+      "projectId": "lint-staged",
+      "projectName": "lint-staged",
+      "license": "MIT",
+      "primaryCapability": "saas_core",
+      "patternType": "architecture",
+      "insight": "Fast pre-commit ESLint on staged SaaS files.",
+      "nelvyonApplication": [
+        "apps/web/",
+        "backend/saas/"
+      ],
+      "repository": "https://github.com/lint-staged/lint-staged"
+    },
+    {
+      "patternId": "harvest-list-unsubscribe-header",
+      "projectId": "list-unsubscribe-header",
+      "projectName": "PHPMailer (List-Unsubscribe)",
+      "license": "LGPL-3.0",
+      "primaryCapability": "email",
+      "patternType": "integration",
+      "insight": "CAN-SPAM/GDPR compliance for tenant email campaigns.",
+      "nelvyonApplication": [
+        "backend/saas/SaasCampaniasService.ts",
+        "backend/email/sesClient.ts"
+      ],
+      "repository": "https://github.com/PHPMailer/PHPMailer"
+    },
+    {
+      "patternId": "harvest-litestream",
+      "projectId": "litestream",
+      "projectName": "Litestream",
+      "license": "Apache-2.0",
+      "primaryCapability": "infraestructura",
+      "patternType": "architecture",
+      "insight": "Backup edge SQLite services to MinIO.",
+      "nelvyonApplication": [
+        "backend/db/migrations/",
+        "backend/local-ai/docker-compose.yml"
+      ],
+      "repository": "https://github.com/benbjohnson/litestream"
+    },
+    {
+      "patternId": "harvest-livekit",
+      "projectId": "livekit",
+      "projectName": "LiveKit",
+      "license": "Apache-2.0",
+      "primaryCapability": "redes_sociales",
+      "patternType": "integration",
+      "insight": "Embed live support video in Chatwoot or portal.",
+      "nelvyonApplication": [
+        "backend/os-agents/sectors/"
+      ],
+      "repository": "https://github.com/livekit/livekit"
+    },
+    {
+      "patternId": "harvest-liveportrait",
+      "projectId": "liveportrait",
+      "projectName": "LivePortrait",
+      "license": "MIT",
+      "primaryCapability": "audio_voz",
+      "patternType": "pipeline",
+      "insight": "Avatar video for social pack talking-head content.",
+      "nelvyonApplication": [
+        "backend/main.py",
+        "backend/labs/NelvyonLabsOptionalAdapter.ts"
+      ],
+      "repository": "https://github.com/KlingTeam/LivePortrait"
+    },
+    {
+      "patternId": "harvest-lottie",
+      "projectId": "lottie",
+      "projectName": "Lottie",
+      "license": "MIT",
+      "primaryCapability": "video",
+      "patternType": "pipeline",
+      "insight": "Animated assets for OS landing pack and SaaS UI micro-interactions.",
+      "nelvyonApplication": [
+        "backend/labs/NelvyonLabsOptionalAdapter.ts"
+      ],
+      "repository": "https://github.com/airbnb/lottie-web"
+    },
+    {
+      "patternId": "harvest-lucide",
+      "projectId": "lucide",
+      "projectName": "Lucide",
+      "license": "ISC",
+      "primaryCapability": "ui_paneles",
+      "patternType": "ux_ui",
+      "insight": "Icon system for SaasSidebar and portal UI.",
+      "nelvyonApplication": [
+        "apps/web/src/features/saas-shell/"
+      ],
+      "repository": "https://github.com/lucide-icons/lucide"
+    },
+    {
+      "patternId": "harvest-magic-ui",
+      "projectId": "magic-ui",
+      "projectName": "Magic UI",
+      "license": "MIT",
+      "primaryCapability": "ui_paneles",
+      "patternType": "ux_ui",
+      "insight": "OS landing pack templates and SaaS marketing pages.",
+      "nelvyonApplication": [
+        "apps/web/src/features/saas-shell/"
+      ],
+      "repository": "https://github.com/magicuidesign/magicui"
+    },
+    {
+      "patternId": "harvest-mailhog",
+      "projectId": "mailhog",
+      "projectName": "MailHog",
+      "license": "MIT",
+      "primaryCapability": "email",
+      "patternType": "integration",
+      "insight": "Dev/staging email capture for SaasCampaniasService QA.",
+      "nelvyonApplication": [
+        "backend/saas/SaasCampaniasService.ts",
+        "backend/email/sesClient.ts"
+      ],
+      "repository": "https://github.com/mailhog/MailHog"
+    },
+    {
+      "patternId": "harvest-mailpit",
+      "projectId": "mailpit",
+      "projectName": "Mailpit",
+      "license": "MIT",
+      "primaryCapability": "email",
+      "patternType": "integration",
+      "insight": "MailHog successor for Next.js dev email testing.",
+      "nelvyonApplication": [
+        "backend/saas/SaasCampaniasService.ts",
+        "backend/email/sesClient.ts"
+      ],
+      "repository": "https://github.com/axllent/mailpit"
+    },
+    {
+      "patternId": "harvest-matrix-synapse",
+      "projectId": "matrix-synapse",
+      "projectName": "Matrix Synapse",
+      "license": "Apache-2.0",
+      "primaryCapability": "redes_sociales",
+      "patternType": "integration",
+      "insight": "Internal team comms and client secure channels in PRIVATE_MODE.",
+      "nelvyonApplication": [
+        "backend/os-agents/sectors/"
+      ],
+      "repository": "https://github.com/element-hq/synapse"
+    },
+    {
+      "patternId": "harvest-mautic",
+      "projectId": "mautic",
+      "projectName": "Mautic",
+      "license": "Apache-2.0",
+      "primaryCapability": "crm",
+      "patternType": "data_model",
+      "insight": "Lead nurturing + CRM contact sync for SaasCampaniasService.",
+      "nelvyonApplication": [
+        "backend/saas/",
+        "apps/web/src/features/saas-crm/"
+      ],
+      "repository": "https://github.com/mautic/mautic"
+    },
+    {
+      "patternId": "harvest-mcp-servers",
+      "projectId": "mcp-servers",
+      "projectName": "MCP Servers (official)",
+      "license": "MIT",
+      "primaryCapability": "mcp",
+      "patternType": "integration",
+      "insight": "Starter tool pack for agency automation.",
+      "nelvyonApplication": [
+        "backend/labs/NelvyonLabsOptionalAdapter.ts"
+      ],
+      "repository": "https://github.com/modelcontextprotocol/servers"
+    },
+    {
+      "patternId": "harvest-medusa",
+      "projectId": "medusa",
+      "projectName": "Medusa",
+      "license": "MIT",
+      "primaryCapability": "contenido",
+      "patternType": "ux_ui",
+      "insight": "Headless ecommerce for client stores in ecommerce-growth pack.",
+      "nelvyonApplication": [
+        "apps/web/src/lib/packs/"
+      ],
+      "repository": "https://github.com/medusajs/medusa"
+    },
+    {
+      "patternId": "harvest-msw",
+      "projectId": "msw",
+      "projectName": "MSW",
+      "license": "MIT",
+      "primaryCapability": "testing",
+      "patternType": "testing",
+      "insight": "Frontend API mocking in Vitest and Storybook.",
+      "nelvyonApplication": [
+        "apps/web/vitest.config.ts",
+        "scripts/run-staging-p0-smokes.mjs"
+      ],
+      "repository": "https://github.com/mswjs/msw"
+    },
+    {
+      "patternId": "harvest-ocrmypdf",
+      "projectId": "ocrmypdf",
+      "projectName": "OCRmyPDF",
+      "license": "MPL-2.0",
+      "primaryCapability": "documentos",
+      "patternType": "pipeline",
+      "insight": "Make scanned client docs searchable before RAG chunking.",
+      "nelvyonApplication": [
+        "backend/local-ai/KnowledgeIngestService.ts"
+      ],
+      "repository": "https://github.com/ocrmypdf/OCRmyPDF"
+    },
+    {
+      "patternId": "harvest-odoo-crm",
+      "projectId": "odoo-crm",
+      "projectName": "Odoo CRM",
+      "license": "LGPL-3.0",
+      "primaryCapability": "crm",
+      "patternType": "data_model",
+      "insight": "All-in-one client ERP+CRM; separate from NELVYON SaaS CRM layer.",
+      "nelvyonApplication": [
+        "backend/saas/",
+        "apps/web/src/features/saas-crm/",
+        "docs/HANDOVER.md",
+        "docs/AI_CONTEXT.md"
+      ],
+      "repository": "https://github.com/odoo/odoo"
+    },
+    {
+      "patternId": "harvest-open-webui",
+      "projectId": "open-webui",
+      "projectName": "Open WebUI",
+      "license": "BSD-3-Clause",
+      "primaryCapability": "ia_llm",
+      "patternType": "architecture",
+      "insight": "Internal ops console for PRIVATE_MODE QA.",
+      "nelvyonApplication": [
+        "backend/local-ai/",
+        "backend/local-ai/specialization/"
+      ],
+      "repository": "https://github.com/open-webui/open-webui"
+    },
+    {
+      "patternId": "harvest-opentofu",
+      "projectId": "opentofu",
+      "projectName": "OpenTofu",
+      "license": "MPL-2.0",
+      "primaryCapability": "devops",
+      "patternType": "automation",
+      "insight": "IaC without BSL if HashiCorp policy changes.",
+      "nelvyonApplication": [
+        ".github/workflows/",
+        "scripts/run-phase1-audit.mjs",
+        "backend/db/migrations/",
+        "backend/local-ai/docker-compose.yml"
+      ],
+      "repository": "https://github.com/opentofu/opentofu"
+    },
+    {
+      "patternId": "harvest-outline",
+      "projectId": "outline",
+      "projectName": "Outline",
+      "license": "Apache-2.0",
+      "primaryCapability": "productividad",
+      "patternType": "architecture",
+      "insight": "Agency wiki; BookStack MIT alternative preferred.",
+      "nelvyonApplication": [
+        "docs/HANDOVER.md",
+        "docs/AI_CONTEXT.md"
+      ],
+      "repository": "https://github.com/outline/outline"
+    },
+    {
+      "patternId": "harvest-paddleocr",
+      "projectId": "paddleocr",
+      "projectName": "PaddleOCR",
+      "license": "Apache-2.0",
+      "primaryCapability": "documentos",
+      "patternType": "pipeline",
+      "insight": "Superior accuracy for marketing PDFs and invoices in ingest pipeline.",
+      "nelvyonApplication": [
+        "backend/local-ai/KnowledgeIngestService.ts"
+      ],
+      "repository": "https://github.com/PaddlePaddle/PaddleOCR"
+    },
+    {
+      "patternId": "harvest-payload-cms",
+      "projectId": "payload-cms",
+      "projectName": "Payload CMS",
+      "license": "MIT",
+      "primaryCapability": "contenido",
+      "patternType": "ux_ui",
+      "insight": "Best-fit CMS for Next.js 15 stack — OS pack content backend.",
+      "nelvyonApplication": [
+        "apps/web/src/lib/packs/"
+      ],
+      "repository": "https://github.com/payloadcms/payload"
+    },
+    {
+      "patternId": "harvest-penpot",
+      "projectId": "penpot",
+      "projectName": "Penpot",
+      "license": "MPL-2.0",
+      "primaryCapability": "diseno",
+      "patternType": "ux_ui",
+      "insight": "Self-hosted Figma alternative for agency design deliverables.",
+      "nelvyonApplication": [
+        "apps/web/"
+      ],
+      "repository": "https://github.com/penpot/penpot"
+    },
+    {
+      "patternId": "harvest-pgbackrest",
+      "projectId": "pgbackrest",
+      "projectName": "pgBackRest",
+      "license": "MIT",
+      "primaryCapability": "infraestructura",
+      "patternType": "architecture",
+      "insight": "Alternative to WAL-G for Postgres 16 PITR on Railway.",
+      "nelvyonApplication": [
+        "backend/db/migrations/",
+        "backend/local-ai/docker-compose.yml"
+      ],
+      "repository": "https://github.com/pgbackrest/pgbackrest"
+    },
+    {
+      "patternId": "harvest-pgbouncer",
+      "projectId": "pgbouncer",
+      "projectName": "PgBouncer",
+      "license": "ISC",
+      "primaryCapability": "infraestructura",
+      "patternType": "architecture",
+      "insight": "Essential on Railway for Next.js serverless connection limits.",
+      "nelvyonApplication": [
+        "backend/db/migrations/",
+        "backend/local-ai/docker-compose.yml"
+      ],
+      "repository": "https://github.com/pgbouncer/pgbouncer"
+    },
+    {
+      "patternId": "harvest-piper",
+      "projectId": "piper",
+      "projectName": "Piper",
+      "license": "MIT",
+      "primaryCapability": "audio_voz",
+      "patternType": "pipeline",
+      "insight": "Low-latency TTS for chatbot and IVR pack demos.",
+      "nelvyonApplication": [
+        "backend/main.py",
+        "backend/labs/NelvyonLabsOptionalAdapter.ts"
+      ],
+      "repository": "https://github.com/rhasspy/piper"
+    },
+    {
+      "patternId": "harvest-playwright-scraper",
+      "projectId": "playwright-scraper",
+      "projectName": "Playwright Scraper",
+      "license": "Apache-2.0",
+      "primaryCapability": "scraping",
+      "patternType": "algorithm",
+      "insight": "Cross-browser SEO rendering tests; separate from E2E test entry.",
+      "nelvyonApplication": [
+        "backend/labs/NelvyonLabsOptionalAdapter.ts"
+      ],
+      "repository": "https://github.com/microsoft/playwright"
+    },
+    {
+      "patternId": "harvest-pomerium",
+      "projectId": "pomerium",
+      "projectName": "Pomerium",
+      "license": "Apache-2.0",
+      "primaryCapability": "integraciones",
+      "patternType": "integration",
+      "insight": "Zero-trust access to Hasura, Grafana, and ops tools.",
+      "nelvyonApplication": [
+        "apps/web/src/app/api/",
+        "backend/saas/",
+        "backend/security/NelvyonSecurityScanAdapter.ts",
+        "backend/local-ai/specialization/SecurityGuard.ts"
+      ],
+      "repository": "https://github.com/pomerium/pomerium"
+    },
+    {
+      "patternId": "harvest-postgrest",
+      "projectId": "postgrest",
+      "projectName": "PostgREST",
+      "license": "MIT",
+      "primaryCapability": "integraciones",
+      "patternType": "integration",
+      "insight": "Zero-code REST for internal tools over Postgres 16.",
+      "nelvyonApplication": [
+        "apps/web/src/app/api/",
+        "backend/saas/",
+        "backend/db/migrations/",
+        "backend/local-ai/docker-compose.yml"
+      ],
+      "repository": "https://github.com/PostgREST/postgrest"
+    },
+    {
+      "patternId": "harvest-posthog",
+      "projectId": "posthog",
+      "projectName": "PostHog",
+      "license": "MIT",
+      "primaryCapability": "analitica",
+      "patternType": "data_model",
+      "insight": "SaaS product analytics + feature flags for gradual rollouts.",
+      "nelvyonApplication": [
+        "apps/web/src/app/saas/dashboard/"
+      ],
+      "repository": "https://github.com/PostHog/posthog"
+    },
+    {
+      "patternId": "harvest-prettier",
+      "projectId": "prettier",
+      "projectName": "Prettier",
+      "license": "MIT",
+      "primaryCapability": "saas_core",
+      "patternType": "architecture",
+      "insight": "Code format standard across TS/Python (via plugin).",
+      "nelvyonApplication": [
+        "apps/web/",
+        "backend/saas/"
+      ],
+      "repository": "https://github.com/prettier/prettier"
+    },
+    {
+      "patternId": "harvest-puppeteer",
+      "projectId": "puppeteer",
+      "projectName": "Puppeteer",
+      "license": "Apache-2.0",
+      "primaryCapability": "scraping",
+      "patternType": "algorithm",
+      "insight": "JS-rendered page scraping for SPA client sites.",
+      "nelvyonApplication": [
+        "backend/labs/NelvyonLabsOptionalAdapter.ts"
+      ],
+      "repository": "https://github.com/puppeteer/puppeteer"
+    },
+    {
+      "patternId": "harvest-pyannote-audio",
+      "projectId": "pyannote-audio",
+      "projectName": "pyannote.audio",
+      "license": "MIT",
+      "primaryCapability": "audio_voz",
+      "patternType": "pipeline",
+      "insight": "Speaker segmentation paired with WhisperX transcripts.",
+      "nelvyonApplication": [
+        "backend/main.py",
+        "backend/labs/NelvyonLabsOptionalAdapter.ts"
+      ],
+      "repository": "https://github.com/pyannote/pyannote-audio"
+    },
+    {
+      "patternId": "harvest-pytest",
+      "projectId": "pytest",
+      "projectName": "pytest",
+      "license": "MIT",
+      "primaryCapability": "testing",
+      "patternType": "testing",
+      "insight": "FastAPI pack agent test suite in backend/tests.",
+      "nelvyonApplication": [
+        "apps/web/vitest.config.ts",
+        "scripts/run-staging-p0-smokes.mjs"
+      ],
+      "repository": "https://github.com/pytest-dev/pytest"
+    },
+    {
+      "patternId": "harvest-r2r",
+      "projectId": "r2r",
+      "projectName": "R2R",
+      "license": "MIT",
+      "primaryCapability": "rag",
+      "patternType": "pipeline",
+      "insight": "End-to-end RAG microservice pattern for OS knowledge packs.",
+      "nelvyonApplication": [
+        "backend/local-ai/LocalRagRetriever.ts",
+        "backend/local-ai/KnowledgeIngestService.ts"
+      ],
+      "repository": "https://github.com/SciPhi-AI/R2R"
+    },
+    {
+      "patternId": "harvest-radix-ui",
+      "projectId": "radix-ui",
+      "projectName": "Radix UI",
+      "license": "MIT",
+      "primaryCapability": "ui_paneles",
+      "patternType": "ux_ui",
+      "insight": "Foundation under shadcn/ui — direct use for custom SaaS components.",
+      "nelvyonApplication": [
+        "apps/web/src/features/saas-shell/"
+      ],
+      "repository": "https://github.com/radix-ui/primitives"
+    },
+    {
+      "patternId": "harvest-rasa",
+      "projectId": "rasa",
+      "projectName": "Rasa",
+      "license": "Apache-2.0",
+      "primaryCapability": "redes_sociales",
+      "patternType": "integration",
+      "insight": "Custom NLU training for industry-specific chatbot packs.",
+      "nelvyonApplication": [
+        "backend/os-agents/sectors/"
+      ],
+      "repository": "https://github.com/RasaHQ/rasa"
+    },
+    {
+      "patternId": "harvest-react-colorful",
+      "projectId": "react-colorful",
+      "projectName": "react-colorful",
+      "license": "MIT",
+      "primaryCapability": "diseno",
+      "patternType": "ux_ui",
+      "insight": "Brand color picker in tenant theme customization UI.",
+      "nelvyonApplication": [
+        "apps/web/"
+      ],
+      "repository": "https://github.com/omgovich/react-colorful"
+    },
+    {
+      "patternId": "harvest-react-hook-form",
+      "projectId": "react-hook-form",
+      "projectName": "React Hook Form",
+      "license": "MIT",
+      "primaryCapability": "ui_paneles",
+      "patternType": "ux_ui",
+      "insight": "All SaaS forms — CRM, campaigns, workflows, billing.",
+      "nelvyonApplication": [
+        "apps/web/src/features/saas-shell/"
+      ],
+      "repository": "https://github.com/react-hook-form/react-hook-form"
+    },
+    {
+      "patternId": "harvest-readability",
+      "projectId": "readability",
+      "projectName": "Mozilla Readability",
+      "license": "Apache-2.0",
+      "primaryCapability": "scraping",
+      "patternType": "algorithm",
+      "insight": "Browser-side and Node content extraction for pack research.",
+      "nelvyonApplication": [
+        "backend/labs/NelvyonLabsOptionalAdapter.ts"
+      ],
+      "repository": "https://github.com/mozilla/readability"
+    },
+    {
+      "patternId": "harvest-real-esrgan",
+      "projectId": "real-esrgan",
+      "projectName": "Real-ESRGAN",
+      "license": "BSD-3-Clause",
+      "primaryCapability": "video",
+      "patternType": "pipeline",
+      "insight": "Upscale client assets for print and ad deliverables.",
+      "nelvyonApplication": [
+        "backend/labs/NelvyonLabsOptionalAdapter.ts"
+      ],
+      "repository": "https://github.com/xinntao/Real-ESRGAN"
+    },
+    {
+      "patternId": "harvest-recharts",
+      "projectId": "recharts",
+      "projectName": "Recharts",
+      "license": "MIT",
+      "primaryCapability": "ui_paneles",
+      "patternType": "ux_ui",
+      "insight": "CRM analytics charts in tenant dashboards.",
+      "nelvyonApplication": [
+        "apps/web/src/features/saas-shell/"
+      ],
+      "repository": "https://github.com/recharts/recharts"
+    },
+    {
+      "patternId": "harvest-redash",
+      "projectId": "redash",
+      "projectName": "Redash",
+      "license": "BSD-2-Clause",
+      "primaryCapability": "reporting",
+      "patternType": "data_model",
+      "insight": "SQL dashboard tool for agency analysts; Metabase preferred.",
+      "nelvyonApplication": [
+        "apps/web/src/components/platform/PackReportDashboard.tsx"
+      ],
+      "repository": "https://github.com/getredash/redash"
+    },
+    {
+      "patternId": "harvest-rhasspy",
+      "projectId": "rhasspy",
+      "projectName": "Rhasspy",
+      "license": "MIT",
+      "primaryCapability": "audio_voz",
+      "patternType": "pipeline",
+      "insight": "Voice command interface for PRIVATE_MODE ops console.",
+      "nelvyonApplication": [
+        "backend/main.py",
+        "backend/labs/NelvyonLabsOptionalAdapter.ts",
+        "backend/os-agents/",
+        "apps/web/src/lib/packs/packOrchestrator.ts"
+      ],
+      "repository": "https://github.com/rhasspy/rhasspy"
+    },
+    {
+      "patternId": "harvest-sadtalker",
+      "projectId": "sadtalker",
+      "projectName": "SadTalker",
+      "license": "Apache-2.0",
+      "primaryCapability": "audio_voz",
+      "patternType": "pipeline",
+      "insight": "Quick talking avatar from client photo + Piper TTS audio.",
+      "nelvyonApplication": [
+        "backend/main.py",
+        "backend/labs/NelvyonLabsOptionalAdapter.ts"
+      ],
+      "repository": "https://github.com/OpenTalker/SadTalker"
+    },
+    {
+      "patternId": "harvest-saleor",
+      "projectId": "saleor",
+      "projectName": "Saleor",
+      "license": "BSD-3-Clause",
+      "primaryCapability": "contenido",
+      "patternType": "ux_ui",
+      "insight": "GraphQL ecommerce for Python-heavy agency clients.",
+      "nelvyonApplication": [
+        "apps/web/src/lib/packs/"
+      ],
+      "repository": "https://github.com/saleor/saleor"
+    },
+    {
+      "patternId": "harvest-scrapyd",
+      "projectId": "scrapyd",
+      "projectName": "Scrapyd",
+      "license": "BSD-3-Clause",
+      "primaryCapability": "scraping",
+      "patternType": "algorithm",
+      "insight": "Scheduled SEO crawl spider deployment for agency clients.",
+      "nelvyonApplication": [
+        "backend/labs/NelvyonLabsOptionalAdapter.ts",
+        "backend/db/migrations/",
+        "backend/local-ai/docker-compose.yml"
+      ],
+      "repository": "https://github.com/scrapy/scrapyd"
+    },
+    {
+      "patternId": "harvest-selenium",
+      "projectId": "selenium",
+      "projectName": "Selenium",
+      "license": "Apache-2.0",
+      "primaryCapability": "navegacion",
+      "patternType": "algorithm",
+      "insight": "Legacy browser automation; Playwright preferred for new work.",
+      "nelvyonApplication": [
+        "apps/web/e2e/",
+        "apps/web/vitest.config.ts",
+        "scripts/run-staging-p0-smokes.mjs"
+      ],
+      "repository": "https://github.com/SeleniumHQ/selenium"
+    },
+    {
+      "patternId": "harvest-semgrep",
+      "projectId": "semgrep",
+      "projectName": "Semgrep",
+      "license": "LGPL-3.0",
+      "primaryCapability": "seguridad",
+      "patternType": "security",
+      "insight": "SAST in CI for TypeScript and Python backends.",
+      "nelvyonApplication": [
+        "backend/security/NelvyonSecurityScanAdapter.ts",
+        "backend/local-ai/specialization/SecurityGuard.ts"
+      ],
+      "repository": "https://github.com/semgrep/semgrep"
+    },
+    {
+      "patternId": "harvest-shadcn-ui",
+      "projectId": "shadcn-ui",
+      "projectName": "shadcn/ui",
+      "license": "MIT",
+      "primaryCapability": "ui_paneles",
+      "patternType": "ux_ui",
+      "insight": "Primary UI kit for SaasShellLayout and portal refresh.",
+      "nelvyonApplication": [
+        "apps/web/src/features/saas-shell/"
+      ],
+      "repository": "https://github.com/shadcn-ui/ui"
+    },
+    {
+      "patternId": "harvest-shoutrrr",
+      "projectId": "shoutrrr",
+      "projectName": "Shoutrrr",
+      "license": "MIT",
+      "primaryCapability": "redes_sociales",
+      "patternType": "integration",
+      "insight": "Lightweight alert routing in Go sidecars and workers.",
+      "nelvyonApplication": [
+        "backend/os-agents/sectors/",
+        "backend/saas/SaasCampaniasService.ts",
+        "backend/email/sesClient.ts"
+      ],
+      "repository": "https://github.com/containrrr/shoutrrr"
+    },
+    {
+      "patternId": "harvest-silero-tts",
+      "projectId": "silero-tts",
+      "projectName": "Silero Models",
+      "license": "MIT",
+      "primaryCapability": "audio_voz",
+      "patternType": "pipeline",
+      "insight": "Lightweight TTS/STT for edge and low-resource PRIVATE_MODE.",
+      "nelvyonApplication": [
+        "backend/main.py",
+        "backend/labs/NelvyonLabsOptionalAdapter.ts"
+      ],
+      "repository": "https://github.com/snakers4/silero-models"
+    },
+    {
+      "patternId": "harvest-sonner",
+      "projectId": "sonner",
+      "projectName": "Sonner",
+      "license": "MIT",
+      "primaryCapability": "ui_paneles",
+      "patternType": "ux_ui",
+      "insight": "Toast notifications across SaaS actions and pack status.",
+      "nelvyonApplication": [
+        "apps/web/src/features/saas-shell/",
+        "backend/saas/SaasCampaniasService.ts",
+        "backend/email/sesClient.ts"
+      ],
+      "repository": "https://github.com/emilkowalski/sonner"
+    },
+    {
+      "patternId": "harvest-stackstorm",
+      "projectId": "stackstorm",
+      "projectName": "StackStorm",
+      "license": "Apache-2.0",
+      "primaryCapability": "automatizaciones",
+      "patternType": "automation",
+      "insight": "DevOps runbooks and incident response automation.",
+      "nelvyonApplication": [
+        "backend/saas/SaasWorkflowService.ts"
+      ],
+      "repository": "https://github.com/StackStorm/st2"
+    },
+    {
+      "patternId": "harvest-stagehand",
+      "projectId": "stagehand",
+      "projectName": "Stagehand",
+      "license": "MIT",
+      "primaryCapability": "navegacion",
+      "patternType": "algorithm",
+      "insight": "Natural language browser tasks for OS research agents.",
+      "nelvyonApplication": [
+        "apps/web/e2e/"
+      ],
+      "repository": "https://github.com/browserbase/stagehand"
+    },
+    {
+      "patternId": "harvest-storybook",
+      "projectId": "storybook",
+      "projectName": "Storybook",
+      "license": "MIT",
+      "primaryCapability": "testing",
+      "patternType": "testing",
+      "insight": "Isolated development for SaaS UI component library.",
+      "nelvyonApplication": [
+        "apps/web/vitest.config.ts",
+        "scripts/run-staging-p0-smokes.mjs"
+      ],
+      "repository": "https://github.com/storybookjs/storybook"
+    },
+    {
+      "patternId": "harvest-swagger-ui",
+      "projectId": "swagger-ui",
+      "projectName": "Swagger UI",
+      "license": "Apache-2.0",
+      "primaryCapability": "integraciones",
+      "patternType": "integration",
+      "insight": "Internal API docs for SaaS and OS endpoints.",
+      "nelvyonApplication": [
+        "apps/web/src/app/api/",
+        "backend/saas/"
+      ],
+      "repository": "https://github.com/swagger-api/swagger-ui"
+    },
+    {
+      "patternId": "harvest-swc",
+      "projectId": "swc",
+      "projectName": "SWC",
+      "license": "Apache-2.0",
+      "primaryCapability": "saas_core",
+      "patternType": "architecture",
+      "insight": "Next.js 15 compiler backend for faster dev builds.",
+      "nelvyonApplication": [
+        "apps/web/",
+        "backend/saas/"
+      ],
+      "repository": "https://github.com/swc-project/swc"
+    },
+    {
+      "patternId": "harvest-tanstack-query",
+      "projectId": "tanstack-query",
+      "projectName": "TanStack Query",
+      "license": "MIT",
+      "primaryCapability": "ui_paneles",
+      "patternType": "ux_ui",
+      "insight": "Standard data layer for all /saas/* pages and portal BFF.",
+      "nelvyonApplication": [
+        "apps/web/src/features/saas-shell/"
+      ],
+      "repository": "https://github.com/TanStack/query"
+    },
+    {
+      "patternId": "harvest-tanstack-table",
+      "projectId": "tanstack-table",
+      "projectName": "TanStack Table",
+      "license": "MIT",
+      "primaryCapability": "ui_paneles",
+      "patternType": "ux_ui",
+      "insight": "CRM, pipeline, and campaign list tables in SaaS shell.",
+      "nelvyonApplication": [
+        "apps/web/src/features/saas-shell/"
+      ],
+      "repository": "https://github.com/TanStack/table"
+    },
+    {
+      "patternId": "harvest-tei",
+      "projectId": "tei",
+      "projectName": "Text Embeddings Inference",
+      "license": "Apache-2.0",
+      "primaryCapability": "ia_llm",
+      "patternType": "architecture",
+      "insight": "Production embedding service alternative to Ollama embed.",
+      "nelvyonApplication": [
+        "backend/local-ai/",
+        "backend/local-ai/specialization/",
+        "backend/local-ai/LocalRagRetriever.ts",
+        "backend/local-ai/KnowledgeIngestService.ts"
+      ],
+      "repository": "https://github.com/huggingface/text-embeddings-inference"
+    },
+    {
+      "patternId": "harvest-testcontainers",
+      "projectId": "testcontainers",
+      "projectName": "Testcontainers",
+      "license": "MIT",
+      "primaryCapability": "testing",
+      "patternType": "testing",
+      "insight": "Postgres/Redis integration tests for SaasWorkflowService.",
+      "nelvyonApplication": [
+        "apps/web/vitest.config.ts",
+        "scripts/run-staging-p0-smokes.mjs",
+        "backend/db/migrations/",
+        "backend/local-ai/docker-compose.yml"
+      ],
+      "repository": "https://github.com/testcontainers/testcontainers-node"
+    },
+    {
+      "patternId": "harvest-testing-library",
+      "projectId": "testing-library",
+      "projectName": "Testing Library",
+      "license": "MIT",
+      "primaryCapability": "testing",
+      "patternType": "testing",
+      "insight": "Component tests for SaasShellLayout and CRM features.",
+      "nelvyonApplication": [
+        "apps/web/vitest.config.ts",
+        "scripts/run-staging-p0-smokes.mjs"
+      ],
+      "repository": "https://github.com/testing-library/react-testing-library"
+    },
+    {
+      "patternId": "harvest-tina-cms",
+      "projectId": "tina-cms",
+      "projectName": "TinaCMS",
+      "license": "Apache-2.0",
+      "primaryCapability": "contenido",
+      "patternType": "ux_ui",
+      "insight": "Git-based content for OS pack templates and docs.",
+      "nelvyonApplication": [
+        "apps/web/src/lib/packs/"
+      ],
+      "repository": "https://github.com/tinacms/tinacms"
+    },
+    {
+      "patternId": "harvest-tldraw",
+      "projectId": "tldraw",
+      "projectName": "tldraw",
+      "license": "MIT",
+      "primaryCapability": "diseno",
+      "patternType": "ux_ui",
+      "insight": "Embeddable whiteboard in portal for client collaboration.",
+      "nelvyonApplication": [
+        "apps/web/"
+      ],
+      "repository": "https://github.com/tldraw/tldraw"
+    },
+    {
+      "patternId": "harvest-tracardi",
+      "projectId": "tracardi",
+      "projectName": "Tracardi",
+      "license": "MIT",
+      "primaryCapability": "analitica",
+      "patternType": "data_model",
+      "insight": "Unified customer profile for CRM + marketing automation.",
+      "nelvyonApplication": [
+        "apps/web/src/app/saas/dashboard/",
+        "backend/saas/SaasWorkflowService.ts"
+      ],
+      "repository": "https://github.com/Tracardi/tracardi"
+    },
+    {
+      "patternId": "harvest-trafilatura",
+      "projectId": "trafilatura",
+      "projectName": "Trafilatura",
+      "license": "Apache-2.0",
+      "primaryCapability": "scraping",
+      "patternType": "algorithm",
+      "insight": "Clean article text for RAG and content marketing analysis.",
+      "nelvyonApplication": [
+        "backend/labs/NelvyonLabsOptionalAdapter.ts"
+      ],
+      "repository": "https://github.com/adbar/trafilatura"
+    },
+    {
+      "patternId": "harvest-tremor",
+      "projectId": "tremor",
+      "projectName": "Tremor",
+      "license": "Apache-2.0",
+      "primaryCapability": "ui_paneles",
+      "patternType": "ux_ui",
+      "insight": "CEO metrics dashboard and tenant analytics widgets.",
+      "nelvyonApplication": [
+        "apps/web/src/features/saas-shell/"
+      ],
+      "repository": "https://github.com/tremorlabs/tremor"
+    },
+    {
+      "patternId": "harvest-txtai",
+      "projectId": "txtai",
+      "projectName": "txtai",
+      "license": "Apache-2.0",
+      "primaryCapability": "rag",
+      "patternType": "pipeline",
+      "insight": "Compact RAG stack for agency one-off deployments.",
+      "nelvyonApplication": [
+        "backend/local-ai/LocalRagRetriever.ts",
+        "backend/local-ai/KnowledgeIngestService.ts",
+        "backend/autonomous/analytics/ga4RealAdapter.ts"
+      ],
+      "repository": "https://github.com/neuml/txtai"
+    },
+    {
+      "patternId": "harvest-vespa",
+      "projectId": "vespa",
+      "projectName": "Vespa",
+      "license": "Apache-2.0",
+      "primaryCapability": "seo",
+      "patternType": "algorithm",
+      "insight": "Enterprise-scale search — overkill for current Railway deploy.",
+      "nelvyonApplication": [
+        "backend/autonomous/analytics/ga4RealAdapter.ts",
+        "backend/local-ai/LocalRagRetriever.ts",
+        "backend/local-ai/KnowledgeIngestService.ts"
+      ],
+      "repository": "https://github.com/vespa-engine/vespa"
+    },
+    {
+      "patternId": "harvest-vite",
+      "projectId": "vite",
+      "projectName": "Vite",
+      "license": "MIT",
+      "primaryCapability": "saas_core",
+      "patternType": "architecture",
+      "insight": "Vitest and script bundling; Next.js primary for app.",
+      "nelvyonApplication": [
+        "apps/web/",
+        "backend/saas/"
+      ],
+      "repository": "https://github.com/vitejs/vite"
+    },
+    {
+      "patternId": "harvest-vitest",
+      "projectId": "vitest",
+      "projectName": "Vitest",
+      "license": "MIT",
+      "primaryCapability": "testing",
+      "patternType": "testing",
+      "insight": "Core test runner — 489+ tests in backend/saas suite.",
+      "nelvyonApplication": [
+        "apps/web/vitest.config.ts",
+        "scripts/run-staging-p0-smokes.mjs"
+      ],
+      "repository": "https://github.com/vitest-dev/vitest"
+    },
+    {
+      "patternId": "harvest-vosk",
+      "projectId": "vosk",
+      "projectName": "Vosk",
+      "license": "Apache-2.0",
+      "primaryCapability": "audio_voz",
+      "patternType": "pipeline",
+      "insight": "CPU-only STT fallback when GPU unavailable.",
+      "nelvyonApplication": [
+        "backend/main.py",
+        "backend/labs/NelvyonLabsOptionalAdapter.ts"
+      ],
+      "repository": "https://github.com/alphacep/vosk-api"
+    },
+    {
+      "patternId": "harvest-waha",
+      "projectId": "waha",
+      "projectName": "WAHA",
+      "license": "Apache-2.0",
+      "primaryCapability": "redes_sociales",
+      "patternType": "integration",
+      "insight": "Lighter WhatsApp bridge alternative to Evolution API.",
+      "nelvyonApplication": [
+        "backend/os-agents/sectors/"
+      ],
+      "repository": "https://github.com/devlikeapro/waha"
+    },
+    {
+      "patternId": "harvest-wal-g",
+      "projectId": "wal-g",
+      "projectName": "WAL-G",
+      "license": "Apache-2.0",
+      "primaryCapability": "infraestructura",
+      "patternType": "architecture",
+      "insight": "Postgres 16 PITR backups to MinIO/S3 on Railway.",
+      "nelvyonApplication": [
+        "backend/db/migrations/",
+        "backend/local-ai/docker-compose.yml"
+      ],
+      "repository": "https://github.com/wal-g/wal-g"
+    },
+    {
+      "patternId": "harvest-watchtower",
+      "projectId": "watchtower",
+      "projectName": "Watchtower",
+      "license": "Apache-2.0",
+      "primaryCapability": "devops",
+      "patternType": "automation",
+      "insight": "Auto-update local-ai sidecar containers in PRIVATE_MODE.",
+      "nelvyonApplication": [
+        ".github/workflows/",
+        "scripts/run-phase1-audit.mjs",
+        "backend/db/migrations/",
+        "backend/local-ai/docker-compose.yml"
+      ],
+      "repository": "https://github.com/containrrr/watchtower"
+    },
+    {
+      "patternId": "harvest-wav2lip",
+      "projectId": "wav2lip",
+      "projectName": "Wav2Lip",
+      "license": "MIT",
+      "primaryCapability": "audio_voz",
+      "patternType": "pipeline",
+      "insight": "Dub and lip-sync for multilingual client video packs.",
+      "nelvyonApplication": [
+        "backend/main.py",
+        "backend/labs/NelvyonLabsOptionalAdapter.ts"
+      ],
+      "repository": "https://github.com/Rudrabha/Wav2Lip"
+    },
+    {
+      "patternId": "harvest-weasyprint",
+      "projectId": "weasyprint",
+      "projectName": "WeasyPrint",
+      "license": "BSD-3-Clause",
+      "primaryCapability": "documentos",
+      "patternType": "pipeline",
+      "insight": "Lightweight invoice and report PDF from React HTML templates.",
+      "nelvyonApplication": [
+        "backend/local-ai/KnowledgeIngestService.ts"
+      ],
+      "repository": "https://github.com/Kozea/WeasyPrint"
+    },
+    {
+      "patternId": "harvest-whisperx",
+      "projectId": "whisperx",
+      "projectName": "WhisperX",
+      "license": "BSD-2-Clause",
+      "primaryCapability": "audio_voz",
+      "patternType": "pipeline",
+      "insight": "Meeting transcripts with speaker labels for agency client reports.",
+      "nelvyonApplication": [
+        "backend/main.py",
+        "backend/labs/NelvyonLabsOptionalAdapter.ts"
+      ],
+      "repository": "https://github.com/m-bain/whisperX"
+    },
+    {
+      "patternId": "harvest-windmill",
+      "projectId": "windmill",
+      "projectName": "Windmill",
+      "license": "Apache-2.0",
+      "primaryCapability": "automatizaciones",
+      "patternType": "automation",
+      "insight": "Internal ops automation; AGPL review for SaaS.",
+      "nelvyonApplication": [
+        "backend/saas/SaasWorkflowService.ts",
+        "backend/os-agents/",
+        "apps/web/src/lib/packs/packOrchestrator.ts"
+      ],
+      "repository": "https://github.com/windmill-labs/windmill"
+    },
+    {
+      "patternId": "harvest-wiremock",
+      "projectId": "wiremock",
+      "projectName": "WireMock",
+      "license": "Apache-2.0",
+      "primaryCapability": "testing",
+      "patternType": "testing",
+      "insight": "Mock Stripe/SES/external APIs in integration tests.",
+      "nelvyonApplication": [
+        "apps/web/vitest.config.ts",
+        "scripts/run-staging-p0-smokes.mjs"
+      ],
+      "repository": "https://github.com/wiremock/wiremock"
+    },
+    {
+      "patternId": "harvest-zaproxy",
+      "projectId": "zaproxy",
+      "projectName": "OWASP ZAP",
+      "license": "Apache-2.0",
+      "primaryCapability": "testing",
+      "patternType": "testing",
+      "insight": "DAST scans on staging /saas and /portal before release.",
+      "nelvyonApplication": [
+        "apps/web/vitest.config.ts",
+        "scripts/run-staging-p0-smokes.mjs",
+        "backend/security/NelvyonSecurityScanAdapter.ts",
+        "backend/local-ai/specialization/SecurityGuard.ts"
+      ],
+      "repository": "https://github.com/zaproxy/zaproxy"
+    },
+    {
+      "patternId": "harvest-zustand",
+      "projectId": "zustand",
+      "projectName": "Zustand",
+      "license": "MIT",
+      "primaryCapability": "ui_paneles",
+      "patternType": "ux_ui",
+      "insight": "Client UI state for SaaS shell sidebar and pack wizard.",
+      "nelvyonApplication": [
+        "apps/web/src/features/saas-shell/"
+      ],
+      "repository": "https://github.com/pmndrs/zustand"
+    }
+  ]
+}
