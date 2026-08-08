@@ -11,7 +11,7 @@
  * conservados. Tambien `saas-nav-full-coverage`.
  *
  * Logica de NELVYON intacta: `GET /api/saas/chat` con `credentials:
- * "same-origin"` (historial + `openai_configured`), el `POST` que reenvia el
+ * "same-origin"` (historial + `ai_available`), el `POST` que reenvia el
  * hilo COMPLETO en `messages` y el `DELETE` que lo borra; el saludo inicial,
  * las seis sugerencias, el auto-scroll al final, Enter para enviar y
  * Shift+Enter para nueva linea, y el bloqueo del envio cuando OpenAI no esta
@@ -57,7 +57,7 @@ export default function SaasChatPage() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [historyLoading, setHistoryLoading] = useState(true);
-  const [openaiConfigured, setOpenaiConfigured] = useState<boolean | null>(null);
+  const [aiAvailable, setAiAvailable] = useState<boolean | null>(null);
   const [clearing, setClearing] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -67,10 +67,10 @@ export default function SaasChatPage() {
         const res = await fetch("/api/saas/chat", { credentials: "same-origin" });
         if (!res.ok) return;
         const data = (await res.json().catch(() => ({}))) as {
-          openai_configured?: boolean;
+          ai_available?: boolean;
           messages?: { role: "user" | "assistant"; content: string }[];
         };
-        setOpenaiConfigured(data.openai_configured ?? false);
+        setAiAvailable(data.ai_available ?? false);
         // Un `messages` que no sea array reventaba el `.length`/`.map`.
         if (Array.isArray(data.messages) && data.messages.length > 0) {
           setMessages(
@@ -81,7 +81,7 @@ export default function SaasChatPage() {
           );
         }
       } catch {
-        setOpenaiConfigured(false);
+        setAiAvailable(false);
       } finally {
         setHistoryLoading(false);
       }
@@ -160,10 +160,10 @@ export default function SaasChatPage() {
               Tu experto en marketing digital disponible 24/7 — historial guardado por usuario
             </p>
 
-            {openaiConfigured === false && (
+            {aiAvailable === false && (
               <div className="alert alert-warning" role="alert">
-                OpenAI no está configurado en el servidor (<code>OPENAI_API_KEY</code>). El chat estará
-                disponible cuando el administrador active la integración.
+                La IA de NELVYON no está disponible en este momento. El chat volverá a estar
+                operativo cuando se restablezca el servicio de inferencia local.
               </div>
             )}
 
@@ -251,7 +251,7 @@ export default function SaasChatPage() {
                 <div className="d-flex align-items-center justify-content-between gap-2">
                   <span className="text-muted fs-12">Shift+Enter para nueva línea</span>
                   <button type="button" className="btn btn-primary"
-                    disabled={!input.trim() || loading || openaiConfigured === false}
+                    disabled={!input.trim() || loading || aiAvailable === false}
                     onClick={() => void send()}>
                     {loading ? "Enviando…" : "Enviar"}
                   </button>
