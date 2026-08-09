@@ -19,6 +19,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { decideWorkforceVerdict } from "./workforceVerdict.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const outDir = join(root, "backend", "local-ai", "benchmarks");
@@ -270,24 +271,6 @@ const ollama = await ollamaReachable();
 }
 
 const forcePass = process.env.NELVYON_WORKFORCE_FORCE_PASS === "1";
-if (forcePass) {
-  blockers.push("force_pass_rejected");
-}
-
-const requiredOk = steps.filter((s) => s.required).every((s) => s.ok);
-const internalBlockers = steps.filter((s) => s.required && !s.ok).map((s) => s.id);
-if (internalBlockers.length) blockers.push(...internalBlockers);
-
-/**
- * La certificación exige evidencia live REAL, con independencia de si el
- * entorno marcó esos pasos como `required`. Sin esta comprobación explícita,
- * declarar un entorno sin IA local convertiría "8 de 8 requeridos en verde" en
- * un PASS falso: exactamente el fraude que el gate existe para impedir.
- */
-const liveEvidenceOk = ["ollama_live", "rag_live"].every(
-  (id) => steps.find((s) => s.id === id)?.ok === true,
-);
-if (!liveEvidenceOk) blockers.push("live_evidence_missing_cert_not_claimed");
 
 // Phase-1 prod residuals — documented, do NOT block workforce PASS
 externalNotes.push(
@@ -296,28 +279,14 @@ externalNotes.push(
   "migration_514_ops_separate_if_shared_memory_unit_ok",
 );
 
-let verdict = "FAIL";
-let certified = false;
-let rationale = "Required workforce gates failed.";
-
-if (forcePass) {
-  verdict = "FAIL";
-  rationale = "NELVYON_WORKFORCE_FORCE_PASS is forbidden; cert must be earned.";
-} else if (requiredOk && liveEvidenceOk && skipped.length === 0 && internalBlockers.length === 0) {
-  verdict = "PASS";
-  certified = true;
-  rationale =
-    "All required internal gates passed with live Ollama/RAG evidence, OpenClaw mock certified, production build, soak, workflow audit, and residual evals. External notes are Phase-1/ops residuals not blocking workforce cert.";
-} else if (requiredOk && skipped.length > 0) {
-  verdict = "CONDITIONAL_PASS";
-  certified = false;
-  rationale = `Required steps OK but skipped=${skipped.length} (e.g. SKIP_BUILD). PASS requires skipped=0.`;
-  blockers.push(...skipped.map((s) => `skipped:${s.id}`));
-} else if (steps.filter((s) => s.required).some((s) => s.ok)) {
-  verdict = "CONDITIONAL_PASS";
-  certified = false;
-  rationale = "Partial: some required steps failed or live evidence incomplete.";
-}
+/**
+ * La decisión vive en `workforceVerdict.mjs` como función pura para poder
+ * blindarla con tests. El comportamiento es idéntico: este script sigue
+ * ejecutando los gates y solo delega el veredicto.
+ */
+const decision = decideWorkforceVerdict({ steps, skipped, forcePass });
+blockers.push(...decision.blockers);
+const { verdict, certified, rationale, requiredOk } = decision;
 
 const report = {
   schema: "nelvyon.autonomous.workforce.cert.v2",
@@ -375,4 +344,4 @@ const outPath = join(outDir, "workforce_certification.json");
 writeFileSync(outPath, JSON.stringify(report, null, 2), "utf8");
 console.log(JSON.stringify(report, null, 2));
 console.log(`\nWrote ${outPath}`);
-process.exit(certified || (requiredOk && verdict === "CONDITIONAL_PASS") ? 0 : 1);
+process.exit(decision.exitCode);
