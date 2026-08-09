@@ -264,6 +264,42 @@ export function resetOsCompetitorGapServiceForTests(): void {
 
 // ── Service ───────────────────────────────────────────────────────────────────────
 
+
+/**
+ * Alcance de una operación sobre `os_competitor_gap_runs`.
+ *
+ * POR QUÉ EXISTE
+ * --------------
+ * Antes el filtro de tenant se construía así:
+ *
+ *     const tenantClause = tenantFilter(opts.tenantId, ` AND tenant_id = $8::uuid`, "analyzeRun");
+ *
+ * Es decir: **omitir el tenant concedía alcance global en silencio**. Ningún
+ * llamador actual lo explota —los tres están trazados— pero el contrato
+ * permitía que un llamador futuro obtuviera acceso a runs de cualquier tenant
+ * sin escribir nada que pareciera peligroso y sin que fallara nada.
+ *
+ * Ahora el modo global hay que PEDIRLO con `SYSTEM_SCOPE`. Un `undefined`,
+ * `null` o cadena vacía ya no lo activan: fallan cerrado.
+ */
+export const SYSTEM_SCOPE = Symbol("nelvyon.competitorGap.systemScope");
+export type GapScope = string | typeof SYSTEM_SCOPE;
+
+/** Filtro SQL de tenant. Fail-closed: sin tenant válido y sin SYSTEM_SCOPE, lanza. */
+function tenantFilter(scope: GapScope | undefined | null, clause: string, operacion: string): string {
+  if (scope === SYSTEM_SCOPE) return "";
+  if (typeof scope === "string" && scope.trim() !== "") return clause;
+  throw new OsCompetitorGapError(
+    "VALIDATION",
+    `${operacion}: tenantId obligatorio. Para operar sobre todos los tenants pasa SYSTEM_SCOPE de forma explícita.`,
+  );
+}
+
+/** `true` si el alcance es un tenant concreto (y por tanto hay parámetro que enlazar). */
+function isTenantScope(scope: GapScope | undefined | null): scope is string {
+  return typeof scope === "string" && scope.trim() !== "";
+}
+
 export class OsCompetitorGapService {
   constructor(
     private readonly db: SaasPostgresPort,
@@ -290,7 +326,7 @@ export class OsCompetitorGapService {
   /** Pull agent data, derive gaps, score, recommend, build HTML, persist. Fails closed without provider data. */
   async analyzeRun(
     runId: string,
-    opts: { userId?: string; sector?: string; hasProductCategory?: boolean; tenantId?: string } = {},
+    opts: { userId?: string; sector?: string; hasProductCategory?: boolean; tenantId?: GapScope } = {},
   ): Promise<CompetitorGapRun> {
     const existing = await this.getRun(runId, opts.tenantId);
 
@@ -335,9 +371,9 @@ export class OsCompetitorGapService {
 
     const html = this.buildReportHtml({ ...existing, gaps, gapScore, recommendedPackId, recommendedSkus, agentData });
 
-    const tenantClause = opts.tenantId ? ` AND tenant_id = $8::uuid` : "";
+    const tenantClause = tenantFilter(opts.tenantId, ` AND tenant_id = $8::uuid`, "analyzeRun");
     const params: unknown[] = [runId, JSON.stringify(gaps), gapScore, recommendedPackId, JSON.stringify(recommendedSkus), JSON.stringify(agentData), html];
-    if (opts.tenantId) params.push(opts.tenantId);
+    if (isTenantScope(opts.tenantId)) params.push(opts.tenantId);
 
     const rows = await this.db.query<GapRow>(
       `UPDATE os_competitor_gap_runs
@@ -389,9 +425,9 @@ export class OsCompetitorGapService {
 </div></body></html>`;
   }
 
-  async failRun(runId: string, error: string, tenantId?: string | null): Promise<CompetitorGapRun> {
-    const tenantClause = tenantId ? ` AND tenant_id = $3::uuid` : "";
-    const params: unknown[] = tenantId ? [runId, error, tenantId] : [runId, error];
+  async failRun(runId: string, error: string, tenantId?: GapScope | null): Promise<CompetitorGapRun> {
+    const tenantClause = tenantFilter(tenantId, ` AND tenant_id = $3::uuid`, "failRun");
+    const params: unknown[] = isTenantScope(tenantId) ? [runId, error, tenantId] : [runId, error];
     const rows = await this.db.query<GapRow>(
       `UPDATE os_competitor_gap_runs SET status = 'failed', error_message = $2, completed_at = NOW() WHERE id = $1${tenantClause} RETURNING *`,
       params,
@@ -403,7 +439,7 @@ export class OsCompetitorGapService {
   /** Launch (or stage) the recommended pack via Brief-to-Launch. */
   async launchRecommendedPack(
     runId: string,
-    opts: { userId?: string; execute?: boolean; tenantId?: string | null } = {},
+    opts: { userId?: string; execute?: boolean; tenantId?: GapScope | null } = {},
   ): Promise<CompetitorGapRun> {
     const run = await this.getRun(runId, opts.tenantId);
     if (!run.recommendedPackId) {
@@ -418,8 +454,8 @@ export class OsCompetitorGapService {
       packId: run.recommendedPackId, brief, userId: opts.userId, execute: true,
     });
 
-    const tenantClause = opts.tenantId ? ` AND tenant_id = $4::uuid` : "";
-    const updateParams: unknown[] = opts.tenantId
+    const tenantClause = tenantFilter(opts.tenantId, ` AND tenant_id = $4::uuid`, "launchFromRun");
+    const updateParams: unknown[] = isTenantScope(opts.tenantId)
       ? [runId, launchId, packRunId, opts.tenantId]
       : [runId, launchId, packRunId];
     const rows = await this.db.query<GapRow>(
@@ -434,8 +470,10 @@ export class OsCompetitorGapService {
     return rowToRun(rows[0]!, true);
   }
 
-  async getRun(id: string, tenantId?: string | null): Promise<CompetitorGapRun> {
-    const rows = tenantId
+  async getRun(id: string, tenantId?: GapScope | null): Promise<CompetitorGapRun> {
+    // Fail-closed igual que las escrituras: sin tenant y sin SYSTEM_SCOPE, lanza.
+    tenantFilter(tenantId, " AND tenant_id = $2::uuid", "getRun");
+    const rows = isTenantScope(tenantId)
       ? await this.db.query<GapRow>(
           `SELECT * FROM os_competitor_gap_runs WHERE id = $1 AND tenant_id = $2::uuid`,
           [id, tenantId],

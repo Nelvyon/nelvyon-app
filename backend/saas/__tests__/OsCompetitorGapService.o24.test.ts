@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   OsCompetitorGapService,
   OsCompetitorGapError,
+  SYSTEM_SCOPE,
   normalizeCompetitorDomain,
   computeGapScore,
   deriveGaps,
@@ -105,6 +106,11 @@ describe("O24 — startRun", () => {
 
 // ── analyzeRun ───────────────────────────────────────────────────────────────────
 
+/**
+ * Estos runs tienen `tenant_id: null`: son de plataforma, no de un tenant. Ese
+ * es el camino system-scoped legítimo, y ahora hay que DECLARARLO con
+ * `SYSTEM_SCOPE`. Omitir el tenant ya no concede alcance global en silencio.
+ */
 describe("O24 — analyzeRun", () => {
   function analyzeDb(extra?: (sql: string) => unknown[] | null) {
     return makeDb((sql) => {
@@ -117,7 +123,7 @@ describe("O24 — analyzeRun", () => {
   }
 
   it("completes with gap_score + recommendation", async () => {
-    const run = await svc(analyzeDb()).analyzeRun("gap-1");
+    const run = await svc(analyzeDb()).analyzeRun("gap-1", { tenantId: SYSTEM_SCOPE });
     expect(run.status).toBe("completed");
     expect(run.gapScore).toBe(55);
     expect(run.recommendedPackId).toBe("local-business-growth");
@@ -130,7 +136,7 @@ describe("O24 — analyzeRun", () => {
         return [gapRow({ status: "failed", error_message: "semrush down" })];
       }
       return null;
-    }), agent, launchPort).analyzeRun("gap-1");
+    }), agent, launchPort).analyzeRun("gap-1", { tenantId: SYSTEM_SCOPE });
     expect(run.status).toBe("failed");
   });
 
@@ -144,13 +150,13 @@ describe("O24 — analyzeRun", () => {
         return [gapRow({ status: "failed", error_message: "Proveedor SEO no configurado" })];
       }
       return null;
-    }), agent, launchPort).analyzeRun("gap-1");
+    }), agent, launchPort).analyzeRun("gap-1", { tenantId: SYSTEM_SCOPE });
     expect(run.status).toBe("failed");
   });
 
   it("missing run → NOT_FOUND", async () => {
     const db = makeDb(() => []);
-    await expect(svc(db).analyzeRun("nope")).rejects.toThrow(OsCompetitorGapError);
+    await expect(svc(db).analyzeRun("nope", { tenantId: SYSTEM_SCOPE })).rejects.toThrow(OsCompetitorGapError);
   });
 });
 
@@ -179,27 +185,27 @@ describe("O24 — launchRecommendedPack", () => {
       if (sql.includes("UPDATE os_competitor_gap_runs SET launch_id")) return [gapRow({ status: "completed", recommended_pack_id: "local-business-growth", launch_id: "launch-1" })];
       return [];
     });
-    const run = await svc(db).launchRecommendedPack("gap-1", { execute: true });
+    const run = await svc(db).launchRecommendedPack("gap-1", { execute: true, tenantId: SYSTEM_SCOPE });
     expect(run.launchId).toBe("launch-1");
   });
 
   it("execute with existing pack_run_id is idempotent", async () => {
     const db = makeDb(() => [gapRow({ status: "completed", recommended_pack_id: "local-business-growth", pack_run_id: "existing-run" })]);
     const launch = { suggestLaunch: vi.fn() };
-    const run = await svc(db, agentPort(), launch).launchRecommendedPack("gap-1", { execute: true });
+    const run = await svc(db, agentPort(), launch).launchRecommendedPack("gap-1", { execute: true, tenantId: SYSTEM_SCOPE });
     expect(run.packRunId).toBe("existing-run");
     expect(launch.suggestLaunch).not.toHaveBeenCalled();
   });
 
   it("execute:false → no launch, returns run", async () => {
     const db = makeDb(() => [gapRow({ status: "completed", recommended_pack_id: "local-business-growth" })]);
-    const run = await svc(db).launchRecommendedPack("gap-1", { execute: false });
+    const run = await svc(db).launchRecommendedPack("gap-1", { execute: false, tenantId: SYSTEM_SCOPE });
     expect(run.launchId).toBeNull();
   });
 
   it("no recommendation → VALIDATION", async () => {
     const db = makeDb(() => [gapRow({ status: "completed", recommended_pack_id: null })]);
-    await expect(svc(db).launchRecommendedPack("gap-1", { execute: true })).rejects.toThrow(OsCompetitorGapError);
+    await expect(svc(db).launchRecommendedPack("gap-1", { execute: true, tenantId: SYSTEM_SCOPE })).rejects.toThrow(OsCompetitorGapError);
   });
 });
 
@@ -208,7 +214,7 @@ describe("O24 — launchRecommendedPack", () => {
 describe("O24 — failRun / queries", () => {
   it("failRun sets failed", async () => {
     const db = makeDb(() => [gapRow({ status: "failed", error_message: "boom" })]);
-    const run = await svc(db).failRun("gap-1", "boom");
+    const run = await svc(db).failRun("gap-1", "boom", SYSTEM_SCOPE);
     expect(run.status).toBe("failed");
   });
 

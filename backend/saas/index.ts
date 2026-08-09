@@ -108,6 +108,7 @@ export {
 export {
   OsCompetitorGapService,
   OsCompetitorGapError,
+  SYSTEM_SCOPE,
   getOsCompetitorGapService,
   resetOsCompetitorGapServiceForTests,
   normalizeDomain as normalizeCompetitorDomain,
@@ -124,6 +125,7 @@ export {
   type GapCategory,
   type GapRunStatus,
   type OsCompetitorGapErrorCode,
+  type GapScope,
 } from "./OsCompetitorGapService";
 export {
   OsDeliveryCertificateService,
