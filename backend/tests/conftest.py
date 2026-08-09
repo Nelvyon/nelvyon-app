@@ -132,6 +132,18 @@ async def setup_database(test_engine):
 
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        # Esquema de runtime FastAPI derivado AUTOMÁTICAMENTE de la migración
+        # canónica 507. Antes se espejaban a mano 2 de sus 124 tablas y las 122
+        # restantes faltaban en la base de tests: 69 pruebas fallaban con
+        # `no such table` pese a ser correcto el producto. Ver
+        # `_schema_bootstrap.py` para por qué no se ejecutan las migraciones
+        # reales (402 de 422 usan sintaxis solo-PostgreSQL).
+        from ._schema_bootstrap import bootstrap_sqlite_schema
+
+        _fallidas = await bootstrap_sqlite_schema(conn)
+        if _fallidas:
+            # No se silencia: un bootstrap incompleto tiene que verse.
+            print(f"[conftest] tablas canonicas no creadas ({len(_fallidas)}): {_fallidas[:5]}")
         # Tables owned by migration 507 (no runtime DDL in services — bootstrap for sqlite tests)
         await conn.execute(
             text(
