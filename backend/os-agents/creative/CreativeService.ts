@@ -3,6 +3,8 @@ import type { CreativeAsset, CreativeProvider } from "./types";
 
 const IMAGINE_API_BASE = "https://cl.imagineapi.dev";
 const KLING_API_BASE = "https://api.klingai.com/v1";
+import { resolveMediaProvider } from "../../media-ai/mediaCapabilities";
+
 const OPENAI_IMAGES_URL = "https://api.openai.com/v1/images/generations";
 
 const MJ_POLL_MS = 3_000;
@@ -83,6 +85,10 @@ async function insertCreativeAsset(params: {
 }
 
 async function tryMidjourney(prompt: string): Promise<string | null> {
+  // La cadena Midjourney -> DALL-E era AUTOMATICA: un fallo del primero
+  // producia gasto en el segundo sin que nadie lo decidiera. Ahora ambos
+  // exigen el doble opt-in explicito de la capa de capacidades.
+  if (resolveMediaProvider("image").kind !== "external") return null;
   const key = process.env.MIDJOURNEY_API_KEY?.trim();
   if (!key) return null;
 
