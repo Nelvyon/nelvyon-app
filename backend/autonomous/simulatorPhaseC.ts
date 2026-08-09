@@ -53,6 +53,23 @@ const DEFAULT_OS_REFS = {
 
 const QA_PASS_THRESHOLD = 85;
 
+/** Prefijo de los checks que se calculan solo sobre el brief de entrada. */
+const BRIEF_CONTRACT_CHECK_PREFIX = "BRIEF-";
+
+/**
+ * `true` si el fallo viene del contrato del brief, no de la generación.
+ *
+ * Un `BRIEF-*` bloqueante es determinista: el brief no cambia entre intentos,
+ * así que ningún reintento puede corregirlo. Cualquier otro fallo se considera
+ * transitorio y conserva su política de reintento.
+ */
+export function tieneFalloDeContratoDeEntrada(qa: QaResult | null | undefined): boolean {
+  const checks = qa?.checks ?? [];
+  return checks.some(
+    (c) => c.blocking === true && !c.passed && String(c.id).startsWith(BRIEF_CONTRACT_CHECK_PREFIX),
+  );
+}
+
 export async function simulatePhaseC(options: PhaseCOptions): Promise<PhaseCResult> {
   const tier = options.tier ?? "professional";
   const llmMode = resolveLlmMode();
@@ -132,6 +149,23 @@ export async function simulatePhaseC(options: PhaseCOptions): Promise<PhaseCResu
        * repiten los side effects del intento anterior (`recordPostQaOutcome`
        * ya se ejecutó y queda tal cual).
        */
+      /**
+       * Fallo DETERMINISTA de contrato de entrada: no se reintenta.
+       *
+       * Los checks `BRIEF-*` se calculan únicamente sobre el brief —
+       * `bot_name`, `website_url`, `openai_cost_bearer`, `seed_keywords`...— y
+       * el brief es idéntico en todos los intentos. Reintentar no puede
+       * cambiar el resultado: solo gasta llamadas LLM y presupuesto.
+       *
+       * Ojo con el alcance: SOLO cuenta un `BRIEF-*` BLOQUEANTE. Un fallo de
+       * calidad del LLM, un JSON inválido o un artefacto no generado SÍ son
+       * transitorios y siguen reintentándose como hasta ahora.
+       */
+      if (tieneFalloDeContratoDeEntrada(qa)) {
+        project.status = "INTAKE_VALIDATING";
+        break;
+      }
+
       const estimate = Math.max(...attemptDurationsMs);
       if (!hasBudgetForAnotherAttempt(estimate)) {
         markLlmBudgetExhausted(

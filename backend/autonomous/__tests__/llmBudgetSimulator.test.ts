@@ -176,3 +176,81 @@ describe("simulatePhaseC — presupuesto agregado", () => {
     expect(res.project.llm_budget_degraded).toBeUndefined();
   });
 });
+
+/**
+ * Fallos deterministas de contrato de entrada: no se reintentan.
+ *
+ * Un `BRIEF-*` bloqueante depende solo del brief, que es idéntico en todos los
+ * intentos, así que reintentar solo gasta llamadas LLM. Los fallos transitorios
+ * (calidad, JSON, artefacto ausente) conservan su política de reintento.
+ */
+describe("simulatePhaseC — reintentos y determinismo", () => {
+  beforeEach(() => {
+    executeMock.mockReset();
+    recordPostQaOutcomeMock.mockClear();
+    process.env.AUTONOMOUS_LLM_MODE = "mock";
+    process.env.AUTONOMOUS_SKU_BUDGET_MS = "600000";
+  });
+
+  function qaCon(checks: Array<{ id: string; passed: boolean; blocking: boolean }>) {
+    return { score: 20, passed: false, checks, failed_agents: [] };
+  }
+
+  it("BRIEF-* bloqueante: termina de inmediato, sin gastar 3 llamadas más", async () => {
+    executeMock.mockImplementation(async () =>
+      qaCon([{ id: "BRIEF-bot_name", passed: false, blocking: true }]),
+    );
+
+    const res = await simulatePhaseC(OPTS);
+
+    expect(executeMock).toHaveBeenCalledTimes(1);
+    expect(res.project.retry_count).toBe(0);
+    expect(res.project.status).toBe("ESCALATE_OPERATOR");
+  });
+
+  it("conserva el diagnóstico del fallo determinista", async () => {
+    executeMock.mockImplementation(async () =>
+      qaCon([{ id: "BRIEF-openai_cost", passed: false, blocking: true }]),
+    );
+
+    const res = await simulatePhaseC(OPTS);
+
+    expect(res.output_bundle.retryHistory).toHaveLength(1);
+    expect(res.project.qa?.checks?.some((c) => c.id === "BRIEF-openai_cost")).toBe(true);
+  });
+
+  it("fallo TRANSITORIO (no BRIEF-*): sigue reintentando los 4 intentos", async () => {
+    executeMock.mockImplementation(async () =>
+      qaCon([{ id: "STRUCT-knowledge_base", passed: false, blocking: true }]),
+    );
+
+    const res = await simulatePhaseC(OPTS);
+
+    expect(executeMock).toHaveBeenCalledTimes(4);
+    expect(res.project.retry_count).toBe(3);
+  });
+
+  it("BRIEF-* NO bloqueante no corta los reintentos", async () => {
+    executeMock.mockImplementation(async () =>
+      qaCon([{ id: "BRIEF-tone", passed: false, blocking: false }]),
+    );
+
+    const res = await simulatePhaseC(OPTS);
+
+    expect(executeMock).toHaveBeenCalledTimes(4);
+  });
+
+  it("mezcla BRIEF-* bloqueante + transitorio: corta, porque el brief no cambiará", async () => {
+    executeMock.mockImplementation(async () =>
+      qaCon([
+        { id: "BRIEF-bot_name", passed: false, blocking: true },
+        { id: "STRUCT-config", passed: false, blocking: true },
+      ]),
+    );
+
+    const res = await simulatePhaseC(OPTS);
+
+    expect(executeMock).toHaveBeenCalledTimes(1);
+    expect(res.project.retry_count).toBe(0);
+  });
+});
