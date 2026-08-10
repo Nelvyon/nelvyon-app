@@ -137,3 +137,78 @@ describe("login — no revela si el usuario existe", () => {
     expect(inexistente).toMatch(/Invalid credentials/);
   });
 });
+
+/**
+ * Oráculo de enumeración por TEMPORIZACIÓN.
+ *
+ * El mensaje ya era idéntico, pero el ramal "usuario no existe" retornaba sin
+ * ejecutar bcrypt, así que respondía en el tiempo de una consulta mientras que
+ * "contraseña incorrecta" pagaba un bcrypt de coste 12. La diferencia es
+ * medible desde fuera y delata qué emails existen.
+ *
+ * No se busca igualdad nanosegundo a nanosegundo — eso sería frágil en CI. Se
+ * comprueba lo estructural: que el camino sin usuario TAMBIÉN ejecuta bcrypt, y
+ * que los tiempos quedan en el mismo orden de magnitud.
+ */
+describe("login — sin oráculo de enumeración por temporización", () => {
+  const HASH_REAL = "$2a$12$N9qo8uLOickgx2ZMRZoMyeGZ8b4H1JfQ0Q6h1qk1pQ8k4Wt0eOJmS";
+  const previo = process.env.JWT_SECRET;
+  afterEach(() => {
+    if (previo === undefined) delete process.env.JWT_SECRET;
+    else process.env.JWT_SECRET = previo;
+    vi.resetModules();
+  });
+
+  beforeEach(() => {
+    process.env.JWT_SECRET = SECRETO;
+    consulta.mockReset();
+    vi.resetModules();
+    vi.spyOn(console, "error").mockImplementation(() => {});
+  });
+
+  async function medir(fn: () => Promise<unknown>): Promise<number> {
+    const t0 = performance.now();
+    await fn().catch(() => undefined);
+    return performance.now() - t0;
+  }
+
+  it("el ramal sin usuario ejecuta bcrypt igualmente", async () => {
+    const { getAuthService } = await import("../AuthService");
+    const svc = getAuthService();
+    const spy = vi.spyOn(svc, "comparePassword");
+
+    consulta.mockResolvedValueOnce([]); // el email no existe
+    await svc.login("nadie@nelvyon.test", "x").catch(() => undefined);
+
+    // Lo esencial: se pagó el coste criptográfico aunque no hubiera usuario.
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  it("ambos ramales quedan en el mismo orden de magnitud", async () => {
+    const { getAuthService } = await import("../AuthService");
+    const svc = getAuthService();
+
+    consulta.mockResolvedValue([]);
+    const sinUsuario = await medir(() => svc.login("nadie@nelvyon.test", "x"));
+
+    consulta.mockResolvedValue([
+      {
+        user_id: "u1",
+        email: "existe@nelvyon.test",
+        password_hash: HASH_REAL,
+        full_name: "X",
+        plan: "starter",
+        tenant_id: "t1",
+      },
+    ]);
+    const malaPassword = await medir(() => svc.login("existe@nelvyon.test", "incorrecta"));
+
+    // Antes del arreglo la relación era de dos órdenes de magnitud (retorno
+    // inmediato frente a bcrypt coste 12). Un factor < 5 elimina la señal
+    // estructural sin exigir una igualdad frágil en CI.
+    const mayor = Math.max(sinUsuario, malaPassword);
+    const menor = Math.max(1, Math.min(sinUsuario, malaPassword));
+    expect(mayor / menor).toBeLessThan(5);
+  });
+
+});

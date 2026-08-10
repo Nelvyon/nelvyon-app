@@ -8,6 +8,26 @@ import { OsAgentError } from "../os-agents/OsAgentError";
 import type { AuthResult, JwtPayload, NelvyonUserRow } from "./types";
 
 const BCRYPT_ROUNDS = 12;
+
+/**
+ * Hash señuelo contra el que se compara cuando el email no existe.
+ *
+ * POR QUE EXISTE
+ * --------------
+ * `login` devolvia el mismo mensaje en ambos casos, pero cuando el usuario no
+ * existia retornaba SIN ejecutar bcrypt. Un email inexistente respondia en el
+ * tiempo de una consulta; uno existente con contrasena incorrecta pagaba un
+ * bcrypt de coste 12 (~200-400 ms). Esa diferencia es medible desde fuera: un
+ * oraculo de enumeracion de usuarios por temporizacion, que el mensaje
+ * identico no cierra.
+ *
+ * Ahora el camino "usuario no existe" hace una comparacion real contra este
+ * hash, de modo que ambos ramales pagan el mismo coste computacional.
+ *
+ * Generado con `bcrypt.hash(<cadena aleatoria>, 12)`. NO corresponde a ninguna
+ * contrasena conocida ni utilizable: su unico proposito es consumir tiempo.
+ */
+const DECOY_HASH = "$2a$12$NZhXnN/QmRLretNJRm58Uuf8QcmqWb0oY9/9DMsVVafa2W3CIZzNi";
 const JWT_EXPIRES = "7d" as const;
 
 export interface AuthDbPort {
@@ -109,6 +129,9 @@ export class AuthService {
     );
     const row = rows[0];
     if (!row) {
+      // Iguala el coste con el ramal "contrasena incorrecta": sin esto, la
+      // ausencia de bcrypt delata que el email no existe.
+      await this.comparePassword(password, DECOY_HASH);
       NelvyonMonitor.trackAuthError(trimmedEmail, new Error("User not found during login"));
       throw new OsAgentError("Invalid credentials");
     }
