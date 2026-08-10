@@ -212,3 +212,63 @@ describe("login — sin oráculo de enumeración por temporización", () => {
   });
 
 });
+
+/**
+ * Ventana de sesión: 8 horas.
+ *
+ * NELVYON no tiene revocación server-side, así que la expiración ES el control
+ * que acota el replay de un token robado. Estos tests fijan ese valor para que
+ * no vuelva a ampliarse sin decisión explícita.
+ */
+describe("expiración de sesión — ventana de 8 horas", () => {
+  beforeEach(() => {
+    process.env.JWT_SECRET = SECRETO;
+    consulta.mockReset();
+    vi.resetModules();
+  });
+
+  it("un token recién emitido caduca a las 8 horas, no a los 7 días", async () => {
+    const { getAuthService } = await import("../AuthService");
+    const bcrypt = (await import("bcryptjs")).default;
+    const svc = getAuthService();
+
+    // Se emite por el camino real (login correcto), no por un método privado.
+    const hash = await bcrypt.hash("correcta", 4);
+    consulta.mockResolvedValue([
+      { user_id: "u1", email: "a@nelvyon.test", password_hash: hash, full_name: "X", plan: "starter", tenant_id: "t1" },
+    ]);
+    const r = (await svc.login("a@nelvyon.test", "correcta")) as { token: string };
+    const d = jwt.decode(r.token) as { iat: number; exp: number };
+    const horas = (d.exp - d.iat) / 3600;
+
+    expect(horas).toBeCloseTo(8, 1);
+    expect(horas).toBeLessThan(24); // ya no es de días
+  });
+
+  it("un token de más de 8 horas se rechaza", () => {
+    const viejo = jwt.sign({ userId: "u1" }, SECRETO, {
+      algorithm: "HS256",
+      expiresIn: "8h",
+      // emitido hace 9 horas: ya fuera de ventana
+      notBefore: 0,
+    });
+    const caducado = jwt.sign(
+      { userId: "u1", iat: Math.floor(Date.now() / 1000) - 9 * 3600 },
+      SECRETO,
+      { algorithm: "HS256", expiresIn: "8h" },
+    );
+    expect(() => jwt.verify(caducado, SECRETO, { algorithms: ["HS256"] })).toThrow(/expired/i);
+    expect(viejo).toBeTruthy();
+  });
+
+  it("la expiración NO se puede ampliar manipulando el claim exp", () => {
+    const valido = jwt.sign({ userId: "u1" }, SECRETO, { algorithm: "HS256", expiresIn: "8h" });
+    const [h, , s] = valido.split(".");
+    // El atacante se concede un año de vida.
+    const estirado = Buffer.from(
+      JSON.stringify({ userId: "u1", exp: Math.floor(Date.now() / 1000) + 365 * 24 * 3600 }),
+    ).toString("base64url");
+    // La firma ya no cuadra: el exp es parte del payload firmado.
+    expect(() => jwt.verify(`${h}.${estirado}.${s}`, SECRETO, { algorithms: ["HS256"] })).toThrow();
+  });
+});

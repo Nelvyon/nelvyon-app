@@ -28,7 +28,37 @@ const BCRYPT_ROUNDS = 12;
  * contrasena conocida ni utilizable: su unico proposito es consumir tiempo.
  */
 const DECOY_HASH = "$2a$12$NZhXnN/QmRLretNJRm58Uuf8QcmqWb0oY9/9DMsVVafa2W3CIZzNi";
-const JWT_EXPIRES = "7d" as const;
+/**
+ * Vida del token de sesion: 8 horas.
+ *
+ * POR QUE 8h Y NO 7d
+ * ------------------
+ * NELVYON no tiene revocacion server-side: `verifyToken` es puramente
+ * criptografico y no consulta ninguna base. Un token robado sigue siendo valido
+ * hasta que expira, y el logout solo borra la cookie del navegador — no
+ * invalida nada en servidor.
+ *
+ * Con 7 dias, la ventana de replay de un token exfiltrado era de una semana.
+ * Con 8 horas cubre una jornada de trabajo sin reautenticar y reduce esa
+ * ventana por un factor de 21, sin introducir ninguna dependencia nueva.
+ *
+ * RESIDUAL CONOCIDO Y ACEPTADO
+ * ----------------------------
+ * Esto ACOTA el riesgo, no lo elimina. Siguen pendientes de infraestructura
+ * compartida (Redis/Upstash u equivalente):
+ *
+ *   - revocacion individual de sesion (logout que invalide de verdad);
+ *   - invalidacion de sesiones al cambiar la contrasena;
+ *   - cierre de "todas las sesiones" de un usuario.
+ *
+ * Hasta entonces, un token robado permanece valido un maximo de 8 horas aunque
+ * el usuario cierre sesion o cambie su contrasena. No se implementa una
+ * denylist fail-open: seria una falsa afirmacion de proteccion.
+ *
+ * La cookie usa el MISMO valor (`apps/web/src/lib/authCookies.ts`); si divergen,
+ * el navegador conserva un token ya muerto o corta la sesion antes de tiempo.
+ */
+const JWT_EXPIRES = "8h" as const;
 
 export interface AuthDbPort {
   query<T>(sql: string, params?: unknown[]): Promise<T[]>;
