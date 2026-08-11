@@ -1,43 +1,21 @@
 import { NextResponse } from "next/server";
 
 import { createPortalInviteBff, listPortalInvitesBff } from "@/lib/portal/portalInviteStore";
-import { requirePlatformClaims } from "@/lib/platformBffAuth";
-import {
-  assertUserCanAccessWorkspace,
-  platformDbFallbackEnabled,
-  WorkspaceAccessError,
-} from "@/lib/platformDbFallback";
+import { requirePlatformContext } from "@/lib/platformBffAuth";
+import { platformDbFallbackEnabled } from "@/lib/platformDbFallback";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-function parseWorkspaceId(req: Request): number | null {
-  const raw = req.headers.get("x-workspace-id")?.trim();
-  if (!raw) return null;
-  const n = Number(raw);
-  return Number.isFinite(n) && n > 0 ? n : null;
-}
-
 export async function GET(req: Request) {
-  const claims = await requirePlatformClaims(req);
-  if (claims instanceof NextResponse) return claims;
+  // Listar invitaciones revela a quién se dio acceso externo: misma autoridad
+  // que crearlas.
+  const gate = await requirePlatformContext(req, "partners.portal.invite");
+  if (gate instanceof NextResponse) return gate;
+  const { workspaceId } = gate;
 
   if (!platformDbFallbackEnabled()) {
     return NextResponse.json({ error: "DATABASE_URL required for portal invites" }, { status: 503 });
-  }
-
-  const workspaceId = parseWorkspaceId(req);
-  if (!workspaceId) {
-    return NextResponse.json({ error: "X-Workspace-Id header required" }, { status: 400 });
-  }
-
-  try {
-    await assertUserCanAccessWorkspace(claims, workspaceId);
-  } catch (e) {
-    if (e instanceof WorkspaceAccessError) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-    throw e;
   }
 
   const clientId = new URL(req.url).searchParams.get("client_id")?.trim();
@@ -55,25 +33,13 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const claims = await requirePlatformClaims(req);
-  if (claims instanceof NextResponse) return claims;
+  // Conceder acceso al portal a un tercero: owner/admin.
+  const gate = await requirePlatformContext(req, "partners.portal.invite");
+  if (gate instanceof NextResponse) return gate;
+  const { claims, workspaceId } = gate;
 
   if (!platformDbFallbackEnabled()) {
     return NextResponse.json({ error: "DATABASE_URL required for portal invites" }, { status: 503 });
-  }
-
-  const workspaceId = parseWorkspaceId(req);
-  if (!workspaceId) {
-    return NextResponse.json({ error: "X-Workspace-Id header required" }, { status: 400 });
-  }
-
-  try {
-    await assertUserCanAccessWorkspace(claims, workspaceId);
-  } catch (e) {
-    if (e instanceof WorkspaceAccessError) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-    throw e;
   }
 
   let body: { client_id?: string; email?: string };

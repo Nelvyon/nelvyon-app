@@ -180,6 +180,41 @@ export async function assertUserCanAccessWorkspace(
   if (!ok) throw new WorkspaceAccessError(workspaceId);
 }
 
+/**
+ * Rol CRUDO del usuario en el workspace, o `null` si no tiene acceso.
+ *
+ * Mismas dos vías que `userCanAccessWorkspace` — propiedad del workspace o
+ * membresía — pero devolviendo el rol en vez de un booleano, que es lo que
+ * faltaba para poder autorizar por capability y no solo por pertenencia.
+ *
+ * El filtro `wm.status = 'active'` es el que deja fuera membresías `pending`,
+ * `inactive` o `deleted`. La normalización del valor NO se hace aquí: se
+ * devuelve crudo para que `normalizePlatformRole` decida, y así una cadena
+ * inesperada en la columna se quede sin capabilities en vez de colarse.
+ */
+export async function resolvePlatformWorkspaceRole(
+  userId: string,
+  workspaceId: number,
+): Promise<string | null> {
+  const owned = await db().query<{ id: number }>(
+    `SELECT id FROM workspaces
+     WHERE id = $1 AND user_id = $2 AND (status = 'active' OR status IS NULL)
+     LIMIT 1`,
+    [workspaceId, userId],
+  );
+  if (owned[0]) return "owner";
+
+  const member = await db().query<{ role: string }>(
+    `SELECT wm.role FROM workspace_members wm
+     JOIN workspaces w ON w.id = wm.workspace_id
+     WHERE wm.workspace_id = $1 AND wm.user_id = $2 AND wm.status = 'active'
+       AND (w.status = 'active' OR w.status IS NULL)
+     LIMIT 1`,
+    [workspaceId, userId],
+  );
+  return member[0]?.role ?? null;
+}
+
 export async function dbResolveWorkspaceId(req: Request, claims: JwtPayload): Promise<number> {
   const fromHeader = parseWorkspaceHeader(req);
   if (fromHeader) {

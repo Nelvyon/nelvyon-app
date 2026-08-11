@@ -5,6 +5,23 @@ import { authenticate } from "@nelvyon/auth";
 import { getNelvyonAdminService } from "@nelvyon/admin";
 import { OsAgentError } from "@nelvyon/os-agents";
 
+import { resolvePlatformWorkspaceRole } from "./platformDbFallback";
+import {
+  canPlatformPerform,
+  normalizePlatformRole,
+  platformCapabilitiesFor,
+  type PlatformAction,
+  type PlatformRole,
+} from "./platformRbac";
+
+/**
+ * AUTENTICACIÓN, no autorización.
+ *
+ * El nombre ha inducido a error: durante mucho tiempo rutas mutantes lo usaron
+ * creyendo estar autorizadas cuando solo comprobaba que hubiera sesión. Una
+ * ruta que muta debe usar `requirePlatformContext(req, action)`; esta primitiva
+ * queda para lecturas sin contexto de workspace y como escalón interno.
+ */
 export async function requirePlatformClaims(
   req: Request,
 ): Promise<JwtPayload | NextResponse> {
@@ -16,6 +33,58 @@ export async function requirePlatformClaims(
     }
     throw e;
   }
+}
+
+/**
+ * Contexto autorizado de una petición al plano `platform/*`.
+ * Solo se construye si la capability pedida está concedida.
+ */
+export type PlatformContext = {
+  claims: JwtPayload;
+  workspaceId: number;
+  role: PlatformRole;
+  capabilities: readonly PlatformAction[];
+};
+
+/**
+ * Frontera común de autorización de `/api/platform/*`.
+ *
+ * Sustituye al par `requirePlatformClaims` + `assertUserCanAccessWorkspace`, que
+ * comprobaba autenticación y PERTENENCIA pero nunca el rol. Aquí una ruta no
+ * puede obtener contexto sin declarar qué autoridad necesita.
+ *
+ * Falla cerrado en cada escalón, y en este orden: sin sesión → 401; sin
+ * `X-Workspace-Id` válido → 400; sin acceso al workspace → 403; con un rol que
+ * no se reconoce → 403; sin la capability → 403. El workspace llega por
+ * cabecera y es por tanto manipulable, pero se valida contra la identidad del
+ * JWT: pedir uno ajeno devuelve 403, no lo concede.
+ */
+export async function requirePlatformContext(
+  req: Request,
+  action: PlatformAction,
+): Promise<PlatformContext | NextResponse> {
+  const claims = await requirePlatformClaims(req);
+  if (claims instanceof NextResponse) return claims;
+
+  const raw = req.headers.get("x-workspace-id")?.trim();
+  const workspaceId = Number(raw ?? "");
+  if (!raw || !Number.isFinite(workspaceId) || workspaceId <= 0) {
+    return NextResponse.json({ error: "X-Workspace-Id required" }, { status: 400 });
+  }
+
+  const rawRole = await resolvePlatformWorkspaceRole(claims.userId, workspaceId);
+  if (rawRole === null) {
+    // No es miembro activo, o el workspace no existe. Mismo 403 en ambos casos:
+    // distinguirlos revelaría qué workspaces existen.
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const role = normalizePlatformRole(rawRole);
+  if (!role || !canPlatformPerform(role, action)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  return { claims, workspaceId, role, capabilities: platformCapabilitiesFor(role) };
 }
 
 /** Platform admin only — for OS cron triggers and learning loops. */

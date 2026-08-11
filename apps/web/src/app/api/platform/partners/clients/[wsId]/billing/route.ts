@@ -1,48 +1,19 @@
 import { NextResponse } from "next/server";
 
-import type { JwtPayload } from "@nelvyon/auth";
-import { requirePlatformClaims } from "@/lib/platformBffAuth";
-import {
-  assertUserCanAccessWorkspace,
-  WorkspaceAccessError,
-} from "@/lib/platformDbFallback";
+import { requirePlatformContext } from "@/lib/platformBffAuth";
 import { upsertPartnerClientBilling } from "@/lib/partners/partnerConnectStore";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-function parseWorkspaceId(req: Request): number | null {
-  const raw = req.headers.get("x-workspace-id")?.trim();
-  if (!raw) return null;
-  const n = Number(raw);
-  return Number.isFinite(n) && n > 0 ? n : null;
-}
-
-async function assertPartnerWorkspace(req: Request, claims: JwtPayload): Promise<number | NextResponse> {
-  const partnerWorkspaceId = parseWorkspaceId(req);
-  if (!partnerWorkspaceId) {
-    return NextResponse.json({ error: "X-Workspace-Id required" }, { status: 400 });
-  }
-  try {
-    await assertUserCanAccessWorkspace(claims, partnerWorkspaceId);
-  } catch (e) {
-    if (e instanceof WorkspaceAccessError) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-    throw e;
-  }
-  return partnerWorkspaceId;
-}
-
 export async function POST(
   req: Request,
   ctx: { params: Promise<{ wsId: string }> },
 ) {
-  const claims = await requirePlatformClaims(req);
-  if (claims instanceof NextResponse) return claims;
-
-  const partnerWorkspaceId = await assertPartnerWorkspace(req, claims);
-  if (partnerWorkspaceId instanceof NextResponse) return partnerWorkspaceId;
+  // Fijar el precio de reventa es autoridad comercial: owner/admin.
+  const gate = await requirePlatformContext(req, "partners.billing.manage");
+  if (gate instanceof NextResponse) return gate;
+  const partnerWorkspaceId = gate.workspaceId;
 
   const { wsId } = await ctx.params;
   const clientWorkspaceId = Number(wsId);
@@ -75,11 +46,10 @@ export async function GET(
   req: Request,
   ctx: { params: Promise<{ wsId: string }> },
 ) {
-  const claims = await requirePlatformClaims(req);
-  if (claims instanceof NextResponse) return claims;
-
-  const partnerWorkspaceId = await assertPartnerWorkspace(req, claims);
-  if (partnerWorkspaceId instanceof NextResponse) return partnerWorkspaceId;
+  // Leer la configuración de reventa expone márgenes: misma autoridad.
+  const gate = await requirePlatformContext(req, "partners.billing.manage");
+  if (gate instanceof NextResponse) return gate;
+  const partnerWorkspaceId = gate.workspaceId;
 
   const { wsId } = await ctx.params;
   const clientWorkspaceId = Number(wsId);

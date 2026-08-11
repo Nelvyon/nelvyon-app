@@ -1,39 +1,16 @@
 import { NextResponse } from "next/server";
 
-import { requirePlatformClaims } from "@/lib/platformBffAuth";
-import {
-  assertUserCanAccessWorkspace,
-  WorkspaceAccessError,
-} from "@/lib/platformDbFallback";
+import { requirePlatformContext } from "@/lib/platformBffAuth";
 import { startPartnerConnectOnboarding } from "@/lib/partners/partnerConnectService";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-function parseWorkspaceId(req: Request): number | null {
-  const raw = req.headers.get("x-workspace-id")?.trim();
-  if (!raw) return null;
-  const n = Number(raw);
-  return Number.isFinite(n) && n > 0 ? n : null;
-}
-
 export async function POST(req: Request) {
-  const claims = await requirePlatformClaims(req);
-  if (claims instanceof NextResponse) return claims;
-
-  const workspaceId = parseWorkspaceId(req);
-  if (!workspaceId) {
-    return NextResponse.json({ error: "X-Workspace-Id required" }, { status: 400 });
-  }
-
-  try {
-    await assertUserCanAccessWorkspace(claims, workspaceId);
-  } catch (e) {
-    if (e instanceof WorkspaceAccessError) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-    throw e;
-  }
+  // Vincula la cuenta Stripe que RECIBE el dinero: owner-only.
+  const gate = await requirePlatformContext(req, "partners.connect.manage");
+  if (gate instanceof NextResponse) return gate;
+  const { claims, workspaceId } = gate;
 
   const email = claims.email?.trim();
   if (!email) {
