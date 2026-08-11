@@ -7,29 +7,29 @@ from httpx import AsyncClient
 
 
 @pytest.mark.asyncio
-async def test_google_ads_status(client: AsyncClient, auth_headers: dict):
-    r = await client.get("/api/google-ads/status", headers=auth_headers)
+async def test_google_ads_status(client: AsyncClient, super_admin_headers: dict):
+    r = await client.get("/api/google-ads/status", headers=super_admin_headers)
     assert r.status_code == 200, r.text
     body = r.json()
     assert "mock" in body
 
 
 @pytest.mark.asyncio
-async def test_google_ads_list_campaigns(client: AsyncClient, auth_headers: dict):
-    r = await client.get("/api/google-ads/campaigns", headers=auth_headers)
+async def test_google_ads_list_campaigns(client: AsyncClient, super_admin_headers: dict):
+    r = await client.get("/api/google-ads/campaigns", headers=super_admin_headers)
     assert r.status_code == 200, r.text
     assert "campaigns" in r.json()
 
 
 @pytest.mark.asyncio
-async def test_google_ads_reporting(client: AsyncClient, auth_headers: dict):
-    r = await client.get("/api/google-ads/reporting", headers=auth_headers)
+async def test_google_ads_reporting(client: AsyncClient, super_admin_headers: dict):
+    r = await client.get("/api/google-ads/reporting", headers=super_admin_headers)
     assert r.status_code == 200, r.text
     assert "summary" in r.json()
 
 
 @pytest.mark.asyncio
-async def test_google_ads_create_campaign(client: AsyncClient, auth_headers: dict):
+async def test_google_ads_create_campaign(client: AsyncClient, super_admin_headers: dict):
     r = await client.post(
         "/api/google-ads/campaigns",
         json={
@@ -39,7 +39,7 @@ async def test_google_ads_create_campaign(client: AsyncClient, auth_headers: dic
             "headlines": ["NELVYON IA", "ROAS real"],
             "descriptions": ["Automatiza paid media"],
         },
-        headers=auth_headers,
+        headers=super_admin_headers,
     )
     assert r.status_code == 200, r.text
     body = r.json()
@@ -47,7 +47,7 @@ async def test_google_ads_create_campaign(client: AsyncClient, auth_headers: dic
 
 
 @pytest.mark.asyncio
-async def test_google_ads_upload_ad_copy(client: AsyncClient, auth_headers: dict):
+async def test_google_ads_upload_ad_copy(client: AsyncClient, super_admin_headers: dict):
     r = await client.post(
         "/api/google-ads/creatives/ad-copy",
         json={
@@ -55,33 +55,33 @@ async def test_google_ads_upload_ad_copy(client: AsyncClient, auth_headers: dict
             "headlines": ["Headline A"],
             "descriptions": ["Desc A"],
         },
-        headers=auth_headers,
+        headers=super_admin_headers,
     )
     assert r.status_code == 200, r.text
 
 
 @pytest.mark.asyncio
-async def test_meta_ads_status(client: AsyncClient, auth_headers: dict):
-    r = await client.get("/api/meta-ads/status", headers=auth_headers)
+async def test_meta_ads_status(client: AsyncClient, super_admin_headers: dict):
+    r = await client.get("/api/meta-ads/status", headers=super_admin_headers)
     assert r.status_code == 200, r.text
 
 
 @pytest.mark.asyncio
-async def test_meta_ads_list_campaigns(client: AsyncClient, auth_headers: dict):
-    r = await client.get("/api/meta-ads/campaigns", headers=auth_headers)
+async def test_meta_ads_list_campaigns(client: AsyncClient, super_admin_headers: dict):
+    r = await client.get("/api/meta-ads/campaigns", headers=super_admin_headers)
     assert r.status_code == 200, r.text
     assert len(r.json().get("campaigns", [])) >= 1
 
 
 @pytest.mark.asyncio
-async def test_meta_ads_reporting(client: AsyncClient, auth_headers: dict):
-    r = await client.get("/api/meta-ads/reporting", headers=auth_headers)
+async def test_meta_ads_reporting(client: AsyncClient, super_admin_headers: dict):
+    r = await client.get("/api/meta-ads/reporting", headers=super_admin_headers)
     assert r.status_code == 200, r.text
     assert "summary" in r.json()
 
 
 @pytest.mark.asyncio
-async def test_meta_ads_create_campaign(client: AsyncClient, auth_headers: dict):
+async def test_meta_ads_create_campaign(client: AsyncClient, super_admin_headers: dict):
     r = await client.post(
         "/api/meta-ads/campaigns",
         json={
@@ -90,14 +90,14 @@ async def test_meta_ads_create_campaign(client: AsyncClient, auth_headers: dict)
             "primary_text": "Escala con IA",
             "headline": "NELVYON",
         },
-        headers=auth_headers,
+        headers=super_admin_headers,
     )
     assert r.status_code == 200, r.text
     assert r.json().get("campaign_id")
 
 
 @pytest.mark.asyncio
-async def test_meta_ads_upload_creative(client: AsyncClient, auth_headers: dict):
+async def test_meta_ads_upload_creative(client: AsyncClient, super_admin_headers: dict):
     r = await client.post(
         "/api/meta-ads/creatives",
         json={
@@ -105,7 +105,7 @@ async def test_meta_ads_upload_creative(client: AsyncClient, auth_headers: dict)
             "primary_text": "Copy IA",
             "headline": "Imperio digital",
         },
-        headers=auth_headers,
+        headers=super_admin_headers,
     )
     assert r.status_code == 200, r.text
 
@@ -171,7 +171,19 @@ async def test_ads_agent_roas_alerts(client: AsyncClient, super_admin_headers: d
 
 
 @pytest.mark.asyncio
-async def test_google_ads_requires_workspace(client: AsyncClient, auth_headers: dict):
-    headers = {k: v for k, v in auth_headers.items() if k != "X-Workspace-Id"}
-    r = await client.get("/api/google-ads/campaigns", headers=headers)
-    assert r.status_code in (400, 401, 403, 422)
+async def test_google_ads_requires_platform_authority(
+    client: AsyncClient, auth_headers: dict, super_admin_headers: dict
+):
+    """
+    Antes se exigia `X-Workspace-Id`. Dejo de tener sentido al establecerse que
+    la cuenta Google Ads es corporativa y unica: la cabecera de workspace no
+    acredita nada aqui. Lo que si debe cumplirse es que un rol de workspace no
+    alcance el recurso, y que la ausencia de la cabecera no afecte al admin de
+    plataforma.
+    """
+    r = await client.get("/api/google-ads/campaigns", headers=auth_headers)
+    assert r.status_code == 403, r.text
+
+    sin_ws = {k: v for k, v in super_admin_headers.items() if k != "X-Workspace-Id"}
+    r = await client.get("/api/google-ads/campaigns", headers=sin_ws)
+    assert r.status_code == 200, r.text

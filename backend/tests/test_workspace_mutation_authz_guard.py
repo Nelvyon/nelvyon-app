@@ -124,7 +124,13 @@ ROUTERS_AUDITADOS = {
 #: de workspace. Aqui la autoridad de workspace no es "demasiado debil": es de la
 #: CLASE equivocada. `ads_agent` opera la unica cuenta Google/Meta de NELVYON, asi
 #: que un operator de cualquier workspace no debe alcanzarla ni para leer.
-ROUTERS_PLATFORM_SCOPED = {"ads_agent.py"}
+ROUTERS_PLATFORM_SCOPED = {
+    "ads_agent.py",
+    # google_ads_service / meta_ads_service: cero referencias a workspace o
+    # tenant, credenciales y cuenta desde variables de entorno globales.
+    "google_ads.py",
+    "meta_ads.py",
+}
 
 #: Autoridad valida para recursos de plataforma. Deriva del rol del JWT
 #: verificado, nunca de `X-Workspace-Id` ni de `workspace_members`.

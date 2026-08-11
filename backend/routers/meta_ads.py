@@ -4,11 +4,21 @@ from __future__ import annotations
 
 from typing import Any
 
+from dependencies.auth import get_super_admin_user
+from schemas.auth import UserResponse
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 
-from dependencies.workspace import WorkspaceContext, require_workspace
 from services.meta_ads_service import get_meta_ads_service
+
+# AUTORIDAD DE PLATAFORMA, NO DE WORKSPACE
+# ----------------------------------------
+# El servicio de este router no acepta workspace ni tenant (cero referencias) y
+# resuelve UNA sola cuenta publicitaria desde variables de entorno globales. Todo
+# lo que se lee o crea aqui es de la cuenta corporativa de NELVYON, no de un
+# cliente. `require_workspace` autorizaba correctamente el recurso EQUIVOCADO:
+# bastaba pertenecer a cualquier workspace para leer el gasto corporativo o crear
+# campanas facturadas a NELVYON.
 
 router = APIRouter(prefix="/api/meta-ads", tags=["meta-ads"])
 
@@ -31,7 +41,7 @@ class UploadMetaCreativeBody(BaseModel):
 
 
 @router.get("/status")
-async def meta_ads_status(_ws: WorkspaceContext = Depends(require_workspace)):
+async def meta_ads_status(_admin: UserResponse = Depends(get_super_admin_user)):
     svc = get_meta_ads_service()
     _ = svc.is_mock
     return {"mock": svc.is_mock, "ad_account_id": svc.ad_account_id}
@@ -40,7 +50,7 @@ async def meta_ads_status(_ws: WorkspaceContext = Depends(require_workspace)):
 @router.get("/campaigns")
 async def list_meta_campaigns(
     ad_account_id: str | None = Query(None),
-    _ws: WorkspaceContext = Depends(require_workspace),
+    _admin: UserResponse = Depends(get_super_admin_user),
 ):
     try:
         return await get_meta_ads_service().get_campaigns(ad_account_id)
@@ -49,7 +59,7 @@ async def list_meta_campaigns(
 
 
 @router.get("/reporting")
-async def meta_ads_reporting(_ws: WorkspaceContext = Depends(require_workspace)):
+async def meta_ads_reporting(_admin: UserResponse = Depends(get_super_admin_user)):
     data = await get_meta_ads_service().get_campaigns()
     campaigns = data.get("campaigns", [])
     impressions = sum(int(c.get("impressions", 0)) for c in campaigns)
@@ -75,7 +85,7 @@ async def meta_ads_reporting(_ws: WorkspaceContext = Depends(require_workspace))
 @router.post("/campaigns")
 async def create_meta_campaign(
     body: CreateMetaCampaignBody,
-    _ws: WorkspaceContext = Depends(require_workspace),
+    _admin: UserResponse = Depends(get_super_admin_user),
 ):
     try:
         return await get_meta_ads_service().create_campaign(
@@ -94,7 +104,7 @@ async def create_meta_campaign(
 @router.post("/creatives")
 async def upload_meta_creative(
     body: UploadMetaCreativeBody,
-    _ws: WorkspaceContext = Depends(require_workspace),
+    _admin: UserResponse = Depends(get_super_admin_user),
 ):
     return await get_meta_ads_service().upload_creative(
         image_url=body.image_url,
