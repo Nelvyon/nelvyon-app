@@ -180,14 +180,21 @@ async def test_tiktok_ads_status(client: AsyncClient, auth_headers: dict):
 
 
 @pytest.mark.asyncio
-async def test_tiktok_ads_create_campaign(client: AsyncClient, auth_headers: dict):
+async def test_tiktok_ads_create_campaign_falla_cerrado_sin_integracion(
+    client: AsyncClient, auth_headers: dict
+):
+    """
+    Antes devolvia 200 creando la campana sobre la cuenta corporativa global de
+    NELVYON. Al ser TikTok Ads customer-facing, esa cuenta dejo de servir de
+    fallback: sin integracion propia del workspace se falla cerrado.
+    """
     r = await client.post(
         "/api/tiktok-ads/campaigns",
         json={"name": "F63 Test Campaign", "daily_budget_eur": 40},
         headers=auth_headers,
     )
-    assert r.status_code == 200
-    assert r.json().get("campaign_id")
+    assert r.status_code == 503, r.text
+    assert "integration is not configured" in r.text
 
 
 @pytest.mark.asyncio

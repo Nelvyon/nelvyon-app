@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
-from dependencies.workspace import WorkspaceContext, require_workspace
+from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.snapchat_ads_service import get_snapchat_ads_service
 
 router = APIRouter(prefix="/api/snapchat-ads", tags=["snapchat-ads"])
@@ -29,20 +29,22 @@ class SuggestCreativeBody(BaseModel):
 
 @router.get("/status")
 async def snapchat_ads_status(
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_operator),
     db: AsyncSession = Depends(get_db),
 ):
     svc = get_snapchat_ads_service(db, ws.workspace_id)
     return {
         "mock": svc.is_mock,
-        "ad_account_id": svc.ad_account_id if not svc.is_mock else None,
+        "integration_configured": False,
+        # No se expone la cuenta corporativa: no es del workspace.
+        "ad_account_id": None,
     }
 
 
 @router.post("/campaigns")
 async def create_campaign(
     body: CreateSnapCampaignBody,
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_operator),
     db: AsyncSession = Depends(get_db),
 ):
     try:
@@ -59,7 +61,7 @@ async def create_campaign(
 
 @router.get("/campaigns")
 async def list_campaigns(
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_operator),
     db: AsyncSession = Depends(get_db),
 ):
     return await get_snapchat_ads_service(db, ws.workspace_id).list_campaigns()
@@ -67,7 +69,7 @@ async def list_campaigns(
 
 @router.get("/metrics")
 async def campaign_metrics(
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_operator),
     db: AsyncSession = Depends(get_db),
 ):
     return await get_snapchat_ads_service(db, ws.workspace_id).get_metrics()
@@ -76,7 +78,7 @@ async def campaign_metrics(
 @router.post("/suggest")
 async def suggest_creative(
     body: SuggestCreativeBody,
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_operator),
     db: AsyncSession = Depends(get_db),
 ):
     return await get_snapchat_ads_service(db, ws.workspace_id).suggest_creative(

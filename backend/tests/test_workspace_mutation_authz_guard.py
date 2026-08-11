@@ -143,7 +143,8 @@ AUTORIDAD_DE_PLATAFORMA = {"get_super_admin_user", "require_super_admin"}
 #: Triarlos exige leer cada uno, asi que quedan como bloque propio. Mientras
 #: tanto este numero solo puede BAJAR: si sube, el trinquete falla y obliga a
 #: revisar el endpoint nuevo antes de entrar.
-DEUDA_SIN_AUDITAR_MAXIMA = 76
+# 76 -> 67 al migrar snapchat_ads y tiktok_ads a require_workspace_operator.
+DEUDA_SIN_AUDITAR_MAXIMA = 67
 
 MUTANTES = _recolectar()
 #: Solo las que se declaran workspace-scoped: las que no tocan workspace tienen
@@ -257,4 +258,38 @@ def test_ningun_endpoint_de_plataforma_usa_autoridad_de_workspace():
     ]
     assert contaminados == [], (
         f"estos endpoints platform-scoped siguen autorizando por workspace: {contaminados}"
+    )
+
+
+#: Routers customer-facing cuyo proveedor externo tenia cuenta GLOBAL. No son
+#: platform-scoped —sus datos si llevan workspace_id— pero jamas pueden caer a
+#: la cuenta corporativa: sin integracion propia se falla cerrado.
+ROUTERS_CUSTOMER_SIN_FALLBACK = {"snapchat_ads.py": "snapchat", "tiktok_ads.py": "tiktok"}
+
+
+@pytest.mark.parametrize("fichero,proveedor", sorted(ROUTERS_CUSTOMER_SIN_FALLBACK.items()))
+def test_customer_ads_no_usan_mera_pertenencia(fichero, proveedor):
+    src = (ROUTERS_DIR / fichero).read_text(encoding="utf-8")
+    assert "Depends(require_workspace)" not in src, (
+        f"{fichero} volvio a autorizar por mera pertenencia; usa require_workspace_operator"
+    )
+
+
+@pytest.mark.parametrize("fichero,proveedor", sorted(ROUTERS_CUSTOMER_SIN_FALLBACK.items()))
+def test_customer_ads_no_exponen_la_cuenta_corporativa(fichero, proveedor):
+    """`/status` llego a devolver el id de la cuenta global a cualquier miembro."""
+    src = (ROUTERS_DIR / fichero).read_text(encoding="utf-8")
+    for filtracion in ("svc.ad_account_id", "svc.advertiser_id"):
+        assert filtracion not in src, f"{fichero} expone {filtracion} de la cuenta corporativa"
+
+
+@pytest.mark.parametrize("fichero,proveedor", sorted(ROUTERS_CUSTOMER_SIN_FALLBACK.items()))
+def test_creacion_de_campana_exige_integracion_propia(fichero, proveedor):
+    """La guarda vive en el servicio, antes de la red."""
+    servicio = ROUTERS_DIR.parent / "services" / f"{proveedor}_ads_service.py"
+    src = servicio.read_text(encoding="utf-8")
+    i = src.index("async def create_campaign")
+    j = src.index("httpx.AsyncClient", i)
+    assert "assert_workspace_ads_integration" in src[i:j], (
+        f"{servicio.name}: create_campaign puede alcanzar la red sin exigir integracion propia"
     )

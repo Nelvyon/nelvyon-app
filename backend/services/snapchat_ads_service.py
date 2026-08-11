@@ -10,6 +10,8 @@ import uuid
 from typing import Any
 
 import httpx
+
+from core.ads_integration import assert_workspace_ads_integration
 from openai import AsyncOpenAI
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -79,6 +81,10 @@ class SnapchatAdsService:
         headline: str = "",
         visual_description: str = "",
     ) -> dict[str, Any]:
+
+        # Sin integracion propia del workspace NO se cae a la cuenta
+        # corporativa: se corta antes de tocar la red.
+        await assert_workspace_ads_integration(self.workspace_id, "snapchat")
         await self.ensure_schema()
         self._ensure_config()
         obj = objective.strip().lower()
