@@ -79,6 +79,23 @@ def _es_mutacion(func: ast.AST) -> bool:
     return False
 
 
+def _recolectar_todos() -> list[tuple[str, str, set[str]]]:
+    """(fichero, funcion, dependencias) de TODO endpoint, mute o no."""
+    out: list[tuple[str, str, set[str]]] = []
+    for p in sorted(ROUTERS_DIR.glob("*.py")):
+        arbol = ast.parse(p.read_text(encoding="utf-8"))
+        for nodo in ast.walk(arbol):
+            if isinstance(nodo, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                for dec in getattr(nodo, "decorator_list", []):
+                    f = dec.func if isinstance(dec, ast.Call) else dec
+                    if isinstance(f, ast.Attribute) and f.attr.lower() in (
+                        METODOS_MUTANTES | {"get"}
+                    ):
+                        out.append((p.name, nodo.name, _dependencias(nodo)))
+                        break
+    return out
+
+
 def _recolectar() -> list[tuple[str, str, set[str]]]:
     """(fichero, funcion, dependencias) de cada endpoint mutante."""
     out: list[tuple[str, str, set[str]]] = []
@@ -101,8 +118,17 @@ ROUTERS_AUDITADOS = {
     "workflow_engine.py",
     "os_store_builder.py",
     "funnel_builder.py",
-    "ads_agent.py",
 }
+
+#: Routers PLATFORM-SCOPED: consumen un recurso corporativo unico, sin dimension
+#: de workspace. Aqui la autoridad de workspace no es "demasiado debil": es de la
+#: CLASE equivocada. `ads_agent` opera la unica cuenta Google/Meta de NELVYON, asi
+#: que un operator de cualquier workspace no debe alcanzarla ni para leer.
+ROUTERS_PLATFORM_SCOPED = {"ads_agent.py"}
+
+#: Autoridad valida para recursos de plataforma. Deriva del rol del JWT
+#: verificado, nunca de `X-Workspace-Id` ni de `workspace_members`.
+AUTORIDAD_DE_PLATAFORMA = {"get_super_admin_user", "require_super_admin"}
 
 #: Deuda medida, NO ignorada. El barrido completo encontro endpoints mutantes
 #: workspace-scoped que se conforman con pertenencia en routers aun sin auditar
@@ -118,7 +144,13 @@ MUTANTES = _recolectar()
 #: su propia frontera (cron, webhooks, publicas) y se auditan aparte.
 WORKSPACE_SCOPED = [m for m in MUTANTES if SOLO_PERTENENCIA in m[2] or AUTORIDAD_SUFICIENTE & m[2]]
 AUDITADOS = [m for m in WORKSPACE_SCOPED if m[0] in ROUTERS_AUDITADOS]
-SIN_AUDITAR = [m for m in WORKSPACE_SCOPED if m[0] not in ROUTERS_AUDITADOS]
+SIN_AUDITAR = [
+    m for m in WORKSPACE_SCOPED
+    if m[0] not in ROUTERS_AUDITADOS and m[0] not in ROUTERS_PLATFORM_SCOPED
+]
+#: Todos los endpoints —muten o no— de los routers platform-scoped: en ellos
+#: incluso una lectura expone datos corporativos.
+PLATFORM = [m for m in _recolectar_todos() if m[0] in ROUTERS_PLATFORM_SCOPED]
 
 
 def test_el_barrido_encuentra_endpoints_de_verdad():
@@ -127,14 +159,13 @@ def test_el_barrido_encuentra_endpoints_de_verdad():
     assert len(WORKSPACE_SCOPED) > 20, f"solo {len(WORKSPACE_SCOPED)} workspace-scoped"
     ficheros = {m[0] for m in WORKSPACE_SCOPED}
     # Los routers upstream de los BFF delegados deben estar cubiertos.
-    for esperado in (
-        "workflows.py",
-        "workflow_engine.py",
-        "os_store_builder.py",
-        "funnel_builder.py",
-        "ads_agent.py",
-    ):
+    for esperado in ("workflows.py", "workflow_engine.py", "os_store_builder.py", "funnel_builder.py"):
         assert esperado in ficheros, f"{esperado} no aparece en el barrido"
+    # `ads_agent.py` ya NO debe aparecer aqui: es platform-scoped y se cubre en
+    # su propio bloque. Si reapareciera, alguien le habria devuelto autoridad de
+    # workspace.
+    assert "ads_agent.py" not in ficheros
+    assert len(PLATFORM) >= 4, f"solo {len(PLATFORM)} endpoints platform-scoped"
 
 
 @pytest.mark.parametrize(
@@ -161,11 +192,18 @@ def test_la_allowlist_no_tiene_entradas_muertas():
         assert k in claves, f"{k} ya no existe: limpia la allowlist"
 
 
-def test_ads_briefing_quedo_con_autoridad_de_operador():
-    """Regresion explicita del hallazgo que origino este guard."""
+def test_ads_briefing_exige_autoridad_de_plataforma():
+    """
+    Regresion explicita del hallazgo. Paso por dos estados: primero
+    `require_workspace` (pertenencia), luego `require_workspace_operator`, y solo
+    al trazar los servicios se vio que la cuenta Google/Meta es unica y
+    corporativa. La autoridad correcta es de plataforma.
+    """
     encontrado = [m for m in MUTANTES if m[0] == "ads_agent.py" and m[1] == "ads_agent_briefing"]
     assert encontrado, "el endpoint del hallazgo ya no existe: revisa el guard"
-    assert "require_workspace_operator" in encontrado[0][2]
+    deps = encontrado[0][2]
+    assert "get_super_admin_user" in deps
+    assert not any(x.startswith("require_workspace") for x in deps)
 
 
 def test_trinquete_de_deuda_no_auditada():
@@ -186,4 +224,31 @@ def test_trinquete_de_deuda_no_auditada():
     assert len(sin_autoridad) >= DEUDA_SIN_AUDITAR_MAXIMA - 5, (
         f"la deuda bajo a {len(sin_autoridad)}: actualiza DEUDA_SIN_AUDITAR_MAXIMA "
         f"para que el trinquete siga apretado"
+    )
+
+
+@pytest.mark.parametrize(
+    "fichero,funcion,deps",
+    [pytest.param(f, fn, d, id=f"{f}::{fn}") for f, fn, d in PLATFORM],
+)
+def test_recurso_de_plataforma_exige_autoridad_de_plataforma(fichero, funcion, deps):
+    """
+    El defecto de ads no fue una dependencia demasiado debil: fue la CLASE de
+    autoridad equivocada. Autorizar por workspace un recurso que no tiene
+    workspace protege correctamente el recurso equivocado.
+    """
+    assert AUTORIDAD_DE_PLATAFORMA & deps, (
+        f"{fichero}::{funcion} consume un recurso corporativo unico pero depende de "
+        f"{sorted(deps)}. Un rol de workspace no acredita autoridad sobre la cuenta "
+        f"de NELVYON: usa get_super_admin_user."
+    )
+
+
+def test_ningun_endpoint_de_plataforma_usa_autoridad_de_workspace():
+    contaminados = [
+        f"{f}::{fn}" for f, fn, d in PLATFORM
+        if any(x.startswith("require_workspace") for x in d)
+    ]
+    assert contaminados == [], (
+        f"estos endpoints platform-scoped siguen autorizando por workspace: {contaminados}"
     )

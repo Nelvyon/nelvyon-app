@@ -111,7 +111,7 @@ async def test_meta_ads_upload_creative(client: AsyncClient, auth_headers: dict)
 
 
 @pytest.mark.asyncio
-async def test_ads_agent_briefing_no_launch(client: AsyncClient, auth_headers: dict):
+async def test_ads_agent_briefing_no_launch(client: AsyncClient, super_admin_headers: dict):
     r = await client.post(
         "/api/ads-agent/briefing",
         json={
@@ -121,7 +121,7 @@ async def test_ads_agent_briefing_no_launch(client: AsyncClient, auth_headers: d
             "daily_budget_eur": 90,
             "launch": False,
         },
-        headers=auth_headers,
+        headers=super_admin_headers,
     )
     assert r.status_code == 200, r.text
     body = r.json()
@@ -130,7 +130,7 @@ async def test_ads_agent_briefing_no_launch(client: AsyncClient, auth_headers: d
 
 
 @pytest.mark.asyncio
-async def test_ads_agent_briefing_with_launch(client: AsyncClient, auth_headers: dict):
+async def test_ads_agent_briefing_with_launch(client: AsyncClient, super_admin_headers: dict):
     r = await client.post(
         "/api/ads-agent/briefing",
         json={
@@ -139,7 +139,7 @@ async def test_ads_agent_briefing_with_launch(client: AsyncClient, auth_headers:
             "daily_budget_eur": 100,
             "launch": True,
         },
-        headers=auth_headers,
+        headers=super_admin_headers,
     )
     assert r.status_code == 200, r.text
     body = r.json()
@@ -149,23 +149,23 @@ async def test_ads_agent_briefing_with_launch(client: AsyncClient, auth_headers:
 
 
 @pytest.mark.asyncio
-async def test_ads_agent_unified_reporting(client: AsyncClient, auth_headers: dict):
-    r = await client.get("/api/ads-agent/reporting/unified", headers=auth_headers)
+async def test_ads_agent_unified_reporting(client: AsyncClient, super_admin_headers: dict):
+    r = await client.get("/api/ads-agent/reporting/unified", headers=super_admin_headers)
     assert r.status_code == 200, r.text
     body = r.json()
     assert "google" in body and "meta" in body and "unified" in body
 
 
 @pytest.mark.asyncio
-async def test_ads_agent_optimize(client: AsyncClient, auth_headers: dict):
-    r = await client.post("/api/ads-agent/optimize?roas_threshold=2", headers=auth_headers)
+async def test_ads_agent_optimize(client: AsyncClient, super_admin_headers: dict):
+    r = await client.post("/api/ads-agent/optimize?roas_threshold=2", headers=super_admin_headers)
     assert r.status_code == 200, r.text
     assert "actions" in r.json()
 
 
 @pytest.mark.asyncio
-async def test_ads_agent_roas_alerts(client: AsyncClient, auth_headers: dict):
-    r = await client.get("/api/ads-agent/alerts/roas?threshold=1.5", headers=auth_headers)
+async def test_ads_agent_roas_alerts(client: AsyncClient, super_admin_headers: dict):
+    r = await client.get("/api/ads-agent/alerts/roas?threshold=1.5", headers=super_admin_headers)
     assert r.status_code == 200, r.text
     assert "alerts" in r.json()
 
