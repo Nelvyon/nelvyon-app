@@ -7,7 +7,7 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 
-from dependencies.workspace import WorkspaceContext, require_workspace
+from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.ads_agent_service import get_ads_agent_service
 
 router = APIRouter(prefix="/api/ads-agent", tags=["ads-agent"])
@@ -26,7 +26,11 @@ class BriefingBody(BaseModel):
 @router.post("/briefing")
 async def ads_agent_briefing(
     body: BriefingBody,
-    ws: WorkspaceContext = Depends(require_workspace),
+    # Mutacion con efecto externo real: `launch=true` crea campanas de pago en
+    # Google/Meta con presupuesto elegido por el cliente. Exige la misma
+    # autoridad que las otras 21 mutaciones workspace-scoped; `require_workspace`
+    # solo comprobaba pertenencia y dejaba pasar a member y viewer.
+    ws: WorkspaceContext = Depends(require_workspace_operator),
 ):
     briefing: dict[str, Any] = body.model_dump()
     return await get_ads_agent_service().run_briefing(
@@ -44,7 +48,10 @@ async def ads_unified_reporting(_ws: WorkspaceContext = Depends(require_workspac
 @router.post("/optimize")
 async def ads_optimize(
     roas_threshold: float = Query(1.5, ge=0.5, le=20),
-    _ws: WorkspaceContext = Depends(require_workspace),
+    # Mismo defecto que /briefing: muta campanas de pago con autoridad de mera
+    # pertenencia. OJO: `optimize_all` NO recibe el workspace — opera sobre todas
+    # las campanas. Eso es un hallazgo aparte, sin corregir aqui.
+    _ws: WorkspaceContext = Depends(require_workspace_operator),
 ):
     return await get_ads_agent_service().optimize_all(roas_threshold=roas_threshold)
 

@@ -19,7 +19,7 @@ from core.database import db_manager
 from services.affiliate_service import AffiliateService
 
 
-from backend.core.ai_provider import AiNotConfigured
+from core.ai_provider import AiNotConfigured
 
 
 def _nelvyon_ai_base_url() -> str:

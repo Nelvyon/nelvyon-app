@@ -15,7 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.sql_compat import json_bind
 
 
-from backend.core.ai_provider import AiNotConfigured
+from core.ai_provider import AiNotConfigured
 
 
 def _nelvyon_ai_base_url() -> str:

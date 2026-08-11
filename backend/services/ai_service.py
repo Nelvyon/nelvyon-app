@@ -21,7 +21,7 @@ from services.klaviyo_service import build_email_marketing_premium_context
 from services.seo_apis import build_seo_premium_context
 
 
-from backend.core.ai_provider import AiNotConfigured
+from core.ai_provider import AiNotConfigured
 
 
 def _nelvyon_ai_base_url() -> str:

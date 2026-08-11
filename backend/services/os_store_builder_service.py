@@ -30,7 +30,7 @@ from services.tenant_service import TenantService
 from services.whitelabel_service import DEFAULT_CNAME_TARGET, _resolve_cname_chain
 
 
-from backend.core.ai_provider import AiNotConfigured
+from core.ai_provider import AiNotConfigured
 
 
 def _nelvyon_ai_base_url() -> str:

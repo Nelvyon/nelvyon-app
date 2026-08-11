@@ -17,7 +17,7 @@ import re
 
 import pytest
 
-from backend.core.ai_provider import (
+from core.ai_provider import (
     AiNotConfigured,
     ai_capability_status,
     get_ai_client,

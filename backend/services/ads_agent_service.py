@@ -13,7 +13,7 @@ from services.google_ads_service import get_google_ads_service
 from services.meta_ads_service import get_meta_ads_service
 
 
-from backend.core.ai_provider import AiNotConfigured
+from core.ai_provider import AiNotConfigured
 
 
 def _nelvyon_ai_base_url() -> str:
