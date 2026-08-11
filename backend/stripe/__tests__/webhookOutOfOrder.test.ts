@@ -22,10 +22,6 @@ vi.mock("../../db/DbClient", () => ({
   DbClient: { getInstance: () => ({ query: async () => [] }) },
 }));
 
-vi.mock("../../saas/DunningService", () => ({
-  DunningService: { getInstance: () => ({ onPaymentSucceeded: vi.fn(), onPaymentFailed: vi.fn() }) },
-}));
-
 import { processStripeEvent } from "../webhookHandler";
 
 const USER_ID = "11111111-1111-4111-8111-111111111111";

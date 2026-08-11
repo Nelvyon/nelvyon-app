@@ -170,10 +170,16 @@ describe("flow: billing — suscripción → webhook Stripe → dunning → canc
 
     await handleStripeWebhook("{}", "sig", { query: queryMock } as never);
 
-    expect(queryMock).toHaveBeenCalledWith(
-      expect.stringContaining("status='canceled'"),
-      ["user-1"],
-    );
+    // La cancelacion lleva guarda de recencia desde `bad314bf`: ademas del
+    // usuario, la sentencia recibe el timestamp y el id del evento para que un
+    // `deleted` antiguo no cancele una suscripcion reactivada despues. Se
+    // afirma la sentencia entera, no solo el `status='canceled'`: asi este test
+    // tambien detecta que alguien retire la guarda para "simplificar".
+    const cancel = queryMock.mock.calls.find(([sql]) => String(sql).includes("status='canceled'"));
+    expect(cancel).toBeDefined();
+    expect(cancel![0]).toMatch(/last_stripe_event_at IS NULL OR last_stripe_event_at < \$2/);
+    expect(cancel![1][0]).toBe("user-1");
+    expect(cancel![1][2]).toBe("evt_sub_del");
   });
 
   it("webhook invoice.payment_failed activa dunning past_due", async () => {
