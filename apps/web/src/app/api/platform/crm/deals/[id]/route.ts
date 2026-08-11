@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 
 import { proxyPlatformFetch } from "@/lib/platformFastApiProxy";
-import { requirePlatformClaims, upstreamFailed } from "@/lib/platformBffAuth";
-import { authenticatePlatformRequest, readJsonBody } from "@/lib/platformBffRoute";
+import { requirePlatformContext, requirePlatformClaims, upstreamFailed } from "@/lib/platformBffAuth";
+import { readJsonBody } from "@/lib/platformBffRoute";
 import {
   dbGetDeal,
   dbResolveWorkspaceId,
@@ -73,16 +73,12 @@ export async function PUT(
     return NextResponse.json({ error: "Invalid id" }, { status: 400 });
   }
 
-  const authError = await authenticatePlatformRequest(req);
-  if (authError) return authError;
-
-  let claims;
-  try {
-    claims = await requirePlatformClaims(req);
-  } catch {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  if (claims instanceof NextResponse) return claims;
+  // Autorización por capability ANTES de leer el cuerpo o mutar.
+  const gate = await requirePlatformContext(req, "platform.crm.write", {
+    allowImplicitWorkspace: true,
+  });
+  if (gate instanceof NextResponse) return gate;
+  const claims = gate.claims;
 
   let body: Record<string, unknown> = {};
   try {

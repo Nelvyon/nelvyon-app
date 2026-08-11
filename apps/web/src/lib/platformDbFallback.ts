@@ -181,6 +181,29 @@ export async function assertUserCanAccessWorkspace(
 }
 
 /**
+ * IDs de los workspaces a los que el usuario pertenece, en orden estable.
+ *
+ * Es la vía de resolución implícita cuando la petición no trae
+ * `X-Workspace-Id`, y reproduce la misma semántica que `dbResolveWorkspaceId`
+ * usaba ya: propios primero, luego membresías activas. Se devuelven solo ids
+ * para que quien resuelva el contexto no dependa del mapeo completo de fila.
+ */
+export async function listPlatformWorkspaceIds(userId: string): Promise<number[]> {
+  const rows = await db().query<{ id: number }>(
+    `SELECT w.id FROM workspaces w
+      WHERE w.user_id = $1 AND (w.status = 'active' OR w.status IS NULL)
+      UNION
+     SELECT w.id FROM workspaces w
+       JOIN workspace_members wm ON wm.workspace_id = w.id
+      WHERE wm.user_id = $1 AND wm.status = 'active'
+        AND (w.status = 'active' OR w.status IS NULL)
+      ORDER BY 1 ASC`,
+    [userId],
+  );
+  return rows.map((r) => Number(r.id));
+}
+
+/**
  * Rol CRUDO del usuario en el workspace, o `null` si no tiene acceso.
  *
  * Mismas dos vías que `userCanAccessWorkspace` — propiedad del workspace o

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { proxyPlatformFetch } from "@/lib/platformFastApiProxy";
-import { requirePlatformClaims, upstreamFailed } from "@/lib/platformBffAuth";
+import { requirePlatformContext, requirePlatformClaims, upstreamFailed } from "@/lib/platformBffAuth";
 import type { JwtPayload } from "@nelvyon/auth";
 import {
   dbGetClient,
@@ -84,16 +84,12 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
 export async function PUT(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params;
   const body = await readJsonBody(req);
-  const authError = await authenticatePlatformRequest(req);
-  if (authError) return authError;
-
-  let claims;
-  try {
-    claims = await requirePlatformClaims(req);
-  } catch {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  if (claims instanceof NextResponse) return claims;
+  // Autorización por capability ANTES de leer el cuerpo o mutar.
+  const gate = await requirePlatformContext(req, "platform.crm.write", {
+    allowImplicitWorkspace: true,
+  });
+  if (gate instanceof NextResponse) return gate;
+  const claims = gate.claims;
 
   const clientId = Number(id);
 

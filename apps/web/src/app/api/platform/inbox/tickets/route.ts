@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 
 import { EMPTY_CLIENT_LIST, proxyPlatformFetch } from "@/lib/platformFastApiProxy";
-import { requirePlatformClaims, upstreamFailed } from "@/lib/platformBffAuth";
-import { authenticatePlatformRequest, readJsonBody } from "@/lib/platformBffRoute";
+import { requirePlatformContext, requirePlatformClaims, upstreamFailed } from "@/lib/platformBffAuth";
+import { readJsonBody } from "@/lib/platformBffRoute";
 import type { JwtPayload } from "@nelvyon/auth";
 import {
   dbCreateTicket,
@@ -92,16 +92,12 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const authError = await authenticatePlatformRequest(req);
-  if (authError) return authError;
-
-  let claims;
-  try {
-    claims = await requirePlatformClaims(req);
-  } catch {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  if (claims instanceof NextResponse) return claims;
+  // Autorización por capability ANTES de leer el cuerpo o mutar.
+  const gate = await requirePlatformContext(req, "platform.support.write", {
+    allowImplicitWorkspace: true,
+  });
+  if (gate instanceof NextResponse) return gate;
+  const claims = gate.claims;
 
   let body: Record<string, unknown> = {};
   try {

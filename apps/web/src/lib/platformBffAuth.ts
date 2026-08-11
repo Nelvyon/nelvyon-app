@@ -5,7 +5,7 @@ import { authenticate } from "@nelvyon/auth";
 import { getNelvyonAdminService } from "@nelvyon/admin";
 import { OsAgentError } from "@nelvyon/os-agents";
 
-import { resolvePlatformWorkspaceRole } from "./platformDbFallback";
+import { listPlatformWorkspaceIds, resolvePlatformWorkspaceRole } from "./platformDbFallback";
 import {
   canPlatformPerform,
   normalizePlatformRole,
@@ -62,14 +62,39 @@ export type PlatformContext = {
 export async function requirePlatformContext(
   req: Request,
   action: PlatformAction,
+  opts: {
+    /**
+     * Si falta `X-Workspace-Id`, resolver el primer workspace del usuario en vez
+     * de responder 400.
+     *
+     * Existe para NO romper las rutas que hoy usan `dbResolveWorkspaceId`: la UI
+     * envía la cabecera de forma condicional (`if (workspaceId)`) y
+     * `ensureWorkspace` es best-effort, así que exigirla dejaría sin servicio a
+     * usuarios legítimos —`member` incluido— antes de que el workspace activo
+     * esté cargado. No relaja la seguridad: el workspace implícito sale de la
+     * lista del PROPIO usuario, nunca de la petición, y el rol se resuelve
+     * igual.
+     *
+     * Las rutas financieras lo dejan en `false` a propósito: cobrar sobre "tu
+     * primer workspace" porque faltaba una cabecera es peor que fallar.
+     */
+    allowImplicitWorkspace?: boolean;
+  } = {},
 ): Promise<PlatformContext | NextResponse> {
   const claims = await requirePlatformClaims(req);
   if (claims instanceof NextResponse) return claims;
 
   const raw = req.headers.get("x-workspace-id")?.trim();
-  const workspaceId = Number(raw ?? "");
+  let workspaceId = Number(raw ?? "");
   if (!raw || !Number.isFinite(workspaceId) || workspaceId <= 0) {
-    return NextResponse.json({ error: "X-Workspace-Id required" }, { status: 400 });
+    if (!opts.allowImplicitWorkspace) {
+      return NextResponse.json({ error: "X-Workspace-Id required" }, { status: 400 });
+    }
+    const propios = await listPlatformWorkspaceIds(claims.userId);
+    if (propios.length === 0) {
+      return NextResponse.json({ error: "X-Workspace-Id required" }, { status: 400 });
+    }
+    workspaceId = propios[0]!;
   }
 
   const rawRole = await resolvePlatformWorkspaceRole(claims.userId, workspaceId);
