@@ -6,10 +6,10 @@
 
 ```text
 HEAD            (ver git log -1)
-último commit   fix(api): cap pagination, close the body-limit bypass, bound SSE streams
+último commit   fix(files): neutralise CSV formulas, stop two path escapes
 fecha           2026-08-12
 bloque actual   34 — Observability (32 y 33 cerrados)
-tests           backend 2023 passed · frontend 6637 passed / 42 skipped · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
+tests           backend 2072 passed · frontend 6637 passed / 42 skipped · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
 build           backend compileall limpio · frontend sin tocar desde el último build conocido
 árbol git       limpio
 push/PR/merge   ninguno
@@ -45,7 +45,7 @@ PG certification BLOQUEADO — Docker Desktop caído (npipe dockerDesktopLinuxEn
 | 14 | Secrets / Credentials Audit | **CERTIFIED** | clave de cifrado por defecto eliminada; fail-open de descifrado cerrado |
 | 15 | Authentication Complete Audit | **CERTIFIED** | sin defecto explotable; invariantes de falsificación fijados |
 | 16 | Global Tenant Isolation | **CERTIFIED** | 2 fugas de PII sin auth cerradas; guard de alcance por id |
-| 17 | Upload / Import / Export Security | **CERTIFIED** | subida sin límite acotada; guard de clase |
+| 17 | Upload / Import / Export Security | **CERTIFIED** | ampliado: CSV injection, escape de prefijo de tenant, report_id sin validar |
 | 18 | Inbound Webhooks | **PARCIAL** | text2pay cerrado (marcaba pagos sin firma); 12 proveedores pendientes, ver TODO |
 | 19 | OAuth / Integrations | **CERTIFIED** | state de un solo uso; tokens cifrados (bloque 14) |
 | 20 | Ads Multi-tenant Functional Completion | **BLOCKED** | necesita decidir a quién pertenece la integración (user vs workspace); ver deuda 3 y 4 |

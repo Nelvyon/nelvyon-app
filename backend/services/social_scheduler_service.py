@@ -30,6 +30,16 @@ ALLOWED_MIME = frozenset(
 )
 
 
+#: Extension de fichero por tipo MIME permitido. Se deriva del MIME —que si esta
+#: en lista blanca— en vez de del nombre que manda el cliente.
+EXTENSION_POR_MIME = {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/gif": "gif",
+    "video/mp4": "mp4",
+    "video/quicktime": "mov",
+}
+
 def _json_dumps(obj: Any) -> str:
     return json.dumps(obj, ensure_ascii=False, default=str)
 
@@ -490,7 +500,17 @@ class SocialSchedulerService:
         if mime.startswith("image/") and len(data) > MAX_IMAGE_BYTES:
             data = _compress_image(data, mime)
 
-        ext = filename.rsplit(".", 1)[-1] if "." in filename else "bin"
+        # La extension sale del MIME ya validado, NO del nombre del cliente.
+        #
+        # Antes era `filename.rsplit(".", 1)[-1]`, que se concatenaba a la ruta
+        # de almacenamiento sin sanear. Se comprobo: un nombre como
+        # `a.../../../otro-tenant/evil` daba ext `/otro-tenant/evil` y la ruta
+        # quedaba `tenant-A/UUID./otro-tenant/evil` — se escapaba del prefijo
+        # del tenant y se escribia en el de otro.
+        #
+        # `mime` ya paso por `ALLOWED_MIME`, asi que es un conjunto cerrado: la
+        # extension deja de ser una entrada y pasa a ser una consecuencia.
+        ext = EXTENSION_POR_MIME[mime]
         path = f"{tenant_id}/{uuid.uuid4().hex}.{ext}"
         supabase = get_supabase_service()
         result = await supabase.upload_bytes(

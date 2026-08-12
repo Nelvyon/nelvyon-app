@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 import asyncio
+import re
 import csv
+
+from core.csv_safety import fila_segura
 import json
 import logging
 import os
@@ -63,6 +66,27 @@ def _gsc_top_rows(gsc_data: dict[str, Any], *, limit: int = 15) -> list[dict[str
         )
     items.sort(key=lambda x: x["clicks"], reverse=True)
     return items[:limit]
+
+
+#: Forma admisible de un identificador de informe.
+#:
+#: `report_id` llega del path de la peticion y se usaba SIN validar en dos
+#: sitios: la ruta de almacenamiento y la cabecera `Content-Disposition`. Se
+#: comprobo que ambos se escapan. Con `../workspace-2/informe` la ruta quedaba
+#: `reports/workspace-1/../workspace-2/informe.csv` — lectura del bucket de OTRO
+#: workspace. Y con un salto de linea en el id, la cabecera de la respuesta se parte.
+#:
+#: Validar la FORMA en el origen cierra los dos a la vez, y es mas robusto que
+#: escapar en cada punto de uso: no hay que acordarse en el siguiente.
+_ID_INFORME = re.compile(r"^[A-Za-z0-9._-]{1,128}$")
+
+
+def _id_informe_valido(report_id: str) -> str:
+    """Devuelve el id si es admisible; si no, corta."""
+    limpio = (report_id or "").strip()
+    if ".." in limpio or not _ID_INFORME.match(limpio):
+        raise ValueError("Invalid report id")
+    return limpio
 
 
 class SimpleBarChart(Flowable):
@@ -428,6 +452,7 @@ class ReportsService:
         }
 
     async def get_report(self, report_id: str) -> dict[str, Any]:
+        report_id = _id_informe_valido(report_id)
         path = f"{self._storage_prefix()}/{report_id}.json"
         storage = get_supabase_service()
         raw = await storage.download_bytes(REPORTS_BUCKET, path)
@@ -465,6 +490,7 @@ class ReportsService:
         return history[:limit]
 
     async def download_pdf(self, report_id: str) -> tuple[bytes, str]:
+        report_id = _id_informe_valido(report_id)
         path = f"{self._storage_prefix()}/{report_id}.pdf"
         storage = get_supabase_service()
         content = await storage.download_bytes(REPORTS_BUCKET, path)
@@ -477,6 +503,7 @@ class ReportsService:
         return pdf_bytes, f"nelvyon-report-{report_id}.pdf"
 
     async def download_csv(self, report_id: str) -> tuple[bytes, str]:
+        report_id = _id_informe_valido(report_id)
         path = f"{self._storage_prefix()}/{report_id}.csv"
         storage = get_supabase_service()
         content = await storage.download_bytes(REPORTS_BUCKET, path)
@@ -488,23 +515,23 @@ class ReportsService:
     def export_csv(self, report_data: dict[str, Any]) -> str:
         buffer = StringIO()
         writer = csv.writer(buffer)
-        writer.writerow(["section", "metric", "value"])
+        writer.writerow(fila_segura(["section", "metric", "value"]))
         report_type = report_data.get("report_type", "report")
         data = report_data.get("data") or report_data
 
         def write_kpis(kpis: list[dict[str, Any]], section: str) -> None:
             for kpi in kpis or []:
-                writer.writerow([section, kpi.get("label"), kpi.get("value")])
+                writer.writerow(fila_segura([section, kpi.get("label"), kpi.get("value")]))
 
         def write_rows(section: str, rows: list[dict[str, Any]], columns: list[str]) -> None:
             for row in rows or []:
                 for col in columns:
-                    writer.writerow([section, col, row.get(col)])
+                    writer.writerow(fila_segura([section, col, row.get(col)]))
 
         if report_type == "seo":
             org = data.get("organic_traffic") or {}
-            writer.writerow(["organic", "clicks", org.get("clicks")])
-            writer.writerow(["organic", "impressions", org.get("impressions")])
+            writer.writerow(fila_segura(["organic", "clicks", org.get("clicks")]))
+            writer.writerow(fila_segura(["organic", "impressions", org.get("impressions")]))
             write_rows("top_queries", data.get("top_queries") or [], ["label", "clicks", "impressions", "ctr", "position"])
             write_rows("top_pages", data.get("top_pages") or [], ["label", "clicks", "impressions", "ctr", "position"])
         elif report_type == "analytics":
@@ -516,22 +543,22 @@ class ReportsService:
         elif report_type == "campaign":
             write_kpis(data.get("kpis") or [], "kpis")
             for key, val in (data.get("deliverability") or {}).items():
-                writer.writerow(["deliverability", key, val])
+                writer.writerow(fila_segura(["deliverability", key, val]))
             for key, val in (data.get("roi") or {}).items():
-                writer.writerow(["roi", key, val])
+                writer.writerow(fila_segura(["roi", key, val]))
         elif report_type == "crm":
             write_kpis(data.get("kpis") or [], "kpis")
             for key, val in (data.get("period_deals") or {}).items():
-                writer.writerow(["period_deals", key, val])
+                writer.writerow(fila_segura(["period_deals", key, val]))
             write_rows("activities", data.get("activities_by_type") or [], ["type", "count"])
         elif report_type == "full":
             for subsection in ("seo", "analytics", "crm"):
                 nested = data.get(subsection) or {}
-                writer.writerow(["full", subsection, "included"])
+                writer.writerow(fila_segura(["full", subsection, "included"]))
                 if nested.get("kpis"):
                     write_kpis(nested.get("kpis") or [], f"{subsection}.kpis")
         else:
-            writer.writerow(["report", "type", report_type])
+            writer.writerow(fila_segura(["report", "type", report_type]))
 
         return buffer.getvalue()
 

@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import csv
+
+from core.csv_safety import fila_segura
 import io
 import json
 import logging
@@ -153,7 +155,7 @@ class AuditService:
         buffer = io.StringIO()
         writer = csv.writer(buffer)
         writer.writerow(
-            [
+            fila_segura([
                 "id",
                 "tenant_id",
                 "user_id",
@@ -162,11 +164,11 @@ class AuditService:
                 "resource_id",
                 "ip_address",
                 "created_at",
-            ]
+            ])
         )
         for row in rows:
             writer.writerow(
-                [
+                fila_segura([
                     row.get("id"),
                     row.get("tenant_id"),
                     row.get("user_id"),
@@ -175,7 +177,7 @@ class AuditService:
                     row.get("resource_id"),
                     row.get("ip_address"),
                     row.get("created_at"),
-                ]
+                ])
             )
         return buffer.getvalue()
 

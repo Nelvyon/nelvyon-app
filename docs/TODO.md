@@ -526,3 +526,32 @@ Auditado y sin defecto, anotado para no repetirlo:
   función de PostgreSQL definida en la migración 507. Divergencia de motor
   esperada, no defecto de producción — pero significa que ese endpoint no se
   puede ejercitar sin PG (hueco de cobertura, no de código).
+
+## DEUDA — `expires_in: 0` en URLs prefirmadas de OSS (2026-08-12)
+
+`services/storage.py` envía `{"expires_in": 0}` al crear URLs de subida y
+descarga contra el servicio OSS externo (`OSS_SERVICE_URL`). El módulo hermano
+`os_deliverable_storage.py` usa `DEFAULT_SIGNED_URL_TTL_SEC = 600`.
+
+No se cambia porque **no se puede demostrar** qué significa `0` para ese
+servicio sin llamarlo, y llamarlo está prohibido: puede ser «sin caducidad» (un
+defecto real) o «usa el default del servidor» (correcto). Poner un valor
+explícito sería mejor si es lo primero y podría romperlo si el servicio exige 0.
+
+Para cerrarlo hace falta el contrato del servicio OSS o una prueba contra una
+instancia de desarrollo.
+
+## VERIFICADO CORRECTO — manejo de ficheros (2026-08-12)
+
+Auditado y sin defecto, anotado para no repetirlo:
+
+- `voice_pilot_v2._sanitize_storage_key` exige `[a-f0-9]{32}`: ni `..`, ni
+  barras, ni nada del cliente.
+- `os_deliverable_storage.sanitize_upload_filename` reduce a
+  `PurePosixPath(...).name`, rechaza `.`/`..`/vacío **y** exige extensión en
+  lista blanca (pdf, jpg, png, docx, xlsx, zip, svg, webp).
+- `download_voice_inbound_audio` filtra por `workspace_id` y sirve un nombre
+  generado por el servidor.
+- `social_scheduler.upload_media` valida MIME contra lista blanca antes de nada.
+- `whatsapp.media_url` no lo descarga NELVYON: lo busca Meta. No es SSRF nuestra,
+  y además el endpoint ya falla cerrado sin integración propia.
