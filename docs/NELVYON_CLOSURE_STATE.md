@@ -8,7 +8,7 @@
 HEAD            (ver git log -1)
 último commit   fix(messaging): stop tenants sending from NELVYON's number and address
 fecha           2026-08-12
-bloque actual   6 — BFF Ads / Provider Isolation (siguiente disponible)
+bloque actual   7 — Financial Safety (siguiente disponible)
 tests           backend 1737 passed · frontend 6609 passed / 42 skipped · tsc --noEmit limpio
 build           backend compileall limpio · frontend sin tocar desde el último build conocido
 árbol git       limpio
@@ -34,7 +34,7 @@ PG certification BLOQUEADO — Docker Desktop caído (npipe dockerDesktopLinuxEn
 | 3 | Clasificación de drift estructural | **BLOCKED** | necesita la medición real de 2; clasificar sobre cifras históricas seria lo prohibido |
 | 4 | Constraint Drift Guard PG | **BLOCKED** | Docker caído |
 | 5 | BFF Authorization | **CERTIFIED** | diferencial de parseo `X-Workspace-Id` corregido |
-| 6 | BFF Ads / Provider Isolation | PENDING | |
+| 6 | BFF Ads / Provider Isolation | **CERTIFIED** | el lado Node ya era correcto; fijado con guard |
 | 7 | Financial Safety | PENDING | |
 | 8 | Charge Pack / Credits / Quotas | PENDING | |
 | 9 | Campaign Idempotency | PENDING | deuda ya medida, ver abajo |
@@ -56,7 +56,7 @@ PG certification BLOQUEADO — Docker Desktop caído (npipe dockerDesktopLinuxEn
 | 25 | Activities Functional Debt | PENDING | |
 | 26 | Reporting / API Contract Debt | PENDING | |
 | 27 | Frontend Error/Permission UX | PENDING | |
-| 28 | Flake / Test Determinism | PENDING | |
+| 28 | Flake / Test Determinism | PARCIAL | resuelto el test que ensuciaba el árbol; resto PENDING |
 | 29 | SQLite vs PostgreSQL Coverage | **BLOCKED** | Docker caído |
 | 30 | Migrations Final Certification | **BLOCKED** | Docker caído |
 | 31 | DB Performance | PENDING | |
@@ -102,6 +102,20 @@ Están en git y con guards vivos; no se reabren sin evidencia nueva.
 ## Hallazgos abiertos
 
 Ninguno CRITICAL ni HIGH sin resolver a día de hoy.
+
+### Cerrado en el bloque 6 — el lado Node de Ads ya era correcto
+
+Verificado, no supuesto: **cero** superficies Node leen `GOOGLE_ADS_CUSTOMER_ID`,
+`META_AD_ACCOUNT_ID`, `SNAPCHAT_AD_ACCOUNT_ID` ni `TIKTOK_ADVERTISER_ID`.
+`GoogleAdsExecutor` resuelve con `oauth.getConnection(userId, "google")` y lanza
+"Google account not connected" sin fallback. El `GOOGLE_ADS_DEVELOPER_TOKEN`
+global identifica al cliente de la API de Google, no a una cuenta, así que no es
+el defecto. `connectorRegistry.ts` nombra `GOOGLE_ADS_CUSTOMER_ID` en `envKeys`
+pero es metadatos del catálogo, no una lectura.
+
+El cero está respaldado por control positivo (el detector sí encuentra las
+credenciales de aplicación y sí encuentra las 5 lecturas del lado Python) y por
+mutación (introducir el fallback pone 2 tests en rojo).
 
 ### Cerrado en el bloque 5 (para no repetir la investigación)
 
@@ -159,6 +173,7 @@ necesita decisión de producto o PostgreSQL real.
 | `tests/_raw_sql_schema_drift.py` | columnas en SQL crudo que no existen en el esquema |
 | `tests/_constraint_drift.py` | (listo, esperando PG) ON CONFLICT / NOT NULL / PK |
 | `platformWorkspaceHeaderParity.test.ts` | que BFF y FastAPI lean `X-Workspace-Id` como números distintos |
+| `adsProviderIsolation.test.ts` | que una superficie Node lea una cuenta de ads corporativa del entorno |
 
 ---
 
