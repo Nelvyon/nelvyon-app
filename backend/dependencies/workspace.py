@@ -18,7 +18,7 @@ from dependencies.auth import get_current_user
 from models.workspaces import Workspaces
 from models.workspace_members import Workspace_members
 from schemas.auth import UserResponse
-from services.audit_events import write_audit_event
+from services.audit_events import write_audit_event_best_effort
 
 logger = logging.getLogger(__name__)
 
@@ -181,7 +181,10 @@ async def require_workspace_operator(
     """
     if workspace_can_mutate(ctx.role_in_workspace):
         return ctx
-    await write_audit_event(
+    # Denegacion: la decision de seguridad ya se tomo bien. Un fallo de
+    # auditoria no puede convertir este 403 en un 500, pero tampoco puede
+    # perderse en silencio — queda como ERROR estructurado.
+    await write_audit_event_best_effort(
         db,
         actor_user_id=ctx.user_id,
         actor_email=ctx.user_email,
