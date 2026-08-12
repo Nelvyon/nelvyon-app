@@ -416,6 +416,10 @@ _AGENT_ALIASES: dict[str, str] = {
 }
 
 
+#: Tope de agentes encadenados en una sola peticion.
+MAX_AGENTES_EN_CADENA = 8
+
+
 def normalize_agent_type(agent_type: str) -> str:
     raw = (agent_type or "").strip()
     key = raw.lower().replace("-", "_")
@@ -670,7 +674,9 @@ class AgentOrchestrator:
                     yield f"data: {json.dumps({'agent': agent_id, 'content': delta})}\n\n"
         except Exception as exc:
             logger.warning("Agent stream error (%s): %s", agent_id, exc)
-            yield f"data: {json.dumps({'agent': agent_id, 'error': str(exc)})}\n\n"
+            # La causa va al log, no al stream: `str(exc)` de un fallo del modelo o
+            # de la base puede llevar rutas, consultas o configuracion al cliente.
+            yield f"data: {json.dumps({'agent': agent_id, 'error': 'agent step failed'})}\n\n"
         finally:
             full = "".join(parts).strip()
             if full:
@@ -717,6 +723,24 @@ class AgentOrchestrator:
             yield f"data: {json.dumps({'error': 'agents_list is required'})}\n\n"
             yield "data: [DONE]\n\n"
             return
+        # La cadena no tenia tope: una peticion con 1000 agentes producia 1000
+        # completions. El coste es de computo propio, no de una API de pago,
+        # pero sigue siendo una peticion que consume el modelo entero.
+        if len(agents_list) > MAX_AGENTES_EN_CADENA:
+            error = f"chain too long (max {MAX_AGENTES_EN_CADENA})"
+            yield f"data: {json.dumps({'error': error})}\n\n"
+            yield "data: [DONE]\n\n"
+            return
+
+        # La cadena no tenia tope: una peticion con 1000 agentes producia 1000
+        # completions. El coste es de computo propio, no de una API de pago,
+        # pero sigue siendo una peticion que consume el modelo entero.
+        if len(agents_list) > MAX_AGENTES_EN_CADENA:
+            error = f"chain too long (max {MAX_AGENTES_EN_CADENA})"
+            yield f"data: {json.dumps({'error': error})}\n\n"
+            yield "data: [DONE]\n\n"
+            return
+
 
         prior = ""
         for agent_type in agents_list:
@@ -736,7 +760,14 @@ class AgentOrchestrator:
                         parts.append(delta)
                         yield f"data: {json.dumps({'agent': agent_id, 'content': delta})}\n\n"
             except Exception as exc:
-                yield f"data: {json.dumps({'agent': agent_id, 'error': str(exc)})}\n\n"
+                logger.error(
+                    "agent_step_failed",
+                    extra={"agent_id": agent_id, "workspace_id": self.workspace_id},
+                    exc_info=True,
+                )
+                # La causa va al log, no al stream: `str(exc)` de un fallo del modelo o
+                # de la base puede llevar rutas, consultas o configuracion al cliente.
+                yield f"data: {json.dumps({'agent': agent_id, 'error': 'agent step failed'})}\n\n"
             prior = "".join(parts).strip()
             if prior:
                 await memory_service.save_memory(

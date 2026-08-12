@@ -8,8 +8,8 @@
 HEAD            (ver git log -1)
 último commit   fix(oauth): consume the state instead of merely reading it
 fecha           2026-08-12
-bloque actual   20 — Ads Multi-tenant Functional Completion (SIN EMPEZAR)
-tests           backend 1836 passed · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
+bloque actual   24 — Social / Messaging Integrations
+tests           backend 1850 passed · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
 build           backend compileall limpio · frontend sin tocar desde el último build conocido
 árbol git       limpio
 push/PR/merge   ninguno
@@ -49,9 +49,9 @@ PG certification BLOQUEADO — Docker Desktop caído (npipe dockerDesktopLinuxEn
 | 18 | Inbound Webhooks | **PARCIAL** | text2pay cerrado (marcaba pagos sin firma); 12 proveedores pendientes, ver TODO |
 | 19 | OAuth / Integrations | **CERTIFIED** | state de un solo uso; tokens cifrados (bloque 14) |
 | 20 | Ads Multi-tenant Functional Completion | **BLOCKED** | necesita decidir a quién pertenece la integración (user vs workspace); ver deuda 3 y 4 |
-| 21 | Agents AI Full Audit | PENDING | |
-| 22 | Multi-agent System | PENDING | |
-| 23 | AI Cost / Provider Audit | PENDING | |
+| 21 | Agents AI Full Audit | **CERTIFIED** | allowlist cerrada; workspace del contexto; sin escalada |
+| 22 | Multi-agent System | **CERTIFIED** | tope de cadena; fuga de error interna cerrada |
+| 23 | AI Cost / Provider Audit | **CERTIFIED** | regla self-hosted ahora se APLICA, no solo se documenta |
 | 24 | Social / Messaging Integrations | PENDING | |
 | 25 | Activities Functional Debt | PENDING | |
 | 26 | Reporting / API Contract Debt | PENDING | |

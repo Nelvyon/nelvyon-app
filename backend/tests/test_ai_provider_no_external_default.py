@@ -70,14 +70,42 @@ def test_infra_nelvyon_tiene_precedencia(monkeypatch):
     assert ai_capability_status() == "nelvyon"
 
 
-def test_url_externa_solo_si_se_configura_explicitamente(monkeypatch):
+def test_apuntar_a_la_api_publica_no_basta_con_la_variable_del_sdk(monkeypatch):
+    """
+    `OPENAI_BASE_URL` es la variable ESTANDAR del SDK, y es tambien como se
+    apunta a un runtime local: Ollama, vLLM y LiteLLM exponen una API
+    compatible. Que este puesta no expresa intencion de usar el proveedor de
+    pago, asi que no puede bastar por si sola.
+
+    Antes si bastaba, y la marca `external_public` no la miraba nadie: era
+    informacion, no un control.
+    """
+    monkeypatch.delenv("NELVYON_ALLOW_EXTERNAL_AI", raising=False)
     monkeypatch.setenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
+    assert resolve_ai_endpoint() is None, "se salio a la API publica sin opt-in"
+
+
+def test_url_externa_solo_si_se_configura_explicitamente(monkeypatch):
+    """El opt-in explicito SI se respeta: es una decision del operador."""
+    monkeypatch.setenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
+    monkeypatch.setenv("NELVYON_ALLOW_EXTERNAL_AI", "1")
     endpoint = resolve_ai_endpoint()
     assert endpoint is not None
-    # Se respeta porque el operador lo pidió explícitamente, y queda marcado.
     assert endpoint.external_public is True
     assert endpoint.nelvyon_controlled is False
     assert ai_capability_status() == "explicit_external"
+
+
+def test_un_runtime_local_por_la_misma_variable_sigue_funcionando(monkeypatch):
+    """
+    Contraprueba imprescindible: el bloqueo es del HOST publico, no de la
+    variable. Apuntar `OPENAI_BASE_URL` a Ollama tiene que seguir valiendo.
+    """
+    monkeypatch.delenv("NELVYON_ALLOW_EXTERNAL_AI", raising=False)
+    monkeypatch.setenv("OPENAI_BASE_URL", "http://127.0.0.1:11434/v1")
+    endpoint = resolve_ai_endpoint()
+    assert endpoint is not None
+    assert endpoint.external_public is False
 
 
 def test_endpoint_local_sin_clave_recibe_credencial_placeholder(monkeypatch):

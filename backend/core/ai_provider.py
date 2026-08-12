@@ -39,12 +39,15 @@ Ningún secreto vive en este fichero: todo sale del entorno.
 
 from __future__ import annotations
 
+import logging
 import os
 from dataclasses import dataclass
 from typing import Any, Optional
 
 #: Endpoint público de OpenAI. Solo se usa para DETECTARLO y poder avisar,
 #: nunca como valor por defecto.
+logger = logging.getLogger(__name__)
+
 OPENAI_PUBLIC_BASE_URL = "https://api.openai.com/v1"
 
 
@@ -88,11 +91,28 @@ def resolve_ai_endpoint() -> Optional[AiEndpoint]:
         api_key = "nelvyon-local"
 
     normalized = base_url.rstrip("/")
+    es_publico = normalized.startswith(OPENAI_PUBLIC_BASE_URL.rstrip("/"))
+
+    # La IA de NELVYON es propia y autoalojada. `external_public` existia ya,
+    # pero solo como informacion: nadie la miraba, asi que un despliegue con
+    # `OPENAI_BASE_URL=https://api.openai.com/v1` mandaba todo el trafico —y su
+    # coste— a un proveedor externo de pago sin que nada lo dijera.
+    #
+    # Ahora se corta, salvo opt-in explicito. Devolver `None` es el estado
+    # NOT_CONFIGURED que los llamantes ya saben degradar; no se sustituye por
+    # otro proveedor.
+    if es_publico and _env("NELVYON_ALLOW_EXTERNAL_AI") != "1":
+        logger.error(
+            "ai_provider_external_endpoint_blocked",
+            extra={"ai_base_url_host": normalized.split("/")[2] if "/" in normalized else normalized},
+        )
+        return None
+
     return AiEndpoint(
         base_url=normalized,
         api_key=api_key,
         nelvyon_controlled=bool(nelvyon_base),
-        external_public=normalized.startswith(OPENAI_PUBLIC_BASE_URL.rstrip("/")),
+        external_public=es_publico,
     )
 
 
