@@ -6,9 +6,9 @@
 
 ```text
 HEAD            (ver git log -1)
-último commit   fix(portability): remove SQL that only works on SQLite
+último commit   fix(contracts): stop signing when the integrity data cannot be read
 fecha           2026-08-12
-bloque actual   32 — API Performance / Timeouts (33 cerrado)
+bloque actual   32 — API Performance / Timeouts (SIN EMPEZAR)
 tests           backend 1874 passed · frontend 6637 passed / 42 skipped · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
 build           backend compileall limpio · frontend sin tocar desde el último build conocido
 árbol git       limpio
@@ -271,7 +271,13 @@ Por orden de gravedad. Ninguno queda abierto.
 
 ## Siguiente acción exacta
 
-**Siguiente: bloque 31 — DB Performance.** Los bloques 29 y 30 siguen BLOCKED
+**Siguiente: bloque 32 — API Performance / Timeouts.** Después 34–47.
+
+Bloques BLOCKED, todos por Docker salvo el 20: **2, 3, 4, 20, 29, 30, 31**.
+Comprobar `docker ps` al arrancar; si responde, 2/3/4/29/30/31 pasan a prioridad
+inmediata (el 31 ya tiene su inventario de 45 bucles medido y listo).
+
+Nota histórica: Los bloques 29 y 30 siguen BLOCKED
 por Docker; 20 sigue BLOCKED por la decisión de propiedad de integración.
 
 Bloque **20 está BLOCKED**: completar Ads multi-tenant exige decidir a quién
