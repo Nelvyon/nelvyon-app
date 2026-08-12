@@ -8,8 +8,8 @@
 HEAD            (ver git log -1)
 último commit   fix(billing): a charge's price can no longer come from a default
 fecha           2026-08-12
-bloque actual   19 — OAuth / Integrations
-tests           backend 1832 passed · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
+bloque actual   20 — Ads Multi-tenant Functional Completion
+tests           backend 1836 passed · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
 build           backend compileall limpio · frontend sin tocar desde el último build conocido
 árbol git       limpio
 push/PR/merge   ninguno
@@ -47,7 +47,7 @@ PG certification BLOQUEADO — Docker Desktop caído (npipe dockerDesktopLinuxEn
 | 16 | Global Tenant Isolation | **CERTIFIED** | 2 fugas de PII sin auth cerradas; guard de alcance por id |
 | 17 | Upload / Import / Export Security | **CERTIFIED** | subida sin límite acotada; guard de clase |
 | 18 | Inbound Webhooks | **PARCIAL** | text2pay cerrado (marcaba pagos sin firma); 12 proveedores pendientes, ver TODO |
-| 19 | OAuth / Integrations | PENDING | |
+| 19 | OAuth / Integrations | **CERTIFIED** | state de un solo uso; tokens cifrados (bloque 14) |
 | 20 | Ads Multi-tenant Functional Completion | PENDING | bloqueado de facto por deuda de claves |
 | 21 | Agents AI Full Audit | PENDING | |
 | 22 | Multi-agent System | PENDING | |

@@ -32,10 +32,23 @@ async def _save_state(state: str, payload: dict[str, Any]) -> None:
 
 
 async def _load_state(state: str) -> dict[str, Any] | None:
+    """
+    Consume el `state`: se lee UNA vez y se borra.
+
+    Antes solo se leia, asi que el mismo `state` valia repetidamente durante
+    todo su TTL. Un `state` es una credencial de un solo uso —su razon de ser es
+    atar esta respuesta del proveedor a la peticion que la origino—, y un
+    callback legitimo ocurre exactamente una vez.
+
+    El borrado va ANTES de devolver: si fallase despues, el `state` seguiria
+    disponible para otro intento.
+    """
     await redis_client.initialize()
-    raw = await redis_client.get(_state_key(state))
+    clave = _state_key(state)
+    raw = await redis_client.get(clave)
     if not raw:
         return None
+    await redis_client.delete(clave)
     return json.loads(raw)
 
 
