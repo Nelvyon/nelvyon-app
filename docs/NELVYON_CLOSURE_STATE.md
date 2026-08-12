@@ -6,10 +6,10 @@
 
 ```text
 HEAD            (ver git log -1)
-último commit   test(ads): pin that the Node side never reaches a corporate ad account
+último commit   fix(billing): entitlements and refunds stop being self-service
 fecha           2026-08-12
-bloque actual   7 — Financial Safety (siguiente disponible)
-tests           backend 1737 passed · frontend 6609 passed / 42 skipped · tsc --noEmit limpio
+bloque actual   8 — Charge Pack / Credits / Quotas (siguiente disponible)
+tests           backend 1751 passed · frontend 6609 passed / 42 skipped · tsc --noEmit limpio
 build           backend compileall limpio · frontend sin tocar desde el último build conocido
 árbol git       limpio
 push/PR/merge   ninguno
@@ -35,7 +35,7 @@ PG certification BLOQUEADO — Docker Desktop caído (npipe dockerDesktopLinuxEn
 | 4 | Constraint Drift Guard PG | **BLOCKED** | Docker caído |
 | 5 | BFF Authorization | **CERTIFIED** | diferencial de parseo `X-Workspace-Id` corregido |
 | 6 | BFF Ads / Provider Isolation | **CERTIFIED** | el lado Node ya era correcto; fijado con guard |
-| 7 | Financial Safety | PENDING | |
+| 7 | Financial Safety | **CERTIFIED** | `83977fea` — 3 hallazgos: autoconcesión de plan, refund cross-tenant, fail-open en verify |
 | 8 | Charge Pack / Credits / Quotas | PENDING | |
 | 9 | Campaign Idempotency | PENDING | deuda ya medida, ver abajo |
 | 10 | External Side-effect Idempotency | PENDING | |
@@ -102,6 +102,22 @@ Están en git y con guards vivos; no se reabren sin evidencia nueva.
 ## Hallazgos abiertos
 
 Ninguno CRITICAL ni HIGH sin resolver a día de hoy.
+
+### Cerrado en el bloque 7 — tres hallazgos en los caminos de dinero
+
+1. **Autoconcesión de plan (demostrada ejecutando)**. Un `operator` creaba
+   `plan_id="enterprise", status="active"` sin `stripe_subscription_id` → 201, y
+   `get_active_plan_id_for_workspace(db,1)` devolvía `enterprise`. Cerrado: los
+   campos que conceden derecho no son escribibles por HTTP; Stripe escribe por
+   `SubscriptionsService` directamente. Crear en `pending` sigue permitido.
+2. **Refund cross-tenant**. `charge_id` venía del cuerpo sin comprobar contra
+   nada, sobre la cuenta Stripe corporativa. Pasa a autoridad de plataforma.
+3. **Fail-open en `verify_payment`**. `if meta_ws and ...` saltaba la
+   comprobación cuando la sesión no traía `workspace_id`. Ahora falla cerrado.
+
+Comprobado y NO tocado por ser correcto: `invoices` son facturas que el workspace
+emite a SUS clientes (`client_name`/`client_email`), no billing de NELVYON, así
+que `operator` es la autoridad correcta ahí.
 
 ### Cerrado en el bloque 6 — el lado Node de Ads ya era correcto
 
@@ -174,6 +190,7 @@ necesita decisión de producto o PostgreSQL real.
 | `tests/_constraint_drift.py` | (listo, esperando PG) ON CONFLICT / NOT NULL / PK |
 | `platformWorkspaceHeaderParity.test.ts` | que BFF y FastAPI lean `X-Workspace-Id` como números distintos |
 | `adsProviderIsolation.test.ts` | que una superficie Node lea una cuenta de ads corporativa del entorno |
+| `test_subscription_entitlement_self_grant.py` | autoconcederse plan/estado/ids de Stripe; refund con autoridad de workspace; fail-open en verify |
 
 ---
 
@@ -194,21 +211,18 @@ recalcularse contra `pg_catalog` cuando Docker vuelva.
 
 ## Siguiente acción exacta
 
-Bloque **7 — Financial Safety**. Es el bloque más grande de la cola, así que la
-sesión anterior lo dejó sin abrir en vez de empezarlo a medias.
+Bloque **8 — Charge Pack / Credits / Quotas**: SKU, retail/wholesale, techos,
+moneda, precisión, idempotencia, ledger, actor, concurrencia, doble gasto.
 
-Alcance: billing, Stripe, Stripe Connect, refunds, credits, quotas y toda acción
-que mueva dinero. Por cada una: autoridad, idempotencia, auditoría y
-concurrencia. Ya certificado antes y NO se reabre: el webhook de Stripe
-(negativos + idempotencia con mutación).
-
-Pistas ya conocidas, para no volver a buscarlas:
-  * `affiliates.register_affiliate` fija `commission_rate` (cap `ge=0, le=1`) y
-    `stripe_connect_id` — ya exige `require_workspace_admin`;
+Pistas ya encontradas, para no volver a buscarlas:
   * `marketplace.purchase_marketplace_item` escribe `marketplace_purchases` con
-    `status='completed'` sin cobro real asociado — revisar semántica;
+    `status='completed'` y un importe, **sin cobro real asociado** — revisar qué
+    significa esa compra y si debe existir sin pago;
   * `advisor_entitlements.consume_advisor_session` decrementa cuota mensual del
-    plan; comprobar concurrencia (mismo patrón read-then-write que campañas).
+    plan con el mismo patrón read-then-write que campañas: comprobar concurrencia
+    (`_consume_month_usage` en `routers/advisor_entitlements.py`);
+  * `affiliates.register_affiliate` ya exige `require_workspace_admin` y acota
+    `commission_rate` con `ge=0, le=1`.
 
 Comandos del entorno, para no volver a buscarlos:
 
