@@ -16,10 +16,8 @@ def encrypt_token(value: str | None) -> str | None:
 def decrypt_token(value: str | None) -> str | None:
     if not value:
         return None
-    try:
-        return decrypt_text(value)
-    except Exception:
-        key = os.environ.get("SOCIAL_TOKEN_ENCRYPTION_KEY") or os.environ.get("MASK_KEY")
-        if not key:
-            return value
-        raise
+    # Un descifrado fallido NO puede devolver el texto cifrado como si fuera el
+    # valor: quien llame lo usaria como token y hablaria con el proveedor con
+    # basura, o peor, lo guardaria de vuelta. Si no se puede descifrar, se
+    # propaga.
+    return decrypt_text(value)

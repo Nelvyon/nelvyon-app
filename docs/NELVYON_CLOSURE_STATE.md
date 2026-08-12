@@ -8,8 +8,8 @@
 HEAD            (ver git log -1)
 último commit   fix(billing): a charge's price can no longer come from a default
 fecha           2026-08-12
-bloque actual   14 — Secrets / Credentials Audit
-tests           backend 1788 passed · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
+bloque actual   15 — Authentication Complete Audit
+tests           backend 1795 passed · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
 build           backend compileall limpio · frontend sin tocar desde el último build conocido
 árbol git       limpio
 push/PR/merge   ninguno
@@ -42,7 +42,7 @@ PG certification BLOQUEADO — Docker Desktop caído (npipe dockerDesktopLinuxEn
 | 11 | Jobs / Workers / Queues | **CERTIFIED** | reintento no bloqueante; cancelación en stop/reset |
 | 12 | Revocation | **CERTIFIED** | CRITICAL: plan vendible concedía rol de plataforma |
 | 13 | Distributed Rate Limit | **CERTIFIED** | fail-closed fijado; multi-instancia = deuda de despliegue |
-| 14 | Secrets / Credentials Audit | PENDING | |
+| 14 | Secrets / Credentials Audit | **CERTIFIED** | clave de cifrado por defecto eliminada; fail-open de descifrado cerrado |
 | 15 | Authentication Complete Audit | PENDING | |
 | 16 | Global Tenant Isolation | PENDING | |
 | 17 | Upload / Import / Export Security | PENDING | |
