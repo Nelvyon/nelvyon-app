@@ -8,7 +8,7 @@
 HEAD            (ver git log -1)
 último commit   fix(portability): remove SQL that only works on SQLite
 fecha           2026-08-12
-bloque actual   31 — DB Performance (29/30 BLOCKED por Docker)
+bloque actual   32 — API Performance / Timeouts
 tests           backend 1870 passed · frontend 6637 passed / 42 skipped · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
 build           backend compileall limpio · frontend sin tocar desde el último build conocido
 árbol git       limpio
@@ -59,7 +59,7 @@ PG certification BLOQUEADO — Docker Desktop caído (npipe dockerDesktopLinuxEn
 | 28 | Flake / Test Determinism | **PARCIAL** | 4 de 5 dependencias de orden cerradas + SQL solo-SQLite; queda 1, ver TODO |
 | 29 | SQLite vs PostgreSQL Coverage | **BLOCKED** | Docker caído |
 | 30 | Migrations Final Certification | **BLOCKED** | Docker caído |
-| 31 | DB Performance | PENDING | |
+| 31 | DB Performance | **BLOCKED** | 45 bucles con consulta inventariados; medir planes exige PG real |
 | 32 | API Performance / Timeouts | PENDING | |
 | 33 | Exception / Fail-open Sweep | PENDING | |
 | 34 | Observability | PENDING | |

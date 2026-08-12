@@ -489,3 +489,24 @@ workspace 1 durante una ejecución. Un diagnóstico con `db_session` contó 3
 miembros, lo que sugiere que esa fixture no ve la misma sesión que la app —
 conviene confirmar qué base usan realmente los tests antes de seguir tirando del
 hilo. No es defecto de producto: el tope funciona.
+
+## BLOQUEADO — rendimiento de base de datos (bloque 31, 2026-08-12)
+
+Medido: **45 bucles** en `services/` y `routers/` que ejecutan una consulta por
+iteración (`await self.session.execute(...)` dentro de un `for`). Lista completa
+reproducible con el detector AST usado en el bloque 31.
+
+No se optimiza ninguno todavía, y es deliberado:
+
+- Muchos son INSERT acotados (p. ej. las secciones de un sitio en
+  `web_builder_service`), que no son un N+1 dañino sino una escritura por fila.
+- Distinguir los dañinos de los inocuos exige medir, y medir planes de consulta
+  —índices, seq scans, N+1 real— solo tiene sentido contra **PostgreSQL real**.
+  En SQLite el resultado no dice nada sobre producción.
+- El plan prohíbe optimizar sin evidencia, y con razón: reescribir un bucle que
+  no era el cuello de botella añade riesgo sin ganancia.
+
+Por tanto este bloque queda **BLOCKED junto con 2/3/4/29/30**, a la espera de
+Docker. Cuando vuelva: levantar PG desechable, cargar volumen representativo,
+`EXPLAIN (ANALYZE)` sobre las consultas de las familias calientes (CRM,
+campañas, inbox, reporting) y atacar solo lo que la medición señale.
