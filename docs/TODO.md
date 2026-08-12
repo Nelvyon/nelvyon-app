@@ -415,3 +415,17 @@ en algún entorno; conviene confirmarlo contra PostgreSQL real (bloque 2/29).
 
 Cerrar la latencia exige decidir dónde vive el rol de plataforma. No se inventa
 aquí una tabla que el sistema no tiene.
+
+## DEUDA — límite de tasa distribuido con varias instancias (2026-08-12)
+
+`RateLimiter` usa Redis cuando hay `REDIS_URL` y cae a un contador **en memoria**
+si no la hay. Con varias instancias, ese contador es por proceso: el límite
+efectivo se multiplica por el número de instancias.
+
+Verificado y correcto: el limitador **falla cerrado** si el almacén revienta, y
+la respuesta declara `backend: "memory"` cuando está degradado, así que la
+degradación es detectable y no silenciosa.
+
+Lo que falta es una decisión de despliegue: exigir Redis en producción (coste
+recurrente) o mover el contador a PostgreSQL. No se elige aquí porque introduce
+infraestructura con coste. Relacionado con el bloque 37 (ENV de producción).
