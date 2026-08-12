@@ -8,8 +8,8 @@
 HEAD            (ver git log -1)
 último commit   fix(billing): a charge's price can no longer come from a default
 fecha           2026-08-12
-bloque actual   17 — Upload / Import / Export Security
-tests           backend 1819 passed · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
+bloque actual   18 — Inbound Webhooks
+tests           backend 1827 passed · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
 build           backend compileall limpio · frontend sin tocar desde el último build conocido
 árbol git       limpio
 push/PR/merge   ninguno
@@ -45,7 +45,7 @@ PG certification BLOQUEADO — Docker Desktop caído (npipe dockerDesktopLinuxEn
 | 14 | Secrets / Credentials Audit | **CERTIFIED** | clave de cifrado por defecto eliminada; fail-open de descifrado cerrado |
 | 15 | Authentication Complete Audit | **CERTIFIED** | sin defecto explotable; invariantes de falsificación fijados |
 | 16 | Global Tenant Isolation | **CERTIFIED** | 2 fugas de PII sin auth cerradas; guard de alcance por id |
-| 17 | Upload / Import / Export Security | PENDING | |
+| 17 | Upload / Import / Export Security | **CERTIFIED** | subida sin límite acotada; guard de clase |
 | 18 | Inbound Webhooks | PENDING | |
 | 19 | OAuth / Integrations | PENDING | |
 | 20 | Ads Multi-tenant Functional Completion | PENDING | bloqueado de facto por deuda de claves |
