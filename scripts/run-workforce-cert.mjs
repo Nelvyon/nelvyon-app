@@ -92,7 +92,14 @@ function addStep(id, required, ok, detail) {
     "backend/saas/__tests__/phase2Elite.test.ts",
     "backend/saas/__tests__/phase2Runtime.test.ts",
   ];
-  const r = run("pnpm", ["-C", "apps/web", "exec", "vitest", "run", ...files, "--reporter=dot"], {}, 600_000);
+  // Solo esta ejecucion refresca la evidencia de soak: los `vitest run`
+  // normales no deben tocar el artefacto versionado (ver el test de residuals).
+  const r = run(
+    "pnpm",
+    ["-C", "apps/web", "exec", "vitest", "run", ...files, "--reporter=dot"],
+    { NELVYON_WRITE_EVIDENCE: "1" },
+    600_000,
+  );
   addStep(
     "workforce_and_elite_regression",
     true,
