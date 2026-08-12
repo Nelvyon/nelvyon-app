@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
 
-from dependencies.workspace import WorkspaceContext, require_workspace
+from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.cache_service import cached
 from services.gsc_service import get_gsc_service
 
@@ -84,7 +84,7 @@ async def list_sitemaps(
 @router.post("/sitemaps")
 async def submit_sitemap(
     body: SubmitSitemapRequest,
-    _ctx: WorkspaceContext = Depends(require_workspace),
+    _ctx: WorkspaceContext = Depends(require_workspace_operator),
 ) -> Dict[str, Any]:
     """Submit a sitemap URL to Search Console."""
     service = get_gsc_service()

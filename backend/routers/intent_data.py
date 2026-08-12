@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
-from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
+from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator, require_workspace_member
 from services.intent_data_service import get_intent_data_service
 
 router = APIRouter(prefix="/api/intent", tags=["intent"])
@@ -31,7 +31,7 @@ class AlertSettingsBody(BaseModel):
 @router.post("/track")
 async def track_event(
     body: TrackEventBody,
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_member),
     db: AsyncSession = Depends(get_db),
 ):
     return await get_intent_data_service(db, ws.workspace_id).track_event(

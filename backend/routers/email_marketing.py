@@ -5,7 +5,7 @@ from typing import Any, Dict
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, EmailStr, Field
 
-from dependencies.workspace import WorkspaceContext, require_workspace
+from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.klaviyo_service import KlaviyoService
 
 router = APIRouter(prefix="/api/email", tags=["email-marketing"])
@@ -46,7 +46,7 @@ async def get_lists(
 @router.post("/lists")
 async def create_list(
     body: CreateListRequest,
-    _ctx: WorkspaceContext = Depends(require_workspace),
+    _ctx: WorkspaceContext = Depends(require_workspace_operator),
 ) -> Dict[str, Any]:
     """Crear lista en Klaviyo."""
     service = KlaviyoService()
@@ -56,7 +56,7 @@ async def create_list(
 @router.post("/profiles")
 async def add_profile(
     body: AddProfileRequest,
-    _ctx: WorkspaceContext = Depends(require_workspace),
+    _ctx: WorkspaceContext = Depends(require_workspace_operator),
 ) -> Dict[str, Any]:
     """Añadir contacto (perfil) a Klaviyo."""
     service = KlaviyoService()
@@ -66,7 +66,7 @@ async def add_profile(
 @router.post("/campaigns")
 async def create_campaign(
     body: CreateCampaignRequest,
-    _ctx: WorkspaceContext = Depends(require_workspace),
+    _ctx: WorkspaceContext = Depends(require_workspace_operator),
 ) -> Dict[str, Any]:
     """Crear campaña de email en Klaviyo."""
     service = KlaviyoService()
@@ -91,7 +91,7 @@ async def get_metrics(
 @router.post("/events")
 async def track_event(
     body: SendEventRequest,
-    _ctx: WorkspaceContext = Depends(require_workspace),
+    _ctx: WorkspaceContext = Depends(require_workspace_operator),
 ) -> Dict[str, Any]:
     """Trackear evento en Klaviyo."""
     service = KlaviyoService()

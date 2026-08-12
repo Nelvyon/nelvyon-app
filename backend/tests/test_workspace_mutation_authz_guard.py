@@ -36,6 +36,20 @@ AUTORIDAD_SUFICIENTE = {
     "require_workspace_admin",
     "require_super_admin",
     "require_admin",
+    # Escalon intermedio: owner/admin/operator/member, nunca `viewer`. Acredita
+    # autoridad de ROL —a diferencia de `require_workspace`, que solo acredita
+    # pertenencia— pero es el mas debil de los cuatro.
+    "require_workspace_member",
+}
+
+#: Autoridad EXIGIDA a las clases sensibles. `require_workspace_member` no basta
+#: aqui: gastar dinero, consumir credito de pago o emitir hacia un tercero con la
+#: identidad del workspace no es trabajo colaborativo ordinario.
+AUTORIDAD_FUERTE = {
+    "require_workspace_operator",
+    "require_workspace_admin",
+    "require_super_admin",
+    "require_admin",
 }
 
 #: La dependencia debil: acredita pertenencia, no autoridad.
@@ -136,15 +150,64 @@ ROUTERS_PLATFORM_SCOPED = {
 #: verificado, nunca de `X-Workspace-Id` ni de `workspace_members`.
 AUTORIDAD_DE_PLATAFORMA = {"get_super_admin_user", "require_super_admin"}
 
-#: Deuda medida, NO ignorada. El barrido completo encontro endpoints mutantes
-#: workspace-scoped que se conforman con pertenencia en routers aun sin auditar
-#: (whatsapp, advisor_entitlements, affiliates, agents, ai...). Muchos usan POST
-#: como lectura —streaming, analisis— y no son defectos; otros hay que mirarlos.
-#: Triarlos exige leer cada uno, asi que quedan como bloque propio. Mientras
-#: tanto este numero solo puede BAJAR: si sube, el trinquete falla y obliga a
-#: revisar el endpoint nuevo antes de entrar.
-# 76 -> 67 al migrar snapchat_ads y tiktok_ads a require_workspace_operator.
-DEUDA_SIN_AUDITAR_MAXIMA = 67
+#: POST/PUT/DELETE que NO mutan: analisis, busqueda, render, previsualizacion.
+#: El metodo HTTP no decide la clase. Exigirles autoridad de rol no protegeria
+#: nada y quitaria a `viewer` lecturas que le corresponden.
+#:
+#: La entrada obliga a declarar por que. Sin motivo, el test falla: una
+#: allowlist sin justificacion es una excepcion silenciosa con otro nombre.
+#: Sustituye al contador `DEUDA_SIN_AUDITAR_MAXIMA = 67`, que solo media cuantos
+#: quedaban sin mirar; estos ya estan mirados uno a uno.
+LECTURA_JUSTIFICADA: dict[str, str] = {
+    "memory.py::search_client_memory":
+        "busqueda semantica; el servicio filtra por ctx.workspace_id",
+    "templates.py::render_template":
+        "render Jinja en memoria; get_template filtra `workspace_id = :ws OR is_public`",
+    "saas_intelligence.py::compare_benchmarks":
+        "calculo puro contra benchmarks de sector; no persiste ni sale fuera",
+    "os_web_builder.py::score_website":
+        "puntua un proyecto ya scopeado por workspace_id; no escribe",
+    "social_publish.py::preview_post":
+        "previsualiza; no programa ni publica en ninguna red",
+    "omnichannel.py::suggest_reply":
+        "sugiere texto al operador humano; no envia nada",
+    "conversation_realtime.py::create_stream_token":
+        "emite token para una conversacion que el llamante ya puede leer; "
+        "_get_scoped_conversation filtra conversation+user+workspace",
+    "gdpr.py::export_user_data":
+        "derecho de acceso: exportar los datos PROPIOS no puede depender del rol. "
+        "Exportar los de otro sujeto ya exige admin/super_admin dentro del endpoint",
+}
+
+#: Clases que exigen AUTORIDAD_FUERTE, fijadas por endpoint.
+#:
+#: Sin esto, degradar `require_workspace_operator` a `require_workspace_member`
+#: en `whatsapp::send_template` seguiria pareciendo correcto —hay autoridad de
+#: rol— y nadie lo notaria. La clase se declara aqui para que el guard pueda
+#: distinguir "tiene guardia" de "tiene la guardia adecuada".
+CLASES_SENSIBLES: dict[str, str] = {
+    # dinero
+    "marketplace.py::purchase_marketplace_item": "FINANCIAL",
+    "affiliates.py::register_affiliate": "FINANCIAL",
+    # credenciales / identidad
+    "ses.py::verify_domain": "CREDENTIAL",
+    # cuota o credito de pago
+    "advisor_entitlements.py::consume_advisor_session": "QUOTA",
+    "apollo.py::search_leads": "QUOTA",
+    # emision externa irreversible con la identidad del workspace
+    "whatsapp.py::send_message": "EXTERNAL_SEND",
+    "whatsapp.py::send_template": "EXTERNAL_SEND",
+    "whatsapp.py::send_media": "EXTERNAL_SEND",
+    "ses.py::send_email": "EXTERNAL_SEND",
+    "ses.py::send_bulk_emails": "EXTERNAL_SEND",
+    "gsc.py::submit_sitemap": "EXTERNAL_SEND",
+    "social_publish.py::publish_now": "EXTERNAL_SEND",
+    "social_publish.py::schedule_posts": "EXTERNAL_SEND",
+    "email_marketing.py::create_campaign": "EXTERNAL_SEND",
+}
+
+#: Dinero: ni siquiera `operator` decide donde se paga o que se compra.
+CLASE_FINANCIERA = {k for k, v in CLASES_SENSIBLES.items() if v == "FINANCIAL"}
 
 MUTANTES = _recolectar()
 #: Solo las que se declaran workspace-scoped: las que no tocan workspace tienen
@@ -213,25 +276,64 @@ def test_ads_briefing_exige_autoridad_de_plataforma():
     assert not any(x.startswith("require_workspace") for x in deps)
 
 
-def test_trinquete_de_deuda_no_auditada():
+@pytest.mark.parametrize(
+    "fichero,funcion,deps",
+    [pytest.param(f, fn, d, id=f"{f}::{fn}") for f, fn, d in SIN_AUDITAR],
+)
+def test_toda_mutacion_workspace_scoped_declara_su_clase(fichero, funcion, deps):
     """
-    La deuda de routers sin auditar solo puede decrecer.
+    Sustituye al contador de deuda. Ya no quedan endpoints "sin mirar": cada
+    uno tiene autoridad de rol o una entrada de lectura con motivo escrito.
 
-    No convierte el hallazgo en verde por omision: fija el numero exacto. Un
-    endpoint nuevo que se conforme con pertenencia hace fallar este test y
-    obliga a justificarlo o corregirlo antes de entrar.
+    Un endpoint nuevo que se conforme con pertenencia falla aqui, y para
+    aprobarlo hay que decir en LECTURA_JUSTIFICADA por que no muta.
     """
-    sin_autoridad = [m for m in SIN_AUDITAR if not (AUTORIDAD_SUFICIENTE & m[2])]
-    assert len(sin_autoridad) <= DEUDA_SIN_AUDITAR_MAXIMA, (
-        f"{len(sin_autoridad)} mutaciones workspace-scoped sin autoridad de rol "
-        f"(techo {DEUDA_SIN_AUDITAR_MAXIMA}). Endpoints nuevos: revisa su autorizacion. "
-        f"Muestra: {sorted(f'{f}::{fn}' for f, fn, _ in sin_autoridad)[:5]}"
+    clave = f"{fichero}::{funcion}"
+    if clave in LECTURA_JUSTIFICADA:
+        motivo = LECTURA_JUSTIFICADA[clave]
+        assert len(motivo) > 30, f"{clave}: el motivo no explica nada ({motivo!r})"
+        return
+    assert AUTORIDAD_SUFICIENTE & deps, (
+        f"{clave} es workspace-scoped y solo depende de {sorted(deps)}. "
+        f"`require_workspace` acredita PERTENENCIA —incluida la de `viewer`—, no "
+        f"autoridad. Usa require_workspace_member (trabajo diario), "
+        f"require_workspace_operator (mutacion de negocio) o require_workspace_admin "
+        f"(dinero); si de verdad no muta, declaralo en LECTURA_JUSTIFICADA."
     )
-    # Si baja, baja tambien el techo: el trinquete no debe aflojarse solo.
-    assert len(sin_autoridad) >= DEUDA_SIN_AUDITAR_MAXIMA - 5, (
-        f"la deuda bajo a {len(sin_autoridad)}: actualiza DEUDA_SIN_AUDITAR_MAXIMA "
-        f"para que el trinquete siga apretado"
+
+
+@pytest.mark.parametrize("clave,clase", sorted(CLASES_SENSIBLES.items()))
+def test_las_clases_sensibles_exigen_autoridad_fuerte(clave, clase):
+    """
+    Tener guardia no es tener la guardia adecuada.
+
+    `require_workspace_member` acredita autoridad de rol, asi que un endpoint
+    que gasta dinero o emite un WhatsApp con el numero de NELVYON pasaria el
+    test generico sin problema. Aqui no.
+    """
+    fichero, funcion = clave.split("::")
+    encontrado = [m for m in MUTANTES if m[0] == fichero and m[1] == funcion]
+    assert encontrado, f"{clave} ya no existe: actualiza CLASES_SENSIBLES"
+    deps = encontrado[0][2]
+    exigido = AUTORIDAD_FUERTE - {"require_workspace_member"}
+    if clave in CLASE_FINANCIERA:
+        exigido = {"require_workspace_admin", "require_super_admin", "require_admin"}
+    assert exigido & deps, (
+        f"{clave} es de clase {clase} pero depende de {sorted(deps)}. "
+        f"Se exige una de {sorted(exigido)}."
     )
+
+
+def test_la_lectura_justificada_no_tiene_entradas_muertas():
+    claves = {f"{f}::{fn}" for f, fn, _ in MUTANTES}
+    huerfanas = [k for k in LECTURA_JUSTIFICADA if k not in claves]
+    assert huerfanas == [], f"entradas muertas en LECTURA_JUSTIFICADA: {huerfanas}"
+
+
+def test_ninguna_lectura_justificada_es_ademas_sensible():
+    """Contradiccion imposible: no puede a la vez no mutar y gastar dinero."""
+    solapan = set(LECTURA_JUSTIFICADA) & set(CLASES_SENSIBLES)
+    assert solapan == set(), f"clasificados como lectura Y como sensibles: {solapan}"
 
 
 @pytest.mark.parametrize(

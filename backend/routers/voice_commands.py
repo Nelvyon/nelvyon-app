@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
-from dependencies.workspace import WorkspaceContext, require_workspace
+from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.voice_commands_service import VoiceCommandsService, get_voice_commands_service
 
 logger = logging.getLogger(__name__)
@@ -40,7 +40,7 @@ def _svc(db: AsyncSession, ws: WorkspaceContext) -> VoiceCommandsService:
 @voice_commands_router.post("/transcribe")
 async def transcribe_voice_command(
     audio: UploadFile = File(...),
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_operator),
     db: AsyncSession = Depends(get_db),
 ):
     await VoiceCommandsService.ensure_schema()

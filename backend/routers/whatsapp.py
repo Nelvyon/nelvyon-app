@@ -7,7 +7,7 @@ from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel, Field
 
 from core.database import get_db
-from dependencies.workspace import WorkspaceContext, require_workspace
+from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.helpdesk_service import default_helpdesk_workspace_id, get_helpdesk_service
 from services.whatsapp_service import get_whatsapp_service
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -37,7 +37,7 @@ class SendMediaRequest(BaseModel):
 @router.post("/send")
 async def send_message(
     body: SendMessageRequest,
-    _ctx: WorkspaceContext = Depends(require_workspace),
+    _ctx: WorkspaceContext = Depends(require_workspace_operator),
 ) -> Dict[str, Any]:
     """Send a WhatsApp text message."""
     service = get_whatsapp_service()
@@ -55,7 +55,7 @@ async def send_message(
 @router.post("/template")
 async def send_template(
     body: SendTemplateRequest,
-    _ctx: WorkspaceContext = Depends(require_workspace),
+    _ctx: WorkspaceContext = Depends(require_workspace_operator),
 ) -> Dict[str, Any]:
     """Send an approved WhatsApp message template."""
     service = get_whatsapp_service()
@@ -78,7 +78,7 @@ async def send_template(
 @router.post("/media")
 async def send_media(
     body: SendMediaRequest,
-    _ctx: WorkspaceContext = Depends(require_workspace),
+    _ctx: WorkspaceContext = Depends(require_workspace_operator),
 ) -> Dict[str, Any]:
     """Send image, video, or document via public URL."""
     service = get_whatsapp_service()

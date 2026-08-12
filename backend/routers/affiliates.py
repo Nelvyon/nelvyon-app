@@ -47,7 +47,7 @@ def _svc(db: AsyncSession, ws: WorkspaceContext | None = None):
 @router.post("/register", status_code=201)
 async def register_affiliate(
     body: RegisterAffiliateBody,
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_admin),
     user: UserResponse = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):

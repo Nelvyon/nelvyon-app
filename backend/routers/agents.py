@@ -14,7 +14,7 @@ from fastapi.responses import StreamingResponse
 from openai import AsyncOpenAI
 
 from core.config import settings
-from dependencies.workspace import WorkspaceContext, require_workspace
+from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_member
 from schemas.agents import AgentStreamRequest
 from services import memory_service
 from services.klaviyo_service import build_email_marketing_premium_context
@@ -195,7 +195,7 @@ def _build_messages(
 @router.post("/stream")
 async def stream_agent(
     request: AgentStreamRequest,
-    ctx: WorkspaceContext = Depends(require_workspace),
+    ctx: WorkspaceContext = Depends(require_workspace_member),
 ):
     """Stream agent LLM output as Server-Sent Events (data: {json}\\n\\n, terminal [DONE])."""
     client = _openai_client()

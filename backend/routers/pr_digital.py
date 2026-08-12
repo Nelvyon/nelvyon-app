@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
-from dependencies.workspace import WorkspaceContext, require_workspace
+from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.pr_digital_service import get_pr_digital_service
 
 router = APIRouter(prefix="/api/pr", tags=["pr-digital"])
@@ -39,7 +39,7 @@ class CrisisBody(BaseModel):
 @router.post("/generate")
 async def generate_release(
     body: GenerateReleaseBody,
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_operator),
     db: AsyncSession = Depends(get_db),
 ):
     return await get_pr_digital_service(db, ws.workspace_id).generate_release(
@@ -55,7 +55,7 @@ async def generate_release(
 @router.post("/headlines")
 async def generate_headlines(
     body: HeadlinesBody,
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_operator),
     db: AsyncSession = Depends(get_db),
 ):
     return await get_pr_digital_service(db, ws.workspace_id).generate_headlines(
@@ -66,7 +66,7 @@ async def generate_headlines(
 @router.post("/crisis")
 async def generate_crisis(
     body: CrisisBody,
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_operator),
     db: AsyncSession = Depends(get_db),
 ):
     return await get_pr_digital_service(db, ws.workspace_id).generate_crisis(

@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
-from dependencies.workspace import WorkspaceContext, require_workspace
+from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.social_auto_publish_service import get_social_auto_publish_service
 
 router = APIRouter(prefix="/api/social-publish", tags=["social-publish"])
@@ -56,7 +56,7 @@ async def get_settings(
 @router.put("/settings")
 async def put_settings(
     body: SettingsBody,
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_operator),
     db: AsyncSession = Depends(get_db),
 ):
     return await get_social_auto_publish_service(db, ws.workspace_id).update_settings(
@@ -78,7 +78,7 @@ async def preview_post(
 @router.post("/schedule")
 async def schedule_posts(
     body: ScheduleBody,
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_operator),
     db: AsyncSession = Depends(get_db),
 ):
     return await get_social_auto_publish_service(db, ws.workspace_id).schedule(
@@ -93,7 +93,7 @@ async def schedule_posts(
 @router.post("/publish-now")
 async def publish_now(
     body: PublishNowBody,
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_operator),
     db: AsyncSession = Depends(get_db),
 ):
     return await get_social_auto_publish_service(db, ws.workspace_id).publish_now(

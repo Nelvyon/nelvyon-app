@@ -236,7 +236,9 @@ async def setup_database(test_engine):
                 INSERT OR IGNORE INTO workspace_members
                 (workspace_id, user_id, email, role, status)
                 VALUES
-                (1, 'member-user-00000000-0000-0000-0000-000000000099', 'member@test.com', 'member', 'active')
+                (1, 'member-user-00000000-0000-0000-0000-000000000099', 'member@test.com', 'member', 'active'),
+                (1, 'viewer-user-00000000-0000-0000-0000-000000000098', 'viewer@test.com', 'viewer', 'active'),
+                (1, 'operator-user-0000000-0000-0000-0000-000000000097', 'operator@test.com', 'operator', 'active')
                 """
             )
         )
@@ -247,6 +249,8 @@ async def setup_database(test_engine):
                 VALUES
                 ('test-user-00000000-0000-0000-0000-000000000001', 'testuser@nelvyon-test.com', 'Test User', 'user'),
                 ('member-user-00000000-0000-0000-0000-000000000099', 'member@test.com', 'Member User', 'user'),
+                ('viewer-user-00000000-0000-0000-0000-000000000098', 'viewer@test.com', 'Viewer User', 'user'),
+                ('operator-user-0000000-0000-0000-0000-000000000097', 'operator@test.com', 'Operator User', 'user'),
                 ('admin-user-00000000-0000-0000-0000-000000000001', 'admin@nelvyon-test.com', 'Admin User', 'admin'),
                 ('super-admin-00000000-0000-0000-0000-000000000001', 'superadmin@nelvyon-test.com', 'Super Admin', 'super_admin')
                 """
@@ -343,6 +347,35 @@ async def member_headers(client: AsyncClient) -> dict:
         "Authorization": f"Bearer {token}",
         "X-Workspace-Id": "1",
     }
+
+
+@pytest_asyncio.fixture
+async def viewer_headers(client: AsyncClient) -> dict:
+    """Rol de workspace `viewer`: solo lectura. Es el agujero que dejaba abierto
+    `require_workspace`, que solo comprueba pertenencia."""
+    from core.auth import create_access_token
+
+    token = create_access_token({
+        "sub": "viewer-user-00000000-0000-0000-0000-000000000098",
+        "email": "viewer@test.com",
+        "name": "Viewer User",
+        "role": "user",
+    })
+    return {"Authorization": f"Bearer {token}", "X-Workspace-Id": "1"}
+
+
+@pytest_asyncio.fixture
+async def operator_headers(client: AsyncClient) -> dict:
+    """Rol de workspace `operator`: muta negocio, no toca dinero."""
+    from core.auth import create_access_token
+
+    token = create_access_token({
+        "sub": "operator-user-0000000-0000-0000-0000-000000000097",
+        "email": "operator@test.com",
+        "name": "Operator User",
+        "role": "user",
+    })
+    return {"Authorization": f"Bearer {token}", "X-Workspace-Id": "1"}
 
 
 @pytest_asyncio.fixture

@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from pydantic import BaseModel, Field, HttpUrl
 
 from core.rate_limiter import endpoint_rate_limit
-from dependencies.workspace import WorkspaceContext, require_workspace
+from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.dalle_service import get_dalle_service
 
 router = APIRouter(prefix="/api/dalle", tags=["dalle"])
@@ -34,7 +34,7 @@ class EditImageRequest(BaseModel):
 async def generate_image(
     body: GenerateImageRequest,
     response: Response,
-    _ctx: WorkspaceContext = Depends(require_workspace),
+    _ctx: WorkspaceContext = Depends(require_workspace_operator),
 ) -> Dict[str, Any]:
     """Generate an image with DALL·E 3 and persist to Supabase agent-results."""
     service = get_dalle_service()
@@ -57,7 +57,7 @@ async def generate_image(
 @router.post("/variations")
 async def generate_variations(
     body: VariationsRequest,
-    _ctx: WorkspaceContext = Depends(require_workspace),
+    _ctx: WorkspaceContext = Depends(require_workspace_operator),
 ) -> Dict[str, Any]:
     """Create variations from an existing image URL (DALL·E 2 variations API)."""
     service = get_dalle_service()
@@ -75,7 +75,7 @@ async def generate_variations(
 @router.post("/edit")
 async def edit_image(
     body: EditImageRequest,
-    _ctx: WorkspaceContext = Depends(require_workspace),
+    _ctx: WorkspaceContext = Depends(require_workspace_operator),
 ) -> Dict[str, Any]:
     """Edit an image with mask and prompt (DALL·E 2 edit API)."""
     service = get_dalle_service()

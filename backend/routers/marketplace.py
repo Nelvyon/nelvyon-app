@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
 from core.list_cache import list_cached
-from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_admin
+from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_admin, require_workspace_operator
 from services.marketplace_service import get_marketplace_service
 
 logger = logging.getLogger(__name__)
@@ -101,7 +101,7 @@ async def get_marketplace_agency(
 async def review_marketplace_agency(
     agency_id: str,
     body: ReviewAgencyBody,
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_operator),
     db: AsyncSession = Depends(get_db),
 ):
     try:
@@ -119,7 +119,7 @@ async def review_marketplace_agency(
 @router.post("/match")
 async def match_client_to_agency(
     body: MatchClientBody,
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_operator),
     db: AsyncSession = Depends(get_db),
 ):
     try:
@@ -156,7 +156,7 @@ async def list_marketplace_items(
 @router.post("/items/{item_id}/purchase", status_code=201)
 async def purchase_marketplace_item(
     item_id: str,
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_admin),
     db: AsyncSession = Depends(get_db),
 ):
     try:
@@ -180,7 +180,7 @@ async def list_my_marketplace_purchases(
 async def review_marketplace_item(
     item_id: str,
     body: ItemReviewBody,
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_operator),
     db: AsyncSession = Depends(get_db),
 ):
     try:

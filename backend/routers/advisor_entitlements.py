@@ -14,7 +14,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import text
 
 from core.advisor_entitlements import AdvisorEntitlementResolved, resolve_advisor_entitlements
-from dependencies.workspace import WorkspaceContext, require_workspace
+from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.plan_quota import get_active_plan_id_for_workspace
 from sqlalchemy.ext.asyncio import AsyncSession
 from core.database import get_db
@@ -133,7 +133,7 @@ async def get_advisor_entitlements(
 
 @router.post("/sessions/consume", response_model=AdvisorSessionConsumeResponse)
 async def consume_advisor_session(
-    ws_ctx: WorkspaceContext = Depends(require_workspace),
+    ws_ctx: WorkspaceContext = Depends(require_workspace_operator),
     db: AsyncSession = Depends(get_db),
 ):
     ws_id = ws_ctx.workspace_id

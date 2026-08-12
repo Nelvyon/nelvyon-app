@@ -11,7 +11,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
-from dependencies.workspace import WorkspaceContext, require_workspace
+from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_member
 from services.agent_orchestrator import get_agent_orchestrator, list_specialized_agents
 
 logger = logging.getLogger(__name__)
@@ -54,7 +54,7 @@ async def list_agents_v2(
 @router.post("/run")
 async def run_agent_stream(
     body: RunAgentRequest,
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_member),
 ):
     """Execute a specialized agent with SSE streaming."""
     orch = _orch(ws)
@@ -85,7 +85,7 @@ async def run_agent_stream(
 @router.post("/chain")
 async def chain_agents_stream(
     body: ChainAgentsRequest,
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_member),
 ):
     """Chain multiple specialized agents (SSE stream with agent boundaries)."""
     orch = _orch(ws)
@@ -116,7 +116,7 @@ async def chain_agents_stream(
 @router.post("/analyze")
 async def analyze_business(
     body: AnalyzeRequest,
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_member),
 ):
     """Full multi-agent business analysis (non-streaming JSON)."""
     orch = _orch(ws)

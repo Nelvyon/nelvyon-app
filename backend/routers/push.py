@@ -16,6 +16,7 @@ from dependencies.workspace import (
     WorkspaceContext,
     require_workspace,
     require_workspace_admin,
+    require_workspace_member,
     require_workspace_operator,
 )
 from services.push_service import get_push_service
@@ -71,7 +72,7 @@ async def vapid_public_key(
 async def subscribe_push(
     body: SubscribeBody,
     request: Request,
-    ws_ctx: WorkspaceContext = Depends(require_workspace),
+    ws_ctx: WorkspaceContext = Depends(require_workspace_member),
     db: AsyncSession = Depends(get_db),
 ):
     svc = _svc(db, ws_ctx)
@@ -89,7 +90,7 @@ async def subscribe_push(
 @router.delete("/unsubscribe")
 async def unsubscribe_push(
     endpoint: str = Query(..., min_length=8),
-    ws_ctx: WorkspaceContext = Depends(require_workspace),
+    ws_ctx: WorkspaceContext = Depends(require_workspace_member),
     db: AsyncSession = Depends(get_db),
 ):
     svc = _svc(db, ws_ctx)

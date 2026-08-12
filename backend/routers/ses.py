@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, EmailStr, Field
 
-from dependencies.workspace import WorkspaceContext, require_workspace
+from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.ses_service import get_ses_service
 
 router = APIRouter(prefix="/api/ses", tags=["ses"])
@@ -36,7 +36,7 @@ class VerifyDomainRequest(BaseModel):
 @router.post("/send")
 async def send_email(
     body: SendEmailRequest,
-    _ctx: WorkspaceContext = Depends(require_workspace),
+    _ctx: WorkspaceContext = Depends(require_workspace_operator),
 ) -> Dict[str, Any]:
     """Send a single cold email via Amazon SES."""
     service = get_ses_service()
@@ -59,7 +59,7 @@ async def send_email(
 @router.post("/bulk")
 async def send_bulk_emails(
     body: BulkSendRequest,
-    _ctx: WorkspaceContext = Depends(require_workspace),
+    _ctx: WorkspaceContext = Depends(require_workspace_operator),
 ) -> Dict[str, Any]:
     """Send cold emails in batches of 50."""
     service = get_ses_service()
@@ -99,7 +99,7 @@ async def get_sending_stats(
 @router.post("/verify-domain")
 async def verify_domain(
     body: VerifyDomainRequest,
-    _ctx: WorkspaceContext = Depends(require_workspace),
+    _ctx: WorkspaceContext = Depends(require_workspace_operator),
 ) -> Dict[str, Any]:
     """Start SES domain identity verification (add DNS TXT record from response)."""
     service = get_ses_service()

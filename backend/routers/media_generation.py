@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from pydantic import BaseModel, Field, HttpUrl
 
 from core.rate_limiter import endpoint_rate_limit
-from dependencies.workspace import WorkspaceContext, require_workspace
+from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.runway_service import get_runway_service
 from services.suno_service import get_suno_service
 
@@ -35,7 +35,7 @@ async def generate_video(
     body: VideoGenerateRequest,
     response: Response,
     wait: bool = Query(False, description="Poll Runway until SUCCEEDED/FAILED (max 300s)"),
-    _ctx: WorkspaceContext = Depends(require_workspace),
+    _ctx: WorkspaceContext = Depends(require_workspace_operator),
 ) -> Dict[str, Any]:
     """Start Runway image-to-video generation (optionally wait for completion)."""
     service = get_runway_service()
@@ -87,7 +87,7 @@ async def video_status(
 @router.post("/music/generate")
 async def generate_music(
     body: MusicGenerateRequest,
-    _ctx: WorkspaceContext = Depends(require_workspace),
+    _ctx: WorkspaceContext = Depends(require_workspace_operator),
 ) -> Dict[str, Any]:
     """Start Suno music generation."""
     service = get_suno_service()

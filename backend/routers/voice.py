@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
-from dependencies.workspace import WorkspaceContext, require_workspace
+from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from core.list_cache import list_cached
 from services.voice_service import ElevenLabsService, get_voice_dashboard_service
 from core.database import get_db
@@ -28,7 +28,7 @@ class TtsBase64Response(BaseModel):
 @router.post("/tts")
 async def text_to_speech(
     body: TtsRequest,
-    _ctx: WorkspaceContext = Depends(require_workspace),
+    _ctx: WorkspaceContext = Depends(require_workspace_operator),
 ):
     """Synthesize speech and return MP3 audio stream."""
     service = ElevenLabsService()
@@ -52,7 +52,7 @@ async def text_to_speech(
 @router.post("/tts-base64", response_model=TtsBase64Response)
 async def text_to_speech_base64(
     body: TtsRequest,
-    _ctx: WorkspaceContext = Depends(require_workspace),
+    _ctx: WorkspaceContext = Depends(require_workspace_operator),
 ):
     """Synthesize speech and return base64-encoded MP3."""
     service = ElevenLabsService()
@@ -82,7 +82,7 @@ async def list_voices(
 @router.post("/stream")
 async def stream_text_to_speech(
     body: TtsRequest,
-    _ctx: WorkspaceContext = Depends(require_workspace),
+    _ctx: WorkspaceContext = Depends(require_workspace_operator),
 ):
     """Stream MP3 audio in real time from ElevenLabs."""
     service = ElevenLabsService()
