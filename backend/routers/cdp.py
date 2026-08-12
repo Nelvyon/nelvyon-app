@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from typing import Any, Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -75,7 +75,7 @@ async def identify_user(body: IdentifyBody, db: AsyncSession = Depends(get_db)):
 async def list_profiles(
     ws: WorkspaceContext = Depends(require_workspace),
     db: AsyncSession = Depends(get_db),
-    limit: int = 50,
+    limit: int = Query(50, ge=1, le=200),
 ):
     await CdpService.ensure_schema()
     items = await _svc(db, ws).list_profiles(ws.workspace_id, limit)
@@ -96,7 +96,7 @@ async def get_profile(
 async def list_events(
     ws: WorkspaceContext = Depends(require_workspace),
     db: AsyncSession = Depends(get_db),
-    limit: int = 50,
+    limit: int = Query(50, ge=1, le=200),
 ):
     await CdpService.ensure_schema()
     items = await _svc(db, ws).list_recent_events(ws.workspace_id, limit)

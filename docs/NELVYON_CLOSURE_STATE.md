@@ -6,10 +6,10 @@
 
 ```text
 HEAD            (ver git log -1)
-último commit   fix(contracts): stop signing when the integrity data cannot be read
+último commit   fix(api): cap pagination, close the body-limit bypass, bound SSE streams
 fecha           2026-08-12
-bloque actual   32 — API Performance / Timeouts (SIN EMPEZAR)
-tests           backend 1874 passed · frontend 6637 passed / 42 skipped · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
+bloque actual   34 — Observability (32 y 33 cerrados)
+tests           backend 2023 passed · frontend 6637 passed / 42 skipped · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
 build           backend compileall limpio · frontend sin tocar desde el último build conocido
 árbol git       limpio
 push/PR/merge   ninguno
@@ -60,7 +60,7 @@ PG certification BLOQUEADO — Docker Desktop caído (npipe dockerDesktopLinuxEn
 | 29 | SQLite vs PostgreSQL Coverage | **BLOCKED** | Docker caído |
 | 30 | Migrations Final Certification | **BLOCKED** | Docker caído |
 | 31 | DB Performance | **BLOCKED** | 45 bucles con consulta inventariados; medir planes exige PG real |
-| 32 | API Performance / Timeouts | PENDING | |
+| 32 | API Performance / Timeouts | **CERTIFIED** | 12 paginaciones sin techo; bypass del límite de cuerpo; stream SSE sin fin |
 | 33 | Exception / Fail-open Sweep | **CERTIFIED** | 8 candidatos barridos; 1 fail-open real (firma de contratos) cerrado |
 | 34 | Observability | PENDING | |
 | 35 | Web Security | PENDING | |

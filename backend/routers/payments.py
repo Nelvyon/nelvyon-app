@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Optional
 
 import stripe
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Query
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -374,7 +374,7 @@ async def create_payment_intent(
 
 @router.get("/charges")
 async def list_charges(
-    limit: int = 25,
+    limit: int = Query(25, ge=1, le=200),
     ws_ctx: WorkspaceContext = Depends(require_workspace),
     current_user: UserResponse = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
@@ -419,7 +419,7 @@ async def refund_payment(
 
 @router.get("/history")
 async def payment_history(
-    limit: int = 50,
+    limit: int = Query(50, ge=1, le=200),
     ws_ctx: WorkspaceContext = Depends(require_workspace),
     current_user: UserResponse = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),

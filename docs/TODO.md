@@ -510,3 +510,19 @@ Por tanto este bloque queda **BLOCKED junto con 2/3/4/29/30**, a la espera de
 Docker. Cuando vuelva: levantar PG desechable, cargar volumen representativo,
 `EXPLAIN (ANALYZE)` sobre las consultas de las familias calientes (CRM,
 campañas, inbox, reporting) y atacar solo lo que la medición señale.
+
+## VERIFICADO CORRECTO — bloque 32 (2026-08-12)
+
+Auditado y sin defecto, anotado para no repetirlo:
+
+- **Timeouts de salida HTTP**: 65 clientes con timeout explícito y 7 sin él, pero
+  el default de httpx 0.28.1 es `Timeout(5.0)` en connect/read/write/pool —
+  medido, no supuesto. «Sin timeout explícito» no es ilimitado, así que no se
+  tocó nada. Si acaso, 5 s puede quedarse corto para TTS y generación; cambiarlo
+  exige evidencia de fallos reales.
+- **Pool de base de datos**: `pool_size=10`, `max_overflow=20`, `pool_recycle=3600`,
+  `pool_timeout=30`. Configurado, no por defecto.
+- **`/api/cdp/profiles` da 500 en tests**: es `no such function: set_tenant_context`,
+  función de PostgreSQL definida en la migración 507. Divergencia de motor
+  esperada, no defecto de producción — pero significa que ese endpoint no se
+  puede ejercitar sin PG (hueco de cobertura, no de código).

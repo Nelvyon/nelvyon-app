@@ -2,7 +2,7 @@
 
 from typing import AsyncGenerator, List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
@@ -102,7 +102,7 @@ async def stream_text_to_speech(
 @router.get("/calls")
 @list_cached("voice:calls")
 async def list_voice_calls(
-    limit: int = 50,
+    limit: int = Query(50, ge=1, le=200),
     ctx: WorkspaceContext = Depends(require_workspace),
     db: AsyncSession = Depends(get_db),
 ):

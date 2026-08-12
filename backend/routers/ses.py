@@ -2,7 +2,7 @@
 
 from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from pydantic import BaseModel, EmailStr, Field
 
 from dependencies.auth import get_super_admin_user
@@ -133,7 +133,7 @@ async def verify_domain(
 
 @router.get("/suppressions")
 async def list_suppressions(
-    limit: int = 200,
+    limit: int = Query(200, ge=1, le=500),
     # Cuenta SES CORPORATIVA: cuota, reputacion, supresiones e identidades
     # verificadas son de la cuenta unica de NELVYON, no del workspace. Un rol
     # de workspace no acredita autoridad sobre ella, ni para leer: agregarian

@@ -1,7 +1,7 @@
 import logging
 from typing import Optional, Dict, Any
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -84,7 +84,7 @@ async def process_job(
 @router.get("/jobs")
 async def list_jobs(
     skip: int = 0,
-    limit: int = 20,
+    limit: int = Query(20, ge=1, le=200),
     status: Optional[str] = None,
     job_type: Optional[str] = None,
     current_user: UserResponse = Depends(get_current_user),

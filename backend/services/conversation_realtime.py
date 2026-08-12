@@ -8,7 +8,7 @@ import os
 import json
 import logging
 from collections import defaultdict
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any, AsyncGenerator, Dict, List, Optional
 
 from sqlalchemy import select, func
@@ -251,13 +251,31 @@ async def sse_stream(conversation_id: int) -> AsyncGenerator[str, None]:
         if (os.getenv("ENVIRONMENT") or "").lower() == "test":
             return
 
-        while True:
+        # El stream dura lo que dura la autorizacion que lo abrio.
+        #
+        # El token de stream vive `STREAM_TOKEN_TTL_MINUTES` (2 min) a
+        # proposito: obliga a reautorizar contra conversacion+usuario+workspace.
+        # Pero el bucle no terminaba nunca, asi que una conexion abierta con un
+        # token de 2 minutos seguia viva indefinidamente — la vida corta del
+        # token no servia de nada, porque la autorizacion solo se comprobaba al
+        # conectar.
+        #
+        # Al vencer se cierra y el cliente reconecta pidiendo un token nuevo,
+        # que es cuando se vuelve a comprobar si aun tiene acceso.
+        limite = datetime.now(timezone.utc) + timedelta(minutes=STREAM_TOKEN_TTL_MINUTES)
+        while datetime.now(timezone.utc) < limite:
             try:
-                event = await asyncio.wait_for(queue.get(), timeout=30.0)
+                restante = (limite - datetime.now(timezone.utc)).total_seconds()
+                event = await asyncio.wait_for(
+                    queue.get(), timeout=min(30.0, max(0.1, restante))
+                )
                 yield f"event: {event['type']}\ndata: {json.dumps(event['data'])}\n\n"
             except asyncio.TimeoutError:
                 # Send keepalive ping every 30s
                 yield f"event: ping\ndata: {json.dumps({'ts': datetime.now(timezone.utc).isoformat()})}\n\n"
+
+        yield f"event: expired\ndata: {json.dumps({'reason': 'stream authorization expired'})}\n\n"
+
     finally:
         _event_queues[conversation_id].remove(queue)
         if not _event_queues[conversation_id]:

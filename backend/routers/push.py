@@ -150,7 +150,7 @@ async def broadcast_push(
 @router.get("/subscribers")
 @list_cached("push:subscribers")
 async def list_subscribers(
-    limit: int = 200,
+    limit: int = Query(200, ge=1, le=500),
     ws_ctx: WorkspaceContext = Depends(require_workspace),
     db: AsyncSession = Depends(get_db),
 ):
