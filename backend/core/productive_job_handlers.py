@@ -76,7 +76,7 @@ async def handle_contract_email(payload: Dict[str, Any]) -> str:
     if not db_manager.async_session_maker:
         raise RuntimeError("Database not initialized for job handler")
 
-    from services.audit_events import write_audit_event
+    from services.audit_events import write_audit_event_best_effort
 
     smtp_host = (os.environ.get("SMTP_HOST") or "").strip()
     smtp_port = int(os.environ.get("SMTP_PORT") or "587")
@@ -112,7 +112,18 @@ async def handle_contract_email(payload: Dict[str, Any]) -> str:
                 logger.warning("SMTP send failed, falling back to audit: %s", exc)
                 delivery = "smtp_failed_audit"
 
-        await write_audit_event(
+        # POLITICA: best-effort, y sin auditoria de intencion previa.
+        #
+        # El envio ya ocurrio, asi que convertir un fallo de auditoria en error
+        # no deshace nada y provocaria que la cola reintentase el job: el mismo
+        # correo saldria dos veces.
+        #
+        # `campaign_sender` si necesita auditar la intencion ANTES porque su
+        # envio nace de una peticion HTTP que no deja rastro propio. Aqui el
+        # rastro previo ya existe: la fila de `job_queue` fue persistida y
+        # reclamada antes de ejecutarse, con su payload y su actor. Auditar la
+        # intencion seria duplicar ese registro.
+        await write_audit_event_best_effort(
             session,
             actor_user_id=actor_user_id,
             actor_email=payload.get("actor_email"),
@@ -140,7 +151,7 @@ async def handle_contract_report(payload: Dict[str, Any]) -> str:
     if not db_manager.async_session_maker:
         raise RuntimeError("Database not initialized for job handler")
 
-    from services.audit_events import write_audit_event
+    from services.audit_events import write_audit_event_best_effort
     from services.plan_quota import count_contacts_in_workspace, get_active_plan_id_for_workspace
 
     async with db_manager.async_session_maker() as session:
@@ -154,7 +165,7 @@ async def handle_contract_report(payload: Dict[str, Any]) -> str:
             {"report_type": report_type, "plan_id": plan_id, "contact_count": contact_count},
             default=str,
         )[:400]
-        await write_audit_event(
+        await write_audit_event_best_effort(
             session,
             actor_user_id=actor_user_id,
             actor_email=payload.get("actor_email"),
@@ -181,7 +192,7 @@ async def handle_contract_webhook(payload: Dict[str, Any]) -> str:
     if not db_manager.async_session_maker:
         raise RuntimeError("Database not initialized for job handler")
 
-    from services.audit_events import write_audit_event
+    from services.audit_events import write_audit_event_best_effort
 
     import httpx
 
@@ -208,7 +219,18 @@ async def handle_contract_webhook(payload: Dict[str, Any]) -> str:
             raise RuntimeError(f"webhook upstream 5xx: {status}")
 
     async with db_manager.async_session_maker() as session:
-        await write_audit_event(
+        # POLITICA: best-effort, y sin auditoria de intencion previa.
+        #
+        # El envio ya ocurrio, asi que convertir un fallo de auditoria en error
+        # no deshace nada y provocaria que la cola reintentase el job: el mismo
+        # correo saldria dos veces.
+        #
+        # `campaign_sender` si necesita auditar la intencion ANTES porque su
+        # envio nace de una peticion HTTP que no deja rastro propio. Aqui el
+        # rastro previo ya existe: la fila de `job_queue` fue persistida y
+        # reclamada antes de ejecutarse, con su payload y su actor. Auditar la
+        # intencion seria duplicar ese registro.
+        await write_audit_event_best_effort(
             session,
             actor_user_id=actor_user_id,
             actor_email=payload.get("actor_email"),
@@ -239,7 +261,7 @@ async def handle_contract_cleanup(payload: Dict[str, Any]) -> str:
     if not db_manager.async_session_maker:
         raise RuntimeError("Database not initialized for job handler")
 
-    from services.audit_events import write_audit_event
+    from services.audit_events import write_audit_event_best_effort
 
     cutoff = datetime.now(timezone.utc) - timedelta(days=days)
     cutoff_naive = cutoff.replace(tzinfo=None)
@@ -264,7 +286,7 @@ async def handle_contract_cleanup(payload: Dict[str, Any]) -> str:
             {"cutoff": cutoff_naive, "ws": workspace_id},
         )
         deleted = result.rowcount or 0
-        await write_audit_event(
+        await write_audit_event_best_effort(
             session,
             actor_user_id=actor_user_id,
             actor_email=payload.get("actor_email"),

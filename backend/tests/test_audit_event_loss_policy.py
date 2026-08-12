@@ -115,3 +115,38 @@ def test_la_denegacion_de_workspace_usa_best_effort():
     )
     assert "write_audit_event_best_effort(" in src
     assert "await write_audit_event(" not in src
+
+
+def test_ningun_llamante_usa_la_funcion_sin_politica():
+    """
+    Guard estructural del bloque.
+
+    `write_audit_event` sigue existiendo porque las dos politicas se construyen
+    sobre ella, pero ya no es una API de llamada directa: usarla deja otra vez
+    la decision de que hacer ante un fallo implicita en el codigo del llamante,
+    que es como se perdieron los eventos.
+
+    Si aparece un llamante nuevo, tiene que elegir explicitamente:
+        `_required`    -> sin registro no hay efecto
+        `_best_effort` -> el efecto ya ocurrio; el fallo queda como ERROR
+    """
+    from pathlib import Path
+
+    backend = Path(__file__).resolve().parent.parent
+    permitidos = {"services/audit_events.py"}
+    culpables = []
+    for f in backend.rglob("*.py"):
+        if "__pycache__" in str(f) or ".venv" in str(f):
+            continue
+        rel = str(f.relative_to(backend)).replace("\\", "/")
+        if rel in permitidos or rel.startswith("tests/"):
+            continue
+        if "await write_audit_event(" in f.read_text(encoding="utf-8"):
+            culpables.append(rel)
+    assert not culpables, f"llamantes sin politica explicita: {culpables}"
+
+
+def test_el_guard_estructural_esta_vivo():
+    """Positivo conocido: cero culpables no vale si el detector no detecta."""
+    texto = "    await write_audit_event(\n        db,\n    )"
+    assert "await write_audit_event(" in texto

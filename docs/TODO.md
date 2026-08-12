@@ -300,3 +300,21 @@
 - [ ] Staging real: `DATABASE_URL` + `STAGING_BASE_URL` (no prod) � 2 tenants � roles � GDPR live � billing/webhooks
 - [ ] Re-run Playwright SaaS completo post-fix dashboard loading (a11y dashboard)
 - [ ] Mantener `claimReady: true` hasta gates live + legal Pepito
+
+## DEUDA — idempotencia de envío de campañas (2026-08-12)
+
+Detectada al cerrar la política de auditoría, fuera del alcance de ese bloque.
+`CampaignSenderService.send_campaign` (`backend/services/campaign_sender.py:106`)
+guarda contra reenvío con `if campaign.status == "sending"`, y tiene dos huecos:
+
+- **TOCTOU**: lee el estado y lo escribe en dos pasos sin bloqueo. Dos peticiones
+  concurrentes pueden leer ambas `draft` y enviar las dos veces. Necesita
+  `SELECT ... FOR UPDATE` o un `UPDATE ... WHERE status <> 'sending'` condicional
+  que actúe de reclamo atómico.
+- **Reenvío de campañas ya enviadas**: `status == "sent"` no está cubierto, así que
+  una campaña completada puede reenviarse indefinidamente. Decidir si es
+  intencionado (producto) o defecto antes de cerrarlo.
+
+La auditoría de intención (`result="attempt"`, migración de hoy) ya deja rastro de
+cada intento, así que un envío duplicado es ahora **detectable**; sigue sin estar
+**impedido**.

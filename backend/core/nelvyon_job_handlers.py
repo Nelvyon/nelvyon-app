@@ -19,7 +19,7 @@ from core.database import db_manager
 from models.workspace_members import Workspace_members
 from models.workspaces import Workspaces
 
-from services.audit_events import write_audit_event
+from services.audit_events import write_audit_event_best_effort
 from services.plan_quota import (
     count_contacts_in_workspace,
     enforce_contacts_plan_module_for_crm_writes,
@@ -100,7 +100,7 @@ async def handle_nelvyon_workspace_audit(payload: Dict[str, Any]) -> str:
 
         plan_id = await get_active_plan_id_for_workspace(session, workspace_id)
 
-        await write_audit_event(
+        await write_audit_event_best_effort(
             session,
             actor_user_id=actor_user_id,
             actor_email=payload.get("actor_email"),
@@ -160,7 +160,7 @@ async def handle_nelvyon_workspace_crm_snapshot(payload: Dict[str, Any]) -> str:
             default=str,
         )[:400]
 
-        await write_audit_event(
+        await write_audit_event_best_effort(
             session,
             actor_user_id=actor_user_id,
             actor_email=payload.get("actor_email"),
