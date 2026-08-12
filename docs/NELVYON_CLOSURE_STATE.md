@@ -6,7 +6,7 @@
 
 ```text
 HEAD            (ver git log -1)
-último commit   fix(messaging): stop tenants sending from NELVYON's number and address
+último commit   test(ads): pin that the Node side never reaches a corporate ad account
 fecha           2026-08-12
 bloque actual   7 — Financial Safety (siguiente disponible)
 tests           backend 1737 passed · frontend 6609 passed / 42 skipped · tsc --noEmit limpio
@@ -194,10 +194,21 @@ recalcularse contra `pg_catalog` cuando Docker vuelva.
 
 ## Siguiente acción exacta
 
-Bloque **6 — BFF Ads / Provider Isolation**: certificar que ninguna superficie
-customer-facing del BFF obtiene credenciales de ads corporativas, la cuenta
-corporativa ni integración de otro workspace. El lado FastAPI ya está cerrado
-(`core/ads_integration.py` + guard); falta el lado Node.
+Bloque **7 — Financial Safety**. Es el bloque más grande de la cola, así que la
+sesión anterior lo dejó sin abrir en vez de empezarlo a medias.
+
+Alcance: billing, Stripe, Stripe Connect, refunds, credits, quotas y toda acción
+que mueva dinero. Por cada una: autoridad, idempotencia, auditoría y
+concurrencia. Ya certificado antes y NO se reabre: el webhook de Stripe
+(negativos + idempotencia con mutación).
+
+Pistas ya conocidas, para no volver a buscarlas:
+  * `affiliates.register_affiliate` fija `commission_rate` (cap `ge=0, le=1`) y
+    `stripe_connect_id` — ya exige `require_workspace_admin`;
+  * `marketplace.purchase_marketplace_item` escribe `marketplace_purchases` con
+    `status='completed'` sin cobro real asociado — revisar semántica;
+  * `advisor_entitlements.consume_advisor_session` decrementa cuota mensual del
+    plan; comprobar concurrencia (mismo patrón read-then-write que campañas).
 
 Comandos del entorno, para no volver a buscarlos:
 
