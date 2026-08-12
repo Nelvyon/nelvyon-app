@@ -5,11 +5,11 @@
 > continuar por el primer bloque `PENDING` disponible, sin preguntar.
 
 ```text
-HEAD            7135eaf5
+HEAD            (ver git log -1)
 último commit   fix(messaging): stop tenants sending from NELVYON's number and address
 fecha           2026-08-12
-bloque actual   3 — Clasificación de drift estructural (siguiente disponible)
-tests           1737 passed / 0 failed  (backend pytest, 137 ficheros)
+bloque actual   6 — BFF Ads / Provider Isolation (siguiente disponible)
+tests           backend 1737 passed · frontend 6609 passed / 42 skipped · tsc --noEmit limpio
 build           backend compileall limpio · frontend sin tocar desde el último build conocido
 árbol git       limpio
 push/PR/merge   ninguno
@@ -31,9 +31,9 @@ PG certification BLOQUEADO — Docker Desktop caído (npipe dockerDesktopLinuxEn
 |--:|---|---|---|
 | 1 | WhatsApp + SES / Email Provider Tenancy | **CERTIFIED** | `7135eaf5` |
 | 2 | Column Drift sobre pg_catalog | **BLOCKED** | Docker caído |
-| 3 | Clasificación de drift estructural | **PENDING** | depende parcialmente de 2 |
+| 3 | Clasificación de drift estructural | **BLOCKED** | necesita la medición real de 2; clasificar sobre cifras históricas seria lo prohibido |
 | 4 | Constraint Drift Guard PG | **BLOCKED** | Docker caído |
-| 5 | BFF Authorization | PENDING | |
+| 5 | BFF Authorization | **CERTIFIED** | diferencial de parseo `X-Workspace-Id` corregido |
 | 6 | BFF Ads / Provider Isolation | PENDING | |
 | 7 | Financial Safety | PENDING | |
 | 8 | Charge Pack / Credits / Quotas | PENDING | |
@@ -103,6 +103,24 @@ Están en git y con guards vivos; no se reabren sin evidencia nueva.
 
 Ninguno CRITICAL ni HIGH sin resolver a día de hoy.
 
+### Cerrado en el bloque 5 (para no repetir la investigación)
+
+**Diferencial de parseo entre BFF y FastAPI** (MEDIO, defensa en profundidad).
+`proxyPlatformFetch` comprobaba pertenencia con `Number(raw)` y reenviaba el
+string ORIGINAL. Medido ejecutando ambos motores: `Number("1_0")` es `NaN` pero
+`int("1_0")` es `10`, así que una cabecera que el BFF no entendía se trataba
+como ausente y `assertUserCanAccessWorkspace` no llegaba a ejecutarse, mientras
+FastAPI sí resolvía workspace 10. No era acceso cruzado end-to-end porque
+FastAPI vuelve a comprobar pertenencia contra `workspace_members`, pero anulaba
+la capa del BFF con una cadena.
+
+Corregido: parser estricto `^[0-9]+$`, cabecera presente e ilegible se RECHAZA
+con 400 en vez de ignorarse, y se reenvía el valor canónico.
+
+Vector descartado por medición: `int()` acepta dígitos Unicode, pero las
+cabeceras HTTP son ByteStrings y `Request` rechaza cualquier carácter > 255. No
+es alcanzable.
+
 ---
 
 ## Deudas aceptadas
@@ -140,6 +158,7 @@ necesita decisión de producto o PostgreSQL real.
 | `test_audit_event_loss_policy.py` | llamada a `write_audit_event` sin política explícita |
 | `tests/_raw_sql_schema_drift.py` | columnas en SQL crudo que no existen en el esquema |
 | `tests/_constraint_drift.py` | (listo, esperando PG) ON CONFLICT / NOT NULL / PK |
+| `platformWorkspaceHeaderParity.test.ts` | que BFF y FastAPI lean `X-Workspace-Id` como números distintos |
 
 ---
 
@@ -160,9 +179,15 @@ recalcularse contra `pg_catalog` cuando Docker vuelva.
 
 ## Siguiente acción exacta
 
-Bloque **3 — Clasificación de drift estructural**, en su parte que NO requiere
-PostgreSQL: clasificar por semántica y cronología (A servicio correcto / B
-esquema correcto / C código muerto / D rediseño) las tablas de las familias
-prioritarias (audit, security, api_keys, invoices, billing, auth, integrations)
-usando código, modelos, migraciones e historial como oráculo. La confirmación
-numérica contra `pg_catalog` queda para cuando Docker vuelva.
+Bloque **6 — BFF Ads / Provider Isolation**: certificar que ninguna superficie
+customer-facing del BFF obtiene credenciales de ads corporativas, la cuenta
+corporativa ni integración de otro workspace. El lado FastAPI ya está cerrado
+(`core/ads_integration.py` + guard); falta el lado Node.
+
+Comandos del entorno, para no volver a buscarlos:
+
+```text
+backend   cd backend && python -m pytest tests/ -q
+frontend  cd apps/web && ./node_modules/.bin/vitest run
+typecheck cd apps/web && ./node_modules/.bin/tsc --noEmit
+```
