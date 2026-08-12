@@ -245,8 +245,20 @@ async def test_el_espia_de_whatsapp_intercepta_de_verdad(
     Cero llamadas solo es evidencia si el espia es capaz de registrar alguna.
     Con un actor AUTORIZADO el envio debe alcanzarlo; si esto no cuenta ninguna,
     el negativo de arriba estaba pasando en vacio.
+
+    Desde el cierre de tenencia de proveedor, estar autorizado ya no basta: hace
+    falta ademas integracion propia del workspace, asi que se inyecta una. La
+    autoridad y la identidad del proveedor son dos controles distintos y este
+    test solo habla del primero.
     """
+    from core import messaging_integration
+    from core.messaging_integration import WorkspaceWhatsAppIntegration
     from routers import whatsapp as router_whatsapp
+
+    async def _propia(_ws):
+        return WorkspaceWhatsAppIntegration("999-del-cliente", "waba", "token-cliente")
+
+    monkeypatch.setattr(messaging_integration, "resolve_workspace_whatsapp_integration", _propia)
 
     llamadas: list[str] = []
 

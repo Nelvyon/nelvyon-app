@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 from core.database import get_db
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.helpdesk_service import default_helpdesk_workspace_id, get_helpdesk_service
+from core.messaging_integration import assert_workspace_whatsapp_integration
 from services.whatsapp_service import get_whatsapp_service
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -37,9 +38,12 @@ class SendMediaRequest(BaseModel):
 @router.post("/send")
 async def send_message(
     body: SendMessageRequest,
-    _ctx: WorkspaceContext = Depends(require_workspace_operator),
+    ctx: WorkspaceContext = Depends(require_workspace_operator),
 ) -> Dict[str, Any]:
     """Send a WhatsApp text message."""
+    # La integracion propia se exige ANTES de instanciar el cliente: sin
+    # credencial del workspace no se cae al numero corporativo, se corta.
+    await assert_workspace_whatsapp_integration(ctx.workspace_id)
     service = get_whatsapp_service()
     try:
         return await service.send_message(body.to_phone, body.message_text)
@@ -55,9 +59,12 @@ async def send_message(
 @router.post("/template")
 async def send_template(
     body: SendTemplateRequest,
-    _ctx: WorkspaceContext = Depends(require_workspace_operator),
+    ctx: WorkspaceContext = Depends(require_workspace_operator),
 ) -> Dict[str, Any]:
     """Send an approved WhatsApp message template."""
+    # La integracion propia se exige ANTES de instanciar el cliente: sin
+    # credencial del workspace no se cae al numero corporativo, se corta.
+    await assert_workspace_whatsapp_integration(ctx.workspace_id)
     service = get_whatsapp_service()
     try:
         return await service.send_template(
@@ -78,9 +85,12 @@ async def send_template(
 @router.post("/media")
 async def send_media(
     body: SendMediaRequest,
-    _ctx: WorkspaceContext = Depends(require_workspace_operator),
+    ctx: WorkspaceContext = Depends(require_workspace_operator),
 ) -> Dict[str, Any]:
     """Send image, video, or document via public URL."""
+    # La integracion propia se exige ANTES de instanciar el cliente: sin
+    # credencial del workspace no se cae al numero corporativo, se corta.
+    await assert_workspace_whatsapp_integration(ctx.workspace_id)
     service = get_whatsapp_service()
     try:
         return await service.send_media(

@@ -190,7 +190,7 @@ CLASES_SENSIBLES: dict[str, str] = {
     "marketplace.py::purchase_marketplace_item": "FINANCIAL",
     "affiliates.py::register_affiliate": "FINANCIAL",
     # credenciales / identidad
-    "ses.py::verify_domain": "CREDENTIAL",
+    "ses.py::verify_domain": "PLATFORM_CREDENTIAL",
     # cuota o credito de pago
     "advisor_entitlements.py::consume_advisor_session": "QUOTA",
     "apollo.py::search_leads": "QUOTA",
@@ -316,7 +316,11 @@ def test_las_clases_sensibles_exigen_autoridad_fuerte(clave, clase):
     assert encontrado, f"{clave} ya no existe: actualiza CLASES_SENSIBLES"
     deps = encontrado[0][2]
     exigido = AUTORIDAD_FUERTE - {"require_workspace_member"}
-    if clave in CLASE_FINANCIERA:
+    if clase == "PLATFORM_CREDENTIAL":
+        # Anade una identidad a la cuenta SES unica de NELVYON y no queda
+        # constancia de que workspace la posee: ningun rol de workspace sirve.
+        exigido = {"get_super_admin_user", "require_super_admin"}
+    elif clave in CLASE_FINANCIERA:
         exigido = {"require_workspace_admin", "require_super_admin", "require_admin"}
     assert exigido & deps, (
         f"{clave} es de clase {clase} pero depende de {sorted(deps)}. "

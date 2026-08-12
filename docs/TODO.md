@@ -318,3 +318,36 @@ guarda contra reenvío con `if campaign.status == "sending"`, y tiene dos huecos
 La auditoría de intención (`result="attempt"`, migración de hoy) ya deja rastro de
 cada intento, así que un envío duplicado es ahora **detectable**; sigue sin estar
 **impedido**.
+
+## DEUDA — identidad remitente de campañas (2026-08-12)
+
+Cerrada la tenencia de WhatsApp y SES, queda un tercer camino con la misma forma
+pero que NO se toca porque romperlo quitaría funcionalidad viva.
+
+`CampaignSenderService` (`backend/services/campaign_sender.py:142`) envía las
+campañas de cada cliente vía `EmailService`, cuyo remitente es global:
+`SENDGRID_FROM_EMAIL` (por defecto `nelvyon@noreply.com`, nombre `NELVYON`). Es
+decir, la campaña de un cliente llega a sus prospectos **firmada por NELVYON**.
+
+La columna `campaigns.from_email` existe desde la migración 507 y **ningún código
+la lee**: el modelo de datos ya anticipaba un remitente por campaña que nunca se
+cableó.
+
+Por qué no se cierra aquí: a diferencia de `/api/whatsapp/*` y `/api/ses/*` —que
+el frontend no consume—, campañas es una funcionalidad en uso. Exigir dominio
+verificado por workspace antes de enviar es una decisión de producto (¿se
+bloquean las campañas de quien no ha verificado dominio, o se sigue enviando
+desde NELVYON con `reply-to` del cliente?), no una corrección mecánica.
+
+Relacionado: la deuda de idempotencia de `send_campaign` registrada más arriba.
+
+## DEUDA — WhatsApp por tenant: `user_id` vs `workspace_id` (2026-08-12)
+
+`integration_whatsapp` (migración 030) está keyed por `user_id`, y solo la lee
+`backend/integrations/WhatsAppService.ts`. `core/messaging_integration.py`
+necesita resolver por `workspace_id`, así que hoy devuelve `None` siempre y los
+envíos Python fallan cerrado.
+
+Para habilitarlos hace falta decidir la relación real (¿la integración pertenece
+al usuario que conectó, o al workspace?) y migrar la clave. Mismo problema ya
+registrado para `oauth_connections` en el cierre de ads.

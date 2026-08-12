@@ -17,6 +17,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import db_manager, get_db
 from core.redis_adapter import redis_client
+from dependencies.auth import get_super_admin_user
+from schemas.auth import UserResponse
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_admin
 from services.ses_service import get_ses_service
 
@@ -31,7 +33,9 @@ class VerifyEmailBody(BaseModel):
 
 @router.get("/ses/quota")
 async def ses_quota(
-    _ctx: WorkspaceContext = Depends(require_workspace_admin),
+    # Cuota, supresiones e identidades son de la cuenta SES unica de NELVYON.
+    # Un admin de workspace no tiene autoridad sobre ella.
+    _admin: UserResponse = Depends(get_super_admin_user),
 ):
     try:
         return await get_ses_service().get_sending_quota()
@@ -43,7 +47,9 @@ async def ses_quota(
 @router.get("/ses/suppressions")
 async def ses_suppressions(
     limit: int = Query(200, ge=1, le=500),
-    _ctx: WorkspaceContext = Depends(require_workspace_admin),
+    # Cuota, supresiones e identidades son de la cuenta SES unica de NELVYON.
+    # Un admin de workspace no tiene autoridad sobre ella.
+    _admin: UserResponse = Depends(get_super_admin_user),
 ):
     items = await get_ses_service().list_suppressions(limit=limit)
     return {"count": len(items), "items": items}
@@ -52,7 +58,9 @@ async def ses_suppressions(
 @router.post("/ses/verify-email")
 async def ses_verify_email(
     body: VerifyEmailBody,
-    _ctx: WorkspaceContext = Depends(require_workspace_admin),
+    # Cuota, supresiones e identidades son de la cuenta SES unica de NELVYON.
+    # Un admin de workspace no tiene autoridad sobre ella.
+    _admin: UserResponse = Depends(get_super_admin_user),
 ):
     try:
         return await get_ses_service().verify_email_identity(str(body.email))
