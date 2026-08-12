@@ -445,3 +445,24 @@ portar el verificador, no relajar el alcance.
 Aparte: `POST /api/lms/courses/{id}/enroll` tampoco tiene autenticación. Puede
 ser deliberado (auto-matrícula en curso público) o un hueco de spam. No se toca
 sin decidir cuál de las dos cosas es.
+
+## DEUDA — webhooks entrantes sin verificación (2026-08-12)
+
+Inventario del bloque 18: 21 endpoints entrantes tipo webhook/callback. Solo
+cuatro verifican algo (`stripe_webhook`, `os_store_builder`, `oauth_integrations`,
+`webhooks/endpoints`). El de `text2pay` se cerró en ese bloque porque marcaba
+pagos como cobrados.
+
+Quedan sin verificación de firma, y hay que revisarlos uno a uno con la
+documentación de cada proveedor:
+
+`bookings/webhook/zoom`, `contracts/webhook` (Signaturit), `dialer/webhook/twilio`,
+`sms/webhook/twilio`, `facebook_messenger/webhook`, `instagram_dm/webhook`,
+`tiktok_dm/webhook`, `whatsapp/webhook`, `helpdesk/inbound/{email,whatsapp}`,
+`monitoring/ses/bounce-webhook`, `automation/webhook/trigger/{key}`.
+
+No se cierran en bloque porque cada proveedor firma de forma distinta (Twilio usa
+`X-Twilio-Signature` sobre la URL + params ordenados; Meta usa `X-Hub-Signature-256`;
+SES/SNS exige validar el certificado de la firma). Hacerlo mal daría una sensación
+de protección peor que no tenerla. `automation/webhook/trigger/{key}` sí tiene una
+clave en la ruta, que es un secreto compartido — conviene confirmar su entropía.

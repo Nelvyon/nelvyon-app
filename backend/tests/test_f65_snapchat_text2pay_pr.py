@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+import hashlib
+import hmac
+import json
+import time
 import pytest
 from httpx import AsyncClient
 
@@ -165,14 +169,30 @@ async def test_text2pay_webhook_paid(client: AsyncClient, auth_headers: dict):
         headers=auth_headers,
     )
     pid = gen.json()["id"]
-    wh = await client.post(
-        "/api/text2pay/webhook",
-        json={
+    # El webhook exige firma de Stripe desde que se cerro el bloque 18: antes
+    # aceptaba cualquier POST y marcaba el pago como cobrado sin cobro. Aqui se
+    # firma como lo haria una entrega real, sobre los MISMOS bytes que se envian.
+    cuerpo = json.dumps(
+        {
+            "id": "evt_text2pay_test",
+            "object": "event",
             "type": "checkout.session.completed",
             "data": {"object": {"metadata": {"text2pay_id": pid}}},
+        }
+    ).encode()
+    marca = str(int(time.time()))
+    firma = hmac.new(
+        b"whsec_test_placeholder", f"{marca}.".encode() + cuerpo, hashlib.sha256
+    ).hexdigest()
+    wh = await client.post(
+        "/api/text2pay/webhook",
+        content=cuerpo,
+        headers={
+            "Content-Type": "application/json",
+            "stripe-signature": f"t={marca},v1={firma}",
         },
     )
-    assert wh.status_code == 200
+    assert wh.status_code == 200, wh.text
     assert wh.json().get("status") == "paid"
     got = await client.get(f"/api/text2pay/payments/{pid}", headers=auth_headers)
     assert got.json().get("status") == "paid"
