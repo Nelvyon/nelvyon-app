@@ -8,8 +8,8 @@
 HEAD            (ver git log -1)
 último commit   fix(billing): a charge's price can no longer come from a default
 fecha           2026-08-12
-bloque actual   10 — External Side-effect Idempotency
-tests           backend 1758 passed · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
+bloque actual   11 — Jobs / Workers / Queues
+tests           backend 1765 passed · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
 build           backend compileall limpio · frontend sin tocar desde el último build conocido
 árbol git       limpio
 push/PR/merge   ninguno
@@ -38,7 +38,7 @@ PG certification BLOQUEADO — Docker Desktop caído (npipe dockerDesktopLinuxEn
 | 7 | Financial Safety | **CERTIFIED** | `83977fea` — 3 hallazgos: autoconcesión de plan, refund cross-tenant, fail-open en verify |
 | 8 | Charge Pack / Credits / Quotas | **CERTIFIED** | `4c6519fe` — precio por defecto, idempotencia Stripe, precisión de moneda |
 | 9 | Campaign Idempotency | **CERTIFIED** | reclamo atómico; `sent` deja de ser reenviable |
-| 10 | External Side-effect Idempotency | PENDING | |
+| 10 | External Side-effect Idempotency | **CERTIFIED** | webhook saliente con clave de entrega estable |
 | 11 | Jobs / Workers / Queues | PENDING | |
 | 12 | Revocation | PENDING | |
 | 13 | Distributed Rate Limit | PENDING | |

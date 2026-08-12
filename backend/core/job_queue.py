@@ -479,7 +479,13 @@ class AsyncJobQueue:
         job.attempts += 1
 
         try:
-            result = await handler(job.payload)
+            # Identidad ESTABLE entre reintentos. Un handler con efecto externo
+            # —el webhook saliente— la necesita para que el receptor distinga un
+            # reintento de un evento nuevo: sin ella, un 5xx transitorio hacia
+            # que la misma entrega llegase dos veces sin forma de saberlo.
+            #
+            # Copia superficial: el payload persistido no se toca.
+            result = await handler({**job.payload, "_job_id": job.id, "_attempt": job.attempts})
             job.status = JobStatus.COMPLETED
             job.result = result
             job.completed_at = datetime.now(timezone.utc).isoformat()
