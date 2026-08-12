@@ -8,8 +8,8 @@
 HEAD            (ver git log -1)
 último commit   fix(billing): a charge's price can no longer come from a default
 fecha           2026-08-12
-bloque actual   8 — Charge Pack / Credits / Quotas (PARCIAL, ver siguiente acción)
-tests           backend 1751 passed · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
+bloque actual   10 — External Side-effect Idempotency
+tests           backend 1758 passed · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
 build           backend compileall limpio · frontend sin tocar desde el último build conocido
 árbol git       limpio
 push/PR/merge   ninguno
@@ -36,8 +36,8 @@ PG certification BLOQUEADO — Docker Desktop caído (npipe dockerDesktopLinuxEn
 | 5 | BFF Authorization | **CERTIFIED** | diferencial de parseo `X-Workspace-Id` corregido |
 | 6 | BFF Ads / Provider Isolation | **CERTIFIED** | el lado Node ya era correcto; fijado con guard |
 | 7 | Financial Safety | **CERTIFIED** | `83977fea` — 3 hallazgos: autoconcesión de plan, refund cross-tenant, fail-open en verify |
-| 8 | Charge Pack / Credits / Quotas | **PARCIAL** | precio por defecto cerrado; cuota advisor verificada; falta idempotencia/ledger/precisión |
-| 9 | Campaign Idempotency | PENDING | deuda ya medida, ver abajo |
+| 8 | Charge Pack / Credits / Quotas | **CERTIFIED** | `4c6519fe` — precio por defecto, idempotencia Stripe, precisión de moneda |
+| 9 | Campaign Idempotency | **CERTIFIED** | reclamo atómico; `sent` deja de ser reenviable |
 | 10 | External Side-effect Idempotency | PENDING | |
 | 11 | Jobs / Workers / Queues | PENDING | |
 | 12 | Revocation | PENDING | |

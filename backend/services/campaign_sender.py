@@ -7,7 +7,7 @@ import logging
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
-from sqlalchemy import select, func, or_
+from sqlalchemy import select, update, func, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.campaigns import Campaigns
@@ -15,6 +15,12 @@ from models.contacts import Contacts
 from services.email_service import EmailService
 
 logger = logging.getLogger(__name__)
+
+
+#: Estados desde los que NO se puede (re)enviar una campana.
+#: `sending` evita el doble envio concurrente; `sent` evita reenviar entera una
+#: campana ya completada, que volveria a escribir a todos sus contactos.
+ESTADOS_NO_REENVIABLES = ("sending", "sent")
 
 
 class CampaignSenderService:
@@ -92,23 +98,49 @@ class CampaignSenderService:
         Send a campaign to all contacts belonging to the user.
         Updates campaign status and metrics.
         """
-        # 1. Load campaign
-        q = select(Campaigns).where(
-            Campaigns.id == campaign_id,
-            Campaigns.user_id == user_id,
-            Campaigns.workspace_id == workspace_id,
+        # 1-2. RECLAMO ATOMICO de la campana.
+        #
+        # Antes se leia el estado y se escribia despues, en dos pasos. Dos
+        # peticiones concurrentes leian ambas `draft`, ambas pasaban la
+        # comprobacion y ambas enviaban: cada contacto recibia el correo dos
+        # veces. Ademas `sent` no estaba cubierto, asi que una campana ya
+        # completada podia reenviarse entera.
+        #
+        # Un UPDATE condicional hace de compare-and-swap: solo una peticion ve
+        # `rowcount = 1`. Mismo patron que `_consume_month_usage`.
+        reclamo = await self.db.execute(
+            update(Campaigns)
+            .where(
+                Campaigns.id == campaign_id,
+                Campaigns.user_id == user_id,
+                Campaigns.workspace_id == workspace_id,
+                Campaigns.status.notin_(ESTADOS_NO_REENVIABLES),
+            )
+            .values(status="sending")
         )
-        result = await self.db.execute(q)
-        campaign = result.scalar_one_or_none()
-        if not campaign:
-            raise ValueError(f"Campaign {campaign_id} not found in this workspace")
-
-        if campaign.status == "sending":
-            raise ValueError("Campaign is already being sent")
-
-        # 2. Mark as sending
-        campaign.status = "sending"
         await self.db.commit()
+
+        if int(reclamo.rowcount or 0) == 0:
+            # No se reclamo. Distinguir por que, para no dar 404 a una campana
+            # que existe ni "ya en curso" a una que no.
+            existente = (
+                await self.db.execute(
+                    select(Campaigns).where(
+                        Campaigns.id == campaign_id,
+                        Campaigns.user_id == user_id,
+                        Campaigns.workspace_id == workspace_id,
+                    )
+                )
+            ).scalar_one_or_none()
+            if not existente:
+                raise ValueError(f"Campaign {campaign_id} not found in this workspace")
+            if existente.status == "sending":
+                raise ValueError("Campaign is already being sent")
+            raise ValueError(f"Campaign was already sent (status: {existente.status})")
+
+        campaign = (
+            await self.db.execute(select(Campaigns).where(Campaigns.id == campaign_id))
+        ).scalar_one()
 
         # 3. Resolve recipients — campaign segment in active workspace
         normalized_filters = self._normalize_segment_filters(segment_filters)
