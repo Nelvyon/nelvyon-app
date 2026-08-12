@@ -400,3 +400,18 @@ No se cierra aquí porque garantizar durabilidad exige decidir infraestructura
 `FOR UPDATE SKIP LOCKED`), y eso es decisión de despliegue con coste asociado.
 Lo que sí está cerrado es que ningún job quede en estado no terminal y que un
 fallo no bloquee la cola.
+
+## DEUDA — latencia de revocación del rol (2026-08-12)
+
+El rol de FastAPI se deriva del `plan` del token de la app en cada petición, así
+que un cambio de plan solo surte efecto cuando ese token se renueva
+(`JWT_EXPIRATION_MINUTES`, 60 por defecto).
+
+Investigado durante el bloque 12: **no existe tabla `users`** en las migraciones
+—solo `nelvyon_users`, que no tiene columna `role`—, así que no hay una fuente
+en base contra la que contrastar el rol por petición. `services/gdpr_service.py`
+consulta `SELECT ... FROM users`, lo que sugiere que esa tabla se da por existente
+en algún entorno; conviene confirmarlo contra PostgreSQL real (bloque 2/29).
+
+Cerrar la latencia exige decidir dónde vive el rol de plataforma. No se inventa
+aquí una tabla que el sistema no tiene.
