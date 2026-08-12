@@ -6,9 +6,9 @@
 
 ```text
 HEAD            (ver git log -1)
-último commit   fix(billing): a charge's price can no longer come from a default
+último commit   fix(oauth): consume the state instead of merely reading it
 fecha           2026-08-12
-bloque actual   20 — Ads Multi-tenant Functional Completion
+bloque actual   20 — Ads Multi-tenant Functional Completion (SIN EMPEZAR)
 tests           backend 1836 passed · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
 build           backend compileall limpio · frontend sin tocar desde el último build conocido
 árbol git       limpio
@@ -48,7 +48,7 @@ PG certification BLOQUEADO — Docker Desktop caído (npipe dockerDesktopLinuxEn
 | 17 | Upload / Import / Export Security | **CERTIFIED** | subida sin límite acotada; guard de clase |
 | 18 | Inbound Webhooks | **PARCIAL** | text2pay cerrado (marcaba pagos sin firma); 12 proveedores pendientes, ver TODO |
 | 19 | OAuth / Integrations | **CERTIFIED** | state de un solo uso; tokens cifrados (bloque 14) |
-| 20 | Ads Multi-tenant Functional Completion | PENDING | bloqueado de facto por deuda de claves |
+| 20 | Ads Multi-tenant Functional Completion | **BLOCKED** | necesita decidir a quién pertenece la integración (user vs workspace); ver deuda 3 y 4 |
 | 21 | Agents AI Full Audit | PENDING | |
 | 22 | Multi-agent System | PENDING | |
 | 23 | AI Cost / Provider Audit | PENDING | |
@@ -228,9 +228,50 @@ recalcularse contra `pg_catalog` cuando Docker vuelva.
 
 ---
 
+## Hallazgos de esta sesión (bloques 8–19)
+
+Por orden de gravedad. Ninguno queda abierto.
+
+1. **CRÍTICO — escalada de privilegio comprable.** `plan == "enterprise"` daba
+   `role = "admin"` de plataforma, que guarda `POST /rbac/assign`. `enterprise`
+   es un plan vendible; `admin` no lo es. Cerrado (`21ec0466`).
+2. **CRÍTICO — webhook público que marcaba pagos como cobrados.**
+   `POST /api/text2pay/webhook` sin verificación de firma. Cerrado (`b12b05dd`).
+3. **ALTO — autoconcesión de plan.** Un `operator` creaba una suscripción
+   `active` de cualquier plan; el plan efectivo cambiaba sin pago. Demostrado
+   ejecutándolo. Cerrado (`83977fea`).
+4. **ALTO — refund cross-tenant.** `charge_id` del cuerpo sin comprobar, sobre la
+   cuenta Stripe corporativa. Cerrado (`83977fea`).
+5. **ALTO — clave de cifrado por defecto en el repo.** Los tokens OAuth de las
+   cuentas sociales de clientes se cifraban con ella si faltaba `MASK_KEY`.
+   Cerrado (`04b6978a`).
+6. **ALTO — PII de alumnos sin autenticación.** Progreso por curso+email y
+   certificados, abiertos a cualquiera. Cerrado (`b9544ea6`).
+7. **MEDIO** — fail-open en `verify_payment`; doble cobro por reintento de pack;
+   doble envío de campaña; webhook saliente sin identidad de entrega; cola
+   bloqueada por reintentos; subida sin límite; `state` de OAuth reutilizable.
+   Todos cerrados.
+
 ## Siguiente acción exacta
 
-Terminar el bloque **8**, que quedó PARCIAL. Lo que falta, en orden:
+Bloque **20 está BLOCKED**: completar Ads multi-tenant exige decidir a quién
+pertenece una integración (usuario que conectó vs workspace), que es la misma
+decisión pendiente de `integration_whatsapp` y `oauth_connections`. No empezarlo
+sin esa decisión.
+
+**Continuar por el bloque 21 — Agents AI Full Audit**, que es independiente.
+Después 22, 23, 24, 25, 26, 27, 28 (parcial), 31–47.
+
+Pendiente reabrir en cuanto Docker responda: **2, 3, 4, 29, 30**. Comprobar con
+`docker ps` al arrancar.
+
+Lo que quedó a medias y hay que retomar:
+  * **Bloque 18 PARCIAL**: 12 webhooks entrantes sin verificar firma, listados en
+    `docs/TODO.md`. Cada proveedor firma distinto; hacerlo mal es peor que no
+    hacerlo.
+  * **Bloque 28 PARCIAL**: solo se resolvió el test que ensuciaba el árbol.
+
+Referencia histórica del bloque 8, ya cerrado:
 
 1. **Idempotencia de `chargePartnerClientPack`** (`apps/web/src/lib/partners/
    partnerConnectStore.ts`): un POST repetido a `charge-pack` cobra otra vez. Es
