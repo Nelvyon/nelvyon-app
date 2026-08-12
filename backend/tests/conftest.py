@@ -245,14 +245,20 @@ async def setup_database(test_engine):
         await conn.execute(
             text(
                 """
-                INSERT OR IGNORE INTO users (id, email, name, role)
+                -- `language` va EXPLICITA. Es NOT NULL y su default vive en el
+                -- modelo (lado Python), no en el servidor, asi que un INSERT
+                -- crudo que la omita viola la restriccion — y `OR IGNORE` se
+                -- tragaba el fallo sin decir nada. Resultado: la tabla `users`
+                -- quedaba VACIA y los tests de perfil solo pasaban cuando otro
+                -- test creaba la fila antes que ellos.
+                INSERT OR IGNORE INTO users (id, email, name, role, language)
                 VALUES
-                ('test-user-00000000-0000-0000-0000-000000000001', 'testuser@nelvyon-test.com', 'Test User', 'user'),
-                ('member-user-00000000-0000-0000-0000-000000000099', 'member@test.com', 'Member User', 'user'),
-                ('viewer-user-00000000-0000-0000-0000-000000000098', 'viewer@test.com', 'Viewer User', 'user'),
-                ('operator-user-0000000-0000-0000-0000-000000000097', 'operator@test.com', 'Operator User', 'user'),
-                ('admin-user-00000000-0000-0000-0000-000000000001', 'admin@nelvyon-test.com', 'Admin User', 'admin'),
-                ('super-admin-00000000-0000-0000-0000-000000000001', 'superadmin@nelvyon-test.com', 'Super Admin', 'super_admin')
+                ('test-user-00000000-0000-0000-0000-000000000001', 'testuser@nelvyon-test.com', 'Test User', 'user', 'es'),
+                ('member-user-00000000-0000-0000-0000-000000000099', 'member@test.com', 'Member User', 'user', 'es'),
+                ('viewer-user-00000000-0000-0000-0000-000000000098', 'viewer@test.com', 'Viewer User', 'user', 'es'),
+                ('operator-user-0000000-0000-0000-0000-000000000097', 'operator@test.com', 'Operator User', 'user', 'es'),
+                ('admin-user-00000000-0000-0000-0000-000000000001', 'admin@nelvyon-test.com', 'Admin User', 'admin', 'es'),
+                ('super-admin-00000000-0000-0000-0000-000000000001', 'superadmin@nelvyon-test.com', 'Super Admin', 'super_admin', 'es')
                 """
             )
         )

@@ -37,8 +37,9 @@ def _rol_para(plan: str) -> str:
             return payload
 
     original = getattr(puente, "jwt", None)
-    if original is None:  # pragma: no cover
-        pytest.skip("el puente no expone `jwt`")
+    # No se salta: si el puente deja de exponer `jwt`, la forma del modulo
+    # cambio y este test dejaria de comprobar nada sin que nadie se enterase.
+    assert original is not None, "el puente ya no expone `jwt`: revisar este test"
     puente.jwt = _Falso  # type: ignore[attr-defined]
     try:
         return str(puente.try_decode_nelvyon_app_token("token")["role"])

@@ -108,6 +108,22 @@ async def test_workspace_invite_member_forbidden_operator_ok(
     )
     assert r_ok.status_code == 201, r_ok.text
 
+    # Se limpia el miembro creado. El workspace tiene un tope de 50 y este test
+    # anade uno cada vez: sin limpiar, agotaba la cuota y otros tests fallaban
+    # con "Maximum of 50 members per workspace" — un fallo que no era suyo y que
+    # solo aparecia segun el orden de ejecucion.
+    from sqlalchemy import text as _text
+
+    from core.database import db_manager
+
+    if not db_manager.async_session_maker:
+        await db_manager.ensure_initialized()
+    async with db_manager.async_session_maker() as limpieza:
+        await limpieza.execute(
+            _text("DELETE FROM workspace_members WHERE email = :e"), {"e": email}
+        )
+        await limpieza.commit()
+
 
 @pytest.mark.asyncio
 async def test_verify_payment_member_forbidden(client: AsyncClient, member_headers: dict):

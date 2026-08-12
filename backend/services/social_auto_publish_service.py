@@ -224,13 +224,14 @@ class SocialAutoPublishService:
         created: list[dict[str, Any]] = []
         for platform in platforms:
             preview = await self.generate_preview(client_id, sector=sector, platform=platform)
-            await self.session.execute(
+            ins = await self.session.execute(
                 text(
                     f"""
                     INSERT INTO social_auto_posts
                     (client_id, workspace_id, platform, caption, image_url, status, frequency, scheduled_at)
                     VALUES (:cid, :ws, :plat, :cap, :img, 'scheduled', :freq, :sched)
-                    """
+                                    RETURNING id
+                """
                 ),
                 {
                     "cid": client_id,
@@ -242,8 +243,14 @@ class SocialAutoPublishService:
                     "sched": when.isoformat(),
                 },
             )
-            rid = await self.session.execute(text("SELECT last_insert_rowid() AS id"))
-            created.append({"post_id": int(rid.scalar_one()), **preview, "scheduled_at": when.isoformat()})
+            # `RETURNING` en vez de `last_insert_rowid()`, que es de SQLite y no
+            # existe en PostgreSQL, la base de produccion.
+            fila = ins.mappings().first()
+            if fila is None:
+                raise ValueError("Scheduled post could not be created")
+            created.append(
+                {"post_id": int(fila["id"]), **preview, "scheduled_at": when.isoformat()}
+            )
         await self.session.commit()
         return {"client_id": client_id, "scheduled": created, "mock": _mock_mode()}
 

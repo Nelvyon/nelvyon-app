@@ -202,6 +202,7 @@ class WebBuilderService:
                 """
                 INSERT INTO client_websites (client_id, workspace_id, slug, html_content, css_content, version)
                 VALUES (:client_id, :ws, :slug, :html, :css, :version)
+                RETURNING id, slug, version
                 """
             ),
             {
@@ -213,14 +214,16 @@ class WebBuilderService:
                 "version": version,
             },
         )
+        # `RETURNING` en vez de `last_insert_rowid()`, que es de SQLite: en
+        # PostgreSQL —la base de produccion— esa funcion no existe. El defecto
+        # estaba oculto porque los tests corren sobre SQLite. De paso desaparece
+        # el SELECT posterior, que podia no encontrar la fila y dejaba un
+        # `None` sin comprobar aguas abajo.
+        site = ins.mappings().first()
+        if site is None:
+            raise ValueError("Website could not be created")
+        site_id = int(site["id"])
         await self.session.commit()
-        site_id_row = await self.session.execute(text("SELECT last_insert_rowid() AS id"))
-        site_id = int(site_id_row.scalar_one())
-        slug_row = await self.session.execute(
-            text("SELECT slug, version, created_at FROM client_websites WHERE id = :id"),
-            {"id": site_id},
-        )
-        site = slug_row.mappings().first()
 
         for sec in sections:
             content_json = json.dumps(sec.get("content", sec), ensure_ascii=False)
@@ -297,11 +300,12 @@ class WebBuilderService:
         if not site:
             raise ValueError("version not found")
         new_version = int(site["version"]) + 1
-        await self.session.execute(
+        ins_restore = await self.session.execute(
             text(
                 """
                 INSERT INTO client_websites (client_id, workspace_id, slug, html_content, css_content, version)
                 VALUES (:client_id, :ws, :slug, :html, :css, :version)
+                RETURNING id
                 """
             ),
             {
@@ -313,9 +317,12 @@ class WebBuilderService:
                 "version": new_version,
             },
         )
+        # Ver nota de `generate`: `RETURNING` es portable, `last_insert_rowid()` no.
+        nueva = ins_restore.mappings().first()
+        if nueva is None:
+            raise ValueError("Website version could not be restored")
+        new_id = int(nueva["id"])
         await self.session.commit()
-        site_id_row = await self.session.execute(text("SELECT last_insert_rowid() AS id"))
-        new_id = int(site_id_row.scalar_one())
         return {
             "website_id": new_id,
             "restored_from": website_id,

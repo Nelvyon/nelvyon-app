@@ -6,7 +6,7 @@ import json
 import logging
 import os
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Any
 
 from openai import AsyncOpenAI
@@ -87,10 +87,17 @@ class LinkedInService:
                 """
                 SELECT COUNT(*) AS c FROM linkedin_outreach
                 WHERE workspace_id = :ws
-                AND created_at >= datetime('now', '-1 hour')
+                  AND created_at >= :desde
                 """
             ),
-            {"ws": self.workspace_id},
+            # El limite se calcula en Python y viaja como parametro.
+            # `datetime('now', '-1 hour')` es de SQLite: en PostgreSQL esta
+            # consulta reventaba, y con ella el limite de tasa horario — un
+            # control que al fallar deja de limitar sin decir nada.
+            {
+                "ws": self.workspace_id,
+                "desde": datetime.now(timezone.utc) - timedelta(hours=1),
+            },
         )
         return int(row.scalar_one() or 0)
 

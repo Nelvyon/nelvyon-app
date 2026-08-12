@@ -470,3 +470,22 @@ No se cierran en bloque porque cada proveedor firma de forma distinta (Twilio us
 SES/SNS exige validar el certificado de la firma). Hacerlo mal daría una sensación
 de protección peor que no tenerla. `automation/webhook/trigger/{key}` sí tiene una
 clave en la ruta, que es un secreto compartido — conviene confirmar su entropía.
+
+## DEUDA — una dependencia de orden restante (2026-08-12)
+
+Bloque 28: la suite pasa en orden normal (1870) y en orden inverso falla **uno**
+solo, `test_workspace_invite_member_forbidden_operator_ok`, con "Maximum of 50
+members per workspace".
+
+Ya corregido en ese bloque, con causa raíz demostrada:
+- el seed de `users` en `conftest` fallaba **en silencio** (`language` es NOT NULL
+  con default de modelo, no de servidor, y `INSERT OR IGNORE` se tragaba la
+  violación): la tabla quedaba vacía y los tests de perfil solo pasaban si otro
+  test creaba la fila antes;
+- el test de invitación no limpiaba el miembro que creaba.
+
+Lo que falta por determinar: quién más consume la cuota de 50 miembros del
+workspace 1 durante una ejecución. Un diagnóstico con `db_session` contó 3
+miembros, lo que sugiere que esa fixture no ve la misma sesión que la app —
+conviene confirmar qué base usan realmente los tests antes de seguir tirando del
+hilo. No es defecto de producto: el tope funciona.
