@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import hashlib
+import hmac
+import json
 import pytest
 from httpx import AsyncClient
 
@@ -88,8 +91,25 @@ async def test_instagram_webhook_receive(client: AsyncClient):
             }
         ]
     }
-    r = await client.post("/api/instagram-dm/webhook", json=payload)
-    assert r.status_code == 200
+    # El webhook exige la firma de Meta desde el bloque 24: antes aceptaba
+    # cualquier cuerpo, asi que se podian inyectar DMs falsos en la bandeja de
+    # un workspace. Aqui se firma como lo haria una entrega real, sobre los
+    # MISMOS bytes que se envian.
+    monkeypatch = pytest.MonkeyPatch()
+    monkeypatch.setenv("INSTAGRAM_APP_SECRET", "secreto-de-prueba-instagram")
+    try:
+        cuerpo = json.dumps(payload).encode()
+        firma = "sha256=" + hmac.new(
+            b"secreto-de-prueba-instagram", cuerpo, hashlib.sha256
+        ).hexdigest()
+        r = await client.post(
+            "/api/instagram-dm/webhook",
+            content=cuerpo,
+            headers={"Content-Type": "application/json", "X-Hub-Signature-256": firma},
+        )
+    finally:
+        monkeypatch.undo()
+    assert r.status_code == 200, r.text
     assert r.json().get("processed", 0) >= 1
 
 
@@ -123,11 +143,24 @@ async def test_fb_messenger_webhook_verify(client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_fb_messenger_webhook_receive(client: AsyncClient):
-    r = await client.post(
-        "/api/fb-messenger/webhook",
-        json={"entry": [{"messaging": [{"sender": {"id": "psid-f63"}, "message": {"text": "Precio?"}}]}]},
-    )
-    assert r.status_code == 200
+    monkeypatch = pytest.MonkeyPatch()
+    monkeypatch.setenv("FACEBOOK_APP_SECRET", "secreto-de-prueba-facebook")
+    try:
+        cuerpo = json.dumps(
+            {"entry": [{"messaging": [{"sender": {"id": "psid-f63"},
+                                       "message": {"text": "Precio?"}}]}]}
+        ).encode()
+        firma = "sha256=" + hmac.new(
+            b"secreto-de-prueba-facebook", cuerpo, hashlib.sha256
+        ).hexdigest()
+        r = await client.post(
+            "/api/fb-messenger/webhook",
+            content=cuerpo,
+            headers={"Content-Type": "application/json", "X-Hub-Signature-256": firma},
+        )
+    finally:
+        monkeypatch.undo()
+    assert r.status_code == 200, r.text
 
 
 @pytest.mark.asyncio

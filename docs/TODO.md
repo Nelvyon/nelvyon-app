@@ -457,9 +457,13 @@ Quedan sin verificación de firma, y hay que revisarlos uno a uno con la
 documentación de cada proveedor:
 
 `bookings/webhook/zoom`, `contracts/webhook` (Signaturit), `dialer/webhook/twilio`,
-`sms/webhook/twilio`, `facebook_messenger/webhook`, `instagram_dm/webhook`,
-`tiktok_dm/webhook`, `whatsapp/webhook`, `helpdesk/inbound/{email,whatsapp}`,
-`monitoring/ses/bounce-webhook`, `automation/webhook/trigger/{key}`.
+`sms/webhook/twilio`, `tiktok_dm/webhook`, `whatsapp/webhook`,
+`helpdesk/inbound/{email,whatsapp}`, `monitoring/ses/bounce-webhook`,
+`automation/webhook/trigger/{key}`.
+
+**Cerrados en el bloque 24**: `instagram_dm/webhook` y `facebook_messenger/webhook`
+verifican `X-Hub-Signature-256` (`core/meta_webhook_signature.py`). Son el mismo
+proveedor y el mismo algoritmo, por eso se pudieron cerrar juntos.
 
 No se cierran en bloque porque cada proveedor firma de forma distinta (Twilio usa
 `X-Twilio-Signature` sobre la URL + params ordenados; Meta usa `X-Hub-Signature-256`;

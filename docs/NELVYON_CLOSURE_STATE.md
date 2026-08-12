@@ -8,8 +8,8 @@
 HEAD            (ver git log -1)
 último commit   fix(oauth): consume the state instead of merely reading it
 fecha           2026-08-12
-bloque actual   24 — Social / Messaging Integrations
-tests           backend 1850 passed · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
+bloque actual   25 — Activities Functional Debt
+tests           backend 1862 passed · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
 build           backend compileall limpio · frontend sin tocar desde el último build conocido
 árbol git       limpio
 push/PR/merge   ninguno
@@ -52,7 +52,7 @@ PG certification BLOQUEADO — Docker Desktop caído (npipe dockerDesktopLinuxEn
 | 21 | Agents AI Full Audit | **CERTIFIED** | allowlist cerrada; workspace del contexto; sin escalada |
 | 22 | Multi-agent System | **CERTIFIED** | tope de cadena; fuga de error interna cerrada |
 | 23 | AI Cost / Provider Audit | **CERTIFIED** | regla self-hosted ahora se APLICA, no solo se documenta |
-| 24 | Social / Messaging Integrations | PENDING | |
+| 24 | Social / Messaging Integrations | **CERTIFIED** | firma Meta en los 2 webhooks de DM; resto de autoridad ya correcta |
 | 25 | Activities Functional Debt | PENDING | |
 | 26 | Reporting / API Contract Debt | PENDING | |
 | 27 | Frontend Error/Permission UX | PENDING | |
