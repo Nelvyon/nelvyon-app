@@ -8,8 +8,8 @@
 HEAD            (ver git log -1)
 último commit   fix(oauth): consume the state instead of merely reading it
 fecha           2026-08-12
-bloque actual   27 — Frontend Error/Permission UX
-tests           backend 1862 passed · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
+bloque actual   28 — Flake / Test Determinism
+tests           backend 1862 passed · frontend 6637 passed / 42 skipped · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
 build           backend compileall limpio · frontend sin tocar desde el último build conocido
 árbol git       limpio
 push/PR/merge   ninguno
@@ -55,7 +55,7 @@ PG certification BLOQUEADO — Docker Desktop caído (npipe dockerDesktopLinuxEn
 | 24 | Social / Messaging Integrations | **CERTIFIED** | firma Meta en los 2 webhooks de DM; resto de autoridad ya correcta |
 | 25 | Activities Functional Debt | **CERTIFIED** | ya resuelto en bloque previo: lector de churn sobre crm_activities.completed_at |
 | 26 | Reporting / API Contract Debt | **CERTIFIED** | website_url fantasma eliminado del informe |
-| 27 | Frontend Error/Permission UX | PENDING | |
+| 27 | Frontend Error/Permission UX | **CERTIFIED** | reintento de POST/PATCH eliminado (duplicaba mutaciones) |
 | 28 | Flake / Test Determinism | PARCIAL | resuelto el test que ensuciaba el árbol; resto PENDING |
 | 29 | SQLite vs PostgreSQL Coverage | **BLOCKED** | Docker caído |
 | 30 | Migrations Final Certification | **BLOCKED** | Docker caído |

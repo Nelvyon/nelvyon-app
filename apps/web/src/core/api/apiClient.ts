@@ -5,6 +5,31 @@ const DEFAULT_RETRY_DELAY_MS = 250;
 
 const RETRYABLE_STATUS = new Set([502, 503, 504]);
 
+/**
+ * Metodos que se pueden repetir sin cambiar el resultado.
+ *
+ * El bucle de reintento era agnostico al metodo, asi que un POST que devolvia
+ * 502/503/504 se reenviaba solo. Un 504 significa que el gateway se canso de
+ * esperar, NO que el servidor no hiciera el trabajo: reintentar ahi ejecuta la
+ * mutacion dos veces. Es el mismo doble efecto que se cerro en el servidor con
+ * claves de idempotencia, amplificado desde el cliente.
+ *
+ * GET no tiene efecto. PUT y DELETE son idempotentes por definicion
+ * HTTP: repetirlos deja el mismo estado. POST y PATCH no lo son.
+ */
+const METODOS_IDEMPOTENTES = new Set<HttpMethod>(["GET", "PUT", "DELETE"]);
+
+/**
+ * Un POST/PATCH solo se reintenta si el llamante declara una clave de
+ * idempotencia: entonces el servidor puede reconocer el reintento, que es
+ * exactamente lo que hace `charge-pack` contra Stripe.
+ */
+function sePuedeReintentar(metodo: HttpMethod, cabeceras: HeadersInit): boolean {
+  if (METODOS_IDEMPOTENTES.has(metodo)) return true;
+  const plano = new Headers(cabeceras);
+  return plano.has("Idempotency-Key");
+}
+
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /** Next.js BFF/auth routes — same-origin. FastAPI `/api/v1/*` uses `baseUrl` + CORS. */
@@ -169,7 +194,11 @@ export class ApiClient {
           this.config.onForbidden();
         }
 
-        if (attempt < retries && RETRYABLE_STATUS.has(response.status)) {
+        if (
+          attempt < retries &&
+          RETRYABLE_STATUS.has(response.status) &&
+          sePuedeReintentar(method, this.buildHeaders(options))
+        ) {
           attempt += 1;
           await sleep(this.config.retryDelayMs * attempt);
           continue;
