@@ -754,12 +754,22 @@ class ReportingService:
         row = r.mappings().first()
         if not row:
             return {"id": self.workspace_id, "name": f"Workspace {self.workspace_id}"}
+        # `website_url` YA NO se devuelve.
+        #
+        # La consulta de arriba dejo de pedirla a proposito —pertenece a las
+        # tablas de cliente (`os_clients`, `nelvyon_clients`), no a
+        # `workspaces`— pero la proyeccion la seguia incluyendo, asi que el
+        # campo salia SIEMPRE nulo. Un contrato que anuncia un dato que nunca
+        # llega es peor que no anunciarlo: quien lo consume no distingue "este
+        # workspace no tiene web" de "esto nunca funciono".
+        #
+        # Ningun consumidor lo leia de aqui; el `website_url` que si usa el
+        # frontend sale de la ficha de cliente, que es donde vive el dato.
         return {
             "id": row["id"],
             "name": row.get("name"),
             "industry": row.get("industry"),
             "logo_url": row.get("logo_url"),
-            "website_url": row.get("website_url"),
         }
 
     async def _admin_user_id(self) -> str | None:
