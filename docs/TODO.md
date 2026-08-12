@@ -364,3 +364,27 @@ Hoy no lo consume ningún componente del frontend, así que cerrarlo no quita
 funcionalidad. Si se quisiera, el diseño correcto exige vincular el cargo al
 workspace (`_get_or_create_stripe_customer` ya da esa relación, y `list_charges`
 la usa) y probablemente una política de importes y plazos.
+
+## DEUDA — marketplace: compra sin cobro (2026-08-12)
+
+`MarketplaceService.purchase_item` inserta en `marketplace_purchases` con
+`status='completed'` y un `amount`, **sin ningún cobro asociado**: no toca Stripe
+ni ninguna pasarela. Una fila dice que hubo una transacción completada que no
+ocurrió.
+
+Impacto acotado hoy: nada lee esas filas salvo `list_my_purchases`, así que no
+desbloquea contenido ni dispara pagos al vendedor. Es un registro que
+sobreafirma, no una escalada.
+
+No se cierra aquí porque el marketplace no tiene integración de pagos: exigirla
+sería inventar una funcionalidad, y cambiar `'completed'` por `'pending'` altera
+semántica de producto sin evidencia de intención. Decidir si el marketplace cobra
+de verdad es decisión de producto.
+
+## VERIFICADO CORRECTO — cuota de sesiones de advisor (2026-08-12)
+
+`_consume_month_usage` usa `UPDATE ... SET used_sessions = used_sessions + 1
+WHERE used_sessions < :monthly_limit` y deriva `consumed` de `rowcount`: es un
+compare-and-swap atómico en una sola sentencia, no el patrón read-then-write de
+`send_campaign`. No hay doble gasto por concurrencia. Se anota para no volver a
+auditarlo.

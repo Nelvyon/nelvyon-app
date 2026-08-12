@@ -34,7 +34,16 @@ export async function POST(
     return NextResponse.json({ error: "packSku required" }, { status: 400 });
   }
 
-  const wholesaleEur = PACK_WHOLESALE[packSku] ?? 149;
+  // Un SKU desconocido se RECHAZA. Antes caia a `?? 149`, asi que una errata
+  // o un SKU inventado producia un cobro valido a precio de un pack que no
+  // existe. El precio no puede salir de un valor por defecto.
+  const wholesaleEur = PACK_WHOLESALE[packSku];
+  if (wholesaleEur === undefined) {
+    return NextResponse.json(
+      { error: `Unknown packSku: ${packSku}` },
+      { status: 400 },
+    );
+  }
   const retailEur = Number(body.retailEur ?? wholesaleEur * 3);
   if (!Number.isFinite(retailEur) || retailEur < wholesaleEur) {
     return NextResponse.json({ error: "retailEur must be >= wholesale" }, { status: 400 });
