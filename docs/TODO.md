@@ -388,3 +388,15 @@ WHERE used_sessions < :monthly_limit` y deriva `consumed` de `rowcount`: es un
 compare-and-swap atómico en una sola sentencia, no el patrón read-then-write de
 `send_campaign`. No hay doble gasto por concurrencia. Se anota para no volver a
 auditarlo.
+
+## DEUDA — persistencia de la cola en proceso (2026-08-12)
+
+`AsyncJobQueue` es `asyncio.Queue` en memoria: un reinicio del proceso pierde los
+jobs encolados y los que estuvieran en reintento. Existe `ARQJobQueue` sobre
+Redis como alternativa, que se desactiva sola si falta `REDIS_URL`.
+
+No se cierra aquí porque garantizar durabilidad exige decidir infraestructura
+(Redis obligatorio, o tabla `job_queue` en PostgreSQL con reclamo
+`FOR UPDATE SKIP LOCKED`), y eso es decisión de despliegue con coste asociado.
+Lo que sí está cerrado es que ningún job quede en estado no terminal y que un
+fallo no bloquee la cola.

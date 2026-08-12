@@ -375,6 +375,7 @@ class AsyncJobQueue:
         self._handlers: Dict[str, JobHandler] = {}
         self._jobs: Dict[str, Job] = {}
         self._queue: asyncio.Queue = asyncio.Queue()
+        self._reintentos_pendientes: set = set()
         self._workers: List[asyncio.Task] = []
         self._max_workers = max_workers
         self._running = False
@@ -390,6 +391,11 @@ class AsyncJobQueue:
         pytest-asyncio puede usar un event loop distinto por test; ``asyncio.Queue``
         queda ligada al loop donde se creó. Recrear cola y estado antes de ``start()``.
         """
+        # Las tareas de reintento quedan ligadas al loop anterior: cancelarlas
+        # evita arrastrarlas a uno nuevo.
+        for tarea in list(self._reintentos_pendientes):
+            tarea.cancel()
+        self._reintentos_pendientes.clear()
         self._queue = asyncio.Queue()
         self._jobs.clear()
         self._workers.clear()
@@ -441,6 +447,9 @@ class AsyncJobQueue:
         self._running = False
         for worker in self._workers:
             worker.cancel()
+        for tarea in list(self._reintentos_pendientes):
+            tarea.cancel()
+        self._reintentos_pendientes.clear()
         if self._workers:
             await asyncio.gather(*self._workers, return_exceptions=True)
         self._workers.clear()
@@ -484,7 +493,8 @@ class AsyncJobQueue:
             # reintento de un evento nuevo: sin ella, un 5xx transitorio hacia
             # que la misma entrega llegase dos veces sin forma de saberlo.
             #
-            # Copia superficial: el payload persistido no se toca.
+            # Copia superficial:  expone , asi que mutarlo
+            # filtraria estas claves internas por .
             result = await handler({**job.payload, "_job_id": job.id, "_attempt": job.attempts})
             job.status = JobStatus.COMPLETED
             job.result = result
@@ -497,8 +507,12 @@ class AsyncJobQueue:
                 job.error = str(e)
                 delay = min(job.retry_delay * (2 ** (job.attempts - 1)), 300)
                 self._stats["total_retried"] += 1
-                await asyncio.sleep(delay)
-                await self._queue.put(job)
+                # El reintento se PROGRAMA; no se espera aqui.
+                #
+                # Esperar en linea dejaba al worker parado hasta 300 s por un
+                # solo job. Con 5 workers bastaban 5 jobs fallando para que la
+                # cola entera dejase de procesar nada, incluidos jobs sanos.
+                self._programar_reintento(job, delay)
             else:
                 job.status = JobStatus.FAILED
                 job.error = str(e)
@@ -510,6 +524,22 @@ class AsyncJobQueue:
                     job_id=job.id,
                     error=str(e),
                 )
+
+    def _programar_reintento(self, job: "Job", delay: float) -> None:
+        """Reencola tras `delay` sin ocupar un worker mientras tanto."""
+
+        async def _esperar_y_reencolar() -> None:
+            try:
+                await asyncio.sleep(delay)
+                await self._queue.put(job)
+            except asyncio.CancelledError:  # parada del servicio
+                raise
+
+        tarea = asyncio.create_task(_esperar_y_reencolar())
+        # Se guarda la referencia: una tarea sin referencias puede recolectarse
+        # antes de ejecutarse, y el reintento se perderia en silencio.
+        self._reintentos_pendientes.add(tarea)
+        tarea.add_done_callback(self._reintentos_pendientes.discard)
 
     def get_stats(self) -> Dict[str, Any]:
         return {
