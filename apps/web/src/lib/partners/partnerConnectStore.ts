@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+
 import { DbClient } from "../../../../../backend/db/DbClient";
 
 import type {
@@ -315,6 +317,37 @@ export async function getPartnerClientBilling(
   return rows[0] ? mapClientBilling(rows[0]) : null;
 }
 
+/**
+ * Clave de idempotencia del cobro.
+ *
+ * Sin ella, un POST repetido —doble clic, reintento de red, retry del cliente—
+ * creaba un PaymentIntent NUEVO y cobraba otra vez, y el ledger registraba dos
+ * filas porque deduplica por `pi.id`, que tambien era distinto.
+ *
+ * Si el llamante manda `Idempotency-Key`, manda esa: es la convencion HTTP y
+ * nunca bloquea un cobro legitimo distinto. Si no la manda, se deriva del
+ * contenido con una ventana de una hora: dos envios accidentales separados por
+ * segundos se funden en uno, y un recobro deliberado mas tarde si pasa.
+ */
+function packChargeIdempotencyKey(params: {
+  partnerWorkspaceId: number;
+  clientWorkspaceId: number;
+  packSku: string;
+  retailEur: number;
+  suministrada?: string;
+}): string {
+  if (params.suministrada?.trim()) return params.suministrada.trim().slice(0, 255);
+  const ventana = Math.floor(Date.now() / 3_600_000);
+  const material = [
+    params.partnerWorkspaceId,
+    params.clientWorkspaceId,
+    params.packSku,
+    Math.round(params.retailEur * 100),
+    ventana,
+  ].join(":");
+  return `pack_${createHash("sha256").update(material).digest("hex").slice(0, 48)}`;
+}
+
 export async function chargePartnerClientPack(params: {
   partnerWorkspaceId: number;
   clientWorkspaceId: number;
@@ -322,6 +355,8 @@ export async function chargePartnerClientPack(params: {
   retailEur: number;
   wholesaleEur: number;
   clientEmail?: string;
+  /** `Idempotency-Key` de la peticion, si el llamante la envio. */
+  idempotencyKey?: string;
 }): Promise<{ ok: boolean; ledgerId: string | null; paymentIntentId?: string; clientSecret?: string | null }> {
   await ensurePartnerRebillingSchema();
 
@@ -361,6 +396,13 @@ export async function chargePartnerClientPack(params: {
       partner_workspace_id: String(params.partnerWorkspaceId),
       client_workspace_id: String(params.clientWorkspaceId),
     },
+    idempotencyKey: packChargeIdempotencyKey({
+      partnerWorkspaceId: params.partnerWorkspaceId,
+      clientWorkspaceId: params.clientWorkspaceId,
+      packSku: params.packSku,
+      retailEur: params.retailEur,
+      suministrada: params.idempotencyKey,
+    }),
   });
   const paymentIntentId = pi.id;
   const clientSecret = pi.client_secret;

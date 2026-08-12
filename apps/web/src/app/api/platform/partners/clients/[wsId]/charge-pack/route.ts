@@ -48,6 +48,16 @@ export async function POST(
   if (!Number.isFinite(retailEur) || retailEur < wholesaleEur) {
     return NextResponse.json({ error: "retailEur must be >= wholesale" }, { status: 400 });
   }
+  // Un importe se cobra en centimos. `Math.round(retailEur * 100)` aguas abajo
+  // convertia 149.999 en 15000 sin decir nada: el cliente pedia un precio y se
+  // le cobraba otro. Se rechaza en vez de redondear a escondidas.
+  const centimos = retailEur * 100;
+  if (Math.abs(centimos - Math.round(centimos)) > 1e-6) {
+    return NextResponse.json(
+      { error: "retailEur must have at most 2 decimals" },
+      { status: 400 },
+    );
+  }
 
   try {
     const result = await chargePartnerClientPack({
@@ -57,6 +67,7 @@ export async function POST(
       retailEur,
       wholesaleEur,
       clientEmail: body.clientEmail,
+      idempotencyKey: req.headers.get("idempotency-key") ?? undefined,
     });
     return NextResponse.json(result);
   } catch (e) {
