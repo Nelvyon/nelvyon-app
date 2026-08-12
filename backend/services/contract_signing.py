@@ -161,8 +161,20 @@ class ContractSigningService:
         if contract.signature_data:
             try:
                 existing_sig = json.loads(contract.signature_data)
-            except json.JSONDecodeError:
-                pass
+            except json.JSONDecodeError as exc:
+                # NO se ignora. Habia datos de firma y no se pueden leer: eso es
+                # corrupcion, no ausencia. Al tragarselo, `stored_hash` quedaba
+                # vacio y la comprobacion de integridad de mas abajo —que solo
+                # actua `if stored_hash`— se saltaba entera: se firmaba sin
+                # verificar que el documento no hubiese cambiado, justo en el
+                # momento en que mas importa.
+                #
+                # `verify_integrity`, en este mismo fichero, ya trata este caso
+                # como integridad INVALIDA. Aqui significaba "nada que
+                # comprobar".
+                raise ValueError(
+                    "Contract signature data is corrupted; refusing to sign"
+                ) from exc
 
         stored_hash = existing_sig.get("document_hash", "")
         current_hash = self.compute_document_hash(contract.content or "")
