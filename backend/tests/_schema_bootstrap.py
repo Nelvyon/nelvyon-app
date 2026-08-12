@@ -27,6 +27,23 @@ siendo la migración: no hay un segundo esquema que mantener.
 
 Si una migración futura añade tablas de runtime FastAPI fuera de 507, el test
 de guardia `test_schema_bootstrap_sync.py` lo detecta y falla.
+
+QUE CERTIFICA SQLITE Y QUE NO
+-----------------------------
+Esta base de tests reproduce COLUMNAS, no restricciones. Durante la auditoria la
+suite dio 1078 verdes mientras PostgreSQL real rechazaba el upsert de
+`intent_scores` por una PRIMARY KEY legacy que SQLite no reproduce. Un verde aqui
+no dice nada sobre el motor de produccion en esa dimension.
+
+    SQLite basta para:      logica funcional, contratos, parsing, unitarios.
+
+    PostgreSQL real EXIGIDO para:
+        PRIMARY KEY · UNIQUE · NOT NULL · FOREIGN KEY
+        ON CONFLICT · tipos y casts propios de PostgreSQL
+        concurrencia y atomicidad dependientes del motor
+
+Para eso existe `scripts/pg-cert-db.mjs`, que levanta una base desechable con la
+cadena real de migraciones.
 """
 
 from __future__ import annotations
@@ -37,9 +54,30 @@ import re
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
 
 #: Única migración que declara el esquema de runtime de FastAPI.
-CANONICAL_MIGRATION = (
-    REPO_ROOT / "backend" / "db" / "migrations" / "507_fastapi_runtime_schemas.sql"
+_MIGRATIONS_DIR = REPO_ROOT / "backend" / "db" / "migrations"
+
+#: Fuente canónica del esquema de runtime FastAPI, en orden de aplicación.
+CANONICAL_MIGRATIONS = (
+    _MIGRATIONS_DIR / "507_fastapi_runtime_schemas.sql",
+    _MIGRATIONS_DIR / "524_fastapi_raw_sql_schema_drift.sql",
+    _MIGRATIONS_DIR / "525_fastapi_raw_sql_schema_drift_batch2.sql",
+    _MIGRATIONS_DIR / "526_legacy_not_null_relaxation.sql",
+    _MIGRATIONS_DIR / "527_intent_scores_unique.sql",
+    _MIGRATIONS_DIR / "528_intent_scores_legacy_pk_repair.sql",
 )
+
+
+class _FuenteCanonica:
+    """Las migraciones canónicas presentadas como un único texto SQL."""
+
+    paths = CANONICAL_MIGRATIONS
+
+    @classmethod
+    def read_text(cls, encoding: str = "utf-8") -> str:
+        return chr(10).join(p.read_text(encoding=encoding) for p in cls.paths)
+
+
+CANONICAL_MIGRATION = _FuenteCanonica
 
 #: Traducciones PostgreSQL -> SQLite. Deliberadamente mínimas y explícitas:
 #: cualquier tipo no contemplado se deja tal cual y SQLite lo acepta como
@@ -102,6 +140,45 @@ _ADD_COLUMN_RE = re.compile(
 )
 
 
+
+#: `(tabla, columna)` que 526 libera de NOT NULL.
+#:
+#: SQLite no soporta `ALTER COLUMN ... DROP NOT NULL`, asi que la relajacion no
+#: puede aplicarse despues: se aplica ANTES, quitando el `NOT NULL` del
+#: `CREATE TABLE` que se genera para SQLite. La migracion PostgreSQL no se toca
+#: — se adapta el bootstrap de compatibilidad, que es lo que corresponde.
+_RELAJADAS_RE = re.compile(r"\(\s*'(?P<tabla>[a-z_]+)'\s*,\s*'(?P<columna>[a-z_]+)'\s*\)")
+
+
+def columnas_relajadas() -> set:
+    fichero = _MIGRATIONS_DIR / "526_legacy_not_null_relaxation.sql"
+    if not fichero.exists():
+        return set()
+    sql = fichero.read_text(encoding="utf-8")
+    ini = sql.find("VALUES")
+    fin = sql.find(") AS t(", ini)
+    if ini < 0 or fin < 0:
+        return set()
+    return {(m.group("tabla"), m.group("columna")) for m in _RELAJADAS_RE.finditer(sql[ini:fin])}
+
+
+def indices_unicos_sqlite() -> list:
+    """`CREATE UNIQUE INDEX` de las migraciones canonicas.
+
+    Sin ellos el `ON CONFLICT` tampoco tiene arbitro en SQLite y el test
+    certificaria un motor distinto del de produccion.
+    """
+    sql = CANONICAL_MIGRATION.read_text()
+    return [
+        m.group(0).rstrip(";")
+        for m in re.finditer(
+            r"CREATE\s+UNIQUE\s+INDEX\s+(?:IF\s+NOT\s+EXISTS\s+)?[a-z0-9_]+\s+ON\s+[^;]+;",
+            sql,
+            re.IGNORECASE,
+        )
+    ]
+
+
 def sqlite_add_column_statements() -> list[tuple[str, str, str]]:
     """`ALTER TABLE ... ADD COLUMN` de la migración canónica.
 
@@ -131,7 +208,16 @@ async def bootstrap_sqlite_schema(conn) -> list[str]:
     from sqlalchemy import text as sa_text
 
     fallidas: list[str] = []
+    relajadas = columnas_relajadas()
     for statement in sqlite_create_statements():
+        # 526 en su forma SQLite: se retira el NOT NULL antes de crear la tabla.
+        for tabla, columna in relajadas:
+            if re.search(r"IF NOT EXISTS " + tabla + r"\b", statement, re.IGNORECASE):
+                statement = re.sub(
+                    r"(?im)^(\s*" + columna + r"\s+[a-z0-9_()]+)\s+NOT\s+NULL",
+                    r"\1",
+                    statement,
+                )
         nombre = re.search(r"IF NOT EXISTS ([a-z0-9_]+)", statement, re.IGNORECASE)
         try:
             await conn.execute(sa_text(statement))
@@ -150,4 +236,13 @@ async def bootstrap_sqlite_schema(conn) -> list[str]:
             if "duplicate column" in mensaje or "no such table" in mensaje:
                 continue
             fallidas.append(f"{tabla}.{columna}: {exc}")
+
+    # 527 y equivalentes: sin el indice unico, `ON CONFLICT` tampoco tiene
+    # arbitro en SQLite y el test certificaria un motor distinto al de produccion.
+    for indice in indices_unicos_sqlite():
+        try:
+            await conn.execute(sa_text(indice))
+        except Exception as exc:  # noqa: BLE001
+            if "already exists" not in str(exc).lower() and "no such table" not in str(exc).lower():
+                fallidas.append(f"indice: {exc}")
     return fallidas

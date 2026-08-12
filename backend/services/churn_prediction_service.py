@@ -44,9 +44,41 @@ class ChurnPredictionService:
     def __init__(self, session: AsyncSession):
         self.session = session
 
+
+    async def _last_activity_at(self, workspace_id: int) -> datetime | None:
+        """Ultima actividad humana sobre datos del workspace, o `None`.
+
+        `None` significa "sin senal", no "activo hoy". Devolver 0 dias —el
+        comportamiento anterior— marcaba como maximamente activo justo al
+        workspace del que no sabemos nada.
+
+        Cada fuente se filtra por `workspace_id`: un MAX global cruzaria tenants.
+        """
+        r = await self.session.execute(
+            text(
+                """
+                SELECT MAX(t) AS last_activity_at FROM (
+                    SELECT MAX(updated_at)   AS t FROM saas_deals     WHERE workspace_id = :ws
+                    UNION ALL
+                    SELECT MAX(updated_at)   AS t FROM saas_contacts  WHERE workspace_id = :ws
+                    UNION ALL
+                    SELECT MAX(completed_at) AS t FROM crm_activities WHERE workspace_id = :ws
+                ) fuentes
+                """
+            ),
+            {"ws": workspace_id},
+        )
+        valor = r.scalar_one_or_none()
+        if isinstance(valor, str):  # SQLite devuelve texto
+            try:
+                return datetime.fromisoformat(valor)
+            except ValueError:
+                return None
+        return valor
+
     async def _gather_signals(self, user_id: str, workspace_id: int) -> dict[str, Any]:
         ws_row = await self.session.execute(
-            text("SELECT id, name, industry, status, updated_at FROM workspaces WHERE id = :ws"),
+            text("SELECT id, name, industry, status FROM workspaces WHERE id = :ws"),
             {"ws": workspace_id},
         )
         ws = ws_row.mappings().first()
@@ -64,9 +96,21 @@ class ChurnPredictionService:
             {"ws": workspace_id},
         )
         open_tickets = int(tickets.scalar_one() or 0)
-        days_since = 0
-        if ws and ws.get("updated_at") and isinstance(ws["updated_at"], datetime):
-            days_since = (datetime.now(timezone.utc) - ws["updated_at"].replace(tzinfo=timezone.utc)).days
+        # `workspaces.updated_at` NO existe: nadie la crea ni la mantiene. Se leia
+        # como "ultima actividad" y la senal nunca se computaba. Sustituirla por
+        # `created_at` habria sido peor: convertiria la antiguedad del workspace
+        # en falsa inactividad.
+        #
+        # La actividad real es trabajo humano sobre datos del workspace. Se deriva
+        # del ultimo movimiento en CRM. Quedan fuera a proposito los workflows
+        # (una automatizacion corriendo sola no prueba que el cliente siga vivo) y
+        # los cambios de billing.
+        last_activity_at = await self._last_activity_at(workspace_id)
+        days_since = (
+            (datetime.now(timezone.utc) - last_activity_at.replace(tzinfo=timezone.utc)).days
+            if isinstance(last_activity_at, datetime)
+            else None
+        )
         return {
             "user_id": user_id,
             "workspace_id": workspace_id,

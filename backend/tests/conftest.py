@@ -22,6 +22,46 @@ sys.path.insert(0, _backend_dir)
 
 _test_db_path = os.path.join(_backend_dir, "test.db").replace("\\", "/")
 
+
+def _reset_test_db() -> None:
+    """Borra `test.db` AL INICIO de la sesion, no solo al final.
+
+    El teardown ya intentaba eliminarlo, pero solo se ejecuta si la sesion
+    termina limpiamente: una interrupcion, un `PermissionError` de Windows o un
+    `OSError` dejaban el fichero vivo. Como el bootstrap usa
+    `CREATE TABLE IF NOT EXISTS`, un `test.db` superviviente conserva el esquema
+    ANTIGUO y los cambios de schema no se reflejan en la siguiente ejecucion.
+
+    Eso ya causo dano real durante la auditoria: la migracion 524 estaba
+    correctamente aplicada por el bootstrap y aun asi los tests seguian fallando
+    con `no column named lead_id`, lo que costo dos ciclos de diagnostico
+    persiguiendo un defecto inexistente.
+
+    `NELVYON_KEEP_TEST_DB=1` conserva la base para inspeccionarla tras un fallo.
+    El default —CI incluido— es siempre limpio.
+    """
+    if os.environ.get("NELVYON_KEEP_TEST_DB", "").strip() == "1":
+        return
+    if not os.path.exists(_test_db_path):
+        return
+    for _ in range(5):
+        try:
+            os.remove(_test_db_path)
+            return
+        except PermissionError:
+            gc.collect()
+            time.sleep(0.05)
+        except OSError:
+            return
+    # No se silencia: un esquema heredado invalida cualquier diagnostico.
+    raise RuntimeError(
+        f"no se pudo eliminar {_test_db_path}; la suite arrancaria con esquema "
+        f"antiguo y sus resultados no serian fiables"
+    )
+
+
+_reset_test_db()
+
 # Set test environment BEFORE importing app
 os.environ["ENVIRONMENT"] = "test"
 os.environ["DATABASE_URL"] = f"sqlite+aiosqlite:///{_test_db_path}"

@@ -743,7 +743,9 @@ class ReportingService:
         r = await self.session.execute(
             text(
                 """
-                SELECT id, name, industry, logo_url, website_url
+                -- `website_url` pertenece a las tablas de cliente
+                -- (`os_clients`, `nelvyon_clients`), no a `workspaces`.
+                SELECT id, name, industry, logo_url
                 FROM workspaces WHERE id = :ws
                 """
             ),

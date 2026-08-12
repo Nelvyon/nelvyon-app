@@ -13,14 +13,67 @@ from sqlalchemy import text
 
 from ._schema_bootstrap import (
     CANONICAL_MIGRATION,
+    CANONICAL_MIGRATIONS,
+    columnas_relajadas,
+    indices_unicos_sqlite,
     canonical_table_names,
     sqlite_add_column_statements,
     sqlite_create_statements,
 )
 
 
-def test_la_migracion_canonica_existe():
-    assert CANONICAL_MIGRATION.is_file(), f"falta la migración canónica: {CANONICAL_MIGRATION}"
+#: La fuente canónica dejó de ser un único fichero: 507 transcribió mal el
+#: esquema que los servicios ya esperaban, y 524-527 lo corrigen. El bootstrap
+#: consume la CONCATENACIÓN, así que este guard verifica el conjunto y su orden.
+FUENTES_ESPERADAS = (
+    "507_fastapi_runtime_schemas.sql",
+    "524_fastapi_raw_sql_schema_drift.sql",
+    "525_fastapi_raw_sql_schema_drift_batch2.sql",
+    "526_legacy_not_null_relaxation.sql",
+    "527_intent_scores_unique.sql",
+    "528_intent_scores_legacy_pk_repair.sql",
+)
+
+
+def test_las_fuentes_canonicas_existen_y_estan_en_orden():
+    assert tuple(p.name for p in CANONICAL_MIGRATIONS) == FUENTES_ESPERADAS, (
+        "el conjunto o el orden de las fuentes canónicas cambió; el orden importa "
+        "porque 526 relaja restricciones que 507 declaró"
+    )
+    for fichero in CANONICAL_MIGRATIONS:
+        assert fichero.is_file(), f"falta la migración canónica: {fichero}"
+
+
+def test_el_bootstrap_consume_exactamente_esas_fuentes():
+    """No basta con que existan: el bootstrap debe leerlas todas."""
+    texto = CANONICAL_MIGRATION.read_text()
+    for fichero in CANONICAL_MIGRATIONS:
+        marca = fichero.read_text(encoding="utf-8").strip().split(chr(10))[0]
+        assert marca in texto, f"{fichero.name} no llega al bootstrap"
+
+
+def test_no_se_puede_volver_a_una_unica_ruta():
+    """La regresión concreta que este guard impide."""
+    from pathlib import Path
+
+    assert not isinstance(CANONICAL_MIGRATION, Path), (
+        "CANONICAL_MIGRATION volvió a ser una ruta única: el esquema de test "
+        "dejaría fuera 524-527 y los fallos parecerían defectos de producto"
+    )
+    assert len(CANONICAL_MIGRATIONS) >= 5
+
+
+def test_la_relajacion_de_526_llega_al_bootstrap():
+    """SQLite no soporta `DROP NOT NULL`: se aplica al generar el CREATE TABLE."""
+    relajadas = columnas_relajadas()
+    assert ("pr_releases", "body") in relajadas
+    assert len(relajadas) == 6, f"526 declara {len(relajadas)} columnas, se esperaban 6"
+
+
+def test_los_indices_unicos_llegan_al_bootstrap():
+    """Sin el índice de 527 el `ON CONFLICT` no tendría árbitro en SQLite."""
+    indices = indices_unicos_sqlite()
+    assert any("uq_intent_scores_lead_workspace" in i for i in indices), indices
 
 
 def test_toda_tabla_canonica_produce_sentencia_de_creacion():

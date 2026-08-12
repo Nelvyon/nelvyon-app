@@ -388,7 +388,9 @@ class PushService:
         r = await self.session.execute(
             text(
                 """
-                SELECT user_id, endpoint, user_agent, created_at, updated_at
+                -- Las suscripciones no se modifican: no hay ningun UPDATE sobre
+                -- esta tabla, asi que `updated_at` nunca existio ni tendria valor.
+                SELECT user_id, endpoint, user_agent, created_at
                 FROM push_subscriptions
                 WHERE workspace_id = :ws
                 ORDER BY created_at DESC

@@ -204,9 +204,12 @@ async def test_tiktok_ads_list_campaigns(client: AsyncClient, auth_headers: dict
         json={"name": "F63 List"},
         headers=auth_headers,
     )
+    # La creacion falla cerrado sin integracion propia del workspace, asi que no
+    # hay nada que listar. La LECTURA si sigue disponible: lee filas locales
+    # filtradas por workspace, no consulta al proveedor.
     r = await client.get("/api/tiktok-ads/campaigns", headers=auth_headers)
     assert r.status_code == 200
-    assert len(r.json().get("campaigns", [])) >= 1
+    assert r.json().get("campaigns") == []
 
 
 @pytest.mark.asyncio

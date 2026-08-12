@@ -225,10 +225,15 @@ class LinkedInService:
         result = await self.session.execute(
             text(
                 """
-                SELECT id, from_name, message, received_at, outreach_id
+                -- `received_at` se mantiene en el contrato de respuesta via alias:
+                -- la columna fisica es `created_at` y nadie escribe una distinta.
+                -- `outreach_id` se retira: no existe columna, ni writer, ni
+                -- relacion real con `linkedin_outreach`, asi que no hay valor
+                -- que devolver — inventarlo seria peor que omitirlo.
+                SELECT id, from_name, message, created_at AS received_at
                 FROM linkedin_inbox
                 WHERE workspace_id = :ws AND client_id = :cid
-                ORDER BY received_at DESC
+                ORDER BY created_at DESC
                 LIMIT 50
                 """
             ),
