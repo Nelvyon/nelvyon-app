@@ -144,12 +144,29 @@ async def test_subscriptions_put_invalid_plan_400(client: AsyncClient, auth_head
     await db_session.refresh(row)
     sid = row.id
 
+    # `plan_id` dejo de poder cambiarse por esta ruta: lo fija el proveedor de
+    # pago. La intencion original —un plan inventado no se acepta— se mantiene y
+    # ademas se refuerza, porque ahora NINGUN plan se acepta aqui.
     r = await client.put(
         f"/api/v1/entities/subscriptions/{sid}",
         headers=auth_headers,
         json={"plan_id": "plan_inventado"},
     )
-    assert r.status_code == 400
+    assert r.status_code == 403, r.text
+    assert "payment provider" in r.json().get("detail", "")
+
+    # La validacion de plan desconocido sigue viva donde `plan_id` SI se acepta.
+    creada = await client.post(
+        "/api/v1/entities/subscriptions",
+        headers=auth_headers,
+        json={
+            "workspace_id": 1,
+            "plan_id": "plan_inventado",
+            "billing_cycle": "monthly",
+            "status": "pending",
+        },
+    )
+    assert creada.status_code == 400, creada.text
 
 
 @pytest.mark.asyncio

@@ -351,3 +351,16 @@ envíos Python fallan cerrado.
 Para habilitarlos hace falta decidir la relación real (¿la integración pertenece
 al usuario que conectó, o al workspace?) y migrar la clave. Mismo problema ya
 registrado para `oauth_connections` en el cierre de ads.
+
+## DEUDA — reembolsos autoservicio (2026-08-12)
+
+`POST /api/v1/payment/refund` pasa a autoridad de plataforma porque el `charge_id`
+venía del cuerpo sin comprobar contra nada y la cuenta Stripe es corporativa: un
+admin de cualquier workspace podía reembolsar el cargo de otro.
+
+Queda la pregunta de producto, que NO se decide aquí: ¿debe existir reembolso
+autoservicio para que un cliente recupere su pago sin intervención de NELVYON?
+Hoy no lo consume ningún componente del frontend, así que cerrarlo no quita
+funcionalidad. Si se quisiera, el diseño correcto exige vincular el cargo al
+workspace (`_get_or_create_stripe_customer` ya da esa relación, y `list_charges`
+la usa) y probablemente una política de importes y plazos.

@@ -5,6 +5,7 @@ from typing import List, Optional
 from datetime import datetime, date
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Query
+from fastapi import status as status_codes
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -19,6 +20,39 @@ from schemas.auth import UserResponse
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/entities/subscriptions", tags=["subscriptions"])
+
+#: Estados de `subscriptions` que CONCEDEN derecho de uso.
+#:
+#: `get_active_plan_id_for_workspace` resuelve el plan comercial con
+#: `WHERE status = 'active' ORDER BY id DESC`, asi que una fila con ese estado
+#: otorga el plan de inmediato. Se comprobo ejecutandolo: un `operator` creaba
+#: `plan_id="enterprise", status="active"` sin `stripe_subscription_id` y el
+#: workspace pasaba a enterprise sin pago.
+#:
+#: El derecho de uso lo concede el pago, no una peticion HTTP.
+#: `services/billing_sync.py` se describe a si mismo como "shared subscription
+#: write-path from Stripe (checkout verify + webhooks)" y escribe por
+#: `SubscriptionsService` DIRECTAMENTE, sin pasar por este router — asi que
+#: cerrar aqui no toca el flujo de cobro. Ningun otro consumidor usa estas rutas.
+ESTADOS_QUE_CONCEDEN_PLAN = frozenset({"active", "trialing"})
+
+#: Campos cuyo valor determina que se factura y que se puede usar. Solo el
+#: camino de Stripe puede fijarlos.
+CAMPOS_DE_DERECHO = ("plan_id", "status", "stripe_subscription_id", "stripe_session_id")
+
+
+def _rechaza_autoconcesion(valores: dict) -> None:
+    """El llamante no puede darse a si mismo un plan activo."""
+    estado = str(valores.get("status") or "").strip().lower()
+    if estado in ESTADOS_QUE_CONCEDEN_PLAN:
+        raise HTTPException(
+            status_code=status_codes.HTTP_403_FORBIDDEN,
+            detail=(
+                "Subscription entitlement comes from the payment provider, "
+                "not from this endpoint"
+            ),
+        )
+
 
 
 # ---------- Pydantic Schemas ----------
@@ -237,6 +271,8 @@ async def create_subscriptions(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
 
+    _rechaza_autoconcesion(data.model_dump())
+
     service = SubscriptionsService(db)
     try:
         result = await service.create(data.model_dump(), user_id=str(current_user.id))
@@ -350,8 +386,13 @@ async def update_subscriptions(
         update_dict = {k: v for k, v in data.model_dump().items() if v is not None}
         if "workspace_id" in update_dict and int(update_dict["workspace_id"]) != int(ws_ctx.workspace_id):
             raise HTTPException(status_code=400, detail="Cannot move subscription to another workspace")
-        if "plan_id" in update_dict:
-            assert_known_plan_or_raise(update_dict.get("plan_id"))
+        _rechaza_autoconcesion(update_dict)
+        prohibidos = [c for c in CAMPOS_DE_DERECHO if c in update_dict]
+        if prohibidos:
+            raise HTTPException(
+                status_code=status_codes.HTTP_403_FORBIDDEN,
+                detail=f"Fields set by the payment provider only: {', '.join(prohibidos)}",
+            )
         result = await service.update(
             id,
             update_dict,
