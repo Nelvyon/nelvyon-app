@@ -6,7 +6,7 @@
 
 ```text
 HEAD            (ver git log -1)
-último commit   fix(oauth): consume the state instead of merely reading it
+último commit   fix(portability): remove SQL that only works on SQLite
 fecha           2026-08-12
 bloque actual   31 — DB Performance (29/30 BLOCKED por Docker)
 tests           backend 1870 passed · frontend 6637 passed / 42 skipped · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
@@ -228,7 +228,24 @@ recalcularse contra `pg_catalog` cuando Docker vuelva.
 
 ---
 
-## Hallazgos de esta sesión (bloques 8–19)
+## Hallazgos de la sesión de bloques 21–28
+
+1. **CRÍTICO — webhooks de DM de Meta sin firma.** Cualquiera podía inyectar
+   mensajes falsos en la bandeja de un workspace, y el sistema los respondía y
+   los daba al agente. Cerrado (`5fd8c242`).
+2. **ALTO — SQL exclusivo de SQLite en producción.** `last_insert_rowid()` en 3
+   servicios y `datetime('now')` en el límite de tasa de LinkedIn: en PostgreSQL
+   fallan. Invisible porque los tests corren sobre SQLite. Cerrado (`a6d6dd03`)
+   con guard de clase.
+3. **ALTO — la regla de IA propia no se aplicaba.** `external_public` se
+   calculaba y no lo miraba nadie: un despliegue con `OPENAI_BASE_URL` público
+   mandaba todo el tráfico a un proveedor de pago. Cerrado (`eec0f6ce`).
+4. **MEDIO — el cliente reintentaba mutaciones.** Un POST con 504 se reenviaba,
+   duplicando el efecto que el servidor acababa de proteger. Cerrado (`36734c8f`).
+5. **MEDIO** — cadena de agentes sin tope; `str(exc)` interno al stream; campo
+   `website_url` siempre nulo; seed de `users` que fallaba en silencio. Cerrados.
+
+## Hallazgos de la sesión anterior (bloques 8–19)
 
 Por orden de gravedad. Ninguno queda abierto.
 
@@ -253,6 +270,9 @@ Por orden de gravedad. Ninguno queda abierto.
    Todos cerrados.
 
 ## Siguiente acción exacta
+
+**Siguiente: bloque 31 — DB Performance.** Los bloques 29 y 30 siguen BLOCKED
+por Docker; 20 sigue BLOCKED por la decisión de propiedad de integración.
 
 Bloque **20 está BLOCKED**: completar Ads multi-tenant exige decidir a quién
 pertenece una integración (usuario que conectó vs workspace), que es la misma
