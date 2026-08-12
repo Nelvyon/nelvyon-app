@@ -6,10 +6,10 @@
 
 ```text
 HEAD            (ver git log -1)
-último commit   fix(billing): entitlements and refunds stop being self-service
+último commit   fix(billing): a charge's price can no longer come from a default
 fecha           2026-08-12
-bloque actual   8 — Charge Pack / Credits / Quotas (siguiente disponible)
-tests           backend 1751 passed · frontend 6609 passed / 42 skipped · tsc --noEmit limpio
+bloque actual   8 — Charge Pack / Credits / Quotas (PARCIAL, ver siguiente acción)
+tests           backend 1751 passed · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
 build           backend compileall limpio · frontend sin tocar desde el último build conocido
 árbol git       limpio
 push/PR/merge   ninguno
@@ -36,7 +36,7 @@ PG certification BLOQUEADO — Docker Desktop caído (npipe dockerDesktopLinuxEn
 | 5 | BFF Authorization | **CERTIFIED** | diferencial de parseo `X-Workspace-Id` corregido |
 | 6 | BFF Ads / Provider Isolation | **CERTIFIED** | el lado Node ya era correcto; fijado con guard |
 | 7 | Financial Safety | **CERTIFIED** | `83977fea` — 3 hallazgos: autoconcesión de plan, refund cross-tenant, fail-open en verify |
-| 8 | Charge Pack / Credits / Quotas | PENDING | |
+| 8 | Charge Pack / Credits / Quotas | **PARCIAL** | precio por defecto cerrado; cuota advisor verificada; falta idempotencia/ledger/precisión |
 | 9 | Campaign Idempotency | PENDING | deuda ya medida, ver abajo |
 | 10 | External Side-effect Idempotency | PENDING | |
 | 11 | Jobs / Workers / Queues | PENDING | |
@@ -102,6 +102,24 @@ Están en git y con guards vivos; no se reabren sin evidencia nueva.
 ## Hallazgos abiertos
 
 Ninguno CRITICAL ni HIGH sin resolver a día de hoy.
+
+### Bloque 8 — parcial
+
+**Cerrado**: `PACK_WHOLESALE[packSku] ?? 149` cobraba un SKU inexistente al
+precio de un pack que no existe, y ese mismo 149 fijaba el suelo de `retailEur`.
+Ahora un SKU fuera del catálogo es 400 y no se cobra nada.
+
+**Verificado correcto, no volver a auditar**: `_consume_month_usage` es un
+compare-and-swap atómico (`UPDATE ... WHERE used < :limit` + `rowcount`), no el
+read-then-write de `send_campaign`. Sin doble gasto por concurrencia.
+
+**Deuda registrada**: `marketplace.purchase_item` escribe `status='completed'`
+con importe y sin cobro; nada lee esas filas salvo el listado. Que el marketplace
+cobre de verdad es decisión de producto.
+
+**Falta en el bloque 8**: idempotencia de `chargePartnerClientPack` (un POST
+repetido cobra otra vez), ledger, precisión de moneda (`Number(retailEur)` admite
+decimales arbitrarios) y techo de `retailEur` (hoy solo hay suelo).
 
 ### Cerrado en el bloque 7 — tres hallazgos en los caminos de dinero
 
@@ -191,6 +209,7 @@ necesita decisión de producto o PostgreSQL real.
 | `platformWorkspaceHeaderParity.test.ts` | que BFF y FastAPI lean `X-Workspace-Id` como números distintos |
 | `adsProviderIsolation.test.ts` | que una superficie Node lea una cuenta de ads corporativa del entorno |
 | `test_subscription_entitlement_self_grant.py` | autoconcederse plan/estado/ids de Stripe; refund con autoridad de workspace; fail-open en verify |
+| `chargePackPricing.test.ts` | que el precio de un cobro salga de un valor por defecto |
 
 ---
 
@@ -211,18 +230,19 @@ recalcularse contra `pg_catalog` cuando Docker vuelva.
 
 ## Siguiente acción exacta
 
-Bloque **8 — Charge Pack / Credits / Quotas**: SKU, retail/wholesale, techos,
-moneda, precisión, idempotencia, ledger, actor, concurrencia, doble gasto.
+Terminar el bloque **8**, que quedó PARCIAL. Lo que falta, en orden:
 
-Pistas ya encontradas, para no volver a buscarlas:
-  * `marketplace.purchase_marketplace_item` escribe `marketplace_purchases` con
-    `status='completed'` y un importe, **sin cobro real asociado** — revisar qué
-    significa esa compra y si debe existir sin pago;
-  * `advisor_entitlements.consume_advisor_session` decrementa cuota mensual del
-    plan con el mismo patrón read-then-write que campañas: comprobar concurrencia
-    (`_consume_month_usage` en `routers/advisor_entitlements.py`);
-  * `affiliates.register_affiliate` ya exige `require_workspace_admin` y acota
-    `commission_rate` con `ge=0, le=1`.
+1. **Idempotencia de `chargePartnerClientPack`** (`apps/web/src/lib/partners/
+   partnerConnectStore.ts`): un POST repetido a `charge-pack` cobra otra vez. Es
+   la misma familia que la deuda de `send_campaign`, y probablemente el bloque 10.
+2. **Precisión de moneda**: `Number(body.retailEur)` admite `149.999999`. Ver
+   cómo lo almacena `chargePartnerClientPack` (céntimos vs decimal).
+3. **Techo de `retailEur`**: hoy solo hay suelo (`>= wholesale`). Si debe haber
+   máximo es decisión de producto — no inventarlo.
+4. **Ledger**: comprobar si existe registro de doble entrada o solo el cobro.
+
+Después continuar por el bloque **9 — Campaign Idempotency**, cuya deuda ya está
+medida y escrita más abajo.
 
 Comandos del entorno, para no volver a buscarlos:
 
