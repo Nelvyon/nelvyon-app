@@ -122,7 +122,23 @@ async def enroll_in_course(course_id: str, body: EnrollBody, db: AsyncSession = 
 
 
 @lms_router.get("/courses/{course_id}/progress/{email}")
-async def student_progress(course_id: str, email: str, db: AsyncSession = Depends(get_db)):
+async def student_progress(
+    course_id: str,
+    email: str,
+    # Estos dos exponen datos personales del alumno —quien esta matriculado y su
+    # progreso— y no tenian NINGUNA autenticacion: bastaba el id del curso y un
+    # correo, lo que ademas servia de oraculo de enumeracion.
+    #
+    # El propio fichero marca por nombre lo que si es publico
+    # (`public_course_catalog`, `public_course_detail`), y estos no lo son.
+    #
+    # El equivalente Node exige un token de alumno
+    # (`verifyLearnerAccessToken`); en Python no existe ese verificador, asi que
+    # se exige contexto de workspace —acceso del personal— en vez de inventar un
+    # esquema de tokens paralelo. La paridad queda anotada como deuda.
+    _ctx: WorkspaceContext = Depends(require_workspace),
+    db: AsyncSession = Depends(get_db),
+):
     await LmsService.ensure_schema()
     try:
         return await get_lms_service(db).get_progress(course_id, email)
@@ -140,7 +156,11 @@ async def complete_lesson(enrollment_id: str, lesson_id: str, db: AsyncSession =
 
 
 @lms_router.get("/enrollments/{enrollment_id}/certificate")
-async def get_certificate(enrollment_id: str, db: AsyncSession = Depends(get_db)):
+async def get_certificate(
+    enrollment_id: str,
+    _ctx: WorkspaceContext = Depends(require_workspace),
+    db: AsyncSession = Depends(get_db),
+):
     await LmsService.ensure_schema()
     try:
         return await get_lms_service(db).generate_certificate(enrollment_id)

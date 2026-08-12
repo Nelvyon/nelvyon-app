@@ -429,3 +429,19 @@ degradación es detectable y no silenciosa.
 Lo que falta es una decisión de despliegue: exigir Redis en producción (coste
 recurrente) o mover el contador a PostgreSQL. No se elige aquí porque introduce
 infraestructura con coste. Relacionado con el bloque 37 (ENV de producción).
+
+## DEUDA — paridad del token de alumno en LMS (2026-08-12)
+
+`apps/web/src/app/api/lms/courses/[id]/progress/[email]/route.ts` exige un token
+de alumno (`verifyLearnerAccessToken`) para que el propio alumno vea su progreso.
+El equivalente Python no tiene ese verificador, así que en el bloque 16 se acotó
+a contexto de workspace (acceso de personal) en lugar de inventar un esquema de
+tokens paralelo.
+
+Consecuencia: por el camino Python, un alumno no puede consultar su progreso ni
+su certificado sin ser miembro del workspace. Si ese caso importa, hay que
+portar el verificador, no relajar el alcance.
+
+Aparte: `POST /api/lms/courses/{id}/enroll` tampoco tiene autenticación. Puede
+ser deliberado (auto-matrícula en curso público) o un hueco de spam. No se toca
+sin decidir cuál de las dos cosas es.
