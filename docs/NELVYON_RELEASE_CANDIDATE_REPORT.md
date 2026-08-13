@@ -1,41 +1,43 @@
 # NELVYON — Informe de Release Candidate
 
 ```text
-HEAD              a38cff62
+HEAD              9a3d71be
 fecha             2026-08-13
 árbol git         limpio
 push/PR/merge     ninguno
-backend           2182 passed / 0 failed / 14 skipped (certificaciones PostgreSQL sin DSN)
-frontend          6646 passed / 42 skipped (751 ficheros)
-PostgreSQL real   431 migraciones desde cero + create_all + smoke de runtime
+
+backend           2206 passed / 0 failed / 14 skipped (certificaciones PG sin DSN)
+frontend          6656 passed / 42 skipped (752 ficheros) · 6 corridas limpias
+E2E               406 tests · 404 passed / 1 skipped / 0 failed
 typecheck         tsc --noEmit limpio
 build producción  next build completa
 compileall        limpio
+dependencias      pip-audit: 1 hallazgo sin fix, cerrado por alcanzabilidad
+PostgreSQL real   432 migraciones desde cero + create_all + smoke de runtime
 ```
 
 ## Veredicto
 
 **NO se declara `NELVYON SAAS RELEASE CANDIDATE ✅`.**
 
-Ya no por falta de evidencia: los siete bloques que dependían de Docker están
-ejecutados y medidos contra PostgreSQL real. Se detiene por **un hallazgo HIGH
-abierto que exige una decisión de producto** (H-1) y por dos verificaciones que
-siguen necesitando red.
+Toda la certificación obligatoria está verde y no queda ningún CRITICAL ni HIGH
+sin resolver salvo uno, que es exactamente el motivo de no declararlo:
 
-Lo que la certificación con motor real cambió respecto al informe anterior:
+**Tres tablas —`calendar_events`, `audit_logs` y `social_posts`— siguen
+declaradas por dos migraciones con definiciones incompatibles.** No es falta de
+investigación: se midió quién escribe y quién lee cada una, en el backend
+FastAPI y en `apps/web`, y las tres tienen consumidores vivos enfrentados.
+Resolverlas exige un dato que **no está en el repositorio**: qué forma tienen hoy
+esas tablas en la base de producción. Con esa respuesta el camino es mecánico y
+ya está probado en la migración 532.
 
-* **Dos bloques que estaban en verde no lo estaban.** El tope de miembros se
-  daba por atómico y era evadible (8 filas con tope 5); el simulacro de
-  restauración aprobaba un backup de 0 bytes. Los dos verdes previos venían de
-  SQLite y de un `docker cp` que devuelve 0 sobre un fichero vacío. Ambos
-  corregidos y vueltos a medir.
-* **La base no se puede reconstruir desde el repositorio.** Las migraciones
-  aplican de cero (431/431) y la aplicación arranca, pero seis tablas quedan con
-  la forma de otra generación del producto y sus consumidores fallan. Producción
-  funciona; recuperación ante desastres, no.
+Además, `506a_reconcile_legacy_pre_507_social_posts.sql` contiene una instrucción
+explícita —«Do NOT rename bookings / api_keys / calendar_events / invoices /
+audit_logs / qr_codes»— tomada con contexto que el código no explica. Saltársela
+sería renombrar a ciegas tablas que probablemente tienen datos.
 
-Declarar RC con H-1 abierto sería afirmar que el sistema se puede reconstruir, y
-no se puede.
+Declarar RC dejaría implícito que la base se puede reconstruir entera desde el
+repositorio, y con esas tres tablas todavía no.
 
 ## Estado por área
 
@@ -61,14 +63,14 @@ no se puede.
 | Gates de CI | CERTIFIED | el gate corría 9 ficheros y ningún guard | `test_ci_gate_coverage` | — | — |
 | Contratos de API | CERTIFIED | dos vocabularios de estado en campañas | `test_campaign_status_contract` | — | unificar la columna |
 | Frontend | VERIFIED | `next build` real completa | 6646 tests | — | — |
-| E2E | BLOCKED_EXTERNALLY | journey de auth 5/5 cuando la fuente está en caché | `e2e/auth.spec.ts` | red: `next/font` descarga de Google Fonts al compilar el dev server | — |
+| E2E | CERTIFIED | 406 tests · 404 passed / 1 skipped / 0 failed. El bloqueo de red ya no existe | suite completa `playwright test` | — | 1 skip declarado (smoke sin credenciales de plataforma) |
 | Concurrencia | CERTIFIED | el tope ERA evadible: 8 de tope 5 con 24 simultáneas. Cerrojo de fila padre → 5/5 | `test_pg_concurrency_certification` | — | — |
-| Column / constraint drift | CERTIFIED con hallazgo abierto | 693 tablas de `pg_catalog`; 0 ON CONFLICT, 0 PK, 22 NOT NULL fijados; 47 columnas del ORM ausentes en PG | `test_pg_constraint_drift_certification` | — | H-1 |
+| Column / constraint drift | CERTIFIED con hallazgo abierto | 0 ON CONFLICT · 0 PK · 20 NOT NULL fijados (eran 22; la migración 532 resolvió 2). Causa raíz medida: 15 tablas declaradas por varias migraciones | `test_pg_constraint_drift_certification`, `test_migration_table_collisions` | — | 3 tablas, ver veredicto |
 | Cobertura SQLite vs PG | CERTIFIED | medido qué NO reproduce SQLite: NOT NULL, tipos y carreras de escritura | `test_sqlite_only_sql_guard` + certificaciones PG | — | — |
 | Migraciones | CERTIFIED | 431/431 desde cero, 0 saltadas; `create_all` añade 42 tablas; smoke `/health` 200 y `/health/ready` 200 | `scripts/pg-cert-db.mjs` | — | 42 tablas fuera de control de migración |
 | Rendimiento de BD | CERTIFIED | 21 filtros de inquilino sin índice → migración 531. Seq Scan 1082 buffers/9,88 ms → índice 402/1,16 ms | `test_pg_tenant_index_coverage` | — | 76 columnas sin índice, ninguna consultada |
 | Backup / restore | CERTIFIED | 8/8; dump de 2.269.676 bytes restaurado y marcador verificado. Aprobaba copias de 0 bytes | `run-postgres-restore-drill.mjs` | — | — |
-| Dependencias | BLOCKED_EXTERNALLY | frontend con lockfile y audit | — | red para CVE | backend sin lockfile |
+| Dependencias | CERTIFIED | pip-audit: 1 hallazgo (`ecdsa` PYSEC-2026-1325) sin fix publicado, cerrado por alcanzabilidad; `requirements.lock.txt` con 118 distribuciones | `test_jwt_algorithm_ec_blocked`, `test_requirements_lock_sync` | — | — |
 | Ads multi-tenant | CERTIFIED | decisión aprobada: el workspace es propietario; migración 529 | `test_integration_workspace_ownership` | — | — |
 | Propiedad de integraciones | CERTIFIED | `workspace_id` propietario, `connected_by_user_id` auditoría; backfill solo inequívoco | `test_integration_workspace_ownership` | — | filas ambiguas fail-closed |
 | Remitente de campañas | CERTIFIED | `campaigns.from_email` llega al envío | `test_campaign_sender_identity` | — | — |
@@ -124,30 +126,43 @@ campañas, `expires_in: 0` del OSS e índices redundantes de `intent_scores`.
 
 ## Qué falta exactamente para el RC
 
-1. **Decisión de producto (H-1)** → seis nombres de tabla reclamados por dos
-   generaciones de esquema vivas. Hay tres salidas legítimas —renombrar la
-   generación legacy, renombrar la del ORM, o mapear `tenant_id`→`workspace_id`
-   y fusionar— y el repositorio no dice cuál es la intención. Elegir por mi
-   cuenta podría dejar sin datos a quien use la otra. Detalle y evidencia
-   reproducida en `docs/NELVYON_CLOSURE_STATE.md`, hallazgo H-1.
-2. **Red** → `pip-audit` y lockfile del backend.
-3. **Red** (segundo uso) → la suite E2E completa. No es cuestión de tiempo: el
-   servidor de desarrollo que Playwright levanta **no compila** sin red, porque
-   24 componentes usan `next/font/google` y la fuente se descarga en tiempo de
-   compilación. El `next build` de producción sí pasa (la fuente queda en
-   caché), pero `playwright test` aborta con
-   «Failed to fetch IBM Plex Sans from Google Fonts».
+**Una sola cosa, y es un dato, no una tarea:** qué forma tienen hoy
+`calendar_events`, `audit_logs` y `social_posts` en la base de producción.
 
-   Medido, no supuesto: el journey de auth pasó 5/5 antes, con la fuente en
-   caché; la ejecución completa aborta al recompilar.
+Cada una está declarada por dos migraciones distintas:
 
-La decisión de propiedad de integraciones ya está tomada y aplicada. La que
-queda —H-1— es distinta: no bloquea una prueba, describe un defecto real que
-solo se ve al reconstruir la base desde cero.
+| tabla | definición A | definición B | quién usa cada una |
+|---|---|---|---|
+| `audit_logs` | 412: `tenant_id uuid`, `module`, `details` | 507: `tenant_id integer`, `old_value`, `new_value` | A: un script de verificación RLS · B: `services/audit_service.py` |
+| `calendar_events` | 408: `tenant_id`, `event_date`, `type` | modelo ORM: `workspace_id`, `start_time`, `end_time` | A: `apps/web` · B: backend, 7 sitios |
+| `social_posts` | 507: `tenant_id`, `media_urls`, `post_type` | modelo ORM: `workspace_id`, `platform`, `likes` | A: 6 sitios del backend · B: `services/social_posts.py` y 2 routers |
 
-Frente al informe anterior, el reparto cambió. Antes faltaba evidencia. Ahora la
-evidencia existe, y dice que dos de los verdes previos no lo eran: el tope de
-miembros era evadible y el simulacro de restauración aprobaba un backup vacío.
-Los dos venían de medir en un motor que no reproduce la propiedad que se
-pretendía certificar. Están corregidos y vueltos a medir; lo que queda abierto
-está acotado, reproducido y no puede crecer sin que un test lo diga.
+Gana siempre la de número más bajo, porque todas usan `CREATE TABLE IF NOT
+EXISTS`. Con esa respuesta, el camino ya está probado en la migración 532:
+
+* si producción tiene la forma canónica → apartar la perdedora vacía en la
+  cadena, como se hizo con `deals` y `conversations`;
+* si producción tiene la perdedora **con datos** → migrar los datos primero.
+
+Mientras tanto la clase no puede crecer: `test_migration_table_collisions.py`
+fija las 15 colisiones medidas y falla ante cualquier nueva.
+
+### Intermitencia del frontend: no reproducida
+
+6 corridas completas con la salida capturada entera, incluida una con la caché de
+Vite borrada: **6/6 limpias, 6656 passed / 42 skipped / 0 failed**. Los 2 fallos
+originales no reproducen y su identidad es irrecuperable porque aquella captura
+quedó recortada por el `tail` con el que se invocó. No se declara resuelto: se
+declara no reproducido, con el número de intentos delante.
+
+### Correcciones sobre lo que este informe decía antes
+
+Dos afirmaciones anteriores eran incorrectas y se rectifican con la medición:
+
+* **«E2E 78 passed / 0 failed»** era un artefacto de una captura truncada. La
+  suite tiene 406 tests, no 79, y aquella corrida tuvo 327 fallos — todos porque
+  se invocó con `PLAYWRIGHT_CHANNEL=chrome` y Chrome del sistema no está
+  instalado. Con el chromium incluido: 404 passed / 1 skipped / 0 failed.
+* **«el dev server no compila sin red»** ya no aplica: la red actual permite
+  descargar las fuentes, y además el `webServer` de Playwright usa el build de
+  producción, no el dev server.

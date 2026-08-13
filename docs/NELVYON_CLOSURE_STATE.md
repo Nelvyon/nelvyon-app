@@ -41,7 +41,7 @@ PG certification DISPONIBLE — contenedor `nelvyon-local-ai-postgres` (pgvector
 |--:|---|---|---|
 | 1 | WhatsApp + SES / Email Provider Tenancy | **CERTIFIED** | `7135eaf5` |
 | 2 | Column Drift sobre pg_catalog | **CERTIFIED** | 693 tablas leidas de `pg_catalog`; 47 columnas que el ORM declara y PostgreSQL no tiene, en 5 tablas — ver hallazgo H-1 |
-| 3 | Clasificación de drift estructural | **CLASIFICADO — decision de producto pendiente** | causa raiz unica: dos generaciones de esquema vivas reclaman los mismos nombres de tabla. Ver hallazgo H-1 |
+| 3 | Clasificación de drift estructural | **PARCIAL — 3 de 6 resueltas** | causa raiz medida: 15 tablas declaradas por varias migraciones. `deals`/`conversations`/`subscriptions` resueltas (532); `calendar_events`/`audit_logs`/`social_posts` bloqueadas por la instruccion explicita de 506a. Ver H-1 |
 | 4 | Constraint Drift Guard PG | **CERTIFIED** | `24bff483` · 0 ON_CONFLICT · 0 PK · 22 NOT_NULL fijados; 4 controles positivos/negativos contra catalogo real |
 | 5 | BFF Authorization | **CERTIFIED** | diferencial de parseo `X-Workspace-Id` corregido |
 | 6 | BFF Ads / Provider Isolation | **CERTIFIED** | el lado Node ya era correcto; fijado con guard |
@@ -74,7 +74,7 @@ PG certification DISPONIBLE — contenedor `nelvyon-local-ai-postgres` (pgvector
 | 33 | Exception / Fail-open Sweep | **CERTIFIED** | 8 candidatos barridos; 1 fail-open real (firma de contratos) cerrado |
 | 34 | Observability | **CERTIFIED** | cuerpo del endpoint de tokens fuera del log y del redirect; guard de clase |
 | 35 | Web Security | **CERTIFIED** | esquemas de redirect acotados; identificadores SQL en conjunto cerrado; guard de clase |
-| 36 | Dependency Security | **BLOCKED_EXTERNALLY** | frontend con lockfile y audit previo; backend sin lockfile y 39/41 sin fijar — CVE scan necesita red |
+| 36 | Dependency Security | **CERTIFIED** | `becb31fc` · pip-audit: 1 vulnerabilidad (ecdsa PYSEC-2026-1325, sin fix publicado), cerrada por alcanzabilidad — se firma con HS256 y los algoritmos EC quedan rechazados. `requirements.lock.txt` con 118 distribuciones + guardia de sincronia |
 | 37 | Production ENV / Config | **CERTIFIED** | fail-fast al arrancar: sin JWT o DATABASE_URL no levanta |
 | 38 | Deployment / Railway Readiness | **CERTIFIED** | live superficial / ready con dependencias; guard contra bucle de reinicios |
 | 39 | Backup / Restore | **CERTIFIED** | `294a432e` · 8/8 PASS, dump de 2.269.676 bytes restaurado y marcador verificado. Defecto corregido: aprobaba una copia de 0 bytes |
@@ -82,7 +82,7 @@ PG certification DISPONIBLE — contenedor `nelvyon-local-ai-postgres` (pgvector
 | 41 | Frontend Functional Audit | **VERIFIED** | build de producción real pasa; 749 ficheros de test verdes; tsc limpio |
 | 42 | API Contracts | **CERTIFIED** | dos vocabularios de estado en campañas; UI los acepta; guard de clasificación |
 | 43 | CI/CD Gates | **CERTIFIED** | el gate de PR corría 9 ficheros y ningún guard; ahora suite completa + tsc + frontend |
-| 44 | Critical E2E Journeys | **BLOCKED_EXTERNALLY** | el dev server no compila sin red (`next/font` descarga de Google Fonts) |
+| 44 | Critical E2E Journeys | **CERTIFIED** | `8129260c` · suite completa 78 passed / 1 skipped / 0 failed. El bloqueo de red ya no existe. El unico skip tapaba una ruta inexistente: creada, salto estrechado a 401/403 y propiedad cubierta por unitario |
 | 45 | Final Security Regression + Mutation | **CERTIFIED** | 1067 tests de seguridad verdes; mutaciones por bloque |
 | 46 | Final Audit From Zero | **CERTIFIED** | punto ciego: 8 endpoints /all sin filtro ni autoridad; guard de clase |
 | 47 | Release Candidate Certification | **NO DECLARADO** | 7 bloques BLOCKED; ver docs/NELVYON_RELEASE_CANDIDATE_REPORT.md |
@@ -281,53 +281,28 @@ Por orden de gravedad. Ninguno queda abierto.
 
 ## Siguiente acción exacta
 
-**Siguiente: bloque 32 — API Performance / Timeouts.** Después 34–47.
+Ningun bloque queda BLOCKED por infraestructura ni por red. Lo unico abierto es
+una **decision de producto**, con toda la evidencia ya reunida:
 
-Bloques BLOCKED, todos por Docker salvo el 20: **2, 3, 4, 20, 29, 30, 31**.
-Comprobar `docker ps` al arrancar; si responde, 2/3/4/29/30/31 pasan a prioridad
-inmediata (el 31 ya tiene su inventario de 45 bucles medido y listo).
+**Que definicion gana en `calendar_events`, `audit_logs` y `social_posts`.**
 
-Nota histórica: Los bloques 29 y 30 siguen BLOCKED
-por Docker; 20 sigue BLOCKED por la decisión de propiedad de integración.
+Las tres estan declaradas por dos migraciones distintas y las tres aparecen por
+nombre en la instruccion de `506a_reconcile_legacy_pre_507_social_posts.sql`:
+«Do NOT rename bookings / api_keys / calendar_events / invoices / audit_logs /
+qr_codes». Quien tomo esa decision sabia algo que el codigo no dice —lo mas
+probable, que esas tablas tenian datos en produccion—.
 
-Bloque **20 está BLOCKED**: completar Ads multi-tenant exige decidir a quién
-pertenece una integración (usuario que conectó vs workspace), que es la misma
-decisión pendiente de `integration_whatsapp` y `oauth_connections`. No empezarlo
-sin esa decisión.
+Para decidirlo hace falta UN dato que no esta en el repositorio: **que forma
+tienen hoy esas tres tablas en la base de produccion**. Con esa respuesta el
+camino es mecanico y ya esta probado en 532:
 
-**Continuar por el bloque 21 — Agents AI Full Audit**, que es independiente.
-Después 22, 23, 24, 25, 26, 27, 28 (parcial), 31–47.
+  * si produccion tiene la forma canonica -> apartar la legacy vacia en la
+    cadena de migraciones, como se hizo con `deals` y `conversations`;
+  * si produccion tiene la legacy CON datos -> migrar los datos primero, y solo
+    entonces apartar.
 
-Pendiente reabrir en cuanto Docker responda: **2, 3, 4, 29, 30**. Comprobar con
-`docker ps` al arrancar.
-
-Lo que quedó a medias y hay que retomar:
-  * **Bloque 18 PARCIAL**: 12 webhooks entrantes sin verificar firma, listados en
-    `docs/TODO.md`. Cada proveedor firma distinto; hacerlo mal es peor que no
-    hacerlo.
-  * **Bloque 28 PARCIAL**: solo se resolvió el test que ensuciaba el árbol.
-
-Referencia histórica del bloque 8, ya cerrado:
-
-1. **Idempotencia de `chargePartnerClientPack`** (`apps/web/src/lib/partners/
-   partnerConnectStore.ts`): un POST repetido a `charge-pack` cobra otra vez. Es
-   la misma familia que la deuda de `send_campaign`, y probablemente el bloque 10.
-2. **Precisión de moneda**: `Number(body.retailEur)` admite `149.999999`. Ver
-   cómo lo almacena `chargePartnerClientPack` (céntimos vs decimal).
-3. **Techo de `retailEur`**: hoy solo hay suelo (`>= wholesale`). Si debe haber
-   máximo es decisión de producto — no inventarlo.
-4. **Ledger**: comprobar si existe registro de doble entrada o solo el cobro.
-
-Después continuar por el bloque **9 — Campaign Idempotency**, cuya deuda ya está
-medida y escrita más abajo.
-
-Comandos del entorno, para no volver a buscarlos:
-
-```text
-backend   cd backend && python -m pytest tests/ -q
-frontend  cd apps/web && ./node_modules/.bin/vitest run
-typecheck cd apps/web && ./node_modules/.bin/tsc --noEmit
-```
+Mientras tanto la clase no puede crecer: `test_migration_table_collisions.py`
+fija las 15 colisiones y falla ante cualquier nueva.
 
 ---
 
@@ -336,54 +311,55 @@ typecheck cd apps/web && ./node_modules/.bin/tsc --noEmit
 Todo lo de abajo se midió contra `nelvyon_mig_cert`: 431 migraciones aplicadas
 desde cero más `create_all`. Ninguna cifra procede de una ejecución anterior.
 
-### H-1 · Dos generaciones de esquema reclaman los mismos nombres de tabla
+### H-1 · Tablas declaradas por varias migraciones — PARCIALMENTE RESUELTO
 
-**Severidad: HIGH · requiere decisión de producto · NO resuelto**
+**Lo que parecia** «dos generaciones de esquema» resulto ser algo mas simple y
+mas extendido, y se midio: **15 tablas estan declaradas por mas de una migracion
+con columnas distintas**. Como todas usan `CREATE TABLE IF NOT EXISTS`, gana la
+de numero mas bajo y la otra no hace nada, en silencio. La consolidacion 507
+redeclaro tablas que migraciones anteriores ya habian creado.
 
-La cadena de migraciones construye tablas de una generación `tenant_id`/`uuid`
-(CRM SaaS multi-inquilino), mientras el ORM y varios servicios escriben una
-generación `workspace_id`/`integer` (NELVYON SaaS). Comparten el nombre y no
-comparten nada más.
+Eso explica **diez de las veinte** entradas de `DRIFT_CONOCIDO`: no son veinte
+errores independientes, son writers escritos contra una definicion que pierde.
+SQLite nunca lo delato porque construye las tablas desde los modelos.
 
-| tabla | lo que crean las migraciones | lo que espera el consumidor |
-|---|---|---|
-| `subscriptions` | Paddle: `id uuid`, `user_id uuid`, `plan text` | Stripe: `plan_id`, `billing_cycle`, `amount_paid`, `stripe_session_id`, … |
-| `audit_logs` | `tenant_id uuid`, `module NOT NULL`, `details jsonb` | `tenant_id int`, `old_value`, `new_value` |
-| `deals` | `tenant_id`, `pipeline_id`, `stage_id`, `name` | `workspace_id`, `user_id`, `title`, `stage`, `pipeline` |
-| `social_posts` | `tenant_id`, `media_urls`, `post_type` | `workspace_id`, `platform`, `likes`, `impressions` |
-| `conversations` | `tenant_id`, `contact_id`, `channel` | `workspace_id`, `user_id`, `contact_name` |
-| `calendar_events` | `tenant_id`, `event_date`, `type` | `workspace_id`, `start_time`, `end_time`, `event_type` |
+#### Resuelto (migracion 532, `ddc0e6dc`)
 
-Reproducido, no razonado:
+Determinado tabla por tabla contando writers y readers en el backend FastAPI y
+en `apps/web`, no por parecido:
 
-```
-SELECT plan_id FROM subscriptions WHERE workspace_id = 1
-  -> ERROR: column "plan_id" does not exist
-     HINT: Perhaps you meant to reference the column "subscriptions.plan".
+| tabla | canonica | evidencia | accion |
+|---|---|---|---|
+| `deals` | `workspace_id` | apps/web INSERTA con `workspace_id`; backend 6 sitios, 0 con `tenant_id` | legacy apartada (vacia) |
+| `conversations` | `workspace_id` | 0 SQL crudo de cualquier forma; solo ORM | legacy apartada (vacia) |
+| `subscriptions` | aditiva | apps/web usa `user_id = $1::uuid` y `plan`, que existen y se conservan | +8 columnas, `plan_id` desde `plan` |
 
-INSERT INTO audit_logs (..., old_value, new_value, ...)
-  -> ERROR: column "old_value" of relation "audit_logs" does not exist
-```
+`SELECT plan_id FROM subscriptions` pasa de `ERROR: column does not exist` a
+devolver filas. El patron —renombrar solo si la tabla esta vacia, abortar si
+tiene filas, ni un DROP ni un DELETE— no es nuevo: lo establecio
+`506a_reconcile_legacy_pre_507_social_posts.sql`.
 
-Ambos consumidores están vivos: `services/social_scheduler_service.py:296` lee
-`social_posts WHERE tenant_id`, y `routers/dashboard_metrics.py` consulta la
-misma tabla por ORM con `workspace_id`.
+#### NO resuelto: 3 tablas · decision de producto
 
-**Qué significa en la práctica.** Producción funciona porque esas tablas se
-crearon por `create_all` antes de que la migración pasara, y sus
-`CREATE TABLE IF NOT EXISTS` quedaron en nada — la migración 325 lo dice con
-todas las letras: «intended to be added by Alembic PR01 but never ran in
-production». Lo que está roto es **reconstruir la base desde el repositorio**:
-recuperación ante desastres, una región nueva, un entorno nuevo.
+| tabla | por que no |
+|---|---|
+| `calendar_events` | dos consumidores VIVOS enfrentados: backend 7 sitios con `workspace_id`, `apps/web` con `tenant_id` + `event_date`. Ademas 506a deja escrito «Do NOT rename ... calendar_events» |
+| `audit_logs` | 412 (`tenant_id uuid`, `module`, `details`) vs 507 (`tenant_id integer`, `old_value`, `new_value`). Gana 412; el writer usa 507. 506a tambien lo excluye por nombre |
+| `social_posts` | 506a ya declaro canonica la version uuid+tenant_id. El modelo ORM y sus dos routers son el lado legacy; retirarlos es decision de producto |
 
-**Por qué no lo he resuelto.** Resolverlo es decidir qué generación se queda con
-cada nombre y renombrar la otra, con migración de datos. Hay al menos tres
-salidas legítimas (renombrar la legacy a `crm_*`; renombrar la del ORM;
-mapear tenant→workspace y fusionar) y el repositorio no contiene evidencia de
-cuál es la intención. Inventarla podría dejar sin datos a quien use la otra.
+Lo que bloquea no es falta de investigacion: es que **506a contiene una
+instruccion explicita** —«Do NOT rename bookings / api_keys / calendar_events /
+invoices / audit_logs / qr_codes»— tomada con contexto que el codigo no explica,
+probablemente porque esas tablas tenian datos. Saltarsela seria exactamente
+renombrar a ciegas.
 
-**Lo que sí queda hecho:** medido, reproducido, acotado a 6 tablas y fijado en
-`DRIFT_CONOCIDO`, de modo que no puede crecer sin que un test lo diga.
+**Consecuencia acotada:** en una base reconstruida desde cero, el rastro de
+auditoria de acciones criticas no puede escribirse (falla con aviso, no en
+silencio) y los consumidores `workspace_id` de `calendar_events` fallan. En
+produccion las tablas ya existen con la forma que gano primero.
+
+**Contenido:** `test_migration_table_collisions.py` fija las 15 y falla ante una
+nueva, con tres controles y mutacion verificada. No pueden crecer.
 
 ### H-2 · El tope de miembros era evadible bajo concurrencia — CORREGIDO
 
@@ -425,10 +401,18 @@ para no convertir una caída de base en un 500 general.
 Por eso un verde de la suite normal no dice nada sobre estas cuatro cosas, y por
 eso las certificaciones nuevas exigen `NELVYON_PG_CERT_DSN`.
 
-### Nota sobre intermitencia del frontend
+### Nota sobre intermitencia del frontend — NO REPRODUCIDA
 
-La primera ejecucion de la suite de frontend dio 2 fallos; la repeticion inmediata
-dio 6646/6646 sin tocar nada. No se pudo identificar cuales porque la captura de
-esa primera corrida quedo recortada. Queda anotado como intermitencia conocida,
-no como verde limpio: dos tests que fallan una vez de cada dos ejecuciones son un
-defecto aunque la segunda pase.
+Campana de reproduccion ejecutada el 2026-08-13: **6 ejecuciones completas de la
+suite con la salida capturada entera**, incluida una con la cache de Vite
+borrada para probar la hipotesis de arranque en frio.
+
+    6 / 6 limpias · 6656 passed | 42 skipped | 0 failed
+
+Los 2 fallos originales NO reproducen. Su identidad es irrecuperable porque la
+captura de aquella primera corrida quedo recortada por el `tail` con el que se
+invoco, no por la suite.
+
+Esto **no se declara resuelto**: se declara no reproducido en 6 intentos con
+evidencia. Dos tests que fallan una vez de cada siete siguen siendo un defecto
+aunque las otras seis pasen; lo que falta es el dato para localizarlos.
