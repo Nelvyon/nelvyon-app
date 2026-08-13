@@ -1,0 +1,255 @@
+"""Certificacion de constraint drift contra PostgreSQL REAL.
+
+POR QUE ESTE FICHERO EXISTE
+---------------------------
+`test_constraint_drift_analyzer.py` prueba el analizador con fixtures: demuestra
+que la LOGICA es correcta. No demuestra nada sobre el esquema del producto,
+porque nunca lee un catalogo.
+
+Aqui se lee `pg_catalog` de una base con la cadena completa de migraciones
+aplicada y se compara con los INSERT reales del repositorio. Es la unica forma
+de detectar un writer que omite una columna `NOT NULL`: SQLite no reproduce esa
+restriccion, asi que la suite normal da verde mientras PostgreSQL rechazaria el
+INSERT en produccion.
+
+COMO SE EJECUTA
+
+    node scripts/pg-cert-db.mjs            # aplica las 430 migraciones
+    NELVYON_PG_CERT_DSN=postgresql://... pytest tests/test_pg_constraint_drift_certification.py
+
+Sin DSN los tests se SALTAN, y el salto es explicito: no se declara certificado
+nada que no se haya medido.
+
+POR QUE HAY CONTROL POSITIVO
+----------------------------
+El detector encontro 0 casos de `ON_CONFLICT_DRIFT`. Un cero solo significa algo
+si se demuestra que el detector habria encontrado un positivo. Por eso
+`test_control_positivo_*` fabrica drift conocido en una tabla temporal real y
+exige que se detecte. Si esos tests pasan y el barrido da cero, el cero es
+evidencia. Si el detector se rompe, el control lo delata antes que el barrido.
+
+LINEA BASE
+----------
+`DRIFT_CONOCIDO` fija los hallazgos medidos el 2026-08-13. El test falla si
+aparece drift NUEVO (regresion) y tambien si desaparece uno conocido sin
+actualizar la lista — un arreglo debe quedar registrado, no colarse en silencio.
+"""
+from __future__ import annotations
+
+import os
+
+import pytest
+
+from ._constraint_drift import (
+    NOT_NULL_DRIFT,
+    ON_CONFLICT_DRIFT,
+    Writer,
+    comparar,
+    leer_catalogo,
+    writers_del_repo,
+)
+
+DSN = os.environ.get("NELVYON_PG_CERT_DSN")
+
+requiere_pg = pytest.mark.skipif(
+    not DSN,
+    reason=(
+        "requiere PostgreSQL con las migraciones aplicadas; "
+        "levantar con scripts/pg-cert-db.mjs y exportar NELVYON_PG_CERT_DSN"
+    ),
+)
+
+#: Drift medido contra PostgreSQL real (430 migraciones, 693 tablas).
+#: Todos son writers que omiten una columna NOT NULL sin default: el INSERT
+#: fallaria en produccion. Estan documentados en NELVYON_CLOSURE_STATE.md.
+DRIFT_CONOCIDO = frozenset({
+    "NOT_NULL_DRIFT|ab_experiments|channel|services/ab_testing_service.py",
+    "NOT_NULL_DRIFT|ab_experiments|user_id|services/ab_testing_service.py",
+    "NOT_NULL_DRIFT|ab_variants|content|services/ab_testing_service.py",
+    "NOT_NULL_DRIFT|api_keys|tenant_id|services/api_keys_service.py",
+    "NOT_NULL_DRIFT|audit_logs|module|services/audit_service.py",
+    "NOT_NULL_DRIFT|bookings|booking_date|services/booking_service.py",
+    "NOT_NULL_DRIFT|bookings|booking_time|services/booking_service.py",
+    "NOT_NULL_DRIFT|bookings|confirmation_token|services/booking_service.py",
+    "NOT_NULL_DRIFT|bookings|user_id|services/booking_service.py",
+    "NOT_NULL_DRIFT|calendar_events|event_date|services/calendar_service.py",
+    "NOT_NULL_DRIFT|calendar_events|tenant_id|services/calendar_service.py",
+    "NOT_NULL_DRIFT|calendar_events|type|services/calendar_service.py",
+    "NOT_NULL_DRIFT|crm_activities|user_id|services/crm_service.py",
+    "NOT_NULL_DRIFT|crm_contacts|user_id|services/crm_service.py",
+    "NOT_NULL_DRIFT|deals|name|routers/e2e_orchestrator.py",
+    "NOT_NULL_DRIFT|deals|tenant_id|routers/e2e_orchestrator.py",
+    "NOT_NULL_DRIFT|invoices|tenant_id|services/invoice_service.py",
+    "NOT_NULL_DRIFT|qr_codes|destination_url|services/qr_service.py",
+    "NOT_NULL_DRIFT|qr_codes|tenant_id|services/qr_service.py",
+    "NOT_NULL_DRIFT|security_events|user_id|services/web_performance_service.py",
+    "NOT_NULL_DRIFT|social_posts|tenant_id|routers/e2e_orchestrator.py",
+    "NOT_NULL_DRIFT|webhook_deliveries|webhook_id|services/webhook_service.py",
+})
+
+_TABLA_SONDA = "zz_drift_probe"
+
+
+def _clave(h) -> str:
+    return f"{h.clase}|{h.tabla}|{','.join(h.columnas)}|{h.fichero}"
+
+
+@pytest.fixture(scope="module")
+def catalogo():
+    psycopg2 = pytest.importorskip("psycopg2")
+    conn = psycopg2.connect(DSN)
+    try:
+        cur = conn.cursor()
+        esquema = leer_catalogo(cur)
+        cur.close()
+    finally:
+        conn.close()
+    return esquema
+
+
+@pytest.fixture(scope="module")
+def catalogo_con_sonda():
+    """Tabla real con drift fabricado, para probar que el detector esta vivo.
+
+    Se crea y se destruye dentro del test: no deja rastro en la base.
+    """
+    psycopg2 = pytest.importorskip("psycopg2")
+    conn = psycopg2.connect(DSN)
+    conn.autocommit = True
+    try:
+        cur = conn.cursor()
+        cur.execute(f"DROP TABLE IF EXISTS {_TABLA_SONDA}")
+        cur.execute(
+            f"""
+            CREATE TABLE {_TABLA_SONDA} (
+              a INTEGER NOT NULL,
+              b INTEGER NOT NULL,
+              obligatoria TEXT NOT NULL,
+              con_default TEXT NOT NULL DEFAULT 'x',
+              UNIQUE (b, a)
+            )
+            """
+        )
+        esquema = leer_catalogo(cur)
+        cur.execute(f"DROP TABLE IF EXISTS {_TABLA_SONDA}")
+        cur.close()
+    finally:
+        conn.close()
+    return esquema
+
+
+def _writer(**kw) -> Writer:
+    base = dict(
+        tabla=_TABLA_SONDA,
+        columnas=frozenset({"a", "b", "obligatoria"}),
+        conflict_target=None,
+        conflict_por_constraint=None,
+        fichero="<sonda>",
+    )
+    base.update(kw)
+    return Writer(**base)
+
+
+# ───────────────────────────── control positivo: el detector esta vivo
+
+
+@requiere_pg
+def test_control_positivo_on_conflict_sin_arbitro(catalogo_con_sonda):
+    """`ON CONFLICT (a)` con `UNIQUE (b, a)` NO tiene arbitro: debe detectarse.
+
+    Si esto no salta, el cero de ON_CONFLICT_DRIFT del barrido no vale nada.
+    """
+    hallazgos = comparar([_writer(conflict_target=frozenset({"a"}))], catalogo_con_sonda)
+    clases = {h.clase for h in hallazgos}
+    assert ON_CONFLICT_DRIFT in clases, (
+        "el detector de ON CONFLICT no reacciona ante un arbitro inexistente "
+        "en una tabla PostgreSQL real"
+    )
+
+
+@requiere_pg
+def test_control_negativo_on_conflict_con_arbitro(catalogo_con_sonda):
+    """`ON CONFLICT (a, b)` con `UNIQUE (b, a)` SI tiene arbitro: el orden no importa.
+
+    Sin esto, un detector que marcase todo tambien pasaria el control positivo.
+    """
+    hallazgos = comparar(
+        [_writer(conflict_target=frozenset({"a", "b"}))], catalogo_con_sonda
+    )
+    assert not [h for h in hallazgos if h.clase == ON_CONFLICT_DRIFT], (
+        "marca drift donde el UNIQUE cubre exactamente esas columnas"
+    )
+
+
+@requiere_pg
+def test_control_positivo_not_null_omitida(catalogo_con_sonda):
+    """Omitir una columna NOT NULL sin default debe detectarse."""
+    hallazgos = comparar(
+        [_writer(columnas=frozenset({"a", "b"}))], catalogo_con_sonda
+    )
+    columnas = {c for h in hallazgos if h.clase == NOT_NULL_DRIFT for c in h.columnas}
+    assert "obligatoria" in columnas
+
+
+@requiere_pg
+def test_control_negativo_not_null_con_default(catalogo_con_sonda):
+    """Una NOT NULL CON default la rellena PostgreSQL: no es drift.
+
+    Marcarla seria ruido que acabaria desactivando el detector entero.
+    """
+    hallazgos = comparar(
+        [_writer(columnas=frozenset({"a", "b", "obligatoria"}))], catalogo_con_sonda
+    )
+    columnas = {c for h in hallazgos if h.clase == NOT_NULL_DRIFT for c in h.columnas}
+    assert "con_default" not in columnas
+
+
+# ───────────────────────────── barrido real
+
+
+@requiere_pg
+def test_el_catalogo_es_el_esquema_completo(catalogo):
+    """Guardia contra certificar sobre una base vacia o a medio migrar.
+
+    Sin esto, un DSN equivocado daria cero hallazgos y pareceria un exito.
+    """
+    assert len(catalogo) > 600, (
+        f"solo {len(catalogo)} tablas: la base no tiene la cadena de migraciones "
+        "aplicada; el resultado no certificaria nada"
+    )
+    for imprescindible in ("subscriptions", "audit_logs", "workspaces", "intent_scores"):
+        assert imprescindible in catalogo, f"falta {imprescindible} en el catalogo"
+
+
+@requiere_pg
+def test_no_hay_drift_nuevo(catalogo):
+    actuales = {_clave(h) for h in comparar(writers_del_repo(), catalogo)}
+    nuevos = sorted(actuales - DRIFT_CONOCIDO)
+    assert not nuevos, (
+        "drift NUEVO contra PostgreSQL real — un INSERT que fallaria en "
+        "produccion y que SQLite no detecta:\n  " + "\n  ".join(nuevos)
+    )
+
+
+@requiere_pg
+def test_la_linea_base_no_esta_caducada(catalogo):
+    """Si se arregla un writer, la linea base debe encogerse explicitamente.
+
+    Una lista que conserva hallazgos ya resueltos deja de describir la realidad
+    y con el tiempo nadie vuelve a mirarla.
+    """
+    actuales = {_clave(h) for h in comparar(writers_del_repo(), catalogo)}
+    resueltos = sorted(DRIFT_CONOCIDO - actuales)
+    assert not resueltos, (
+        "estos hallazgos ya no ocurren; borrarlos de DRIFT_CONOCIDO:\n  "
+        + "\n  ".join(resueltos)
+    )
+
+
+@requiere_pg
+def test_ningun_on_conflict_sin_arbitro(catalogo):
+    """El barrido real. Vale como evidencia porque el control positivo pasa."""
+    hallazgos = [
+        h for h in comparar(writers_del_repo(), catalogo) if h.clase == ON_CONFLICT_DRIFT
+    ]
+    assert not hallazgos, "\n".join(str(h) for h in hallazgos)
