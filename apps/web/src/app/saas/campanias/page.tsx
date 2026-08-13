@@ -206,10 +206,20 @@ export default function SaasCampaniasPage() {
 
   }, []);
 
+  // `campaigns.status` lleva DOS vocabularios, escritos por servicios distintos:
+  // el planificador usa draft/running/paused/completed y el enviador usa
+  // sending/sent/failed. Esta pantalla solo conocia el primero, asi que una
+  // campana enviada de verdad desaparecia de "activas" y de "completadas".
+  //
+  // Se aceptan ambos aqui porque es lo unico que no toca datos: unificar la
+  // columna exigiria migrar estados de campanas existentes.
+  const ESTADOS_ACTIVOS = ["running", "scheduled", "sending"];
+  const ESTADOS_TERMINADOS = ["completed", "sent", "failed"];
+
   const filtered = useMemo(() => {
     if (tab === "all") return campanias;
-    if (tab === "active") return campanias.filter((c) => c.status === "running" || c.status === "scheduled");
-    if (tab === "completed") return campanias.filter((c) => c.status === "completed");
+    if (tab === "active") return campanias.filter((c) => ESTADOS_ACTIVOS.includes(c.status));
+    if (tab === "completed") return campanias.filter((c) => ESTADOS_TERMINADOS.includes(c.status));
     return campanias.filter((c) => c.status === "draft");
   }, [campanias, tab]);
 

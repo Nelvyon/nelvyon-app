@@ -639,3 +639,19 @@ apply_discount, add_page, _store_mention, configure_usage_alert, send_connect,
 _ensure_recipients, recalculate_contact_score) quedan inventariados: sus límites
 no son de seguridad ni de dinero, así que esperan a PG en vez de reescribirse
 a ciegas.
+
+## DEUDA — dos vocabularios en `campaigns.status` (2026-08-12)
+
+La misma columna la escriben dos servicios con conjuntos distintos:
+
+- `campaign_service` (planificador): `draft`, `running`, `paused`, `completed`
+- `campaign_sender` (envío): `sending`, `sent`, `failed`
+
+En el bloque 42 se corrigió el síntoma visible: la pantalla de campañas solo
+conocía el primer vocabulario, así que una campaña realmente enviada (`sent`)
+desaparecía de «activas» y de «completadas». Ahora acepta ambos.
+
+Unificar la columna sigue pendiente y **no se hace aquí** porque exige migrar
+estados de campañas existentes: decidir si `sent` pasa a `completed` (y qué
+ocurre con `failed`) es una operación sobre datos vivos cuya semántica no puedo
+demostrar. Hay un guard que obliga a clasificar cualquier estado nuevo.

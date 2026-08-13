@@ -8,8 +8,8 @@
 HEAD            (ver git log -1)
 último commit   fix(files): neutralise CSV formulas, stop two path escapes
 fecha           2026-08-12
-bloque actual   42 — API Contracts
-tests           backend 2109 passed · frontend 6637 passed / 42 skipped · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
+bloque actual   44 — Critical E2E Journeys
+tests           backend 2113 passed · frontend 6637 passed / 42 skipped · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
 build           backend compileall limpio · frontend  REAL pasa (2026-08-12)
 árbol git       limpio
 push/PR/merge   ninguno
@@ -70,7 +70,7 @@ PG certification BLOQUEADO — Docker Desktop caído (npipe dockerDesktopLinuxEn
 | 39 | Backup / Restore | **BLOCKED_EXTERNALLY** | el drill usa `docker exec` + pg_dump; sin daemon no se puede ejecutar |
 | 40 | Load / Stress / Concurrency | **PARCIAL** | tope de miembros hecho atómico; 8 candidatos inventariados; carrera real necesita PG |
 | 41 | Frontend Functional Audit | **VERIFIED** | build de producción real pasa; 749 ficheros de test verdes; tsc limpio |
-| 42 | API Contracts | PENDING | |
+| 42 | API Contracts | **CERTIFIED** | dos vocabularios de estado en campañas; UI los acepta; guard de clasificación |
 | 43 | CI/CD Gates | **CERTIFIED** | el gate de PR corría 9 ficheros y ningún guard; ahora suite completa + tsc + frontend |
 | 44 | Critical E2E Journeys | PENDING | |
 | 45 | Final Security Regression + Mutation | PENDING | |
