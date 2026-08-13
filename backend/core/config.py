@@ -95,6 +95,40 @@ class Settings(BaseSettings):
     def effective_jwt_secret(self) -> str:
         return self.jwt_secret.strip() or self.jwt_secret_key.strip()
 
+    def assert_production_ready(self) -> None:
+        """
+        Aborta el arranque si falta un secreto sin el cual el servicio no puede
+        funcionar. Solo en produccion.
+
+        Todos los secretos criticos se declaran con `default=""`, asi que un
+        despliegue al que se le olvide uno LEVANTA IGUAL y falla peticion a
+        peticion. El health check responde, el proceso parece sano y la
+        autenticacion esta rota: el peor modo de fallo posible, porque no se
+        nota hasta que lo nota un usuario.
+
+        El conjunto es deliberadamente corto — solo lo que deja el servicio
+        inservible:
+
+          * secreto JWT: sin el, `decode_access_token` rechaza TODA peticion;
+          * `DATABASE_URL`: sin ella no hay nada que servir.
+
+        Lo demas ya falla cerrado donde se usa y no justifica impedir el
+        arranque: `STRIPE_WEBHOOK_SECRET` tiene su propia guarda por ruta, y
+        `MASK_KEY` corta al cifrar (bloque de secretos), lo que solo afecta a
+        integraciones sociales.
+        """
+        if not self.is_production:
+            return
+        faltan = []
+        if not self.effective_jwt_secret:
+            faltan.append("JWT_SECRET (o JWT_SECRET_KEY)")
+        if not self.database_url.strip():
+            faltan.append("DATABASE_URL")
+        if faltan:
+            raise RuntimeError(
+                "Refusing to start in production without: " + ", ".join(faltan)
+            )
+
     @property
     def effective_frontend_url(self) -> str:
         return (

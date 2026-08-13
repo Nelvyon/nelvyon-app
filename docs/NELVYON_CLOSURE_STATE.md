@@ -8,8 +8,8 @@
 HEAD            (ver git log -1)
 último commit   fix(files): neutralise CSV formulas, stop two path escapes
 fecha           2026-08-12
-bloque actual   36 — Dependency Security
-tests           backend 2088 passed · frontend 6637 passed / 42 skipped · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
+bloque actual   38 — Deployment / Railway Readiness
+tests           backend 2101 passed · frontend 6637 passed / 42 skipped · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
 build           backend compileall limpio · frontend sin tocar desde el último build conocido
 árbol git       limpio
 push/PR/merge   ninguno
@@ -64,8 +64,8 @@ PG certification BLOQUEADO — Docker Desktop caído (npipe dockerDesktopLinuxEn
 | 33 | Exception / Fail-open Sweep | **CERTIFIED** | 8 candidatos barridos; 1 fail-open real (firma de contratos) cerrado |
 | 34 | Observability | **CERTIFIED** | cuerpo del endpoint de tokens fuera del log y del redirect; guard de clase |
 | 35 | Web Security | **CERTIFIED** | esquemas de redirect acotados; identificadores SQL en conjunto cerrado; guard de clase |
-| 36 | Dependency Security | PENDING | |
-| 37 | Production ENV / Config | PENDING | |
+| 36 | Dependency Security | **BLOCKED_EXTERNALLY** | frontend con lockfile y audit previo; backend sin lockfile y 39/41 sin fijar — CVE scan necesita red |
+| 37 | Production ENV / Config | **CERTIFIED** | fail-fast al arrancar: sin JWT o DATABASE_URL no levanta |
 | 38 | Deployment / Railway Readiness | PENDING | |
 | 39 | Backup / Restore | PENDING | drill previo existe (`scripts/run-postgres-restore-drill.mjs`) |
 | 40 | Load / Stress / Concurrency | PENDING | |

@@ -573,3 +573,26 @@ producto con impacto en correos que ya están en bandejas de entrada.
 
 Mitigante medido: un middleware exige cabecera de tenant, así que no es un
 redirect abierto anónimo.
+
+## BLOQUEADO EXTERNAMENTE — auditoría de dependencias del backend (bloque 36)
+
+Medido offline:
+
+- **Frontend**: `pnpm-lock.yaml` presente (builds reproducibles) y evidencia de
+  `npm audit` previa (2026-07-21) con 0 críticas y 0 altas, bajo política que
+  rompe CI si aparecen.
+- **Backend**: **no hay lockfile** y **39 de 41** dependencias usan `>=` sin cota
+  superior. Un rebuild puede traer una versión mayor distinta sin que nadie lo
+  decida — de hecho ya ocurrió: `requirements.txt` pide `fastapi>=0.112.2` y hay
+  instalado 0.139.0 con `starlette 1.3.1`. Solo `pydantic` lleva cota (`<2.10`),
+  lo que muestra que se acota cuando se sabe que importa.
+
+Versiones instaladas de los paquetes sensibles, todas recientes: cryptography
+49.0.0, urllib3 2.7.0, jinja2 3.1.6, requests 2.34.2, python-jose 3.5.0.
+
+**Por qué queda bloqueado**: un escaneo CVE real necesita la base de avisos
+(red), y `pip-audit` no está instalado. Fijar las 41 sin poder resolver e instalar
+contra PyPI podría romper el build, y el plan prohíbe upgrades masivos a ciegas.
+
+Para cerrarlo: red disponible → `pip-audit`, generar lockfile
+(`pip-compile`/`uv lock`), reinstalar, suite completa.
