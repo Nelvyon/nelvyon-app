@@ -70,9 +70,20 @@ const SHOTS: Shot[] = [
 
 test.describe.configure({ mode: "serial" });
 
-test("capture marketing SaaS shots", async ({ page, context }) => {
+// 21 capturas en un solo test: 60 s no dan, y al agotarse el navegador se cierra
+// a mitad de `page.screenshot`, que es como se manifestaba el fallo.
+test.setTimeout(180_000);
+
+test("capture marketing SaaS shots", async ({ page, context, baseURL }) => {
   fs.mkdirSync(OUT_DIR, { recursive: true });
-  await setAuthCookie(context, process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:3010");
+  // La cookie se fija PARA EL SERVIDOR QUE ESTA CORRIENDO, no para una URL
+  // escrita a mano. Antes decia `?? "http://127.0.0.1:3010"`, pensado para la
+  // config dedicada de marketing shots; bajo la config principal el servidor
+  // esta en `localhost:3000` y las cookies son por host, asi que `127.0.0.1` no
+  // aplicaba: las paginas cargaban sin sesion, `waitForText` no encontraba nada
+  // y el test agotaba el tiempo. `baseURL` lo da el propio runner y acierta con
+  // cualquiera de las dos configuraciones.
+  await setAuthCookie(context, baseURL);
   await mockMarketingSaasApis(page);
 
   await context.addInitScript(() => {

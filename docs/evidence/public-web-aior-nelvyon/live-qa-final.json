@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-08-02T18:48:42.451Z",
-  "passCount": 10,
+  "generatedAt": "2026-08-13T15:04:32.099Z",
+  "passCount": 9,
   "failCount": 0,
   "results": [
     {
@@ -74,21 +74,7 @@
       "failed404": []
     },
     {
-      "path": "/www/home-ai-agent.html",
-      "viewport": {
-        "width": 1280,
-        "height": 720
-      },
-      "ok": true,
-      "overflowX": false,
-      "pixelatedCount": 0,
-      "brokenImgs": [],
-      "consoleErrors": [],
-      "pageErrors": [],
-      "failed404": []
-    },
-    {
-      "path": "/www/home-saas-product-showcase.html",
+      "path": "/www/saas.html",
       "viewport": {
         "width": 1280,
         "height": 720
