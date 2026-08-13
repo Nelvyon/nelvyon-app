@@ -9,7 +9,7 @@ HEAD            (ver git log -1)
 último commit   fix(files): neutralise CSV formulas, stop two path escapes
 fecha           2026-08-12
 bloque actual   propiedad de integraciones CERRADA; siguen bloqueados los de PostgreSQL
-tests           backend 2168 passed · frontend 6643 passed / 42 skipped · next build OK · frontend 6637 passed / 42 skipped · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
+tests           backend 2176 passed · frontend 6643 passed / 42 skipped · next build OK · frontend 6637 passed / 42 skipped · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
 build           backend compileall limpio · frontend  REAL pasa (2026-08-12)
 árbol git       limpio
 push/PR/merge   ninguno
