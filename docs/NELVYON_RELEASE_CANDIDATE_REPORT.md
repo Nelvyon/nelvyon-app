@@ -37,19 +37,19 @@ producción que en los tests.
 | Charge pack / cuotas | CERTIFIED | precio por defecto, idempotencia Stripe, precisión de moneda | `chargePackPricing`, `partnerChargeIdempotency` | — | techo de `retailEur` |
 | Idempotencia de efectos | CERTIFIED | campañas, webhooks salientes, reintentos de cliente | `test_campaign_send_idempotency`, `test_outbound_webhook_idempotency` | — | — |
 | Webhooks entrantes | PARCIAL | text2pay y los 2 de Meta firmados | `test_inbound_webhook_signature`, `test_meta_webhook_signature` | — | 9 proveedores sin firma |
-| Proveedores / tenencia | CERTIFIED | WhatsApp y SES sin fallback corporativo | `test_messaging_provider_tenancy` | — | claves por `user_id` |
+| Proveedores / tenencia | CERTIFIED | WhatsApp y SES sin fallback corporativo; propiedad por workspace | `test_messaging_provider_tenancy` | — | — |
 | Secretos | CERTIFIED | clave de cifrado por defecto eliminada; cuerpo de token fuera de logs | `test_encryption_key_required`, `test_log_secret_hygiene` | — | — |
 | Autenticación | CERTIFIED | `alg:none`, otro secreto, `nbf` futuro | `test_auth_forgery_resistance` | — | — |
 | Agentes IA | CERTIFIED | allowlist cerrada, tope de cadena, sin escalada | `test_agent_action_boundaries` | — | — |
 | Proveedor de IA | CERTIFIED | regla self-hosted ahora se aplica | `test_ai_provider_no_external_default` | — | — |
-| Ficheros / export | CERTIFIED | CSV injection, 2 escapes de ruta | `test_file_handling_security` | — | `expires_in: 0` en OSS |
+| Ficheros / export | CERTIFIED | CSV injection, 2 escapes de ruta | `test_file_handling_security` | — | — |
 | Seguridad web | CERTIFIED | redirect scriptable, identificadores SQL | `test_web_security_sweep` | — | redirect sin firmar |
 | Rendimiento API | CERTIFIED | 12 paginaciones, bypass de cuerpo, stream sin fin | `test_pagination_bounds`, `test_request_body_limit` | — | — |
 | Config de producción | CERTIFIED | fail-fast sin JWT ni DATABASE_URL | `test_production_fail_fast` | — | — |
 | Despliegue | CERTIFIED | `live` superficial / `ready` con dependencias | `probesShape.test.ts` | — | — |
 | Gates de CI | CERTIFIED | el gate corría 9 ficheros y ningún guard | `test_ci_gate_coverage` | — | — |
 | Contratos de API | CERTIFIED | dos vocabularios de estado en campañas | `test_campaign_status_contract` | — | unificar la columna |
-| Frontend | VERIFIED | `next build` real completa | 6643 tests | — | — |
+| Frontend | VERIFIED | `next build` real completa | 6646 tests | — | — |
 | E2E | VERIFIED | infraestructura operativa; journey de auth 5/5 | `e2e/auth.spec.ts` | 406 tests no ejecutados en esta sesión | — |
 | Concurrencia | PARCIAL | tope de miembros hecho atómico | `test_member_cap_atomicity` | carrera real necesita PG | 8 candidatos |
 | Column / constraint drift | BLOCKED_EXTERNALLY | analizador AST listo | `_constraint_drift.py` | Docker | — |
@@ -94,11 +94,22 @@ Eso desbloqueó Ads multi-tenant, que ya no depende de una fuente inexistente.
 ## Deuda aceptada
 
 Entendida, documentada en `docs/TODO.md`, y ninguna bloquea seguridad, dinero ni
-datos: reenvío/idempotencia residual de campañas, remitente corporativo en
-campañas, propiedad de integraciones (`user_id` vs `workspace_id`), stock que no
-se decrementa, `expires_in: 0` del OSS, redirect de tracking sin firmar,
-unificación de `campaigns.status`, backend sin lockfile, límite de tasa
-multi-instancia, y una dependencia de orden en tests.
+datos:
+
+- stock de la tienda que no se decrementa (decisión de producto: ¿inventario
+  transaccional o informativo?);
+- redirect de tracking de clics sin firmar (firmarlo invalida enlaces ya
+  enviados);
+- `campaigns.status` con dos vocabularios (unificar exige migrar estados vivos);
+- backend sin lockfile;
+- límite de tasa multi-instancia (exige Redis obligatorio o contador en PG);
+- latencia de revocación del rol de plataforma;
+- techo de `retailEur`;
+- una dependencia de orden en la suite de tests;
+- 9 webhooks entrantes sin verificación de firma (cada proveedor firma distinto).
+
+Resueltas desde el informe anterior: propiedad de integraciones, remitente de
+campañas, `expires_in: 0` del OSS e índices redundantes de `intent_scores`.
 
 ## Qué falta exactamente para el RC
 
