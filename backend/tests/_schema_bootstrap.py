@@ -125,12 +125,39 @@ def sqlite_create_statements() -> list[str]:
     ausente no puede enmascarar una diferencia de esquema real.
     """
     sql = CANONICAL_MIGRATION.read_text(encoding="utf-8")
+    ganadoras = definiciones_ganadoras()
     statements: list[str] = []
     for match in _CREATE_TABLE_RE.finditer(sql):
         name = match.group("name")
-        body = match.group("body")
+        body = ganadoras.get(name.lower(), match.group("body"))
         statements.append(_to_sqlite(f"CREATE TABLE IF NOT EXISTS {name} ({body}\n)"))
     return statements
+
+
+def definiciones_ganadoras() -> dict:
+    """Para cada tabla, el cuerpo del PRIMER `CREATE TABLE` de toda la cadena.
+
+    POR QUE NO BASTA CON LEER LA 507
+    --------------------------------
+    `backend/db/migrate.ts` aplica los ficheros ordenados por nombre y todos usan
+    `CREATE TABLE IF NOT EXISTS`. Cuando dos ficheros declaran la misma tabla,
+    gana el de numero mas bajo y el otro NO HACE NADA.
+
+    Derivar el esquema de tests solo de la 507 modelaba, para 12 tablas, una
+    definicion que en ningun despliegue llega a aplicarse — entre ellas
+    `audit_logs`, donde gana la 412. Los tests validaban contra columnas que la
+    base real no tiene, asi que un writer equivocado pasaba en verde y fallaba
+    contra PostgreSQL.
+
+    Esta funcion reproduce la misma regla que el ejecutor: primero en el orden,
+    primero en ganar.
+    """
+    fuera: dict = {}
+    for fichero in sorted(_MIGRATIONS_DIR.glob("*.sql")):
+        texto = fichero.read_text(encoding="utf-8", errors="replace")
+        for m in _CREATE_TABLE_RE.finditer(texto):
+            fuera.setdefault(m.group("name").lower(), m.group("body"))
+    return fuera
 
 
 _ADD_COLUMN_RE = re.compile(

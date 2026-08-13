@@ -62,6 +62,8 @@ requiere_pg = pytest.mark.skipif(
 #: Drift medido contra PostgreSQL real (432 migraciones).
 #: La migracion 532 resolvio los dos de `deals`: la tabla legacy que forzaba
 #: `tenant_id NOT NULL` quedo apartada y ahora existe la canonica.
+#: El de `audit_logs` se resolvio corrigiendo el writer, que escribia contra la
+#: definicion de la 507 — la que nunca se aplica porque gana la 412.
 #: Todos son writers que omiten una columna NOT NULL sin default: el INSERT
 #: fallaria en produccion. Estan documentados en NELVYON_CLOSURE_STATE.md.
 DRIFT_CONOCIDO = frozenset({
@@ -69,7 +71,6 @@ DRIFT_CONOCIDO = frozenset({
     "NOT_NULL_DRIFT|ab_experiments|user_id|services/ab_testing_service.py",
     "NOT_NULL_DRIFT|ab_variants|content|services/ab_testing_service.py",
     "NOT_NULL_DRIFT|api_keys|tenant_id|services/api_keys_service.py",
-    "NOT_NULL_DRIFT|audit_logs|module|services/audit_service.py",
     "NOT_NULL_DRIFT|bookings|booking_date|services/booking_service.py",
     "NOT_NULL_DRIFT|bookings|booking_time|services/booking_service.py",
     "NOT_NULL_DRIFT|bookings|confirmation_token|services/booking_service.py",
