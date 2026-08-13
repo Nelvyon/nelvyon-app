@@ -431,9 +431,27 @@ async def invite_member(
     # comprobacion y la escritura en una sola sentencia, que el motor resuelve
     # de forma atomica.
     #
-    # NOTA: la atomicidad bajo concurrencia real depende del motor y solo se
-    # certifica contra PostgreSQL; en SQLite este test comprueba la LOGICA del
-    # tope, no la carrera.
+    # LA SENTENCIA UNICA NO BASTA — medido contra PostgreSQL real.
+    #
+    # Con 24 invitaciones simultaneas y tope 5, este INSERT dejaba entrar 8.
+    # Bajo READ COMMITTED cada sentencia toma su instantanea al empezar y no ve
+    # las filas que las demas transacciones aun no han confirmado: todas cuentan
+    # lo mismo y todas creen tener sitio. Ser una sola sentencia la hace
+    # indivisible, no la hace ver el presente.
+    #
+    # SQLite nunca lo delato porque serializa las escrituras a nivel de fichero:
+    # alli hasta el patron ingenuo respeta el tope. Por eso el verde anterior no
+    # significaba nada sobre el motor de produccion.
+    #
+    # Se cierra tomando el cerrojo de la fila del workspace ANTES de contar, lo
+    # que serializa las altas de ese workspace y solo de ese. `with_for_update()`
+    # no se emite en SQLite —donde sobra— y si en PostgreSQL.
+    await db.execute(
+        select(Workspaces.id)
+        .where(Workspaces.id == ctx.workspace_id)
+        .with_for_update()
+    )
+
     insercion = await db.execute(
         text(
             """

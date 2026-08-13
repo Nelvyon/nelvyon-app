@@ -97,13 +97,25 @@ def test_la_comprobacion_va_dentro_de_la_sentencia_que_inserta():
     Regresion de forma. Si vuelve el `count()` seguido de `db.add()`, vuelve la
     carrera, y ningun test sobre SQLite lo detectaria.
     """
+    # Se lee la funcion por AST y no recortando 2500 caracteres desde su nombre:
+    # esa ventana fija dejaba fuera el `INSERT` en cuanto crecian los comentarios
+    # de arriba, y el test empezaba a fallar por una razon que no era la suya.
+    import ast
     from pathlib import Path
 
-    src = (
+    ruta = (
         Path(__file__).resolve().parent.parent / "routers" / "workspace_management.py"
-    ).read_text(encoding="utf-8")
-    i = src.index("async def invite_member")
-    cuerpo = src[i : i + 2500]
+    )
+    arbol = ast.parse(ruta.read_text(encoding="utf-8"))
+    cuerpo = None
+    for nodo in ast.walk(arbol):
+        if isinstance(nodo, (ast.FunctionDef, ast.AsyncFunctionDef)) and (
+            nodo.name == "invite_member"
+        ):
+            cuerpo = ast.unparse(nodo)
+            break
+    assert cuerpo is not None, "no existe invite_member"
+
     assert "INSERT INTO workspace_members" in cuerpo
     assert "SELECT COUNT(*) FROM workspace_members" in cuerpo
     assert "rowcount" in cuerpo, "la decision debe salir de rowcount"
