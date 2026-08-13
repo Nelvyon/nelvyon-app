@@ -681,3 +681,23 @@ cerrado en vez de atribuirse a lo que parezca.
 
 Sustituye a las deudas 3 y 4 anteriores (`integration_whatsapp` keyed por
 `user_id`, y multi-tenencia de Ads sin fuente de credencial).
+
+## BLOQUEADO EXTERNAMENTE — suite E2E completa (2026-08-12)
+
+`playwright test` aborta antes del primer test: el servidor de desarrollo que
+levanta no compila sin red. 24 componentes usan `next/font/google` y la fuente
+se descarga en tiempo de compilación:
+
+```
+`next/font` error: Failed to fetch `IBM Plex Sans` from Google Fonts.
+> Build failed because of webpack errors
+Error: Process from config.webServer was not able to start. Exit code: 1
+```
+
+No es cuestión de tiempo, que fue la evaluación anterior y era incorrecta. El
+`next build` de producción sí pasa porque la fuente ya está en caché del build;
+el dev server recompila y vuelve a pedirla.
+
+Para cerrarlo: red disponible, o `next/font/local` con las fuentes en el repo
+—que además haría el build reproducible sin salir a internet—. Lo segundo es un
+cambio de producto (tipografía autoalojada) y no se hace sin decidirlo.

@@ -50,7 +50,7 @@ producción que en los tests.
 | Gates de CI | CERTIFIED | el gate corría 9 ficheros y ningún guard | `test_ci_gate_coverage` | — | — |
 | Contratos de API | CERTIFIED | dos vocabularios de estado en campañas | `test_campaign_status_contract` | — | unificar la columna |
 | Frontend | VERIFIED | `next build` real completa | 6646 tests | — | — |
-| E2E | VERIFIED | infraestructura operativa; journey de auth 5/5 | `e2e/auth.spec.ts` | 406 tests no ejecutados en esta sesión | — |
+| E2E | BLOCKED_EXTERNALLY | journey de auth 5/5 cuando la fuente está en caché | `e2e/auth.spec.ts` | red: `next/font` descarga de Google Fonts al compilar el dev server | — |
 | Concurrencia | PARCIAL | tope de miembros hecho atómico | `test_member_cap_atomicity` | carrera real necesita PG | 8 candidatos |
 | Column / constraint drift | BLOCKED_EXTERNALLY | analizador AST listo | `_constraint_drift.py` | Docker | — |
 | Cobertura SQLite vs PG | BLOCKED_EXTERNALLY | 4 usos solo-SQLite corregidos | `test_sqlite_only_sql_guard` | Docker | — |
@@ -117,7 +117,15 @@ campañas, `expires_in: 0` del OSS e índices redundantes de `intent_scores`.
    desde cero, rendimiento de BD, backup/restore y la certificación de
    concurrencia.
 2. **Red** → `pip-audit` y lockfile del backend.
-3. **Tiempo de ejecución** → los 406 tests E2E completos (≈1 min/test).
+3. **Red** (segundo uso) → la suite E2E completa. No es cuestión de tiempo: el
+   servidor de desarrollo que Playwright levanta **no compila** sin red, porque
+   24 componentes usan `next/font/google` y la fuente se descarga en tiempo de
+   compilación. El `next build` de producción sí pasa (la fuente queda en
+   caché), pero `playwright test` aborta con
+   «Failed to fetch IBM Plex Sans from Google Fonts».
+
+   Medido, no supuesto: el journey de auth pasó 5/5 antes, con la fuente en
+   caché; la ejecución completa aborta al recompilar.
 
 La decisión de producto que faltaba —propiedad de integraciones— ya está tomada
 y aplicada.
