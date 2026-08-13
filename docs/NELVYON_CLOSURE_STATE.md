@@ -311,55 +311,89 @@ fija las 15 colisiones y falla ante cualquier nueva.
 Todo lo de abajo se midió contra `nelvyon_mig_cert`: 431 migraciones aplicadas
 desde cero más `create_all`. Ninguna cifra procede de una ejecución anterior.
 
-### H-1 · Tablas declaradas por varias migraciones — PARCIALMENTE RESUELTO
+### H-1 · Tablas declaradas por varias migraciones
 
-**Lo que parecia** «dos generaciones de esquema» resulto ser algo mas simple y
-mas extendido, y se midio: **15 tablas estan declaradas por mas de una migracion
-con columnas distintas**. Como todas usan `CREATE TABLE IF NOT EXISTS`, gana la
-de numero mas bajo y la otra no hace nada, en silencio. La consolidacion 507
-redeclaro tablas que migraciones anteriores ya habian creado.
+**Causa raiz medida:** 15 tablas estan declaradas por mas de una migracion con
+columnas distintas. Todas usan `CREATE TABLE IF NOT EXISTS` y
+`backend/db/migrate.ts` las aplica ordenadas por nombre, asi que gana la de
+numero mas bajo y la otra no hace nada, en silencio.
 
-Eso explica **diez de las veinte** entradas de `DRIFT_CONOCIDO`: no son veinte
-errores independientes, son writers escritos contra una definicion que pierde.
-SQLite nunca lo delato porque construye las tablas desde los modelos.
+Ademas el esquema de tests SQLite se derivaba de la 507 — justo la definicion
+que pierde en 12 de esas tablas. Ya corregido: `tests/_schema_bootstrap.py`
+reproduce ahora la regla del ejecutor.
 
-#### Resuelto (migracion 532, `ddc0e6dc`)
+#### Resueltas (4 de 6)
 
-Determinado tabla por tabla contando writers y readers en el backend FastAPI y
-en `apps/web`, no por parecido:
-
-| tabla | canonica | evidencia | accion |
+| tabla | canonica | como se demostro | commit |
 |---|---|---|---|
-| `deals` | `workspace_id` | apps/web INSERTA con `workspace_id`; backend 6 sitios, 0 con `tenant_id` | legacy apartada (vacia) |
-| `conversations` | `workspace_id` | 0 SQL crudo de cualquier forma; solo ORM | legacy apartada (vacia) |
-| `subscriptions` | aditiva | apps/web usa `user_id = $1::uuid` y `plan`, que existen y se conservan | +8 columnas, `plan_id` desde `plan` |
+| `deals` | `workspace_id` | apps/web INSERTA con `workspace_id`; backend 6 sitios, 0 con `tenant_id` | `ddc0e6dc` |
+| `conversations` | `workspace_id` | 0 SQL crudo de cualquier forma | `ddc0e6dc` |
+| `subscriptions` | aditiva | apps/web usa `user_id = $1::uuid` y `plan`, que existen y se conservan | `ddc0e6dc` |
+| `audit_logs` | **412** | sin modelo ORM -> `create_all` no puede crearla; 412 < 507; `backend/migrations/` no esta en la cadena de despliegue; dump real de julio | `691bed02` |
 
-`SELECT plan_id FROM subscriptions` pasa de `ERROR: column does not exist` a
-devolver filas. El patron —renombrar solo si la tabla esta vacia, abortar si
-tiene filas, ni un DROP ni un DELETE— no es nuevo: lo establecio
-`506a_reconcile_legacy_pre_507_social_posts.sql`.
+`audit_logs` merece detalle: **el rastro de auditoria de acciones criticas no se
+habia escrito nunca**. El writer usaba la definicion de la 507, que no se aplica
+jamas. Se demostro sin consultar produccion, y esta certificado contra
+PostgreSQL con escritura, lectura, supervivencia del antes/despues en jsonb y
+aislamiento por inquilino.
 
-#### NO resuelto: 3 tablas · decision de producto
+#### NO resueltas: `calendar_events` y `social_posts` — PARADA HUMANA
 
-| tabla | por que no |
-|---|---|
-| `calendar_events` | dos consumidores VIVOS enfrentados: backend 7 sitios con `workspace_id`, `apps/web` con `tenant_id` + `event_date`. Ademas 506a deja escrito «Do NOT rename ... calendar_events» |
-| `audit_logs` | 412 (`tenant_id uuid`, `module`, `details`) vs 507 (`tenant_id integer`, `old_value`, `new_value`). Gana 412; el writer usa 507. 506a tambien lo excluye por nombre |
-| `social_posts` | 506a ya declaro canonica la version uuid+tenant_id. El modelo ORM y sus dos routers son el lado legacy; retirarlos es decision de producto |
+No es falta de investigacion. Se agoto: migraciones, modelos, writers, readers,
+frontend, backend, historial git, `pg_catalog`, un `pg_dump` real de julio y la
+configuracion de despliegue. **No hay credenciales de produccion en el
+repositorio** — solo ficheros `.example`; comprobado, no supuesto.
 
-Lo que bloquea no es falta de investigacion: es que **506a contiene una
-instruccion explicita** —«Do NOT rename bookings / api_keys / calendar_events /
-invoices / audit_logs / qr_codes»— tomada con contexto que el codigo no explica,
-probablemente porque esas tablas tenian datos. Saltarsela seria exactamente
-renombrar a ciegas.
+El problema no son columnas ausentes sino TIPOS. Reproducido contra PostgreSQL
+real, insertando con el ORM tras anadir todas las columnas que faltaban:
 
-**Consecuencia acotada:** en una base reconstruida desde cero, el rastro de
-auditoria de acciones criticas no puede escribirse (falla con aviso, no en
-silencio) y los consumidores `workspace_id` de `calendar_events` fallan. En
-produccion las tablas ya existen con la forma que gano primero.
+```
+calendar_events   ProgrammingError: operator does not exist: uuid = integer
+social_posts      DatatypeMismatchError: column "scheduled_at" is of type timestamp
+```
 
-**Contenido:** `test_migration_table_collisions.py` fija las 15 y falla ante una
-nueva, con tres controles y mutacion verificada. No pueden crecer.
+La tabla tiene `id uuid`; el modelo declara `id Integer`. Eso no se arregla
+anadiendo columnas: hay que cambiar el modelo o la tabla, y cual de los dos
+depende de algo que el repositorio no dice.
+
+**Las dos lecturas son legitimas y se excluyen:**
+
+* si produccion tiene la forma de la migracion (`tenant_id uuid`), el dashboard
+  SaaS —`apps/web/src/app/api/saas/dashboard/route.ts`, que consulta
+  `calendar_events` por `tenant_id`, `type` y `event_date`— funciona, y las
+  rutas FastAPI llevan rotas desde siempre;
+* si tiene la forma del ORM, es al reves: el dashboard esta roto y las rutas
+  FastAPI funcionan.
+
+Elegir mal rompe una superficie viva. Ademas `506a` prohibe por nombre renombrar
+`calendar_events`, y para `social_posts` ya declaro canonica la version uuid.
+
+**LA CONSULTA READ-ONLY QUE LO RESUELVE**
+
+```sql
+-- Contra la base de PRODUCCION. Solo lectura, no modifica nada.
+SELECT table_name, column_name, data_type
+  FROM information_schema.columns
+ WHERE table_schema = 'public'
+   AND table_name IN ('calendar_events', 'social_posts')
+   AND column_name IN ('id', 'tenant_id', 'workspace_id', 'event_date',
+                       'start_time', 'scheduled_at', 'platform')
+ ORDER BY table_name, column_name;
+
+SELECT 'calendar_events' AS tabla, count(*) FROM calendar_events
+UNION ALL
+SELECT 'social_posts', count(*) FROM social_posts;
+```
+
+Con eso el camino es mecanico y ya esta probado:
+
+* `id uuid` y filas > 0 -> manda la migracion: alinear modelo y servicios a esa
+  forma, como se hizo con `audit_logs`;
+* `id integer` -> manda el ORM: apartar la legacy vacia como en la 532, o
+  anadir columnas y relajar NOT NULL como en 524/525/526.
+
+Mientras tanto la clase no puede crecer: `test_migration_table_collisions.py`
+fija las 15 y falla ante cualquier nueva.
 
 ### H-2 · El tope de miembros era evadible bajo concurrencia — CORREGIDO
 
