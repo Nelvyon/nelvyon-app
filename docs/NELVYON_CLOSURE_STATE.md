@@ -6,10 +6,13 @@
 
 ```text
 HEAD            (ver git log -1)
-último commit   perf(db): indice sobre el filtro de inquilino donde el codigo consulta
+último commit   fix(planes): un fallo de esquema degradaba el plan en silencio
 fecha           2026-08-13
 bloque actual   PostgreSQL real disponible; bloques 2/4/30/31/39/40 CERTIFICADOS con medicion nueva
-tests           backend 2176 passed · frontend 6646 passed / 42 skipped · frontend 6643 passed / 42 skipped · next build OK · frontend 6637 passed / 42 skipped · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
+tests           backend 2182 passed / 0 failed / 14 skipped (PG sin DSN)
+                frontend 6646 passed / 42 skipped (751 ficheros)
+                typecheck apps/web limpio · next build completa · compileall limpio
+                certificaciones PostgreSQL con DSN: 17 passed
 build           backend compileall limpio · frontend  REAL pasa (2026-08-12)
 árbol git       limpio
 push/PR/merge   ninguno
@@ -421,3 +424,11 @@ para no convertir una caída de base en un 500 general.
 
 Por eso un verde de la suite normal no dice nada sobre estas cuatro cosas, y por
 eso las certificaciones nuevas exigen `NELVYON_PG_CERT_DSN`.
+
+### Nota sobre intermitencia del frontend
+
+La primera ejecucion de la suite de frontend dio 2 fallos; la repeticion inmediata
+dio 6646/6646 sin tocar nada. No se pudo identificar cuales porque la captura de
+esa primera corrida quedo recortada. Queda anotado como intermitencia conocida,
+no como verde limpio: dos tests que fallan una vez de cada dos ejecuciones son un
+defecto aunque la segunda pase.

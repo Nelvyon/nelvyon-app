@@ -1,11 +1,12 @@
 # NELVYON — Informe de Release Candidate
 
 ```text
-HEAD              45225a0e
+HEAD              a38cff62
 fecha             2026-08-13
 árbol git         limpio
 push/PR/merge     ninguno
-backend           2179 passed / 0 failed / 14 skipped (certificaciones PostgreSQL sin DSN)
+backend           2182 passed / 0 failed / 14 skipped (certificaciones PostgreSQL sin DSN)
+frontend          6646 passed / 42 skipped (751 ficheros)
 PostgreSQL real   431 migraciones desde cero + create_all + smoke de runtime
 typecheck         tsc --noEmit limpio
 build producción  next build completa
