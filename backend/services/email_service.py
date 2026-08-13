@@ -140,6 +140,12 @@ class EmailService:
         email_type: str = "transactional",
         campaign_id: Optional[int] = None,
         workspace_id: Optional[int] = None,
+        # Remitente propio del envio. Sin el, se usa el corporativo, que es lo
+        # correcto para el correo operativo del SaaS pero NO para una campana
+        # del cliente: `campaigns.from_email` se capturaba y se almacenaba, y el
+        # enviador lo ignoraba, asi que toda campana salia firmada por NELVYON.
+        from_email: Optional[str] = None,
+        from_name: Optional[str] = None,
     ) -> dict:
         """
         Send an email via SendGrid SDK or queue it if not configured.
@@ -253,7 +259,9 @@ class EmailService:
                 ClickTracking, OpenTracking,
             )
 
-            from_email = Email(self.from_email, self.from_name)
+            remitente = (from_email or "").strip() or self.from_email
+            nombre_remitente = (from_name or "").strip() or self.from_name
+            from_email = Email(remitente, nombre_remitente)
             to = To(to_email, to_name or "")
             content_list = []
             if body_text:

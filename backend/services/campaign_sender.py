@@ -179,6 +179,17 @@ class CampaignSenderService:
                     body_html=body_html,
                     email_type="campaign",
                     workspace_id=workspace_id,
+                    # La campana lleva su propio remitente. La API lo acepta y
+                    # el servicio lo almacena desde la migracion 507; solo el
+                    # envio lo ignoraba, asi que TODA campana de cliente salia
+                    # firmada por NELVYON. Si la campana no lo trae, se usa el
+                    # corporativo, que es el comportamiento anterior.
+                    #
+                    # SendGrid rechaza remitentes sin verificar, asi que la
+                    # verificacion la impone el proveedor y no hace falta
+                    # duplicarla aqui.
+                    from_email=getattr(campaign, "from_email", None),
+                    from_name=getattr(campaign, "from_name", None),
                 )
                 if email_result["status"] in ("sent", "no_api_key", "pending"):
                     sent_count += 1

@@ -319,7 +319,16 @@ La auditoría de intención (`result="attempt"`, migración de hoy) ya deja rast
 cada intento, así que un envío duplicado es ahora **detectable**; sigue sin estar
 **impedido**.
 
-## DEUDA — identidad remitente de campañas (2026-08-12)
+## RESUELTO — identidad remitente de campañas (2026-08-12)
+
+Cerrado: `campaign_sender` ya pasa `campaigns.from_email`/`from_name` al envío.
+No era decisión de producto — la API los aceptaba, el servicio los guardaba y
+solo el envío los ignoraba. Sin remitente propio se sigue usando el corporativo.
+La verificación del remitente la impone SendGrid.
+
+Texto original conservado abajo por trazabilidad.
+
+## (histórico) DEUDA — identidad remitente de campañas
 
 Cerrada la tenencia de WhatsApp y SES, queda un tercer camino con la misma forma
 pero que NO se toca porque romperlo quitaría funcionalidad viva.
