@@ -8,9 +8,9 @@
 HEAD            (ver git log -1)
 último commit   fix(files): neutralise CSV formulas, stop two path escapes
 fecha           2026-08-12
-bloque actual   41 — Frontend Functional Audit
-tests           backend 2105 passed · frontend 6637 passed / 42 skipped · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
-build           backend compileall limpio · frontend sin tocar desde el último build conocido
+bloque actual   42 — API Contracts
+tests           backend 2109 passed · frontend 6637 passed / 42 skipped · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
+build           backend compileall limpio · frontend  REAL pasa (2026-08-12)
 árbol git       limpio
 push/PR/merge   ninguno
 PG certification BLOQUEADO — Docker Desktop caído (npipe dockerDesktopLinuxEngine no responde)
@@ -69,9 +69,9 @@ PG certification BLOQUEADO — Docker Desktop caído (npipe dockerDesktopLinuxEn
 | 38 | Deployment / Railway Readiness | **CERTIFIED** | live superficial / ready con dependencias; guard contra bucle de reinicios |
 | 39 | Backup / Restore | **BLOCKED_EXTERNALLY** | el drill usa `docker exec` + pg_dump; sin daemon no se puede ejecutar |
 | 40 | Load / Stress / Concurrency | **PARCIAL** | tope de miembros hecho atómico; 8 candidatos inventariados; carrera real necesita PG |
-| 41 | Frontend Functional Audit | PENDING | |
+| 41 | Frontend Functional Audit | **VERIFIED** | build de producción real pasa; 749 ficheros de test verdes; tsc limpio |
 | 42 | API Contracts | PENDING | |
-| 43 | CI/CD Gates | PENDING | |
+| 43 | CI/CD Gates | **CERTIFIED** | el gate de PR corría 9 ficheros y ningún guard; ahora suite completa + tsc + frontend |
 | 44 | Critical E2E Journeys | PENDING | |
 | 45 | Final Security Regression + Mutation | PENDING | |
 | 46 | Final Audit From Zero | PENDING | |
