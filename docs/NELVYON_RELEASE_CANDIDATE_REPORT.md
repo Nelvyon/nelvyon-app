@@ -1,12 +1,12 @@
 # NELVYON — Informe de Release Candidate
 
 ```text
-HEAD              72416d5a
+HEAD              1e82398b
 fecha             2026-08-12
 árbol git         limpio
 push/PR/merge     ninguno
-backend           2143 passed / 0 failed
-frontend          6643 passed / 42 skipped (750 ficheros)
+backend           2176 passed / 0 failed
+frontend          6646 passed / 42 skipped (751 ficheros)
 typecheck         tsc --noEmit limpio
 build producción  next build completa
 compileall        limpio
@@ -58,7 +58,13 @@ producción que en los tests.
 | Rendimiento de BD | BLOCKED_EXTERNALLY | 45 bucles inventariados | — | Docker | — |
 | Backup / restore | BLOCKED_EXTERNALLY | drill existe | `run-postgres-restore-drill.mjs` | Docker | — |
 | Dependencias | BLOCKED_EXTERNALLY | frontend con lockfile y audit | — | red para CVE | backend sin lockfile |
-| Ads multi-tenant | BLOCKED | falla cerrado, sin fallback | `core/ads_integration.py` | decisión de propiedad | — |
+| Ads multi-tenant | CERTIFIED | decisión aprobada: el workspace es propietario; migración 529 | `test_integration_workspace_ownership` | — | — |
+| Propiedad de integraciones | CERTIFIED | `workspace_id` propietario, `connected_by_user_id` auditoría; backfill solo inequívoco | `test_integration_workspace_ownership` | — | filas ambiguas fail-closed |
+| Remitente de campañas | CERTIFIED | `campaigns.from_email` llega al envío | `test_campaign_sender_identity` | — | — |
+| URLs prefirmadas | CERTIFIED | `expires_at` obligatorio descarta «sin caducidad»; TTL explícito | `test_signed_url_ttl` | — | — |
+| Skips | VERIFIED | 42, todos puertas a PostgreSQL; ninguno apagado | `skipsAreGated.test.ts` | — | — |
+| Índices redundantes | CERTIFIED | migración 530 condicionada a la PK | `test_migration_530_safety` | — | — |
+| Rutas duplicadas | CERTIFIED | 0 con ruta completa | `test_no_duplicate_routes` | — | — |
 
 ## Hallazgos por severidad
 
@@ -73,6 +79,17 @@ exclusivo de SQLite en producción; regla de IA propia sin aplicar; webhooks de 
 de Meta sin firma.
 
 **Abiertos: 0 CRITICAL · 0 HIGH.**
+
+### Cerrado tras la decisión de producto
+
+La propiedad de integraciones estaba bloqueada esperando una decisión humana.
+Aprobada («la integración pertenece al workspace»), se implementó con la
+migración 529 —aditiva, sin borrar ni renombrar— y backfill **solo donde es
+demostrable**: usuario con exactamente un workspace. Cero o varios queda `NULL`
+y los resolvedores lo ignoran, porque adivinar el propietario es como se le da a
+un inquilino la credencial de otro.
+
+Eso desbloqueó Ads multi-tenant, que ya no depende de una fuente inexistente.
 
 ## Deuda aceptada
 
@@ -89,9 +106,10 @@ multi-instancia, y una dependencia de orden en tests.
    desde cero, rendimiento de BD, backup/restore y la certificación de
    concurrencia.
 2. **Red** → `pip-audit` y lockfile del backend.
-3. **Decisión de producto** → a quién pertenece una integración
-   (`user_id` vs `workspace_id`), que desbloquea Ads multi-tenant.
-4. **Tiempo de ejecución** → los 406 tests E2E completos.
+3. **Tiempo de ejecución** → los 406 tests E2E completos (≈1 min/test).
+
+La decisión de producto que faltaba —propiedad de integraciones— ya está tomada
+y aplicada.
 
 Nada de esto son defectos: son pruebas que aún no se han podido ejecutar. El
 código está en el estado que se pretendía; lo que falta es la evidencia.
