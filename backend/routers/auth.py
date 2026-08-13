@@ -186,13 +186,19 @@ async def callback(
             return redirect_with_error(f"Token exchange failed: {e}")
 
         if token_response.status_code != 200:
+            # El cuerpo del endpoint de tokens es DONDE viven los tokens. Se
+            # registra acotado y nunca se devuelve al navegador: antes iba
+            # entero al log y ademas al redirect, o sea a la URL, al historial
+            # y a la cabecera Referer.
+            #
+            # `oauth_integrations.py` ya lo hacia asi; este era el atipico.
             logger.error(
                 "[callback] Token exchange failed: url=%s, status_code=%s, response=%s",
                 token_url,
                 token_response.status_code,
-                token_response.text,
+                token_response.text[:200],
             )
-            return redirect_with_error(f"Token exchange failed: {token_response.text}")
+            return redirect_with_error("Token exchange failed")
 
         tokens = token_response.json()
 
