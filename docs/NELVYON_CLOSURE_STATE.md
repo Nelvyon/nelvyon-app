@@ -8,8 +8,8 @@
 HEAD            (ver git log -1)
 último commit   fix(files): neutralise CSV formulas, stop two path escapes
 fecha           2026-08-12
-bloque actual   44 — Critical E2E Journeys
-tests           backend 2113 passed · frontend 6637 passed / 42 skipped · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
+bloque actual   44 — Critical E2E Journeys (46 cerrado antes por hallazgo)
+tests           backend 2143 passed · frontend 6637 passed / 42 skipped · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
 build           backend compileall limpio · frontend  REAL pasa (2026-08-12)
 árbol git       limpio
 push/PR/merge   ninguno
@@ -74,7 +74,7 @@ PG certification BLOQUEADO — Docker Desktop caído (npipe dockerDesktopLinuxEn
 | 43 | CI/CD Gates | **CERTIFIED** | el gate de PR corría 9 ficheros y ningún guard; ahora suite completa + tsc + frontend |
 | 44 | Critical E2E Journeys | PENDING | |
 | 45 | Final Security Regression + Mutation | PENDING | |
-| 46 | Final Audit From Zero | PENDING | |
+| 46 | Final Audit From Zero | **CERTIFIED** | punto ciego: 8 endpoints /all sin filtro ni autoridad; guard de clase |
 | 47 | Release Candidate Certification | PENDING | |
 
 ---
