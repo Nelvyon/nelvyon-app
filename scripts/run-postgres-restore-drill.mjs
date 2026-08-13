@@ -19,6 +19,10 @@ const OUT_DIR = path.join(ROOT, "docs", "evidence", "os-saas-e2e");
 const BACKUP_DIR = path.join(ROOT, "docs", "evidence", "os-saas-e2e", "dr_backups");
 const CONTAINER = process.env.CERT_PG_CONTAINER || "nelvyon-test-postgres";
 const SOURCE_DB = process.env.CERT_SOURCE_DB || "nelvyon_test";
+// El rol estaba fijado a PGUSER, asi que el drill solo podia correr
+// contra un contenedor concreto. La base de certificacion del repo usa
+// otro rol, y el simulacro no llegaba ni a hacer el dump.
+const PGUSER = process.env.CERT_PG_USER || "nelvyon";
 const RESTORE_DB = `nelvyon_restore_drill_${Date.now()}`;
 
 const require = createRequire(path.join(ROOT, "backend", "db", "package.json"));
@@ -43,7 +47,7 @@ async function main() {
   fs.mkdirSync(BACKUP_DIR, { recursive: true });
   fs.mkdirSync(OUT_DIR, { recursive: true });
 
-  const ping = dockerExec(["pg_isready", "-U", "nelvyon", "-d", SOURCE_DB]);
+  const ping = dockerExec(["pg_isready", "-U", PGUSER, "-d", SOURCE_DB]);
   record("dr.container_ready", ping.status === 0, { out: ping.out || ping.err });
 
   // Seed marker table/row on source
@@ -75,7 +79,7 @@ async function main() {
   const dump = dockerExec([
     "pg_dump",
     "-U",
-    "nelvyon",
+    PGUSER,
     "-d",
     SOURCE_DB,
     "-Fc",
@@ -85,18 +89,29 @@ async function main() {
   record("dr.pg_dump", dump.status === 0, { error: dump.status !== 0 ? dump.err : undefined });
 
   const cp = sh("docker", ["cp", `${CONTAINER}:${dumpContainer}`, dumpHost]);
-  record("dr.copy_dump", cp.status === 0 && fs.existsSync(dumpHost), {
+  const bytes = fs.existsSync(dumpHost) ? fs.statSync(dumpHost).size : 0;
+  // `docker cp` devuelve 0 aunque el fichero este vacio: cuando `pg_dump` fallo
+  // al conectar, este paso daba PASS sobre un dump de 0 bytes. Un simulacro de
+  // recuperacion que aprueba una copia inexistente es peor que no tenerlo,
+  // porque produce la confianza sin el respaldo. Un dump `-Fc` valido nunca es
+  // trivialmente pequeno: lleva cabecera y catalogo de objetos.
+  const MINIMO_DUMP_BYTES = 512;
+  record("dr.copy_dump", cp.status === 0 && bytes >= MINIMO_DUMP_BYTES, {
     path: dumpHost,
-    bytes: fs.existsSync(dumpHost) ? fs.statSync(dumpHost).size : 0,
+    bytes,
+    error:
+      bytes < MINIMO_DUMP_BYTES
+        ? `dump de ${bytes} bytes: por debajo del minimo de ${MINIMO_DUMP_BYTES}; no hay copia que restaurar`
+        : undefined,
   });
 
-  const createDb = dockerExec(["psql", "-U", "nelvyon", "-d", "postgres", "-c", `CREATE DATABASE ${RESTORE_DB}`]);
+  const createDb = dockerExec(["psql", "-U", PGUSER, "-d", "postgres", "-c", `CREATE DATABASE ${RESTORE_DB}`]);
   record("dr.create_restore_db", createDb.status === 0, { db: RESTORE_DB, error: createDb.err || undefined });
 
   const restore = dockerExec([
     "pg_restore",
     "-U",
-    "nelvyon",
+    PGUSER,
     "-d",
     RESTORE_DB,
     "--no-owner",
@@ -108,7 +123,7 @@ async function main() {
   const check = dockerExec([
     "psql",
     "-U",
-    "nelvyon",
+    PGUSER,
     "-d",
     RESTORE_DB,
     "-t",
@@ -124,7 +139,7 @@ async function main() {
   });
 
   // Cleanup restore DB + marker optional leave on source for audit
-  dockerExec(["psql", "-U", "nelvyon", "-d", "postgres", "-c", `DROP DATABASE IF EXISTS ${RESTORE_DB}`]);
+  dockerExec(["psql", "-U", PGUSER, "-d", "postgres", "-c", `DROP DATABASE IF EXISTS ${RESTORE_DB}`]);
   dockerExec(["rm", "-f", dumpContainer]);
   await client.query(`DELETE FROM _nelvyon_restore_drill WHERE id=$1`, [marker]);
   await client.end();

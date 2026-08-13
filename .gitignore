@@ -165,3 +165,7 @@ docs/ops/_elements_*
 
 # Salida de build Capacitor
 apps/mobile/android/www/
+# Dumps del simulacro de restauracion: son copias completas de la base, con
+# datos reales dentro. Se generan al ejecutar el drill y se regeneran solas;
+# versionarlas metería contenido de la base en el historial de git.
+docs/evidence/os-saas-e2e/dr_backups/
