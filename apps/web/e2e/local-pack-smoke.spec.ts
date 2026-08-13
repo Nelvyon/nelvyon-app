@@ -36,8 +36,16 @@ for (const packId of PACK_IDS) {
 // Service catalog: coming_soon packs must have valid slugs
 test("Catálogo de service packs — 5 nuevos packs tienen slugs válidos", async ({ request }) => {
   const res = await request.get("/api/os/packs/catalog", { maxRedirects: 0 });
-  // Catalog may require auth in CI — skip rather than fail the gate
-  if (res.status() === 401 || res.status() === 403 || res.status() === 404 || res.status() === 410) {
+  // El catalogo exige autenticacion de plataforma, que este smoke no lleva: 401
+  // y 403 son el estado esperado y se saltan.
+  //
+  // 404 y 410 ya NO. Antes tambien se saltaban, con el comentario «may require
+  // auth in CI», y resulta que la ruta no existia: el test llevaba saltandose
+  // sobre un endpoint ausente, indistinguible de uno protegido. Una ruta que
+  // falta es un defecto, y asi lo afirma el test de arriba con `not.toBe(404)`.
+  expect(res.status()).not.toBe(404);
+  expect(res.status()).not.toBe(410);
+  if (res.status() === 401 || res.status() === 403) {
     test.skip();
     return;
   }
