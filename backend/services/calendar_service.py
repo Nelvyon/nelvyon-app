@@ -14,6 +14,8 @@ from zoneinfo import ZoneInfo
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from core.tenant_bridge import require_tenant_uuid
+
 logger = logging.getLogger(__name__)
 
 GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
@@ -104,6 +106,20 @@ class CalendarService:
             raise ValueError("workspace_id is required")
         self.session = session
         self.workspace_id = int(workspace_id)
+        self._tenant_uuid: str | None = None
+
+    async def _tenant(self) -> str:
+        """El uuid de inquilino de este workspace, resuelto una vez.
+
+        `calendar_events` la creo la generacion `/saas` y su columna de
+        inquilino es `tenant_id uuid` con clave foranea a `saas_tenants`. Este
+        servicio trabaja con workspaces enteros, asi que traduce por el puente
+        que ya existe en el esquema. Lanza si el workspace no tiene inquilino:
+        escribir bajo uno ajeno mezclaria datos de dos clientes.
+        """
+        if self._tenant_uuid is None:
+            self._tenant_uuid = await require_tenant_uuid(self.session, self.workspace_id)
+        return self._tenant_uuid
         self._api: Any | None = None
         self._init_attempted = False
         self._mock = False
@@ -208,6 +224,7 @@ class CalendarService:
         attendees: list[str] | None = None,
         meet_link: bool = True,
     ) -> dict[str, Any]:
+        tenant_uuid = await self._tenant()
         cal = (calendar_id or self.default_calendar_id()).strip()
         start_dt = _parse_dt(start)
         end_dt = _parse_dt(end)
@@ -239,7 +256,7 @@ class CalendarService:
             record = {
                 "mock": True,
                 "id": gid,
-                "workspace_id": self.workspace_id,
+                "tenant_id": tenant_uuid,
                 "google_event_id": gid,
                 "calendar_id": cal,
                 "title": title,
@@ -386,6 +403,7 @@ class CalendarService:
         return slots
 
     async def sync_events(self, calendar_id: str) -> dict[str, Any]:
+        tenant_uuid = await self._tenant()
         cal = (calendar_id or self.default_calendar_id()).strip()
         now = datetime.now(timezone.utc)
         window_end = now + timedelta(days=90)
@@ -413,7 +431,7 @@ class CalendarService:
 
         return {
             "calendar_id": cal,
-            "workspace_id": self.workspace_id,
+            "tenant_id": tenant_uuid,
             "pulled": upserted,
             "pushed": pushed,
             "synced_at": now.isoformat(),
@@ -428,13 +446,14 @@ class CalendarService:
         end_date: datetime | str,
         calendar_id: str | None = None,
     ) -> list[dict[str, Any]]:
+        tenant_uuid = await self._tenant()
         params: dict[str, Any] = {
-            "workspace_id": self.workspace_id,
+            "tenant_id": tenant_uuid,
             "start": _parse_dt(start_date),
             "end": _parse_dt(end_date),
         }
         where = (
-            "workspace_id = :workspace_id AND start_at IS NOT NULL "
+            "tenant_id = CAST(:tenant_id AS uuid) AND start_at IS NOT NULL "
             "AND start_at >= :start AND start_at <= :end"
         )
         if calendar_id:
@@ -459,6 +478,7 @@ class CalendarService:
         with_meet: bool = True,
         push_google: bool = True,
     ) -> dict[str, Any]:
+        tenant_uuid = await self._tenant()
         cal = (calendar_id or self.default_calendar_id()).strip()
         start_dt = _parse_dt(start)
         end_dt = _parse_dt(end)
@@ -481,21 +501,22 @@ class CalendarService:
             text(
                 """
                 INSERT INTO calendar_events (
-                    user_id, workspace_id, title, google_event_id, calendar_id,
-                    description, start_at, end_at, start_time, end_time,
-                    attendees, meet_link, status, synced_at, created_at
+                    tenant_id, title, type, event_date, google_event_id, calendar_id,
+                    description, start_at, end_at,
+                    attendees, meet_link, synced_at, created_at, updated_at
                 )
                 VALUES (
-                    :user_id, :workspace_id, :title, :google_event_id, :calendar_id,
-                    :description, :start_at, :end_at, :start_at, :end_at,
-                    CAST(:attendees AS jsonb), :meet_link, :status, :synced_at, :created_at
+                    CAST(:tenant_id AS uuid), :title, 'appointment', CAST(:start_at AS date),
+                    :google_event_id, :calendar_id,
+                    :description, :start_at, :end_at,
+                    CAST(:attendees AS jsonb), :meet_link, :synced_at, :created_at, :created_at
                 )
                 RETURNING *
                 """
             ),
             {
                 "user_id": SYNC_USER_ID,
-                "workspace_id": self.workspace_id,
+                "tenant_id": tenant_uuid,
                 "title": title.strip(),
                 "google_event_id": google_event.get("google_event_id") if google_event else None,
                 "calendar_id": cal,
@@ -513,6 +534,7 @@ class CalendarService:
         return _row_to_dict(result.fetchone())
 
     async def update_local_event(self, event_id: int, data: dict[str, Any]) -> dict[str, Any]:
+        tenant_uuid = await self._tenant()
         row = await self._get_local_row(event_id)
         cal = row.get("calendar_id") or self.default_calendar_id()
         google_id = row.get("google_event_id")
@@ -537,7 +559,7 @@ class CalendarService:
                 await self.update_event(cal, str(google_id), patch)
 
         sets: list[str] = []
-        params: dict[str, Any] = {"id": event_id, "workspace_id": self.workspace_id}
+        params: dict[str, Any] = {"id": event_id, "tenant_id": tenant_uuid}
         for key in ("title", "description", "start_at", "end_at", "meet_link", "status"):
             if key in data and data[key] is not None:
                 sets.append(f"{key} = :{key}")
@@ -557,7 +579,7 @@ class CalendarService:
                 text(
                     f"""
                     UPDATE calendar_events SET {', '.join(sets)}
-                    WHERE id = :id AND workspace_id = :workspace_id
+                    WHERE id = :id AND tenant_id = CAST(:tenant_id AS uuid)
                     """
                 ),
                 params,
@@ -567,6 +589,7 @@ class CalendarService:
         return await self.get_local_event(event_id)
 
     async def delete_local_event(self, event_id: int) -> dict[str, Any]:
+        tenant_uuid = await self._tenant()
         row = await self._get_local_row(event_id)
         google_id = row.get("google_event_id")
         cal = row.get("calendar_id") or self.default_calendar_id()
@@ -574,8 +597,8 @@ class CalendarService:
             await self.delete_event(cal, str(google_id))
 
         await self.session.execute(
-            text("DELETE FROM calendar_events WHERE id = :id AND workspace_id = :workspace_id"),
-            {"id": event_id, "workspace_id": self.workspace_id},
+            text("DELETE FROM calendar_events WHERE id = :id AND tenant_id = CAST(:tenant_id AS uuid)"),
+            {"id": event_id, "tenant_id": tenant_uuid},
         )
         await self.session.commit()
         return {"deleted": True, "id": event_id}
@@ -584,11 +607,12 @@ class CalendarService:
         return _row_to_dict(await self._get_local_row(event_id))
 
     async def _get_local_row(self, event_id: int) -> Any:
+        tenant_uuid = await self._tenant()
         result = await self.session.execute(
             text(
-                "SELECT * FROM calendar_events WHERE id = :id AND workspace_id = :workspace_id"
+                "SELECT * FROM calendar_events WHERE id = :id AND tenant_id = CAST(:tenant_id AS uuid)"
             ),
-            {"id": event_id, "workspace_id": self.workspace_id},
+            {"id": event_id, "tenant_id": tenant_uuid},
         )
         row = result.fetchone()
         if not row:
@@ -596,6 +620,7 @@ class CalendarService:
         return row
 
     async def _upsert_local(self, item: dict[str, Any], synced_at: datetime) -> None:
+        tenant_uuid = await self._tenant()
         gid = item.get("google_event_id")
         if not gid:
             return
@@ -603,14 +628,14 @@ class CalendarService:
             text(
                 """
                 SELECT id FROM calendar_events
-                WHERE workspace_id = :workspace_id AND google_event_id = :google_event_id
+                WHERE tenant_id = CAST(:tenant_id AS uuid) AND google_event_id = :google_event_id
                 """
             ),
-            {"workspace_id": self.workspace_id, "google_event_id": gid},
+            {"tenant_id": tenant_uuid, "google_event_id": gid},
         )
         row = existing.fetchone()
         params = {
-            "workspace_id": self.workspace_id,
+            "tenant_id": tenant_uuid,
             "google_event_id": gid,
             "calendar_id": item.get("calendar_id", self.default_calendar_id()),
             "title": item.get("title"),
@@ -641,14 +666,15 @@ class CalendarService:
                 text(
                     """
                     INSERT INTO calendar_events (
-                        user_id, workspace_id, google_event_id, calendar_id, title, description,
-                        start_at, end_at, start_time, end_time, attendees, meet_link, status,
-                        synced_at, created_at
+                        tenant_id, google_event_id, calendar_id, title, type, event_date,
+                        description, start_at, end_at, attendees, meet_link,
+                        synced_at, created_at, updated_at
                     )
                     VALUES (
-                        :user_id, :workspace_id, :google_event_id, :calendar_id, :title, :description,
-                        :start_at, :end_at, :start_at, :end_at, CAST(:attendees AS jsonb), :meet_link,
-                        :status, :synced_at, :synced_at
+                        CAST(:tenant_id AS uuid), :google_event_id, :calendar_id, :title,
+                        'appointment', CAST(:start_at AS date),
+                        :description, :start_at, :end_at, CAST(:attendees AS jsonb), :meet_link,
+                        :synced_at, :synced_at, :synced_at
                     )
                     """
                 ),
@@ -657,11 +683,12 @@ class CalendarService:
         await self.session.commit()
 
     async def _local_pending_push(self, calendar_id: str) -> list[dict[str, Any]]:
+        tenant_uuid = await self._tenant()
         result = await self.session.execute(
             text(
                 """
                 SELECT * FROM calendar_events
-                WHERE workspace_id = :workspace_id
+                WHERE tenant_id = CAST(:tenant_id AS uuid)
                   AND calendar_id = :calendar_id
                   AND google_event_id IS NULL
                   AND start_at IS NOT NULL
@@ -669,13 +696,14 @@ class CalendarService:
                 LIMIT 50
                 """
             ),
-            {"workspace_id": self.workspace_id, "calendar_id": calendar_id},
+            {"tenant_id": tenant_uuid, "calendar_id": calendar_id},
         )
         return [_row_to_dict(r) for r in result.fetchall()]
 
     async def _link_local_to_google(
         self, local_id: int, google: dict[str, Any], synced_at: datetime
     ) -> None:
+        tenant_uuid = await self._tenant()
         await self.session.execute(
             text(
                 """
@@ -684,12 +712,12 @@ class CalendarService:
                     meet_link = :meet_link,
                     status = :status,
                     synced_at = :synced_at
-                WHERE id = :id AND workspace_id = :workspace_id
+                WHERE id = :id AND tenant_id = CAST(:tenant_id AS uuid)
                 """
             ),
             {
                 "id": local_id,
-                "workspace_id": self.workspace_id,
+                "tenant_id": tenant_uuid,
                 "google_event_id": google.get("google_event_id") or google.get("id"),
                 "meet_link": google.get("meet_link"),
                 "status": google.get("status", "confirmed"),

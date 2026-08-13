@@ -64,6 +64,9 @@ requiere_pg = pytest.mark.skipif(
 #: `tenant_id NOT NULL` quedo apartada y ahora existe la canonica.
 #: El de `audit_logs` se resolvio corrigiendo el writer, que escribia contra la
 #: definicion de la 507 — la que nunca se aplica porque gana la 412.
+#: Los tres de `calendar_events` se resolvieron alineando `calendar_service`
+#: con el contrato real de la tabla, una vez confirmado en produccion que la
+#: forma existente es la de `tenant_id` y que la tabla esta vacia.
 #: Todos son writers que omiten una columna NOT NULL sin default: el INSERT
 #: fallaria en produccion. Estan documentados en NELVYON_CLOSURE_STATE.md.
 DRIFT_CONOCIDO = frozenset({
@@ -75,9 +78,6 @@ DRIFT_CONOCIDO = frozenset({
     "NOT_NULL_DRIFT|bookings|booking_time|services/booking_service.py",
     "NOT_NULL_DRIFT|bookings|confirmation_token|services/booking_service.py",
     "NOT_NULL_DRIFT|bookings|user_id|services/booking_service.py",
-    "NOT_NULL_DRIFT|calendar_events|event_date|services/calendar_service.py",
-    "NOT_NULL_DRIFT|calendar_events|tenant_id|services/calendar_service.py",
-    "NOT_NULL_DRIFT|calendar_events|type|services/calendar_service.py",
     "NOT_NULL_DRIFT|crm_activities|user_id|services/crm_service.py",
     "NOT_NULL_DRIFT|crm_contacts|user_id|services/crm_service.py",
     "NOT_NULL_DRIFT|invoices|tenant_id|services/invoice_service.py",
