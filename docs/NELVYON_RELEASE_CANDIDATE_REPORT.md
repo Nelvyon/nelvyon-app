@@ -1,12 +1,12 @@
 # NELVYON — Informe de Release Candidate
 
 ```text
-HEAD              1e82398b
-fecha             2026-08-12
+HEAD              45225a0e
+fecha             2026-08-13
 árbol git         limpio
 push/PR/merge     ninguno
-backend           2176 passed / 0 failed
-frontend          6646 passed / 42 skipped (751 ficheros)
+backend           2179 passed / 0 failed / 14 skipped (certificaciones PostgreSQL sin DSN)
+PostgreSQL real   431 migraciones desde cero + create_all + smoke de runtime
 typecheck         tsc --noEmit limpio
 build producción  next build completa
 compileall        limpio
@@ -16,15 +16,25 @@ compileall        limpio
 
 **NO se declara `NELVYON SAAS RELEASE CANDIDATE ✅`.**
 
-No por defectos abiertos —no queda ningún CRITICAL ni HIGH sin resolver— sino
-porque **siete bloques no pueden ejecutarse** con Docker caído, y cinco de ellos
-certifican propiedades que solo PostgreSQL real puede demostrar: constraints,
-atomicidad bajo concurrencia, y que las migraciones aplican de cero.
+Ya no por falta de evidencia: los siete bloques que dependían de Docker están
+ejecutados y medidos contra PostgreSQL real. Se detiene por **un hallazgo HIGH
+abierto que exige una decisión de producto** (H-1) y por dos verificaciones que
+siguen necesitando red.
 
-Llamar CERTIFIED a esos bloques con evidencia de SQLite sería exactamente el
-falso verde que este trabajo existe para evitar. Un RC declarado sin ellos no
-sería seguro: son las propiedades que deciden si el sistema se comporta igual en
-producción que en los tests.
+Lo que la certificación con motor real cambió respecto al informe anterior:
+
+* **Dos bloques que estaban en verde no lo estaban.** El tope de miembros se
+  daba por atómico y era evadible (8 filas con tope 5); el simulacro de
+  restauración aprobaba un backup de 0 bytes. Los dos verdes previos venían de
+  SQLite y de un `docker cp` que devuelve 0 sobre un fichero vacío. Ambos
+  corregidos y vueltos a medir.
+* **La base no se puede reconstruir desde el repositorio.** Las migraciones
+  aplican de cero (431/431) y la aplicación arranca, pero seis tablas quedan con
+  la forma de otra generación del producto y sus consumidores fallan. Producción
+  funciona; recuperación ante desastres, no.
+
+Declarar RC con H-1 abierto sería afirmar que el sistema se puede reconstruir, y
+no se puede.
 
 ## Estado por área
 
@@ -51,12 +61,12 @@ producción que en los tests.
 | Contratos de API | CERTIFIED | dos vocabularios de estado en campañas | `test_campaign_status_contract` | — | unificar la columna |
 | Frontend | VERIFIED | `next build` real completa | 6646 tests | — | — |
 | E2E | BLOCKED_EXTERNALLY | journey de auth 5/5 cuando la fuente está en caché | `e2e/auth.spec.ts` | red: `next/font` descarga de Google Fonts al compilar el dev server | — |
-| Concurrencia | PARCIAL | tope de miembros hecho atómico | `test_member_cap_atomicity` | carrera real necesita PG | 8 candidatos |
-| Column / constraint drift | BLOCKED_EXTERNALLY | analizador AST listo | `_constraint_drift.py` | Docker | — |
-| Cobertura SQLite vs PG | BLOCKED_EXTERNALLY | 4 usos solo-SQLite corregidos | `test_sqlite_only_sql_guard` | Docker | — |
-| Migraciones | BLOCKED_EXTERNALLY | — | — | Docker | — |
-| Rendimiento de BD | BLOCKED_EXTERNALLY | 45 bucles inventariados | — | Docker | — |
-| Backup / restore | BLOCKED_EXTERNALLY | drill existe | `run-postgres-restore-drill.mjs` | Docker | — |
+| Concurrencia | CERTIFIED | el tope ERA evadible: 8 de tope 5 con 24 simultáneas. Cerrojo de fila padre → 5/5 | `test_pg_concurrency_certification` | — | — |
+| Column / constraint drift | CERTIFIED con hallazgo abierto | 693 tablas de `pg_catalog`; 0 ON CONFLICT, 0 PK, 22 NOT NULL fijados; 47 columnas del ORM ausentes en PG | `test_pg_constraint_drift_certification` | — | H-1 |
+| Cobertura SQLite vs PG | CERTIFIED | medido qué NO reproduce SQLite: NOT NULL, tipos y carreras de escritura | `test_sqlite_only_sql_guard` + certificaciones PG | — | — |
+| Migraciones | CERTIFIED | 431/431 desde cero, 0 saltadas; `create_all` añade 42 tablas; smoke `/health` 200 y `/health/ready` 200 | `scripts/pg-cert-db.mjs` | — | 42 tablas fuera de control de migración |
+| Rendimiento de BD | CERTIFIED | 21 filtros de inquilino sin índice → migración 531. Seq Scan 1082 buffers/9,88 ms → índice 402/1,16 ms | `test_pg_tenant_index_coverage` | — | 76 columnas sin índice, ninguna consultada |
+| Backup / restore | CERTIFIED | 8/8; dump de 2.269.676 bytes restaurado y marcador verificado. Aprobaba copias de 0 bytes | `run-postgres-restore-drill.mjs` | — | — |
 | Dependencias | BLOCKED_EXTERNALLY | frontend con lockfile y audit | — | red para CVE | backend sin lockfile |
 | Ads multi-tenant | CERTIFIED | decisión aprobada: el workspace es propietario; migración 529 | `test_integration_workspace_ownership` | — | — |
 | Propiedad de integraciones | CERTIFIED | `workspace_id` propietario, `connected_by_user_id` auditoría; backfill solo inequívoco | `test_integration_workspace_ownership` | — | filas ambiguas fail-closed |
@@ -113,9 +123,12 @@ campañas, `expires_in: 0` del OSS e índices redundantes de `intent_scores`.
 
 ## Qué falta exactamente para el RC
 
-1. **Docker** → cerrar column drift, constraint drift, cobertura PG, migraciones
-   desde cero, rendimiento de BD, backup/restore y la certificación de
-   concurrencia.
+1. **Decisión de producto (H-1)** → seis nombres de tabla reclamados por dos
+   generaciones de esquema vivas. Hay tres salidas legítimas —renombrar la
+   generación legacy, renombrar la del ORM, o mapear `tenant_id`→`workspace_id`
+   y fusionar— y el repositorio no dice cuál es la intención. Elegir por mi
+   cuenta podría dejar sin datos a quien use la otra. Detalle y evidencia
+   reproducida en `docs/NELVYON_CLOSURE_STATE.md`, hallazgo H-1.
 2. **Red** → `pip-audit` y lockfile del backend.
 3. **Red** (segundo uso) → la suite E2E completa. No es cuestión de tiempo: el
    servidor de desarrollo que Playwright levanta **no compila** sin red, porque
@@ -127,8 +140,13 @@ campañas, `expires_in: 0` del OSS e índices redundantes de `intent_scores`.
    Medido, no supuesto: el journey de auth pasó 5/5 antes, con la fuente en
    caché; la ejecución completa aborta al recompilar.
 
-La decisión de producto que faltaba —propiedad de integraciones— ya está tomada
-y aplicada.
+La decisión de propiedad de integraciones ya está tomada y aplicada. La que
+queda —H-1— es distinta: no bloquea una prueba, describe un defecto real que
+solo se ve al reconstruir la base desde cero.
 
-Nada de esto son defectos: son pruebas que aún no se han podido ejecutar. El
-código está en el estado que se pretendía; lo que falta es la evidencia.
+Frente al informe anterior, el reparto cambió. Antes faltaba evidencia. Ahora la
+evidencia existe, y dice que dos de los verdes previos no lo eran: el tope de
+miembros era evadible y el simulacro de restauración aprobaba un backup vacío.
+Los dos venían de medir en un motor que no reproduce la propiedad que se
+pretendía certificar. Están corregidos y vueltos a medir; lo que queda abierto
+está acotado, reproducido y no puede crecer sin que un test lo diga.

@@ -6,21 +6,28 @@
 
 ```text
 HEAD            (ver git log -1)
-último commit   fix(files): neutralise CSV formulas, stop two path escapes
-fecha           2026-08-12
-bloque actual   propiedad de integraciones CERRADA; siguen bloqueados los de PostgreSQL
+último commit   perf(db): indice sobre el filtro de inquilino donde el codigo consulta
+fecha           2026-08-13
+bloque actual   PostgreSQL real disponible; bloques 2/4/30/31/39/40 CERTIFICADOS con medicion nueva
 tests           backend 2176 passed · frontend 6646 passed / 42 skipped · frontend 6643 passed / 42 skipped · next build OK · frontend 6637 passed / 42 skipped · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
 build           backend compileall limpio · frontend  REAL pasa (2026-08-12)
 árbol git       limpio
 push/PR/merge   ninguno
-PG certification BLOQUEADO — Docker Desktop caído (npipe dockerDesktopLinuxEngine no responde)
+PG certification DISPONIBLE — contenedor `nelvyon-local-ai-postgres` (pgvector/pg16, 127.0.0.1:5434)
+                base de certificacion `nelvyon_mig_cert`: 431 migraciones desde cero + create_all
+                DSN de los tests: NELVYON_PG_CERT_DSN
 ```
 
 ## Regla de arranque
 
 1. `git status` + `git log -1` → el repo es la verdad. Si HEAD avanzó, no retroceder.
-2. Comprobar Docker: `docker info`. Si responde, los bloques 2/4/29/30 pasan a
-   PRIORIDAD INMEDIATA.
+2. Levantar PostgreSQL de certificacion antes de tocar nada de base:
+
+       PG_CERT_ADMIN_URL="postgresql://nelvyon_local:nelvyon_local_dev@127.0.0.1:5434/nelvyon_local_ai"          node scripts/pg-cert-db.mjs
+       export NELVYON_PG_CERT_DSN="postgresql://nelvyon_local:nelvyon_local_dev@127.0.0.1:5434/nelvyon_mig_cert"
+
+   Sin ese DSN las certificaciones de PostgreSQL se SALTAN. Un verde sin el no
+   certifica nada de lo que solo el motor real demuestra.
 3. Continuar por el primer `PENDING` no bloqueado.
 
 ---
@@ -30,9 +37,9 @@ PG certification BLOQUEADO — Docker Desktop caído (npipe dockerDesktopLinuxEn
 | # | Bloque | Estado | Nota |
 |--:|---|---|---|
 | 1 | WhatsApp + SES / Email Provider Tenancy | **CERTIFIED** | `7135eaf5` |
-| 2 | Column Drift sobre pg_catalog | **BLOCKED** | Docker caído |
-| 3 | Clasificación de drift estructural | **BLOCKED** | necesita la medición real de 2; clasificar sobre cifras históricas seria lo prohibido |
-| 4 | Constraint Drift Guard PG | **BLOCKED** | Docker caído |
+| 2 | Column Drift sobre pg_catalog | **CERTIFIED** | 693 tablas leidas de `pg_catalog`; 47 columnas que el ORM declara y PostgreSQL no tiene, en 5 tablas — ver hallazgo H-1 |
+| 3 | Clasificación de drift estructural | **CLASIFICADO — decision de producto pendiente** | causa raiz unica: dos generaciones de esquema vivas reclaman los mismos nombres de tabla. Ver hallazgo H-1 |
+| 4 | Constraint Drift Guard PG | **CERTIFIED** | `24bff483` · 0 ON_CONFLICT · 0 PK · 22 NOT_NULL fijados; 4 controles positivos/negativos contra catalogo real |
 | 5 | BFF Authorization | **CERTIFIED** | diferencial de parseo `X-Workspace-Id` corregido |
 | 6 | BFF Ads / Provider Isolation | **CERTIFIED** | el lado Node ya era correcto; fijado con guard |
 | 7 | Financial Safety | **CERTIFIED** | `83977fea` — 3 hallazgos: autoconcesión de plan, refund cross-tenant, fail-open en verify |
@@ -57,9 +64,9 @@ PG certification BLOQUEADO — Docker Desktop caído (npipe dockerDesktopLinuxEn
 | 26 | Reporting / API Contract Debt | **CERTIFIED** | website_url fantasma eliminado del informe |
 | 27 | Frontend Error/Permission UX | **CERTIFIED** | reintento de POST/PATCH eliminado (duplicaba mutaciones) |
 | 28 | Flake / Test Determinism | **PARCIAL** | 4 de 5 dependencias de orden cerradas + SQL solo-SQLite; queda 1, ver TODO |
-| 29 | SQLite vs PostgreSQL Coverage | **BLOCKED** | Docker caído |
-| 30 | Migrations Final Certification | **BLOCKED** | Docker caído |
-| 31 | DB Performance | **BLOCKED** | 45 bucles con consulta inventariados; medir planes exige PG real |
+| 29 | SQLite vs PostgreSQL Coverage | **CERTIFIED** | medido: SQLite no reproduce NOT NULL (22 casos) ni la concurrencia (tope evadible). Ambas dimensiones ya tienen certificacion contra PG |
+| 30 | Migrations Final Certification | **CERTIFIED** | 431/431 desde cero, 0 saltadas · create_all anade 42 tablas · smoke: /health 200, /health/ready 200, endpoint protegido 401 |
+| 31 | DB Performance | **CERTIFIED** | `45225a0e` · 367 columnas de inquilino, 97 sin indice, 21 consultadas por codigo → migracion 531. Medido: Seq Scan 1082 buffers/9,88 ms → Bitmap Index Scan 402/1,16 ms |
 | 32 | API Performance / Timeouts | **CERTIFIED** | 12 paginaciones sin techo; bypass del límite de cuerpo; stream SSE sin fin |
 | 33 | Exception / Fail-open Sweep | **CERTIFIED** | 8 candidatos barridos; 1 fail-open real (firma de contratos) cerrado |
 | 34 | Observability | **CERTIFIED** | cuerpo del endpoint de tokens fuera del log y del redirect; guard de clase |
@@ -67,8 +74,8 @@ PG certification BLOQUEADO — Docker Desktop caído (npipe dockerDesktopLinuxEn
 | 36 | Dependency Security | **BLOCKED_EXTERNALLY** | frontend con lockfile y audit previo; backend sin lockfile y 39/41 sin fijar — CVE scan necesita red |
 | 37 | Production ENV / Config | **CERTIFIED** | fail-fast al arrancar: sin JWT o DATABASE_URL no levanta |
 | 38 | Deployment / Railway Readiness | **CERTIFIED** | live superficial / ready con dependencias; guard contra bucle de reinicios |
-| 39 | Backup / Restore | **BLOCKED_EXTERNALLY** | el drill usa `docker exec` + pg_dump; sin daemon no se puede ejecutar |
-| 40 | Load / Stress / Concurrency | **PARCIAL** | tope de miembros hecho atómico; 8 candidatos inventariados; carrera real necesita PG |
+| 39 | Backup / Restore | **CERTIFIED** | `294a432e` · 8/8 PASS, dump de 2.269.676 bytes restaurado y marcador verificado. Defecto corregido: aprobaba una copia de 0 bytes |
+| 40 | Load / Stress / Concurrency | **CERTIFIED** | `0f0eee61` · el tope ERA evadible en PostgreSQL (8 de tope 5 con 24 simultaneas). Corregido con cerrojo de fila padre: 5/5. Barrido: 1 sola instancia del patron roto en todo el repo |
 | 41 | Frontend Functional Audit | **VERIFIED** | build de producción real pasa; 749 ficheros de test verdes; tsc limpio |
 | 42 | API Contracts | **CERTIFIED** | dos vocabularios de estado en campañas; UI los acepta; guard de clasificación |
 | 43 | CI/CD Gates | **CERTIFIED** | el gate de PR corría 9 ficheros y ningún guard; ahora suite completa + tsc + frontend |
@@ -318,3 +325,99 @@ backend   cd backend && python -m pytest tests/ -q
 frontend  cd apps/web && ./node_modules/.bin/vitest run
 typecheck cd apps/web && ./node_modules/.bin/tsc --noEmit
 ```
+
+---
+
+## Hallazgos de la certificación PostgreSQL (2026-08-13)
+
+Todo lo de abajo se midió contra `nelvyon_mig_cert`: 431 migraciones aplicadas
+desde cero más `create_all`. Ninguna cifra procede de una ejecución anterior.
+
+### H-1 · Dos generaciones de esquema reclaman los mismos nombres de tabla
+
+**Severidad: HIGH · requiere decisión de producto · NO resuelto**
+
+La cadena de migraciones construye tablas de una generación `tenant_id`/`uuid`
+(CRM SaaS multi-inquilino), mientras el ORM y varios servicios escriben una
+generación `workspace_id`/`integer` (NELVYON SaaS). Comparten el nombre y no
+comparten nada más.
+
+| tabla | lo que crean las migraciones | lo que espera el consumidor |
+|---|---|---|
+| `subscriptions` | Paddle: `id uuid`, `user_id uuid`, `plan text` | Stripe: `plan_id`, `billing_cycle`, `amount_paid`, `stripe_session_id`, … |
+| `audit_logs` | `tenant_id uuid`, `module NOT NULL`, `details jsonb` | `tenant_id int`, `old_value`, `new_value` |
+| `deals` | `tenant_id`, `pipeline_id`, `stage_id`, `name` | `workspace_id`, `user_id`, `title`, `stage`, `pipeline` |
+| `social_posts` | `tenant_id`, `media_urls`, `post_type` | `workspace_id`, `platform`, `likes`, `impressions` |
+| `conversations` | `tenant_id`, `contact_id`, `channel` | `workspace_id`, `user_id`, `contact_name` |
+| `calendar_events` | `tenant_id`, `event_date`, `type` | `workspace_id`, `start_time`, `end_time`, `event_type` |
+
+Reproducido, no razonado:
+
+```
+SELECT plan_id FROM subscriptions WHERE workspace_id = 1
+  -> ERROR: column "plan_id" does not exist
+     HINT: Perhaps you meant to reference the column "subscriptions.plan".
+
+INSERT INTO audit_logs (..., old_value, new_value, ...)
+  -> ERROR: column "old_value" of relation "audit_logs" does not exist
+```
+
+Ambos consumidores están vivos: `services/social_scheduler_service.py:296` lee
+`social_posts WHERE tenant_id`, y `routers/dashboard_metrics.py` consulta la
+misma tabla por ORM con `workspace_id`.
+
+**Qué significa en la práctica.** Producción funciona porque esas tablas se
+crearon por `create_all` antes de que la migración pasara, y sus
+`CREATE TABLE IF NOT EXISTS` quedaron en nada — la migración 325 lo dice con
+todas las letras: «intended to be added by Alembic PR01 but never ran in
+production». Lo que está roto es **reconstruir la base desde el repositorio**:
+recuperación ante desastres, una región nueva, un entorno nuevo.
+
+**Por qué no lo he resuelto.** Resolverlo es decidir qué generación se queda con
+cada nombre y renombrar la otra, con migración de datos. Hay al menos tres
+salidas legítimas (renombrar la legacy a `crm_*`; renombrar la del ORM;
+mapear tenant→workspace y fusionar) y el repositorio no contiene evidencia de
+cuál es la intención. Inventarla podría dejar sin datos a quien use la otra.
+
+**Lo que sí queda hecho:** medido, reproducido, acotado a 6 tablas y fijado en
+`DRIFT_CONOCIDO`, de modo que no puede crecer sin que un test lo diga.
+
+### H-2 · El tope de miembros era evadible bajo concurrencia — CORREGIDO
+
+`INSERT ... SELECT ... WHERE (SELECT COUNT(*)) < :tope` parecía cerrar la carrera
+por ser una sola sentencia. No la cierra: bajo READ COMMITTED la subconsulta lee
+la instantánea del inicio de la sentencia y no ve filas sin confirmar. Con 24
+invitaciones simultáneas y tope 5 entraron **8**. Corregido con `with_for_update()`
+sobre la fila del workspace → 5 exactas. Barrido: es la única instancia del
+patrón en el repositorio. `0f0eee61`
+
+### H-3 · El simulacro de restauración aprobaba un backup vacío — CORREGIDO
+
+`dr.copy_dump` daba PASS con `bytes: 0` porque `docker cp` devuelve 0 aunque el
+fichero esté vacío. Un simulacro que aprueba una copia inexistente produce la
+confianza sin el respaldo. `294a432e`
+
+### H-4 · Un error de esquema degrada el plan de todo cliente, en silencio
+
+`services/plan_quota.py::get_active_plan_id_for_workspace` captura cualquier
+excepción, la registra a nivel **debug** y devuelve `"starter"`. Sobre una base
+donde `plan_id` no existe, todo cliente de pago pasa al plan más barato sin que
+nada lo señale, porque «no hay suscripción» y «la consulta falló» son
+indistinguibles.
+
+No es un agujero de seguridad —degradar da menos privilegios, no más— pero sí un
+fallo visible para el producto que hoy nadie vería. Pendiente: separar los dos
+casos y registrar el fallo de esquema a nivel ERROR, conservando el fallback
+para no convertir una caída de base en un 500 general.
+
+### Lo que SÍ reproduce SQLite y lo que no (bloque 29, medido)
+
+| dimensión | SQLite | PostgreSQL real |
+|---|---|---|
+| columnas | sí | — |
+| `NOT NULL` | **no** | 22 writers que fallarían en producción |
+| carrera de escritura | **no** (serializa por fichero) | tope evadido: 8 de 5 |
+| tipos (`uuid` vs `integer`) | no | H-1 |
+
+Por eso un verde de la suite normal no dice nada sobre estas cuatro cosas, y por
+eso las certificaciones nuevas exigen `NELVYON_PG_CERT_DSN`.
