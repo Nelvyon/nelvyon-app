@@ -596,3 +596,17 @@ contra PyPI podría romper el build, y el plan prohíbe upgrades masivos a ciega
 
 Para cerrarlo: red disponible → `pip-audit`, generar lockfile
 (`pip-compile`/`uv lock`), reinstalar, suite completa.
+
+## BLOQUEADO EXTERNAMENTE — drill de backup/restore (bloque 39)
+
+`scripts/run-postgres-restore-drill.mjs` opera con `docker exec` sobre un
+contenedor PostgreSQL (`pg_isready`, `pg_dump`, restore) y exige `DATABASE_URL`.
+Con el daemon caído no puede ejecutarse, y no hay forma de simularlo sin fingir
+la certificación.
+
+Existe evidencia previa de 8/8 PASS (KI-R012), pero es **histórica**: no cuenta
+como certificación actual.
+
+Para cerrarlo: Docker disponible → levantar PG desechable → ejecutar el drill →
+comprobar que tras restaurar se aplican migraciones, arranca la app y los datos
+críticos están.
