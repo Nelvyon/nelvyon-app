@@ -555,3 +555,21 @@ Auditado y sin defecto, anotado para no repetirlo:
 - `social_scheduler.upload_media` valida MIME contra lista blanca antes de nada.
 - `whatsapp.media_url` no lo descarga NELVYON: lo busca Meta. No es SSRF nuestra,
   y además el endpoint ya falla cerrado sin integración propia.
+
+## DEUDA — redirect de tracking de clics sin firmar (2026-08-12)
+
+`GET /api/campaigns/track/click/{campaign_id}/{recipient_id}?url=...` redirige a
+la URL del parámetro. En el bloque 35 se cerró lo inequívoco: solo `http`/`https`
+(antes admitía `javascript:`, `data:`, `file:`).
+
+Queda que redirige a **cualquier** http(s). Eso es inherente al tracking de clics
+—el cliente pone en su campaña el enlace que quiera— pero significa que el
+dominio de NELVYON puede usarse para redirigir a donde sea.
+
+El diseño correcto es no aceptar la URL como parámetro: guardar el enlace al
+generar la campaña y redirigir por id, o firmarla. Ambas opciones **invalidan los
+enlaces ya enviados** en campañas en circulación, así que es una decisión de
+producto con impacto en correos que ya están en bandejas de entrada.
+
+Mitigante medido: un middleware exige cabecera de tenant, así que no es un
+redirect abierto anónimo.

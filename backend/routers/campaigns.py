@@ -353,7 +353,7 @@ async def delete_campaigns(
 
 # ─── Scheduler + deliverability API (/api/campaigns) ───────────────────────────
 
-from urllib.parse import unquote
+from urllib.parse import unquote, urlparse
 
 from fastapi.responses import RedirectResponse, Response as FastAPIResponse
 
@@ -442,7 +442,20 @@ async def track_campaign_click(
     """Redirect tracking (no auth)."""
     from sqlalchemy import text as sql_text
 
+    # Solo http/https.
+    #
+    # El endpoint es publico y sin auth (es el click de un correo), y el destino
+    # sale entero del parametro. Eso permitia `javascript:` y `data:`, que en un
+    # enlace con el dominio de NELVYON convierten el tracking en un vector de
+    # ejecucion; y `file:`, que apunta al disco de quien pincha.
+    #
+    # Redirigir a un http(s) arbitrario es INHERENTE al tracking de clics —el
+    # cliente pone en su campana el enlace que quiere— asi que eso no se toca
+    # aqui. Lo que se corta es lo que ningun correo legitimo necesita.
     target = unquote(url)
+    esquema = urlparse(target).scheme.lower()
+    if esquema not in ("http", "https"):
+        raise HTTPException(status_code=400, detail="Unsupported redirect scheme")
     try:
         ws_row = await db.execute(
             sql_text("SELECT workspace_id FROM campaigns WHERE id = :id"),

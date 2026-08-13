@@ -8,8 +8,8 @@
 HEAD            (ver git log -1)
 último commit   fix(files): neutralise CSV formulas, stop two path escapes
 fecha           2026-08-12
-bloque actual   35 — Web Security
-tests           backend 2077 passed · frontend 6637 passed / 42 skipped · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
+bloque actual   36 — Dependency Security
+tests           backend 2088 passed · frontend 6637 passed / 42 skipped · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
 build           backend compileall limpio · frontend sin tocar desde el último build conocido
 árbol git       limpio
 push/PR/merge   ninguno
@@ -63,7 +63,7 @@ PG certification BLOQUEADO — Docker Desktop caído (npipe dockerDesktopLinuxEn
 | 32 | API Performance / Timeouts | **CERTIFIED** | 12 paginaciones sin techo; bypass del límite de cuerpo; stream SSE sin fin |
 | 33 | Exception / Fail-open Sweep | **CERTIFIED** | 8 candidatos barridos; 1 fail-open real (firma de contratos) cerrado |
 | 34 | Observability | **CERTIFIED** | cuerpo del endpoint de tokens fuera del log y del redirect; guard de clase |
-| 35 | Web Security | PENDING | |
+| 35 | Web Security | **CERTIFIED** | esquemas de redirect acotados; identificadores SQL en conjunto cerrado; guard de clase |
 | 36 | Dependency Security | PENDING | |
 | 37 | Production ENV / Config | PENDING | |
 | 38 | Deployment / Railway Readiness | PENDING | |

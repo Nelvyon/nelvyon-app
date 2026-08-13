@@ -131,10 +131,27 @@ async def _fetch_all(db: AsyncSession, query: str, params: dict) -> List[dict]:
     return [dict(r) for r in result.mappings().all()]
 
 
+#: Identificadores admitidos en las consultas de conteo. Van al SQL como texto
+#: —no pueden ir como parametro ligado— asi que la unica defensa es que salgan
+#: de un conjunto cerrado.
+TABLAS_CONTABLES = frozenset({
+    "deals", "campaigns", "helpdesk_tickets",
+    "nelvyon_outputs", "nelvyon_assets", "contracts", "social_posts",
+})
+CAMPOS_CONTABLES = frozenset({"project_id", "client_id"})
+
+
 async def _count_in_workspace(
     db: AsyncSession, table: str, field: str, value: int, user_id: str, workspace_id: int
 ) -> int:
     """Count rows tied to a project/client, scoped to the active workspace."""
+    # `table` ya se comprobaba; `field` no. Hoy todos los llamantes pasan
+    # literales, asi que no es explotable — pero la seguridad de un helper no
+    # deberia depender de que cada llamante futuro se acuerde. Mismo trato para
+    # los dos: identificadores desde conjunto cerrado, valores por parametro.
+    if table not in TABLAS_CONTABLES or field not in CAMPOS_CONTABLES:
+        raise ValueError(f"Unsupported table/field for counting: {table}.{field}")
+
     if table in ("deals", "campaigns", "helpdesk_tickets"):
         result = await db.execute(
             text(
