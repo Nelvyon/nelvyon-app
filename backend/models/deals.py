@@ -1,10 +1,16 @@
 from core.database import Base
-from sqlalchemy import Column, DateTime, Float, Integer, String
+from sqlalchemy import Column, DateTime, Float, Integer, String, Index
 
 
 class Deals(Base):
     __tablename__ = "deals"
-    __table_args__ = {"extend_existing": True}
+    # `deals` pasa a crearla `create_all` desde la migracion 532, que aparto la
+    # tabla legacy `tenant_id`. El indice del filtro de inquilino va aqui porque
+    # 531 no puede crearlo: al migrar desde cero la tabla aun no existe.
+    __table_args__ = (
+        Index("ix_deals_workspace_id", "workspace_id"),
+        {"extend_existing": True},
+    )
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True, nullable=False)
     user_id = Column(String, nullable=False)
