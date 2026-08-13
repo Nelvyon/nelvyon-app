@@ -610,3 +610,32 @@ como certificación actual.
 Para cerrarlo: Docker disponible → levantar PG desechable → ejecutar el drill →
 comprobar que tras restaurar se aplican migraciones, arranca la app y los datos
 críticos están.
+
+## DEUDA — el stock de la tienda no se decrementa (2026-08-12)
+
+`os_store_builder_service.process_order` comprueba `prod["stock"] < qty` y
+rechaza si no llega, pero **ninguna parte del código decrementa `stock`**. Solo
+se actualiza como campo editable del producto (línea 453) y se usa para mostrar
+`in_stock`.
+
+Consecuencia: la comprobación solo bloquea un pedido mayor que el stock total,
+nunca la suma de pedidos. Se puede vender el mismo artículo indefinidamente.
+
+No se cierra porque decidir si esa tienda gestiona inventario transaccional es
+decisión de producto: puede estar diseñada para stock informativo con gestión
+manual. Inventar el decremento cambiaría el comportamiento del producto del
+cliente.
+
+## BLOQUEADO PARCIALMENTE — certificación de concurrencia (bloque 40)
+
+Detectados 10 patrones read-then-write sobre límites. Cerrado el de
+`invite_member` (tope de 50 miembros) con `INSERT ... SELECT ... WHERE
+(SELECT COUNT(*)) < :tope`, una sola sentencia.
+
+La **atomicidad bajo concurrencia real depende del motor** y solo se certifica
+contra PostgreSQL, que sigue bloqueado. Los tests sobre SQLite validan la lógica
+del tope y su forma, no la carrera. Los otros 8 candidatos (create_workspace,
+apply_discount, add_page, _store_mention, configure_usage_alert, send_connect,
+_ensure_recipients, recalculate_contact_score) quedan inventariados: sus límites
+no son de seguridad ni de dinero, así que esperan a PG en vez de reescribirse
+a ciegas.

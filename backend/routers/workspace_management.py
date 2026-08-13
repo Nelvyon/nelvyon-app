@@ -10,7 +10,7 @@ from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, ConfigDict
-from sqlalchemy import select, func, or_
+from sqlalchemy import select, func, or_, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.config import settings
@@ -26,6 +26,10 @@ from models.workspace_members import Workspace_members
 from schemas.auth import UserResponse
 
 logger = logging.getLogger(__name__)
+
+#: Tope de miembros por workspace. Se comprueba en la misma sentencia que
+#: inserta, para que dos invitaciones simultaneas no lo rebasen.
+MAX_MIEMBROS_POR_WORKSPACE = 50
 
 router = APIRouter(prefix="/api/v1/workspace", tags=["workspace-management"])
 
@@ -419,27 +423,58 @@ async def invite_member(
     if existing.scalar_one_or_none():
         raise HTTPException(status_code=400, detail="User is already a member of this workspace")
 
-    # Check member limit (max 50)
-    count = (await db.execute(
-        select(func.count(Workspace_members.id)).where(
-            Workspace_members.workspace_id == ctx.workspace_id
-        )
-    )).scalar() or 0
-    if count >= 50:
-        raise HTTPException(status_code=400, detail="Maximum of 50 members per workspace")
-
-    member = Workspace_members(
-        workspace_id=ctx.workspace_id,
-        user_id="",  # Will be set when user accepts invite
-        email=data.email,
-        role=data.role,
-        status="invited",
-        invited_by=ctx.user_id,
-        created_at=datetime.now(timezone.utc).isoformat(),
+    # Tope de miembros, comprobado en la MISMA sentencia que inserta.
+    #
+    # Antes se contaba y despues se insertaba, en dos pasos: dos invitaciones
+    # simultaneas leian ambas 49, ambas pasaban y el workspace acababa con 51.
+    # Un `INSERT ... SELECT ... WHERE (SELECT count(*)) < :tope` deja la
+    # comprobacion y la escritura en una sola sentencia, que el motor resuelve
+    # de forma atomica.
+    #
+    # NOTA: la atomicidad bajo concurrencia real depende del motor y solo se
+    # certifica contra PostgreSQL; en SQLite este test comprueba la LOGICA del
+    # tope, no la carrera.
+    insercion = await db.execute(
+        text(
+            """
+            INSERT INTO workspace_members
+                (workspace_id, user_id, email, role, status, invited_by, created_at)
+            SELECT :ws, '', :email, :role, 'invited', :invited_by, :creado
+            WHERE (
+                SELECT COUNT(*) FROM workspace_members WHERE workspace_id = :ws
+            ) < :tope
+            """
+        ),
+        {
+            "ws": ctx.workspace_id,
+            "email": data.email,
+            "role": data.role,
+            "invited_by": ctx.user_id,
+            "creado": datetime.now(timezone.utc).isoformat(),
+            "tope": MAX_MIEMBROS_POR_WORKSPACE,
+        },
     )
-    db.add(member)
+    if int(insercion.rowcount or 0) == 0:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Maximum of {MAX_MIEMBROS_POR_WORKSPACE} members per workspace",
+        )
     await db.commit()
-    await db.refresh(member)
+
+    # La fila ya esta escrita por la sentencia de arriba; aqui solo se relee
+    # para construir la respuesta. Volver a insertarla con el ORM crearia un
+    # duplicado.
+    member = (
+        await db.execute(
+            select(Workspace_members)
+            .where(
+                Workspace_members.workspace_id == ctx.workspace_id,
+                Workspace_members.email == data.email,
+            )
+            .order_by(Workspace_members.id.desc())
+            .limit(1)
+        )
+    ).scalar_one()
 
     logger.info(f"Member invited: {data.email} to workspace {ctx.workspace_id}")
 

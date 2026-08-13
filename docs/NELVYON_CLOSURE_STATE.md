@@ -8,8 +8,8 @@
 HEAD            (ver git log -1)
 último commit   fix(files): neutralise CSV formulas, stop two path escapes
 fecha           2026-08-12
-bloque actual   40 — Load / Stress / Concurrency
-tests           backend 2101 passed · frontend 6637 passed / 42 skipped · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
+bloque actual   41 — Frontend Functional Audit
+tests           backend 2105 passed · frontend 6637 passed / 42 skipped · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
 build           backend compileall limpio · frontend sin tocar desde el último build conocido
 árbol git       limpio
 push/PR/merge   ninguno
@@ -68,7 +68,7 @@ PG certification BLOQUEADO — Docker Desktop caído (npipe dockerDesktopLinuxEn
 | 37 | Production ENV / Config | **CERTIFIED** | fail-fast al arrancar: sin JWT o DATABASE_URL no levanta |
 | 38 | Deployment / Railway Readiness | **CERTIFIED** | live superficial / ready con dependencias; guard contra bucle de reinicios |
 | 39 | Backup / Restore | **BLOCKED_EXTERNALLY** | el drill usa `docker exec` + pg_dump; sin daemon no se puede ejecutar |
-| 40 | Load / Stress / Concurrency | PENDING | |
+| 40 | Load / Stress / Concurrency | **PARCIAL** | tope de miembros hecho atómico; 8 candidatos inventariados; carrera real necesita PG |
 | 41 | Frontend Functional Audit | PENDING | |
 | 42 | API Contracts | PENDING | |
 | 43 | CI/CD Gates | PENDING | |
