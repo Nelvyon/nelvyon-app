@@ -1,43 +1,64 @@
 # NELVYON — Informe de Release Candidate
 
 ```text
-HEAD              9a3d71be
+HEAD              a306bfe2
 fecha             2026-08-13
 árbol git         limpio
 push/PR/merge     ninguno
 
-backend           2206 passed / 0 failed / 14 skipped (certificaciones PG sin DSN)
-frontend          6656 passed / 42 skipped (752 ficheros) · 6 corridas limpias
-E2E               406 tests · 404 passed / 1 skipped / 0 failed
+backend           2226 passed / 0 failed / 0 skipped   (con NELVYON_PG_CERT_DSN)
+                  2206 passed / 0 failed / 20 skipped  (sin DSN; los 20 son la puerta a PostgreSQL)
+frontend          6656 passed / 42 skipped (752 ficheros)
+E2E               406 descubiertos · 405 passed / 1 skipped / 0 failed
 typecheck         tsc --noEmit limpio
 build producción  next build completa
 compileall        limpio
-dependencias      pip-audit: 1 hallazgo sin fix, cerrado por alcanzabilidad
-PostgreSQL real   432 migraciones desde cero + create_all + smoke de runtime
+PostgreSQL real   432 migraciones desde cero · create_all +44 tablas · smoke /health 200, /health/ready 200
+guards PG         28 certificaciones verdes
+backup/restore    8/8 · dump restaurado y marcador verificado
+dependencias      pip-audit: 1 hallazgo sin fix publicado, cerrado por alcanzabilidad
 ```
 
 ## Veredicto
 
 **NO se declara `NELVYON SAAS RELEASE CANDIDATE ✅`.**
 
-Toda la certificación obligatoria está verde y no queda ningún CRITICAL ni HIGH
-sin resolver salvo uno, que es exactamente el motivo de no declararlo:
+Toda la certificación ejecutable está verde. Queda **un HIGH abierto** que exige
+una decisión humana con un dato que el repositorio no contiene, y por eso no se
+declara.
 
-**Tres tablas —`calendar_events`, `audit_logs` y `social_posts`— siguen
-declaradas por dos migraciones con definiciones incompatibles.** No es falta de
-investigación: se midió quién escribe y quién lee cada una, en el backend
-FastAPI y en `apps/web`, y las tres tienen consumidores vivos enfrentados.
-Resolverlas exige un dato que **no está en el repositorio**: qué forma tienen hoy
-esas tablas en la base de producción. Con esa respuesta el camino es mecánico y
-ya está probado en la migración 532.
+**`calendar_events` y `social_posts`.** Cada una está declarada por dos
+migraciones con definiciones incompatibles, y las dos formas tienen consumidores
+vivos. El problema no son columnas ausentes sino **tipos**: reproducido contra
+PostgreSQL real, tras añadir todas las columnas que faltaban, el INSERT del ORM
+sigue fallando con `operator does not exist: uuid = integer` y
+`column "scheduled_at" is of type timestamp`. La tabla tiene `id uuid`; el modelo
+declara `id Integer`.
 
-Además, `506a_reconcile_legacy_pre_507_social_posts.sql` contiene una instrucción
-explícita —«Do NOT rename bookings / api_keys / calendar_events / invoices /
-audit_logs / qr_codes»— tomada con contexto que el código no explica. Saltársela
-sería renombrar a ciegas tablas que probablemente tienen datos.
+Las dos lecturas son legítimas y se excluyen: si producción tiene la forma de la
+migración, el dashboard SaaS funciona y las rutas FastAPI llevan rotas desde
+siempre; si tiene la del ORM, es al revés. Elegir mal rompe una superficie viva.
 
-Declarar RC dejaría implícito que la base se puede reconstruir entera desde el
-repositorio, y con esas tres tablas todavía no.
+Se agotó la evidencia disponible —migraciones, modelos, writers, readers,
+frontend, backend, historial git, `pg_catalog`, un `pg_dump` real de julio y la
+configuración de despliegue— y **no hay credenciales de producción en el
+repositorio**, solo ficheros `.example`. La consulta READ-ONLY exacta que lo
+resuelve está en `docs/NELVYON_CLOSURE_STATE.md`, hallazgo H-1.
+
+### Lo que sí se cerró en esta ronda
+
+**`audit_logs`: la traza de auditoría de acciones críticas no se había escrito
+nunca.** El writer usaba la definición de la migración 507, que no se aplica
+jamás — gana la 412, `audit_logs` no tiene modelo ORM y `backend/migrations/` no
+forma parte de la cadena de despliegue. Se demostró sin consultar producción y
+un `pg_dump` real lo confirma. Corregido y certificado contra PostgreSQL:
+escritura, lectura, supervivencia del antes/después en jsonb y aislamiento por
+inquilino, con dos controles positivos.
+
+**El mecanismo que lo ocultaba.** El esquema de tests SQLite se derivaba de la
+migración 507, justo la definición que pierde en 12 tablas. Los tests validaban
+contra columnas que ninguna base real tiene. Corregido: ahora reproduce la regla
+del ejecutor —primero en el orden, primero en ganar—.
 
 ## Estado por área
 
@@ -126,43 +147,52 @@ campañas, `expires_in: 0` del OSS e índices redundantes de `intent_scores`.
 
 ## Qué falta exactamente para el RC
 
-**Una sola cosa, y es un dato, no una tarea:** qué forma tienen hoy
-`calendar_events`, `audit_logs` y `social_posts` en la base de producción.
+Un dato, no una tarea. La consulta READ-ONLY está en `NELVYON_CLOSURE_STATE.md`
+(H-1): tipos de `id`/`tenant_id`/`workspace_id` en `calendar_events` y
+`social_posts` de producción, y su número de filas. Con la respuesta, el camino
+es mecánico y ya está probado dos veces en este repositorio — la 532 para
+`deals`/`conversations`, y el arreglo de `audit_logs`.
 
-Cada una está declarada por dos migraciones distintas:
+## Severidades abiertas
 
-| tabla | definición A | definición B | quién usa cada una |
-|---|---|---|---|
-| `audit_logs` | 412: `tenant_id uuid`, `module`, `details` | 507: `tenant_id integer`, `old_value`, `new_value` | A: un script de verificación RLS · B: `services/audit_service.py` |
-| `calendar_events` | 408: `tenant_id`, `event_date`, `type` | modelo ORM: `workspace_id`, `start_time`, `end_time` | A: `apps/web` · B: backend, 7 sitios |
-| `social_posts` | 507: `tenant_id`, `media_urls`, `post_type` | modelo ORM: `workspace_id`, `platform`, `likes` | A: 6 sitios del backend · B: `services/social_posts.py` y 2 routers |
+```text
+CRITICAL   0
+HIGH       1   calendar_events + social_posts (decisión humana, evidencia completa)
+P0         0
+P1         0 no aceptados
+```
 
-Gana siempre la de número más bajo, porque todas usan `CREATE TABLE IF NOT
-EXISTS`. Con esa respuesta, el camino ya está probado en la migración 532:
+## Skips, uno por uno
 
-* si producción tiene la forma canónica → apartar la perdedora vacía en la
-  cadena, como se hizo con `deals` y `conversations`;
-* si producción tiene la perdedora **con datos** → migrar los datos primero.
+| Suite | Skips | Razón | ¿Oculta algo roto? |
+|---|--:|---|---|
+| backend sin DSN | 20 | puerta a PostgreSQL; **con DSN los 20 pasan** | no |
+| backend con DSN | 0 | — | — |
+| frontend | 42 | puertas a PostgreSQL, ya declaradas | no |
+| E2E | 1 | `local-pack-smoke`: el catálogo exige credenciales de plataforma que el smoke no lleva. 404/410 **ya no se saltan** | no: la propiedad la cubren 10 tests unitarios |
 
-Mientras tanto la clase no puede crecer: `test_migration_table_collisions.py`
-fija las 15 colisiones medidas y falla ante cualquier nueva.
+## Deuda no bloqueante
 
-### Intermitencia del frontend: no reproducida
+- 19 writers omiten una columna `NOT NULL` sin default (drift fijado y vigilado);
+- 15 tablas declaradas por varias migraciones (fijadas; no pueden crecer);
+- `ecdsa` PYSEC-2026-1325 sin arreglo publicado, no alcanzable: se firma con
+  HS256 y los algoritmos EC quedan rechazados;
+- stock de tienda sin decrementar; redirect de tracking sin firmar;
+  `campaigns.status` con dos vocabularios; límite de tasa multiinstancia;
+  9 webhooks entrantes sin verificación de firma.
 
-6 corridas completas con la salida capturada entera, incluida una con la caché de
-Vite borrada: **6/6 limpias, 6656 passed / 42 skipped / 0 failed**. Los 2 fallos
-originales no reproducen y su identidad es irrecuperable porque aquella captura
-quedó recortada por el `tail` con el que se invocó. No se declara resuelto: se
-declara no reproducido, con el número de intentos delante.
+## Riesgo residual
 
-### Correcciones sobre lo que este informe decía antes
+Dos superficies de producto comparten base de datos y, en `calendar_events` y
+`social_posts`, comparten nombre de tabla con formas incompatibles. Una de las
+dos está rota en producción ahora mismo; cuál, lo dice la consulta de H-1. Nada
+de lo entregado en esta ronda lo empeora.
 
-Dos afirmaciones anteriores eran incorrectas y se rectifican con la medición:
+## Correcciones sobre afirmaciones anteriores
 
-* **«E2E 78 passed / 0 failed»** era un artefacto de una captura truncada. La
-  suite tiene 406 tests, no 79, y aquella corrida tuvo 327 fallos — todos porque
-  se invocó con `PLAYWRIGHT_CHANNEL=chrome` y Chrome del sistema no está
-  instalado. Con el chromium incluido: 404 passed / 1 skipped / 0 failed.
-* **«el dev server no compila sin red»** ya no aplica: la red actual permite
-  descargar las fuentes, y además el `webServer` de Playwright usa el build de
-  producción, no el dev server.
+- **«E2E 78 passed / 0 failed»**: falso, artefacto de una captura truncada. La
+  suite tiene 406 tests. Cifra real: 405 passed / 1 skipped / 0 failed.
+- **«el dev server no compila sin red»**: ya no aplica.
+- **«`audit_logs`: canónica la migrada, se corrige el writer»** (comentario de la
+  532): la dirección era correcta pero el writer entonces se dejó sin tocar. Ya
+  está corregido y certificado.
