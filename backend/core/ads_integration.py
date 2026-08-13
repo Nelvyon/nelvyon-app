@@ -29,9 +29,13 @@ que cambia es `resolve_workspace_ads_integration`.
 """
 from __future__ import annotations
 
+import logging
+
 from typing import Optional
 
 from fastapi import HTTPException, status
+
+logger = logging.getLogger(__name__)
 
 
 class WorkspaceAdsIntegration:
@@ -44,18 +48,70 @@ class WorkspaceAdsIntegration:
 
 
 async def resolve_workspace_ads_integration(
-    workspace_id: int,
+    workspace_id: Optional[int],
     provider: str,
 ) -> Optional[WorkspaceAdsIntegration]:
     """
     Integracion propia del workspace, o `None` si no la tiene.
 
-    Devuelve `None` de forma incondicional: no hay ninguna fuente de credencial
-    por workspace en el sistema. Deliberadamente NO cae a la configuracion
-    global — ese fallback es justamente el defecto que se esta cerrando.
+    Lee `oauth_connections` por `workspace_id`, que desde la migracion 529 es el
+    propietario funcional de la integracion. NUNCA cae a la configuracion global:
+    ese fallback es el defecto que este modulo existe para cerrar.
+
+    Una fila con `workspace_id` NULL —pertenencia que no se pudo demostrar al
+    migrar— no se resuelve. Es deliberado: adivinar el propietario podria dar a
+    un inquilino la credencial de otro.
     """
-    _ = (workspace_id, provider)
-    return None
+    if workspace_id is None:
+        return None
+
+    from sqlalchemy import text
+
+    from core.database import db_manager
+
+    # La inicializacion entra DENTRO del try: si falla, tampoco hay integracion
+    # demostrable, y dejarla fuera hacia que el resolvedor lanzase — el llamante
+    # devolvia 500 en vez de cortar con 503.
+    try:
+        if not db_manager.async_session_maker:
+            await db_manager.ensure_initialized()
+        if not db_manager.async_session_maker:
+            return None
+
+        async with db_manager.async_session_maker() as db:
+            fila = (
+                await db.execute(
+                text(
+                    """
+                    SELECT external_account_id, access_token
+                      FROM oauth_connections
+                     WHERE workspace_id = :ws
+                       AND provider = :provider
+                       AND is_active = true
+                     LIMIT 1
+                    """
+                ),
+                {"ws": int(workspace_id), "provider": provider},
+                )
+            ).fetchone()
+    except Exception as exc:
+        # FALLA CERRADO. Si la tabla no existe o la base no responde, no hay
+        # integracion demostrable, y sin integracion no se toca al proveedor.
+        # Se registra como ERROR porque un fallo permanente aqui deja la
+        # funcionalidad caida y no debe pasar por "el workspace no la tiene".
+        logger.error(
+            "ads_integration_lookup_failed",
+            extra={"integration_workspace_id": workspace_id, "integration_error": str(exc)[:200]},
+        )
+        return None
+
+    if fila is None:
+        return None
+    cuenta, token = fila[0], fila[1]
+    if not cuenta or not token:
+        # Sin cuenta externa o sin credencial no hay integracion utilizable.
+        return None
+    return WorkspaceAdsIntegration(provider, str(cuenta), str(token))
 
 
 async def assert_workspace_ads_integration(

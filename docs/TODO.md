@@ -655,3 +655,20 @@ Unificar la columna sigue pendiente y **no se hace aquí** porque exige migrar
 estados de campañas existentes: decidir si `sent` pasa a `completed` (y qué
 ocurre con `failed`) es una operación sobre datos vivos cuya semántica no puedo
 demostrar. Hay un guard que obliga a clasificar cualquier estado nuevo.
+
+## RESUELTO — propiedad de integraciones (2026-08-12)
+
+Decisión de producto aprobada: **la integración pertenece al workspace**; el
+usuario que la conectó queda como `connected_by_user_id`, metadato de auditoría.
+
+Migración **529**, aditiva: añade `workspace_id` y `connected_by_user_id` a
+`oauth_connections` e `integration_whatsapp`, con índice único parcial por
+(workspace, proveedor). No borra, no renombra, `user_id` se conserva.
+
+Backfill **solo donde es demostrable**: usuario con exactamente un workspace
+(sumando los que posee y aquellos de los que es miembro activo). Con cero o con
+varios queda `NULL`, y los resolvedores ignoran esas filas — lo ambiguo falla
+cerrado en vez de atribuirse a lo que parezca.
+
+Sustituye a las deudas 3 y 4 anteriores (`integration_whatsapp` keyed por
+`user_id`, y multi-tenencia de Ads sin fuente de credencial).

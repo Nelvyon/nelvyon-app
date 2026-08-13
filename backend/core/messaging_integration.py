@@ -59,9 +59,13 @@ funciones `resolve_*`.
 """
 from __future__ import annotations
 
+import logging
+
 from typing import Optional
 
 from fastapi import HTTPException, status
+
+logger = logging.getLogger(__name__)
 
 
 class WorkspaceWhatsAppIntegration:
@@ -88,12 +92,61 @@ async def resolve_workspace_whatsapp_integration(
     """
     Integracion propia del workspace, o `None`.
 
-    Devuelve `None` incondicionalmente: no hay fuente de credencial por
-    workspace. Deliberadamente NO cae a `WHATSAPP_TOKEN` /
-    `WHATSAPP_PHONE_NUMBER_ID` — ese fallback es el defecto que se cierra.
+    Lee `integration_whatsapp` por `workspace_id`, que desde la migracion 529 es
+    el propietario funcional. NUNCA cae a `WHATSAPP_TOKEN` /
+    `WHATSAPP_PHONE_NUMBER_ID`: ese fallback es el defecto que se cerro.
+
+    Una fila con `workspace_id` NULL —pertenencia no demostrable al migrar— no
+    se resuelve, para no dar a un inquilino el numero de otro.
     """
-    _ = workspace_id
-    return None
+    if workspace_id is None:
+        return None
+
+    from sqlalchemy import text
+
+    from core.database import db_manager
+
+    # La inicializacion entra DENTRO del try: si falla, tampoco hay integracion
+    # demostrable, y dejarla fuera hacia que el resolvedor lanzase — el llamante
+    # devolvia 500 en vez de cortar con 503.
+    try:
+        if not db_manager.async_session_maker:
+            await db_manager.ensure_initialized()
+        if not db_manager.async_session_maker:
+            return None
+
+        async with db_manager.async_session_maker() as db:
+            fila = (
+                await db.execute(
+                text(
+                    """
+                    SELECT phone_number_id, waba_id, access_token
+                      FROM integration_whatsapp
+                     WHERE workspace_id = :ws
+                       AND is_active = true
+                     LIMIT 1
+                    """
+                ),
+                {"ws": int(workspace_id)},
+                )
+            ).fetchone()
+    except Exception as exc:
+        # FALLA CERRADO. Si la tabla no existe o la base no responde, no hay
+        # integracion demostrable, y sin integracion no se toca al proveedor.
+        # Se registra como ERROR porque un fallo permanente aqui deja la
+        # funcionalidad caida y no debe pasar por "el workspace no la tiene".
+        logger.error(
+            "whatsapp_integration_lookup_failed",
+            extra={"integration_workspace_id": workspace_id, "integration_error": str(exc)[:200]},
+        )
+        return None
+
+    if fila is None:
+        return None
+    numero, waba, token = fila[0], fila[1], fila[2]
+    if not numero or not token:
+        return None
+    return WorkspaceWhatsAppIntegration(str(numero), str(waba or ""), str(token))
 
 
 async def resolve_workspace_email_sender(

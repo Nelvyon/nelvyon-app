@@ -8,8 +8,8 @@
 HEAD            (ver git log -1)
 último commit   fix(files): neutralise CSV formulas, stop two path escapes
 fecha           2026-08-12
-bloque actual   ninguno · informe de RC emitido; esperando Docker / red / decisión de producto
-tests           backend 2143 passed · frontend 6643 passed / 42 skipped · next build OK · frontend 6637 passed / 42 skipped · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
+bloque actual   propiedad de integraciones CERRADA; siguen bloqueados los de PostgreSQL
+tests           backend 2156 passed · frontend 6643 passed / 42 skipped · next build OK · frontend 6637 passed / 42 skipped · frontend 6616 passed / 42 skipped · tsc --noEmit limpio
 build           backend compileall limpio · frontend  REAL pasa (2026-08-12)
 árbol git       limpio
 push/PR/merge   ninguno
@@ -48,7 +48,7 @@ PG certification BLOQUEADO — Docker Desktop caído (npipe dockerDesktopLinuxEn
 | 17 | Upload / Import / Export Security | **CERTIFIED** | ampliado: CSV injection, escape de prefijo de tenant, report_id sin validar |
 | 18 | Inbound Webhooks | **PARCIAL** | text2pay cerrado (marcaba pagos sin firma); 12 proveedores pendientes, ver TODO |
 | 19 | OAuth / Integrations | **CERTIFIED** | state de un solo uso; tokens cifrados (bloque 14) |
-| 20 | Ads Multi-tenant Functional Completion | **BLOCKED** | necesita decidir a quién pertenece la integración (user vs workspace); ver deuda 3 y 4 |
+| 20 | Ads Multi-tenant Functional Completion | **CERTIFIED** | decisión aprobada: el workspace es propietario; migración 529 + resolvedores reales |
 | 21 | Agents AI Full Audit | **CERTIFIED** | allowlist cerrada; workspace del contexto; sin escalada |
 | 22 | Multi-agent System | **CERTIFIED** | tope de cadena; fuga de error interna cerrada |
 | 23 | AI Cost / Provider Audit | **CERTIFIED** | regla self-hosted ahora se APLICA, no solo se documenta |
