@@ -5,6 +5,7 @@ from typing import List, Optional
 from datetime import datetime, date
 
 from core.secrets import sanitize_text
+from core.campaign_redirect import destino_pertenece_a_la_campana
 from fastapi import APIRouter, Body, Depends, HTTPException, Query, Response
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -456,15 +457,38 @@ async def track_campaign_click(
     esquema = urlparse(target).scheme.lower()
     if esquema not in ("http", "https"):
         raise HTTPException(status_code=400, detail="Unsupported redirect scheme")
-    try:
-        ws_row = await db.execute(
-            sql_text("SELECT workspace_id FROM campaigns WHERE id = :id"),
-            {"id": campaign_id},
+
+    ws_row = await db.execute(
+        sql_text("SELECT workspace_id, content FROM campaigns WHERE id = :id"),
+        {"id": campaign_id},
+    )
+    fetched = ws_row.fetchone()
+    if not fetched:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+
+    # EL DESTINO TIENE QUE ESTAR EN LA CAMPANA.
+    #
+    # Sin esto, cualquiera podia usar el dominio de NELVYON como salto hacia
+    # donde quisiera: un enlace de aspecto legitimo, con nuestro dominio
+    # delante, que aterriza en una pagina de phishing. Es la definicion de open
+    # redirect, y en un producto de email marketing tiene publico garantizado.
+    #
+    # No se firma el enlace, y no por comodidad: firmarlo invalidaria todos los
+    # correos ya enviados. No hace falta. Los enlaces legitimos salen de un
+    # `href` del contenido de la campana —los genera
+    # `_wrap_links_for_tracking`— asi que el propio contenido es la lista de
+    # destinos validos. Comprobarlo no rompe ni un enlace existente y cierra el
+    # salto arbitrario.
+    if not destino_pertenece_a_la_campana(target, fetched._mapping.get("content")):
+        logger.warning(
+            "campaign_click_destino_ajeno",
+            extra={"campaign_id": campaign_id},
         )
-        fetched = ws_row.fetchone()
-        if fetched:
-            svc = CampaignService(db, int(fetched._mapping["workspace_id"]))
-            await svc.track_click(campaign_id, recipient_id)
+        raise HTTPException(status_code=400, detail="Redirect target not in campaign")
+
+    try:
+        svc = CampaignService(db, int(fetched._mapping["workspace_id"]))
+        await svc.track_click(campaign_id, recipient_id)
     except Exception as exc:
         logger.debug("track_click %s/%s: %s", campaign_id, recipient_id, exc)
     return RedirectResponse(url=target, status_code=302)

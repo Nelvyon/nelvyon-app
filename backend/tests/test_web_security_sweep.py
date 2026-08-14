@@ -58,19 +58,99 @@ async def test_el_tracking_no_redirige_a_un_esquema_peligroso(
 
 
 @pytest.mark.asyncio
-async def test_el_tracking_sigue_redirigiendo_a_http(client: AsyncClient, auth_headers: dict):
+async def test_el_tracking_sigue_redirigiendo_a_http(
+    client: AsyncClient, auth_headers: dict, db_session
+):
     """
     Contraprueba: el tracking de clics tiene que seguir funcionando. Cerrar los
-    esquemas no puede romper la funcionalidad.
+    esquemas —y ahora tambien el destino— no puede romper la funcionalidad.
+
+    El destino debe estar en el contenido de la campana, que es de donde salen
+    los enlaces legitimos: los envuelve `_wrap_links_for_tracking` a partir de
+    los `href` del propio correo.
     """
+    from sqlalchemy import text as sql_text
+
+    await db_session.execute(
+        sql_text(
+            "INSERT INTO campaigns (id, workspace_id, user_id, name, content, status, type) "
+            "VALUES (901, 1, 'u1', 'Oferta', :html, 'draft', 'email')"
+        ),
+        {"html": '<a href="https://cliente-real.example/oferta">Ver</a>'},
+    )
+    await db_session.commit()
+
     r = await client.get(
-        "/api/campaigns/track/click/1/1",
+        "/api/campaigns/track/click/901/1",
         params={"url": "https://cliente-real.example/oferta"},
         headers=auth_headers,
         follow_redirects=False,
     )
     assert r.status_code == 302, r.text[:150]
     assert r.headers["location"] == "https://cliente-real.example/oferta"
+
+
+@pytest.mark.asyncio
+async def test_el_tracking_no_salta_a_un_destino_ajeno(
+    client: AsyncClient, auth_headers: dict, db_session
+):
+    """El open redirect: nuestro dominio como trampolin a donde el atacante quiera.
+
+    El enlace lleva el dominio de NELVYON delante, que es lo que la victima mira,
+    y aterriza en otro sitio. Se cierra comprobando que el destino sale del
+    contenido de la campana, sin firmar el enlace — firmarlo invalidaria todos
+    los correos ya enviados.
+    """
+    from sqlalchemy import text as sql_text
+
+    await db_session.execute(
+        sql_text(
+            "INSERT INTO campaigns (id, workspace_id, user_id, name, content, status, type) "
+            "VALUES (902, 1, 'u1', 'Oferta', :html, 'draft', 'email')"
+        ),
+        {"html": '<a href="https://cliente-real.example/oferta">Ver</a>'},
+    )
+    await db_session.commit()
+
+    r = await client.get(
+        "/api/campaigns/track/click/902/1",
+        params={"url": "https://phishing.example/robo"},
+        headers=auth_headers,
+        follow_redirects=False,
+    )
+    assert r.status_code == 400, r.text[:150]
+    assert "location" not in r.headers
+
+
+@pytest.mark.asyncio
+async def test_una_campana_sin_contenido_no_autoriza_ningun_destino(
+    client: AsyncClient, auth_headers: dict, db_session
+):
+    """Falla cerrado cuando no hay con que comparar.
+
+    Es el hueco por el que se reabriria el open redirect sin que nada lo delate:
+    si «sin contenido» significara «todo vale», bastaria una campana vacia para
+    volver a saltar a donde fuera. Lo detecto una mutacion que los otros dos
+    tests no mataban.
+    """
+    from sqlalchemy import text as sql_text
+
+    await db_session.execute(
+        sql_text(
+            "INSERT INTO campaigns (id, workspace_id, user_id, name, content, status, type) "
+            "VALUES (903, 1, 'u1', 'Vacia', '', 'draft', 'email')"
+        )
+    )
+    await db_session.commit()
+
+    r = await client.get(
+        "/api/campaigns/track/click/903/1",
+        params={"url": "https://phishing.example/robo"},
+        headers=auth_headers,
+        follow_redirects=False,
+    )
+    assert r.status_code == 400, r.text[:150]
+    assert "location" not in r.headers
 
 
 def test_el_endpoint_valida_el_esquema_antes_de_redirigir():
