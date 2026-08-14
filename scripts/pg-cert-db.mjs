@@ -48,19 +48,16 @@ if (/prod/i.test(ADMIN)) {
   process.exit(1);
 }
 
-const SHIMS = [
-  "CREATE SCHEMA IF NOT EXISTS auth",
-  "CREATE OR REPLACE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $$ SELECT NULL::uuid $$",
-  "DO $$ BEGIN CREATE ROLE authenticated NOLOGIN; EXCEPTION WHEN duplicate_object THEN NULL; END $$",
-  "DO $$ BEGIN CREATE ROLE anon NOLOGIN; EXCEPTION WHEN duplicate_object THEN NULL; END $$",
-  "DO $$ BEGIN CREATE ROLE service_role NOLOGIN; EXCEPTION WHEN duplicate_object THEN NULL; END $$",
-  "CREATE EXTENSION IF NOT EXISTS pgcrypto",
-  `CREATE TABLE IF NOT EXISTS workflows (
-     id SERIAL PRIMARY KEY, user_id VARCHAR NOT NULL, workspace_id INTEGER NOT NULL,
-     name VARCHAR NOT NULL, description VARCHAR, trigger_type VARCHAR NOT NULL,
-     nodes_json VARCHAR, status VARCHAR, runs_count INTEGER,
-     last_run_at TIMESTAMPTZ, created_at TIMESTAMPTZ)`,
-];
+// SIN SHIMS. Los habia —schema `auth`, roles, pgcrypto y la tabla `workflows`—
+// y eran precisamente el motivo de que esta certificacion no viera el fallo que
+// tumbo el despliegue de staging: la cadena moria en la 023 con
+// `schema "auth" does not exist` sobre un PostgreSQL virgen, y aqui no, porque
+// aqui el schema se creaba antes de migrar.
+//
+// Ahora esos prerrequisitos viven en `000_bootstrap_prerequisites.sql`, dentro
+// de la cadena. Certificar y desplegar recorren el mismo camino, que es la
+// unica forma de que certificar signifique algo.
+const SHIMS = [];
 
 const urlDe = (base, db) => { const u = new URL(base); u.pathname = `/${db}`; return u.toString(); };
 
