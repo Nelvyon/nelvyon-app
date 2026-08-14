@@ -7,6 +7,7 @@ import os
 from typing import Any, Dict
 
 from core.health_monitor import health_monitor
+from core.sns_webhook_signature import verificar_firma_sns
 from core.rate_limiter import get_workspace_rate_limit_status
 from core.regions import CURRENT_REGION, get_optimal_region, list_regions
 from core.secrets import sanitize_text
@@ -81,6 +82,11 @@ async def ses_bounce_webhook(request: Request) -> Dict[str, Any]:
 
     if not isinstance(payload, dict):
         raise HTTPException(status_code=400, detail="Expected JSON object")
+
+    # La firma se comprueba ANTES de procesar el rebote. Sin ella cualquiera
+    # podia declarar rebotada la direccion de un cliente, que es como se le deja
+    # de entregar correo: una denegacion de servicio barata y silenciosa.
+    verificar_firma_sns(payload)
 
     try:
         return await get_ses_service().bounce_handler(payload)

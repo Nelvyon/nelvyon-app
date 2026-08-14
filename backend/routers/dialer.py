@@ -5,11 +5,12 @@ from __future__ import annotations
 import logging
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Form, HTTPException, Query
+from fastapi import APIRouter, Depends, Form, HTTPException, Query, Request
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
+from core.twilio_webhook_signature import verificar_firma_twilio
 from core.list_cache import list_cached
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.dialer_service import DialerService, get_dialer_service
@@ -130,6 +131,7 @@ async def dialer_stats(ws: WorkspaceContext = Depends(require_workspace), db: As
 
 @dialer_router.post("/webhook/twilio")
 async def twilio_webhook(
+    request: Request,
     CallSid: str = Form(""),
     CallStatus: str = Form(""),
     CallDuration: str = Form("0"),
@@ -137,6 +139,11 @@ async def twilio_webhook(
     workspace_id: int | None = Query(None),
     db: AsyncSession = Depends(get_db),
 ):
+    # La firma se comprueba ANTES de tocar la base. Sin ella cualquiera podia
+    # inventar llamadas y marcarlas completadas — y elegir el inquilino, porque
+    # `workspace_id` viaja en el query string.
+    await verificar_firma_twilio(request)
+
     await DialerService.ensure_schema()
     ws = int(workspace_id or 1)
     svc = get_dialer_service(db, ws)

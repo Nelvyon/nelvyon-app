@@ -180,13 +180,40 @@ async def test_fb_messenger_send(client: AsyncClient, auth_headers: dict):
 
 
 @pytest.mark.asyncio
-async def test_tiktok_dm_webhook(client: AsyncClient):
+async def test_tiktok_dm_webhook(client: AsyncClient, monkeypatch):
+    """El webhook exige ahora el secreto compartido.
+
+    TikTok no publica esquema de firma, asi que la autenticidad se establece con
+    el secreto que se configura junto a la URL en su panel. Antes este endpoint
+    era publico y anonimo: cualquiera podia inyectar DMs con el remitente que
+    quisiera.
+    """
+    monkeypatch.setenv("TIKTOK_WEBHOOK_SECRET", "secreto-de-prueba-no-real")
     r = await client.post(
         "/api/tiktok-dm/webhook",
         json={"events": [{"open_id": "tt-open-f63", "text": "Hola TikTok"}]},
+        headers={"X-Nelvyon-Webhook-Secret": "secreto-de-prueba-no-real"},
     )
     assert r.status_code == 200
     assert r.json().get("processed") >= 1
+
+
+@pytest.mark.asyncio
+async def test_tiktok_dm_webhook_sin_secreto_no_tiene_efecto(
+    client: AsyncClient, monkeypatch
+):
+    """Con autenticacion fallida: 4xx y CERO efectos.
+
+    No basta con que devuelva error: hay que comprobar que no se proceso nada,
+    porque el defecto que esto cierra era precisamente el efecto.
+    """
+    monkeypatch.setenv("TIKTOK_WEBHOOK_SECRET", "secreto-de-prueba-no-real")
+    r = await client.post(
+        "/api/tiktok-dm/webhook",
+        json={"events": [{"open_id": "tt-intruso", "text": "inyectado"}]},
+    )
+    assert r.status_code in (400, 403)
+    assert "processed" not in (r.json() if r.headers.get("content-type", "").startswith("application/json") else {})
 
 
 @pytest.mark.asyncio

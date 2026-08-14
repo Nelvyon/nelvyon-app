@@ -12,6 +12,13 @@ from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
+from core.zoom_webhook_signature import (
+    CABECERA_FIRMA,
+    CABECERA_TS,
+    _secreto as _secreto_zoom,
+    token_de_validacion,
+    verificar_firma_zoom,
+)
 from core.list_cache import list_cached
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.booking_service import get_booking_service
@@ -46,11 +53,35 @@ def _svc(db: AsyncSession, ws: WorkspaceContext):
 
 @router.post("/webhook/zoom")
 async def zoom_webhook(request: Request, db: AsyncSession = Depends(get_db)):
-    """Zoom webhook (configure URL in Zoom app; optional workspace via query)."""
+    """Webhook de Zoom.
+
+    La firma se comprueba ANTES de mirar el cuerpo. Sin ella cualquiera podia
+    inventar eventos de reunion en la agenda de un cliente, eligiendo ademas el
+    inquilino con `?workspace_id=`.
+
+    Zoom firma sobre `v0:<timestamp>:<cuerpo>` e incluye el timestamp, asi que
+    la verificacion tambien acota la reproduccion: un mensaje capturado deja de
+    valer pasados cinco minutos.
+    """
+    cuerpo = await request.body()
+    verificar_firma_zoom(
+        cuerpo,
+        request.headers.get(CABECERA_FIRMA),
+        request.headers.get(CABECERA_TS),
+    )
     try:
         payload = await request.json()
     except Exception:
         payload = {}
+
+    # El reto de configuracion viene firmado igual que el resto, asi que llega
+    # aqui ya verificado: responderlo no abre ninguna puerta.
+    if payload.get("event") == "endpoint.url_validation":
+        plain = (payload.get("payload") or {}).get("plainToken", "")
+        return {
+            "plainToken": plain,
+            "encryptedToken": token_de_validacion(_secreto_zoom(), plain),
+        }
     if not isinstance(payload, dict):
         raise HTTPException(status_code=400, detail="JSON body required")
 

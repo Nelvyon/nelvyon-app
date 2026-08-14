@@ -10,12 +10,13 @@ Meta firma con `X-Hub-Signature-256: sha256=<hmac_sha256(app_secret, cuerpo)>`
 sobre el cuerpo CRUDO. Es el mismo esquema para Instagram y Messenger, asi que
 se implementa una vez.
 
-POR QUE ESTOS TRES Y NO LOS DOCE
---------------------------------
-El resto de webhooks entrantes pendientes usan esquemas distintos —Twilio firma
-sobre la URL mas los parametros ordenados, SNS exige validar el certificado de
-la firma— y hacerlos mal daria una sensacion de proteccion peor que no tenerla.
-Estos tres son el mismo proveedor y el mismo algoritmo.
+ALCANCE
+-------
+Cubre la familia Meta completa: Instagram, Messenger y WhatsApp Business. Los
+tres son el mismo proveedor y el mismo algoritmo. Los proveedores con otro
+esquema —Twilio firma sobre la URL mas los parametros ordenados, Zoom sobre
+`v0:timestamp:cuerpo`— tienen su propio verificador, porque hacerlos aqui a
+medias daria una sensacion de proteccion peor que no tenerla.
 """
 from __future__ import annotations
 
@@ -33,12 +34,23 @@ _SECRETO_POR_PLATAFORMA = {
     "instagram": "INSTAGRAM_APP_SECRET",
     "facebook": "FACEBOOK_APP_SECRET",
     "messenger": "FACEBOOK_APP_SECRET",
+    # WhatsApp Business tambien es Meta y firma con el mismo esquema. Se acepta
+    # su propio secreto y, si no esta puesto, el de la app de Meta: en muchas
+    # instalaciones es la misma aplicacion. Lo que NO se hace es dejarlo pasar
+    # sin secreto.
+    "whatsapp": ("WHATSAPP_APP_SECRET", "META_APP_SECRET", "FACEBOOK_APP_SECRET"),
 }
 
 
 def _secreto(plataforma: str) -> str:
-    nombre = _SECRETO_POR_PLATAFORMA.get(plataforma.lower(), "")
-    return (os.environ.get(nombre) or "").strip() if nombre else ""
+    nombres = _SECRETO_POR_PLATAFORMA.get(plataforma.lower(), "")
+    if isinstance(nombres, str):
+        nombres = (nombres,) if nombres else ()
+    for nombre in nombres:
+        valor = (os.environ.get(nombre) or "").strip()
+        if valor:
+            return valor
+    return ""
 
 
 def firma_esperada(secreto: str, cuerpo: bytes) -> str:

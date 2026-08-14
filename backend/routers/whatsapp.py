@@ -7,6 +7,7 @@ from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel, Field
 
 from core.database import get_db
+from core.meta_webhook_signature import verificar_firma_meta
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.helpdesk_service import default_helpdesk_workspace_id, get_helpdesk_service
 from core.messaging_integration import assert_workspace_whatsapp_integration
@@ -147,7 +148,18 @@ async def receive_webhook(
     request: Request,
     db: AsyncSession = Depends(get_db),
 ) -> Dict[str, Any]:
-    """Receive inbound messages and delivery status updates from Meta."""
+    """Receive inbound messages and delivery status updates from Meta.
+
+    La firma se comprueba ANTES de mirar el cuerpo. Sin ella, cualquiera podia
+    inyectar mensajes falsos en la bandeja de un workspace —con el remitente que
+    quisiera— y el sistema los trataba como reales, creando ademas el ticket de
+    helpdesk correspondiente.
+
+    WhatsApp Business es Meta y firma igual que Messenger e Instagram, asi que
+    usa el mismo verificador que ya existia para esos dos.
+    """
+    cuerpo = await request.body()
+    verificar_firma_meta("whatsapp", cuerpo, request.headers.get("x-hub-signature-256"))
     try:
         payload = await request.json()
     except Exception as e:

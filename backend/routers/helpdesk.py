@@ -11,6 +11,8 @@ from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
+from core.sns_webhook_signature import verificar_firma_sns
+from core.meta_webhook_signature import verificar_firma_meta
 from core.i18n import request_language, t
 from core.list_cache import list_cached
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
@@ -88,7 +90,12 @@ async def inbound_email_webhook(
     body: InboundEmailBody | None = None,
     db: AsyncSession = Depends(get_db),
 ):
-    """Inbound email (SES SNS notification or direct JSON for testing)."""
+    """Correo entrante, via notificacion de Amazon SNS.
+
+    La firma de SNS se comprueba ANTES de crear el ticket. Sin ella cualquiera
+    podia inyectar correos con el remitente que quisiera.
+    """
+    verificar_firma_sns(await request.json())
     ws_id = _resolve_inbound_workspace(request)
     svc = get_helpdesk_service(db, ws_id)
 
@@ -125,7 +132,14 @@ async def inbound_whatsapp_webhook(
     body: InboundWhatsAppBody | None = None,
     db: AsyncSession = Depends(get_db),
 ):
-    """Inbound WhatsApp (Meta webhook payload or simple JSON)."""
+    """WhatsApp entrante.
+
+    La firma de Meta se comprueba ANTES de tocar nada: sin ella cualquiera podia
+    abrir tickets con el remitente que quisiera, en el workspace que quisiera.
+    Es el mismo verificador que usan Messenger e Instagram.
+    """
+    verificar_firma_meta("whatsapp", await request.body(),
+                         request.headers.get("x-hub-signature-256"))
     ws_id = _resolve_inbound_workspace(request)
     svc = get_helpdesk_service(db, ws_id)
 

@@ -12,6 +12,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
+from core.twilio_webhook_signature import verificar_firma_twilio
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.sms_service import SmsService, get_sms_service
 
@@ -139,7 +140,15 @@ async def twilio_inbound_webhook(
     workspace_id: int | None = Query(None),
     db: AsyncSession = Depends(get_db),
 ):
-    """Twilio inbound SMS webhook (no auth). Pass ?workspace_id= for multi-tenant routing."""
+    """SMS entrante de Twilio.
+
+    La firma se comprueba ANTES de leer el cuerpo. Sin ella cualquiera podia
+    inyectar mensajes en la bandeja de un cliente, con el remitente que
+    quisiera, y ademas elegir el inquilino: `workspace_id` viaja en el query
+    string y nadie comprobaba que quien lo envia tenga relacion con el.
+    """
+    await verificar_firma_twilio(request)
+
     await SmsService.ensure_schema()
 
     content_type = (request.headers.get("content-type") or "").lower()
