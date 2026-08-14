@@ -1,7 +1,7 @@
 # NELVYON — Pre-deploy del Release Candidate
 
 ```text
-RC commit    6c565e10   (base certificada bc1202e0 + dos arreglos de despliegue)
+RC commit    b7bd2b9d   (bc1202e0 + arreglos de despliegue + healthcheck readiness)
 rama         audit/2026-08-08-full-hardening
 árbol        limpio
 push/PR      ninguno
@@ -352,27 +352,95 @@ que antes pasaban en silencio.
 
 ---
 
-## 10. Riesgo identificado, con acción concreta
+## 10. Healthcheck del API — RESUELTO
 
-### El healthcheck del API no comprueba la base
+`railway.backend.json` y `backend/railway.json` apuntaban a `/health`, que
+devuelve `healthy` sin mirar la base. Ya apuntan a `/health/ready`, que ejecuta
+`SELECT 1` y devuelve 503 cuando la base no responde: un despliegue con la base
+inalcanzable ya no se promociona.
 
-`railway.backend.json` usa `healthcheckPath: "/health"`, y ese endpoint devuelve
-`{"status": "healthy"}` incondicionalmente. Un despliegue con `DATABASE_URL`
-presente pero **apuntando a una base inalcanzable** pasaría el healthcheck,
-recibiría tráfico y fallaría petición a petición.
+`/health` se conserva como liveness. Siete tests fijan la diferencia, incluido el
+control negativo de que liveness NO debe depender de la base — si dependiera, un
+corte transitorio reiniciaría el proceso en vez de sacarlo del balanceo.
 
-`/health/ready` sí comprueba la base y devuelve 503 cuando no responde.
+---
 
-**Acción propuesta** (no aplicada: cambia la semántica de promoción y es una
-decisión de operación):
+## 11. Estado real de la infraestructura (medido, 2026-08-14)
 
-```json
-"healthcheckPath": "/health/ready"
+Consultado con el CLI de Railway en modo lectura. **No se ejecutó ningún
+comando de despliegue.**
+
+### Proyecto
+
+```
+truthful-respect · f6cf47db-4302-4f19-90c2-4c3d6f3c1d66
+entornos: production, staging
 ```
 
-A favor: un despliegue con la base mal configurada no se promociona.
-En contra: un corte transitorio de base durante el arranque provocaría
-reintentos. Con `healthcheckTimeout: 120` hay margen suficiente.
+### production
 
-Recomendación: **cambiarlo**. El modo de fallo que evita —promocionar un
-despliegue roto— es peor que el que introduce.
+| recurso | estado |
+|---|---|
+| `nelvyon-app` (API) | ● Online |
+| `@nelvyon/web` | ● Online · **Deploy failed hace 5 días** |
+| Postgres | ● Online · volumen 1,1 GB |
+
+El último `migrate-prod` registrado (2026-08-02) dice
+`deploy_env=production(explicit) isProduction=true` y `pending_count=0`. Es
+anterior a las 11 migraciones de este RC.
+
+### staging — NO PROVISIONADO
+
+| recurso | estado |
+|---|---|
+| `comfortable-empathy` | ● Online |
+| `ideal-victory` | ● **Crashed · Deploy failed hace 5 días** |
+| base de datos | **no existe** |
+
+Las variables del entorno son 9, y las 9 son inyectadas por Railway
+(`RAILWAY_*`). **No hay `DATABASE_URL` ni `JWT_SECRET`.**
+
+Eso explica el fallo: el build termina bien y el healthcheck nunca pasa, porque
+`preDeployCommand` ejecuta `migrate:prod`, que sale con error sin
+`DATABASE_URL`. `ideal-victory-staging.up.railway.app` responde 502.
+
+**Consecuencia: staging no puede certificar nada.** Sin base de datos no hay
+migraciones que aplicar, ni readiness que ponerse verde, ni smoke que ejecutar.
+
+### Secretos, por nombre (nunca por valor)
+
+| variable | production `@nelvyon/web` | production `nelvyon-app` | staging |
+|---|---|---|---|
+| `DATABASE_URL` | ✅ | ✅ | ❌ |
+| `JWT_SECRET` | ✅ | ✅ | ❌ |
+| `STRIPE_WEBHOOK_SECRET` | ✅ | — | ❌ |
+| `TWILIO_AUTH_TOKEN` | — | ✅ | ❌ |
+| `META_WA_APP_SECRET` | ❌ | ❌ | ❌ |
+| `ZOOM_WEBHOOK_SECRET_TOKEN` | ❌ | ❌ | ❌ |
+| `TIKTOK_WEBHOOK_SECRET` | ❌ | ❌ | ❌ |
+| `SIGNATURIT_WEBHOOK_SECRET` | ❌ | ❌ | ❌ |
+| `STRIPE_STORE_WEBHOOK_SECRET` | ❌ | ❌ | ❌ |
+| `NELVYON_PROD_MIGRATE_APPROVED` | ❌ | ❌ | ❌ |
+
+Las dos REQUIRED están presentes en producción. **Cinco secretos de webhook
+faltan en los dos entornos**: al desplegar, esas cinco integraciones devolverán
+503 hasta que se configuren. Es el comportamiento correcto — antes aceptaban
+cualquier cuerpo — pero hay que decidirlo, no descubrirlo.
+
+No se han creado ni modificado variables: inventar un secreto sería peor que no
+tenerlo, y reutilizar uno de producción en staging convertiría staging en un
+riesgo de producción.
+
+### Migración 528 — sin medir
+
+Requiere contar filas de `intent_scores`. Staging no tiene base y producción no
+se toca. **Queda como acción del operador**, con esta consulta de sólo lectura:
+
+```sql
+SELECT relname, n_live_tup,
+       pg_size_pretty(pg_total_relation_size(relid)) AS tamano
+  FROM pg_stat_user_tables
+ WHERE relname = 'intent_scores';
+```
+
+Por debajo de ~1 M filas, 528 es cuestión de segundos.
