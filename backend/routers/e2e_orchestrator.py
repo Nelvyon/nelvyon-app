@@ -153,6 +153,21 @@ async def _count_in_workspace(
     if table not in TABLAS_CONTABLES or field not in CAMPOS_CONTABLES:
         raise ValueError(f"Unsupported table/field for counting: {table}.{field}")
 
+    # `social_posts` se acota por su propia columna de inquilino. No entra en la
+    # rama del JOIN porque no tiene `project_id`: esa columna es de la generacion
+    # anterior y la tabla real —la de la migracion 507— nunca la tuvo, asi que la
+    # consulta fallaba con `no such column`.
+    if table == "social_posts":
+        result = await db.execute(
+            text(
+                f"SELECT COUNT(*) as cnt FROM social_posts "
+                f"WHERE tenant_id = :wid"
+            ),
+            {"wid": workspace_id},
+        )
+        row = result.mappings().first()
+        return (row or {}).get("cnt", 0)
+
     if table in ("deals", "campaigns", "helpdesk_tickets"):
         result = await db.execute(
             text(
@@ -889,12 +904,18 @@ async def get_full_chain(
     social = await _fetch_all(
         db,
         """
-        SELECT s.id, s.project_id, s.contract_id, s.platform, s.status, s.campaign_name FROM social_posts s
-        INNER JOIN nelvyon_projects p ON p.id = s.project_id AND p.workspace_id = :wid
-        WHERE s.client_id = :cid
-        ORDER BY s.id DESC LIMIT 30
+        -- `social_posts` no tiene `project_id`, `client_id`, `platform` ni
+        -- `campaign_name`: son columnas de la generacion anterior y la tabla
+        -- real nunca las tuvo, asi que esta consulta fallaba con
+        -- `no such column`. El inquilino acota directamente, y el cliente se
+        -- filtra por `metadata`, que es donde vive desde la migracion 507.
+        SELECT s.id, s.status, s.content, s.scheduled_at, s.metadata
+        FROM social_posts s
+        WHERE s.tenant_id = :wid
+          AND s.metadata ->> 'client_id' = :cid_txt
+        ORDER BY s.created_at DESC LIMIT 30
         """,
-        {"cid": client_id, "wid": wid},
+        {"cid_txt": str(client_id), "wid": wid},
     )
 
     # Tickets

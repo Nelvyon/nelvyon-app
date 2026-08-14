@@ -27,8 +27,11 @@ PERMITIDAS: dict[tuple[str, str], dict[str, str]] = {}
 
 #: Linea base medida en v2.1. El techo evita crecimiento silencioso; el suelo
 #: obliga a bajarlo explicitamente cuando mejore, para que no se afloje solo.
-UNRESOLVED_BASELINE = 120
-UNRESOLVED_POR_MOTIVO = {"join_ambiguo": 94, "multiples_from": 26}
+#: Bajo de 120 a 113 al alinear `social_posts` con su tabla real: dos consultas
+#: unian por `project_id`, columna que esa tabla nunca tuvo, y el JOIN ambiguo
+#: desaparecio con ellas. El trinquete solo puede apretarse.
+UNRESOLVED_BASELINE = 113
+UNRESOLVED_POR_MOTIVO = {"join_ambiguo": 87, "multiples_from": 26}
 
 #: Drift conocido pendiente de decision de migracion. NO es una allowlist: el
 #: test falla si aparece cualquier otro, y falla tambien si estos desaparecen
