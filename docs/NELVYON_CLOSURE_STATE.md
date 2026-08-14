@@ -281,10 +281,42 @@ Por orden de gravedad. Ninguno queda abierto.
 
 ## Siguiente acción exacta
 
-### Cerrado en esta ronda
+Ninguna. La deuda funcional bloqueante está cerrada.
 
-| deuda | estado | commit |
-|---|---|---|
+```
+WRITERS POSTGRESQL ROTOS = 0
+```
+
+Recalculado desde cero contra `pg_catalog`: 191 writers estáticos, 695 tablas,
+**0 hallazgos**. `DRIFT_CONOCIDO` está vacío, y lo está porque PostgreSQL
+demuestra que los hallazgos ya no ocurren — no por allowlist.
+
+### Los 14, y lo que arrastraron
+
+Los 14 compartían causa: hablaban la definición de la migración 507 mientras
+gana una anterior. Alinearlos destapó tres defectos más que nadie había visto
+porque el esquema de tests modelaba la definición equivocada:
+
+* `churn_prediction_service` leía `MAX(completed_at)` de `crm_activities`, que
+  no existe: la señal de actividad **nunca encontraba nada** y el riesgo de fuga
+  salía siempre igual;
+* `complete_activity` escribía tres columnas inexistentes, así que una actividad
+  no quedaba completada nunca;
+* el agregado de puntuación de contacto contaba por esa misma columna.
+
+El hueco que los ocultaba: `_CREATE_TABLE_RE` exigía `IF NOT EXISTS`, y
+migraciones como la 084 declaran `CREATE TABLE crm_contacts (...)` a secas.
+Quedaban invisibles y SQLite modelaba una tabla que PostgreSQL nunca construye.
+
+### Deuda residual, no bloqueante
+
+* **15 tablas declaradas por varias migraciones.** No rompen nada: todos los
+  consumidores hablan ya la definición que gana. Fijadas por
+  `test_migration_table_collisions.py`; no pueden crecer.
+* **`ecdsa` PYSEC-2026-1325.** Sin arreglo publicado y no alcanzable: se firma
+  con HS256 y los algoritmos de curva elíptica quedan rechazados con guard.
+
+---|---|---|
 | 9 webhooks entrantes sin firma | **CERRADO** — cada uno con el mecanismo de su proveedor, fail-closed | `ca053f39` |
 | redirect de tracking sin firmar | **CERRADO** — el destino debe estar en el contenido de la campaña, sin invalidar enlaces | `ad7a8e9f` |
 | stock que no se decrementa | **CERRADO** — descuento atómico e idempotente al pagar | `f0f2e720` |

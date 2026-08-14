@@ -1,52 +1,44 @@
 # NELVYON — Informe de Release Candidate
 
 ```text
-HEAD              3702f708
+HEAD              9cd69a3c
 fecha             2026-08-14
 árbol git         limpio
 push/PR/merge     ninguno
 
-backend           2244 passed / 0 failed / 0 skipped   (con PostgreSQL real)
-                  2211 passed / 0 failed / 33 skipped  (sin DSN; los 33 son su puerta)
+backend           2314 passed / 0 failed / 0 skipped   (PostgreSQL real)
+                  2273 passed / 0 failed / 41 skipped  (sin DSN; los 41 son su puerta)
 frontend          6656 passed / 42 skipped (752 ficheros)
-E2E               406 descubiertos · 405 passed / 1 skipped / 0 failed
+E2E               406 descubiertos · 406 passed · 0 skipped · 0 failed
 typecheck         tsc --noEmit limpio
 build producción  next build completa
 compileall        limpio
-PostgreSQL real   432 migraciones desde cero · create_all +44 · smoke 200/200/401
-guards PG         41 certificaciones verdes
+PostgreSQL real   433 migraciones desde cero · create_all +44 · smoke 200/200/401
+writers rotos     0   (191 writers · 695 tablas · 0 hallazgos)
+drift NOT NULL    0   (DRIFT_CONOCIDO vacío)
+guards seguridad  134 verdes
 backup/restore    8/8 · dump restaurado y marcador verificado
 dependencias      pip-audit: 1 hallazgo sin fix publicado, cerrado por alcanzabilidad
-paridad ORM/PG    0 columnas ausentes · 0 obligatorias sin declarar
 ```
 
 ## Veredicto
 
-**NELVYON SAAS RELEASE CANDIDATE ✅ CERTIFICADO**
+**NELVYON SAAS RELEASE CANDIDATE FINAL ✅**
 
-0 CRITICAL · 0 HIGH · 0 P0 · 0 P1 no aceptados. Toda la certificación
-obligatoria está verde y medida de nuevo contra PostgreSQL real.
+0 CRITICAL · 0 HIGH · 0 P0 · 0 P1 · **0 writers PostgreSQL rotos** · 0 skips en
+E2E · árbol limpio.
 
 ### Lo que cerró esta ronda
 
-La evidencia de producción —`calendar_events` y `social_posts` existen con la
-generación `tenant_id` y **están vacías**— eliminó la única incertidumbre que
-quedaba. Con el contrato canónico fijado y sin datos en juego, las tres tablas
-se alinearon:
+Los 14 writers que fallaban contra PostgreSQL, todos con la misma causa: hablaban
+la definición de la migración 507 mientras gana una anterior. Ninguna restricción
+se relajó y ninguna entrada se ocultó en una allowlist — la lista de drift está
+vacía porque PostgreSQL demuestra que los hallazgos ya no ocurren.
 
-* **`audit_logs`**: la traza de acciones críticas **no se había escrito nunca**.
-  El writer usaba la definición de la 507, que no se aplica jamás.
-* **`calendar_events`**: la sincronización con Google escribía cuatro columnas
-  inexistentes y omitía tres obligatorias.
-* **`social_posts`**: el orquestador escribía siete columnas inexistentes, y el
-  modelo ORM describía otra tabla entera.
-
-### El hallazgo que no estaba en ninguna lista
-
-Al alinear `calendar_events` apareció que `WorkspaceAwareMixin` desactivaba el
-filtro de inquilino **en silencio** cuando el modelo no tenía `workspace_id`.
-Ese servicio se habría quedado sin aislamiento con la suite entera en verde.
-Ahora falla cerrado, al leer y al escribir.
+Alinearlos destapó tres defectos que ninguna auditoría había inventariado,
+todos por la misma razón: el esquema de tests modelaba la definición perdedora.
+El más serio, `churn_prediction_service` leyendo una columna inexistente, hacía
+que la señal de actividad nunca encontrara nada.
 
 ## Estado por área
 
