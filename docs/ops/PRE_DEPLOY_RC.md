@@ -33,7 +33,7 @@ falla, Railway aborta la promoción y el tráfico sigue en la versión anterior.
 ```
 1. build            backend/Dockerfile
 2. start            uvicorn main:app --host 0.0.0.0 --port 8000
-3. healthcheck      GET /health                 (timeout 120 s)
+3. healthcheck      GET /health/ready        (timeout 300 s)  <- readiness
 ```
 
 **No tiene `preDeployCommand`: este servicio NO migra.** Al arrancar ejecuta
