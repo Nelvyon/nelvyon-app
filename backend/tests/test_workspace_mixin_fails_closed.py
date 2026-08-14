@@ -91,21 +91,18 @@ def test_sin_workspace_no_se_filtra_y_no_se_lanza():
     assert _ServicioDescuidado()._apply_workspace_filter(consulta, None) is consulta
 
 
-@pytest.mark.parametrize(
-    "servicio, esperada",
-    [("Calendar_eventsService", "tenant_id"), ("Social_postsService", None)],
-)
-def test_los_servicios_realineados_declaran_su_columna(servicio, esperada):
-    """Los dos servicios cuyas tablas usan `tenant_id`.
+def test_el_servicio_de_calendario_declara_su_columna():
+    """`calendar_events` acota por `tenant_id`, no por `workspace_id`.
 
-    `Social_postsService` no hereda del mixin —acota con su propio filtro— asi
-    que solo se comprueba el que si.
+    Si alguien devuelve el servicio al valor por defecto, el filtro lanzara en
+    vez de colar filas de otros inquilinos — pero mejor detectarlo aqui.
+
+    `Social_postsService` no aparece porque no hereda del mixin: acota con su
+    propio filtro, cubierto en `test_pg_social_posts_writes`.
     """
-    if esperada is None:
-        pytest.skip("no usa el mixin; su acotado se cubre en sus propios tests")
     from services.calendar_events import Calendar_eventsService
 
-    assert Calendar_eventsService.columna_inquilino == esperada
+    assert Calendar_eventsService.columna_inquilino == "tenant_id"
 
 
 @pytest.mark.asyncio
