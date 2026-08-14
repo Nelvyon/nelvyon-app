@@ -38,7 +38,17 @@ _SECRETO_POR_PLATAFORMA = {
     # su propio secreto y, si no esta puesto, el de la app de Meta: en muchas
     # instalaciones es la misma aplicacion. Lo que NO se hace es dejarlo pasar
     # sin secreto.
-    "whatsapp": ("WHATSAPP_APP_SECRET", "META_APP_SECRET", "FACEBOOK_APP_SECRET"),
+    # `META_WA_APP_SECRET` va PRIMERO porque es el nombre que ya usa el
+    # repositorio para WhatsApp Business —`backend/oauth/oauthEnv.ts` lo exige y
+    # `integrationsCatalog` lo declara—, asi que es el que estara configurado.
+    # Los demas se aceptan como alias: en muchas instalaciones WhatsApp cuelga
+    # de la misma aplicacion de Meta.
+    "whatsapp": (
+        "META_WA_APP_SECRET",
+        "WHATSAPP_APP_SECRET",
+        "META_APP_SECRET",
+        "FACEBOOK_APP_SECRET",
+    ),
 }
 
 

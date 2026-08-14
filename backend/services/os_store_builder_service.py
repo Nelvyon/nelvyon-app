@@ -638,7 +638,14 @@ class OsStoreBuilderService:
         #
         # Un webhook de pagos que acepta cuerpos sin firmar «porque aun no hay
         # secreto» es exactamente el estado que no puede existir.
-        webhook_secret = os.environ.get("STRIPE_WEBHOOK_SECRET", "").strip()
+        # Precedencia ya establecida en el repositorio:
+        # `apps/web/src/app/api/webhooks/stripe-store/route.ts` usa
+        # `STRIPE_STORE_WEBHOOK_SECRET` y cae al general. Se respeta para que la
+        # variable que ya este configurada siga sirviendo.
+        webhook_secret = (
+            os.environ.get("STRIPE_STORE_WEBHOOK_SECRET", "").strip()
+            or os.environ.get("STRIPE_WEBHOOK_SECRET", "").strip()
+        )
         if not webhook_secret:
             raise WebhookNoVerificable(
                 "STRIPE_WEBHOOK_SECRET no esta configurado; no se puede "

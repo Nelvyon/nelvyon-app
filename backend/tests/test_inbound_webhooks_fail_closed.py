@@ -79,9 +79,23 @@ def test_meta_rechaza_la_firma_ausente(monkeypatch):
         verificar_firma_meta("whatsapp", CUERPO, None)
 
 
+def test_meta_acepta_el_nombre_de_secreto_del_repositorio(monkeypatch):
+    """`META_WA_APP_SECRET` es el nombre que ya usa el repositorio para WhatsApp.
+
+    Lo exige `backend/oauth/oauthEnv.ts` y lo declara `integrationsCatalog`, asi
+    que es el que estara configurado en produccion. Si el verificador no lo
+    leyera, el webhook devolveria 503 en cuanto se desplegara — un fallo que
+    solo aparece con las variables reales delante.
+    """
+    for var in ("WHATSAPP_APP_SECRET", "META_APP_SECRET", "FACEBOOK_APP_SECRET"):
+        monkeypatch.delenv(var, raising=False)
+    monkeypatch.setenv("META_WA_APP_SECRET", SECRETO)
+    verificar_firma_meta("whatsapp", CUERPO, firma_esperada(SECRETO, CUERPO))
+
+
 def test_meta_sin_secreto_corta_con_503(monkeypatch):
     """Sin secreto NO se acepta. Es el estado en el que cualquiera escribe."""
-    for var in ("WHATSAPP_APP_SECRET", "META_APP_SECRET", "FACEBOOK_APP_SECRET"):
+    for var in ("META_WA_APP_SECRET", "WHATSAPP_APP_SECRET", "META_APP_SECRET", "FACEBOOK_APP_SECRET"):
         monkeypatch.delenv(var, raising=False)
     with pytest.raises(HTTPException) as exc:
         verificar_firma_meta("whatsapp", CUERPO, firma_esperada(SECRETO, CUERPO))
