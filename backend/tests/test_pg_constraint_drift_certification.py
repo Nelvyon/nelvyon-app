@@ -85,7 +85,6 @@ DRIFT_CONOCIDO = frozenset({
     "NOT_NULL_DRIFT|invoices|tenant_id|services/invoice_service.py",
     "NOT_NULL_DRIFT|qr_codes|destination_url|services/qr_service.py",
     "NOT_NULL_DRIFT|qr_codes|tenant_id|services/qr_service.py",
-    "NOT_NULL_DRIFT|security_events|user_id|services/web_performance_service.py",
     "NOT_NULL_DRIFT|webhook_deliveries|webhook_id|services/webhook_service.py",
 })
 
