@@ -7,12 +7,12 @@ function makeDb(rows: Record<string, unknown[]> = {}) {
   return {
     query: vi.fn().mockImplementation(async (sql: string) => {
       if (sql.includes("conversations") && sql.includes("SELECT")) return rows.conversations ?? [];
-      if (sql.includes("INSERT INTO conversations")) return [{ id: "conv-1" }];
+      if (sql.includes("INSERT INTO saas_conversations")) return [{ id: "conv-1" }];
       if (sql.includes("saas_sms_log") && sql.includes("INSERT")) {
         return [{ id: "msg-1", tenant_id: "t1", conversation_id: null, to_number: "+34612345678",
           body: "Hola", twilio_sid: "SM123", status: "sent", contact_id: null, created_at: new Date() }];
       }
-      if (sql.includes("UPDATE conversations")) return [];
+      if (sql.includes("UPDATE saas_conversations")) return [];
       if (sql.includes("saas_sms_log") && sql.includes("SELECT")) return [];
       return rows.default ?? [];
     }),
@@ -69,7 +69,7 @@ describe("SaasWhatsAppService.send", () => {
     expect(msg.status).toBe("sent");
     expect(msg.twilioSid).toBe("SM123");
     expect(fetchFn).toHaveBeenCalledOnce();
-    const updateCall = db.query.mock.calls.find((c) => String(c[0]).includes("UPDATE conversations"));
+    const updateCall = db.query.mock.calls.find((c) => String(c[0]).includes("UPDATE saas_conversations"));
     expect(updateCall?.[0]).toContain("tenant_id");
     expect(updateCall?.[1]).toEqual(["Hola", "conv-1", "t1"]);
   });

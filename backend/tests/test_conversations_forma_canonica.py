@@ -100,24 +100,44 @@ def test_la_migracion_534_existe_y_restaura_la_canonica():
         assert destructivo not in sql.upper(), f"la 534 hace {destructivo}"
 
 
-def test_conversations_tiene_consumidores_de_sql_crudo():
-    """Control positivo, y la refutacion directa del recuento de la 532.
+def test_ningun_consumidor_del_buzon_se_perdio_al_renombrar():
+    """La 535 renombro la tabla; NO podia perder consumidores por el camino.
 
-    Si este barrido dejara de ver esas referencias, el test siguiente daria
-    verde vacio — que es exactamente como se colo el fallo.
+    Antes estas 22 referencias apuntaban a `conversations` y refutaban el
+    recuento de la 532. Ahora apuntan a `saas_conversations`, que es el nombre
+    correcto de la generacion tenant. El numero tiene que seguir ahi: si baja,
+    es que se elimino funcionalidad en vez de renombrarla.
     """
-    consumidores = consumidores_sql("conversations")
-    total = sum(consumidores.values())
-    assert total >= 20, (
-        f"solo {total} referencias detectadas; el barrido dejo de ver el SQL crudo: {consumidores}"
-    )
-    esperados = {
-        "backend/saas/SaasInboxService.ts",
-        "backend/saas/SaasWhatsAppService.ts",
-        "backend/saas/SaasWhatsAppCloudService.ts",
+    # Recuento POR FICHERO, medido antes de renombrar. Es mas exigente que un
+    # total: un total permite que una consulta desaparezca de un servicio y
+    # aparezca en otro sin que nadie se entere.
+    #
+    # (Las 22 referencias del informe anterior mezclaban las dos generaciones:
+    # incluian `routers/conversations.py` y la revision de alembic, que son de
+    # la generacion workspace y siguen apuntando a `conversations`, como debe
+    # ser. Los consumidores tenant siempre fueron estos 18.)
+    ESPERADO = {
+        "backend/saas/SaasInboxService.ts": 10,
+        "backend/saas/SaasWhatsAppCloudService.ts": 5,
+        "backend/saas/SaasWhatsAppService.ts": 3,
     }
-    faltan = esperados - set(consumidores)
-    assert not faltan, f"el barrido no ve estos consumidores conocidos: {sorted(faltan)}"
+    consumidores = consumidores_sql("saas_conversations")
+    assert consumidores == ESPERADO, (
+        "el renombrado perdio o movio consultas del buzon.\n"
+        f"  esperado: {ESPERADO}\n  encontrado: {consumidores}"
+    )
+
+
+def test_ya_nadie_consulta_conversations_por_tenant_id():
+    """La otra mitad: el nombre sin prefijo quedo libre para el ORM.
+
+    Si alguien vuelve a escribir `FROM conversations ... tenant_id`, reaparece
+    exactamente el conflicto que costo dos despliegues encontrar.
+    """
+    for rel in consumidores_sql("conversations"):
+        if not rel.startswith("backend/saas/"):
+            continue
+        raise AssertionError(f"{rel} vuelve a consultar `conversations` sin prefijo")
 
 
 def test_el_barrido_no_confunde_tablas_con_prefijo_o_sufijo():
@@ -169,7 +189,7 @@ def test_el_recuento_por_forma_distingue_los_dos_consumidores():
     test recuenta de verdad y exige que las DOS familias sean visibles, que es
     lo que convierte esto en una decision de producto y no en un descuido.
     """
-    for tabla, esperado_tenant, esperado_workspace in (("conversations", 3, 1), ("deals", 1, 2)):
+    for tabla, esperado_tenant, esperado_workspace in (("saas_conversations", 3, 0), ("deals", 0, 2)):
         consumidores = consumidores_sql(tabla)
         por_tenant, por_workspace = [], []
         for rel in consumidores:

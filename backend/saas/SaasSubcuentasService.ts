@@ -166,7 +166,7 @@ export class SaasSubcuentasService {
     const tid = sub.tenantId;
 
     const [contRow, campRow, wfRow] = await Promise.all([
-      this.db.query<{ count: string }>(`SELECT COUNT(*)::text as count FROM contacts WHERE tenant_id=$1`, [tid]),
+      this.db.query<{ count: string }>(`SELECT COUNT(*)::text as count FROM saas_contacts WHERE tenant_id=$1`, [tid]),
       this.db.query<{ count: string }>(`SELECT COUNT(*)::text as count FROM saas_campanias WHERE tenant_id=$1`, [tid]),
       this.db.query<{ count: string }>(`SELECT COUNT(*)::text as count FROM saas_workflows WHERE tenant_id=$1 AND status='active'`, [tid]),
     ]);

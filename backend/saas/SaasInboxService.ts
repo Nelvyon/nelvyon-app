@@ -208,7 +208,7 @@ export class SaasInboxService {
               COALESCE(c.sla_breached,false) as sla_breached,
               c.unread_count, c.last_message, c.last_message_at, c.created_at, c.updated_at,
               ct.name AS contact_name, ct.email AS contact_email, ct.phone AS contact_phone
-       FROM conversations c
+       FROM saas_conversations c
        LEFT JOIN saas_contacts ct ON ct.tenant_id = c.tenant_id AND ct.id = c.contact_id
        WHERE ${clauses.join(" AND ")}
        ORDER BY c.last_message_at DESC NULLS LAST, c.created_at DESC`,
@@ -226,7 +226,7 @@ export class SaasInboxService {
               COALESCE(c.sla_breached,false) as sla_breached,
               c.unread_count, c.last_message, c.last_message_at, c.created_at, c.updated_at,
               ct.name AS contact_name, ct.email AS contact_email, ct.phone AS contact_phone
-       FROM conversations c
+       FROM saas_conversations c
        LEFT JOIN saas_contacts ct ON ct.tenant_id = c.tenant_id AND ct.id = c.contact_id
        WHERE c.tenant_id=$1 AND c.id=$2 LIMIT 1`,
       [tenantId, id],
@@ -254,7 +254,7 @@ export class SaasInboxService {
     }
 
     const rows = await this.db.query<ConvRow>(
-      `INSERT INTO conversations
+      `INSERT INTO saas_conversations
          (tenant_id, contact_id, channel, assigned_to, last_message, last_message_at,
           thread_id, subject, priority, sla_due_at, updated_at)
        VALUES ($1,$2,$3,$4,$5,CASE WHEN $5 IS NOT NULL THEN NOW() ELSE NULL END,
@@ -286,7 +286,7 @@ export class SaasInboxService {
     if (input.assignedTo !== undefined) { sets.push(`assigned_to = $${idx++}`); params.push(input.assignedTo); }
     if (input.priority !== undefined) { sets.push(`priority = $${idx++}`); params.push(input.priority); }
     const rows = await this.db.query<ConvRow>(
-      `UPDATE conversations SET ${sets.join(",")} WHERE tenant_id=$1 AND id=$2
+      `UPDATE saas_conversations SET ${sets.join(",")} WHERE tenant_id=$1 AND id=$2
        RETURNING id, tenant_id, contact_id, channel, status,
                  COALESCE(priority,'normal') as priority,
                  assigned_to, thread_id, subject,
@@ -313,11 +313,11 @@ export class SaasInboxService {
       `SELECT id, conversation_id, tenant_id, direction,
               channel, body, status, external_id, parent_message_id,
               COALESCE(metadata,'{}') as metadata, created_at
-       FROM conversation_messages WHERE conversation_id=$1 ORDER BY created_at ASC`,
+       FROM saas_conversation_messages WHERE conversation_id=$1 ORDER BY created_at ASC`,
       [conversationId],
     );
     await this.db.query(
-      `UPDATE conversations SET unread_count=0, updated_at=NOW() WHERE tenant_id=$1 AND id=$2`,
+      `UPDATE saas_conversations SET unread_count=0, updated_at=NOW() WHERE tenant_id=$1 AND id=$2`,
       [tenantId, conversationId],
     );
     return rows.map(rowToMsg);
@@ -330,7 +330,7 @@ export class SaasInboxService {
     const direction = input.direction ?? "outbound";
     const status = input.status ?? (direction === "inbound" ? "received" : "sent");
     const rows = await this.db.query<MsgRow>(
-      `INSERT INTO conversation_messages
+      `INSERT INTO saas_conversation_messages
          (conversation_id, tenant_id, direction, channel, body, status,
           parent_message_id, metadata, external_id)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8::jsonb,$9)
@@ -347,7 +347,7 @@ export class SaasInboxService {
         `SELECT id, conversation_id, tenant_id, direction, channel, body, status,
                 external_id, parent_message_id,
                 COALESCE(metadata,'{}') as metadata, created_at
-         FROM conversation_messages WHERE external_id=$1 LIMIT 1`,
+         FROM saas_conversation_messages WHERE external_id=$1 LIMIT 1`,
         [input.externalId],
       );
       if (dup[0]) return { ...rowToMsg(dup[0]), inserted: false };
@@ -355,7 +355,7 @@ export class SaasInboxService {
     if (!rows[0]) throw new SaasInboxError("Failed to send message", "VALIDATION");
     const unreadDelta = direction === "inbound" ? 1 : 0;
     await this.db.query(
-      `UPDATE conversations SET last_message=$3, last_message_at=NOW(),
+      `UPDATE saas_conversations SET last_message=$3, last_message_at=NOW(),
         unread_count = unread_count + $4, updated_at=NOW()
        WHERE tenant_id=$1 AND id=$2`,
       [tenantId, conversationId, input.body.trim().slice(0, 200), unreadDelta],
@@ -374,7 +374,7 @@ export class SaasInboxService {
     if (!conv.firstResponseAt) {
       const withinSla = !conv.slaDueAt || new Date() <= new Date(conv.slaDueAt);
       await this.db.query(
-        `UPDATE conversations SET first_response_at=NOW(),
+        `UPDATE saas_conversations SET first_response_at=NOW(),
           sla_breached = CASE WHEN $3 THEN false ELSE sla_breached END,
           updated_at=NOW()
          WHERE tenant_id=$1 AND id=$2`,
@@ -463,7 +463,7 @@ export class SaasInboxService {
   async getOrCreateThread(tenantId: string, contactId: string): Promise<string> {
     // Find existing thread_id for this contact in this tenant
     const rows = await this.db.query<{ thread_id: string }>(
-      `SELECT thread_id FROM conversations
+      `SELECT thread_id FROM saas_conversations
        WHERE tenant_id=$1 AND contact_id=$2 AND thread_id IS NOT NULL
        ORDER BY created_at ASC LIMIT 1`,
       [tenantId, contactId],
@@ -494,7 +494,7 @@ export class SaasInboxService {
               MAX(c.last_message_at) AS last_message_at,
               BOOL_OR(COALESCE(c.sla_breached,false)) AS has_breached,
               MIN(c.sla_due_at) FILTER (WHERE c.status='open') AS earliest_sla_due
-       FROM conversations c
+       FROM saas_conversations c
        LEFT JOIN saas_contacts ct ON ct.tenant_id = c.tenant_id AND ct.id = c.contact_id
        WHERE c.tenant_id=$1 AND c.thread_id IS NOT NULL
        GROUP BY c.thread_id, c.contact_id, ct.name, ct.email, ct.phone
@@ -525,7 +525,7 @@ export class SaasInboxService {
       `SELECT id, conversation_id, tenant_id, direction,
               channel, body, status, external_id, parent_message_id,
               COALESCE(metadata,'{}') as metadata, created_at
-       FROM conversation_messages
+       FROM saas_conversation_messages
        WHERE conversation_id = ANY($1::uuid[])
        ORDER BY created_at ASC`,
       [convIds],
@@ -631,7 +631,7 @@ export class SaasInboxService {
 
   async checkSlaBreaches(tenantId: string): Promise<number> {
     const result = await this.db.query<{ count: string }>(
-      `UPDATE conversations SET sla_breached=true, updated_at=NOW()
+      `UPDATE saas_conversations SET sla_breached=true, updated_at=NOW()
        WHERE tenant_id=$1 AND status='open' AND sla_due_at < NOW()
          AND first_response_at IS NULL AND sla_breached=false
        RETURNING id`,
