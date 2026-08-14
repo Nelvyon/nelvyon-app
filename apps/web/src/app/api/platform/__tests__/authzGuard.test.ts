@@ -68,6 +68,34 @@ const PERMITIDAS: Record<string, { motivo: string; categoria: Categoria }> = {
   ),
   ...Object.fromEntries(
     [
+      ["automations/rules/[id]/execute", "workflow_engine.py:270 `POST /execute/{rule_id}`"],
+      ["automations/workflows/[id]/activate", "workflows_visual.py:126 `POST /{workflow_id}/activate`"],
+      ["ecommerce/projects/[id]/publish", "os_store_builder.py:127 `POST /projects/{id}/publish`"],
+      ["ecommerce/projects/[id]/products", "os_store_builder.py:140 `POST /projects/{id}/products`"],
+    ].map(([id, upstream]) => [
+      id,
+      {
+        motivo:
+          "BFF delegado, y a diferencia del bloque de arriba el upstream SI se ha verificado: " +
+          `${upstream} depende de \`require_workspace_operator\`, que resuelve contexto de ` +
+          "workspace Y exige rol de operador. No es solo autenticacion. La ruta de Next no " +
+          "escribe en la base de NELVYON: solo proxya. " +
+          "PENDIENTE DE PRODUCTO: no existe `platform.automations.*` ni `platform.ecommerce.*` " +
+          "en la matriz de capabilities; crearlas exige decidir que roles pueden ejecutar una " +
+          "automatizacion o publicar una tienda, y esa decision no se toma en un test.",
+        categoria: "bff-delegado" as Categoria,
+      },
+    ]),
+  ),
+  "portal/auth/login": {
+    motivo:
+      "Es el login del portal de cliente: exigirle autorizacion previa seria una contradiccion, " +
+      "porque no hay sesion todavia. Control real: credenciales contra el propio portal, " +
+      "con el mismo hash que valida el resto del plano portal.",
+    categoria: "plano-portal",
+  },
+  ...Object.fromEntries(
+    [
       "portal/auth/accept-invite",
       "portal/deliverables/[id]/approve",
       "portal/deliverables/[id]/reject",
@@ -106,7 +134,27 @@ function rutas(): Array<{ id: string; src: string }> {
 }
 
 const TODAS = rutas();
-const CON_MUTACION = TODAS.filter((r) => MUTANTES.test(r.src) || (MUTANTES.lastIndex = 0));
+
+/**
+ * `MUTANTES` lleva bandera `g`, y `.test()` sobre una expresión global CONSERVA
+ * estado en `lastIndex`. La version anterior era
+ *
+ *     TODAS.filter((r) => MUTANTES.test(r.src) || (MUTANTES.lastIndex = 0))
+ *
+ * que solo reinicia cuando `.test()` devuelve false: tras cada acierto, el
+ * fichero siguiente se examinaba EMPEZANDO A MITAD de la cadena anterior. El
+ * resultado dependia del orden de recorrido del directorio, asi que el mismo
+ * commit pasaba en Windows y fallaba en Linux — y lo hacia en un guard de
+ * autorizacion, que es el peor sitio posible para un resultado que depende del
+ * sistema de ficheros.
+ *
+ * Se reinicia antes de cada comprobacion. El barrido es determinista y, al
+ * dejar de perderse rutas, ESTRICTAMENTE mas exigente que antes.
+ */
+const CON_MUTACION = TODAS.filter((r) => {
+  MUTANTES.lastIndex = 0;
+  return MUTANTES.test(r.src);
+});
 
 describe("guard — toda ruta mutante de platform/* declara autorización", () => {
   it("el barrido encuentra rutas de verdad (el test no pasa por vacío)", () => {
