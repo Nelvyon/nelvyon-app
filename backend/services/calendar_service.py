@@ -560,13 +560,16 @@ class CalendarService:
 
         sets: list[str] = []
         params: dict[str, Any] = {"id": event_id, "tenant_id": tenant_uuid}
-        for key in ("title", "description", "start_at", "end_at", "meet_link", "status"):
+        # `status`, `start_time` y `end_time` no son columnas de esta tabla: eran
+        # espejos de la generacion anterior. `start_at`/`end_at` si lo son y son
+        # las canonicas. Al cambiar el inicio se recalcula `event_date`, que es
+        # NOT NULL y debe seguir describiendo el mismo evento.
+        for key in ("title", "description", "start_at", "end_at", "meet_link"):
             if key in data and data[key] is not None:
                 sets.append(f"{key} = :{key}")
                 params[key] = data[key]
-                if key in ("start_at", "end_at"):
-                    col = "start_time" if key == "start_at" else "end_time"
-                    sets.append(f"{col} = :{key}")
+                if key == "start_at":
+                    sets.append("event_date = CAST(:start_at AS date)")
 
         if "attendees" in data and data["attendees"] is not None:
             sets.append("attendees = CAST(:attendees AS jsonb)")
@@ -653,9 +656,10 @@ class CalendarService:
                     """
                     UPDATE calendar_events SET
                         calendar_id = :calendar_id, title = :title, description = :description,
-                        start_at = :start_at, end_at = :end_at, start_time = :start_at, end_time = :end_at,
+                        start_at = :start_at, end_at = :end_at,
+                        event_date = CAST(:start_at AS date),
                         attendees = CAST(:attendees AS jsonb), meet_link = :meet_link,
-                        status = :status, synced_at = :synced_at
+                        synced_at = :synced_at, updated_at = :synced_at
                     WHERE id = :id
                     """
                 ),
@@ -710,8 +714,8 @@ class CalendarService:
                 UPDATE calendar_events SET
                     google_event_id = :google_event_id,
                     meet_link = :meet_link,
-                    status = :status,
-                    synced_at = :synced_at
+                    synced_at = :synced_at,
+                    updated_at = :synced_at
                 WHERE id = :id AND tenant_id = CAST(:tenant_id AS uuid)
                 """
             ),

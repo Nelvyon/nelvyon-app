@@ -38,11 +38,36 @@ class WorkspaceAwareMixin:
 
     model: Type = None  # Subclass MUST set this
 
+    #: Columna por la que se acota el inquilino. Un servicio cuya tabla use otro
+    #: nombre —`calendar_events` usa `tenant_id`— debe declararlo aqui.
+    columna_inquilino: str = "workspace_id"
+
     def _apply_workspace_filter(self, query, workspace_id: Optional[int]):
-        """Apply workspace_id filter if the model supports it and workspace_id is provided."""
-        if workspace_id is not None and hasattr(self.model, 'workspace_id'):
-            query = query.where(self.model.workspace_id == workspace_id)
-        return query
+        """Acota la consulta al inquilino. Falla cerrado si no puede.
+
+        ANTES ERA `if hasattr(...)`, Y ESO ERA PELIGROSO
+        ------------------------------------------------
+        Si el modelo no tenia `workspace_id`, el filtro simplemente NO se
+        aplicaba y la consulta devolvia filas de TODOS los inquilinos. En
+        silencio, sin error y sin aviso. Bastaba renombrar una columna —o
+        alinear un modelo con su tabla real, que es justo lo que ocurrio con
+        `calendar_events`— para desactivar el aislamiento de ese servicio entero.
+
+        Un filtro de aislamiento que se apaga solo cuando no encuentra su
+        columna es peor que no tenerlo: promete algo que ya no cumple. Ahora, si
+        la columna declarada no existe en el modelo, se lanza.
+        """
+        if workspace_id is None:
+            return query
+        columna = getattr(self.model, self.columna_inquilino, None)
+        if columna is None:
+            raise RuntimeError(
+                f"{type(self).__name__}: el modelo {self.model.__name__} no tiene "
+                f"la columna '{self.columna_inquilino}', asi que la consulta no "
+                "puede acotarse al inquilino. Declara `columna_inquilino` con el "
+                "nombre correcto en vez de devolver filas sin filtrar."
+            )
+        return query.where(columna == workspace_id)
 
     def _apply_user_filter(self, query, user_id: Optional[str]):
         """Apply user_id filter if provided."""
@@ -59,12 +84,23 @@ class WorkspaceAwareMixin:
     async def ws_create(
         self, data: Dict[str, Any], user_id: Optional[str] = None, workspace_id: Optional[int] = None
     ):
-        """Create a record with workspace_id stamped."""
+        """Crea la fila sellando el inquilino.
+
+        Sella la columna DECLARADA, no `workspace_id` a secas: si el modelo usa
+        otro nombre, el sello se saltaba y la fila salia sin inquilino.
+        """
+        # La precondicion se comprueba FUERA del try: no necesita sesion, y
+        # dentro el `rollback` del except la enmascaraba con un AttributeError.
+        if workspace_id is not None and not hasattr(self.model, self.columna_inquilino):
+            raise RuntimeError(
+                f"{type(self).__name__}: el modelo {self.model.__name__} no tiene "
+                f"'{self.columna_inquilino}'; la fila quedaria sin inquilino."
+            )
         try:
             if user_id and hasattr(self.model, "user_id"):
                 data["user_id"] = user_id
-            if workspace_id is not None and hasattr(self.model, 'workspace_id'):
-                data['workspace_id'] = workspace_id
+            if workspace_id is not None:
+                data[self.columna_inquilino] = workspace_id
             obj = self.model(**data)
             self.db.add(obj)
             await self.db.commit()

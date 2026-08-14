@@ -229,6 +229,53 @@ async def setup_database(test_engine):
                 """
             )
         )
+        # `saas_tenants` la crea una migracion de la superficie `/saas`, fuera
+        # del bootstrap canonico. Se declara aqui con la forma real —lo que
+        # necesitan las claves foraneas— para que los tests modelen el mismo
+        # estado que produccion.
+        await conn.execute(
+            text(
+                """
+                CREATE TABLE IF NOT EXISTS saas_tenants (
+                    id TEXT PRIMARY KEY,
+                    user_id TEXT NOT NULL,
+                    company_name TEXT NOT NULL,
+                    industry TEXT NOT NULL,
+                    plan TEXT NOT NULL DEFAULT 'starter',
+                    website TEXT,
+                    phone TEXT,
+                    employees TEXT,
+                    goals TEXT,
+                    onboarding_completed BOOLEAN NOT NULL DEFAULT 0,
+                    onboarding_step INTEGER NOT NULL DEFAULT 1,
+                    workspace_id INTEGER,
+                    mfa_enforced BOOLEAN NOT NULL DEFAULT 0,
+                    created_at TIMESTAMP,
+                    updated_at TIMESTAMP
+                )
+                """
+            )
+        )
+        # Cada workspace necesita su fila en `saas_tenants`.
+        #
+        # No es adorno del test: varias tablas de la generacion `/saas`
+        # —`calendar_events`, `audit_logs`— tienen `tenant_id uuid` con clave
+        # foranea a `saas_tenants`. Sin esta fila, en PostgreSQL real no se puede
+        # escribir en ellas, y sembrar workspaces sin inquilino modelaba un
+        # estado que produccion no admite.
+        await conn.execute(
+            text(
+                """
+                INSERT OR IGNORE INTO saas_tenants
+                (id, user_id, company_name, industry, workspace_id)
+                VALUES
+                ('11111111-1111-4111-8111-111111111111',
+                 '11111111-1111-4111-8111-1111111111aa', 'Test Tenant', 'test', 1),
+                ('22222222-2222-4222-8222-222222222222',
+                 '22222222-2222-4222-8222-2222222222aa', 'Admin Tenant', 'test', 2)
+                """
+            )
+        )
         # ENTERPRISE-READY-1 RBAC: member de workspace 1 (sin permiso de mutación SaaS)
         await conn.execute(
             text(

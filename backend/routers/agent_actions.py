@@ -14,6 +14,7 @@ Política Fase 2 (producto):
 
 import json
 import logging
+import uuid as _uuid
 from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
@@ -34,6 +35,7 @@ from models.contacts import Contacts
 from models.deals import Deals
 from models.report_items import Report_items
 from models.blog_posts import Blog_posts
+from core.tenant_bridge import require_tenant_uuid
 from models.calendar_events import Calendar_events
 from models.activities import Activities
 
@@ -250,19 +252,38 @@ async def _schedule_event(db: AsyncSession, user_id: str, workspace_id: int, par
         except (ValueError, AttributeError):
             pass
 
+    # `calendar_events` es de la generacion `/saas`: su inquilino es un uuid con
+    # clave foranea a `saas_tenants`, no el workspace entero. Antes se le pasaba
+    # `workspace_id`, `start_time`, `status` y `channel`, que no son columnas de
+    # la tabla, y el INSERT fallaba con `operator does not exist: uuid = integer`.
+    #
+    # Lo que no cabe en columnas —el canal, el cliente— va a `notes`, que es
+    # texto libre y ya se usaba para eso. `event_date` es NOT NULL y se deriva
+    # del inicio, que es lo unico que no puede quedar incoherente con el evento.
+    tenant_uuid = await require_tenant_uuid(db, workspace_id)
+    ahora = datetime.now(timezone.utc)
+    detalle = params.get("notes", "Scheduled by AI agent")
+    canal = params.get("channel", "video")
+    cliente = params.get("client_name", "")
+    if canal:
+        detalle = f"{detalle} · canal: {canal}"
+    if cliente:
+        detalle = f"{detalle} · cliente: {cliente}"
+
     event = Calendar_events(
-        user_id=user_id,
-        workspace_id=workspace_id,
+        id=str(_uuid.uuid4()),
+        tenant_id=tenant_uuid,
         title=title,
-        client_name=params.get("client_name", ""),
-        event_type=params.get("event_type", "meeting"),
-        start_time=start_time,
-        end_time=end_time,
+        type="appointment",
+        event_date=start_time.date(),
+        start_at=start_time,
+        end_at=end_time,
         duration_minutes=params.get("duration_minutes", 60),
-        status="scheduled",
-        channel=params.get("channel", "video"),
-        notes=params.get("notes", "Scheduled by AI agent"),
-        created_at=datetime.now(timezone.utc),
+        completed=False,
+        attendees=[],
+        notes=detalle,
+        created_at=ahora,
+        updated_at=ahora,
     )
     db.add(event)
     await db.flush()
