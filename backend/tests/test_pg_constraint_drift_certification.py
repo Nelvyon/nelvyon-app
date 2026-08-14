@@ -64,6 +64,8 @@ requiere_pg = pytest.mark.skipif(
 #: `tenant_id NOT NULL` quedo apartada y ahora existe la canonica.
 #: El de `audit_logs` se resolvio corrigiendo el writer, que escribia contra la
 #: definicion de la 507 — la que nunca se aplica porque gana la 412.
+#: El de `social_posts` se resolvio alineando el orquestador; lo que llevaban
+#: las columnas inexistentes vive ahora en `metadata` (jsonb).
 #: Los tres de `calendar_events` se resolvieron alineando `calendar_service`
 #: con el contrato real de la tabla, una vez confirmado en produccion que la
 #: forma existente es la de `tenant_id` y que la tabla esta vacia.
@@ -84,7 +86,6 @@ DRIFT_CONOCIDO = frozenset({
     "NOT_NULL_DRIFT|qr_codes|destination_url|services/qr_service.py",
     "NOT_NULL_DRIFT|qr_codes|tenant_id|services/qr_service.py",
     "NOT_NULL_DRIFT|security_events|user_id|services/web_performance_service.py",
-    "NOT_NULL_DRIFT|social_posts|tenant_id|routers/e2e_orchestrator.py",
     "NOT_NULL_DRIFT|webhook_deliveries|webhook_id|services/webhook_service.py",
 })
 

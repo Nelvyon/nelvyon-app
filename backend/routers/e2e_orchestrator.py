@@ -5,6 +5,7 @@ and entity creation across the full NELVYON chain:
   Client → Project → Generator → QA → Assets → Contracts → Social → Helpdesk
   CRM (Contacts/Deals/Campaigns) ↔ OS (Clients/Projects)
 """
+import json as _json
 import logging
 from datetime import datetime
 from typing import Any, Dict, List, Optional
@@ -484,22 +485,32 @@ async def create_social_from_contract(
 
     result = await db.execute(
         text("""
+            -- `social_posts` es la tabla del scheduler social, con
+            -- `tenant_id INTEGER` (el workspace, sin traducir: asi la usa
+            -- tambien `finetuning_service`). Las columnas de la otra generacion
+            -- —platform, campaign_name, client_id, project_id, output_id,
+            -- contract_id— no existen: el INSERT fallaba siempre. Su contenido
+            -- no se pierde, va a `metadata`, que es jsonb y esta para eso.
             INSERT INTO social_posts
-            (user_id, platform, content, status, campaign_name,
-             client_id, project_id, output_id, contract_id, scheduled_at, created_at)
+            (tenant_id, content, status, scheduled_at, created_at, updated_at, metadata)
             VALUES
-            (:uid, :platform, :content, :status, :campaign,
-             :client_id, :project_id, :output_id, :contract_id, :scheduled_at, :now)
+            (:tenant_id, :content, :status, :scheduled_at, :now, :now,
+             CAST(:metadata AS jsonb))
             RETURNING id
         """),
         {
-            "uid": user_id, "platform": req.platform, "content": content,
+            "tenant_id": wid,
+            "content": content,
             "status": "scheduled" if req.scheduled_at else "draft",
-            "campaign": req.campaign_name,
-            "client_id": contract.get("client_id"),
-            "project_id": contract.get("project_id"),
-            "output_id": contract.get("output_id"),
-            "contract_id": req.contract_id,
+            "metadata": _json.dumps({
+                "user_id": user_id,
+                "platform": req.platform,
+                "campaign_name": req.campaign_name,
+                "client_id": contract.get("client_id"),
+                "project_id": contract.get("project_id"),
+                "output_id": contract.get("output_id"),
+                "contract_id": req.contract_id,
+            }, default=str),
             "scheduled_at": req.scheduled_at,
             "now": now,
         },
