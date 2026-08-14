@@ -90,3 +90,56 @@ def test_los_que_dependen_solo_de_la_base_ya_no_existen():
         f"{f}::{fn}" for f, fn, d, _ in _endpoints_all() if d == {"get_db"}
     ]
     assert culpables == [], f"endpoints /all sin ninguna autoridad: {culpables}"
+
+
+def test_ningun_endpoint_de_escritura_queda_publico_sin_verificar():
+    """Barrido final: POST/PUT/PATCH/DELETE publicos que escriben en la base.
+
+    Encontro `system_health.track_metric`: publico, sin autenticar, insertaba
+    una fila por llamada en `platform_metrics` y aceptaba el `user_id` como
+    parametro. Es decir, llenar la tabla sin limite y fabricar metricas a nombre
+    de cualquiera. No lo llamaba nadie: superficie regalada.
+
+    Los webhooks entrantes quedan fuera porque su autenticidad no es una sesion
+    sino la firma del proveedor; los cubre
+    `test_inbound_webhooks_fail_closed.py`.
+    """
+    import ast
+    from pathlib import Path
+
+    raiz = Path(__file__).resolve().parent.parent / "routers"
+    AUTORIDAD = (
+        "get_current_user", "require_workspace", "get_super_admin", "get_admin_user",
+        "require_public_scope", "api_key", "require_platform",
+    )
+    VERIFICACION = ("verificar_", "construct", "webhook_key", "verify_", "signature")
+
+    desprotegidos = []
+    for fichero in sorted(raiz.rglob("*.py")):
+        try:
+            arbol = ast.parse(fichero.read_text(encoding="utf-8"))
+        except SyntaxError:
+            continue
+        for nodo in ast.walk(arbol):
+            if not isinstance(nodo, (ast.AsyncFunctionDef, ast.FunctionDef)):
+                continue
+            metodos = [
+                d.func.attr for d in nodo.decorator_list
+                if isinstance(d, ast.Call) and isinstance(d.func, ast.Attribute)
+            ]
+            if not any(m in ("post", "put", "patch", "delete") for m in metodos):
+                continue
+            argumentos = ast.unparse(nodo.args)
+            if any(a in argumentos for a in AUTORIDAD):
+                continue
+            cuerpo = ast.unparse(nodo)
+            escribe = any(
+                k in cuerpo for k in ("INSERT INTO", "UPDATE ", "db.add(", "DELETE FROM")
+            )
+            if escribe and not any(v in cuerpo for v in VERIFICACION):
+                desprotegidos.append(f"{fichero.name}::{nodo.name}")
+
+    assert not desprotegidos, (
+        "endpoints publicos que escriben sin establecer autoridad ni "
+        "autenticidad:\n  " + "\n  ".join(desprotegidos)
+    )

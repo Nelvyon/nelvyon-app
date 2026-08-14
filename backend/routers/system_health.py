@@ -12,6 +12,8 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
+from schemas.auth import UserResponse
+from dependencies.auth import get_current_user
 
 logger = logging.getLogger(__name__)
 
@@ -181,13 +183,31 @@ async def track_metric(
     status: str = "success",
     status_code: int = 200,
     is_ai: bool = False,
-    user_id: str = "anonymous",
+    current_user: UserResponse = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    """Registro de metricas de observabilidad.
+
+    ERA PUBLICO, SIN AUTENTICAR Y ESCRIBIA UNA FILA POR LLAMADA
+    -----------------------------------------------------------
+    Cualquiera podia insertar en `platform_metrics` sin limite —llenando la
+    tabla— y ademas elegir el `user_id`, que llegaba como parametro: metricas
+    fabricadas a nombre de quien se quisiera, en los cuadros de mando.
+
+    No lo llamaba nadie: no hay una sola referencia en `apps/web`. Un endpoint
+    de escritura publico sin usuarios es superficie regalada.
+
+    Ahora exige sesion y el actor sale de ella. El `user_id` del cliente ya no
+    se cree: era suplantacion directa.
+
+    Los campos de texto se acotan porque esta tabla la escribe un cliente y no
+    tiene por que aceptar cadenas de cualquier tamano.
     """
-    Lightweight metric tracking endpoint.
-    Frontend can POST metrics here for automatic observability.
-    """
+    user_id = str(current_user.id)
+    metric_type = (metric_type or "api_call")[:64]
+    module_name = (module_name or "unknown")[:64]
+    endpoint = (endpoint or "")[:256]
+    status = (status or "success")[:32]
     try:
         await db.execute(
             text("""
