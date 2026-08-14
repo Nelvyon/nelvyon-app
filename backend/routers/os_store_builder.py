@@ -11,6 +11,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
+from services.os_store_builder_service import WebhookNoVerificable
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.os_store_builder_service import get_os_store_builder_service
 from services.os_store_builder_worker import start_store_generation
@@ -283,6 +284,10 @@ async def stripe_webhook(
     sig = request.headers.get("stripe-signature")
     try:
         return await svc.handle_stripe_webhook(subdomain.lower(), payload, sig)
+    except WebhookNoVerificable as exc:
+        # 503, no 400: el problema es nuestro (falta configuracion) y Stripe
+        # debe reintentar cuando este resuelto, no descartar el evento.
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 

@@ -144,6 +144,15 @@ def _ensure_stripe_key() -> bool:
     return True
 
 
+class WebhookNoVerificable(RuntimeError):
+    """No hay con que verificar la autenticidad del evento.
+
+    Se distingue de una firma invalida: aquella es culpa del emisor y merece un
+    400; esta es una configuracion incompleta nuestra y merece un 503, para que
+    Stripe reintente cuando este resuelta en vez de darlo por descartado.
+    """
+
+
 class OsStoreBuilderService:
     """AI-powered online store builder with Stripe checkout."""
 
@@ -622,20 +631,32 @@ class OsStoreBuilderService:
         if not project:
             raise ValueError("Store not found")
 
+        # FAIL-CLOSED. Antes, si faltaba el secreto o la cabecera, se caia a
+        # `json.loads(payload)` y se seguia adelante: cualquiera podia enviar un
+        # `payment_intent.succeeded` inventado y marcar como PAGADO el pedido
+        # que quisiera. Es la ruta del dinero de las tiendas de los clientes.
+        #
+        # Un webhook de pagos que acepta cuerpos sin firmar «porque aun no hay
+        # secreto» es exactamente el estado que no puede existir.
         webhook_secret = os.environ.get("STRIPE_WEBHOOK_SECRET", "").strip()
-        event: dict[str, Any]
+        if not webhook_secret:
+            raise WebhookNoVerificable(
+                "STRIPE_WEBHOOK_SECRET no esta configurado; no se puede "
+                "verificar la autenticidad de un evento de pago"
+            )
+        if not sig_header:
+            raise ValueError("Missing Stripe-Signature")
+        if not _ensure_stripe_key():
+            raise WebhookNoVerificable(
+                "la clave de Stripe no esta configurada; no se puede verificar "
+                "la firma del evento"
+            )
 
-        if webhook_secret and sig_header and _ensure_stripe_key():
-            try:
-                event_obj = stripe.Webhook.construct_event(payload, sig_header, webhook_secret)
-                event = dict(event_obj)
-            except Exception as exc:
-                raise ValueError(f"Webhook signature invalid: {exc}") from exc
-        else:
-            try:
-                event = json.loads(payload.decode("utf-8"))
-            except json.JSONDecodeError as exc:
-                raise ValueError("Invalid webhook payload") from exc
+        try:
+            event_obj = stripe.Webhook.construct_event(payload, sig_header, webhook_secret)
+            event = dict(event_obj)
+        except Exception as exc:
+            raise ValueError(f"Webhook signature invalid: {exc}") from exc
 
         event_type = event.get("type")
         data_obj = (event.get("data") or {}).get("object") or {}
@@ -643,21 +664,102 @@ class OsStoreBuilderService:
         if event_type == "payment_intent.succeeded":
             pi_id = data_obj.get("id")
             order_id = (data_obj.get("metadata") or {}).get("os_store_order_id")
-            await self.session.execute(
+            # El paso a `paid` es la puerta de la idempotencia: solo transiciona
+            # una vez. Sin ese `AND status <> 'paid'`, un reintento de Stripe
+            # —que los hace— volveria a descontar el stock del mismo pedido.
+            resultado = await self.session.execute(
                 text(
                     """
                     UPDATE os_store_orders
                     SET status = 'paid', updated_at = NOW()
-                    WHERE stripe_payment_intent_id = :pi
-                       OR id = NULLIF(:oid, '')::uuid
+                    WHERE (stripe_payment_intent_id = :pi
+                           OR id = NULLIF(:oid, '')::uuid)
+                      AND status <> 'paid'
+                    RETURNING id
                     """
                 ),
                 {"pi": pi_id, "oid": order_id or ""},
             )
+            fila = resultado.fetchone()
+            if fila is None:
+                # Ya estaba pagado: reintento de Stripe. Se responde OK para que
+                # deje de reintentar, y NO se vuelve a tocar el stock.
+                await self.session.commit()
+                return {
+                    "handled": True, "event": event_type,
+                    "order_status": "paid", "duplicate": True,
+                }
+
+            descontados = await self._descontar_stock(str(fila._mapping["id"]))
             await self.session.commit()
-            return {"handled": True, "event": event_type, "order_status": "paid"}
+            return {
+                "handled": True, "event": event_type,
+                "order_status": "paid", "stock_descontado": descontados,
+            }
 
         return {"handled": False, "event": event_type}
+
+    async def _descontar_stock(self, order_id: str) -> int:
+        """Descuenta el stock de las lineas del pedido, sin dejarlo negativo.
+
+        POR QUE NO SE DESCONTABA
+        ------------------------
+        El stock se comprobaba al crear el pedido y no se tocaba nunca mas. Con
+        eso, dos compras simultaneas de la ultima unidad pasaban las dos: ambas
+        leian el mismo stock y ninguna lo reducia. Se vendia lo que no habia.
+
+        POR QUE SE DESCUENTA AL PAGAR Y NO AL CREAR
+        -------------------------------------------
+        Un pedido creado y no pagado no debe retener inventario: dejaria la
+        tienda sin stock por carritos abandonados. El momento en que la unidad
+        deja de estar disponible es el cobro.
+
+        LA CONDICION VA DENTRO DEL UPDATE
+        ---------------------------------
+        `WHERE stock >= :qty` en la misma sentencia que resta: leer y luego
+        escribir volveria a abrir la carrera que esto cierra. Si otro pedido se
+        adelanto, `rowcount` es 0 y queda registrado en vez de dejar el stock en
+        negativo.
+        """
+        # Las lineas viven en `os_store_orders.items` (jsonb), no en una tabla
+        # aparte: es donde `create_order` las deja.
+        fila = (
+            await self.session.execute(
+                text("SELECT items FROM os_store_orders WHERE id = CAST(:oid AS uuid)"),
+                {"oid": order_id},
+            )
+        ).fetchone()
+        if fila is None:
+            return 0
+        crudo = fila._mapping["items"]
+        lineas = json.loads(crudo) if isinstance(crudo, str) else (crudo or [])
+
+        descontados = 0
+        for linea in lineas:
+            if not isinstance(linea, dict):
+                continue
+            cantidad = int(linea.get("quantity") or 0)
+            producto = linea.get("product_id")
+            if cantidad <= 0 or not producto:
+                continue
+            resultado = await self.session.execute(
+                text(
+                    """
+                    UPDATE os_store_products
+                    SET stock = stock - :qty, updated_at = NOW()
+                    WHERE id = :pid AND stock >= :qty
+                    """
+                ),
+                {"qty": cantidad, "pid": producto},
+            )
+            if resultado.rowcount:
+                descontados += 1
+            else:
+                logger.warning(
+                    "os_store_stock_insuficiente_al_pagar",
+                    extra={"os_store_order_id": order_id},
+                )
+        return descontados
 
     async def apply_discount(
         self, project_id: str, workspace_id: int, discount_info: dict[str, Any]
