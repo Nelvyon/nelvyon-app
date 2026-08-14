@@ -1,6 +1,6 @@
 {
   "tag": "postgres_restore_drill",
-  "timestamp": "2026-08-14T00:50:22.287Z",
+  "timestamp": "2026-08-14T02:01:57.374Z",
   "decision": "PASS",
   "container": "nelvyon-local-ai-postgres",
   "sourceDb": "nelvyon_mig_cert",
@@ -14,50 +14,50 @@
       "flow": "dr.container_ready",
       "ok": true,
       "out": "/var/run/postgresql:5432 - accepting connections",
-      "at": "2026-08-14T00:50:13.406Z"
+      "at": "2026-08-14T02:01:48.745Z"
     },
     {
       "flow": "dr.database_url",
       "ok": true,
-      "at": "2026-08-14T00:50:13.408Z"
+      "at": "2026-08-14T02:01:48.747Z"
     },
     {
       "flow": "dr.seed_marker",
       "ok": true,
-      "marker": "drill-1786668613420",
-      "at": "2026-08-14T00:50:13.428Z"
+      "marker": "drill-1786672908760",
+      "at": "2026-08-14T02:01:48.768Z"
     },
     {
       "flow": "dr.pg_dump",
       "ok": true,
-      "at": "2026-08-14T00:50:13.848Z"
+      "at": "2026-08-14T02:01:49.175Z"
     },
     {
       "flow": "dr.copy_dump",
       "ok": true,
-      "path": "C:\\Users\\Daniel\\nelvyon-app\\docs\\evidence\\os-saas-e2e\\dr_backups\\restore_drill_1786668613428.dump",
-      "bytes": 2301873,
-      "at": "2026-08-14T00:50:13.904Z"
+      "path": "C:\\Users\\Daniel\\nelvyon-app\\docs\\evidence\\os-saas-e2e\\dr_backups\\restore_drill_1786672908768.dump",
+      "bytes": 2301901,
+      "at": "2026-08-14T02:01:49.235Z"
     },
     {
       "flow": "dr.create_restore_db",
       "ok": true,
-      "db": "nelvyon_restore_drill_1786668613262",
-      "at": "2026-08-14T00:50:14.075Z"
+      "db": "nelvyon_restore_drill_1786672908596",
+      "at": "2026-08-14T02:01:49.372Z"
     },
     {
       "flow": "dr.restore_marker",
       "ok": true,
-      "out": "drill-1786668613420",
+      "out": "drill-1786672908760",
       "restore_status": 0,
       "restore_err": "",
-      "at": "2026-08-14T00:50:21.162Z"
+      "at": "2026-08-14T02:01:56.381Z"
     },
     {
       "flow": "dr.cleanup",
       "ok": true,
-      "at": "2026-08-14T00:50:22.287Z"
+      "at": "2026-08-14T02:01:57.374Z"
     }
   ],
-  "hash": "4f5d14fd5a765f85"
+  "hash": "04ae9615d3f2d47c"
 }
