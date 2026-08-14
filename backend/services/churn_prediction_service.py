@@ -62,7 +62,11 @@ class ChurnPredictionService:
                     UNION ALL
                     SELECT MAX(updated_at)   AS t FROM saas_contacts  WHERE workspace_id = :ws
                     UNION ALL
-                    SELECT MAX(completed_at) AS t FROM crm_activities WHERE workspace_id = :ws
+                    -- `crm_activities` no tiene `completed_at`: la tabla real —migracion 084—
+                    -- registra el instante en `created_at`. Leer una columna
+                    -- inexistente hacia que la senal de actividad nunca encontrara
+                    -- nada y el riesgo de fuga saliera siempre igual.
+                    SELECT MAX(created_at) AS t FROM crm_activities WHERE workspace_id = :ws
                 ) fuentes
                 """
             ),

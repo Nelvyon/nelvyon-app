@@ -98,8 +98,14 @@ _TYPE_TRANSLATIONS: tuple[tuple[str, str], ...] = (
     (r"::\s*[A-Za-z][A-Za-z0-9_]*(\s*\(\s*\d+\s*(,\s*\d+\s*)?\))?", ""),
 )
 
+#: `IF NOT EXISTS` es OPCIONAL a proposito. Migraciones antiguas como la 084
+#: declaran `CREATE TABLE crm_contacts (...)` a secas, y exigir la clausula las
+#: dejaba invisibles: el bootstrap creia que ganaba la 507 y el esquema de
+#: SQLite modelaba una tabla que PostgreSQL nunca construye. Es justo el falso
+#: verde que `definiciones_ganadoras` viene a cerrar.
 _CREATE_TABLE_RE = re.compile(
-    r"CREATE\s+TABLE\s+IF\s+NOT\s+EXISTS\s+(?P<name>[a-z_][a-z0-9_]*)\s*\((?P<body>.*?)\n\);",
+    r"CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?(?:public\.)?"
+    r"(?P<name>[a-z_][a-z0-9_]*)\s*\((?P<body>.*?)\n\);",
     re.IGNORECASE | re.DOTALL,
 )
 
@@ -206,6 +212,18 @@ def indices_unicos_sqlite() -> list:
     ]
 
 
+#: Tablas a las que la migracion 533 anade `workspace_id`.
+#:
+#: Son de la generacion `/saas`: acotan por `tenant_id`/`user_id` uuid y el
+#: backend FastAPI las consulta por workspace. La columna se anade AL LADO, sin
+#: sustituir a la original, que sigue siendo obligatoria.
+TABLAS_CON_WORKSPACE_ANADIDO = (
+    "ab_experiments", "ab_variants", "api_keys", "bookings",
+    "crm_contacts", "crm_activities", "invoices", "qr_codes",
+    "webhook_deliveries",
+)
+
+
 def sqlite_add_column_statements() -> list[tuple[str, str, str]]:
     """`ALTER TABLE ... ADD COLUMN` de la migración canónica.
 
@@ -222,6 +240,15 @@ def sqlite_add_column_statements() -> list[tuple[str, str, str]]:
         columna = m.group("column")
         resto = _to_sqlite(m.group("rest").strip())
         out.append((tabla, columna, f"ALTER TABLE {tabla} ADD COLUMN {columna} {resto}"))
+
+    # La migracion 533 anade `workspace_id` a las tablas de la generacion
+    # `/saas`, pero lo hace con `EXECUTE format(...)` dentro de un bloque `DO`,
+    # que no se puede leer estaticamente. Se declara aqui, y un test comprueba
+    # que esta lista y la migracion no se separan.
+    for tabla in TABLAS_CON_WORKSPACE_ANADIDO:
+        out.append(
+            (tabla, "workspace_id", f"ALTER TABLE {tabla} ADD COLUMN workspace_id INTEGER")
+        )
     return out
 
 

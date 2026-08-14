@@ -1,6 +1,7 @@
 """NELVYON Spanish invoicing — correlativa numbering, IVA, legal PDF (ReportLab), SES delivery."""
 
 from __future__ import annotations
+from core.tenant_bridge import require_tenant_uuid
 
 import asyncio
 import json
@@ -161,6 +162,7 @@ class InvoiceService:
         due_date: date | None = None,
         notes: str | None = None,
     ) -> dict[str, Any]:
+        inquilino = await require_tenant_uuid(self.session, self.workspace_id)
         client_name = (client_data.get("client_name") or client_data.get("name") or "").strip()
         if not client_name:
             raise ValueError("client_name is required")
@@ -175,21 +177,29 @@ class InvoiceService:
         result = await self.session.execute(
             text(
                 """
+                -- La tabla real —migracion 054, la que gana— acota por
+                -- `tenant_id uuid`, las lineas viven en `line_items` y los
+                -- impuestos en `tax_rate`/`tax_amount`. El writer hablaba la
+                -- definicion de la 507: emitir una factura fallaba siempre.
+                --
+                -- Los datos del cliente y la serie no tienen columna aqui; van a
+                -- `notes` en vez de perderse, que es lo unico que la tabla
+                -- ofrece para texto libre.
                 INSERT INTO invoices (
-                    workspace_id, invoice_number, series, client_name, client_email,
-                    client_nif, client_address, items, subtotal, iva_rate, iva_amount,
-                    total, currency, status, due_date, notes, created_at
+                    id, tenant_id, workspace_id, invoice_number, line_items, subtotal, tax_rate,
+                    tax_amount, total, currency, status, due_date, notes, created_at
                 )
                 VALUES (
-                    :workspace_id, :invoice_number, :series, :client_name, :client_email,
-                    :client_nif, :client_address, CAST(:items AS jsonb), :subtotal, :iva_rate,
+                    gen_random_uuid(), CAST(:inquilino AS uuid), :ws, :invoice_number,
+                    CAST(:items AS jsonb), :subtotal, :iva_rate,
                     :iva_amount, :total, :currency, 'draft', :due_date, :notes, :created_at
                 )
                 RETURNING *
                 """
             ),
             {
-                "workspace_id": self.workspace_id,
+                "inquilino": inquilino,
+                "ws": self.workspace_id,
                 "invoice_number": invoice_number,
                 "series": (series or DEFAULT_SERIES).strip().upper(),
                 "client_name": client_name,

@@ -59,34 +59,17 @@ requiere_pg = pytest.mark.skipif(
     ),
 )
 
-#: Drift medido contra PostgreSQL real (432 migraciones).
-#: La migracion 532 resolvio los dos de `deals`: la tabla legacy que forzaba
-#: `tenant_id NOT NULL` quedo apartada y ahora existe la canonica.
-#: El de `audit_logs` se resolvio corrigiendo el writer, que escribia contra la
-#: definicion de la 507 — la que nunca se aplica porque gana la 412.
-#: El de `social_posts` se resolvio alineando el orquestador; lo que llevaban
-#: las columnas inexistentes vive ahora en `metadata` (jsonb).
-#: Los tres de `calendar_events` se resolvieron alineando `calendar_service`
-#: con el contrato real de la tabla, una vez confirmado en produccion que la
-#: forma existente es la de `tenant_id` y que la tabla esta vacia.
-#: Todos son writers que omiten una columna NOT NULL sin default: el INSERT
-#: fallaria en produccion. Estan documentados en NELVYON_CLOSURE_STATE.md.
-DRIFT_CONOCIDO = frozenset({
-    "NOT_NULL_DRIFT|ab_experiments|channel|services/ab_testing_service.py",
-    "NOT_NULL_DRIFT|ab_experiments|user_id|services/ab_testing_service.py",
-    "NOT_NULL_DRIFT|ab_variants|content|services/ab_testing_service.py",
-    "NOT_NULL_DRIFT|api_keys|tenant_id|services/api_keys_service.py",
-    "NOT_NULL_DRIFT|bookings|booking_date|services/booking_service.py",
-    "NOT_NULL_DRIFT|bookings|booking_time|services/booking_service.py",
-    "NOT_NULL_DRIFT|bookings|confirmation_token|services/booking_service.py",
-    "NOT_NULL_DRIFT|bookings|user_id|services/booking_service.py",
-    "NOT_NULL_DRIFT|crm_activities|user_id|services/crm_service.py",
-    "NOT_NULL_DRIFT|crm_contacts|user_id|services/crm_service.py",
-    "NOT_NULL_DRIFT|invoices|tenant_id|services/invoice_service.py",
-    "NOT_NULL_DRIFT|qr_codes|destination_url|services/qr_service.py",
-    "NOT_NULL_DRIFT|qr_codes|tenant_id|services/qr_service.py",
-    "NOT_NULL_DRIFT|webhook_deliveries|webhook_id|services/webhook_service.py",
-})
+DRIFT_CONOCIDO: frozenset = frozenset()
+#: VACIO, y esa es la noticia. Llego a haber 22 writers que omitian una columna
+#: `NOT NULL` sin default: su INSERT fallaba contra PostgreSQL y pasaba en
+#: SQLite, que no reproduce la restriccion.
+#:
+#: Se cerraron todos alineando cada writer con la definicion que realmente gana
+#: en la cadena de migraciones —no relajando restricciones ni metiendolos en una
+#: allowlist—. Cada retirada se hizo despues de que PostgreSQL demostrara que el
+#: hallazgo ya no ocurre.
+#:
+#: Si vuelve a aparecer uno, `test_no_hay_drift_nuevo` lo dice.
 
 _TABLA_SONDA = "zz_drift_probe"
 

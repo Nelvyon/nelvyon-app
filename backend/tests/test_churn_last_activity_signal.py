@@ -23,7 +23,7 @@ async def _preparar(db_session):
     for tabla, col in (
         ("saas_deals", "updated_at"),
         ("saas_contacts", "updated_at"),
-        ("crm_activities", "completed_at"),
+        ("crm_activities", "created_at"),
     ):
         await db_session.execute(
             text(f"CREATE TABLE IF NOT EXISTS {tabla} (id INTEGER PRIMARY KEY, workspace_id INTEGER, {col} TEXT)")
@@ -40,8 +40,9 @@ async def _senal(db_session, workspace_id: int):
 async def _inserta(db_session, tabla, col, ws, cuando):
     # `crm_activities` ya existe en el esquema real con `contact_id NOT NULL`:
     # el fixture respeta la tabla de produccion en vez de recrearla a medida.
-    extra = ", contact_id, type, description" if tabla == "crm_activities" else ""
-    valor = ", 'c1', 'note', 'd'" if tabla == "crm_activities" else ""
+    # `user_id` es NOT NULL en la tabla real: la actividad pertenece a alguien.
+    extra = ", contact_id, type, summary, user_id" if tabla == "crm_activities" else ""
+    valor = ", 'c1', 'note', 'd', 'u-test'" if tabla == "crm_activities" else ""
     await db_session.execute(
         text(f"INSERT INTO {tabla} (workspace_id, {col}{extra}) VALUES (:ws, :t{valor})"),
         {"ws": ws, "t": cuando},
@@ -54,13 +55,13 @@ async def _inserta(db_session, tabla, col, ws, cuando):
     [
         ("saas_deals", "updated_at", "2026-03-01T00:00:00"),
         ("saas_contacts", "updated_at", "2026-03-01T00:00:00"),
-        ("crm_activities", "completed_at", "2026-03-01T00:00:00"),
+        ("crm_activities", "created_at", "2026-03-01T00:00:00"),
     ],
 )
 async def test_gana_la_fuente_mas_reciente(db_session, tabla, col, esperado):
     await _preparar(db_session)
     # Las otras dos quedan mas atras: la mas reciente debe imponerse.
-    for t, c in (("saas_deals", "updated_at"), ("saas_contacts", "updated_at"), ("crm_activities", "completed_at")):
+    for t, c in (("saas_deals", "updated_at"), ("saas_contacts", "updated_at"), ("crm_activities", "created_at")):
         await _inserta(db_session, t, c, WS_A, "2026-01-01T00:00:00")
     await _inserta(db_session, tabla, col, WS_A, esperado)
     assert await _senal(db_session, WS_A) == datetime.fromisoformat(esperado)

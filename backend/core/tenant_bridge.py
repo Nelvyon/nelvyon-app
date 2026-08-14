@@ -32,6 +32,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 _SQL = "SELECT id FROM saas_tenants WHERE workspace_id = :ws LIMIT 1"
+_SQL_PROPIETARIO = "SELECT user_id FROM saas_tenants WHERE workspace_id = :ws LIMIT 1"
 
 
 async def resolve_tenant_uuid(session: AsyncSession, workspace_id: int) -> str | None:
@@ -69,3 +70,39 @@ async def require_tenant_uuid(session: AsyncSession, workspace_id: int) -> str:
             "no se puede escribir bajo un inquilino inexistente"
         )
     return uuid_inquilino
+
+
+async def resolve_owner_uuid(session: AsyncSession, workspace_id: int) -> str | None:
+    """`workspace_id` -> `saas_tenants.user_id` (uuid), o None si no existe.
+
+    POR QUE HACE FALTA ADEMAS DEL TENANT
+    ------------------------------------
+    Varias tablas de la generacion `/saas` acotan por `user_id uuid` en vez de
+    por `tenant_id`: `crm_contacts`, `bookings`, `ab_experiments`. No tienen
+    columna de workspace, asi que la separacion entre inquilinos LA DA esa
+    columna. El backend FastAPI trabaja con workspaces enteros, y el propietario
+    del inquilino es la unica traduccion que el esquema permite demostrar.
+
+    Cada workspace tiene su propio inquilino y su propio propietario, de modo que
+    el aislamiento se conserva: dos workspaces nunca resuelven al mismo uuid.
+    """
+    if workspace_id is None:
+        return None
+    r = await session.execute(text(_SQL_PROPIETARIO), {"ws": int(workspace_id)})
+    fila = r.fetchone()
+    return str(fila[0]) if fila else None
+
+
+async def require_owner_uuid(session: AsyncSession, workspace_id: int) -> str:
+    """Como `resolve_owner_uuid`, pero lanza en vez de devolver None.
+
+    Para escrituras: sin propietario no hay bajo quien escribir, y elegir uno
+    cualquiera mezclaria datos de dos clientes.
+    """
+    propietario = await resolve_owner_uuid(session, workspace_id)
+    if propietario is None:
+        raise TenantNoEncontrado(
+            f"el workspace {workspace_id} no tiene fila en saas_tenants; "
+            "no se puede escribir sin propietario"
+        )
+    return propietario

@@ -80,6 +80,15 @@ def esquema_de_migraciones() -> dict[str, set[str]]:
             )
         for m in _ADD_COL_RE.finditer(sql):
             esquema.setdefault(m.group("table").lower(), set()).add(m.group("column").lower())
+
+    # La migracion 533 anade `workspace_id` con `EXECUTE format(...)` dentro de
+    # un bloque `DO`, que ningun regex puede leer sin ejecutar SQL. Se declara
+    # desde la misma lista que usa el bootstrap de tests, para que las dos no
+    # puedan separarse.
+    from tests._schema_bootstrap import TABLAS_CON_WORKSPACE_ANADIDO
+
+    for tabla in TABLAS_CON_WORKSPACE_ANADIDO:
+        esquema.setdefault(tabla, set()).add("workspace_id")
     return esquema
 
 

@@ -14,6 +14,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from services.webhook_service import WebhookService
 
+from core.tenant_bridge import require_tenant_uuid
+
 logger = logging.getLogger(__name__)
 
 KEY_PREFIX = "nlv_"
@@ -62,6 +64,7 @@ class APIKeysService:
         scopes: list[str],
         expires_at: datetime | None = None,
     ) -> dict[str, Any]:
+        inquilino = await require_tenant_uuid(self.session, workspace_id)
         await WebhookService.ensure_schema()
         normalized_scopes = [s.strip().lower() for s in scopes if s.strip()]
         invalid = [s for s in normalized_scopes if s not in VALID_SCOPES]
@@ -78,22 +81,30 @@ class APIKeysService:
         r = await self.session.execute(
             text(
                 """
+                -- La tabla real —migracion 118, la que gana— acota por
+                -- `tenant_id uuid` y no tiene `workspace_id`. El writer hablaba
+                -- la definicion de la 507, que nunca se aplica: crear una clave
+                -- de API fallaba siempre.
+                --
+                -- `scopes` es un ARRAY de texto, no jsonb.
                 INSERT INTO api_keys (
-                    id, workspace_id, name, key_prefix, key_hash, scopes, expires_at
+                    id, tenant_id, workspace_id, name, key_prefix, key_hash, scopes, expires_at
                 )
                 VALUES (
-                    :id, :ws, :name, :prefix, :hash, CAST(:scopes AS jsonb), :expires_at
+                    CAST(:id AS uuid), CAST(:inquilino AS uuid), :ws, :name, :prefix,
+                    :hash, :scopes, :expires_at
                 )
-                RETURNING id, workspace_id, name, key_prefix, scopes, expires_at, created_at
+                RETURNING id, tenant_id, name, key_prefix, scopes, expires_at, created_at
                 """
             ),
             {
                 "id": key_id,
+                "inquilino": inquilino,
                 "ws": workspace_id,
                 "name": name.strip(),
                 "prefix": display_prefix,
                 "hash": key_hash,
-                "scopes": __import__("json").dumps(normalized_scopes),
+                "scopes": list(normalized_scopes),
                 "expires_at": expires_at,
             },
         )
