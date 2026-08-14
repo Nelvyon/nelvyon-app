@@ -281,20 +281,52 @@ Por orden de gravedad. Ninguno queda abierto.
 
 ## Siguiente acción exacta
 
-Ninguna pendiente. Los tres HIGH que quedaban —`calendar_events`, `audit_logs` y
-`social_posts`— estan cerrados con la evidencia de produccion, y la clase entera
-queda vigilada por `test_migration_table_collisions.py` y
-`test_pg_orm_catalog_parity.py`.
+### Cerrado en esta ronda
 
-Deuda no bloqueante, toda medida y con guardia:
+| deuda | estado | commit |
+|---|---|---|
+| 9 webhooks entrantes sin firma | **CERRADO** — cada uno con el mecanismo de su proveedor, fail-closed | `ca053f39` |
+| redirect de tracking sin firmar | **CERRADO** — el destino debe estar en el contenido de la campaña, sin invalidar enlaces | `ad7a8e9f` |
+| stock que no se decrementa | **CERRADO** — descuento atómico e idempotente al pagar | `f0f2e720` |
+| webhook de pago de tienda aceptaba eventos sin firmar | **CERRADO** (CRITICAL encontrado en el camino) | `f0f2e720` |
+| `campaigns.status` dos vocabularios | **CERRADO** — contrato derivado del código; `archived`/`cancelled` ya no desaparecen | `1ec61cc2` |
+| skip de E2E | **ELIMINADO** — se afirma que la ruta existe y está protegida | `1ec61cc2` |
+| `ecdsa` PYSEC-2026-1325 | **REVERIFICADO** — sin fix publicado, 0 referencias EC en el código, guard fail-closed verde | — |
+| `security_events` no registraba alertas | **CERRADO** | `19cfd244` |
 
-* 15 tablas siguen declaradas por varias migraciones. Ya no rompen nada —los
-  consumidores hablan la definicion que gana— pero la lista esta fijada y no
-  puede crecer.
-* 15 writers de SQL crudo omiten una columna `NOT NULL` sin default, en tablas
-  sin consumidor activo. Fijados en `DRIFT_CONOCIDO`.
-* `ecdsa` PYSEC-2026-1325, sin arreglo publicado y no alcanzable: se firma con
-  HS256 y los algoritmos de curva eliptica quedan rechazados.
+### Lo que queda, y es trabajo, no bloqueo
+
+**14 writers de SQL crudo omiten una columna NOT NULL.** Corrección importante
+sobre el informe anterior: **NO están «sin consumidor activo»**. `api_keys`,
+`invoices`, `bookings`, `qr_codes`, `crm_contacts`, `crm_activities`,
+`ab_experiments`, `ab_variants` y `webhook_deliveries` tienen routers montados.
+Sus INSERT fallan contra PostgreSQL, así que esos endpoints devuelven 500.
+
+Severidad: funcional (P2). No hay pérdida de datos, ni fuga entre inquilinos, ni
+riesgo de dinero — el INSERT falla, no escribe mal.
+
+**La causa es siempre la misma** y ya está resuelta dos veces (`calendar_events`,
+`social_posts`): el writer habla la definición de la migración 507 y gana una
+anterior. La columna que falta es `tenant_id`/`user_id` de tipo `uuid`, y el
+backend maneja workspaces enteros.
+
+**Acción exacta**, tabla por tabla, con el patrón ya certificado:
+
+```bash
+export NELVYON_PG_CERT_DSN="postgresql://nelvyon_local:nelvyon_local_dev@127.0.0.1:5434/nelvyon_mig_cert"
+python -m pytest tests/test_pg_constraint_drift_certification.py -q   # lista viva
+```
+
+1. `core/tenant_bridge.require_tenant_uuid(session, workspace_id)` para el
+   `tenant_id uuid` — igual que en `calendar_service` y `audit_service`;
+2. alinear el INSERT con las columnas reales del catálogo;
+3. quitar la entrada de `DRIFT_CONOCIDO` **solo** después de que PostgreSQL
+   demuestre que ya no ocurre;
+4. certificar con un test como `test_pg_calendar_events_writes.py`.
+
+**15 tablas declaradas por varias migraciones.** No rompen nada: los
+consumidores ya hablan la definición que gana. Fijadas por
+`test_migration_table_collisions.py`, no pueden crecer.
 
 ---
 
