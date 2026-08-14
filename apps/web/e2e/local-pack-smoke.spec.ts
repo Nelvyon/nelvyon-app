@@ -36,20 +36,18 @@ for (const packId of PACK_IDS) {
 // Service catalog: coming_soon packs must have valid slugs
 test("Catálogo de service packs — 5 nuevos packs tienen slugs válidos", async ({ request }) => {
   const res = await request.get("/api/os/packs/catalog", { maxRedirects: 0 });
-  // El catalogo exige autenticacion de plataforma, que este smoke no lleva: 401
-  // y 403 son el estado esperado y se saltan.
+  // Sin skip. El smoke corre a proposito SIN credenciales de plataforma, asi
+  // que 401/403 es el resultado correcto y afirmarlo vale mas que saltarse el
+  // test: comprueba que la ruta existe Y que esta protegida.
   //
-  // 404 y 410 ya NO. Antes tambien se saltaban, con el comentario «may require
-  // auth in CI», y resulta que la ruta no existia: el test llevaba saltandose
-  // sobre un endpoint ausente, indistinguible de uno protegido. Una ruta que
-  // falta es un defecto, y asi lo afirma el test de arriba con `not.toBe(404)`.
+  // 404 y 410 siguen siendo defecto. Antes se saltaban junto a los codigos de
+  // auth y resulto que la ruta no existia: el test llevaba anos sin comprobar
+  // nada. Los slugs, que es la propiedad de negocio, los cubre
+  // `servicePacksCatalogSlugs.test.ts`, que si puede ejecutarse siempre.
   expect(res.status()).not.toBe(404);
   expect(res.status()).not.toBe(410);
-  if (res.status() === 401 || res.status() === 403) {
-    test.skip();
-    return;
-  }
-  expect(res.status()).toBe(200);
+  expect([200, 401, 403]).toContain(res.status());
+  if (res.status() !== 200) return;
   const body = (await res.json()) as { packs?: Array<{ id: string; availability: string }> };
   const packs = body.packs ?? [];
   const newPacks = ["social-calendar-pack", "content-strategy-pack", "cro-audit-pack", "analytics-setup-pack", "brand-voice-pack"];

@@ -214,7 +214,11 @@ export default function SaasCampaniasPage() {
   // Se aceptan ambos aqui porque es lo unico que no toca datos: unificar la
   // columna exigiria migrar estados de campanas existentes.
   const ESTADOS_ACTIVOS = ["running", "scheduled", "sending"];
-  const ESTADOS_TERMINADOS = ["completed", "sent", "failed"];
+  // `archived` y `cancelled` cuentan como terminados para la cuota del plan
+  // (backend: `_CAMPAIGN_TERMINAL_STATUSES`). Si aqui no estuvieran, una
+  // campana en ese estado desapareceria de las dos pestanas — que es
+  // exactamente el defecto que se arreglo para `sent`.
+  const ESTADOS_TERMINADOS = ["completed", "sent", "failed", "archived", "cancelled"];
 
   const filtered = useMemo(() => {
     if (tab === "all") return campanias;
