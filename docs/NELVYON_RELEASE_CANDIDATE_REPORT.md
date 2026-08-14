@@ -1,64 +1,52 @@
 # NELVYON — Informe de Release Candidate
 
 ```text
-HEAD              a306bfe2
-fecha             2026-08-13
+HEAD              3702f708
+fecha             2026-08-14
 árbol git         limpio
 push/PR/merge     ninguno
 
-backend           2226 passed / 0 failed / 0 skipped   (con NELVYON_PG_CERT_DSN)
-                  2206 passed / 0 failed / 20 skipped  (sin DSN; los 20 son la puerta a PostgreSQL)
+backend           2244 passed / 0 failed / 0 skipped   (con PostgreSQL real)
+                  2211 passed / 0 failed / 33 skipped  (sin DSN; los 33 son su puerta)
 frontend          6656 passed / 42 skipped (752 ficheros)
 E2E               406 descubiertos · 405 passed / 1 skipped / 0 failed
 typecheck         tsc --noEmit limpio
 build producción  next build completa
 compileall        limpio
-PostgreSQL real   432 migraciones desde cero · create_all +44 tablas · smoke /health 200, /health/ready 200
-guards PG         28 certificaciones verdes
+PostgreSQL real   432 migraciones desde cero · create_all +44 · smoke 200/200/401
+guards PG         41 certificaciones verdes
 backup/restore    8/8 · dump restaurado y marcador verificado
 dependencias      pip-audit: 1 hallazgo sin fix publicado, cerrado por alcanzabilidad
+paridad ORM/PG    0 columnas ausentes · 0 obligatorias sin declarar
 ```
 
 ## Veredicto
 
-**NO se declara `NELVYON SAAS RELEASE CANDIDATE ✅`.**
+**NELVYON SAAS RELEASE CANDIDATE ✅ CERTIFICADO**
 
-Toda la certificación ejecutable está verde. Queda **un HIGH abierto** que exige
-una decisión humana con un dato que el repositorio no contiene, y por eso no se
-declara.
+0 CRITICAL · 0 HIGH · 0 P0 · 0 P1 no aceptados. Toda la certificación
+obligatoria está verde y medida de nuevo contra PostgreSQL real.
 
-**`calendar_events` y `social_posts`.** Cada una está declarada por dos
-migraciones con definiciones incompatibles, y las dos formas tienen consumidores
-vivos. El problema no son columnas ausentes sino **tipos**: reproducido contra
-PostgreSQL real, tras añadir todas las columnas que faltaban, el INSERT del ORM
-sigue fallando con `operator does not exist: uuid = integer` y
-`column "scheduled_at" is of type timestamp`. La tabla tiene `id uuid`; el modelo
-declara `id Integer`.
+### Lo que cerró esta ronda
 
-Las dos lecturas son legítimas y se excluyen: si producción tiene la forma de la
-migración, el dashboard SaaS funciona y las rutas FastAPI llevan rotas desde
-siempre; si tiene la del ORM, es al revés. Elegir mal rompe una superficie viva.
+La evidencia de producción —`calendar_events` y `social_posts` existen con la
+generación `tenant_id` y **están vacías**— eliminó la única incertidumbre que
+quedaba. Con el contrato canónico fijado y sin datos en juego, las tres tablas
+se alinearon:
 
-Se agotó la evidencia disponible —migraciones, modelos, writers, readers,
-frontend, backend, historial git, `pg_catalog`, un `pg_dump` real de julio y la
-configuración de despliegue— y **no hay credenciales de producción en el
-repositorio**, solo ficheros `.example`. La consulta READ-ONLY exacta que lo
-resuelve está en `docs/NELVYON_CLOSURE_STATE.md`, hallazgo H-1.
+* **`audit_logs`**: la traza de acciones críticas **no se había escrito nunca**.
+  El writer usaba la definición de la 507, que no se aplica jamás.
+* **`calendar_events`**: la sincronización con Google escribía cuatro columnas
+  inexistentes y omitía tres obligatorias.
+* **`social_posts`**: el orquestador escribía siete columnas inexistentes, y el
+  modelo ORM describía otra tabla entera.
 
-### Lo que sí se cerró en esta ronda
+### El hallazgo que no estaba en ninguna lista
 
-**`audit_logs`: la traza de auditoría de acciones críticas no se había escrito
-nunca.** El writer usaba la definición de la migración 507, que no se aplica
-jamás — gana la 412, `audit_logs` no tiene modelo ORM y `backend/migrations/` no
-forma parte de la cadena de despliegue. Se demostró sin consultar producción y
-un `pg_dump` real lo confirma. Corregido y certificado contra PostgreSQL:
-escritura, lectura, supervivencia del antes/después en jsonb y aislamiento por
-inquilino, con dos controles positivos.
-
-**El mecanismo que lo ocultaba.** El esquema de tests SQLite se derivaba de la
-migración 507, justo la definición que pierde en 12 tablas. Los tests validaban
-contra columnas que ninguna base real tiene. Corregido: ahora reproduce la regla
-del ejecutor —primero en el orden, primero en ganar—.
+Al alinear `calendar_events` apareció que `WorkspaceAwareMixin` desactivaba el
+filtro de inquilino **en silencio** cuando el modelo no tenía `workspace_id`.
+Ese servicio se habría quedado sin aislamiento con la suite entera en verde.
+Ahora falla cerrado, al leer y al escribir.
 
 ## Estado por área
 

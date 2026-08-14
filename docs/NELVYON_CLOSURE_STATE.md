@@ -281,28 +281,20 @@ Por orden de gravedad. Ninguno queda abierto.
 
 ## Siguiente acción exacta
 
-Ningun bloque queda BLOCKED por infraestructura ni por red. Lo unico abierto es
-una **decision de producto**, con toda la evidencia ya reunida:
+Ninguna pendiente. Los tres HIGH que quedaban —`calendar_events`, `audit_logs` y
+`social_posts`— estan cerrados con la evidencia de produccion, y la clase entera
+queda vigilada por `test_migration_table_collisions.py` y
+`test_pg_orm_catalog_parity.py`.
 
-**Que definicion gana en `calendar_events`, `audit_logs` y `social_posts`.**
+Deuda no bloqueante, toda medida y con guardia:
 
-Las tres estan declaradas por dos migraciones distintas y las tres aparecen por
-nombre en la instruccion de `506a_reconcile_legacy_pre_507_social_posts.sql`:
-«Do NOT rename bookings / api_keys / calendar_events / invoices / audit_logs /
-qr_codes». Quien tomo esa decision sabia algo que el codigo no dice —lo mas
-probable, que esas tablas tenian datos en produccion—.
-
-Para decidirlo hace falta UN dato que no esta en el repositorio: **que forma
-tienen hoy esas tres tablas en la base de produccion**. Con esa respuesta el
-camino es mecanico y ya esta probado en 532:
-
-  * si produccion tiene la forma canonica -> apartar la legacy vacia en la
-    cadena de migraciones, como se hizo con `deals` y `conversations`;
-  * si produccion tiene la legacy CON datos -> migrar los datos primero, y solo
-    entonces apartar.
-
-Mientras tanto la clase no puede crecer: `test_migration_table_collisions.py`
-fija las 15 colisiones y falla ante cualquier nueva.
+* 15 tablas siguen declaradas por varias migraciones. Ya no rompen nada —los
+  consumidores hablan la definicion que gana— pero la lista esta fijada y no
+  puede crecer.
+* 15 writers de SQL crudo omiten una columna `NOT NULL` sin default, en tablas
+  sin consumidor activo. Fijados en `DRIFT_CONOCIDO`.
+* `ecdsa` PYSEC-2026-1325, sin arreglo publicado y no alcanzable: se firma con
+  HS256 y los algoritmos de curva eliptica quedan rechazados.
 
 ---
 
@@ -311,89 +303,52 @@ fija las 15 colisiones y falla ante cualquier nueva.
 Todo lo de abajo se midió contra `nelvyon_mig_cert`: 431 migraciones aplicadas
 desde cero más `create_all`. Ninguna cifra procede de una ejecución anterior.
 
-### H-1 · Tablas declaradas por varias migraciones
+### H-1 · Tablas declaradas por varias migraciones — CERRADO
 
-**Causa raiz medida:** 15 tablas estan declaradas por mas de una migracion con
-columnas distintas. Todas usan `CREATE TABLE IF NOT EXISTS` y
-`backend/db/migrate.ts` las aplica ordenadas por nombre, asi que gana la de
-numero mas bajo y la otra no hace nada, en silencio.
+**Causa raiz:** 15 tablas estan declaradas por mas de una migracion con columnas
+distintas. Todas usan `CREATE TABLE IF NOT EXISTS` y el ejecutor las aplica por
+nombre, asi que gana la de numero mas bajo y la otra no hace nada, en silencio.
+Ademas el esquema de tests SQLite se derivaba de la 507 —la que pierde en 12 de
+ellas—, de modo que los tests validaban contra columnas que ninguna base tiene.
 
-Ademas el esquema de tests SQLite se derivaba de la 507 — justo la definicion
-que pierde en 12 de esas tablas. Ya corregido: `tests/_schema_bootstrap.py`
-reproduce ahora la regla del ejecutor.
+**Lo que lo desbloqueo:** comprobacion manual en Railway → Postgres → Data, sin
+modificar nada. `calendar_events` y `social_posts` existen con la generacion
+`tenant_id` y **estan vacias**. Eso fijo el contrato canonico y elimino el riesgo
+de datos.
 
-#### Resueltas (4 de 6)
+| tabla | canonica | resuelto en |
+|---|---|---|
+| `deals` | `workspace_id` | `ddc0e6dc` |
+| `conversations` | `workspace_id` | `ddc0e6dc` |
+| `subscriptions` | aditiva | `ddc0e6dc` |
+| `audit_logs` | 412 (`tenant_id uuid`) | `691bed02` |
+| `calendar_events` | 408 (`tenant_id uuid`) | `8122b8a7` |
+| `social_posts` | 507 (`tenant_id integer`) | `18028d05` |
 
-| tabla | canonica | como se demostro | commit |
-|---|---|---|---|
-| `deals` | `workspace_id` | apps/web INSERTA con `workspace_id`; backend 6 sitios, 0 con `tenant_id` | `ddc0e6dc` |
-| `conversations` | `workspace_id` | 0 SQL crudo de cualquier forma | `ddc0e6dc` |
-| `subscriptions` | aditiva | apps/web usa `user_id = $1::uuid` y `plan`, que existen y se conservan | `ddc0e6dc` |
-| `audit_logs` | **412** | sin modelo ORM -> `create_all` no puede crearla; 412 < 507; `backend/migrations/` no esta en la cadena de despliegue; dump real de julio | `691bed02` |
+`saas_social_posts` es OTRA tabla —migracion 420, `tenant_id uuid`, servicio
+TypeScript propio de `/saas`— y no se ha tocado. Hay un test que exige que las
+dos sigan siendo distintas.
 
-`audit_logs` merece detalle: **el rastro de auditoria de acciones criticas no se
-habia escrito nunca**. El writer usaba la definicion de la 507, que no se aplica
-jamas. Se demostro sin consultar produccion, y esta certificado contra
-PostgreSQL con escritura, lectura, supervivencia del antes/despues en jsonb y
-aislamiento por inquilino.
+**Resultado medido contra PostgreSQL real:**
 
-#### NO resueltas: `calendar_events` y `social_posts` — PARADA HUMANA
+    columnas del ORM ausentes en PostgreSQL   47 -> 0
+    NOT NULL sin declarar                      7 -> 0
+    DRIFT_CONOCIDO (NOT NULL en SQL crudo)    22 -> 15
+    referencias SQL no atribuibles           120 -> 113
 
-No es falta de investigacion. Se agoto: migraciones, modelos, writers, readers,
-frontend, backend, historial git, `pg_catalog`, un `pg_dump` real de julio y la
-configuracion de despliegue. **No hay credenciales de produccion en el
-repositorio** — solo ficheros `.example`; comprobado, no supuesto.
+Cada retirada de `DRIFT_CONOCIDO` se hizo solo despues de que PostgreSQL
+demostrara que el hallazgo ya no ocurre, nunca por allowlist.
 
-El problema no son columnas ausentes sino TIPOS. Reproducido contra PostgreSQL
-real, insertando con el ORM tras anadir todas las columnas que faltaban:
+### H-5 · Fuga de aislamiento encontrada al realinear — CERRADO
 
-```
-calendar_events   ProgrammingError: operator does not exist: uuid = integer
-social_posts      DatatypeMismatchError: column "scheduled_at" is of type timestamp
-```
+`WorkspaceAwareMixin._apply_workspace_filter` decia
+`if hasattr(self.model, 'workspace_id')`. Sin esa columna, el filtro NO se
+aplicaba y la consulta devolvia filas de todos los inquilinos, en silencio.
 
-La tabla tiene `id uuid`; el modelo declara `id Integer`. Eso no se arregla
-anadiendo columnas: hay que cambiar el modelo o la tabla, y cual de los dos
-depende de algo que el repositorio no dice.
-
-**Las dos lecturas son legitimas y se excluyen:**
-
-* si produccion tiene la forma de la migracion (`tenant_id uuid`), el dashboard
-  SaaS —`apps/web/src/app/api/saas/dashboard/route.ts`, que consulta
-  `calendar_events` por `tenant_id`, `type` y `event_date`— funciona, y las
-  rutas FastAPI llevan rotas desde siempre;
-* si tiene la forma del ORM, es al reves: el dashboard esta roto y las rutas
-  FastAPI funcionan.
-
-Elegir mal rompe una superficie viva. Ademas `506a` prohibe por nombre renombrar
-`calendar_events`, y para `social_posts` ya declaro canonica la version uuid.
-
-**LA CONSULTA READ-ONLY QUE LO RESUELVE**
-
-```sql
--- Contra la base de PRODUCCION. Solo lectura, no modifica nada.
-SELECT table_name, column_name, data_type
-  FROM information_schema.columns
- WHERE table_schema = 'public'
-   AND table_name IN ('calendar_events', 'social_posts')
-   AND column_name IN ('id', 'tenant_id', 'workspace_id', 'event_date',
-                       'start_time', 'scheduled_at', 'platform')
- ORDER BY table_name, column_name;
-
-SELECT 'calendar_events' AS tabla, count(*) FROM calendar_events
-UNION ALL
-SELECT 'social_posts', count(*) FROM social_posts;
-```
-
-Con eso el camino es mecanico y ya esta probado:
-
-* `id uuid` y filas > 0 -> manda la migracion: alinear modelo y servicios a esa
-  forma, como se hizo con `audit_logs`;
-* `id integer` -> manda el ORM: apartar la legacy vacia como en la 532, o
-  anadir columnas y relajar NOT NULL como en 524/525/526.
-
-Mientras tanto la clase no puede crecer: `test_migration_table_collisions.py`
-fija las 15 y falla ante cualquier nueva.
+Aparecio al alinear `calendar_events`, cuya columna de inquilino se llama
+`tenant_id`: ese servicio se habria quedado sin aislamiento con la suite entera
+en verde. Ahora la columna se declara y, si no existe, se lanza — al leer y al
+escribir. `8122b8a7`
 
 ### H-2 · El tope de miembros era evadible bajo concurrencia — CORREGIDO
 
