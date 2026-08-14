@@ -4,7 +4,17 @@ dockerfilePath = "Dockerfile"
 
 [deploy]
 # alembic upgrade head runs inside CMD before uvicorn starts (see Dockerfile).
-healthcheckPath = "/health"
+#
+# `/health/ready` y no `/health`: este es el fichero que Railway carga de verdad
+# para el servicio API —los despliegues de staging registran
+# `configFile: /backend/railway.toml`—, asi que es el que decide si un
+# despliegue se promociona. `/health` responde «healthy» sin mirar la base: un
+# despliegue con la base inalcanzable pasaba el healthcheck, recibia trafico y
+# fallaba peticion a peticion. `/health/ready` ejecuta SELECT 1 y devuelve 503.
+#
+# Los tres ficheros de config del API —este, `railway.json` y
+# `../railway.backend.json`— deben decir lo mismo; lo exige un test.
+healthcheckPath = "/health/ready"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3

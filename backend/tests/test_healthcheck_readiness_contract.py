@@ -20,44 +20,115 @@ Railway usa su healthcheck para decidir si promociona, asi que ahi la pregunta
 correcta es la de readiness. `/health` se conserva porque responder «vivo» sin
 tocar la base sigue siendo util: distingue «proceso colgado» de «base caida»,
 que son incidencias distintas con respuestas distintas.
+
+POR QUE ESTE TEST BARRE EN VEZ DE MIRAR UNA LISTA
+-------------------------------------------------
+La primera version comprobaba dos ficheros escritos a mano —`backend/railway.json`
+y `railway.backend.json`— y daba verde. Pero el repo tiene SIETE configuraciones
+de Railway, y la que el servicio API carga de verdad es una tercera:
+`backend/railway.toml`. Se sabe porque los despliegues de staging lo registran:
+
+    "configFile": "/backend/railway.toml"
+
+Esa seguia diciendo `/health`. El arreglo estaba en los dos ficheros que nadie
+lee y ausente del unico que decide. Un test verde sobre una lista incompleta es
+peor que no tenerlo, asi que ahora se descubren los ficheros por barrido y se
+comprueba que el conjunto encontrado es el esperado: anadir una configuracion
+nueva sin declararla aqui rompe el test.
 """
 from __future__ import annotations
 
 import json
+import tomllib
 from pathlib import Path
 
 import pytest
 from httpx import ASGITransport, AsyncClient
 
 RAIZ = Path(__file__).resolve().parent.parent
-CONFIGS = (
-    RAIZ / "railway.json",
-    RAIZ.parent / "railway.backend.json",
-)
+REPO = RAIZ.parent
+
+#: Cada servicio con las configuraciones que puede cargar y el healthcheck que
+#: le corresponde. El API comprueba la base porque su readiness la necesita; el
+#: web usa liveness (su readiness depende del API, y encadenarlos haria que una
+#: caida del API impidiera desplegar el frontend).
+SERVICIOS = {
+    "api": {
+        "esperado": "/health/ready",
+        "configs": ("backend/railway.json", "backend/railway.toml", "railway.backend.json"),
+    },
+    "web": {
+        "esperado": "/api/health/live",
+        "configs": ("railway.json", "railway.toml", "apps/web/railway.json", "apps/web/railway.toml"),
+    },
+}
+
+TODAS = tuple(sorted(c for s in SERVICIOS.values() for c in s["configs"]))
 
 
-def _config(ruta: Path) -> dict:
-    return json.loads(ruta.read_text(encoding="utf-8"))
+def _healthcheck(rel: str) -> str | None:
+    """El `deploy.healthcheckPath` de una configuracion, sea JSON o TOML."""
+    ruta = REPO / rel
+    texto = ruta.read_text(encoding="utf-8")
+    datos = tomllib.loads(texto) if ruta.suffix == ".toml" else json.loads(texto)
+    return (datos.get("deploy") or {}).get("healthcheckPath")
 
 
-@pytest.mark.parametrize("ruta", CONFIGS, ids=lambda p: p.name)
-def test_el_healthcheck_de_despliegue_es_readiness(ruta):
-    """Si vuelve a `/health`, vuelve a promocionarse un despliegue roto."""
-    assert ruta.exists(), f"falta {ruta.name}"
-    assert _config(ruta)["deploy"]["healthcheckPath"] == "/health/ready", (
-        f"{ruta.name} apunta a un healthcheck que no comprueba la base"
+def _configs_en_el_repo() -> set[str]:
+    """Las que existen de verdad, descubiertas, no listadas."""
+    encontradas = set()
+    for patron in ("railway*.json", "railway*.toml"):
+        for ruta in list(REPO.glob(patron)) + list(REPO.glob(f"*/{patron}")) + list(
+            REPO.glob(f"*/*/{patron}")
+        ):
+            if "node_modules" in ruta.parts or ".next" in ruta.parts:
+                continue
+            encontradas.add(ruta.relative_to(REPO).as_posix())
+    return encontradas
+
+
+def test_no_hay_configuraciones_de_railway_sin_vigilar():
+    """El fallo que esto impide: una config que nadie mira y que Railway si lee.
+
+    Si aparece un `railway.toml` nuevo en otro directorio, este test lo dice.
+    Sin esto, el resto de comprobaciones pueden estar verdes sobre el fichero
+    equivocado — que es exactamente lo que paso.
+    """
+    sin_vigilar = _configs_en_el_repo() - set(TODAS)
+    assert not sin_vigilar, (
+        "configuraciones de Railway que ningun test comprueba: "
+        f"{sorted(sin_vigilar)} — anadelas a SERVICIOS con su healthcheck"
     )
 
 
-def test_los_dos_ficheros_de_config_dicen_lo_mismo():
-    """El servicio API tiene DOS ficheros de configuracion.
+def test_las_configuraciones_declaradas_existen():
+    """Control inverso: si una se renombra, el barrido no debe quedar hueco."""
+    faltan = [c for c in TODAS if not (REPO / c).exists()]
+    assert not faltan, f"declaradas pero inexistentes: {faltan}"
 
-    Railway usa uno u otro segun como este montado el servicio. Si se separan,
-    el healthcheck real depende de un detalle del panel, que es exactamente el
-    tipo de cosa que nadie revisa hasta que falla.
+
+@pytest.mark.parametrize(
+    "servicio,config",
+    [(s, c) for s, d in SERVICIOS.items() for c in d["configs"]],
+    ids=lambda v: v.replace("/", "_"),
+)
+def test_cada_configuracion_apunta_al_healthcheck_de_su_servicio(servicio, config):
+    """Si el API vuelve a `/health`, vuelve a promocionarse un despliegue roto."""
+    esperado = SERVICIOS[servicio]["esperado"]
+    assert _healthcheck(config) == esperado, (
+        f"{config} ({servicio}) apunta a un healthcheck que no es {esperado}"
+    )
+
+
+@pytest.mark.parametrize("servicio", sorted(SERVICIOS))
+def test_todas_las_configuraciones_de_un_servicio_dicen_lo_mismo(servicio):
+    """Railway carga una u otra segun como este montado el servicio.
+
+    Si se separan, el healthcheck real depende de un detalle del panel, que es
+    exactamente el tipo de cosa que nadie revisa hasta que falla.
     """
-    rutas = [_config(r)["deploy"]["healthcheckPath"] for r in CONFIGS]
-    assert len(set(rutas)) == 1, f"configuraciones divergentes: {rutas}"
+    rutas = {c: _healthcheck(c) for c in SERVICIOS[servicio]["configs"]}
+    assert len(set(rutas.values())) == 1, f"configuraciones divergentes: {rutas}"
 
 
 @pytest.mark.asyncio
