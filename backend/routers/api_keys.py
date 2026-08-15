@@ -28,13 +28,38 @@ class CreateAPIKeyBody(BaseModel):
 
 
 @router.get("/docs")
-async def developer_docs(request: Request):
-    """Link to OpenAPI documentation for the public API."""
+async def developer_docs(
+    request: Request,
+    _ws: WorkspaceContext = Depends(require_workspace_admin),
+):
+    """Enlaces a la documentacion del API publica, para quien gestiona claves.
+
+    DOS ARREGLOS
+    ------------
+    1. Estaba abierto. Era el unico endpoint del router sin autoridad, y su
+       contenido —la forma del API, el esquema de autenticacion, el portal de
+       desarrollo— es justo lo que no interesa publicar. Los demas endpoints de
+       claves ya exigen `require_workspace_admin`; este era la excepcion sin
+       motivo.
+
+    2. Anunciaba `/docs`, `/redoc` y `/openapi.json` incondicionalmente. En
+       produccion esas tres rutas estan cerradas, asi que devolvia enlaces
+       muertos. Ahora solo se listan si de verdad se sirven.
+    """
     base = str(request.base_url).rstrip("/")
+    from main import DOCS_PUBLICAS
+
+    interactiva = (
+        {
+            "openapi_url": f"{base}/openapi.json",
+            "swagger_ui": f"{base}/docs",
+            "redoc": f"{base}/redoc",
+        }
+        if DOCS_PUBLICAS
+        else {}
+    )
     return {
-        "openapi_url": f"{base}/openapi.json",
-        "swagger_ui": f"{base}/docs",
-        "redoc": f"{base}/redoc",
+        **interactiva,
         "authentication": {
             "type": "bearer",
             "header": "Authorization: Bearer nlv_<your_api_key>",

@@ -2,8 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import {
   getSaasVoiceCommandService,
   SaasVoiceCommandError,
-  requireSaasContext,
-} from "@nelvyon/saas";
+  requireSaasContext, saasErrorBody, saasErrorStatus } from "@nelvyon/saas";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -33,7 +32,10 @@ export async function POST(req: NextRequest) {
     }
     if ((e as { status?: number }).status === 401)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    console.error("[voice/execute POST]", e);
-    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+    const estado = saasErrorStatus(e);
+    // Solo es incidencia lo que de verdad lo es. Un tenant ausente o un
+    // permiso denegado son respuestas del contrato, no averias.
+    if (estado >= 500) console.error("[voice/execute POST]", e);
+    return NextResponse.json(saasErrorBody(e), { status: estado });
   }
 }

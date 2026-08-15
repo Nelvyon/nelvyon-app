@@ -116,7 +116,15 @@ def test_ningun_consumidor_del_buzon_se_perdio_al_renombrar():
     # incluian `routers/conversations.py` y la revision de alembic, que son de
     # la generacion workspace y siguen apuntando a `conversations`, como debe
     # ser. Los consumidores tenant siempre fueron estos 18.)
+    #
+    # `SaasCeoBriefService` entro despues, y NO por un renombrado: contaba las
+    # conversaciones abiertas contra `saas_inbox_conversations`, una tabla que
+    # no existe y que no crea ninguna migracion. El `.catch` que envolvia la
+    # consulta devolvia cero, asi que el resumen del CEO llevaba tiempo
+    # afirmando que no habia ninguna conversacion abierta sin que se viera un
+    # solo error. Su consulta pasa a la tabla real, que es esta.
     ESPERADO = {
+        "backend/saas/SaasCeoBriefService.ts": 1,
         "backend/saas/SaasInboxService.ts": 10,
         "backend/saas/SaasWhatsAppCloudService.ts": 5,
         "backend/saas/SaasWhatsAppService.ts": 3,

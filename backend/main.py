@@ -31,6 +31,20 @@ IS_DEV = ENVIRONMENT in ("dev", "development", "test")
 IS_STAGING = ENVIRONMENT == "staging"
 IS_PRODUCTION = ENVIRONMENT in ("production", "prod")
 
+# La superficie de documentacion se cierra ENTERA o no se cierra.
+#
+# Antes solo se anulaban `docs_url` y `redoc_url`. `openapi_url` conservaba su
+# valor por defecto `/openapi.json`, asi que el esquema completo del API se
+# seguia publicando aunque las dos paginas estuvieran cerradas: quien quisiera
+# el inventario de rutas lo tenia igual, sin la interfaz. Cerrar dos de tres no
+# es cerrar, y se comprobo en produccion: /docs, /redoc y /openapi.json
+# respondian 200 los tres.
+#
+# Con `openapi_url=None` FastAPI ya no monta ni /docs ni /redoc aunque se les
+# pase ruta, porque no hay esquema que mostrar: la decision queda en un solo
+# sitio en vez de repartida en tres parametros que pueden divergir.
+DOCS_PUBLICAS = not IS_PRODUCTION
+
 
 def setup_logging():
     """Configure OBS-ABCD-1 structured logging (JSON en prod/staging por defecto, texto en dev/test)."""
@@ -97,8 +111,9 @@ app = FastAPI(
     title="NELVYON OS API",
     description="NELVYON OS + SaaS Platform — Enterprise-grade API for CRM, contracts, billing, helpdesk, campaigns, and AI agents.",
     version="2.0.0",
-    docs_url="/docs" if not IS_PRODUCTION else None,
-    redoc_url="/redoc" if not IS_PRODUCTION else None,
+    docs_url="/docs" if DOCS_PUBLICAS else None,
+    redoc_url="/redoc" if DOCS_PUBLICAS else None,
+    openapi_url="/openapi.json" if DOCS_PUBLICAS else None,
 )
 
 
@@ -609,8 +624,35 @@ async def health_ready():
         body["status"] = "degraded"
         record_counter("nelvyon.health", tags={"result": "degraded", "reason": "db_query"})
         return JSONResponse(status_code=503, content=body)
+
+    # Estado de Redis, INFORMATIVO: no decide el codigo de respuesta.
+    #
+    # Redis no es dependencia requerida de esta aplicacion. Sin el, las colas
+    # usan un almacen en memoria que si encola y desencola, y el limitador de
+    # peticiones cuenta por proceso en vez de globalmente. Son degradaciones
+    # reales pero acotadas, y ninguna impide servir.
+    #
+    # Aun asi tiene que verse. Antes solo aparecia en una linea de log del
+    # arranque: en produccion llevaba caido desde vete a saber cuando y no habia
+    # forma de saberlo sin rebuscar en los registros. Exponerlo aqui no es
+    # convertir una averia en «healthy» —el estado sigue siendo el de la base—,
+    # es dejar de esconder una degradacion.
+    body["redis"] = _estado_de_redis()
+
     record_counter("nelvyon.health", tags={"result": "ok"})
     return body
+
+
+def _estado_de_redis() -> str:
+    """`ok`, `fallback_en_memoria` o `no_configurado`. Nunca lanza."""
+    if not (os.environ.get("REDIS_URL") or "").strip():
+        return "no_configurado"
+    try:
+        from core.redis_adapter import redis_client
+
+        return "ok" if getattr(redis_client, "_using_redis", False) else "fallback_en_memoria"
+    except Exception:  # noqa: BLE001 — el diagnostico no puede tumbar readiness
+        return "desconocido"
 
 
 def run_in_debug_mode(app: FastAPI):

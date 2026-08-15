@@ -148,7 +148,7 @@ class WebhookService:
                 """
                 SELECT id, workspace_id, url, events, secret, active, created_at
                 FROM webhook_endpoints
-                WHERE id = :id::uuid AND workspace_id = :ws
+                WHERE id = CAST(:id AS uuid) AND workspace_id = :ws
                 """
             ),
             {"id": endpoint_id, "ws": self.workspace_id},
@@ -187,7 +187,7 @@ class WebhookService:
             text(
                 f"""
                 UPDATE webhook_endpoints SET {', '.join(sets)}
-                WHERE id = :id::uuid AND workspace_id = :ws
+                WHERE id = CAST(:id AS uuid) AND workspace_id = :ws
                 """
             ),
             params,
@@ -199,7 +199,7 @@ class WebhookService:
     async def delete_endpoint(self, endpoint_id: str) -> bool:
         r = await self.session.execute(
             text(
-                "DELETE FROM webhook_endpoints WHERE id = :id::uuid AND workspace_id = :ws"
+                "DELETE FROM webhook_endpoints WHERE id = CAST(:id AS uuid) AND workspace_id = :ws"
             ),
             {"id": endpoint_id, "ws": self.workspace_id},
         )
@@ -302,7 +302,7 @@ class WebhookService:
             next_retry = now + timedelta(seconds=delay)
 
         existing = await self.session.execute(
-            text("SELECT 1 FROM webhook_deliveries WHERE id = :id::uuid"),
+            text("SELECT 1 FROM webhook_deliveries WHERE id = CAST(:id AS uuid)"),
             {"id": delivery_id},
         )
         if existing.fetchone():
@@ -313,7 +313,7 @@ class WebhookService:
                     SET status = :status, attempts = :attempts,
                         response_code = :response_code, response_body = :response_body,
                         last_attempt_at = :last_attempt_at, next_retry_at = :next_retry_at
-                    WHERE id = :id::uuid
+                    WHERE id = CAST(:id AS uuid)
                     """
                 ),
                 {
@@ -432,7 +432,7 @@ class WebhookService:
         """
         params: dict[str, Any] = {"ws": self.workspace_id, "limit": limit}
         if endpoint_id:
-            q += " AND d.endpoint_id = :endpoint_id::uuid"
+            q += " AND d.endpoint_id = CAST(:endpoint_id AS uuid)"
             params["endpoint_id"] = endpoint_id
         q += " ORDER BY d.created_at DESC LIMIT :limit"
         r = await self.session.execute(text(q), params)

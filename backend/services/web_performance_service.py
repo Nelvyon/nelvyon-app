@@ -82,7 +82,7 @@ async def save_metrics(
                 website_id, workspace_id, lcp_ms, cls, fid_ms,
                 performance_score, measured_url, raw_report, measured_at
             ) VALUES (
-                :wid::uuid, :ws, :lcp, :cls, :fid,
+                CAST(:wid AS uuid), :ws, :lcp, :cls, :fid,
                 :score, :url, CAST(:raw AS jsonb), NOW()
             )
             """
@@ -110,7 +110,7 @@ async def get_latest_metrics(
             """
             SELECT lcp_ms, cls, fid_ms, performance_score, measured_url, measured_at
             FROM web_performance_metrics
-            WHERE website_id = :wid::uuid AND workspace_id = :ws
+            WHERE website_id = CAST(:wid AS uuid) AND workspace_id = :ws
             ORDER BY measured_at DESC
             LIMIT 1
             """

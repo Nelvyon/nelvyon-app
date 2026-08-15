@@ -115,7 +115,7 @@ class APIKeysService:
 
     async def revoke_api_key(self, key_id: str, workspace_id: int | None = None) -> bool:
         ws = workspace_id if workspace_id is not None else self.workspace_id
-        q = "UPDATE api_keys SET revoked_at = NOW() WHERE id = :id::uuid"
+        q = "UPDATE api_keys SET revoked_at = NOW() WHERE id = CAST(:id AS uuid)"
         params: dict[str, Any] = {"id": key_id}
         if ws is not None:
             q += " AND workspace_id = :ws"
@@ -156,7 +156,7 @@ class APIKeysService:
             if exp_dt < datetime.now(timezone.utc):
                 return None
         await self.session.execute(
-            text("UPDATE api_keys SET last_used_at = NOW() WHERE id = :id::uuid"),
+            text("UPDATE api_keys SET last_used_at = NOW() WHERE id = CAST(:id AS uuid)"),
             {"id": data["id"]},
         )
         await self.session.commit()
@@ -190,7 +190,7 @@ class APIKeysService:
                 SELECT id, workspace_id, name, key_prefix, scopes,
                        expires_at, revoked_at, last_used_at, created_at
                 FROM api_keys
-                WHERE id = :id::uuid AND workspace_id = :ws
+                WHERE id = CAST(:id AS uuid) AND workspace_id = :ws
                 """
             ),
             {"id": key_id, "ws": workspace_id},

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { NELVYON_AGENT_SKILLS, requireSaasContext } from "@nelvyon/saas";
+import { NELVYON_AGENT_SKILLS, requireSaasContext, saasErrorBody, saasErrorStatus } from "@nelvyon/saas";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -20,7 +20,13 @@ export async function GET(req: Request) {
       total: NELVYON_AGENT_SKILLS.length,
     });
   } catch (e: unknown) {
-    const status = (e as { status?: number }).status === 401 ? 401 : 500;
-    return NextResponse.json({ error: "Unauthorized" }, { status });
+    if ((e as { status?: number }).status === 401)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // Devolvia 500 con el cuerpo «Unauthorized»: codigo equivocado y ademas
+    // una descripcion falsa de lo ocurrido. Un tenant ausente no es una averia
+    // ni una falta de credenciales.
+    const estado = saasErrorStatus(e);
+    if (estado >= 500) console.error("[agent/skills GET]", e);
+    return NextResponse.json(saasErrorBody(e), { status: estado });
   }
 }

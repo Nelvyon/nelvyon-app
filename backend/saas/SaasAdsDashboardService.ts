@@ -30,6 +30,13 @@ export type AdsMetrics = {
   ctr: number | null;
   cpc: number | null;
   roas: number | null;
+  /** Ingresos atribuidos que reporta la plataforma.
+   *
+   * Se calculaban ya —de `action_values` en Meta y de `conversions_value` en
+   * Google— solo para derivar `roas`, y despues se tiraban. El panel los pedia
+   * con `SUM(c.revenue)` y la columna no existia siquiera, asi que la consulta
+   * fallaba con `column c.revenue does not exist`. */
+  revenue: number | null;
   fromCache: boolean;
   fetchedAt: string;
 };
@@ -132,7 +139,8 @@ type ConnectionRow = {
 type CacheRow = {
   id: string; connection_id: string; tenant_id: string; date_start: string; date_end: string;
   spend: string; impressions: string; clicks: string; conversions: string;
-  ctr: string | null; cpc: string | null; roas: string | null; fetched_at: Date;
+  ctr: string | null; cpc: string | null; roas: string | null;
+  revenue: string | null; fetched_at: Date;
 };
 
 type LinkRow = {
@@ -235,6 +243,7 @@ export class SaasAdsDashboardService {
         ctr: c.ctr !== null ? Number(c.ctr) : null,
         cpc: c.cpc !== null ? Number(c.cpc) : null,
         roas: c.roas !== null ? Number(c.roas) : null,
+        revenue: c.revenue !== null && c.revenue !== undefined ? Number(c.revenue) : null,
         fetchedAt: new Date(c.fetched_at).toISOString(),
       };
     }
@@ -258,12 +267,13 @@ export class SaasAdsDashboardService {
     const now = new Date().toISOString();
     // Upsert cache
     await this.db.query(
-      `INSERT INTO saas_ads_metrics_cache (connection_id,tenant_id,date_start,date_end,spend,impressions,clicks,conversions,ctr,cpc,roas,fetched_at)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,NOW())
+      `INSERT INTO saas_ads_metrics_cache (connection_id,tenant_id,date_start,date_end,spend,impressions,clicks,conversions,ctr,cpc,roas,revenue,fetched_at)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,NOW())
        ON CONFLICT (connection_id,date_start,date_end) DO UPDATE SET
-         spend=$5,impressions=$6,clicks=$7,conversions=$8,ctr=$9,cpc=$10,roas=$11,fetched_at=NOW()`,
+         spend=$5,impressions=$6,clicks=$7,conversions=$8,ctr=$9,cpc=$10,roas=$11,revenue=$12,fetched_at=NOW()`,
       [conn.id, tenantId, dateStart, dateEnd, metrics.spend, metrics.impressions,
-       metrics.clicks, metrics.conversions, metrics.ctr, metrics.cpc, metrics.roas],
+       metrics.clicks, metrics.conversions, metrics.ctr, metrics.cpc, metrics.roas,
+       metrics.revenue ?? null],
     ).catch(() => null);
 
     return { platform, dateStart, dateEnd, fromCache: false, fetchedAt: now, ...metrics };
@@ -293,6 +303,7 @@ export class SaasAdsDashboardService {
       conversions, ctr: row["ctr"] ? Number(row["ctr"]) : null,
       cpc: row["cpc"] ? Number(row["cpc"]) : null,
       roas: spend > 0 && revenue > 0 ? revenue / spend : null,
+      revenue,
     };
   }
 
@@ -334,7 +345,10 @@ export class SaasAdsDashboardService {
     const ctr = totals.impressions > 0 ? (totals.clicks / totals.impressions) * 100 : null;
     const cpc = totals.clicks > 0 ? spend / totals.clicks : null;
     const roas = spend > 0 && totals.revenue > 0 ? totals.revenue / spend : null;
-    return { spend, impressions: totals.impressions, clicks: totals.clicks, conversions: totals.conversions, ctr, cpc, roas };
+    return {
+      spend, impressions: totals.impressions, clicks: totals.clicks,
+      conversions: totals.conversions, ctr, cpc, roas, revenue: totals.revenue,
+    };
   }
 
   // ─── Campaign management ──────────────────────────────────────────────────
@@ -935,7 +949,8 @@ export class SaasAdsDashboardService {
     const conversions = Number(el.externalWebsiteConversions ?? 0);
     const ctr = impressions > 0 ? (clicks / impressions) * 100 : null;
     const cpc = clicks > 0 ? spend / clicks : null;
-    return { spend, impressions, clicks, conversions, ctr, cpc, roas: null };
+    // Esta plataforma no reporta ingresos atribuidos: NULL, no cero.
+    return { spend, impressions, clicks, conversions, ctr, cpc, roas: null, revenue: null };
   }
 
   private async _fetchLinkedInCampaigns(token: string, accountId: string): Promise<AdsCampaign[]> {
@@ -1066,7 +1081,8 @@ export class SaasAdsDashboardService {
     const conversions = Number(row.conversion ?? 0);
     const ctr = impressions > 0 ? (clicks / impressions) * 100 : null;
     const cpc = clicks > 0 ? spend / clicks : null;
-    return { spend, impressions, clicks, conversions, ctr, cpc, roas: null };
+    // Esta plataforma no reporta ingresos atribuidos: NULL, no cero.
+    return { spend, impressions, clicks, conversions, ctr, cpc, roas: null, revenue: null };
   }
 
   private async _fetchSnapchatMetrics(
@@ -1088,7 +1104,8 @@ export class SaasAdsDashboardService {
     const conversions = Number(stat.conversion_purchases ?? 0);
     const ctr = impressions > 0 ? (clicks / impressions) * 100 : null;
     const cpc = clicks > 0 ? spend / clicks : null;
-    return { spend, impressions, clicks, conversions, ctr, cpc, roas: null };
+    // Esta plataforma no reporta ingresos atribuidos: NULL, no cero.
+    return { spend, impressions, clicks, conversions, ctr, cpc, roas: null, revenue: null };
   }
 }
 

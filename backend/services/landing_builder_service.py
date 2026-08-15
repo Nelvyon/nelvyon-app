@@ -317,7 +317,7 @@ class LandingBuilderService:
         if workspace_id is not None:
             await self._set_workspace(workspace_id)
         r = await self.session.execute(
-            text("SELECT * FROM landing_pages WHERE id = :id::uuid"),
+            text("SELECT * FROM landing_pages WHERE id = CAST(:id AS uuid)"),
             {"id": page_id},
         )
         row = _row(r.fetchone())
@@ -364,7 +364,7 @@ class LandingBuilderService:
             params["status"] = updates["status"]
 
         await self.session.execute(
-            text(f"UPDATE landing_pages SET {', '.join(sets)} WHERE id = :id::uuid"),
+            text(f"UPDATE landing_pages SET {', '.join(sets)} WHERE id = CAST(:id AS uuid)"),
             params,
         )
         await self.session.commit()
@@ -375,7 +375,7 @@ class LandingBuilderService:
         await self._set_workspace(workspace_id)
         r = await self.session.execute(
             text(
-                "DELETE FROM landing_pages WHERE id = :id::uuid AND workspace_id = :ws RETURNING id"
+                "DELETE FROM landing_pages WHERE id = CAST(:id AS uuid) AND workspace_id = :ws RETURNING id"
             ),
             {"id": page_id, "ws": workspace_id},
         )
@@ -425,7 +425,7 @@ class LandingBuilderService:
                 UPDATE landing_pages
                 SET status = 'published', slug = :slug, published_at = NOW(), updated_at = NOW(),
                     domain_verified = :verified
-                WHERE id = :id::uuid AND workspace_id = :ws
+                WHERE id = CAST(:id AS uuid) AND workspace_id = :ws
                 """
             ),
             {
@@ -448,7 +448,7 @@ class LandingBuilderService:
                 """
                 UPDATE landing_pages
                 SET status = 'draft', updated_at = NOW()
-                WHERE id = :id::uuid AND workspace_id = :ws
+                WHERE id = CAST(:id AS uuid) AND workspace_id = :ws
                 """
             ),
             {"id": page_id, "ws": workspace_id},
@@ -628,7 +628,7 @@ class LandingBuilderService:
                 SELECT variant, event_type, COUNT(*) AS cnt,
                        metadata->>'referrer' AS referrer
                 FROM landing_analytics
-                WHERE page_id = :pid::uuid
+                WHERE page_id = CAST(:pid AS uuid)
                 GROUP BY variant, event_type, metadata->>'referrer'
                 """
             ),
@@ -662,7 +662,7 @@ class LandingBuilderService:
                 """
                 SELECT AVG((metadata->>'seconds')::float) AS avg_seconds
                 FROM landing_analytics
-                WHERE page_id = :pid::uuid AND event_type = 'time_on_page'
+                WHERE page_id = CAST(:pid AS uuid) AND event_type = 'time_on_page'
                 """
             ),
             {"pid": page_id},
@@ -697,7 +697,7 @@ class LandingBuilderService:
     async def get_template(self, template_id: str) -> dict[str, Any] | None:
         await self.ensure_schema()
         r = await self.session.execute(
-            text("SELECT * FROM landing_templates WHERE id = :id::uuid"),
+            text("SELECT * FROM landing_templates WHERE id = CAST(:id AS uuid)"),
             {"id": template_id},
         )
         return _row(r.fetchone()) or None
@@ -729,7 +729,7 @@ class LandingBuilderService:
             text(
                 """
                 SELECT * FROM landing_pages
-                WHERE id = :id::uuid AND status = 'published'
+                WHERE id = CAST(:id AS uuid) AND status = 'published'
                 """
             ),
             {"id": page_id},

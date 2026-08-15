@@ -169,7 +169,7 @@ class AffiliateService:
             text(
                 """
                 INSERT INTO affiliate_clicks (affiliate_id, code, ip_hash, user_agent, referrer)
-                VALUES (:aid::uuid, :code, :ip_hash, :ua, :ref)
+                VALUES (CAST(:aid AS uuid), :code, :ip_hash, :ua, :ref)
                 """
             ),
             {
@@ -185,7 +185,7 @@ class AffiliateService:
                 """
                 UPDATE affiliates
                 SET total_clicks = total_clicks + 1, updated_at = NOW()
-                WHERE id = :id::uuid
+                WHERE id = CAST(:id AS uuid)
                 """
             ),
             {"id": affiliate["id"]},
@@ -233,7 +233,7 @@ class AffiliateService:
                     commission_type, subscription_amount, commission_amount
                 )
                 VALUES (
-                    :id, :aid::uuid, :rws, 'approved',
+                    :id, CAST(:aid AS uuid), :rws, 'approved',
                     :ctype, :sub_amount, :commission
                 )
                 RETURNING *
@@ -256,7 +256,7 @@ class AffiliateService:
                     total_earnings = total_earnings + :commission,
                     pending_payout = pending_payout + :commission,
                     updated_at = NOW()
-                WHERE id = :id::uuid
+                WHERE id = CAST(:id AS uuid)
                 """
             ),
             {"id": affiliate["id"], "commission": commission},
@@ -282,7 +282,7 @@ class AffiliateService:
                 SELECT id, referred_workspace_id, commission_type,
                        subscription_amount, commission_amount, status, created_at
                 FROM affiliate_referrals
-                WHERE affiliate_id = :aid::uuid
+                WHERE affiliate_id = CAST(:aid AS uuid)
                   AND created_at >= :start AND created_at < :end
                   AND status IN ('pending', 'approved')
                 ORDER BY created_at ASC
@@ -334,7 +334,7 @@ class AffiliateService:
             raise ValueError("Payout amount must be positive")
 
         r = await self.session.execute(
-            text("SELECT * FROM affiliates WHERE id = :id::uuid"),
+            text("SELECT * FROM affiliates WHERE id = CAST(:id AS uuid)"),
             {"id": affiliate_id},
         )
         affiliate = _row(r.fetchone())
@@ -395,7 +395,7 @@ class AffiliateService:
                 INSERT INTO affiliate_payouts (
                     id, affiliate_id, amount, status, stripe_transfer_id, error_message
                 )
-                VALUES (:id, :aid::uuid, :amount, :status, :transfer_id, :error)
+                VALUES (:id, CAST(:aid AS uuid), :amount, :status, :transfer_id, :error)
                 """
             ),
             {
@@ -414,7 +414,7 @@ class AffiliateService:
                     """
                     UPDATE affiliates
                     SET pending_payout = pending_payout - :amount, updated_at = NOW()
-                    WHERE id = :id::uuid
+                    WHERE id = CAST(:id AS uuid)
                     """
                 ),
                 {"id": affiliate_id, "amount": payout_amount},
@@ -424,7 +424,7 @@ class AffiliateService:
                     """
                     UPDATE affiliate_referrals
                     SET status = 'paid', paid_at = NOW()
-                    WHERE affiliate_id = :aid::uuid
+                    WHERE affiliate_id = CAST(:aid AS uuid)
                       AND status = 'approved' AND paid_at IS NULL
                     """
                 ),
@@ -444,7 +444,7 @@ class AffiliateService:
     async def get_affiliate_stats(self, affiliate_id: str) -> dict[str, Any]:
         await self.ensure_schema()
         r = await self.session.execute(
-            text("SELECT * FROM affiliates WHERE id = :id::uuid"),
+            text("SELECT * FROM affiliates WHERE id = CAST(:id AS uuid)"),
             {"id": affiliate_id},
         )
         affiliate = _row(r.fetchone())
@@ -457,7 +457,7 @@ class AffiliateService:
                 SELECT COUNT(*) AS cnt,
                        COALESCE(SUM(commission_amount), 0) AS total_commission
                 FROM affiliate_referrals
-                WHERE affiliate_id = :aid::uuid
+                WHERE affiliate_id = CAST(:aid AS uuid)
                 """
             ),
             {"aid": affiliate_id},
@@ -468,7 +468,7 @@ class AffiliateService:
                 """
                 SELECT COALESCE(SUM(commission_amount), 0) AS pending
                 FROM affiliate_referrals
-                WHERE affiliate_id = :aid::uuid AND status = 'approved' AND paid_at IS NULL
+                WHERE affiliate_id = CAST(:aid AS uuid) AND status = 'approved' AND paid_at IS NULL
                 """
             ),
             {"aid": affiliate_id},
@@ -500,7 +500,7 @@ class AffiliateService:
                 SELECT id, affiliate_id, amount, currency, status,
                        stripe_transfer_id, error_message, created_at
                 FROM affiliate_payouts
-                WHERE affiliate_id = :aid::uuid
+                WHERE affiliate_id = CAST(:aid AS uuid)
                 ORDER BY created_at DESC
                 LIMIT :limit
                 """

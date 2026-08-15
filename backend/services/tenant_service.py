@@ -29,19 +29,50 @@ class TenantService:
 
 
 
-    async def set_tenant_context(self, tenant_id: int) -> None:
-        """Set Postgres session variable for Supabase RLS policies."""
+    async def set_tenant_context(self, tenant_id: int, user_id: str | None = None) -> None:
+        """Fija el contexto de sesion que evaluan las politicas RLS.
+
+        DOS VARIABLES, NO UNA
+        ---------------------
+        Las 969 politicas del esquema no miran todas lo mismo:
+
+            606  `nelvyon_jwt_user_id()`  ->  request.jwt.claim.sub
+             53  tenant por workspace     ->  app.tenant_id
+             11  tenant SaaS              ->  request.jwt.claim.sub (a traves de la anterior)
+
+        Hasta ahora solo se fijaba `app.tenant_id`, asi que las 617 politicas que
+        dependen del sujeto del JWT evaluarian NULL. Como la aplicacion se conecta
+        con un rol superusuario, ninguna llega a evaluarse y el detalle no se
+        notaba; el dia que se le retire ese privilegio —que es lo que hace falta
+        para que RLS sea frontera real— esas tablas denegarian TODO en vez de
+        aislar, y el sintoma seria una aplicacion que devuelve listas vacias sin
+        un solo error.
+
+        Fijar aqui las dos deja el contexto completo y es inocuo mientras el rol
+        siga siendo superusuario: `set_config` no altera ninguna respuesta si las
+        politicas no se evaluan. Es preparacion verificable, no un cambio de
+        conducta.
+
+        Ambas con ambito de TRANSACCION (`is_local = true`), no de conexion: es
+        lo que hace seguro reutilizar conexiones de un pool, porque el contexto
+        no sobrevive al commit ni se filtra a la siguiente peticion.
+        """
         await self.ensure_schema()
         await self.session.execute(
             text("SELECT set_tenant_context(:tid)"),
             {"tid": int(tenant_id)},
         )
+        if user_id:
+            await self.session.execute(
+                text("SELECT set_config('request.jwt.claim.sub', :uid, true)"),
+                {"uid": str(user_id)},
+            )
 
-    async def apply_request_tenant(self) -> int | None:
+    async def apply_request_tenant(self, user_id: str | None = None) -> int | None:
         """Apply tenant from ContextVar to DB session (call at start of tenant-scoped handlers)."""
         tid = get_tenant_context()
         if tid is not None:
-            await self.set_tenant_context(tid)
+            await self.set_tenant_context(tid, user_id)
         return tid
 
     @staticmethod

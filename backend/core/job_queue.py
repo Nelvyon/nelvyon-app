@@ -203,6 +203,14 @@ class ARQJobQueue:
         """Enqueue a job to Redis."""
         import json
 
+        # El payload se valida SIEMPRE, haya cola o no.
+        #
+        # Antes la comprobacion vivia despues del retorno anticipado, asi que sin
+        # Redis un payload invalido se aceptaba sin rechistar y solo se descubria
+        # el dia que la cola volviera. Que la infraestructura este caida no es
+        # motivo para relajar la validacion de la entrada.
+        validate_job_payload(job_type, payload)
+
         if not self._available or not self._redis_pool:
             logger.warning("ARQ: Redis unavailable, job not enqueued type=%s", job_type)
             job = Job(job_type=job_type, payload=payload, priority=priority,
@@ -212,7 +220,6 @@ class ARQJobQueue:
             self._jobs[job.id] = job
             return job.id
 
-        validate_job_payload(job_type, payload)
         job = Job(job_type=job_type, payload=payload, priority=priority,
                   max_retries=max_retries, retry_delay=retry_delay)
         self._jobs[job.id] = job
