@@ -229,9 +229,23 @@ describe("Workforce residuals — reasonable soak", () => {
           jobsProcessed: daemon.health().jobsProcessed,
           ok: running === 0 && succeeded + dead >= n - 2,
         };
-        const outDir = join(process.cwd(), "../../backend/local-ai/benchmarks");
-        mkdirSync(outDir, { recursive: true });
-        writeFileSync(join(outDir, "workforce_soak.json"), JSON.stringify(metrics, null, 2), "utf8");
+        // La evidencia solo se REESCRIBE cuando la certificacion la pide.
+        //
+        // `ticks` depende del temporizado de la maquina, asi que escribir en la
+        // ruta versionada en cada `vitest run` dejaba el arbol sucio despues de
+        // cualquier ejecucion de tests. `scripts/run-workforce-cert.mjs` lanza
+        // este test con la variable puesta y luego lee el artefacto; sin ella,
+        // el fichero comprometido sigue siendo la evidencia de la ultima
+        // certificacion real, que es lo que debe ser.
+        if (process.env.NELVYON_WRITE_EVIDENCE === "1") {
+          const outDir = join(process.cwd(), "../../backend/local-ai/benchmarks");
+          mkdirSync(outDir, { recursive: true });
+          writeFileSync(
+            join(outDir, "workforce_soak.json"),
+            JSON.stringify(metrics, null, 2),
+            "utf8",
+          );
+        }
         expect(metrics.ok).toBe(true);
 
         await daemon.stop();

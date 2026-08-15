@@ -44,7 +44,16 @@ def _openai_client() -> AsyncOpenAI | None:
     key = os.environ.get("OPENAI_API_KEY", "").strip() or os.environ.get("APP_AI_KEY", "").strip()
     if not key:
         return None
-    base = os.environ.get("OPENAI_BASE_URL", "").strip() or None
+    base = (
+        os.environ.get("NELVYON_AI_BASE_URL", "").strip()
+        or os.environ.get("OPENAI_BASE_URL", "").strip()
+        or os.environ.get("APP_AI_BASE_URL", "").strip()
+    ).rstrip("/")
+    if not base:
+        # `base_url=None` NO es neutro: el SDK aplica su propio default, que es
+        # `https://api.openai.com/v1`. Sin endpoint explicito la capacidad queda
+        # NOT_CONFIGURED y no se contacta ningun proveedor externo.
+        return None
     return AsyncOpenAI(api_key=key, base_url=base)
 
 
@@ -734,7 +743,9 @@ class ReportingService:
         r = await self.session.execute(
             text(
                 """
-                SELECT id, name, industry, logo_url, website_url
+                -- `website_url` pertenece a las tablas de cliente
+                -- (`os_clients`, `nelvyon_clients`), no a `workspaces`.
+                SELECT id, name, industry, logo_url
                 FROM workspaces WHERE id = :ws
                 """
             ),
@@ -743,12 +754,22 @@ class ReportingService:
         row = r.mappings().first()
         if not row:
             return {"id": self.workspace_id, "name": f"Workspace {self.workspace_id}"}
+        # `website_url` YA NO se devuelve.
+        #
+        # La consulta de arriba dejo de pedirla a proposito —pertenece a las
+        # tablas de cliente (`os_clients`, `nelvyon_clients`), no a
+        # `workspaces`— pero la proyeccion la seguia incluyendo, asi que el
+        # campo salia SIEMPRE nulo. Un contrato que anuncia un dato que nunca
+        # llega es peor que no anunciarlo: quien lo consume no distingue "este
+        # workspace no tiene web" de "esto nunca funciono".
+        #
+        # Ningun consumidor lo leia de aqui; el `website_url` que si usa el
+        # frontend sale de la ficha de cliente, que es donde vive el dato.
         return {
             "id": row["id"],
             "name": row.get("name"),
             "industry": row.get("industry"),
             "logo_url": row.get("logo_url"),
-            "website_url": row.get("website_url"),
         }
 
     async def _admin_user_id(self) -> str | None:

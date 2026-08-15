@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
 
+import { requireSaasContext, saasErrorBody, saasErrorStatus } from "@nelvyon/saas";
 import {
-  isOpenAiEnvConfigured,
-  isOpenAiSpendAllowed,
-  requireSaasContext,
-  saasErrorBody,
-  saasErrorStatus,
-} from "@nelvyon/saas";
+  nelvyonTextErrorStatus,
+  runNelvyonTextTask,
+} from "../../../../../../../backend/saas/NelvyonAiTextService";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -50,8 +48,8 @@ export async function GET(req: Request) {
     return NextResponse.json({
       types: COPY_TYPES,
       tones: ["formal", "casual", "urgente", "inspirador"],
-      openai_configured: isOpenAiEnvConfigured(),
-      openai_spend_allowed: isOpenAiSpendAllowed(),
+      ai_provider: "nelvyon-local",
+      ai_available: true,
       company: ctx.tenant.companyName ?? null,
     });
   } catch (e: unknown) {
@@ -68,26 +66,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "type y context son obligatorios" }, { status: 400 });
     }
 
-    if (!isOpenAiEnvConfigured()) {
-      return NextResponse.json(
-        {
-          error: "OpenAI no configurado. Configura OPENAI_API_KEY en el servidor.",
-          code: "missing_openai",
-        },
-        { status: 503 },
-      );
-    }
-    if (!isOpenAiSpendAllowed()) {
-      return NextResponse.json(
-        {
-          error: "Gasto OpenAI deshabilitado. Requiere AUTONOMOUS_ALLOW_OPENAI=1.",
-          code: "openai_spend_disabled",
-        },
-        { status: 503 },
-      );
-    }
-    const openaiKey = process.env.OPENAI_API_KEY!.trim();
-
     const variations = Math.min(body.variations ?? 3, 5);
     const tone = body.tone ?? "casual";
     const toneMap = { formal: "formal y profesional", casual: "cercano y conversacional", urgente: "urgente y directo", inspirador: "motivador e inspirador" };
@@ -99,28 +77,21 @@ Empresa: ${ctx.tenant.companyName ?? "la empresa del usuario"}.
 Idioma: ${body.language === "en" ? "inglés" : "español"}.
 Genera exactamente ${variations} variaciones numeradas (1., 2., 3...) separadas por líneas en blanco.`;
 
-    const oaRes = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${openaiKey}` },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: body.context.trim() },
-        ],
-        max_tokens: 800,
-        temperature: 0.8,
-      }),
-      signal: AbortSignal.timeout(20_000),
+    // IA propia de NELVYON con `tenantId` obligatorio. Sin fallback externo.
+    const ai = await runNelvyonTextTask({
+      tenantId: String(ctx.tenant.id),
+      system: systemPrompt,
+      prompt: body.context.trim(),
+      agentId: "saas-ai-copy",
     });
 
-    if (!oaRes.ok) {
-      const err = (await oaRes.json().catch(() => ({}))) as { error?: { message?: string } };
-      throw new Error(err.error?.message ?? `OpenAI ${oaRes.status}`);
+    if (!ai.ok) {
+      return NextResponse.json(
+        { error: ai.message, code: ai.code },
+        { status: nelvyonTextErrorStatus(ai.code) },
+      );
     }
-
-    const data = (await oaRes.json()) as { choices?: { message?: { content?: string } }[] };
-    const raw = data.choices?.[0]?.message?.content ?? "";
+    const raw = ai.content;
 
     // Parse numbered variations
     const lines = raw.split(/\n\s*\n/).filter(Boolean);

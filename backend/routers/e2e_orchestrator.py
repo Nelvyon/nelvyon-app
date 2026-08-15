@@ -5,6 +5,7 @@ and entity creation across the full NELVYON chain:
   Client → Project → Generator → QA → Assets → Contracts → Social → Helpdesk
   CRM (Contacts/Deals/Campaigns) ↔ OS (Clients/Projects)
 """
+import json as _json
 import logging
 from datetime import datetime
 from typing import Any, Dict, List, Optional
@@ -131,10 +132,42 @@ async def _fetch_all(db: AsyncSession, query: str, params: dict) -> List[dict]:
     return [dict(r) for r in result.mappings().all()]
 
 
+#: Identificadores admitidos en las consultas de conteo. Van al SQL como texto
+#: —no pueden ir como parametro ligado— asi que la unica defensa es que salgan
+#: de un conjunto cerrado.
+TABLAS_CONTABLES = frozenset({
+    "deals", "campaigns", "helpdesk_tickets",
+    "nelvyon_outputs", "nelvyon_assets", "contracts", "social_posts",
+})
+CAMPOS_CONTABLES = frozenset({"project_id", "client_id"})
+
+
 async def _count_in_workspace(
     db: AsyncSession, table: str, field: str, value: int, user_id: str, workspace_id: int
 ) -> int:
     """Count rows tied to a project/client, scoped to the active workspace."""
+    # `table` ya se comprobaba; `field` no. Hoy todos los llamantes pasan
+    # literales, asi que no es explotable — pero la seguridad de un helper no
+    # deberia depender de que cada llamante futuro se acuerde. Mismo trato para
+    # los dos: identificadores desde conjunto cerrado, valores por parametro.
+    if table not in TABLAS_CONTABLES or field not in CAMPOS_CONTABLES:
+        raise ValueError(f"Unsupported table/field for counting: {table}.{field}")
+
+    # `social_posts` se acota por su propia columna de inquilino. No entra en la
+    # rama del JOIN porque no tiene `project_id`: esa columna es de la generacion
+    # anterior y la tabla real —la de la migracion 507— nunca la tuvo, asi que la
+    # consulta fallaba con `no such column`.
+    if table == "social_posts":
+        result = await db.execute(
+            text(
+                f"SELECT COUNT(*) as cnt FROM social_posts "
+                f"WHERE tenant_id = :wid"
+            ),
+            {"wid": workspace_id},
+        )
+        row = result.mappings().first()
+        return (row or {}).get("cnt", 0)
+
     if table in ("deals", "campaigns", "helpdesk_tickets"):
         result = await db.execute(
             text(
@@ -467,22 +500,32 @@ async def create_social_from_contract(
 
     result = await db.execute(
         text("""
+            -- `social_posts` es la tabla del scheduler social, con
+            -- `tenant_id INTEGER` (el workspace, sin traducir: asi la usa
+            -- tambien `finetuning_service`). Las columnas de la otra generacion
+            -- —platform, campaign_name, client_id, project_id, output_id,
+            -- contract_id— no existen: el INSERT fallaba siempre. Su contenido
+            -- no se pierde, va a `metadata`, que es jsonb y esta para eso.
             INSERT INTO social_posts
-            (user_id, platform, content, status, campaign_name,
-             client_id, project_id, output_id, contract_id, scheduled_at, created_at)
+            (tenant_id, content, status, scheduled_at, created_at, updated_at, metadata)
             VALUES
-            (:uid, :platform, :content, :status, :campaign,
-             :client_id, :project_id, :output_id, :contract_id, :scheduled_at, :now)
+            (:tenant_id, :content, :status, :scheduled_at, :now, :now,
+             CAST(:metadata AS jsonb))
             RETURNING id
         """),
         {
-            "uid": user_id, "platform": req.platform, "content": content,
+            "tenant_id": wid,
+            "content": content,
             "status": "scheduled" if req.scheduled_at else "draft",
-            "campaign": req.campaign_name,
-            "client_id": contract.get("client_id"),
-            "project_id": contract.get("project_id"),
-            "output_id": contract.get("output_id"),
-            "contract_id": req.contract_id,
+            "metadata": _json.dumps({
+                "user_id": user_id,
+                "platform": req.platform,
+                "campaign_name": req.campaign_name,
+                "client_id": contract.get("client_id"),
+                "project_id": contract.get("project_id"),
+                "output_id": contract.get("output_id"),
+                "contract_id": req.contract_id,
+            }, default=str),
             "scheduled_at": req.scheduled_at,
             "now": now,
         },
@@ -861,12 +904,18 @@ async def get_full_chain(
     social = await _fetch_all(
         db,
         """
-        SELECT s.id, s.project_id, s.contract_id, s.platform, s.status, s.campaign_name FROM social_posts s
-        INNER JOIN nelvyon_projects p ON p.id = s.project_id AND p.workspace_id = :wid
-        WHERE s.client_id = :cid
-        ORDER BY s.id DESC LIMIT 30
+        -- `social_posts` no tiene `project_id`, `client_id`, `platform` ni
+        -- `campaign_name`: son columnas de la generacion anterior y la tabla
+        -- real nunca las tuvo, asi que esta consulta fallaba con
+        -- `no such column`. El inquilino acota directamente, y el cliente se
+        -- filtra por `metadata`, que es donde vive desde la migracion 507.
+        SELECT s.id, s.status, s.content, s.scheduled_at, s.metadata
+        FROM social_posts s
+        WHERE s.tenant_id = :wid
+          AND s.metadata ->> 'client_id' = :cid_txt
+        ORDER BY s.created_at DESC LIMIT 30
         """,
-        {"cid": client_id, "wid": wid},
+        {"cid_txt": str(client_id), "wid": wid},
     )
 
     # Tickets

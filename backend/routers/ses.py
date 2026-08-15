@@ -2,10 +2,13 @@
 
 from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from pydantic import BaseModel, EmailStr, Field
 
-from dependencies.workspace import WorkspaceContext, require_workspace
+from dependencies.auth import get_super_admin_user
+from dependencies.workspace import WorkspaceContext, require_workspace_operator
+from schemas.auth import UserResponse
+from core.messaging_integration import assert_workspace_email_sender
 from services.ses_service import get_ses_service
 
 router = APIRouter(prefix="/api/ses", tags=["ses"])
@@ -15,14 +18,16 @@ class SendEmailRequest(BaseModel):
     to: EmailStr
     subject: str = Field(..., min_length=1, max_length=998)
     html_body: str = Field(..., min_length=1)
-    from_email: Optional[EmailStr] = None
+    # `from_email` YA NO se acepta del cuerpo. Lo elegia quien llamaba, sin
+    # comprobar que el workspace tuviera derecho a esa direccion: servia para
+    # suplantar tanto a otro tenant como a NELVYON. La identidad remitente sale
+    # ahora de la integracion verificada del workspace.
 
 
 class BulkRecipient(BaseModel):
     to: EmailStr
     subject: str = Field(..., min_length=1, max_length=998)
     html_body: str = Field(..., min_length=1)
-    from_email: Optional[EmailStr] = None
 
 
 class BulkSendRequest(BaseModel):
@@ -36,16 +41,20 @@ class VerifyDomainRequest(BaseModel):
 @router.post("/send")
 async def send_email(
     body: SendEmailRequest,
-    _ctx: WorkspaceContext = Depends(require_workspace),
+    ctx: WorkspaceContext = Depends(require_workspace_operator),
 ) -> Dict[str, Any]:
     """Send a single cold email via Amazon SES."""
+    # El email en frio va dirigido a los prospectos DEL CLIENTE, asi que la
+    # identidad remitente es del cliente. Sin remitente propio se corta antes de
+    # instanciar el cliente SES: no se cae a SES_FROM_EMAIL.
+    remitente = await assert_workspace_email_sender(ctx.workspace_id)
     service = get_ses_service()
     try:
         return await service.send_email(
             to=str(body.to),
             subject=body.subject.strip(),
             html_body=body.html_body,
-            from_email=str(body.from_email) if body.from_email else None,
+            from_email=remitente.from_email,
         )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
@@ -59,16 +68,17 @@ async def send_email(
 @router.post("/bulk")
 async def send_bulk_emails(
     body: BulkSendRequest,
-    _ctx: WorkspaceContext = Depends(require_workspace),
+    ctx: WorkspaceContext = Depends(require_workspace_operator),
 ) -> Dict[str, Any]:
     """Send cold emails in batches of 50."""
+    remitente = await assert_workspace_email_sender(ctx.workspace_id)
     service = get_ses_service()
     recipients = [
         {
             "to": str(r.to),
             "subject": r.subject.strip(),
             "html_body": r.html_body,
-            "from_email": str(r.from_email) if r.from_email else None,
+            "from_email": remitente.from_email,
         }
         for r in body.recipients
     ]
@@ -83,7 +93,11 @@ async def send_bulk_emails(
 
 @router.get("/stats")
 async def get_sending_stats(
-    _ctx: WorkspaceContext = Depends(require_workspace),
+    # Cuenta SES CORPORATIVA: cuota, reputacion, supresiones e identidades
+    # verificadas son de la cuenta unica de NELVYON, no del workspace. Un rol
+    # de workspace no acredita autoridad sobre ella, ni para leer: agregarian
+    # el envio de todos los tenants.
+    _admin: UserResponse = Depends(get_super_admin_user),
 ) -> Dict[str, Any]:
     """Return SES send statistics (delivery/bounce/complaint aggregates)."""
     service = get_ses_service()
@@ -99,7 +113,10 @@ async def get_sending_stats(
 @router.post("/verify-domain")
 async def verify_domain(
     body: VerifyDomainRequest,
-    _ctx: WorkspaceContext = Depends(require_workspace),
+    # Verificar un dominio ANADE una identidad a la cuenta SES de NELVYON, y no
+    # queda registro de que workspace la posee. Mientras esa relacion no exista,
+    # es una operacion de plataforma, no de workspace.
+    _admin: UserResponse = Depends(get_super_admin_user),
 ) -> Dict[str, Any]:
     """Start SES domain identity verification (add DNS TXT record from response)."""
     service = get_ses_service()
@@ -116,8 +133,12 @@ async def verify_domain(
 
 @router.get("/suppressions")
 async def list_suppressions(
-    limit: int = 200,
-    _ctx: WorkspaceContext = Depends(require_workspace),
+    limit: int = Query(200, ge=1, le=500),
+    # Cuenta SES CORPORATIVA: cuota, reputacion, supresiones e identidades
+    # verificadas son de la cuenta unica de NELVYON, no del workspace. Un rol
+    # de workspace no acredita autoridad sobre ella, ni para leer: agregarian
+    # el envio de todos los tenants.
+    _admin: UserResponse = Depends(get_super_admin_user),
 ) -> Dict[str, Any]:
     """List suppressed email addresses (bounces/complaints)."""
     service = get_ses_service()
@@ -126,7 +147,11 @@ async def list_suppressions(
 
 @router.get("/reputation")
 async def get_reputation(
-    _ctx: WorkspaceContext = Depends(require_workspace),
+    # Cuenta SES CORPORATIVA: cuota, reputacion, supresiones e identidades
+    # verificadas son de la cuenta unica de NELVYON, no del workspace. Un rol
+    # de workspace no acredita autoridad sobre ella, ni para leer: agregarian
+    # el envio de todos los tenants.
+    _admin: UserResponse = Depends(get_super_admin_user),
 ) -> Dict[str, Any]:
     """SES sending reputation and bounce rate."""
     service = get_ses_service()

@@ -330,23 +330,30 @@ class WebhookService:
             await self.session.execute(
                 text(
                     """
+                    -- La tabla real —migracion 405, la que gana— llama
+                    -- `webhook_id` a la referencia del endpoint y guarda el
+                    -- resultado en `status_code`, `success` y `attempt`. El
+                    -- writer hablaba la definicion de la 507: registrar una
+                    -- entrega fallaba siempre, y sin ese registro no hay
+                    -- reintentos ni diagnostico de webhooks salientes.
                     INSERT INTO webhook_deliveries (
-                        id, endpoint_id, event, payload, status, attempts,
-                        response_code, response_body, last_attempt_at, next_retry_at
+                        id, webhook_id, workspace_id, event, payload, status_code, response_body,
+                        success, attempt, created_at
                     )
                     VALUES (
-                        :id, :endpoint_id::uuid, :event, CAST(:payload AS jsonb),
-                        :status, :attempts, :response_code, :response_body,
-                        :last_attempt_at, :next_retry_at
+                        CAST(:id AS uuid), CAST(:endpoint_id AS uuid), :ws, :event,
+                        CAST(:payload AS jsonb), :response_code, :response_body,
+                        :exito, :attempts, NOW()
                     )
                     """
                 ),
                 {
                     "id": delivery_id,
                     "endpoint_id": endpoint_id,
+                    "ws": self.workspace_id,
                     "event": event,
                     "payload": _json_dumps(envelope),
-                    "status": status,
+                    "exito": str(status).lower() in ("success", "delivered", "ok"),
                     "attempts": attempts,
                     "response_code": response_code,
                     "response_body": response_body,

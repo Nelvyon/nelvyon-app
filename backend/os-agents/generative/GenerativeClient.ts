@@ -1,3 +1,5 @@
+import { resolveMediaProvider } from "../../media-ai/mediaCapabilities";
+
 export type GenerativeResult = {
   url: string;
   metadata?: Record<string, unknown>;
@@ -210,7 +212,9 @@ export class GenerativeClient {
   }
 
   static async generateVoice(text: string, options?: VoiceGenerationOptions): Promise<GenerativeResult> {
-    const key = process.env.ELEVENLABS_API_KEY?.trim();
+    // ElevenLabs solo con doble opt-in explicito, nunca por tener la clave.
+    const ttsProvider = resolveMediaProvider("tts");
+    const key = ttsProvider.kind === "external" ? process.env.ELEVENLABS_API_KEY?.trim() : "";
     if (!key || useGenerativeMocks()) {
       return placeholderResult("audio.mp3", useGenerativeMocks() ? "vitest" : "missing_api_key");
     }

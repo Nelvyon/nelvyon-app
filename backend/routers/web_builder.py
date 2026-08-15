@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
-from dependencies.workspace import WorkspaceContext, require_workspace
+from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.web_builder_service import get_web_builder_service
 from services.web_publisher_service import get_web_publisher_service
 
@@ -42,7 +42,7 @@ class RestoreBody(BaseModel):
 @router.post("/generate")
 async def generate_website(
     body: GenerateBody,
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_operator),
     db: AsyncSession = Depends(get_db),
 ):
     try:
@@ -60,7 +60,7 @@ async def generate_website(
 @router.post("/publish")
 async def publish_website(
     body: PublishBody,
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_operator),
     db: AsyncSession = Depends(get_db),
 ):
     try:
@@ -94,7 +94,7 @@ async def website_history(
 @router.post("/restore")
 async def restore_website_version(
     body: RestoreBody,
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_operator),
     db: AsyncSession = Depends(get_db),
 ):
     try:

@@ -10,6 +10,8 @@ import uuid
 from typing import Any
 
 import httpx
+
+from core.ads_integration import assert_workspace_ads_integration
 from openai import AsyncOpenAI
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -63,6 +65,10 @@ class TikTokAdsService:
         hook: str = "",
         primary_text: str = "",
     ) -> dict[str, Any]:
+
+        # Sin integracion propia del workspace NO se cae a la cuenta
+        # corporativa: se corta antes de tocar la red.
+        await assert_workspace_ads_integration(self.workspace_id, "tiktok")
         await self.ensure_schema()
         self._ensure_config()
         cid = str(uuid.uuid4())
@@ -216,7 +222,16 @@ def _openai_client() -> AsyncOpenAI | None:
     key = os.environ.get("OPENAI_API_KEY", "").strip() or os.environ.get("APP_AI_KEY", "").strip()
     if not key:
         return None
-    base = os.environ.get("OPENAI_BASE_URL", "").strip() or None
+    base = (
+        os.environ.get("NELVYON_AI_BASE_URL", "").strip()
+        or os.environ.get("OPENAI_BASE_URL", "").strip()
+        or os.environ.get("APP_AI_BASE_URL", "").strip()
+    ).rstrip("/")
+    if not base:
+        # `base_url=None` NO es neutro: el SDK aplica su propio default, que es
+        # `https://api.openai.com/v1`. Sin endpoint explicito la capacidad queda
+        # NOT_CONFIGURED y no se contacta ningun proveedor externo.
+        return None
     return AsyncOpenAI(api_key=key, base_url=base)
 
 

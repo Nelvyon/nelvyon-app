@@ -5,6 +5,12 @@ Fuente oficial SaaS: saas_contacts — ver docs/PHASE_1A_CRM_TRANSITION.md
 """
 
 from __future__ import annotations
+import json as _json_crm
+
+
+def _json_dumps_crm(obj):
+    return _json_crm.dumps(obj, default=str)
+from core.tenant_bridge import require_owner_uuid
 
 import json
 import logging
@@ -143,14 +149,20 @@ class CRMService:
         tags: list | None = None,
         metadata: dict | None = None,
     ) -> dict[str, Any]:
+        propietario = await require_owner_uuid(self.session, self.workspace_id)
         params = {
-            "workspace_id": self.workspace_id,
+            "propietario": propietario,
+            "ws": self.workspace_id,
             "name": name.strip(),
             "email": (email or "").strip() or None,
             "phone": (phone or "").strip() or None,
             "company": (company or "").strip() or None,
             "status": (status or "active").strip(),
-            "tags": _json_dumps(tags or []),
+            # `crm_contacts.tags` es un ARRAY de texto en PostgreSQL, que
+            # acepta una lista; SQLite no tiene ARRAY y no sabe vincularla, asi
+            # que alli viaja serializada. Es la unica diferencia de motor que
+            # este writer necesita.
+            "tags": _json_dumps(tags or []) if _is_sqlite(self.session) else list(tags or []),
             "metadata": _json_dumps(metadata or {}),
         }
         if _is_sqlite(self.session):
@@ -159,12 +171,17 @@ class CRMService:
             await self.session.execute(
                 text(
                     f"""
+                    -- La tabla real —migracion 084, la que gana— acota por
+                    -- `user_id uuid`, no tiene `workspace_id`, y la etapa se
+                    -- llama `stage`. El writer hablaba la definicion de la 507,
+                    -- que nunca se aplica: crear un contacto fallaba siempre.
                     INSERT INTO crm_contacts (
-                        id, workspace_id, name, email, phone, company, status, tags, metadata
+                        id, user_id, workspace_id, name, email, phone, company, stage, tags, metadata
                     )
                     VALUES (
-                        :id, :workspace_id, :name, :email, :phone, :company, :status,
-                        {json_bind(self.session, "tags")}, {json_bind(self.session, "metadata")}
+                        {uuid_bind(self.session, "id")}, CAST(:propietario AS uuid), :ws, :name, :email,
+                        :phone, :company, :status,
+                        :tags, {json_bind(self.session, "metadata")}
                     )
                     """
                 ),
@@ -176,11 +193,12 @@ class CRMService:
                 text(
                     f"""
                     INSERT INTO crm_contacts (
-                        workspace_id, name, email, phone, company, status, tags, metadata
+                        id, user_id, name, email, phone, company, stage, tags, metadata
                     )
                     VALUES (
-                        :workspace_id, :name, :email, :phone, :company, :status,
-                        {json_bind(self.session, "tags")}, {json_bind(self.session, "metadata")}
+                        gen_random_uuid(), CAST(:propietario AS uuid), :ws, :name, :email,
+                        :phone, :company, :status,
+                        :tags, {json_bind(self.session, "metadata")}
                     )
                     RETURNING *
                     """
@@ -592,6 +610,7 @@ class CRMService:
         outcome: str | None = None,
         scheduled_at: datetime | None = None,
     ) -> dict[str, Any]:
+        propietario = await require_owner_uuid(self.session, self.workspace_id)
         await self._assert_contact(contact_id)
         if deal_id:
             await self.get_deal_by_id(deal_id)
@@ -599,22 +618,27 @@ class CRMService:
         result = await self.session.execute(
             text(
                 """
+                -- La tabla real —migracion 084— acota por `user_id uuid` y el
+                -- texto vive en `summary`. `deal_id`, `outcome` y
+                -- `scheduled_at` no son columnas suyas: van a `metadata`, que
+                -- es jsonb y esta para eso, en vez de perderse.
                 INSERT INTO crm_activities (
-                    workspace_id, contact_id, deal_id, type, description,
-                    outcome, scheduled_at
+                    id, contact_id, user_id, workspace_id, type, summary, metadata, created_at
                 )
                 VALUES (
-                    :workspace_id, CAST(:contact_id AS uuid),
-                    CAST(:deal_id AS uuid), :type, :description,
-                    :outcome, :scheduled_at
+                    gen_random_uuid(), CAST(:contact_id AS uuid),
+                    CAST(:propietario AS uuid), :ws, :type, :description,
+                    CAST(:extra AS jsonb), NOW()
                 )
                 RETURNING *
                 """
             ),
             {
-                "workspace_id": self.workspace_id,
+                "ws": self.workspace_id,
                 "contact_id": contact_id,
-                "deal_id": deal_id,
+                "extra": _json_dumps_crm(
+                    {"deal_id": deal_id, "outcome": outcome, "scheduled_at": scheduled_at}
+                ),
                 "type": type.strip(),
                 "description": description.strip(),
                 "outcome": (outcome or "").strip() or None,
@@ -631,10 +655,13 @@ class CRMService:
         await self.session.execute(
             text(
                 """
+                -- `completed_at`, `outcome` y `updated_at` no son columnas de
+                -- esta tabla: la real —migracion 084— guarda los extras en
+                -- `metadata`, que es jsonb. Antes el UPDATE fallaba y la
+                -- actividad nunca quedaba marcada como completada.
                 UPDATE crm_activities
-                SET completed_at = now(),
-                    outcome = COALESCE(:outcome, outcome),
-                    updated_at = now()
+                SET metadata = COALESCE(metadata, '{}'::jsonb)
+                    || jsonb_build_object('completed_at', now(), 'outcome', :outcome)
                 WHERE id = CAST(:id AS uuid) AND workspace_id = :workspace_id
                 """
             ),
@@ -826,18 +853,18 @@ class CRMService:
         if _is_sqlite(self.session):
             act_sql = f"""
                 SELECT
-                    SUM(CASE WHEN completed_at >= :week_ago THEN 1 ELSE 0 END) AS completed_7d,
+                    SUM(CASE WHEN created_at >= :week_ago THEN 1 ELSE 0 END) AS completed_7d,
                     SUM(CASE WHEN created_at >= :month_ago THEN 1 ELSE 0 END) AS activity_30d,
-                    MAX(completed_at) AS last_completed
+                    MAX(created_at) AS last_completed
                 FROM crm_activities
                 WHERE contact_id = {cid_bind} AND workspace_id = :workspace_id
             """
         else:
             act_sql = f"""
                 SELECT
-                    COUNT(*) FILTER (WHERE completed_at >= :week_ago) AS completed_7d,
+                    COUNT(*) FILTER (WHERE created_at >= :week_ago) AS completed_7d,
                     COUNT(*) FILTER (WHERE created_at >= :month_ago) AS activity_30d,
-                    MAX(completed_at) AS last_completed
+                    MAX(created_at) AS last_completed
                 FROM crm_activities
                 WHERE contact_id = {cid_bind} AND workspace_id = :workspace_id
             """

@@ -114,6 +114,13 @@ async def startup_event():
     logger.info("=== Application startup initiated ===")
     logger.info("Environment: %s | Version: 2.0.0", ENVIRONMENT)
 
+    # Lo PRIMERO, antes de abrir nada: si en produccion falta un secreto sin el
+    # que el servicio no puede funcionar, es mejor no arrancar que arrancar roto
+    # y responder al health check mientras la autenticacion rechaza todo.
+    from core.config import settings as _settings
+
+    _settings.assert_production_ready()
+
     dsn = os.environ.get("SENTRY_DSN", "").strip()
     if dsn:
         try:

@@ -14,7 +14,7 @@
  * titulo de caja repite el texto de un boton o etiqueta de esta pantalla.
  *
  * Logica de NELVYON intacta: `GET /api/saas/ai-copy` con `credentials:
- * "same-origin"` (solo lee `openai_configured`) y el `POST` con
+ * "same-origin"` (solo lee `ai_available`) y el `POST` con
  * `{ type, context, tone, variations }`; los ocho tipos de copy con su icono y
  * su placeholder; los cuatro tonos; el rango de 1 a 5 variaciones; el reset de
  * contexto y resultados al cambiar de tipo; el contador de caracteres para
@@ -65,17 +65,17 @@ export default function SaasCopywriterPage() {
   const [copies, setCopies] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState<number | null>(null);
-  const [openaiConfigured, setOpenaiConfigured] = useState<boolean | null>(null);
+  const [aiAvailable, setAiAvailable] = useState<boolean | null>(null);
 
   useEffect(() => {
     void (async () => {
       try {
         const res = await fetch("/api/saas/ai-copy", { credentials: "same-origin" });
         if (!res.ok) return;
-        const data = (await res.json().catch(() => ({}))) as { openai_configured?: boolean };
-        setOpenaiConfigured(data.openai_configured ?? false);
+        const data = (await res.json().catch(() => ({}))) as { ai_available?: boolean };
+        setAiAvailable(data.ai_available ?? false);
       } catch {
-        setOpenaiConfigured(false);
+        setAiAvailable(false);
       }
     })();
   }, []);
@@ -122,10 +122,10 @@ export default function SaasCopywriterPage() {
           <div className="col-xl-12">
             <p className="fs-14 text-muted">Genera textos de marketing persuasivos en segundos con IA</p>
 
-            {openaiConfigured === false && (
+            {aiAvailable === false && (
               <div className="alert alert-warning" role="alert">
-                OpenAI no está configurado (<code>OPENAI_API_KEY</code>). La generación IA estará
-                disponible cuando se configure en Railway.
+                La IA de NELVYON no está disponible en este momento. La generación volverá a estar
+                operativa cuando se restablezca el servicio de inferencia local.
               </div>
             )}
           </div>
@@ -185,7 +185,7 @@ export default function SaasCopywriterPage() {
 
                 <div className="text-end">
                   <button type="submit" className="btn btn-primary"
-                    disabled={loading || !context.trim() || openaiConfigured === false}>
+                    disabled={loading || !context.trim() || aiAvailable === false}>
                     {loading ? "Generando con IA…" : `Generar ${variations} variaciones`}
                   </button>
                 </div>

@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from typing import Any, Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -83,7 +83,7 @@ async def create_workflow(
 @workflows_visual_router.get("")
 async def list_workflows(
     skip: int = 0,
-    limit: int = 50,
+    limit: int = Query(50, ge=1, le=200),
     ws: WorkspaceContext = Depends(require_workspace),
     db: AsyncSession = Depends(get_db),
 ):
@@ -155,7 +155,7 @@ async def trigger_workflow(
 async def list_executions(
     workflow_id: int,
     skip: int = 0,
-    limit: int = 50,
+    limit: int = Query(50, ge=1, le=200),
     ws: WorkspaceContext = Depends(require_workspace),
     db: AsyncSession = Depends(get_db),
 ):

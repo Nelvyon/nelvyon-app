@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from typing import Any, Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -156,7 +156,7 @@ async def leaderboard(
     program_id: str,
     ws: WorkspaceContext = Depends(require_workspace),
     db: AsyncSession = Depends(get_db),
-    limit: int = 10,
+    limit: int = Query(10, ge=1, le=200),
 ):
     await LoyaltyService.ensure_schema()
     items = await _svc(db, ws).get_leaderboard(program_id, limit)

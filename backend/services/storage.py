@@ -24,6 +24,21 @@ from schemas.storage import (
 logger = logging.getLogger(__name__)
 
 
+#: TTL de las URLs prefirmadas, en segundos.
+#:
+#: Antes se enviaba `expires_in: 0`. Se investigo que significaba sin llamar al
+#: servicio, y el contrato del propio repo lo resuelve: `FileUpDownResponse`
+#: declara `expires_at` como campo OBLIGATORIO (`Field(...)`), asi que el
+#: servicio siempre devuelve una caducidad. Si `0` significara "sin caducidad",
+#: no podria rellenar ese campo. Queda descartada la lectura peligrosa —URL
+#: permanente— y `0` es "usa el default del servidor".
+#:
+#: Se manda un valor EXPLICITO igualmente, y el mismo que ya usa el modulo
+#: hermano `os_deliverable_storage` (`DEFAULT_SIGNED_URL_TTL_SEC = 600`): asi la
+#: vida de la URL es una decision de NELVYON y no un default ajeno que puede
+#: cambiar sin que nos enteremos.
+TTL_URL_PREFIRMADA_SEG = 600
+
 class StorageService:
     """Service for handling file upload and display with ObjectStorage service integration."""
 
@@ -135,7 +150,7 @@ class StorageService:
         Create presigned URL for file upload with access URL.
         """
         endpoint = f"/api/v1/infra/client/oss/buckets/{request.bucket_name}/objects/upload_url"
-        payload = {"expires_in": 0, "object_key": request.object_key}
+        payload = {"expires_in": TTL_URL_PREFIRMADA_SEG, "object_key": request.object_key}
         try:
             result = await self._apost_oss_service(endpoint, payload)
             # Format response according to ObjectStorage service response
@@ -157,7 +172,7 @@ class StorageService:
             content_type = "application/octet-stream"
         payload = {
             "content_type": content_type,  # like "image/jpeg"
-            "expires_in": 0,
+            "expires_in": TTL_URL_PREFIRMADA_SEG,
             "object_key": request.object_key,
         }
         try:

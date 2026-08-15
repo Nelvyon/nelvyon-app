@@ -167,7 +167,15 @@ async def test_social_posts_operator_create_orphan_ok(client: AsyncClient, auth_
         },
     )
     assert r.status_code == 201, r.text
-    assert r.json().get("user_id") == "test-user-00000000-0000-0000-0000-000000000001"
+    # `user_id` ya no es columna de `social_posts`: la tabla real —la que crea la
+    # migracion 507 y la que existe en produccion— no la tiene. El autor viaja en
+    # `metadata`, que es jsonb. El endpoint devolvia 500 mientras la afirmaba
+    # como campo de primer nivel, asi que esta asercion no relaja nada: pasa a
+    # comprobar el contrato que si puede cumplirse.
+    assert r.json().get("tenant_id") is not None
+    assert (r.json().get("metadata") or {}).get("user_id") == (
+        "test-user-00000000-0000-0000-0000-000000000001"
+    )
 
 
 @pytest.mark.asyncio
@@ -185,7 +193,10 @@ async def test_social_posts_operator_create_with_client_ok(client: AsyncClient, 
         },
     )
     assert r.status_code == 201, r.text
-    assert r.json().get("client_id") == cid
+    # Igual que arriba: `client_id` no es columna. Lo que SI debe seguir
+    # cumpliendose es que el cliente pertenezca al workspace — eso lo valida el
+    # servicio antes de escribir y lo cubre `test_social_posts_client_de_otro_ws`.
+    assert (r.json().get("metadata") or {}).get("client_id") == cid
 
 
 @pytest.mark.asyncio

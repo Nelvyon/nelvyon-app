@@ -16,7 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.database import db_manager, get_db
 from core.tenant_context import get_tenant_context
 from dependencies.auth import bearer_scheme, get_access_token, get_current_user
-from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_admin
+from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_admin, require_workspace_member, require_workspace_operator
 from schemas.auth import UserResponse
 from services.livechat_pubsub import publish_event, set_agent_presence, subscribe_events
 from services.livechat_service import get_livechat_service
@@ -227,7 +227,7 @@ async def get_chat_messages(
 async def assign_conversation_agent(
     conversation_id: str,
     body: AssignAgentBody,
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_operator),
     current_user: UserResponse = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -244,7 +244,7 @@ async def assign_conversation_agent(
 async def close_conversation(
     conversation_id: str,
     body: CloseConversationBody,
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_operator),
     db: AsyncSession = Depends(get_db),
 ):
     tid = _tid(ws)
@@ -295,7 +295,7 @@ async def get_chat_stats(
 @livechat_router.post("/presence")
 async def update_agent_presence(
     body: PresenceBody,
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_member),
     current_user: UserResponse = Depends(get_current_user),
 ):
     tid = _tid(ws)

@@ -63,6 +63,14 @@ describe("CreativeService", () => {
 
   beforeEach(() => {
     queryMock.mockReset();
+    /**
+     * Los proveedores externos de imagen exigen ahora DOBLE opt-in: el
+     * interruptor general más la clave concreta. Tener solo la clave ya no
+     * basta — ese era el defecto: la cadena Midjourney → DALL·E se disparaba
+     * sola y generaba gasto. Este suite ejercita el camino externo, así que
+     * declara el opt-in explícitamente, como haría un operador.
+     */
+    process.env.NELVYON_ALLOW_EXTERNAL_MEDIA = "1";
     process.env.MIDJOURNEY_API_KEY = "mj-test";
     process.env.OPENAI_API_KEY = "sk-test";
     process.env.KLING_API_KEY = "kl-test";

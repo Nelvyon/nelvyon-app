@@ -14,6 +14,33 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.sql_compat import json_bind
 
+
+from core.ai_provider import AiNotConfigured
+
+
+def _nelvyon_ai_base_url() -> str:
+    """Endpoint de IA explicito. Nunca cae a `api.openai.com` por defecto.
+
+    Precedencia: infraestructura de NELVYON primero, luego configuracion
+    explicita del operador (que puede apuntar a un runtime local compatible).
+    Cadena vacia = NOT_CONFIGURED; el llamante debe degradar.
+    """
+    base = (
+        os.environ.get("NELVYON_AI_BASE_URL", "").strip()
+        or os.environ.get("OPENAI_BASE_URL", "").strip()
+        or os.environ.get("APP_AI_BASE_URL", "").strip()
+    ).rstrip("/")
+    if not base:
+        # NOT_CONFIGURED explicito. Nunca se deja que el SDK aplique su default,
+        # que es `https://api.openai.com/v1`: eso seria salir a un proveedor
+        # externo de pago sin decision del operador.
+        raise AiNotConfigured(
+            "IA no configurada: define NELVYON_AI_BASE_URL. No se contacta "
+            "ningun proveedor externo por defecto."
+        )
+    return base
+
+
 logger = logging.getLogger(__name__)
 
 SCHEMA_PATH = "client_web_builder.sql"
@@ -101,7 +128,7 @@ async def _gpt_generate(briefing: dict[str, Any]) -> tuple[str, str, list[dict[s
 
         client = AsyncOpenAI(
             api_key=key,
-            base_url=os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1").strip(),
+            base_url=_nelvyon_ai_base_url(),
         )
         prompt = (
             "Genera una web completa en JSON con keys: html (documento HTML5 completo mobile-first), "
@@ -175,6 +202,7 @@ class WebBuilderService:
                 """
                 INSERT INTO client_websites (client_id, workspace_id, slug, html_content, css_content, version)
                 VALUES (:client_id, :ws, :slug, :html, :css, :version)
+                RETURNING id, slug, version
                 """
             ),
             {
@@ -186,14 +214,16 @@ class WebBuilderService:
                 "version": version,
             },
         )
+        # `RETURNING` en vez de `last_insert_rowid()`, que es de SQLite: en
+        # PostgreSQL —la base de produccion— esa funcion no existe. El defecto
+        # estaba oculto porque los tests corren sobre SQLite. De paso desaparece
+        # el SELECT posterior, que podia no encontrar la fila y dejaba un
+        # `None` sin comprobar aguas abajo.
+        site = ins.mappings().first()
+        if site is None:
+            raise ValueError("Website could not be created")
+        site_id = int(site["id"])
         await self.session.commit()
-        site_id_row = await self.session.execute(text("SELECT last_insert_rowid() AS id"))
-        site_id = int(site_id_row.scalar_one())
-        slug_row = await self.session.execute(
-            text("SELECT slug, version, created_at FROM client_websites WHERE id = :id"),
-            {"id": site_id},
-        )
-        site = slug_row.mappings().first()
 
         for sec in sections:
             content_json = json.dumps(sec.get("content", sec), ensure_ascii=False)
@@ -270,11 +300,12 @@ class WebBuilderService:
         if not site:
             raise ValueError("version not found")
         new_version = int(site["version"]) + 1
-        await self.session.execute(
+        ins_restore = await self.session.execute(
             text(
                 """
                 INSERT INTO client_websites (client_id, workspace_id, slug, html_content, css_content, version)
                 VALUES (:client_id, :ws, :slug, :html, :css, :version)
+                RETURNING id
                 """
             ),
             {
@@ -286,9 +317,12 @@ class WebBuilderService:
                 "version": new_version,
             },
         )
+        # Ver nota de `generate`: `RETURNING` es portable, `last_insert_rowid()` no.
+        nueva = ins_restore.mappings().first()
+        if nueva is None:
+            raise ValueError("Website version could not be restored")
+        new_id = int(nueva["id"])
         await self.session.commit()
-        site_id_row = await self.session.execute(text("SELECT last_insert_rowid() AS id"))
-        new_id = int(site_id_row.scalar_one())
         return {
             "website_id": new_id,
             "restored_from": website_id,

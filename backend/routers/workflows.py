@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
 from routers.crm_http_helpers import raise_internal, warn_and_bad_request, warn_integrity_conflict
-from services.audit_events import write_audit_event
+from services.audit_events import write_audit_event_best_effort
 from services.workflows import WorkflowsService
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from dependencies.quota_guards import (
@@ -191,7 +191,7 @@ async def create_workflows(
         result = await service.create(data.model_dump(), user_id=ws_ctx.user_id, workspace_id=ws_ctx.workspace_id)
         if not result:
             raise HTTPException(status_code=400, detail="Failed to create workflow")
-        await write_audit_event(
+        await write_audit_event_best_effort(
             db,
             actor_user_id=ws_ctx.user_id,
             actor_email=ws_ctx.user_email,
@@ -205,7 +205,7 @@ async def create_workflows(
         )
         return result
     except HTTPException:
-        await write_audit_event(
+        await write_audit_event_best_effort(
             db,
             actor_user_id=ws_ctx.user_id,
             actor_email=ws_ctx.user_email,
@@ -219,7 +219,7 @@ async def create_workflows(
         )
         raise
     except IntegrityError as e:
-        await write_audit_event(
+        await write_audit_event_best_effort(
             db,
             actor_user_id=ws_ctx.user_id,
             actor_email=ws_ctx.user_email,
@@ -233,7 +233,7 @@ async def create_workflows(
         )
         warn_integrity_conflict(logger, "create workflow", e)
     except ValueError as e:
-        await write_audit_event(
+        await write_audit_event_best_effort(
             db,
             actor_user_id=ws_ctx.user_id,
             actor_email=ws_ctx.user_email,
@@ -247,7 +247,7 @@ async def create_workflows(
         )
         warn_and_bad_request(logger, "create workflow", e)
     except Exception as e:
-        await write_audit_event(
+        await write_audit_event_best_effort(
             db,
             actor_user_id=ws_ctx.user_id,
             actor_email=ws_ctx.user_email,

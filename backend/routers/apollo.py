@@ -28,7 +28,7 @@ class SyncCrmBody(BaseModel):
 @router.post("/search")
 async def search_leads(
     body: SearchBody,
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_operator),
     db: AsyncSession = Depends(get_db),
 ):
     svc = get_apollo_service(db, ws.workspace_id)

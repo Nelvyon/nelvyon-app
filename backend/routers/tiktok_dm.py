@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
+from core.webhook_shared_secret import verificar_secreto_compartido
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.tiktok_dm_service import get_tiktok_dm_service
 
@@ -25,6 +26,17 @@ class BotToggleBody(BaseModel):
 
 @router.post("/webhook")
 async def receive_webhook(request: Request, db: AsyncSession = Depends(get_db)):
+    """DM entrante de TikTok.
+
+    TikTok no publica esquema de firma para este webhook, asi que se exige el
+    secreto compartido configurado al dar de alta la URL en su panel — el mismo
+    patron que el repositorio ya usa en `/webhook/trigger/{webhook_key}`.
+    Inventarse una firma que el proveedor no enviaria seria peor que inutil.
+
+    Sin esto, cualquiera podia inyectar DMs en la bandeja con el remitente que
+    quisiera.
+    """
+    verificar_secreto_compartido("tiktok", request)
     return await get_tiktok_dm_service(db, 1).handle_webhook(await request.json())
 
 

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { requireSaasContext, saasErrorBody, saasErrorStatus } from "@nelvyon/saas";
 import { DbClient } from "../../../../../../../../backend/db/DbClient";
+import { runNelvyonTextTask } from "../../../../../../../../backend/saas/NelvyonAiTextService";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -81,33 +82,21 @@ export async function POST(req: Request) {
         throw new Error(err.detail ?? `Backend returned ${backendRes.status}`);
       }
     } catch (_backendErr) {
-      // Fallback: use OpenAI directly with agent context
-      const openaiKey = process.env.OPENAI_API_KEY;
-      if (openaiKey) {
-        const oaRes = await fetch("https://api.openai.com/v1/chat/completions", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${openaiKey}` },
-          body: JSON.stringify({
-            model: "gpt-4o-mini",
-            messages: [
-              {
-                role: "system",
-                content: `Eres el agente especializado de Nelvyon para el sector "${agentId}". Eres un experto en marketing digital, SEO, publicidad y crecimiento. Responde de forma estructurada, accionable y en español. Da resultados concretos que el usuario pueda implementar hoy mismo.`,
-              },
-              { role: "user", content: input },
-            ],
-            max_tokens: 2000,
-            temperature: 0.7,
-          }),
-          signal: AbortSignal.timeout(30_000),
-        });
-        if (oaRes.ok) {
-          const oaData = (await oaRes.json()) as { choices?: { message?: { content?: string } }[] };
-          result = oaData.choices?.[0]?.message?.content ?? "Sin respuesta del agente";
-        } else {
-          status = "failed";
-          result = `El agente "${agentId}" no pudo ejecutarse. Verifica la clave OPENAI_API_KEY en Railway.`;
-        }
+      /**
+       * Respaldo con la IA PROPIA de NELVYON. Antes este camino llamaba a
+       * `api.openai.com` con la clave del entorno, lo que convertía un fallo del
+       * backend de agentes en gasto por tokens de un tercero y, sin clave,
+       * en el mensaje "Verifica la clave OPENAI_API_KEY en Railway".
+       * Ahora usa `LocalModelRouter` con el `tenantId` autenticado.
+       */
+      const ai = await runNelvyonTextTask({
+        tenantId: String(ctx.tenant.id),
+        system: `Eres el agente especializado de Nelvyon para el sector "${agentId}". Eres un experto en marketing digital, SEO, publicidad y crecimiento. Responde de forma estructurada, accionable y en español. Da resultados concretos que el usuario pueda implementar hoy mismo.`,
+        prompt: input,
+        agentId: `saas-agent-${agentId}`,
+      });
+      if (ai.ok) {
+        result = ai.content;
       } else {
         status = "failed";
         result = "";
@@ -119,7 +108,8 @@ export async function POST(req: Request) {
 
       return NextResponse.json(
         {
-          error: "Agente no disponible — configura OPENAI_API_KEY o el backend de agentes (FastAPI).",
+          error:
+            "Agente no disponible: el backend de agentes y la IA local de NELVYON no respondieron.",
           code: "AGENT_UNAVAILABLE",
           runId,
           status: "failed",

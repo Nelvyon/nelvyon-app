@@ -1,17 +1,19 @@
 {
   "$schema": "https://railway.com/railway.schema.json",
-  "$comment": "Monorepo API service: Config file path /backend/railway.json OR use this file with Root Directory backend",
+  "$comment": "Monorepo API service: Config file path /backend/railway.json OR use this file with Root Directory backend | healthcheckPath es /health/ready: /health responde 'healthy' sin mirar la base, asi que un despliegue con la base inalcanzable se promocionaba y fallaba peticion a peticion. Los DOS ficheros de config de este servicio deben decir lo mismo; hay un test que lo exige.",
   "rootDirectory": "backend",
   "build": {
     "builder": "DOCKERFILE",
     "dockerfilePath": "Dockerfile",
     "buildCommand": null,
-    "watchPatterns": ["backend/**"]
+    "watchPatterns": [
+      "backend/**"
+    ]
   },
   "deploy": {
     "startCommand": "uvicorn main:app --host 0.0.0.0 --port 8000",
     "restartPolicyType": "ON_FAILURE",
-    "healthcheckPath": "/health",
+    "healthcheckPath": "/health/ready",
     "healthcheckTimeout": 120,
     "port": 8000
   }

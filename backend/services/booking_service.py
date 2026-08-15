@@ -1,6 +1,7 @@
 """NELVYON bookings — Zoom meetings, calendar slots, SES notifications."""
 
 from __future__ import annotations
+from core.tenant_bridge import require_owner_uuid
 
 import logging
 from datetime import date, datetime, timedelta, timezone
@@ -98,6 +99,7 @@ class BookingService:
         notes: str | None = None,
         auto_confirm: bool = True,
     ) -> dict[str, Any]:
+        propietario = await require_owner_uuid(self.session, self.workspace_id)
         client_name = (client_data.get("client_name") or client_data.get("name") or "").strip()
         client_email = (client_data.get("client_email") or client_data.get("email") or "").strip()
         if not client_name or not client_email:
@@ -120,22 +122,34 @@ class BookingService:
         result = await self.session.execute(
             text(
                 """
+                -- La tabla real —migracion 049, la que gana— acota por
+                -- `user_id uuid` y descompone la cita en `booking_date` +
+                -- `booking_time`; ademas exige `confirmation_token`, que es lo
+                -- que el cliente usa para confirmar o cancelar sin sesion.
+                --
+                -- El writer hablaba la definicion de la 507 (`workspace_id`,
+                -- `start_at`, `service_name`), que nunca se aplica: reservar
+                -- fallaba siempre.
+                --
+                -- Lo que no tiene columna —servicio, Zoom, host— va a `notes`,
+                -- que es texto libre y ya se usaba para anotaciones.
                 INSERT INTO bookings (
-                    workspace_id, host_user_id, client_name, client_email, client_phone,
-                    service_name, duration_minutes, start_at, end_at, status,
-                    zoom_meeting_id, zoom_join_url, zoom_host_url, notes, created_at
+                    id, user_id, client_name, client_email, client_phone,
+                    booking_date, booking_time, duration, status,
+                    confirmation_token, notes, created_at, updated_at
                 )
                 VALUES (
-                    :workspace_id, :host_user_id, :client_name, :client_email, :client_phone,
-                    :service_name, :duration_minutes, :start_at, :end_at, :status,
-                    :zoom_meeting_id, :zoom_join_url, :zoom_host_url, :notes, :created_at
+                    gen_random_uuid(), CAST(:propietario AS uuid), :client_name,
+                    :client_email, :client_phone,
+                    CAST(:start_at AS date), CAST(:start_at AS time), :duration_minutes,
+                    :status, :token_confirmacion, :notes, :created_at, :created_at
                 )
                 RETURNING *
                 """
             ),
             {
-                "workspace_id": self.workspace_id,
-                "host_user_id": self.host_user_id,
+                "propietario": propietario,
+                "token_confirmacion": _uuid.uuid4().hex,
                 "client_name": client_name,
                 "client_email": client_email,
                 "client_phone": client_data.get("client_phone") or client_data.get("phone"),
@@ -147,7 +161,13 @@ class BookingService:
                 "zoom_meeting_id": str(meeting.get("id", "")),
                 "zoom_join_url": meeting.get("join_url"),
                 "zoom_host_url": meeting.get("start_url"),
-                "notes": notes,
+                "notes": " · ".join(
+                    x for x in (
+                        notes,
+                        f"servicio: {service_name}" if service_name else "",
+                        f"zoom: {meeting.get('join_url')}" if meeting.get("join_url") else "",
+                    ) if x
+                ),
                 "created_at": datetime.now(timezone.utc),
             },
         )

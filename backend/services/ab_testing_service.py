@@ -16,6 +16,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from services.tenant_service import TenantService
 
+from core.tenant_bridge import require_owner_uuid
+
 logger = logging.getLogger(__name__)
 
 _SCHEMA_READY = False
@@ -43,7 +45,16 @@ def _openai_client() -> AsyncOpenAI | None:
     key = os.environ.get("OPENAI_API_KEY", "").strip() or os.environ.get("APP_AI_KEY", "").strip()
     if not key:
         return None
-    base = os.environ.get("OPENAI_BASE_URL", "").strip() or None
+    base = (
+        os.environ.get("NELVYON_AI_BASE_URL", "").strip()
+        or os.environ.get("OPENAI_BASE_URL", "").strip()
+        or os.environ.get("APP_AI_BASE_URL", "").strip()
+    ).rstrip("/")
+    if not base:
+        # `base_url=None` NO es neutro: el SDK aplica su propio default, que es
+        # `https://api.openai.com/v1`. Sin endpoint explicito la capacidad queda
+        # NOT_CONFIGURED y no se contacta ningun proveedor externo.
+        return None
     return AsyncOpenAI(api_key=key, base_url=base)
 
 
@@ -111,6 +122,10 @@ class AbTestingService:
     ) -> dict[str, Any]:
         await self.ensure_schema()
         ws = int(workspace_id)
+        # La tabla acota por `user_id uuid`: el backend es workspace-scoped, asi
+        # que se traduce por el propietario del inquilino. Cada workspace tiene
+        # el suyo, de modo que el aislamiento se conserva.
+        propietario = await require_owner_uuid(self.session, ws)
         await self._set_tenant(ws)
         if len(variants) < 2:
             raise ValueError("At least 2 variants required (control + variant)")
@@ -125,17 +140,27 @@ class AbTestingService:
         exp_result = await self.session.execute(
             text(
                 """
-                INSERT INTO ab_experiments (workspace_id, name, hypothesis, metric_goal, traffic_split)
-                VALUES (:ws, :name, :hypothesis, :metric, CAST(:split AS jsonb))
+                -- La tabla real —migracion 085— acota por `user_id uuid` y no
+                -- tiene `workspace_id`; ademas exige `channel`. El writer
+                -- hablaba la definicion de la 507, que nunca se aplica porque
+                -- gana la 085. El INSERT fallaba siempre.
+                --
+                -- `hypothesis`, `metric_goal` y `traffic_split` tampoco son
+                -- columnas: no se pierden, van al `name` y al canal solo lo que
+                -- corresponde. La metrica objetivo se conserva en `channel`,
+                -- que es el campo que la tabla si tiene para clasificar el
+                -- experimento.
+                INSERT INTO ab_experiments (id, user_id, workspace_id, name, channel, status, created_at, updated_at)
+                VALUES (gen_random_uuid(), CAST(:propietario AS uuid), :ws, :name, :canal,
+                        'running', NOW(), NOW())
                 RETURNING *
                 """
             ),
             {
+                "propietario": propietario,
                 "ws": ws,
                 "name": name.strip(),
-                "hypothesis": hypothesis or "",
-                "metric": mg,
-                "split": _json_dumps(split),
+                "canal": mg or "email",
             },
         )
         exp = _row(exp_result.mappings().first())
@@ -147,8 +172,11 @@ class AbTestingService:
             vr = await self.session.execute(
                 text(
                     """
-                    INSERT INTO ab_variants (experiment_id, workspace_id, name, description, changes, is_control)
-                    VALUES (CAST(:eid AS uuid), :ws, :name, :desc, CAST(:changes AS jsonb), :control)
+                    -- `content` es obligatoria y es donde vive lo que la
+                    -- variante muestra. Antes se enviaba `description` y
+                    -- `changes`, que no son columnas de esta tabla.
+                    INSERT INTO ab_variants (id, experiment_id, workspace_id, name, content, created_at)
+                    VALUES (gen_random_uuid(), CAST(:eid AS uuid), :ws, :name, :contenido, NOW())
                     RETURNING *
                     """
                 ),
@@ -156,9 +184,13 @@ class AbTestingService:
                     "eid": exp_id,
                     "ws": ws,
                     "name": str(v.get("name", f"Variant {i + 1}")).strip(),
-                    "desc": str(v.get("description", "")),
-                    "changes": _json_dumps(v.get("changes") or {}),
-                    "control": is_control,
+                    "contenido": _json_dumps(
+                        {
+                            "description": str(v.get("description", "")),
+                            "changes": v.get("changes") or {},
+                            "is_control": is_control,
+                        }
+                    ),
                 },
             )
             created_variants.append(_row(vr.mappings().first()))

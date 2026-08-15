@@ -363,7 +363,9 @@ export class SaasCrmEtlService {
     await this.db.query(
       `INSERT INTO saas_contacts
          (tenant_id, name, email, phone, company, position, status, pipeline_stage, value, notes, tags, updated_at)
-       VALUES ($1,$2,$3,$4,$5,NULL,$6,$7,0,$8,$9,NOW())`,
+       VALUES ($1,$2,$3,$4,$5,NULL,$6,$7,0,$8,$9,NOW())
+       ON CONFLICT (nelvyon_etl_legacy_tag(tags))
+         WHERE nelvyon_etl_legacy_tag(tags) IS NOT NULL DO NOTHING`,
       [
         c.tenantId,
         c.name,

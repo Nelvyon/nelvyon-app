@@ -115,7 +115,7 @@ export class SaasWhatsAppService {
 
     // Ensure inbox conversation exists for this contact/number
     const convRows = await this.db.query<{ id: string }>(
-      `SELECT id FROM conversations WHERE tenant_id=$1 AND channel='whatsapp'
+      `SELECT id FROM saas_conversations WHERE tenant_id=$1 AND channel='whatsapp'
        AND (metadata->>'wa_to' = $2 OR contact_id = $3) LIMIT 1`,
       [tenantId, input.to, input.contactId ?? ""],
     );
@@ -124,7 +124,7 @@ export class SaasWhatsAppService {
       conversationId = convRows[0].id;
     } else {
       const newConv = await this.db.query<{ id: string }>(
-        `INSERT INTO conversations (tenant_id, contact_id, channel, status, last_message, last_message_at,
+        `INSERT INTO saas_conversations (tenant_id, contact_id, channel, status, last_message, last_message_at,
            updated_at, metadata)
          VALUES ($1,$2,'whatsapp','open',$3,NOW(),NOW(),$4::jsonb)
          RETURNING id`,
@@ -155,7 +155,7 @@ export class SaasWhatsAppService {
 
     // Update conversation last message
     await this.db.query(
-      `UPDATE conversations SET last_message=$1, last_message_at=NOW(), updated_at=NOW() WHERE id=$2 AND tenant_id=$3`,
+      `UPDATE saas_conversations SET last_message=$1, last_message_at=NOW(), updated_at=NOW() WHERE id=$2 AND tenant_id=$3`,
       [input.body.slice(0, 120), conversationId, tenantId],
     );
 

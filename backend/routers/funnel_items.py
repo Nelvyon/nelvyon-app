@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
 from services.funnel_items import Funnel_itemsService
-from dependencies.auth import get_current_user
+from dependencies.auth import get_current_user, get_super_admin_user
 from schemas.auth import UserResponse
 
 # Set up logging
@@ -145,6 +145,13 @@ async def query_funnel_itemss_all(
     skip: int = Query(0, ge=0, description="Number of records to skip"),
     limit: int = Query(20, ge=1, le=2000, description="Max number of records to return"),
     fields: str = Query(None, description="Comma-separated list of fields to return"),
+    # Vista de TODOS los inquilinos: no filtra por workspace ("without user
+    # limitation" en el comentario original). Cualquier usuario autenticado la
+    # alcanzaba y recibia filas de otros tenants.
+    #
+    # Diez endpoints `/all` hermanos de este mismo backend ya exigen autoridad
+    # de plataforma; estos se habian quedado fuera.
+    _admin: UserResponse = Depends(get_super_admin_user),
     db: AsyncSession = Depends(get_db),
 ):
     # Query funnel_itemss with filtering, sorting, and pagination without user limitation

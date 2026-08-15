@@ -7,7 +7,10 @@ from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
+import json
+
 from core.database import get_db
+from core.meta_webhook_signature import verificar_firma_meta
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.facebook_messenger_service import get_facebook_messenger_service
 
@@ -40,7 +43,11 @@ async def verify_webhook(
 
 @router.post("/webhook")
 async def receive_webhook(request: Request, db: AsyncSession = Depends(get_db)):
-    return await get_facebook_messenger_service(db, 1).handle_webhook(await request.json())
+    # Se lee el cuerpo CRUDO: reserializar el JSON cambia los bytes y la
+    # firma dejaria de casar.
+    cuerpo = await request.body()
+    verificar_firma_meta("facebook", cuerpo, request.headers.get("x-hub-signature-256"))
+    return await get_facebook_messenger_service(db, 1).handle_webhook(json.loads(cuerpo))
 
 
 @router.get("/conversations")

@@ -300,3 +300,404 @@
 - [ ] Staging real: `DATABASE_URL` + `STAGING_BASE_URL` (no prod) � 2 tenants � roles � GDPR live � billing/webhooks
 - [ ] Re-run Playwright SaaS completo post-fix dashboard loading (a11y dashboard)
 - [ ] Mantener `claimReady: true` hasta gates live + legal Pepito
+
+## DEUDA — idempotencia de envío de campañas (2026-08-12)
+
+Detectada al cerrar la política de auditoría, fuera del alcance de ese bloque.
+`CampaignSenderService.send_campaign` (`backend/services/campaign_sender.py:106`)
+guarda contra reenvío con `if campaign.status == "sending"`, y tiene dos huecos:
+
+- **TOCTOU**: lee el estado y lo escribe en dos pasos sin bloqueo. Dos peticiones
+  concurrentes pueden leer ambas `draft` y enviar las dos veces. Necesita
+  `SELECT ... FOR UPDATE` o un `UPDATE ... WHERE status <> 'sending'` condicional
+  que actúe de reclamo atómico.
+- **Reenvío de campañas ya enviadas**: `status == "sent"` no está cubierto, así que
+  una campaña completada puede reenviarse indefinidamente. Decidir si es
+  intencionado (producto) o defecto antes de cerrarlo.
+
+La auditoría de intención (`result="attempt"`, migración de hoy) ya deja rastro de
+cada intento, así que un envío duplicado es ahora **detectable**; sigue sin estar
+**impedido**.
+
+## RESUELTO — identidad remitente de campañas (2026-08-12)
+
+Cerrado: `campaign_sender` ya pasa `campaigns.from_email`/`from_name` al envío.
+No era decisión de producto — la API los aceptaba, el servicio los guardaba y
+solo el envío los ignoraba. Sin remitente propio se sigue usando el corporativo.
+La verificación del remitente la impone SendGrid.
+
+Texto original conservado abajo por trazabilidad.
+
+## (histórico) DEUDA — identidad remitente de campañas
+
+Cerrada la tenencia de WhatsApp y SES, queda un tercer camino con la misma forma
+pero que NO se toca porque romperlo quitaría funcionalidad viva.
+
+`CampaignSenderService` (`backend/services/campaign_sender.py:142`) envía las
+campañas de cada cliente vía `EmailService`, cuyo remitente es global:
+`SENDGRID_FROM_EMAIL` (por defecto `nelvyon@noreply.com`, nombre `NELVYON`). Es
+decir, la campaña de un cliente llega a sus prospectos **firmada por NELVYON**.
+
+La columna `campaigns.from_email` existe desde la migración 507 y **ningún código
+la lee**: el modelo de datos ya anticipaba un remitente por campaña que nunca se
+cableó.
+
+Por qué no se cierra aquí: a diferencia de `/api/whatsapp/*` y `/api/ses/*` —que
+el frontend no consume—, campañas es una funcionalidad en uso. Exigir dominio
+verificado por workspace antes de enviar es una decisión de producto (¿se
+bloquean las campañas de quien no ha verificado dominio, o se sigue enviando
+desde NELVYON con `reply-to` del cliente?), no una corrección mecánica.
+
+Relacionado: la deuda de idempotencia de `send_campaign` registrada más arriba.
+
+## DEUDA — WhatsApp por tenant: `user_id` vs `workspace_id` (2026-08-12)
+
+`integration_whatsapp` (migración 030) está keyed por `user_id`, y solo la lee
+`backend/integrations/WhatsAppService.ts`. `core/messaging_integration.py`
+necesita resolver por `workspace_id`, así que hoy devuelve `None` siempre y los
+envíos Python fallan cerrado.
+
+Para habilitarlos hace falta decidir la relación real (¿la integración pertenece
+al usuario que conectó, o al workspace?) y migrar la clave. Mismo problema ya
+registrado para `oauth_connections` en el cierre de ads.
+
+## DEUDA — reembolsos autoservicio (2026-08-12)
+
+`POST /api/v1/payment/refund` pasa a autoridad de plataforma porque el `charge_id`
+venía del cuerpo sin comprobar contra nada y la cuenta Stripe es corporativa: un
+admin de cualquier workspace podía reembolsar el cargo de otro.
+
+Queda la pregunta de producto, que NO se decide aquí: ¿debe existir reembolso
+autoservicio para que un cliente recupere su pago sin intervención de NELVYON?
+Hoy no lo consume ningún componente del frontend, así que cerrarlo no quita
+funcionalidad. Si se quisiera, el diseño correcto exige vincular el cargo al
+workspace (`_get_or_create_stripe_customer` ya da esa relación, y `list_charges`
+la usa) y probablemente una política de importes y plazos.
+
+## DEUDA — marketplace: compra sin cobro (2026-08-12)
+
+`MarketplaceService.purchase_item` inserta en `marketplace_purchases` con
+`status='completed'` y un `amount`, **sin ningún cobro asociado**: no toca Stripe
+ni ninguna pasarela. Una fila dice que hubo una transacción completada que no
+ocurrió.
+
+Impacto acotado hoy: nada lee esas filas salvo `list_my_purchases`, así que no
+desbloquea contenido ni dispara pagos al vendedor. Es un registro que
+sobreafirma, no una escalada.
+
+No se cierra aquí porque el marketplace no tiene integración de pagos: exigirla
+sería inventar una funcionalidad, y cambiar `'completed'` por `'pending'` altera
+semántica de producto sin evidencia de intención. Decidir si el marketplace cobra
+de verdad es decisión de producto.
+
+## VERIFICADO CORRECTO — cuota de sesiones de advisor (2026-08-12)
+
+`_consume_month_usage` usa `UPDATE ... SET used_sessions = used_sessions + 1
+WHERE used_sessions < :monthly_limit` y deriva `consumed` de `rowcount`: es un
+compare-and-swap atómico en una sola sentencia, no el patrón read-then-write de
+`send_campaign`. No hay doble gasto por concurrencia. Se anota para no volver a
+auditarlo.
+
+## DEUDA — persistencia de la cola en proceso (2026-08-12)
+
+`AsyncJobQueue` es `asyncio.Queue` en memoria: un reinicio del proceso pierde los
+jobs encolados y los que estuvieran en reintento. Existe `ARQJobQueue` sobre
+Redis como alternativa, que se desactiva sola si falta `REDIS_URL`.
+
+No se cierra aquí porque garantizar durabilidad exige decidir infraestructura
+(Redis obligatorio, o tabla `job_queue` en PostgreSQL con reclamo
+`FOR UPDATE SKIP LOCKED`), y eso es decisión de despliegue con coste asociado.
+Lo que sí está cerrado es que ningún job quede en estado no terminal y que un
+fallo no bloquee la cola.
+
+## DEUDA — latencia de revocación del rol (2026-08-12)
+
+El rol de FastAPI se deriva del `plan` del token de la app en cada petición, así
+que un cambio de plan solo surte efecto cuando ese token se renueva
+(`JWT_EXPIRATION_MINUTES`, 60 por defecto).
+
+Investigado durante el bloque 12: **no existe tabla `users`** en las migraciones
+—solo `nelvyon_users`, que no tiene columna `role`—, así que no hay una fuente
+en base contra la que contrastar el rol por petición. `services/gdpr_service.py`
+consulta `SELECT ... FROM users`, lo que sugiere que esa tabla se da por existente
+en algún entorno; conviene confirmarlo contra PostgreSQL real (bloque 2/29).
+
+Cerrar la latencia exige decidir dónde vive el rol de plataforma. No se inventa
+aquí una tabla que el sistema no tiene.
+
+## DEUDA — límite de tasa distribuido con varias instancias (2026-08-12)
+
+`RateLimiter` usa Redis cuando hay `REDIS_URL` y cae a un contador **en memoria**
+si no la hay. Con varias instancias, ese contador es por proceso: el límite
+efectivo se multiplica por el número de instancias.
+
+Verificado y correcto: el limitador **falla cerrado** si el almacén revienta, y
+la respuesta declara `backend: "memory"` cuando está degradado, así que la
+degradación es detectable y no silenciosa.
+
+Lo que falta es una decisión de despliegue: exigir Redis en producción (coste
+recurrente) o mover el contador a PostgreSQL. No se elige aquí porque introduce
+infraestructura con coste. Relacionado con el bloque 37 (ENV de producción).
+
+## DEUDA — paridad del token de alumno en LMS (2026-08-12)
+
+`apps/web/src/app/api/lms/courses/[id]/progress/[email]/route.ts` exige un token
+de alumno (`verifyLearnerAccessToken`) para que el propio alumno vea su progreso.
+El equivalente Python no tiene ese verificador, así que en el bloque 16 se acotó
+a contexto de workspace (acceso de personal) en lugar de inventar un esquema de
+tokens paralelo.
+
+Consecuencia: por el camino Python, un alumno no puede consultar su progreso ni
+su certificado sin ser miembro del workspace. Si ese caso importa, hay que
+portar el verificador, no relajar el alcance.
+
+Aparte: `POST /api/lms/courses/{id}/enroll` tampoco tiene autenticación. Puede
+ser deliberado (auto-matrícula en curso público) o un hueco de spam. No se toca
+sin decidir cuál de las dos cosas es.
+
+## DEUDA — webhooks entrantes sin verificación (2026-08-12)
+
+Inventario del bloque 18: 21 endpoints entrantes tipo webhook/callback. Solo
+cuatro verifican algo (`stripe_webhook`, `os_store_builder`, `oauth_integrations`,
+`webhooks/endpoints`). El de `text2pay` se cerró en ese bloque porque marcaba
+pagos como cobrados.
+
+Quedan sin verificación de firma, y hay que revisarlos uno a uno con la
+documentación de cada proveedor:
+
+`bookings/webhook/zoom`, `contracts/webhook` (Signaturit), `dialer/webhook/twilio`,
+`sms/webhook/twilio`, `tiktok_dm/webhook`, `whatsapp/webhook`,
+`helpdesk/inbound/{email,whatsapp}`, `monitoring/ses/bounce-webhook`,
+`automation/webhook/trigger/{key}`.
+
+**Cerrados en el bloque 24**: `instagram_dm/webhook` y `facebook_messenger/webhook`
+verifican `X-Hub-Signature-256` (`core/meta_webhook_signature.py`). Son el mismo
+proveedor y el mismo algoritmo, por eso se pudieron cerrar juntos.
+
+No se cierran en bloque porque cada proveedor firma de forma distinta (Twilio usa
+`X-Twilio-Signature` sobre la URL + params ordenados; Meta usa `X-Hub-Signature-256`;
+SES/SNS exige validar el certificado de la firma). Hacerlo mal daría una sensación
+de protección peor que no tenerla. `automation/webhook/trigger/{key}` sí tiene una
+clave en la ruta, que es un secreto compartido — conviene confirmar su entropía.
+
+## DEUDA — una dependencia de orden restante (2026-08-12)
+
+Bloque 28: la suite pasa en orden normal (1870) y en orden inverso falla **uno**
+solo, `test_workspace_invite_member_forbidden_operator_ok`, con "Maximum of 50
+members per workspace".
+
+Ya corregido en ese bloque, con causa raíz demostrada:
+- el seed de `users` en `conftest` fallaba **en silencio** (`language` es NOT NULL
+  con default de modelo, no de servidor, y `INSERT OR IGNORE` se tragaba la
+  violación): la tabla quedaba vacía y los tests de perfil solo pasaban si otro
+  test creaba la fila antes;
+- el test de invitación no limpiaba el miembro que creaba.
+
+Lo que falta por determinar: quién más consume la cuota de 50 miembros del
+workspace 1 durante una ejecución. Un diagnóstico con `db_session` contó 3
+miembros, lo que sugiere que esa fixture no ve la misma sesión que la app —
+conviene confirmar qué base usan realmente los tests antes de seguir tirando del
+hilo. No es defecto de producto: el tope funciona.
+
+## BLOQUEADO — rendimiento de base de datos (bloque 31, 2026-08-12)
+
+Medido: **45 bucles** en `services/` y `routers/` que ejecutan una consulta por
+iteración (`await self.session.execute(...)` dentro de un `for`). Lista completa
+reproducible con el detector AST usado en el bloque 31.
+
+No se optimiza ninguno todavía, y es deliberado:
+
+- Muchos son INSERT acotados (p. ej. las secciones de un sitio en
+  `web_builder_service`), que no son un N+1 dañino sino una escritura por fila.
+- Distinguir los dañinos de los inocuos exige medir, y medir planes de consulta
+  —índices, seq scans, N+1 real— solo tiene sentido contra **PostgreSQL real**.
+  En SQLite el resultado no dice nada sobre producción.
+- El plan prohíbe optimizar sin evidencia, y con razón: reescribir un bucle que
+  no era el cuello de botella añade riesgo sin ganancia.
+
+Por tanto este bloque queda **BLOCKED junto con 2/3/4/29/30**, a la espera de
+Docker. Cuando vuelva: levantar PG desechable, cargar volumen representativo,
+`EXPLAIN (ANALYZE)` sobre las consultas de las familias calientes (CRM,
+campañas, inbox, reporting) y atacar solo lo que la medición señale.
+
+## VERIFICADO CORRECTO — bloque 32 (2026-08-12)
+
+Auditado y sin defecto, anotado para no repetirlo:
+
+- **Timeouts de salida HTTP**: 65 clientes con timeout explícito y 7 sin él, pero
+  el default de httpx 0.28.1 es `Timeout(5.0)` en connect/read/write/pool —
+  medido, no supuesto. «Sin timeout explícito» no es ilimitado, así que no se
+  tocó nada. Si acaso, 5 s puede quedarse corto para TTS y generación; cambiarlo
+  exige evidencia de fallos reales.
+- **Pool de base de datos**: `pool_size=10`, `max_overflow=20`, `pool_recycle=3600`,
+  `pool_timeout=30`. Configurado, no por defecto.
+- **`/api/cdp/profiles` da 500 en tests**: es `no such function: set_tenant_context`,
+  función de PostgreSQL definida en la migración 507. Divergencia de motor
+  esperada, no defecto de producción — pero significa que ese endpoint no se
+  puede ejercitar sin PG (hueco de cobertura, no de código).
+
+## DEUDA — `expires_in: 0` en URLs prefirmadas de OSS (2026-08-12)
+
+`services/storage.py` envía `{"expires_in": 0}` al crear URLs de subida y
+descarga contra el servicio OSS externo (`OSS_SERVICE_URL`). El módulo hermano
+`os_deliverable_storage.py` usa `DEFAULT_SIGNED_URL_TTL_SEC = 600`.
+
+No se cambia porque **no se puede demostrar** qué significa `0` para ese
+servicio sin llamarlo, y llamarlo está prohibido: puede ser «sin caducidad» (un
+defecto real) o «usa el default del servidor» (correcto). Poner un valor
+explícito sería mejor si es lo primero y podría romperlo si el servicio exige 0.
+
+Para cerrarlo hace falta el contrato del servicio OSS o una prueba contra una
+instancia de desarrollo.
+
+## VERIFICADO CORRECTO — manejo de ficheros (2026-08-12)
+
+Auditado y sin defecto, anotado para no repetirlo:
+
+- `voice_pilot_v2._sanitize_storage_key` exige `[a-f0-9]{32}`: ni `..`, ni
+  barras, ni nada del cliente.
+- `os_deliverable_storage.sanitize_upload_filename` reduce a
+  `PurePosixPath(...).name`, rechaza `.`/`..`/vacío **y** exige extensión en
+  lista blanca (pdf, jpg, png, docx, xlsx, zip, svg, webp).
+- `download_voice_inbound_audio` filtra por `workspace_id` y sirve un nombre
+  generado por el servidor.
+- `social_scheduler.upload_media` valida MIME contra lista blanca antes de nada.
+- `whatsapp.media_url` no lo descarga NELVYON: lo busca Meta. No es SSRF nuestra,
+  y además el endpoint ya falla cerrado sin integración propia.
+
+## DEUDA — redirect de tracking de clics sin firmar (2026-08-12)
+
+`GET /api/campaigns/track/click/{campaign_id}/{recipient_id}?url=...` redirige a
+la URL del parámetro. En el bloque 35 se cerró lo inequívoco: solo `http`/`https`
+(antes admitía `javascript:`, `data:`, `file:`).
+
+Queda que redirige a **cualquier** http(s). Eso es inherente al tracking de clics
+—el cliente pone en su campaña el enlace que quiera— pero significa que el
+dominio de NELVYON puede usarse para redirigir a donde sea.
+
+El diseño correcto es no aceptar la URL como parámetro: guardar el enlace al
+generar la campaña y redirigir por id, o firmarla. Ambas opciones **invalidan los
+enlaces ya enviados** en campañas en circulación, así que es una decisión de
+producto con impacto en correos que ya están en bandejas de entrada.
+
+Mitigante medido: un middleware exige cabecera de tenant, así que no es un
+redirect abierto anónimo.
+
+## BLOQUEADO EXTERNAMENTE — auditoría de dependencias del backend (bloque 36)
+
+Medido offline:
+
+- **Frontend**: `pnpm-lock.yaml` presente (builds reproducibles) y evidencia de
+  `npm audit` previa (2026-07-21) con 0 críticas y 0 altas, bajo política que
+  rompe CI si aparecen.
+- **Backend**: **no hay lockfile** y **39 de 41** dependencias usan `>=` sin cota
+  superior. Un rebuild puede traer una versión mayor distinta sin que nadie lo
+  decida — de hecho ya ocurrió: `requirements.txt` pide `fastapi>=0.112.2` y hay
+  instalado 0.139.0 con `starlette 1.3.1`. Solo `pydantic` lleva cota (`<2.10`),
+  lo que muestra que se acota cuando se sabe que importa.
+
+Versiones instaladas de los paquetes sensibles, todas recientes: cryptography
+49.0.0, urllib3 2.7.0, jinja2 3.1.6, requests 2.34.2, python-jose 3.5.0.
+
+**Por qué queda bloqueado**: un escaneo CVE real necesita la base de avisos
+(red), y `pip-audit` no está instalado. Fijar las 41 sin poder resolver e instalar
+contra PyPI podría romper el build, y el plan prohíbe upgrades masivos a ciegas.
+
+Para cerrarlo: red disponible → `pip-audit`, generar lockfile
+(`pip-compile`/`uv lock`), reinstalar, suite completa.
+
+## BLOQUEADO EXTERNAMENTE — drill de backup/restore (bloque 39)
+
+`scripts/run-postgres-restore-drill.mjs` opera con `docker exec` sobre un
+contenedor PostgreSQL (`pg_isready`, `pg_dump`, restore) y exige `DATABASE_URL`.
+Con el daemon caído no puede ejecutarse, y no hay forma de simularlo sin fingir
+la certificación.
+
+Existe evidencia previa de 8/8 PASS (KI-R012), pero es **histórica**: no cuenta
+como certificación actual.
+
+Para cerrarlo: Docker disponible → levantar PG desechable → ejecutar el drill →
+comprobar que tras restaurar se aplican migraciones, arranca la app y los datos
+críticos están.
+
+## DEUDA — el stock de la tienda no se decrementa (2026-08-12)
+
+`os_store_builder_service.process_order` comprueba `prod["stock"] < qty` y
+rechaza si no llega, pero **ninguna parte del código decrementa `stock`**. Solo
+se actualiza como campo editable del producto (línea 453) y se usa para mostrar
+`in_stock`.
+
+Consecuencia: la comprobación solo bloquea un pedido mayor que el stock total,
+nunca la suma de pedidos. Se puede vender el mismo artículo indefinidamente.
+
+No se cierra porque decidir si esa tienda gestiona inventario transaccional es
+decisión de producto: puede estar diseñada para stock informativo con gestión
+manual. Inventar el decremento cambiaría el comportamiento del producto del
+cliente.
+
+## BLOQUEADO PARCIALMENTE — certificación de concurrencia (bloque 40)
+
+Detectados 10 patrones read-then-write sobre límites. Cerrado el de
+`invite_member` (tope de 50 miembros) con `INSERT ... SELECT ... WHERE
+(SELECT COUNT(*)) < :tope`, una sola sentencia.
+
+La **atomicidad bajo concurrencia real depende del motor** y solo se certifica
+contra PostgreSQL, que sigue bloqueado. Los tests sobre SQLite validan la lógica
+del tope y su forma, no la carrera. Los otros 8 candidatos (create_workspace,
+apply_discount, add_page, _store_mention, configure_usage_alert, send_connect,
+_ensure_recipients, recalculate_contact_score) quedan inventariados: sus límites
+no son de seguridad ni de dinero, así que esperan a PG en vez de reescribirse
+a ciegas.
+
+## DEUDA — dos vocabularios en `campaigns.status` (2026-08-12)
+
+La misma columna la escriben dos servicios con conjuntos distintos:
+
+- `campaign_service` (planificador): `draft`, `running`, `paused`, `completed`
+- `campaign_sender` (envío): `sending`, `sent`, `failed`
+
+En el bloque 42 se corrigió el síntoma visible: la pantalla de campañas solo
+conocía el primer vocabulario, así que una campaña realmente enviada (`sent`)
+desaparecía de «activas» y de «completadas». Ahora acepta ambos.
+
+Unificar la columna sigue pendiente y **no se hace aquí** porque exige migrar
+estados de campañas existentes: decidir si `sent` pasa a `completed` (y qué
+ocurre con `failed`) es una operación sobre datos vivos cuya semántica no puedo
+demostrar. Hay un guard que obliga a clasificar cualquier estado nuevo.
+
+## RESUELTO — propiedad de integraciones (2026-08-12)
+
+Decisión de producto aprobada: **la integración pertenece al workspace**; el
+usuario que la conectó queda como `connected_by_user_id`, metadato de auditoría.
+
+Migración **529**, aditiva: añade `workspace_id` y `connected_by_user_id` a
+`oauth_connections` e `integration_whatsapp`, con índice único parcial por
+(workspace, proveedor). No borra, no renombra, `user_id` se conserva.
+
+Backfill **solo donde es demostrable**: usuario con exactamente un workspace
+(sumando los que posee y aquellos de los que es miembro activo). Con cero o con
+varios queda `NULL`, y los resolvedores ignoran esas filas — lo ambiguo falla
+cerrado en vez de atribuirse a lo que parezca.
+
+Sustituye a las deudas 3 y 4 anteriores (`integration_whatsapp` keyed por
+`user_id`, y multi-tenencia de Ads sin fuente de credencial).
+
+## BLOQUEADO EXTERNAMENTE — suite E2E completa (2026-08-12)
+
+`playwright test` aborta antes del primer test: el servidor de desarrollo que
+levanta no compila sin red. 24 componentes usan `next/font/google` y la fuente
+se descarga en tiempo de compilación:
+
+```
+`next/font` error: Failed to fetch `IBM Plex Sans` from Google Fonts.
+> Build failed because of webpack errors
+Error: Process from config.webServer was not able to start. Exit code: 1
+```
+
+No es cuestión de tiempo, que fue la evaluación anterior y era incorrecta. El
+`next build` de producción sí pasa porque la fuente ya está en caché del build;
+el dev server recompila y vuelve a pedirla.
+
+Para cerrarlo: red disponible, o `next/font/local` con las fuentes en el repo
+—que además haría el build reproducible sin salir a internet—. Lo segundo es un
+cambio de producto (tipografía autoalojada) y no se hace sin decidirlo.

@@ -121,9 +121,20 @@ export function routeTask(input: RouterTaskInput): RouterDecision {
 }
 
 export async function executeTask(input: RouterTaskInput, requestId?: string): Promise<RouterTaskResult> {
-  // Fail-closed before any RAG/DB/inference work (ADR-069) — never hit localhost Postgres in prod.
+  /**
+   * ADR-069 — INCONDICIONAL. Este guard no comprueba disponibilidad: impide que
+   * cualquier camino de ejecución acabe hablando con la Postgres de la máquina
+   * del owner en producción, y resuelve la URL. Es cálculo puro sobre variables
+   * de entorno, sin E/S, así que su coste es nulo y se ejecuta siempre. No se
+   * hace depender de la clasificación de tarea: un invariante de seguridad no
+   * puede quedar sujeto a que una heurística acierte.
+   */
   assertLocalAiDatabaseUrlReady();
-  await assertLocalAiRagSchemaPresent(getLocalAiPool());
+  /**
+   * La presencia del esquema RAG SÍ es condicional: hace una consulta real a
+   * `pg_tables` y solo importa si la decisión de routing va a recuperar
+   * documentos o leer memoria. Se comprueba más abajo, junto a `decision`.
+   */
 
   const queue = getRouterQueue();
   const queued = queue.enqueue(input, requestId);
@@ -194,6 +205,17 @@ export async function executeTask(input: RouterTaskInput, requestId?: string): P
     const ragSources: string[] = [];
     let ragMs = 0;
     let memoryMs = 0;
+
+    /**
+     * Fail-closed del esquema RAG, ahora acotado a las tareas que de verdad lo
+     * usan. Una tarea de texto sin retrieval (chat, copy, social) no necesita
+     * las tablas `local_ai_*` aplicadas y no debe bloquearse por ellas. El guard
+     * anti-loopback de ADR-069 ya se ejecutó incondicionalmente más arriba.
+     */
+    const needsRagSchema = decision.rag.enabled || decision.memory.read;
+    if (needsRagSchema) {
+      await assertLocalAiRagSchemaPresent(getLocalAiPool());
+    }
 
     if (decision.rag.enabled && decision.rag.domain) {
       const ragStart = Date.now();

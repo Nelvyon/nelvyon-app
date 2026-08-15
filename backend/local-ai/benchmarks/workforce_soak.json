@@ -1,6 +1,6 @@
 {
   "soakMs": 8000,
-  "ticks": 29833,
+  "ticks": 16807,
   "jobs": 24,
   "succeeded": 21,
   "dead_letter": 3,

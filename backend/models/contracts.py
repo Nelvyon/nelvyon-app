@@ -1,10 +1,16 @@
 from core.database import Base
-from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy import Column, DateTime, Integer, String, Index
 
 
 class Contracts(Base):
     __tablename__ = "contracts"
-    __table_args__ = {"extend_existing": True}
+    # El indice va tambien aqui, no solo en la migracion 531: esta tabla la
+    # crea `create_all` al arrancar, y al migrar desde cero todavia no existe
+    # cuando la migracion pasa, asi que 531 la salta.
+    __table_args__ = (
+        Index("ix_contracts_workspace_id", "workspace_id"),
+        {"extend_existing": True},
+    )
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True, nullable=False)
     user_id = Column(String, nullable=False)

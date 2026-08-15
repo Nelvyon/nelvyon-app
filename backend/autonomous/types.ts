@@ -141,6 +141,15 @@ export interface AutonomousProject {
   sector_escalation?: boolean;
   /** Phase L — selector de plantillas en pipeline */
   template_pipeline?: TemplatePipelineState | null;
+  /**
+   * `true` cuando el presupuesto agregado de LLM recortó trabajo (llamadas
+   * omitidas, timeout recortado o reintentos cancelados). Una ejecución con esta
+   * marca NO es un resultado LLM normal: es una degradación, y va acompañada de
+   * una entrada `llm_budget_guard` en `agent_log`.
+   */
+  llm_budget_degraded?: boolean;
+  /** Motivo de la primera degradación por presupuesto. */
+  llm_budget_reason?: string | null;
 }
 
 export interface RetryHistoryEntry {

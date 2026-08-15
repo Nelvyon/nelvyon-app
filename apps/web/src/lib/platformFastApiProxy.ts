@@ -81,11 +81,28 @@ export async function readSessionToken(req: Request): Promise<string | null> {
   return extractToken(req);
 }
 
+/**
+ * Estricto a proposito: solo digitos ASCII, sin signo, sin separadores.
+ *
+ * `Number()` acepta cosas que Python rechaza (`"1e0"`, `"0x2"`, `"2.0"`) y
+ * —peor— rechaza cosas que Python acepta: `Number("1_0")` es `NaN`, pero
+ * `int("1_0")` es `10`. Con el parser laxo, una cabecera que este lado no
+ * entendia se trataba como "sin workspace" y la comprobacion de pertenencia se
+ * saltaba entera, mientras FastAPI si resolvia un workspace. Los dos extremos
+ * tienen que leer el mismo numero o ninguno.
+ */
 export function parsePlatformWorkspaceId(req: Request): number | null {
   const raw = req.headers.get("x-workspace-id")?.trim();
   if (!raw) return null;
+  if (!/^[0-9]+$/.test(raw)) return null;
   const n = Number(raw);
-  return Number.isFinite(n) && n > 0 ? n : null;
+  return Number.isSafeInteger(n) && n > 0 ? n : null;
+}
+
+/** Hay cabecera, pero no es un identificador que ambos lados lean igual. */
+export function hasUnparsableWorkspaceHeader(req: Request): boolean {
+  const raw = req.headers.get("x-workspace-id")?.trim();
+  return Boolean(raw) && parsePlatformWorkspaceId(req) === null;
 }
 
 export type PlatformProxyOptions = {
@@ -108,8 +125,17 @@ export async function proxyPlatformFetch(
     });
   }
 
-  const workspaceId = req.headers.get("x-workspace-id")?.trim();
   const wsNum = parsePlatformWorkspaceId(req);
+
+  // Una cabecera presente que este lado no sabe leer se RECHAZA; antes se
+  // trataba como ausente, lo que hacia que la comprobacion de pertenencia de
+  // mas abajo no llegase a ejecutarse mientras FastAPI si resolvia workspace.
+  if (hasUnparsableWorkspaceHeader(req)) {
+    return new Response(JSON.stringify({ error: "Invalid X-Workspace-Id header" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
 
   if (options.requireWorkspace && !wsNum) {
     return new Response(JSON.stringify({ error: "X-Workspace-Id header required" }), {
@@ -142,7 +168,10 @@ export async function proxyPlatformFetch(
   const headers = new Headers(init.headers);
   headers.set("Authorization", `Bearer ${token}`);
   headers.set("Accept", "application/json");
-  if (workspaceId) headers.set("X-Workspace-Id", workspaceId);
+  // Se reenvia el valor CANONICO, no el original: si se pasa el string crudo,
+  // FastAPI puede interpretarlo como un workspace distinto del que se acaba de
+  // comprobar aqui.
+  if (wsNum) headers.set("X-Workspace-Id", String(wsNum));
 
   return fetch(`${platformApiBase()}${path}`, {
     ...init,

@@ -5,11 +5,14 @@ import { type NextRequest, NextResponse } from "next/server";
 import {
   buildDeliverableSocialProofPost,
   getSaasSocialProofService,
-  isOpenAiEnvConfigured,
   requireSaasContext,
   saasErrorBody,
   saasErrorStatus,
 } from "@nelvyon/saas";
+import {
+  nelvyonTextErrorStatus,
+  runNelvyonTextTask,
+} from "../../../../../../../../backend/saas/NelvyonAiTextService";
 
 export async function GET(req: Request) {
   try {
@@ -47,44 +50,23 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "topic es obligatorio (o deliverableId/title)" }, { status: 400 });
     }
 
-    if (!isOpenAiEnvConfigured()) {
-      return NextResponse.json(
-        {
-          error: "OpenAI no configurado. Configura OPENAI_API_KEY para generar borradores sociales.",
-          code: "missing_openai",
-        },
-        { status: 503 },
-      );
-    }
-
-    const openaiKey = process.env.OPENAI_API_KEY!.trim();
     const platform = body.platform?.trim() || "linkedin";
-    const oaRes = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${openaiKey}` },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [
-          {
-            role: "system",
-            content:
-              "Genera un borrador de post para redes sociales en español. Responde JSON: {\"content\":\"...\",\"hashtags\":[\"...\"]}",
-          },
-          { role: "user", content: `Plataforma: ${platform}. Tema: ${topic}` },
-        ],
-        max_tokens: 800,
-        temperature: 0.7,
-      }),
-      signal: AbortSignal.timeout(30_000),
+    // IA propia de NELVYON con `tenantId` obligatorio. Sin fallback externo.
+    const ai = await runNelvyonTextTask({
+      tenantId: String(ctx.tenant.id),
+      system:
+        'Genera un borrador de post para redes sociales en español. Responde JSON: {"content":"...","hashtags":["..."]}',
+      prompt: `Plataforma: ${platform}. Tema: ${topic}`,
+      agentId: "saas-social-suggest",
+      hints: { requireJson: true },
     });
-    if (!oaRes.ok) {
+    if (!ai.ok) {
       return NextResponse.json(
-        { error: "No se pudo generar el borrador social.", code: "openai_failed" },
-        { status: 503 },
+        { error: ai.message, code: ai.code },
+        { status: nelvyonTextErrorStatus(ai.code) },
       );
     }
-    const oaData = (await oaRes.json()) as { choices?: { message?: { content?: string } }[] };
-    const raw = oaData.choices?.[0]?.message?.content ?? "";
+    const raw = ai.content;
     let content = raw;
     let hashtags: string[] = [];
     try {

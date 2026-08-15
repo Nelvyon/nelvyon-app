@@ -12,7 +12,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
-from dependencies.workspace import WorkspaceContext, require_workspace
+from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_member, require_workspace_operator
 from services.ai_service import get_ai_service, list_agents
 from services.cache_service import cached
 
@@ -63,7 +63,7 @@ async def get_ai_context(
 @router.post("/context", status_code=status.HTTP_201_CREATED)
 async def save_ai_context(
     body: ContextSaveBody,
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_operator),
 ):
     try:
         return await _svc(ws).save_context(body.key, body.value)
@@ -75,7 +75,7 @@ async def save_ai_context(
 
 @router.delete("/context")
 async def clear_ai_context(
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_operator),
 ):
     return await _svc(ws).clear_context()
 
@@ -84,7 +84,7 @@ async def clear_ai_context(
 async def ai_chat_stream(
     body: ChatRequest,
     response: Response,
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_member),
 ):
     """Chat with GPT-4o + client context (SSE stream)."""
     svc = _svc(ws)
@@ -119,7 +119,7 @@ async def ai_chat_stream(
 @router.post("/chat/simple")
 async def ai_chat_simple(
     body: ChatRequest,
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_member),
 ):
     """Chat with GPT-4o + client context (non-streaming JSON)."""
     try:

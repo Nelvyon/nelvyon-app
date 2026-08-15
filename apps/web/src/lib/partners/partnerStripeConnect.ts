@@ -13,10 +13,18 @@ function secretKey(): string {
   return key.trim();
 }
 
-async function stripeForm<T>(method: string, path: string, body?: Record<string, string>): Promise<T> {
+async function stripeForm<T>(
+  method: string,
+  path: string,
+  body?: Record<string, string>,
+  idempotencyKey?: string,
+): Promise<T> {
   const headers: Record<string, string> = {
     Authorization: `Bearer ${secretKey()}`,
   };
+  // Stripe deduplica por esta clave durante 24h: un reintento devuelve el MISMO
+  // objeto en vez de crear otro cobro.
+  if (idempotencyKey) headers["Idempotency-Key"] = idempotencyKey;
   let payload: string | undefined;
   if (body) {
     payload = new URLSearchParams(body).toString();
@@ -121,6 +129,8 @@ export async function createConnectPaymentIntent(params: {
   applicationFeeCents: number;
   customerId?: string;
   metadata?: Record<string, string>;
+  /** Sin ella, un POST repetido crea un PaymentIntent nuevo y cobra dos veces. */
+  idempotencyKey?: string;
 }): Promise<{ id: string; client_secret: string | null; status: string }> {
   const body: Record<string, string> = {
     amount: String(params.amountCents),
@@ -133,7 +143,7 @@ export async function createConnectPaymentIntent(params: {
   for (const [k, v] of Object.entries(params.metadata ?? {})) {
     body[`metadata[${k}]`] = v;
   }
-  return stripeForm("POST", "/payment_intents", body);
+  return stripeForm("POST", "/payment_intents", body, params.idempotencyKey);
 }
 
 /** Monthly subscription with application fee (wholesale retained on platform). */

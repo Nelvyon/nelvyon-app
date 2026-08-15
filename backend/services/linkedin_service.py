@@ -6,7 +6,7 @@ import json
 import logging
 import os
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Any
 
 from openai import AsyncOpenAI
@@ -29,7 +29,16 @@ def _openai_client() -> AsyncOpenAI | None:
     key = os.environ.get("OPENAI_API_KEY", "").strip() or os.environ.get("APP_AI_KEY", "").strip()
     if not key:
         return None
-    base = os.environ.get("OPENAI_BASE_URL", "").strip() or None
+    base = (
+        os.environ.get("NELVYON_AI_BASE_URL", "").strip()
+        or os.environ.get("OPENAI_BASE_URL", "").strip()
+        or os.environ.get("APP_AI_BASE_URL", "").strip()
+    ).rstrip("/")
+    if not base:
+        # `base_url=None` NO es neutro: el SDK aplica su propio default, que es
+        # `https://api.openai.com/v1`. Sin endpoint explicito la capacidad queda
+        # NOT_CONFIGURED y no se contacta ningun proveedor externo.
+        return None
     return AsyncOpenAI(api_key=key, base_url=base)
 
 
@@ -78,10 +87,17 @@ class LinkedInService:
                 """
                 SELECT COUNT(*) AS c FROM linkedin_outreach
                 WHERE workspace_id = :ws
-                AND created_at >= datetime('now', '-1 hour')
+                  AND created_at >= :desde
                 """
             ),
-            {"ws": self.workspace_id},
+            # El limite se calcula en Python y viaja como parametro.
+            # `datetime('now', '-1 hour')` es de SQLite: en PostgreSQL esta
+            # consulta reventaba, y con ella el limite de tasa horario — un
+            # control que al fallar deja de limitar sin decir nada.
+            {
+                "ws": self.workspace_id,
+                "desde": datetime.now(timezone.utc) - timedelta(hours=1),
+            },
         )
         return int(row.scalar_one() or 0)
 
@@ -216,10 +232,15 @@ class LinkedInService:
         result = await self.session.execute(
             text(
                 """
-                SELECT id, from_name, message, received_at, outreach_id
+                -- `received_at` se mantiene en el contrato de respuesta via alias:
+                -- la columna fisica es `created_at` y nadie escribe una distinta.
+                -- `outreach_id` se retira: no existe columna, ni writer, ni
+                -- relacion real con `linkedin_outreach`, asi que no hay valor
+                -- que devolver — inventarlo seria peor que omitirlo.
+                SELECT id, from_name, message, created_at AS received_at
                 FROM linkedin_inbox
                 WHERE workspace_id = :ws AND client_id = :cid
-                ORDER BY received_at DESC
+                ORDER BY created_at DESC
                 LIMIT 50
                 """
             ),

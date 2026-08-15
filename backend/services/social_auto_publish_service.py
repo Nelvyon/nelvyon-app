@@ -14,6 +14,33 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.sql_compat import json_bind
 
+
+from core.ai_provider import AiNotConfigured
+
+
+def _nelvyon_ai_base_url() -> str:
+    """Endpoint de IA explicito. Nunca cae a `api.openai.com` por defecto.
+
+    Precedencia: infraestructura de NELVYON primero, luego configuracion
+    explicita del operador (que puede apuntar a un runtime local compatible).
+    Cadena vacia = NOT_CONFIGURED; el llamante debe degradar.
+    """
+    base = (
+        os.environ.get("NELVYON_AI_BASE_URL", "").strip()
+        or os.environ.get("OPENAI_BASE_URL", "").strip()
+        or os.environ.get("APP_AI_BASE_URL", "").strip()
+    ).rstrip("/")
+    if not base:
+        # NOT_CONFIGURED explicito. Nunca se deja que el SDK aplique su default,
+        # que es `https://api.openai.com/v1`: eso seria salir a un proveedor
+        # externo de pago sin decision del operador.
+        raise AiNotConfigured(
+            "IA no configurada: define NELVYON_AI_BASE_URL. No se contacta "
+            "ningun proveedor externo por defecto."
+        )
+    return base
+
+
 logger = logging.getLogger(__name__)
 
 PLATFORMS = ("instagram", "twitter", "linkedin", "buffer")
@@ -48,7 +75,7 @@ async def _gpt_copy(sector: str, platform: str, topic: str = "") -> str:
 
         client = AsyncOpenAI(
             api_key=key,
-            base_url=os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1").strip(),
+            base_url=_nelvyon_ai_base_url(),
         )
         resp = await client.chat.completions.create(
             model=os.environ.get("OPENAI_MODEL", "gpt-4o"),
@@ -197,13 +224,14 @@ class SocialAutoPublishService:
         created: list[dict[str, Any]] = []
         for platform in platforms:
             preview = await self.generate_preview(client_id, sector=sector, platform=platform)
-            await self.session.execute(
+            ins = await self.session.execute(
                 text(
                     f"""
                     INSERT INTO social_auto_posts
                     (client_id, workspace_id, platform, caption, image_url, status, frequency, scheduled_at)
                     VALUES (:cid, :ws, :plat, :cap, :img, 'scheduled', :freq, :sched)
-                    """
+                                    RETURNING id
+                """
                 ),
                 {
                     "cid": client_id,
@@ -215,8 +243,14 @@ class SocialAutoPublishService:
                     "sched": when.isoformat(),
                 },
             )
-            rid = await self.session.execute(text("SELECT last_insert_rowid() AS id"))
-            created.append({"post_id": int(rid.scalar_one()), **preview, "scheduled_at": when.isoformat()})
+            # `RETURNING` en vez de `last_insert_rowid()`, que es de SQLite y no
+            # existe en PostgreSQL, la base de produccion.
+            fila = ins.mappings().first()
+            if fila is None:
+                raise ValueError("Scheduled post could not be created")
+            created.append(
+                {"post_id": int(fila["id"]), **preview, "scheduled_at": when.isoformat()}
+            )
         await self.session.commit()
         return {"client_id": client_id, "scheduled": created, "mock": _mock_mode()}
 

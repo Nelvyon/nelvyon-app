@@ -154,12 +154,23 @@ export function scoreChatbot(
   attempt: number,
 ): QaResult {
   const plan = artifacts.plan as { blockers?: string[]; faqs_target_count?: number } | undefined;
-  const kb = artifacts.knowledge_base as Record<string, unknown>;
-  const config = artifacts.config as Record<string, unknown>;
+  const kb = artifacts.knowledge_base as Record<string, unknown> | undefined;
+  const config = artifacts.config as Record<string, unknown> | undefined;
   const target = plan?.faqs_target_count ?? 15;
 
+  /**
+   * `knowledge_base` puede faltar por completo: si el plan trae blockers,
+   * `runChatbotPhaseC` corta en validación de intake y nunca lo produce. La
+   * expresión anterior encadenaba opcional sobre `kb` pero leía `.length`
+   * directamente sobre el resultado, así que con el artefacto ausente lanzaba
+   * `Cannot read properties of undefined` en lugar de puntuar 0 — un fallo de
+   * QA se convertía en una excepción.
+   */
+  const faqs = kb?.faqs;
+  const faqsCount = Array.isArray(faqs) ? faqs.length : 0;
+
   const checks: QaCheckResult[] = [
-    check("C-SOP-01", !(plan?.blockers?.length) && (kb?.faqs as unknown[]).length >= target, 5, true),
+    check("C-SOP-01", !(plan?.blockers?.length) && faqsCount >= target, 5, true),
     check("C-SOP-02", Boolean(config?.widget_snippet), 4, true),
     check("C-SOP-03", Boolean(config?.handoff_email), 5, true),
     check("C-SOP-04", config?.webhook_delivers === true, 4),

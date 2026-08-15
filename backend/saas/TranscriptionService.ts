@@ -1,3 +1,7 @@
+import {
+  MediaCapabilityNotConfigured,
+  resolveMediaProvider,
+} from "../media-ai/mediaCapabilities";
 import type { DbClient } from "../db/DbClient";
 import { DbClient as DbClientClass } from "../db/DbClient";
 import type { ILlmClient } from "../os-agents/LlmClient";
@@ -79,9 +83,22 @@ function normalizeSentiment(v: unknown): AnalysisResult["sentiment"] {
 }
 
 async function defaultWhisperTranscribe(audioUrl: string, language?: string): Promise<TranscribeResult> {
+  /**
+   * La transcripción pasa por la capa de capacidades de NELVYON. Antes bastaba
+   * con tener `OPENAI_API_KEY` en el entorno para que cada transcripción
+   * generase gasto en Whisper sin decisión explícita. Ahora se exige un
+   * proveedor propio o un doble opt-in; si no lo hay, NOT_CONFIGURED.
+   */
+  const provider = resolveMediaProvider("stt");
+  if (provider.kind === "not_configured") {
+    throw new MediaCapabilityNotConfigured("stt", provider.reason);
+  }
   const key = process.env.OPENAI_API_KEY?.trim();
   if (!key) {
-    throw new Error("OPENAI_API_KEY requerido para Whisper");
+    throw new MediaCapabilityNotConfigured(
+      "stt",
+      "Proveedor de transcripción no operativo.",
+    );
   }
 
   const audioRes = await fetch(audioUrl);

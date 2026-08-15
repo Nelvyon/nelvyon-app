@@ -13,7 +13,7 @@ from core.database import get_db
 from dependencies.auth import get_current_user
 from dependencies.quota_guards import enforce_helpdesk_module_allowed
 from schemas.auth import UserResponse
-from services.audit_events import write_audit_event
+from services.audit_events import write_audit_event_best_effort
 from services.communications_v1 import after_ticket_created
 from services.helpdesk_tickets import Helpdesk_ticketsService
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
@@ -328,7 +328,7 @@ async def update_helpdesk_tickets(
         if not result:
             raise HTTPException(status_code=404, detail="Ticket not found")
         if action in ("assign_ticket", "transition_ticket"):
-            await write_audit_event(
+            await write_audit_event_best_effort(
                 db,
                 actor_user_id=ws_ctx.user_id,
                 actor_email=ws_ctx.user_email,
@@ -343,7 +343,7 @@ async def update_helpdesk_tickets(
         return result
     except HTTPException:
         if action in ("assign_ticket", "transition_ticket"):
-            await write_audit_event(
+            await write_audit_event_best_effort(
                 db,
                 actor_user_id=ws_ctx.user_id,
                 actor_email=ws_ctx.user_email,
@@ -358,7 +358,7 @@ async def update_helpdesk_tickets(
         raise
     except ValueError as e:
         if action in ("assign_ticket", "transition_ticket"):
-            await write_audit_event(
+            await write_audit_event_best_effort(
                 db,
                 actor_user_id=ws_ctx.user_id,
                 actor_email=ws_ctx.user_email,
@@ -373,7 +373,7 @@ async def update_helpdesk_tickets(
         raise _http_exc_from_ticket_value_error(e)
     except Exception as e:
         if action in ("assign_ticket", "transition_ticket"):
-            await write_audit_event(
+            await write_audit_event_best_effort(
                 db,
                 actor_user_id=ws_ctx.user_id,
                 actor_email=ws_ctx.user_email,

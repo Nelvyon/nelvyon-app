@@ -158,9 +158,18 @@ class SecurityMiddleware(BaseHTTPMiddleware):
                     response.headers[header] = value
             return response
 
-        # 1. Check request size via Content-Length header
+        # 1. Tamano del cuerpo.
+        #
+        # `Content-Length` es una DECLARACION del cliente y no siempre viaja:
+        # una peticion con `Transfer-Encoding: chunked` no la lleva. Comprobar
+        # solo la cabecera dejaba pasar cuerpos sin limite — se midio enviando
+        # 20 MB sin ella: entraban enteros y solo los rechazaba despues la
+        # validacion del esquema, con la memoria ya consumida.
+        #
+        # Se conserva la comprobacion de la cabecera porque corta ANTES de leer
+        # nada, que es lo barato. Y para las que no la traen, se lee con tope.
         content_length = request.headers.get("content-length")
-        if content_length and int(content_length) > MAX_BODY_SIZE:
+        if content_length and content_length.isdigit() and int(content_length) > MAX_BODY_SIZE:
             logger.warning(
                 "Request too large: %s bytes from %s",
                 content_length, request.client.host if request.client else "unknown",
@@ -169,6 +178,30 @@ class SecurityMiddleware(BaseHTTPMiddleware):
                 status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
                 content={"detail": "Request body too large"},
             )
+
+        if request.method in ("POST", "PUT", "PATCH") and not content_length:
+            # Se lee por trozos y se corta en cuanto se pasa: nunca se
+            # materializa mas de `MAX_BODY_SIZE`. El cuerpo leido se reinyecta
+            # para que el endpoint lo reciba intacto.
+            cuerpo = b""
+            async for trozo in request.stream():
+                cuerpo += trozo
+                if len(cuerpo) > MAX_BODY_SIZE:
+                    logger.warning(
+                        "Streamed request body exceeded %s bytes from %s",
+                        MAX_BODY_SIZE, request.client.host if request.client else "unknown",
+                    )
+                    return JSONResponse(
+                        status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                        content={"detail": "Request body too large"},
+                    )
+
+            # El cuerpo ya leido se deja en la cache que usa Starlette, para
+            # que el endpoint lo reciba intacto. Reconstruir el canal `receive`
+            # no vale aqui: `BaseHTTPMiddleware` monta el suyo y el cuerpo no
+            # llegaba — se comprobo, una peticion chunked legitima daba 422 por
+            # cuerpo ausente.
+            request._body = cuerpo  # noqa: SLF001 — cache documentada de Starlette
 
         # 2. Path traversal check
         if ".." in request.url.path:

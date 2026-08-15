@@ -56,7 +56,16 @@ def _openai_client() -> AsyncOpenAI | None:
     key = os.environ.get("OPENAI_API_KEY", "").strip() or os.environ.get("APP_AI_KEY", "").strip()
     if not key:
         return None
-    base = os.environ.get("OPENAI_BASE_URL", "").strip() or None
+    base = (
+        os.environ.get("NELVYON_AI_BASE_URL", "").strip()
+        or os.environ.get("OPENAI_BASE_URL", "").strip()
+        or os.environ.get("APP_AI_BASE_URL", "").strip()
+    ).rstrip("/")
+    if not base:
+        # `base_url=None` NO es neutro: el SDK aplica su propio default, que es
+        # `https://api.openai.com/v1`. Sin endpoint explicito la capacidad queda
+        # NOT_CONFIGURED y no se contacta ningun proveedor externo.
+        return None
     return AsyncOpenAI(api_key=key, base_url=base)
 
 

@@ -145,7 +145,7 @@ describe("SaasWhatsAppCloudService — configured", () => {
       expect.stringContaining("123456789/messages"),
       expect.objectContaining({ method: "POST" }),
     );
-    const updateCall = db.query.mock.calls.find((c) => String(c[0]).includes("UPDATE conversations"));
+    const updateCall = db.query.mock.calls.find((c) => String(c[0]).includes("UPDATE saas_conversations"));
     expect(updateCall?.[0]).toContain("tenant_id");
     expect(updateCall?.[1]).toEqual(["Hola", "conv-1", TENANT]);
   });

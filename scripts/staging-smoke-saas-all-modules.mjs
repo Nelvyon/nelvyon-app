@@ -129,6 +129,14 @@ async function probeModule(mod, token, workspaceId) {
   }
   pass(mod.id, "page", `HTTP 200 (${html.length}b)`);
 
+  // Un modulo sin API canonica se certifica por su pagina y punto. Sondear una
+  // URL inventada solo producia seis avisos permanentes que no correspondian a
+  // ningun defecto — ver el comentario en `lib/saas-nav-modules.mjs`.
+  if (mod.soloPagina || !mod.apiPath) {
+    pass(mod.id, "api", "modulo sin API propia: se certifica por su pagina");
+    return;
+  }
+
   const apiRes = await fetch(`${BASE}${mod.apiPath}`, {
     headers: headers(token, workspaceId),
     cache: "no-store",

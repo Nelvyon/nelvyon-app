@@ -13,12 +13,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.database import get_db
 from core.i18n import apply_workspace_language, request_language, t
 from core.observability import set_workspace_id_for_log
-from core.rbac import workspace_can_mutate
+from core.rbac import workspace_can_collaborate, workspace_can_mutate
 from dependencies.auth import get_current_user
 from models.workspaces import Workspaces
 from models.workspace_members import Workspace_members
 from schemas.auth import UserResponse
-from services.audit_events import write_audit_event
+from services.audit_events import write_audit_event_best_effort
 
 logger = logging.getLogger(__name__)
 
@@ -181,7 +181,48 @@ async def require_workspace_operator(
     """
     if workspace_can_mutate(ctx.role_in_workspace):
         return ctx
-    await write_audit_event(
+    # Denegacion: la decision de seguridad ya se tomo bien. Un fallo de
+    # auditoria no puede convertir este 403 en un 500, pero tampoco puede
+    # perderse en silencio — queda como ERROR estructurado.
+    await write_audit_event_best_effort(
+        db,
+        actor_user_id=ctx.user_id,
+        actor_email=ctx.user_email,
+        workspace_id=ctx.workspace_id,
+        action=request.method.lower(),
+        resource_type="workspace_scope",
+        resource_id=request.url.path,
+        result="denied",
+        event_type="saas.rbac.denied",
+        commit=True,
+    )
+    lang = request_language(request)
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail=t("workspace_operator_required", lang),
+    )
+
+
+async def require_workspace_member(
+    request: Request,
+    ctx: WorkspaceContext = Depends(require_workspace),
+    db: AsyncSession = Depends(get_db),
+) -> WorkspaceContext:
+    """
+    Trabajo diario del workspace: owner, admin, operator o member. `viewer` no.
+
+    Es el escalon que le faltaba a FastAPI. El producto permite a `member` crear
+    en crm, inbox, campaigns, ads, social, funnels y ecommerce
+    (`roleMatrix.ts`), asi que exigir `operator` ahi le quitaria acceso a quien
+    debe tenerlo. Pero `require_workspace` solo comprueba PERTENENCIA, y por esa
+    puerta entraba tambien `viewer`, que es solo lectura por definicion.
+
+    Un rol desconocido no entra: `workspace_can_collaborate` compara contra un
+    conjunto cerrado, no descarta una lista negra.
+    """
+    if workspace_can_collaborate(ctx.role_in_workspace):
+        return ctx
+    await write_audit_event_best_effort(
         db,
         actor_user_id=ctx.user_id,
         actor_email=ctx.user_email,

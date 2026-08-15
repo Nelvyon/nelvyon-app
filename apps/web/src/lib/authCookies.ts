@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 
 export const NELVYON_AUTH_COOKIE = "nelvyon_token";
-const MAX_AGE_SEC = 60 * 60 * 24 * 7;
+/**
+ * 8 horas — DEBE coincidir con `JWT_EXPIRES` en `backend/auth/AuthService.ts`.
+ * Una cookie mas larga deja al navegador enviando un token ya expirado; una mas
+ * corta corta la sesion antes de que el token caduque.
+ */
+const MAX_AGE_SEC = 60 * 60 * 8;
 
 function isSecureContext(): boolean {
   if (process.env.NODE_ENV === "production") return true;

@@ -12,7 +12,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
-from services.audit_events import write_audit_event
+from services.audit_events import (
+    AuditPersistError,
+    write_audit_event_best_effort,
+    write_audit_event_required,
+)
 from services.campaign_sender import CampaignSenderService
 
 logger = logging.getLogger(__name__)
@@ -52,6 +56,34 @@ async def send_campaign(
 ):
     """Send a campaign to all user contacts with email."""
     service = CampaignSenderService(db)
+
+    # AUDITORIA DE INTENCION, antes de cualquier efecto externo.
+    #
+    # El envio es un side effect externo cuyo resultado solo se conoce despues,
+    # asi que no se puede auditar el desenlace por adelantado. Lo que si se
+    # registra antes es que este envio fue autorizado e intentado: sin esa fila,
+    # no se envia. Auditar solo al final dejaba envios reales sin rastro si la
+    # tabla fallaba.
+    #
+    # Comparte `action`, actor, workspace y campana con el evento de resultado
+    # para poder correlacionarlos; solo cambia `result`.
+    try:
+        await write_audit_event_required(
+            db,
+            actor_user_id=ws_ctx.user_id,
+            actor_email=ws_ctx.user_email,
+            workspace_id=ws_ctx.workspace_id,
+            action="send",
+            resource_type="campaign",
+            resource_id=str(data.campaign_id),
+            result="attempt",
+            event_type="saas.campaign.send",
+            commit=True,
+        )
+    except AuditPersistError:
+        # No se expone el detalle de persistencia al cliente.
+        raise HTTPException(status_code=503, detail="Audit unavailable, campaign not sent")
+
     try:
         segment_filters = data.segment_filters.model_dump() if data.segment_filters else None
         result = await service.send_campaign(
@@ -60,7 +92,7 @@ async def send_campaign(
             ws_ctx.workspace_id,
             segment_filters=segment_filters,
         )
-        await write_audit_event(
+        await write_audit_event_best_effort(
             db,
             actor_user_id=ws_ctx.user_id,
             actor_email=ws_ctx.user_email,
@@ -74,7 +106,7 @@ async def send_campaign(
         )
         return SendCampaignResponse(**{k: v for k, v in result.items() if k in SendCampaignResponse.model_fields})
     except ValueError as e:
-        await write_audit_event(
+        await write_audit_event_best_effort(
             db,
             actor_user_id=ws_ctx.user_id,
             actor_email=ws_ctx.user_email,
@@ -88,7 +120,7 @@ async def send_campaign(
         )
         raise HTTPException(status_code=400, detail=safe_client_error_detail(e, fallback="Invalid campaign request"))
     except Exception as e:
-        await write_audit_event(
+        await write_audit_event_best_effort(
             db,
             actor_user_id=ws_ctx.user_id,
             actor_email=ws_ctx.user_email,

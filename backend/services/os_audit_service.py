@@ -6,7 +6,7 @@ from typing import Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from services.audit_events import write_audit_event
+from services.audit_events import write_audit_event_best_effort
 
 logger = logging.getLogger(__name__)
 
@@ -38,20 +38,22 @@ async def record_os_event(
         workspace_id,
         extra={"os_category": category, "os_result": result},
     )
-    try:
-        await write_audit_event(
-            db,
-            actor_user_id=actor_user_id,
-            actor_email=actor_email,
-            workspace_id=workspace_id,
-            action=action,
-            resource_type=resource_type,
-            resource_id=resource_id,
-            result=result,
-            event_type=f"os.{category}.{action}",
-            source="os",
-            severity=severity if result != "error" else "warning",
-            commit=commit,
-        )
-    except Exception as exc:
-        logger.warning("record_os_event failed: %s", exc)
+    # Telemetria operativa: no puede degradar la respuesta al usuario. El fallo
+    # no se silencia — `write_audit_event_best_effort` lo deja como ERROR
+    # estructurado con el evento reconstruible. El `except ... warning` anterior
+    # borraba el rastro por debajo del umbral de alerta.
+    await write_audit_event_best_effort(
+        db,
+        actor_user_id=actor_user_id,
+        actor_email=actor_email,
+        workspace_id=workspace_id,
+        action=action,
+        resource_type=resource_type,
+        resource_id=resource_id,
+        result=result,
+        event_type=f"os.{category}.{action}",
+        source="os",
+        severity=severity if result != "error" else "warning",
+        commit=commit,
+    )
+

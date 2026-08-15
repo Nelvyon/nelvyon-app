@@ -13,7 +13,7 @@ from sqlalchemy.exc import IntegrityError
 from core.database import get_db
 from routers.crm_http_helpers import raise_internal, warn_and_bad_request, warn_integrity_conflict
 from services.contacts import ContactsService
-from services.audit_events import write_audit_event
+from services.audit_events import write_audit_event_best_effort
 from services.workflow_engine import WorkflowEngineService
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from dependencies.quota_guards import enforce_contact_headroom
@@ -252,7 +252,7 @@ async def create_contacts(
             )
 
         logger.info(f"Contacts created id={result.id} ws={ws_ctx.workspace_id}")
-        await write_audit_event(
+        await write_audit_event_best_effort(
             db,
             actor_user_id=ws_ctx.user_id,
             actor_email=ws_ctx.user_email,
@@ -266,7 +266,7 @@ async def create_contacts(
         )
         return result
     except HTTPException:
-        await write_audit_event(
+        await write_audit_event_best_effort(
             db,
             actor_user_id=ws_ctx.user_id,
             actor_email=ws_ctx.user_email,
@@ -280,7 +280,7 @@ async def create_contacts(
         )
         raise
     except IntegrityError as e:
-        await write_audit_event(
+        await write_audit_event_best_effort(
             db,
             actor_user_id=ws_ctx.user_id,
             actor_email=ws_ctx.user_email,
@@ -294,7 +294,7 @@ async def create_contacts(
         )
         warn_integrity_conflict(logger, "create contact", e)
     except ValueError as e:
-        await write_audit_event(
+        await write_audit_event_best_effort(
             db,
             actor_user_id=ws_ctx.user_id,
             actor_email=ws_ctx.user_email,
@@ -308,7 +308,7 @@ async def create_contacts(
         )
         warn_and_bad_request(logger, "create contact", e)
     except Exception as e:
-        await write_audit_event(
+        await write_audit_event_best_effort(
             db,
             actor_user_id=ws_ctx.user_id,
             actor_email=ws_ctx.user_email,

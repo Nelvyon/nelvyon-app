@@ -1,6 +1,6 @@
 import * as matchers from "@testing-library/jest-dom/matchers";
 import React from "react";
-import { expect, vi } from "vitest";
+import { afterAll, expect, vi } from "vitest";
 
 expect.extend(matchers);
 
@@ -122,4 +122,41 @@ vi.mock("../../backend/saas/SaasSecurityEnterpriseService", async (importOrigina
       verifyMfa: vi.fn().mockResolvedValue(true),
     }),
   };
+});
+
+
+/**
+ * AISLAMIENTO DE `process.env` ENTRE FICHEROS DEL MISMO WORKER
+ * ------------------------------------------------------------
+ * Vitest aisla modulos, pero NO el proceso: los ficheros que comparten worker
+ * comparten `process.env`. Y que ficheros comparten worker —y en que orden—
+ * cambia entre corridas, porque depende de la planificacion.
+ *
+ * El resultado era una suite que fallaba una de cada nueve corridas, siempre en
+ * tests que pasaban aislados. Medido sobre el arbol: SETENTA Y CINCO variables
+ * de entorno escritas por mas de un fichero de test; `OPENAI_API_KEY` por 17,
+ * `STRIPE_SECRET_KEY` por 14, `JWT_SECRET` por 6. Cualquier pareja de esas
+ * podia cruzarse.
+ *
+ * Arreglarlo fichero a fichero seria interminable y volveria a romperse con el
+ * siguiente test que escriba una variable. Se arregla donde el problema existe:
+ * este fichero corre UNA VEZ POR FICHERO DE TEST, asi que aqui se fotografia el
+ * entorno y al terminar se restaura. Lo que un fichero toque, deja de existir
+ * para el siguiente.
+ *
+ * La foto se toma DESPUES de la normalizacion de arriba, para que la linea base
+ * sea la que los tests esperan y no la del shell del desarrollador.
+ *
+ * No es un reintento ni un skip: es la garantia que todo autor de test ya daba
+ * por supuesta.
+ */
+const _entornoBase: NodeJS.ProcessEnv = { ...process.env };
+
+afterAll(() => {
+  for (const clave of Object.keys(process.env)) {
+    if (!(clave in _entornoBase)) delete process.env[clave];
+  }
+  for (const [clave, valor] of Object.entries(_entornoBase)) {
+    if (process.env[clave] !== valor) process.env[clave] = valor as string;
+  }
 });

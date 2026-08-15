@@ -22,6 +22,46 @@ sys.path.insert(0, _backend_dir)
 
 _test_db_path = os.path.join(_backend_dir, "test.db").replace("\\", "/")
 
+
+def _reset_test_db() -> None:
+    """Borra `test.db` AL INICIO de la sesion, no solo al final.
+
+    El teardown ya intentaba eliminarlo, pero solo se ejecuta si la sesion
+    termina limpiamente: una interrupcion, un `PermissionError` de Windows o un
+    `OSError` dejaban el fichero vivo. Como el bootstrap usa
+    `CREATE TABLE IF NOT EXISTS`, un `test.db` superviviente conserva el esquema
+    ANTIGUO y los cambios de schema no se reflejan en la siguiente ejecucion.
+
+    Eso ya causo dano real durante la auditoria: la migracion 524 estaba
+    correctamente aplicada por el bootstrap y aun asi los tests seguian fallando
+    con `no column named lead_id`, lo que costo dos ciclos de diagnostico
+    persiguiendo un defecto inexistente.
+
+    `NELVYON_KEEP_TEST_DB=1` conserva la base para inspeccionarla tras un fallo.
+    El default —CI incluido— es siempre limpio.
+    """
+    if os.environ.get("NELVYON_KEEP_TEST_DB", "").strip() == "1":
+        return
+    if not os.path.exists(_test_db_path):
+        return
+    for _ in range(5):
+        try:
+            os.remove(_test_db_path)
+            return
+        except PermissionError:
+            gc.collect()
+            time.sleep(0.05)
+        except OSError:
+            return
+    # No se silencia: un esquema heredado invalida cualquier diagnostico.
+    raise RuntimeError(
+        f"no se pudo eliminar {_test_db_path}; la suite arrancaria con esquema "
+        f"antiguo y sus resultados no serian fiables"
+    )
+
+
+_reset_test_db()
+
 # Set test environment BEFORE importing app
 os.environ["ENVIRONMENT"] = "test"
 os.environ["DATABASE_URL"] = f"sqlite+aiosqlite:///{_test_db_path}"
@@ -132,6 +172,18 @@ async def setup_database(test_engine):
 
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        # Esquema de runtime FastAPI derivado AUTOMÁTICAMENTE de la migración
+        # canónica 507. Antes se espejaban a mano 2 de sus 124 tablas y las 122
+        # restantes faltaban en la base de tests: 69 pruebas fallaban con
+        # `no such table` pese a ser correcto el producto. Ver
+        # `_schema_bootstrap.py` para por qué no se ejecutan las migraciones
+        # reales (402 de 422 usan sintaxis solo-PostgreSQL).
+        from ._schema_bootstrap import bootstrap_sqlite_schema
+
+        _fallidas = await bootstrap_sqlite_schema(conn)
+        if _fallidas:
+            # No se silencia: un bootstrap incompleto tiene que verse.
+            print(f"[conftest] tablas canonicas no creadas ({len(_fallidas)}): {_fallidas[:5]}")
         # Tables owned by migration 507 (no runtime DDL in services — bootstrap for sqlite tests)
         await conn.execute(
             text(
@@ -177,6 +229,53 @@ async def setup_database(test_engine):
                 """
             )
         )
+        # `saas_tenants` la crea una migracion de la superficie `/saas`, fuera
+        # del bootstrap canonico. Se declara aqui con la forma real —lo que
+        # necesitan las claves foraneas— para que los tests modelen el mismo
+        # estado que produccion.
+        await conn.execute(
+            text(
+                """
+                CREATE TABLE IF NOT EXISTS saas_tenants (
+                    id TEXT PRIMARY KEY,
+                    user_id TEXT NOT NULL,
+                    company_name TEXT NOT NULL,
+                    industry TEXT NOT NULL,
+                    plan TEXT NOT NULL DEFAULT 'starter',
+                    website TEXT,
+                    phone TEXT,
+                    employees TEXT,
+                    goals TEXT,
+                    onboarding_completed BOOLEAN NOT NULL DEFAULT 0,
+                    onboarding_step INTEGER NOT NULL DEFAULT 1,
+                    workspace_id INTEGER,
+                    mfa_enforced BOOLEAN NOT NULL DEFAULT 0,
+                    created_at TIMESTAMP,
+                    updated_at TIMESTAMP
+                )
+                """
+            )
+        )
+        # Cada workspace necesita su fila en `saas_tenants`.
+        #
+        # No es adorno del test: varias tablas de la generacion `/saas`
+        # —`calendar_events`, `audit_logs`— tienen `tenant_id uuid` con clave
+        # foranea a `saas_tenants`. Sin esta fila, en PostgreSQL real no se puede
+        # escribir en ellas, y sembrar workspaces sin inquilino modelaba un
+        # estado que produccion no admite.
+        await conn.execute(
+            text(
+                """
+                INSERT OR IGNORE INTO saas_tenants
+                (id, user_id, company_name, industry, workspace_id)
+                VALUES
+                ('11111111-1111-4111-8111-111111111111',
+                 '11111111-1111-4111-8111-1111111111aa', 'Test Tenant', 'test', 1),
+                ('22222222-2222-4222-8222-222222222222',
+                 '22222222-2222-4222-8222-2222222222aa', 'Admin Tenant', 'test', 2)
+                """
+            )
+        )
         # ENTERPRISE-READY-1 RBAC: member de workspace 1 (sin permiso de mutación SaaS)
         await conn.execute(
             text(
@@ -184,19 +283,29 @@ async def setup_database(test_engine):
                 INSERT OR IGNORE INTO workspace_members
                 (workspace_id, user_id, email, role, status)
                 VALUES
-                (1, 'member-user-00000000-0000-0000-0000-000000000099', 'member@test.com', 'member', 'active')
+                (1, 'member-user-00000000-0000-0000-0000-000000000099', 'member@test.com', 'member', 'active'),
+                (1, 'viewer-user-00000000-0000-0000-0000-000000000098', 'viewer@test.com', 'viewer', 'active'),
+                (1, 'operator-user-0000000-0000-0000-0000-000000000097', 'operator@test.com', 'operator', 'active')
                 """
             )
         )
         await conn.execute(
             text(
                 """
-                INSERT OR IGNORE INTO users (id, email, name, role)
+                -- `language` va EXPLICITA. Es NOT NULL y su default vive en el
+                -- modelo (lado Python), no en el servidor, asi que un INSERT
+                -- crudo que la omita viola la restriccion — y `OR IGNORE` se
+                -- tragaba el fallo sin decir nada. Resultado: la tabla `users`
+                -- quedaba VACIA y los tests de perfil solo pasaban cuando otro
+                -- test creaba la fila antes que ellos.
+                INSERT OR IGNORE INTO users (id, email, name, role, language)
                 VALUES
-                ('test-user-00000000-0000-0000-0000-000000000001', 'testuser@nelvyon-test.com', 'Test User', 'user'),
-                ('member-user-00000000-0000-0000-0000-000000000099', 'member@test.com', 'Member User', 'user'),
-                ('admin-user-00000000-0000-0000-0000-000000000001', 'admin@nelvyon-test.com', 'Admin User', 'admin'),
-                ('super-admin-00000000-0000-0000-0000-000000000001', 'superadmin@nelvyon-test.com', 'Super Admin', 'super_admin')
+                ('test-user-00000000-0000-0000-0000-000000000001', 'testuser@nelvyon-test.com', 'Test User', 'user', 'es'),
+                ('member-user-00000000-0000-0000-0000-000000000099', 'member@test.com', 'Member User', 'user', 'es'),
+                ('viewer-user-00000000-0000-0000-0000-000000000098', 'viewer@test.com', 'Viewer User', 'user', 'es'),
+                ('operator-user-0000000-0000-0000-0000-000000000097', 'operator@test.com', 'Operator User', 'user', 'es'),
+                ('admin-user-00000000-0000-0000-0000-000000000001', 'admin@nelvyon-test.com', 'Admin User', 'admin', 'es'),
+                ('super-admin-00000000-0000-0000-0000-000000000001', 'superadmin@nelvyon-test.com', 'Super Admin', 'super_admin', 'es')
                 """
             )
         )
@@ -291,6 +400,35 @@ async def member_headers(client: AsyncClient) -> dict:
         "Authorization": f"Bearer {token}",
         "X-Workspace-Id": "1",
     }
+
+
+@pytest_asyncio.fixture
+async def viewer_headers(client: AsyncClient) -> dict:
+    """Rol de workspace `viewer`: solo lectura. Es el agujero que dejaba abierto
+    `require_workspace`, que solo comprueba pertenencia."""
+    from core.auth import create_access_token
+
+    token = create_access_token({
+        "sub": "viewer-user-00000000-0000-0000-0000-000000000098",
+        "email": "viewer@test.com",
+        "name": "Viewer User",
+        "role": "user",
+    })
+    return {"Authorization": f"Bearer {token}", "X-Workspace-Id": "1"}
+
+
+@pytest_asyncio.fixture
+async def operator_headers(client: AsyncClient) -> dict:
+    """Rol de workspace `operator`: muta negocio, no toca dinero."""
+    from core.auth import create_access_token
+
+    token = create_access_token({
+        "sub": "operator-user-0000000-0000-0000-0000-000000000097",
+        "email": "operator@test.com",
+        "name": "Operator User",
+        "role": "user",
+    })
+    return {"Authorization": f"Bearer {token}", "X-Workspace-Id": "1"}
 
 
 @pytest_asyncio.fixture

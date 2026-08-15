@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import hashlib
+import hmac
+import json
 import pytest
 from httpx import AsyncClient
 
@@ -88,8 +91,25 @@ async def test_instagram_webhook_receive(client: AsyncClient):
             }
         ]
     }
-    r = await client.post("/api/instagram-dm/webhook", json=payload)
-    assert r.status_code == 200
+    # El webhook exige la firma de Meta desde el bloque 24: antes aceptaba
+    # cualquier cuerpo, asi que se podian inyectar DMs falsos en la bandeja de
+    # un workspace. Aqui se firma como lo haria una entrega real, sobre los
+    # MISMOS bytes que se envian.
+    monkeypatch = pytest.MonkeyPatch()
+    monkeypatch.setenv("INSTAGRAM_APP_SECRET", "secreto-de-prueba-instagram")
+    try:
+        cuerpo = json.dumps(payload).encode()
+        firma = "sha256=" + hmac.new(
+            b"secreto-de-prueba-instagram", cuerpo, hashlib.sha256
+        ).hexdigest()
+        r = await client.post(
+            "/api/instagram-dm/webhook",
+            content=cuerpo,
+            headers={"Content-Type": "application/json", "X-Hub-Signature-256": firma},
+        )
+    finally:
+        monkeypatch.undo()
+    assert r.status_code == 200, r.text
     assert r.json().get("processed", 0) >= 1
 
 
@@ -123,11 +143,24 @@ async def test_fb_messenger_webhook_verify(client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_fb_messenger_webhook_receive(client: AsyncClient):
-    r = await client.post(
-        "/api/fb-messenger/webhook",
-        json={"entry": [{"messaging": [{"sender": {"id": "psid-f63"}, "message": {"text": "Precio?"}}]}]},
-    )
-    assert r.status_code == 200
+    monkeypatch = pytest.MonkeyPatch()
+    monkeypatch.setenv("FACEBOOK_APP_SECRET", "secreto-de-prueba-facebook")
+    try:
+        cuerpo = json.dumps(
+            {"entry": [{"messaging": [{"sender": {"id": "psid-f63"},
+                                       "message": {"text": "Precio?"}}]}]}
+        ).encode()
+        firma = "sha256=" + hmac.new(
+            b"secreto-de-prueba-facebook", cuerpo, hashlib.sha256
+        ).hexdigest()
+        r = await client.post(
+            "/api/fb-messenger/webhook",
+            content=cuerpo,
+            headers={"Content-Type": "application/json", "X-Hub-Signature-256": firma},
+        )
+    finally:
+        monkeypatch.undo()
+    assert r.status_code == 200, r.text
 
 
 @pytest.mark.asyncio
@@ -147,13 +180,40 @@ async def test_fb_messenger_send(client: AsyncClient, auth_headers: dict):
 
 
 @pytest.mark.asyncio
-async def test_tiktok_dm_webhook(client: AsyncClient):
+async def test_tiktok_dm_webhook(client: AsyncClient, monkeypatch):
+    """El webhook exige ahora el secreto compartido.
+
+    TikTok no publica esquema de firma, asi que la autenticidad se establece con
+    el secreto que se configura junto a la URL en su panel. Antes este endpoint
+    era publico y anonimo: cualquiera podia inyectar DMs con el remitente que
+    quisiera.
+    """
+    monkeypatch.setenv("TIKTOK_WEBHOOK_SECRET", "secreto-de-prueba-no-real")
     r = await client.post(
         "/api/tiktok-dm/webhook",
         json={"events": [{"open_id": "tt-open-f63", "text": "Hola TikTok"}]},
+        headers={"X-Nelvyon-Webhook-Secret": "secreto-de-prueba-no-real"},
     )
     assert r.status_code == 200
     assert r.json().get("processed") >= 1
+
+
+@pytest.mark.asyncio
+async def test_tiktok_dm_webhook_sin_secreto_no_tiene_efecto(
+    client: AsyncClient, monkeypatch
+):
+    """Con autenticacion fallida: 4xx y CERO efectos.
+
+    No basta con que devuelva error: hay que comprobar que no se proceso nada,
+    porque el defecto que esto cierra era precisamente el efecto.
+    """
+    monkeypatch.setenv("TIKTOK_WEBHOOK_SECRET", "secreto-de-prueba-no-real")
+    r = await client.post(
+        "/api/tiktok-dm/webhook",
+        json={"events": [{"open_id": "tt-intruso", "text": "inyectado"}]},
+    )
+    assert r.status_code in (400, 403)
+    assert "processed" not in (r.json() if r.headers.get("content-type", "").startswith("application/json") else {})
 
 
 @pytest.mark.asyncio
@@ -180,14 +240,21 @@ async def test_tiktok_ads_status(client: AsyncClient, auth_headers: dict):
 
 
 @pytest.mark.asyncio
-async def test_tiktok_ads_create_campaign(client: AsyncClient, auth_headers: dict):
+async def test_tiktok_ads_create_campaign_falla_cerrado_sin_integracion(
+    client: AsyncClient, auth_headers: dict
+):
+    """
+    Antes devolvia 200 creando la campana sobre la cuenta corporativa global de
+    NELVYON. Al ser TikTok Ads customer-facing, esa cuenta dejo de servir de
+    fallback: sin integracion propia del workspace se falla cerrado.
+    """
     r = await client.post(
         "/api/tiktok-ads/campaigns",
         json={"name": "F63 Test Campaign", "daily_budget_eur": 40},
         headers=auth_headers,
     )
-    assert r.status_code == 200
-    assert r.json().get("campaign_id")
+    assert r.status_code == 503, r.text
+    assert "integration is not configured" in r.text
 
 
 @pytest.mark.asyncio
@@ -197,9 +264,12 @@ async def test_tiktok_ads_list_campaigns(client: AsyncClient, auth_headers: dict
         json={"name": "F63 List"},
         headers=auth_headers,
     )
+    # La creacion falla cerrado sin integracion propia del workspace, asi que no
+    # hay nada que listar. La LECTURA si sigue disponible: lee filas locales
+    # filtradas por workspace, no consulta al proveedor.
     r = await client.get("/api/tiktok-ads/campaigns", headers=auth_headers)
     assert r.status_code == 200
-    assert len(r.json().get("campaigns", [])) >= 1
+    assert r.json().get("campaigns") == []
 
 
 @pytest.mark.asyncio

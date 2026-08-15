@@ -2,10 +2,10 @@
 
 from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from pydantic import BaseModel, Field
 
-from dependencies.workspace import WorkspaceContext, require_workspace
+from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from core.list_cache import list_cached
 from services import memory_service
 
@@ -43,7 +43,7 @@ class MemorySearchRequest(BaseModel):
 @router.get("")
 @list_cached("memory")
 async def list_workspace_memories(
-    limit: int = 50,
+    limit: int = Query(50, ge=1, le=200),
     ctx: WorkspaceContext = Depends(require_workspace),
 ):
     """List all memories in the workspace (across clients)."""
@@ -71,7 +71,7 @@ async def get_client_memory(
 async def create_client_memory(
     client_id: str,
     body: MemoryCreateRequest,
-    ctx: WorkspaceContext = Depends(require_workspace),
+    ctx: WorkspaceContext = Depends(require_workspace_operator),
 ):
     """Save a new memory entry for the client."""
     row_id = await memory_service.save_memory(
@@ -104,7 +104,7 @@ async def search_client_memory(
 @router.delete("/{client_id}", response_model=MemoryDeleteResponse)
 async def delete_client_memory(
     client_id: str,
-    ctx: WorkspaceContext = Depends(require_workspace),
+    ctx: WorkspaceContext = Depends(require_workspace_operator),
 ):
     """Delete all memories for the client in the active workspace."""
     deleted = await memory_service.delete_client_memories(ctx.workspace_id, client_id)

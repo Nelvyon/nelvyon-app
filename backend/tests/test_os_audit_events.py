@@ -9,7 +9,7 @@ from services.os_audit_service import record_os_event
 @pytest.mark.asyncio
 async def test_record_os_event_writes_security_event():
     db = AsyncMock()
-    with patch("services.os_audit_service.write_audit_event", new_callable=AsyncMock) as mock_write:
+    with patch("services.os_audit_service.write_audit_event_best_effort", new_callable=AsyncMock) as mock_write:
         await record_os_event(
             db,
             category="upload",
@@ -30,17 +30,23 @@ async def test_record_os_event_writes_security_event():
 
 @pytest.mark.asyncio
 async def test_record_os_event_survives_write_failure():
-    db = AsyncMock()
-    with patch(
-        "services.os_audit_service.write_audit_event",
-        new_callable=AsyncMock,
-        side_effect=RuntimeError("db down"),
-    ):
-        await record_os_event(
-            db,
-            category="portal",
-            action="login",
-            resource_type="os_portal_user",
-            resource_id="a@b.com",
-            result="error",
-        )
+    # Se rompe la BASE, no el helper: asi corre la politica best-effort real
+    # (captura de `AuditPersistError` + log ERROR) en vez de un mock que la
+    # sustituye. Mockear el propio helper dejaba sin probar lo unico que aqui
+    # importa: que un fallo de persistencia no propague.
+    class _DbRota:
+        async def execute(self, *_a, **_k):
+            raise RuntimeError("db down")
+
+        async def commit(self):
+            raise RuntimeError("db down")
+
+    db = _DbRota()
+    await record_os_event(
+        db,
+        category="portal",
+        action="login",
+        resource_type="os_portal_user",
+        resource_id="a@b.com",
+        result="error",
+    )

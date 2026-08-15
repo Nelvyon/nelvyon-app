@@ -8,7 +8,57 @@ import { OsAgentError } from "../os-agents/OsAgentError";
 import type { AuthResult, JwtPayload, NelvyonUserRow } from "./types";
 
 const BCRYPT_ROUNDS = 12;
-const JWT_EXPIRES = "7d" as const;
+
+/**
+ * Hash señuelo contra el que se compara cuando el email no existe.
+ *
+ * POR QUE EXISTE
+ * --------------
+ * `login` devolvia el mismo mensaje en ambos casos, pero cuando el usuario no
+ * existia retornaba SIN ejecutar bcrypt. Un email inexistente respondia en el
+ * tiempo de una consulta; uno existente con contrasena incorrecta pagaba un
+ * bcrypt de coste 12 (~200-400 ms). Esa diferencia es medible desde fuera: un
+ * oraculo de enumeracion de usuarios por temporizacion, que el mensaje
+ * identico no cierra.
+ *
+ * Ahora el camino "usuario no existe" hace una comparacion real contra este
+ * hash, de modo que ambos ramales pagan el mismo coste computacional.
+ *
+ * Generado con `bcrypt.hash(<cadena aleatoria>, 12)`. NO corresponde a ninguna
+ * contrasena conocida ni utilizable: su unico proposito es consumir tiempo.
+ */
+const DECOY_HASH = "$2a$12$NZhXnN/QmRLretNJRm58Uuf8QcmqWb0oY9/9DMsVVafa2W3CIZzNi";
+/**
+ * Vida del token de sesion: 8 horas.
+ *
+ * POR QUE 8h Y NO 7d
+ * ------------------
+ * NELVYON no tiene revocacion server-side: `verifyToken` es puramente
+ * criptografico y no consulta ninguna base. Un token robado sigue siendo valido
+ * hasta que expira, y el logout solo borra la cookie del navegador — no
+ * invalida nada en servidor.
+ *
+ * Con 7 dias, la ventana de replay de un token exfiltrado era de una semana.
+ * Con 8 horas cubre una jornada de trabajo sin reautenticar y reduce esa
+ * ventana por un factor de 21, sin introducir ninguna dependencia nueva.
+ *
+ * RESIDUAL CONOCIDO Y ACEPTADO
+ * ----------------------------
+ * Esto ACOTA el riesgo, no lo elimina. Siguen pendientes de infraestructura
+ * compartida (Redis/Upstash u equivalente):
+ *
+ *   - revocacion individual de sesion (logout que invalide de verdad);
+ *   - invalidacion de sesiones al cambiar la contrasena;
+ *   - cierre de "todas las sesiones" de un usuario.
+ *
+ * Hasta entonces, un token robado permanece valido un maximo de 8 horas aunque
+ * el usuario cierre sesion o cambie su contrasena. No se implementa una
+ * denylist fail-open: seria una falsa afirmacion de proteccion.
+ *
+ * La cookie usa el MISMO valor (`apps/web/src/lib/authCookies.ts`); si divergen,
+ * el navegador conserva un token ya muerto o corta la sesion antes de tiempo.
+ */
+const JWT_EXPIRES = "8h" as const;
 
 export interface AuthDbPort {
   query<T>(sql: string, params?: unknown[]): Promise<T[]>;
@@ -109,6 +159,9 @@ export class AuthService {
     );
     const row = rows[0];
     if (!row) {
+      // Iguala el coste con el ramal "contrasena incorrecta": sin esto, la
+      // ausencia de bcrypt delata que el email no existe.
+      await this.comparePassword(password, DECOY_HASH);
       NelvyonMonitor.trackAuthError(trimmedEmail, new Error("User not found during login"));
       throw new OsAgentError("Invalid credentials");
     }

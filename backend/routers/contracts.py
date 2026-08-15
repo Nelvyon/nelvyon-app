@@ -7,6 +7,7 @@ from typing import Any, List, Optional
 from datetime import datetime
 
 from core.secrets import sanitize_text
+from core.webhook_shared_secret import verificar_secreto_compartido
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import Response
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
@@ -397,7 +398,13 @@ signaturit_router = APIRouter(prefix="/api/contracts", tags=["contracts-signatur
 
 @signaturit_router.post("/webhook")
 async def signaturit_webhook(request: Request):
-    """Receive Signaturit webhook events (no auth — configure URL in Signaturit dashboard)."""
+    """Eventos de firma de Signaturit.
+
+    Signaturit no publica esquema de firma para sus webhooks, asi que se exige
+    el secreto compartido que se configura junto con la URL en su panel. Sin el,
+    cualquiera podia declarar un documento como firmado o cancelado.
+    """
+    verificar_secreto_compartido("signaturit", request)
     try:
         payload = await request.json()
     except Exception:

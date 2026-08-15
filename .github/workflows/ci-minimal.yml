@@ -39,3 +39,22 @@ jobs:
 
       - name: Fast tests
         run: pnpm test:fast
+
+      # Suite completa del backend.
+      #
+      # `test:fast` corre 9 ficheros. Los guards estructurales que sostienen las
+      # certificaciones —autoridad de mutaciones, tenencia de proveedores,
+      # politica de auditoria, drift de esquema, saneado de CSV, higiene de
+      # logs, topes de paginacion, fail-fast de produccion— viven en el resto de
+      # la suite, y en un PR no se ejecutaba ninguno. Cualquiera de esas
+      # propiedades podia revertirse sin que nada lo notase.
+      #
+      # La suite entera tarda alrededor de un minuto: barato para lo que evita.
+      - name: Backend suite (guards de certificacion)
+        run: cd backend && python -m pytest tests/ -q --tb=short
+
+      - name: Typecheck del frontend
+        run: pnpm -C apps/web exec tsc --noEmit
+
+      - name: Frontend tests
+        run: pnpm -C apps/web exec vitest run

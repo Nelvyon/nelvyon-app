@@ -45,12 +45,22 @@ def decode_nelvyon_app_token(token: str) -> Dict[str, Any]:
     if not user_id or not email:
         raise AccessTokenError("Invalid authentication token")
 
+    # Un PLAN COMERCIAL no concede autoridad de PLATAFORMA.
+    #
+    # `enterprise` daba `role = "admin"`, y `get_admin_user` acepta ese rol como
+    # "platform operator": audit stats, platform settings, metricas globales y
+    # `POST /rbac/assign`, que asigna roles. `enterprise` es un plan VENDIBLE
+    # (`core.pricing_plans`), asi que la autoridad sobre la plataforma se
+    # compraba con una suscripcion.
+    #
+    # `admin` NO es un plan vendible: no esta en `pricing_plans`. Es el
+    # mecanismo con el que se marca al personal de NELVYON, y por eso se
+    # conserva. Los planes de cliente —enterprise incluido— llegan como mucho a
+    # `operator`, que es autoridad de trabajo, no de plataforma.
     plan = str(decoded.get("plan") or "free").lower()
-    if plan in ("admin",):
+    if plan == "admin":
         role = "admin"
-    elif plan in ("enterprise",):
-        role = "admin"
-    elif plan in ("pro", "starter"):
+    elif plan in ("enterprise", "pro", "starter"):
         role = "operator"
     else:
         role = "user"

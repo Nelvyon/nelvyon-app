@@ -1,11 +1,11 @@
 import json
 import logging
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
@@ -72,32 +72,31 @@ class Social_postsUpdateData(BaseModel):
 
 
 class Social_postsResponse(BaseModel):
-    """Entity response schema"""
-    id: int
-    user_id: str
-    platform: str
+    """Respuesta de una publicacion.
+
+    Refleja la tabla real: `id` es un uuid y `tenant_id` el workspace. Los
+    campos de la generacion anterior —platform, likes, client_id...— ya no son
+    columnas; se devuelven dentro de `metadata`, que es donde se guardan. Antes
+    esta respuesta declaraba `id: int` y campos inexistentes, asi que el
+    endpoint devolvia 500 en cuanto se le pedia una fila real.
+    """
+    id: str
+    tenant_id: int
     content: str
-    format_type: Optional[str] = None
     status: str
-    scheduled_at: Optional[str] = None
-    published_at: Optional[str] = None
-    impressions: Optional[int] = None
-    clicks: Optional[int] = None
-    likes: Optional[int] = None
-    comments: Optional[int] = None
-    shares: Optional[int] = None
+    post_type: str
+    media_urls: Optional[Any] = None
+    platform_post_ids: Optional[Any] = None
+    account_ids: Optional[Any] = None
+    scheduled_at: Optional[datetime] = None
+    published_at: Optional[datetime] = None
     error_message: Optional[str] = None
     retry_count: Optional[int] = None
-    hashtags: Optional[str] = None
-    media_url: Optional[str] = None
-    campaign_name: Optional[str] = None
-    client_id: Optional[int] = None
-    project_id: Optional[int] = None
-    output_id: Optional[int] = None
-    contract_id: Optional[int] = None
+    metadata: Optional[Any] = Field(default=None, validation_alias="post_metadata")
     created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 
 class Social_postsListResponse(BaseModel):

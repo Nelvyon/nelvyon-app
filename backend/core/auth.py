@@ -79,8 +79,32 @@ def _fastapi_jwt_secret_key() -> Optional[str]:
     return os.environ.get("JWT_SECRET_KEY", "").strip() or None
 
 
+#: Algoritmos JWT de curva eliptica. Prohibidos, y no por preferencia de diseno.
+#:
+#: `python-jose` arrastra `python-ecdsa`, que tiene un ataque de temporizacion
+#: Minerva sobre P-256 (PYSEC-2026-1325): midiendo el tiempo de firma se puede
+#: filtrar el nonce interno y de ahi la clave privada. Afecta a firmar, generar
+#: claves y ECDH; verificar no. No hay version corregida ni la habra: el proyecto
+#: considera los canales laterales fuera de su alcance, y el rango del aviso
+#: empieza en 0.
+#:
+#: Hoy NELVYON firma con HS256 —HMAC, sin curvas— asi que ese codigo nunca se
+#: ejecuta. Pero el algoritmo sale de una variable de entorno, y «no alcanzable»
+#: por configuracion deja de serlo el dia que alguien cambia la variable. Esto
+#: convierte la circunstancia en invariante.
+_ALGORITMOS_EC_PROHIBIDOS = frozenset({"ES256", "ES256K", "ES384", "ES512"})
+
+
 def _fastapi_jwt_algorithm() -> str:
-    return os.environ.get("JWT_ALGORITHM", "HS256").strip() or "HS256"
+    alg = os.environ.get("JWT_ALGORITHM", "HS256").strip() or "HS256"
+    if alg.upper() in _ALGORITMOS_EC_PROHIBIDOS:
+        raise RuntimeError(
+            f"JWT_ALGORITHM={alg} usa curva eliptica, y la dependencia que la "
+            "implementa tiene un ataque de temporizacion sin arreglo disponible "
+            "(PYSEC-2026-1325, Minerva sobre P-256): firmar con ella puede "
+            "filtrar la clave privada. Usar HS256 o un algoritmo RSA."
+        )
+    return alg
 
 
 def _fastapi_jwt_expire_minutes() -> int:

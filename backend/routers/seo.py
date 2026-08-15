@@ -5,7 +5,7 @@ from typing import Any, Dict
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 
-from dependencies.workspace import WorkspaceContext, require_workspace
+from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.seo_apis import DataForSEOService, SemrushService
 
 router = APIRouter(prefix="/api/seo", tags=["seo"])
@@ -32,7 +32,7 @@ class KeywordIdeasRequest(BaseModel):
 @router.post("/domain-overview")
 async def domain_overview(
     body: DomainRequest,
-    _ctx: WorkspaceContext = Depends(require_workspace),
+    _ctx: WorkspaceContext = Depends(require_workspace_operator),
 ) -> Dict[str, Any]:
     """Análisis completo de dominio (Semrush domain_ranks)."""
     service = SemrushService()
@@ -48,7 +48,7 @@ async def domain_overview(
 @router.post("/keyword-overview")
 async def keyword_overview(
     body: KeywordRequest,
-    _ctx: WorkspaceContext = Depends(require_workspace),
+    _ctx: WorkspaceContext = Depends(require_workspace_operator),
 ) -> Dict[str, Any]:
     """Datos de keyword (Semrush phrase_this)."""
     service = SemrushService()
@@ -58,7 +58,7 @@ async def keyword_overview(
 @router.post("/competitors")
 async def competitors(
     body: DomainRequest,
-    _ctx: WorkspaceContext = Depends(require_workspace),
+    _ctx: WorkspaceContext = Depends(require_workspace_operator),
 ) -> Dict[str, Any]:
     """Competidores orgánicos (Semrush domain_organic_organic)."""
     service = SemrushService()
@@ -68,7 +68,7 @@ async def competitors(
 @router.post("/serp")
 async def serp_analysis(
     body: SerpRequest,
-    _ctx: WorkspaceContext = Depends(require_workspace),
+    _ctx: WorkspaceContext = Depends(require_workspace_operator),
 ) -> Dict[str, Any]:
     """Análisis SERP real (DataForSEO live advanced)."""
     service = DataForSEOService()
@@ -78,7 +78,7 @@ async def serp_analysis(
 @router.post("/keyword-ideas")
 async def keyword_ideas(
     body: KeywordIdeasRequest,
-    _ctx: WorkspaceContext = Depends(require_workspace),
+    _ctx: WorkspaceContext = Depends(require_workspace_operator),
 ) -> Dict[str, Any]:
     """Ideas de keywords (DataForSEO keywords_for_keywords)."""
     service = DataForSEOService()

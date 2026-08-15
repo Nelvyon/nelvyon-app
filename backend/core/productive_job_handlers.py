@@ -14,6 +14,7 @@ import os
 import smtplib
 from datetime import datetime, timedelta, timezone
 from email.message import EmailMessage
+import hashlib
 from typing import Any, Dict
 
 from sqlalchemy import select, text
@@ -76,7 +77,7 @@ async def handle_contract_email(payload: Dict[str, Any]) -> str:
     if not db_manager.async_session_maker:
         raise RuntimeError("Database not initialized for job handler")
 
-    from services.audit_events import write_audit_event
+    from services.audit_events import write_audit_event_best_effort
 
     smtp_host = (os.environ.get("SMTP_HOST") or "").strip()
     smtp_port = int(os.environ.get("SMTP_PORT") or "587")
@@ -112,7 +113,18 @@ async def handle_contract_email(payload: Dict[str, Any]) -> str:
                 logger.warning("SMTP send failed, falling back to audit: %s", exc)
                 delivery = "smtp_failed_audit"
 
-        await write_audit_event(
+        # POLITICA: best-effort, y sin auditoria de intencion previa.
+        #
+        # El envio ya ocurrio, asi que convertir un fallo de auditoria en error
+        # no deshace nada y provocaria que la cola reintentase el job: el mismo
+        # correo saldria dos veces.
+        #
+        # `campaign_sender` si necesita auditar la intencion ANTES porque su
+        # envio nace de una peticion HTTP que no deja rastro propio. Aqui el
+        # rastro previo ya existe: la fila de `job_queue` fue persistida y
+        # reclamada antes de ejecutarse, con su payload y su actor. Auditar la
+        # intencion seria duplicar ese registro.
+        await write_audit_event_best_effort(
             session,
             actor_user_id=actor_user_id,
             actor_email=payload.get("actor_email"),
@@ -140,7 +152,7 @@ async def handle_contract_report(payload: Dict[str, Any]) -> str:
     if not db_manager.async_session_maker:
         raise RuntimeError("Database not initialized for job handler")
 
-    from services.audit_events import write_audit_event
+    from services.audit_events import write_audit_event_best_effort
     from services.plan_quota import count_contacts_in_workspace, get_active_plan_id_for_workspace
 
     async with db_manager.async_session_maker() as session:
@@ -154,7 +166,7 @@ async def handle_contract_report(payload: Dict[str, Any]) -> str:
             {"report_type": report_type, "plan_id": plan_id, "contact_count": contact_count},
             default=str,
         )[:400]
-        await write_audit_event(
+        await write_audit_event_best_effort(
             session,
             actor_user_id=actor_user_id,
             actor_email=payload.get("actor_email"),
@@ -170,6 +182,24 @@ async def handle_contract_report(payload: Dict[str, Any]) -> str:
     return "report_audited"
 
 
+def _clave_de_entrega(payload: Dict[str, Any]) -> str:
+    """
+    Identidad de la entrega, constante entre reintentos del mismo job.
+
+    Usa `_job_id`, que inyecta la cola. Si faltase —un handler invocado a mano—
+    se deriva del contenido, que tambien es constante entre reintentos; nunca se
+    usa el reloj ni un aleatorio, que romperian justo la propiedad buscada.
+    """
+    job_id = str(payload.get("_job_id") or "").strip()
+    if job_id:
+        return f"job_{job_id}"
+    material = json.dumps(
+        {k: v for k, v in payload.items() if not k.startswith("_")},
+        sort_keys=True, default=str,
+    )
+    return "wh_" + hashlib.sha256(material.encode("utf-8")).hexdigest()[:32]
+
+
 async def handle_contract_webhook(payload: Dict[str, Any]) -> str:
     workspace_id, actor_user_id = _ws_actor(payload)
     url = str(payload["url"]).strip()
@@ -181,7 +211,7 @@ async def handle_contract_webhook(payload: Dict[str, Any]) -> str:
     if not db_manager.async_session_maker:
         raise RuntimeError("Database not initialized for job handler")
 
-    from services.audit_events import write_audit_event
+    from services.audit_events import write_audit_event_best_effort
 
     import httpx
 
@@ -191,16 +221,29 @@ async def handle_contract_webhook(payload: Dict[str, Any]) -> str:
         ):
             raise ValueError("Actor is not a member of the target workspace")
 
+    # Un 5xx hace que la cola reintente, y la MISMA entrega vuelve a salir. El
+    # receptor no tenia forma de distinguir el reintento de un evento nuevo, asi
+    # que un fallo transitorio suyo se convertia en efecto duplicado del suyo.
+    #
+    # La clave es el id del job, que no cambia entre reintentos. Se manda tambien
+    # el numero de intento, informativo: deduplicar es por la clave, no por el.
+    entrega = _clave_de_entrega(payload)
+    cabeceras = {
+        "Idempotency-Key": entrega,
+        "X-Nelvyon-Delivery-Id": entrega,
+        "X-Nelvyon-Delivery-Attempt": str(payload.get("_attempt") or 1),
+    }
+
     timeout = httpx.Timeout(20.0, connect=10.0)
     async with httpx.AsyncClient(timeout=timeout, follow_redirects=True) as client:
         if method == "GET":
-            resp = await client.get(url)
+            resp = await client.get(url, headers=cabeceras)
         elif method == "POST":
-            resp = await client.post(url, json=body)
+            resp = await client.post(url, json=body, headers=cabeceras)
         elif method == "PUT":
-            resp = await client.put(url, json=body)
+            resp = await client.put(url, json=body, headers=cabeceras)
         elif method == "PATCH":
-            resp = await client.patch(url, json=body)
+            resp = await client.patch(url, json=body, headers=cabeceras)
         else:
             raise ValueError(f"Unsupported HTTP method for webhook job: {method}")
         status = resp.status_code
@@ -208,7 +251,18 @@ async def handle_contract_webhook(payload: Dict[str, Any]) -> str:
             raise RuntimeError(f"webhook upstream 5xx: {status}")
 
     async with db_manager.async_session_maker() as session:
-        await write_audit_event(
+        # POLITICA: best-effort, y sin auditoria de intencion previa.
+        #
+        # El envio ya ocurrio, asi que convertir un fallo de auditoria en error
+        # no deshace nada y provocaria que la cola reintentase el job: el mismo
+        # correo saldria dos veces.
+        #
+        # `campaign_sender` si necesita auditar la intencion ANTES porque su
+        # envio nace de una peticion HTTP que no deja rastro propio. Aqui el
+        # rastro previo ya existe: la fila de `job_queue` fue persistida y
+        # reclamada antes de ejecutarse, con su payload y su actor. Auditar la
+        # intencion seria duplicar ese registro.
+        await write_audit_event_best_effort(
             session,
             actor_user_id=actor_user_id,
             actor_email=payload.get("actor_email"),
@@ -239,7 +293,7 @@ async def handle_contract_cleanup(payload: Dict[str, Any]) -> str:
     if not db_manager.async_session_maker:
         raise RuntimeError("Database not initialized for job handler")
 
-    from services.audit_events import write_audit_event
+    from services.audit_events import write_audit_event_best_effort
 
     cutoff = datetime.now(timezone.utc) - timedelta(days=days)
     cutoff_naive = cutoff.replace(tzinfo=None)
@@ -264,7 +318,7 @@ async def handle_contract_cleanup(payload: Dict[str, Any]) -> str:
             {"cutoff": cutoff_naive, "ws": workspace_id},
         )
         deleted = result.rowcount or 0
-        await write_audit_event(
+        await write_audit_event_best_effort(
             session,
             actor_user_id=actor_user_id,
             actor_email=payload.get("actor_email"),

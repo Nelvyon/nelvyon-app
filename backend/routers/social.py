@@ -208,13 +208,38 @@ async def account_analytics(
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 
 
+#: Tope de subida de media social. Los hermanos de este backend
+#: (`voice_commands`, `voice_pilot_v2`, `os_deliverables_rest`) ya leen acotado;
+#: este era el unico `await file.read()` sin limite, y una subida grande se
+#: cargaba entera en memoria antes de que nadie mirase su tamano.
+MAX_MEDIA_BYTES = 25 * 1024 * 1024
+
+
+async def _leer_subida_acotada(upload: UploadFile, limite: int = MAX_MEDIA_BYTES) -> bytes:
+    """Lee por bloques y corta en cuanto se pasa: nunca materializa de mas."""
+    trozos: list[bytes] = []
+    total = 0
+    while True:
+        bloque = await upload.read(65536)
+        if not bloque:
+            break
+        total += len(bloque)
+        if total > limite:
+            raise HTTPException(
+                status_code=413,
+                detail=f"File exceeds maximum size ({limite} bytes)",
+            )
+        trozos.append(bloque)
+    return b"".join(trozos)
+
+
 @social_router.post("/media/upload")
 async def upload_media(
     file: UploadFile = File(...),
     ws: WorkspaceContext = Depends(require_workspace_operator),
     db: AsyncSession = Depends(get_db),
 ):
-    data = await file.read()
+    data = await _leer_subida_acotada(file)
     if not data:
         raise HTTPException(status_code=400, detail="Empty file")
     mime = file.content_type or "application/octet-stream"

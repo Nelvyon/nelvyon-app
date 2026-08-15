@@ -78,6 +78,8 @@ export async function processStripeEvent(event: Stripe.Event, db: DbClient): Pro
 
       const wasSuspended = await isTenantSuspended(db, userId);
       await upsertSubscription(db, {
+        eventAt: new Date(event.created * 1000),
+        eventId: event.id,
         userId,
         stripeSubscriptionId: subscriptionId,
         stripeCustomerId: customerId,
@@ -123,6 +125,8 @@ export async function processStripeEvent(event: Stripe.Event, db: DbClient): Pro
       const wasSuspended = await isTenantSuspended(db, userId);
 
       await upsertSubscription(db, {
+        eventAt: new Date(event.created * 1000),
+        eventId: event.id,
         userId,
         stripeSubscriptionId: sub.id,
         stripeCustomerId: typeof sub.customer === "string" ? sub.customer : sub.customer?.id ?? null,
@@ -168,7 +172,18 @@ export async function processStripeEvent(event: Stripe.Event, db: DbClient): Pro
         break;
       }
 
-      await db.query(`UPDATE subscriptions SET status='canceled', updated_at=now() WHERE user_id::text=$1`, [userId]);
+      // Misma garantia de recencia que el upsert: un `deleted` antiguo no puede
+      // cancelar una suscripcion reactivada despues.
+      await db.query(
+        `UPDATE subscriptions
+            SET status='canceled',
+                last_stripe_event_at=$2,
+                last_stripe_event_id=$3,
+                updated_at=now()
+          WHERE user_id::text=$1
+            AND (last_stripe_event_at IS NULL OR last_stripe_event_at < $2)`,
+        [userId, new Date(event.created * 1000), event.id],
+      );
       await downgradeSaasTenantPlan(db, userId);
       const email = await getUserEmail(db, userId);
       const periodEnd = periodEndFromSubscription(sub);
@@ -209,6 +224,8 @@ export async function processStripeEvent(event: Stripe.Event, db: DbClient): Pro
       const wasPastDue = (await getSubscriptionStatus(db, userId)) === "past_due";
 
       await upsertSubscription(db, {
+        eventAt: new Date(event.created * 1000),
+        eventId: event.id,
         userId,
         stripeSubscriptionId: sub.id,
         stripeCustomerId: typeof sub.customer === "string" ? sub.customer : sub.customer?.id ?? null,
@@ -242,6 +259,8 @@ export async function processStripeEvent(event: Stripe.Event, db: DbClient): Pro
       }
 
       await upsertSubscription(db, {
+        eventAt: new Date(event.created * 1000),
+        eventId: event.id,
         userId,
         stripeSubscriptionId: sub.id,
         stripeCustomerId: typeof sub.customer === "string" ? sub.customer : sub.customer?.id ?? null,
@@ -288,6 +307,11 @@ async function upsertSubscription(
     periodEnd: Date | null;
     cancelAtPeriodEnd: boolean;
     status?: string;
+    /** `event.created` del evento que origina la mutacion. Obligatorio: sin el
+     *  no hay forma de rechazar un evento antiguo. */
+    eventAt: Date;
+    /** `event.id`, solo para trazabilidad: NO es orden cronologico. */
+    eventId: string;
   },
 ): Promise<void> {
   const status = opts.status ?? "active";
@@ -295,8 +319,9 @@ async function upsertSubscription(
   await db.query(
     `INSERT INTO subscriptions
        (user_id, stripe_subscription_id, stripe_customer_id,
-        plan, status, current_period_end, cancel_at_period_end, updated_at)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,now())
+        plan, status, current_period_end, cancel_at_period_end,
+        last_stripe_event_at, last_stripe_event_id, updated_at)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,now())
      ON CONFLICT (user_id) DO UPDATE SET
        stripe_subscription_id = COALESCE(EXCLUDED.stripe_subscription_id, subscriptions.stripe_subscription_id),
        stripe_customer_id = COALESCE(EXCLUDED.stripe_customer_id, subscriptions.stripe_customer_id),
@@ -304,7 +329,11 @@ async function upsertSubscription(
        status = EXCLUDED.status,
        current_period_end = EXCLUDED.current_period_end,
        cancel_at_period_end = EXCLUDED.cancel_at_period_end,
-       updated_at = now()`,
+       last_stripe_event_at = EXCLUDED.last_stripe_event_at,
+       last_stripe_event_id = EXCLUDED.last_stripe_event_id,
+       updated_at = now()
+     WHERE subscriptions.last_stripe_event_at IS NULL
+        OR subscriptions.last_stripe_event_at < EXCLUDED.last_stripe_event_at`,
     [
       opts.userId,
       opts.stripeSubscriptionId,
@@ -313,6 +342,8 @@ async function upsertSubscription(
       status,
       opts.periodEnd,
       opts.cancelAtPeriodEnd,
+      opts.eventAt,
+      opts.eventId,
     ],
   );
 

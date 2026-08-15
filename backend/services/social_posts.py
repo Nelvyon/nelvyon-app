@@ -1,4 +1,6 @@
+from datetime import datetime, timezone
 import logging
+import uuid as _uuid
 from typing import Any, Dict, List, Optional
 
 from sqlalchemy import and_, func, or_, select
@@ -12,22 +14,28 @@ logger = logging.getLogger(__name__)
 
 
 def _workspace_visibility(workspace_id: int, user_id: str):
-    """Posts visibles en workspace: enlazados a cliente/proyecto del WS, o huérfanos propios del usuario."""
-    clients_sq = select(Nelvyon_clients.id).where(Nelvyon_clients.workspace_id == workspace_id)
-    projects_sq = select(Nelvyon_projects.id).where(Nelvyon_projects.workspace_id == workspace_id)
-    return or_(
-        Social_posts.client_id.in_(clients_sq),
-        Social_posts.project_id.in_(projects_sq),
-        and_(
-            Social_posts.client_id.is_(None),
-            Social_posts.project_id.is_(None),
-            Social_posts.user_id == user_id,
-        ),
-    )
+    """Posts del workspace. Directo, por la columna de inquilino de la tabla.
+
+    ANTES ERA INDIRECTO, Y MAS DEBIL
+    --------------------------------
+    Se acotaba por `client_id`/`project_id` porque se creia que la tabla no
+    tenia columna de inquilino. Si la tiene: `tenant_id INTEGER`, que guarda el
+    workspace — asi la usa tambien `finetuning_service`. Aquellas columnas ni
+    siquiera existen en la tabla real, de modo que el filtro no podia funcionar.
+
+    El filtro anterior ademas incluia una rama `client_id IS NULL AND project_id
+    IS NULL AND user_id = :yo`: los posts «huerfanos» quedaban visibles por
+    usuario y no por workspace. Filtrar por `tenant_id` es a la vez lo unico que
+    funciona y un aislamiento mas estricto.
+
+    `user_id` se conserva en la firma porque los llamantes la pasan; ya no
+    interviene en la visibilidad, que ahora es exactamente la del inquilino.
+    """
+    return Social_posts.tenant_id == workspace_id
 
 
 class Social_postsService:
-    """Social posts — acotado por workspace vía client_id / project_id (sin columna workspace_id en social_posts)."""
+    """Social posts, acotados por `tenant_id` (el workspace) de la tabla real."""
 
     def __init__(self, db: AsyncSession):
         self.db = db
@@ -64,14 +72,51 @@ class Social_postsService:
             raise ValueError("user_id and workspace_id son obligatorios para crear social_posts")
         try:
             payload = dict(data)
-            cid = payload.get("client_id")
-            pid = payload.get("project_id")
+            cid = payload.pop("client_id", None)
+            pid = payload.pop("project_id", None)
+            # La pertenencia de cliente/proyecto al workspace se sigue validando:
+            # es una comprobacion de autorizacion y no depende de donde se
+            # guarde el dato despues.
             await self._validate_client_project_for_workspace(
                 workspace_id,
                 int(cid) if cid is not None else None,
                 int(pid) if pid is not None else None,
             )
-            payload["user_id"] = user_id
+            # `client_id`, `project_id`, `user_id` y demas no son columnas de
+            # esta tabla; viajan en `metadata`, que es jsonb. El inquilino, en
+            # cambio, si es columna, y es lo que acota la fila.
+            # Que es columna y que no se deriva del modelo, no de una lista
+            # escrita a mano: asi no se desincroniza cuando la tabla cambie.
+            columnas = {c.key for c in Social_posts.__table__.columns} | {
+                a for a in ("post_metadata",)
+            }
+            metadatos = dict(payload.pop("post_metadata", None) or {})
+            for clave in [k for k in payload if k not in columnas]:
+                metadatos[clave] = payload.pop(clave)
+            metadatos.setdefault("user_id", user_id)
+            if cid is not None:
+                metadatos["client_id"] = cid
+            if pid is not None:
+                metadatos["project_id"] = pid
+
+            payload["tenant_id"] = workspace_id
+            payload["post_metadata"] = metadatos
+            # `setdefault` no vale: el esquema del router manda estas claves con
+            # valor None explicito, y None no es «ausente».
+            ahora = datetime.now(timezone.utc)
+            if not payload.get("id"):
+                payload["id"] = str(_uuid.uuid4())
+            if not payload.get("created_at"):
+                payload["created_at"] = ahora
+            if not payload.get("updated_at"):
+                payload["updated_at"] = ahora
+            for obligatoria, porDefecto in (
+                ("content", ""), ("media_urls", []), ("platform_post_ids", {}),
+                ("account_ids", []), ("post_type", "text"), ("status", "draft"),
+                ("retry_count", 0),
+            ):
+                if payload.get(obligatoria) is None:
+                    payload[obligatoria] = porDefecto
             obj = Social_posts(**payload)
             self.db.add(obj)
             await self.db.commit()

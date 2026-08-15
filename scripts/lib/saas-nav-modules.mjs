@@ -71,6 +71,9 @@ const SAAS_API_BY_ID = {
   "white-label": "/api/saas/white-label",
   webhooks: "/api/saas/webhooks",
   "api-keys": "/api/saas/api-keys",
+  // Existia y se probaba solo gracias al fallback que fabricaba rutas; al
+  // retirarlo habria perdido cobertura en silencio.
+  "knowledge-base": "/api/saas/knowledge-base",
   billing: "/api/saas/billing",
   settings: "/api/saas/settings",
 };
@@ -83,8 +86,20 @@ export function loadSaasNavModules() {
   while ((m = re.exec(src)) !== null) {
     const id = m[1];
     const href = m[2];
-    const apiPath = SAAS_API_BY_ID[id] ?? `/api/saas/${id}`;
-    items.push({ id, href, apiPath });
+    // Sin mapeo canonico NO se inventa endpoint.
+    //
+    // Antes esto era `SAAS_API_BY_ID[id] ?? `/api/saas/${id}``, que fabricaba
+    // una ruta inexistente para los modulos que solo tienen pagina. El smoke
+    // pedia `/api/saas/erp-purchases`, recibia 404 y lo reportaba como aviso:
+    // seis avisos permanentes que no correspondian a ningun defecto. Los cinco
+    // modulos ERP viven en rutas anidadas (`/saas/erp/purchases`) y su id de
+    // menu nunca fue un segmento de API.
+    //
+    // Que un modulo no tenga API propia es legitimo. Se marca como tal y decide
+    // el llamante; lo que no vale es inventarse la URL y luego avisar de que no
+    // responde.
+    const apiPath = SAAS_API_BY_ID[id] ?? null;
+    items.push({ id, href, apiPath, soloPagina: apiPath === null });
   }
   return items;
 }

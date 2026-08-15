@@ -38,7 +38,23 @@ async def get_active_plan_id_for_workspace(db: AsyncSession, workspace_id: int) 
         if row and row[0]:
             return str(row[0]).lower()
     except Exception as e:
-        logger.debug("plan_quota: no subscription row for ws=%s: %s", workspace_id, e)
+        # "Este workspace no tiene suscripcion" y "la consulta ha fallado" daban
+        # el mismo resultado y el mismo silencio: un `debug` que en produccion no
+        # se emite. Si la columna no existe o la base no responde, TODO cliente
+        # de pago pasa al plan mas barato y nadie se entera.
+        #
+        # El fallback se conserva a proposito: convertir una caida de base en un
+        # 500 general seria peor que servir el plan minimo. Lo que cambia es que
+        # ahora se ve. El caso legitimo —no hay fila— no pasa por aqui: sale por
+        # el `return` de abajo sin registrar nada, que es como debe ser.
+        logger.error(
+            "plan_quota.consulta_fallida ws=%s: se degrada a 'starter' sin haber "
+            "podido leer la suscripcion (%s: %s)",
+            workspace_id,
+            type(e).__name__,
+            e,
+            exc_info=True,
+        )
     return "starter"
 
 

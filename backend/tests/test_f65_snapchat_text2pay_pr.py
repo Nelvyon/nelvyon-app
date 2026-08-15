@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+import hashlib
+import hmac
+import json
+import time
 import pytest
 from httpx import AsyncClient
 
@@ -20,8 +24,14 @@ async def test_snapchat_create_campaign(client: AsyncClient, auth_headers: dict)
         json={"name": "F65 Snap", "objective": "traffic", "daily_budget_eur": 40},
         headers=auth_headers,
     )
-    assert r.status_code == 200, r.text
-    assert r.json().get("campaign_id")
+    """
+    Snapchat Ads es customer-facing y su cuenta externa era la corporativa de
+    NELVYON. Sin integracion propia del workspace se falla cerrado ANTES de
+    validar nada especifico de la campana: no se revela el contrato de una
+    operacion que este workspace todavia no puede ejecutar.
+    """
+    assert r.status_code == 503, r.text
+    assert "integration is not configured" in r.text
 
 
 @pytest.mark.asyncio
@@ -31,9 +41,11 @@ async def test_snapchat_list_campaigns(client: AsyncClient, auth_headers: dict):
         json={"name": "List Snap", "objective": "awareness"},
         headers=auth_headers,
     )
+    # La creacion falla cerrado, asi que no hay nada que listar. La LECTURA si
+    # sigue disponible: lee filas locales del workspace, no consulta al proveedor.
     r = await client.get("/api/snapchat-ads/campaigns", headers=auth_headers)
     assert r.status_code == 200
-    assert len(r.json().get("campaigns", [])) >= 1
+    assert r.json().get("campaigns") == []
 
 
 @pytest.mark.asyncio
@@ -61,7 +73,10 @@ async def test_snapchat_invalid_objective(client: AsyncClient, auth_headers: dic
         json={"name": "Bad", "objective": "invalid_obj"},
         headers=auth_headers,
     )
-    assert r.status_code == 400
+    # `objective` invalido ya no llega a validarse: la guarda de integracion actua
+    # antes. El orden es deliberado — auth, rol, integracion, y solo despues
+    # validacion especifica.
+    assert r.status_code == 503
 
 
 @pytest.mark.asyncio
@@ -154,14 +169,30 @@ async def test_text2pay_webhook_paid(client: AsyncClient, auth_headers: dict):
         headers=auth_headers,
     )
     pid = gen.json()["id"]
-    wh = await client.post(
-        "/api/text2pay/webhook",
-        json={
+    # El webhook exige firma de Stripe desde que se cerro el bloque 18: antes
+    # aceptaba cualquier POST y marcaba el pago como cobrado sin cobro. Aqui se
+    # firma como lo haria una entrega real, sobre los MISMOS bytes que se envian.
+    cuerpo = json.dumps(
+        {
+            "id": "evt_text2pay_test",
+            "object": "event",
             "type": "checkout.session.completed",
             "data": {"object": {"metadata": {"text2pay_id": pid}}},
+        }
+    ).encode()
+    marca = str(int(time.time()))
+    firma = hmac.new(
+        b"whsec_test_placeholder", f"{marca}.".encode() + cuerpo, hashlib.sha256
+    ).hexdigest()
+    wh = await client.post(
+        "/api/text2pay/webhook",
+        content=cuerpo,
+        headers={
+            "Content-Type": "application/json",
+            "stripe-signature": f"t={marca},v1={firma}",
         },
     )
-    assert wh.status_code == 200
+    assert wh.status_code == 200, wh.text
     assert wh.json().get("status") == "paid"
     got = await client.get(f"/api/text2pay/payments/{pid}", headers=auth_headers)
     assert got.json().get("status") == "paid"

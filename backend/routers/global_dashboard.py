@@ -479,7 +479,27 @@ async def get_global_dashboard(
     try:
         r = await db.execute(
             text("""
-                SELECT type, description, entity_type, entity_id, created_at
+                -- `entity_type`/`entity_id` no son columnas: el modelo real
+                -- (models/activities.py) tiene `contact_id` y `deal_id`, no un
+                -- modelo polimorfico. Se DERIVA la forma que el contrato del
+                -- dashboard espera, sin anadir schema.
+                --
+                -- Precedencia contact > deal: el modelo declara ambas nullable y
+                -- no impide que coexistan, asi que hace falta un desempate
+                -- explicito. Se elige contacto porque es la entidad de la que
+                -- cuelga el deal en el CRM, no al azar.
+                SELECT type, description,
+                       CASE
+                         WHEN contact_id IS NOT NULL THEN 'contact'
+                         WHEN deal_id IS NOT NULL THEN 'deal'
+                         ELSE NULL
+                       END AS entity_type,
+                       CASE
+                         WHEN contact_id IS NOT NULL THEN contact_id
+                         WHEN deal_id IS NOT NULL THEN deal_id
+                         ELSE NULL
+                       END AS entity_id,
+                       created_at
                 FROM activities
                 WHERE user_id = :uid AND workspace_id = :ws_id
                 ORDER BY created_at DESC NULLS LAST

@@ -1,6 +1,7 @@
 """NELVYON QR Code Generator — static/dynamic QRs with tracking."""
 
 from __future__ import annotations
+from core.tenant_bridge import require_tenant_uuid
 
 import base64
 import io
@@ -139,6 +140,7 @@ class QrService:
     ) -> dict[str, Any]:
         await self.ensure_schema()
         ws = int(workspace_id)
+        inquilino = await require_tenant_uuid(self.session, ws)
         await self._set_tenant(ws)
         cfg = config or {}
         qt = (qr_type or "url").lower()
@@ -149,8 +151,11 @@ class QrService:
         result = await self.session.execute(
             text(
                 """
-                INSERT INTO qr_codes (workspace_id, name, qr_type, content, config, image_base64, is_dynamic)
-                VALUES (:ws, :name, :type, :content, CAST(:cfg AS jsonb), :img, false)
+                -- La tabla real —migracion 416— acota por `tenant_id uuid` y
+                -- exige `destination_url`. `qr_type`, `config`, `image_base64` e
+                -- `is_dynamic` no son columnas suyas.
+                INSERT INTO qr_codes (id, tenant_id, name, destination_url, created_at)
+                VALUES (gen_random_uuid(), CAST(:inquilino AS uuid), :name, :contenido, NOW())
                 RETURNING *
                 """
             ),
@@ -176,6 +181,7 @@ class QrService:
     ) -> dict[str, Any]:
         await self.ensure_schema()
         ws = int(workspace_id)
+        inquilino = await require_tenant_uuid(self.session, ws)
         await self._set_tenant(ws)
         code = _short_code()
         for _ in range(10):
@@ -192,11 +198,10 @@ class QrService:
         result = await self.session.execute(
             text(
                 """
-                INSERT INTO qr_codes (
-                    workspace_id, name, qr_type, content, config, short_code,
-                    destination_url, image_base64, is_dynamic
-                )
-                VALUES (:ws, :name, 'url', :dest, CAST(:cfg AS jsonb), :code, :dest, :img, true)
+                -- Mismo contrato que arriba: `tenant_id uuid` y
+                -- `destination_url` obligatoria.
+                INSERT INTO qr_codes (id, tenant_id, name, destination_url, created_at)
+                VALUES (gen_random_uuid(), CAST(:inquilino AS uuid), :name, :dest, NOW())
                 RETURNING *
                 """
             ),
@@ -216,6 +221,7 @@ class QrService:
         return row
 
     async def update_dynamic_qr(self, qr_id: str, new_destination_url: str) -> dict[str, Any]:
+        inquilino = await require_tenant_uuid(self.session, self.workspace_id)
         await self.ensure_schema()
         if self.workspace_id is None:
             raise ValueError("workspace_id required")
@@ -224,7 +230,7 @@ class QrService:
             text(
                 """
                 UPDATE qr_codes SET destination_url = :url, content = :url
-                WHERE id = CAST(:id AS uuid) AND workspace_id = :ws AND is_dynamic = true
+                WHERE id = CAST(:id AS uuid) AND tenant_id = CAST(:inquilino AS uuid)
                 RETURNING *
                 """
             ),
@@ -281,12 +287,13 @@ class QrService:
         return {"destination_url": qr.get("destination_url"), "qr_id": qr["id"]}
 
     async def get_qr_stats(self, qr_id: str) -> dict[str, Any]:
+        inquilino = await require_tenant_uuid(self.session, self.workspace_id)
         await self.ensure_schema()
         if self.workspace_id is None:
             raise ValueError("workspace_id required")
         await self._set_tenant(self.workspace_id)
         qr = await self.session.execute(
-            text("SELECT * FROM qr_codes WHERE id = CAST(:id AS uuid) AND workspace_id = :ws"),
+            text("SELECT * FROM qr_codes WHERE id = CAST(:id AS uuid) AND tenant_id = CAST(:inquilino AS uuid)"),
             {"id": qr_id, "ws": self.workspace_id},
         )
         q = qr.mappings().first()
@@ -332,13 +339,14 @@ class QrService:
     async def list_qrs(self, workspace_id: int) -> list[dict[str, Any]]:
         await self.ensure_schema()
         ws = int(workspace_id)
+        inquilino = await require_tenant_uuid(self.session, ws)
         await self._set_tenant(ws)
         result = await self.session.execute(
             text(
                 """
                 SELECT id, workspace_id, name, qr_type, content, short_code, destination_url,
                        is_dynamic, scan_count, created_at
-                FROM qr_codes WHERE workspace_id = :ws ORDER BY created_at DESC
+                FROM qr_codes WHERE tenant_id = CAST(:inquilino AS uuid) ORDER BY created_at DESC
                 """
             ),
             {"ws": ws},

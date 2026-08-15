@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Optional
 
 import stripe
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Query
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -16,7 +16,7 @@ from core.billing_catalog import (
     VALID_PLAN_IDS,
 )
 from core.database import get_db
-from dependencies.auth import get_current_user
+from dependencies.auth import get_current_user, get_super_admin_user
 from dependencies.workspace import (
     WorkspaceContext,
     require_workspace,
@@ -222,8 +222,17 @@ async def verify_payment(
         payment_service = PaymentService()
         status_response = await payment_service.get_checkout_status(data.session_id)
 
-        meta_ws = (status_response.metadata or {}).get("workspace_id")
-        if meta_ws and str(ws_ctx.workspace_id) != str(meta_ws).strip():
+        # Toda sesion creada por NELVYON lleva `workspace_id` en metadata
+        # (lineas 91 y 360). Que falte significa que la sesion vino de fuera, y
+        # antes eso SALTABA la comprobacion: cualquier workspace podia verificar
+        # esa sesion y activarse la suscripcion con el pago de otro.
+        meta_ws = str((status_response.metadata or {}).get("workspace_id") or "").strip()
+        if not meta_ws:
+            raise HTTPException(
+                status_code=403,
+                detail="Checkout session does not declare a workspace",
+            )
+        if str(ws_ctx.workspace_id) != meta_ws:
             raise HTTPException(
                 status_code=403,
                 detail="Checkout session does not belong to this workspace",
@@ -365,7 +374,7 @@ async def create_payment_intent(
 
 @router.get("/charges")
 async def list_charges(
-    limit: int = 25,
+    limit: int = Query(25, ge=1, le=200),
     ws_ctx: WorkspaceContext = Depends(require_workspace),
     current_user: UserResponse = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
@@ -383,8 +392,18 @@ async def list_charges(
 @router.post("/refund")
 async def refund_payment(
     body: RefundRequest,
-    ws_ctx: WorkspaceContext = Depends(require_workspace_admin),
-    _db: AsyncSession = Depends(get_db),
+    # OPERACION DE PLATAFORMA, no de workspace.
+    #
+    # `charge_id`/`payment_intent_id` venian del CUERPO y no se comprobaba
+    # contra nada: `PaymentService.refund_payment` llama directamente a
+    # `stripe.Refund.create_async(charge=...)` sobre la cuenta Stripe de
+    # NELVYON. Un admin de cualquier workspace podia reembolsar el cargo de
+    # OTRO workspace con solo conocer su id, y el suyo propio sin que NELVYON
+    # lo aprobase. La cuenta Stripe es un recurso corporativo unico, igual que
+    # la cuenta de Ads o la de SES, asi que la autoridad es de plataforma.
+    #
+    # Sin coste funcional: no hay un solo consumidor de esta ruta.
+    _admin: UserResponse = Depends(get_super_admin_user),
 ):
     """Refund a charge or payment intent."""
     payment_service = PaymentService()
@@ -400,7 +419,7 @@ async def refund_payment(
 
 @router.get("/history")
 async def payment_history(
-    limit: int = 50,
+    limit: int = Query(50, ge=1, le=200),
     ws_ctx: WorkspaceContext = Depends(require_workspace),
     current_user: UserResponse = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),

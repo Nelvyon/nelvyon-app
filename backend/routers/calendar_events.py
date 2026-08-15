@@ -2,7 +2,7 @@ import json
 import logging
 from typing import List, Optional
 
-from datetime import datetime
+from datetime import date, datetime, time
 
 from core.secrets import sanitize_text
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -48,19 +48,30 @@ class Calendar_eventsUpdateData(BaseModel):
 
 
 class Calendar_eventsResponse(BaseModel):
-    id: int
-    user_id: str
-    workspace_id: Optional[int] = None
+    """Respuesta de un evento.
+
+    Refleja la tabla real: `id` y `tenant_id` son uuid, el inicio es `start_at`
+    y el tipo es `type`. Antes declaraba `id: int`, `workspace_id`, `start_time`
+    y `status`, que no son columnas, asi que el endpoint devolvia 500 en cuanto
+    tocaba una fila real.
+    """
+    id: str
+    tenant_id: str
     title: str
-    client_name: Optional[str] = None
-    event_type: Optional[str] = None
-    start_time: datetime
-    end_time: Optional[datetime] = None
+    type: str
+    event_date: Optional[date] = None
+    event_time: Optional[time] = None
+    start_at: Optional[datetime] = None
+    end_at: Optional[datetime] = None
     duration_minutes: Optional[int] = None
-    status: Optional[str] = None
-    channel: Optional[str] = None
+    completed: Optional[bool] = None
     notes: Optional[str] = None
+    description: Optional[str] = None
+    google_event_id: Optional[str] = None
+    calendar_id: Optional[str] = None
+    meet_link: Optional[str] = None
     created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
     model_config = ConfigDict(from_attributes=True)
 

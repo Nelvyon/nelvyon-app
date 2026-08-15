@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { proxyPlatformFetch } from "@/lib/platformFastApiProxy";
-import { requirePlatformClaims, upstreamFailed } from "@/lib/platformBffAuth";
+import { requirePlatformContext, requirePlatformClaims, upstreamFailed } from "@/lib/platformBffAuth";
 import { authenticatePlatformRequest, readJsonBody } from "@/lib/platformBffRoute";
 import type { JwtPayload } from "@nelvyon/auth";
 import {
@@ -92,9 +92,14 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
 
 export async function PUT(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params;
+  // La autorización se adelanta al `readJsonBody`: antes se leía el cuerpo
+  // antes de comprobar nada.
+  // Autorización por capability ANTES de leer el cuerpo o mutar.
+  const gate = await requirePlatformContext(req, "platform.crm.write", {
+    allowImplicitWorkspace: true,
+  });
+  if (gate instanceof NextResponse) return gate;
   const body = await readJsonBody(req);
-  const authError = await authenticatePlatformRequest(req);
-  if (authError) return authError;
 
   const upstream = await proxyPlatformFetch(req, "PUT", entityPath(id), {
     body: JSON.stringify(body),

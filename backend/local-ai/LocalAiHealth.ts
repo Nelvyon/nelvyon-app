@@ -2,6 +2,7 @@ import { getLocalAiPool } from "./db";
 import { getLocalAiConfig } from "./config";
 import { getLocalEmbeddingProvider } from "./LocalEmbeddingProvider";
 import { getPrivateModeStatus, isPrivateMode } from "../private-ai/privateMode";
+import { checkRlsRole, type RlsRoleCheck } from "./rlsRoleGuard";
 
 export type LocalAiHealthReport = {
   ok: boolean;
@@ -10,6 +11,13 @@ export type LocalAiHealthReport = {
   pgvector: { ok: boolean; detail?: string };
   schema: { ok: boolean; tables: string[] };
   ollama: { ok: boolean; detail?: string };
+  /**
+   * Rol de PostgreSQL. RLS se salta SIEMPRE para superusuarios y para roles con
+   * BYPASSRLS, y `FORCE ROW LEVEL SECURITY` no lo impide. Si el rol efectivo es
+   * privilegiado, el aislamiento entre tenants NO está activo aunque las
+   * políticas existan, así que la salud global pasa a false.
+   */
+  rlsRole: { ok: boolean; currentUser?: string; detail?: string };
   embeddingModel: string;
   storageDir: string;
 };
@@ -23,6 +31,7 @@ export async function runLocalAiHealthCheck(): Promise<LocalAiHealthReport> {
     pgvector: { ok: false },
     schema: { ok: false, tables: [] },
     ollama: { ok: false },
+    rlsRole: { ok: false },
     embeddingModel: cfg.embeddingModel,
     storageDir: cfg.storageDir,
   };
@@ -67,11 +76,32 @@ export async function runLocalAiHealthCheck(): Promise<LocalAiHealthReport> {
     report.ollama = { ok: false, detail: e instanceof Error ? e.message : String(e) };
   }
 
+  // Guard de rol: fail-closed. Sin esto, un LOCAL_AI_DATABASE_URL apuntando a
+  // un rol privilegiado desactiva el aislamiento sin que nada falle ni avise.
+  let roleCheck: RlsRoleCheck;
+  try {
+    roleCheck = await checkRlsRole(getLocalAiPool());
+  } catch (e) {
+    roleCheck = {
+      ok: false,
+      currentUser: "unknown",
+      isSuperuser: false,
+      bypassesRls: false,
+      reason: e instanceof Error ? e.message : String(e),
+    };
+  }
+  report.rlsRole = {
+    ok: roleCheck.ok,
+    currentUser: roleCheck.currentUser,
+    detail: roleCheck.reason,
+  };
+
   report.ok =
     isPrivateMode() &&
     report.postgres.ok &&
     report.pgvector.ok &&
-    report.schema.ok;
+    report.schema.ok &&
+    report.rlsRole.ok;
 
   return report;
 }

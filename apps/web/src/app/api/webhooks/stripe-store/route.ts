@@ -29,8 +29,26 @@ export async function POST(req: Request) {
   const sig = req.headers.get("stripe-signature");
   const rawBody = await req.text();
 
-  if (!webhookSecret?.trim() || !sig) {
-    return NextResponse.json({ error: "Webhook not configured or missing signature" }, { status: 401 });
+  // «No configurado» y «sin firma» NO son lo mismo, y confundirlos en un 401
+  // tiene consecuencias en una ruta de pagos.
+  //
+  // Si falta el secreto el problema es NUESTRO: Stripe debe reintentar cuando se
+  // resuelva, no descartar el evento. Con 401 agota su presupuesto de reintentos
+  // y el evento de pago se pierde en silencio. Con 503 vuelve.
+  //
+  // La distincion ya estaba bien hecha en los otros dos sitios del repositorio
+  // que verifican webhooks de Stripe: `backend/routers/os_store_builder.py`
+  // devuelve 503 con ese razonamiento escrito, y la ruta general
+  // `/api/webhooks/stripe` responde «Stripe not configured» con 503. Esta era la
+  // unica que los fundia.
+  if (!webhookSecret?.trim()) {
+    return NextResponse.json(
+      { error: "Webhook not configured", code: "WEBHOOK_NOT_CONFIGURED" },
+      { status: 503 },
+    );
+  }
+  if (!sig) {
+    return NextResponse.json({ error: "Missing stripe-signature" }, { status: 401 });
   }
 
   try {

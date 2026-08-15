@@ -141,11 +141,19 @@ async def maybe_alert_low_score(
         await session.execute(
             text(
                 """
-                INSERT INTO security_events (event_type, severity, message, metadata, created_at)
+                -- `user_id` es NOT NULL. Esta alerta la genera el sistema al
+                -- evaluar rendimiento, no una persona, asi que se registra con
+                -- el actor `system`: la alternativa era omitir la columna, y
+                -- entonces el INSERT falla y la alerta no se guarda en absoluto.
+                -- El workspace afectado sigue estando en `metadata`, que es de
+                -- donde lo lee `security_events_service` para acotar la lectura.
+                INSERT INTO security_events
+                    (event_type, severity, message, user_id, metadata, created_at)
                 VALUES (
                     'web.performance.alert',
                     'warning',
                     :msg,
+                    'system',
                     CAST(:meta AS jsonb),
                     NOW()
                 )

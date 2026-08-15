@@ -7,6 +7,33 @@ import logging
 import os
 from typing import Any
 
+
+from core.ai_provider import AiNotConfigured
+
+
+def _nelvyon_ai_base_url() -> str:
+    """Endpoint de IA explicito. Nunca cae a `api.openai.com` por defecto.
+
+    Precedencia: infraestructura de NELVYON primero, luego configuracion
+    explicita del operador (que puede apuntar a un runtime local compatible).
+    Cadena vacia = NOT_CONFIGURED; el llamante debe degradar.
+    """
+    base = (
+        os.environ.get("NELVYON_AI_BASE_URL", "").strip()
+        or os.environ.get("OPENAI_BASE_URL", "").strip()
+        or os.environ.get("APP_AI_BASE_URL", "").strip()
+    ).rstrip("/")
+    if not base:
+        # NOT_CONFIGURED explicito. Nunca se deja que el SDK aplique su default,
+        # que es `https://api.openai.com/v1`: eso seria salir a un proveedor
+        # externo de pago sin decision del operador.
+        raise AiNotConfigured(
+            "IA no configurada: define NELVYON_AI_BASE_URL. No se contacta "
+            "ningun proveedor externo por defecto."
+        )
+    return base
+
+
 logger = logging.getLogger(__name__)
 
 MODEL = "gpt-4o"
@@ -33,11 +60,10 @@ class DesignScorerAgent:
         )
         if not api_key:
             return None
-        base_url = (
-            os.environ.get("OPENAI_BASE_URL", "").strip()
-            or os.environ.get("APP_AI_BASE_URL", "").strip()
-            or "https://api.openai.com/v1"
-        )
+        try:
+            base_url = _nelvyon_ai_base_url()
+        except AiNotConfigured:
+            return None
         self._client = AsyncOpenAI(api_key=api_key, base_url=base_url)
         return self._client
 

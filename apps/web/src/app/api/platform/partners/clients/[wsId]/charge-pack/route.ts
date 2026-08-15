@@ -1,10 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { requirePlatformClaims } from "@/lib/platformBffAuth";
-import {
-  assertUserCanAccessWorkspace,
-  WorkspaceAccessError,
-} from "@/lib/platformDbFallback";
+import { requirePlatformContext } from "@/lib/platformBffAuth";
 import { chargePartnerClientPack } from "@/lib/partners/partnerConnectStore";
 
 export const dynamic = "force-dynamic";
@@ -16,33 +12,15 @@ const PACK_WHOLESALE: Record<string, number> = {
   saas_b2b_growth: 249,
 };
 
-function parseWorkspaceId(req: Request): number | null {
-  const raw = req.headers.get("x-workspace-id")?.trim();
-  if (!raw) return null;
-  const n = Number(raw);
-  return Number.isFinite(n) && n > 0 ? n : null;
-}
-
 export async function POST(
   req: Request,
   ctx: { params: Promise<{ wsId: string }> },
 ) {
-  const claims = await requirePlatformClaims(req);
-  if (claims instanceof NextResponse) return claims;
-
-  const partnerWorkspaceId = parseWorkspaceId(req);
-  if (!partnerWorkspaceId) {
-    return NextResponse.json({ error: "X-Workspace-Id required" }, { status: 400 });
-  }
-
-  try {
-    await assertUserCanAccessWorkspace(claims, partnerWorkspaceId);
-  } catch (e) {
-    if (e instanceof WorkspaceAccessError) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-    throw e;
-  }
+  // Cobrar mueve dinero de un tercero: owner-only, y comprobado ANTES de leer
+  // el cuerpo o tocar Stripe.
+  const gate = await requirePlatformContext(req, "partners.billing.charge");
+  if (gate instanceof NextResponse) return gate;
+  const partnerWorkspaceId = gate.workspaceId;
 
   const { wsId } = await ctx.params;
   const clientWorkspaceId = Number(wsId);
@@ -56,10 +34,29 @@ export async function POST(
     return NextResponse.json({ error: "packSku required" }, { status: 400 });
   }
 
-  const wholesaleEur = PACK_WHOLESALE[packSku] ?? 149;
+  // Un SKU desconocido se RECHAZA. Antes caia a `?? 149`, asi que una errata
+  // o un SKU inventado producia un cobro valido a precio de un pack que no
+  // existe. El precio no puede salir de un valor por defecto.
+  const wholesaleEur = PACK_WHOLESALE[packSku];
+  if (wholesaleEur === undefined) {
+    return NextResponse.json(
+      { error: `Unknown packSku: ${packSku}` },
+      { status: 400 },
+    );
+  }
   const retailEur = Number(body.retailEur ?? wholesaleEur * 3);
   if (!Number.isFinite(retailEur) || retailEur < wholesaleEur) {
     return NextResponse.json({ error: "retailEur must be >= wholesale" }, { status: 400 });
+  }
+  // Un importe se cobra en centimos. `Math.round(retailEur * 100)` aguas abajo
+  // convertia 149.999 en 15000 sin decir nada: el cliente pedia un precio y se
+  // le cobraba otro. Se rechaza en vez de redondear a escondidas.
+  const centimos = retailEur * 100;
+  if (Math.abs(centimos - Math.round(centimos)) > 1e-6) {
+    return NextResponse.json(
+      { error: "retailEur must have at most 2 decimals" },
+      { status: 400 },
+    );
   }
 
   try {
@@ -70,6 +67,7 @@ export async function POST(
       retailEur,
       wholesaleEur,
       clientEmail: body.clientEmail,
+      idempotencyKey: req.headers.get("idempotency-key") ?? undefined,
     });
     return NextResponse.json(result);
   } catch (e) {
