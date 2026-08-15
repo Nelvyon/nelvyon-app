@@ -49,7 +49,6 @@ const PERMITIDAS: Record<string, { motivo: string; categoria: Categoria }> = {
       "automations/workflows",
       "automations/workflows/[id]",
       "ecommerce/projects",
-      "ecommerce/projects/[id]",
       "ecommerce/projects/[id]/generate",
       "ecommerce/projects/[id]/products/[productId]",
       "funnels",
@@ -60,8 +59,10 @@ const PERMITIDAS: Record<string, { motivo: string; categoria: Categoria }> = {
         motivo:
           "BFF puramente delegado: autentica en `adsBffPost`/`resolveClaims` y proxya a FastAPI, " +
           "que aplica su propia autorización. No escribe en la base de NELVYON. " +
-          "RESIDUAL CONOCIDO: la autorización de FastAPI para estas rutas NO se ha verificado en " +
-          "esta auditoría y queda registrada como deuda del plano upstream.",
+          "UPSTREAM VERIFICADO: se mapeó cada ruta a su endpoint FastAPI y todas dependen de " +
+          "`require_workspace_operator` —contexto de workspace Y rol de operador— salvo " +
+          "`ads/briefing`, que usa `get_super_admin_user` porque `launch=true` crea campañas de " +
+          "pago reales. Ya no es solo autenticación, y ya no es deuda.",
         categoria: "bff-delegado" as Categoria,
       },
     ]),
