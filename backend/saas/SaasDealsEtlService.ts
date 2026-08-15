@@ -462,6 +462,19 @@ export class SaasDealsEtlService {
     return new Set(rows.map((r) => r.source));
   }
 
+  /**
+   * El `ON CONFLICT ... DO NOTHING` se apoya en el indice unico parcial de la
+   * migracion 536: un registro legado produce como mucho un deal migrado.
+   *
+   * No es un parche sobre la carrera, es la misma regla que el `SELECT DISTINCT
+   * source` de `loadMigratedSourceTags` ya intentaba imponer — solo que ahora la
+   * comprueba PostgreSQL en el momento del INSERT, y no una lectura previa que
+   * otra ejecucion puede invalidar.
+   *
+   * Consecuencia deseada: `RETURNING id` no devuelve las filas que el conflicto
+   * descarto, asi que el contador refleja inserciones REALES. Si dos ejecuciones
+   * coinciden, una inserta y la otra reporta 0. Ninguna falla.
+   */
   private async insertDealsBatch(
     candidates: DealCandidate[],
     report: SaasDealsEtlReport,
@@ -496,6 +509,7 @@ export class SaasDealsEtlService {
              (tenant_id, contact_id, title, value, currency, stage, probability,
               expected_close_date, source, notes, updated_at)
            VALUES ${tuples.join(", ")}
+           ON CONFLICT (source) WHERE source LIKE 'etl:legacy_id:%' DO NOTHING
            RETURNING id`,
           values,
         );
@@ -524,7 +538,8 @@ export class SaasDealsEtlService {
       `INSERT INTO saas_deals
          (tenant_id, contact_id, title, value, currency, stage, probability,
           expected_close_date, source, notes, updated_at)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,NOW())`,
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,NOW())
+       ON CONFLICT (source) WHERE source LIKE 'etl:legacy_id:%' DO NOTHING`,
       [
         c.tenantId,
         c.contactId,
