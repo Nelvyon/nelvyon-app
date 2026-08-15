@@ -74,9 +74,21 @@ describe("JWT — algoritmo y manipulación", () => {
 });
 
 describe("JWT_SECRET — fail-closed", () => {
-  const original = process.env.JWT_SECRET;
+  // `process.env` es del PROCESO, y vitest aisla modulos pero no el proceso: los
+  // ficheros que comparten worker comparten entorno, y que ficheros comparten
+  // worker cambia entre corridas. Capturar el valor en el ambito del `describe`
+  // lo congelaba en el momento de CARGAR el modulo, es decir, con lo que hubiera
+  // dejado el fichero anterior. De ahi salia un fallo que aparecia una de cada
+  // cinco corridas y nunca aislado.
+  //
+  // Capturado en `beforeEach` el valor es el de ESTE test, no el de otro fichero.
+  let original: string | undefined;
+  beforeEach(() => {
+    original = process.env.JWT_SECRET;
+  });
   afterEach(() => {
-    process.env.JWT_SECRET = original;
+    if (original === undefined) delete process.env.JWT_SECRET;
+    else process.env.JWT_SECRET = original;
     vi.resetModules();
   });
 
@@ -152,7 +164,12 @@ describe("login — no revela si el usuario existe", () => {
  */
 describe("login — sin oráculo de enumeración por temporización", () => {
   const HASH_REAL = "$2a$12$N9qo8uLOickgx2ZMRZoMyeGZ8b4H1JfQ0Q6h1qk1pQ8k4Wt0eOJmS";
-  const previo = process.env.JWT_SECRET;
+  // Mismo motivo que arriba: capturado al cargar el modulo, el valor era el que
+  // hubiera dejado otro fichero del mismo worker.
+  let previo: string | undefined;
+  beforeEach(() => {
+    previo = process.env.JWT_SECRET;
+  });
   afterEach(() => {
     if (previo === undefined) delete process.env.JWT_SECRET;
     else process.env.JWT_SECRET = previo;
