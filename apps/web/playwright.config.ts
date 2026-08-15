@@ -52,7 +52,24 @@ export default defineConfig({
           // Fuera de CI se reutiliza el servidor que ya responda en esa URL,
           // de modo que no se relanza `pnpm build` sobre un `.next` en uso.
           reuseExistingServer: !process.env.CI,
-          timeout: 600_000,
+          /**
+         * 20 min, no 10. Medido sobre el fallo real en CI (run 31875550350):
+         *
+         *     09:00:49  arranca el paso
+         *     09:06:58  "Compiled with warnings in 6.1min"
+         *     09:08:16  seguia generando estatico ("Using edge runtime...")
+         *     09:10:51  timeout, exactamente a los 600000 ms
+         *
+         * El build NO estaba colgado: progresaba. No habia puerto ocupado, ni
+         * proceso zombi, ni error de arranque — solo un `next build` en frio de
+         * este monorepo en un runner de 2 nucleos, justo por encima del limite.
+         * Por eso unas corridas pasaban y otras no.
+         *
+         * Esto no oculta fallos: si el servidor nunca llega a responder,
+         * Playwright sigue fallando, solo que despues de darle tiempo real. Lo
+         * que se elimina es el falso negativo por cronometro.
+         */
+        timeout: 1_200_000,
           env: {
             JWT_SECRET: TEST_JWT_SECRET,
             NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET ?? TEST_JWT_SECRET,
