@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
 from services.os_store_builder_service import WebhookNoVerificable
-from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
+from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_admin, require_workspace_member, require_workspace_operator
 from services.os_store_builder_service import get_os_store_builder_service
 from services.os_store_builder_worker import start_store_generation
 
@@ -78,7 +78,7 @@ class CheckoutBody(BaseModel):
 @os_store_router.post("/projects", status_code=201)
 async def create_project(
     body: CreateProjectBody,
-    ws: WorkspaceContext = Depends(require_workspace_operator),
+    ws: WorkspaceContext = Depends(require_workspace_member),
     db: AsyncSession = Depends(get_db),
 ):
     svc = get_os_store_builder_service(db, ws.workspace_id)
@@ -87,7 +87,7 @@ async def create_project(
 
 @os_store_router.get("/projects")
 async def list_projects(
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_member),
     db: AsyncSession = Depends(get_db),
 ):
     svc = get_os_store_builder_service(db, ws.workspace_id)
@@ -97,7 +97,7 @@ async def list_projects(
 @os_store_router.get("/projects/{project_id}")
 async def get_project(
     project_id: str,
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_member),
     db: AsyncSession = Depends(get_db),
 ):
     svc = get_os_store_builder_service(db, ws.workspace_id)
@@ -141,7 +141,7 @@ async def publish_store(
 async def add_product(
     project_id: str,
     body: ProductBody,
-    ws: WorkspaceContext = Depends(require_workspace_operator),
+    ws: WorkspaceContext = Depends(require_workspace_member),
     db: AsyncSession = Depends(get_db),
 ):
     svc = get_os_store_builder_service(db, ws.workspace_id)
@@ -172,7 +172,7 @@ async def update_product(
 async def delete_product(
     project_id: str,
     product_id: str,
-    ws: WorkspaceContext = Depends(require_workspace_operator),
+    ws: WorkspaceContext = Depends(require_workspace_admin),
     db: AsyncSession = Depends(get_db),
 ):
     svc = get_os_store_builder_service(db, ws.workspace_id)
@@ -185,7 +185,7 @@ async def delete_product(
 @os_store_router.get("/projects/{project_id}/analytics")
 async def store_analytics(
     project_id: str,
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_member),
     db: AsyncSession = Depends(get_db),
 ):
     svc = get_os_store_builder_service(db, ws.workspace_id)
@@ -211,7 +211,7 @@ async def create_discount(
 
 @os_store_router.get("/templates")
 async def list_templates(
-    ws: WorkspaceContext = Depends(require_workspace),
+    ws: WorkspaceContext = Depends(require_workspace_member),
     db: AsyncSession = Depends(get_db),
 ):
     svc = get_os_store_builder_service(db, ws.workspace_id)
@@ -221,7 +221,7 @@ async def list_templates(
 @os_store_router.delete("/projects/{project_id}")
 async def delete_project(
     project_id: str,
-    ws: WorkspaceContext = Depends(require_workspace_operator),
+    ws: WorkspaceContext = Depends(require_workspace_admin),
     db: AsyncSession = Depends(get_db),
 ):
     svc = get_os_store_builder_service(db, ws.workspace_id)
