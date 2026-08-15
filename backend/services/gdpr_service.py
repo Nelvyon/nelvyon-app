@@ -172,7 +172,7 @@ class GDPRService:
                     company = NULL,
                     metadata = '{}'::jsonb,
                     updated_at = NOW()
-                WHERE id = :id::uuid AND workspace_id = :workspace_id
+                WHERE id = CAST(:id AS uuid) AND workspace_id = :workspace_id
                 RETURNING id, score, status, created_at
                 """
             ),
@@ -192,7 +192,7 @@ class GDPRService:
                 """
                 UPDATE crm_deals
                 SET notes = NULL, updated_at = NOW()
-                WHERE contact_id = :id::uuid AND workspace_id = :workspace_id
+                WHERE contact_id = CAST(:id AS uuid) AND workspace_id = :workspace_id
                 """
             ),
             {"id": contact_id, "workspace_id": self.workspace_id},

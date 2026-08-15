@@ -180,7 +180,7 @@ class LiveChatService:
         if sender_type == "visitor" and HANDOFF_PATTERNS.search(content or ""):
             await self.session.execute(
                 text(
-                    "UPDATE chat_conversations SET status = 'waiting' WHERE id = :id::uuid"
+                    "UPDATE chat_conversations SET status = 'waiting' WHERE id = CAST(:id AS uuid)"
                 ),
                 {"id": conversation_id},
             )
@@ -192,7 +192,7 @@ class LiveChatService:
                 INSERT INTO chat_messages (
                     id, conversation_id, sender_type, sender_id, content
                 )
-                VALUES (:id, :cid::uuid, :stype, :sid, :content)
+                VALUES (:id, CAST(:cid AS uuid), :stype, :sid, :content)
                 RETURNING *
                 """
             ),
@@ -211,7 +211,7 @@ class LiveChatService:
                     """
                     UPDATE chat_conversations
                     SET first_response_at = :now
-                    WHERE id = :id::uuid AND first_response_at IS NULL
+                    WHERE id = CAST(:id AS uuid) AND first_response_at IS NULL
                     """
                 ),
                 {"id": conversation_id, "now": now},
@@ -274,7 +274,7 @@ class LiveChatService:
                 """
                 UPDATE chat_conversations
                 SET assigned_agent_id = :aid, status = 'open'
-                WHERE id = :id::uuid AND tenant_id = :tid
+                WHERE id = CAST(:id AS uuid) AND tenant_id = :tid
                 """
             ),
             {"id": conversation_id, "aid": agent_id, "tid": tid},
@@ -309,7 +309,7 @@ class LiveChatService:
                 UPDATE chat_conversations
                 SET status = 'closed', closed_at = NOW(),
                     resolution_note = :note, csat_score = :csat
-                WHERE id = :id::uuid AND tenant_id = :tid
+                WHERE id = CAST(:id AS uuid) AND tenant_id = :tid
                 """
             ),
             {
@@ -393,7 +393,7 @@ class LiveChatService:
                 """
                 SELECT id, conversation_id, sender_type, sender_id, content, read_at, created_at
                 FROM chat_messages
-                WHERE conversation_id = :cid::uuid
+                WHERE conversation_id = CAST(:cid AS uuid)
                 ORDER BY created_at ASC
                 """
             ),
@@ -578,7 +578,7 @@ class LiveChatService:
 
     async def _get_conversation_raw(self, conversation_id: str) -> dict[str, Any] | None:
         r = await self.session.execute(
-            text("SELECT * FROM chat_conversations WHERE id = :id::uuid"),
+            text("SELECT * FROM chat_conversations WHERE id = CAST(:id AS uuid)"),
             {"id": conversation_id},
         )
         row = r.fetchone()

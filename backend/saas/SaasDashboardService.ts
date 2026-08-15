@@ -169,11 +169,24 @@ export class SaasDashboardService {
       ),
       (async () => {
         try {
+          // Lo facturado y cobrado al inquilino, desde `saas_invoices`.
+          //
+          // Antes se leia de `billing_payments`, una tabla que no crea ninguna
+          // migracion, ningun modelo y ningun revision de Alembic: nunca ha
+          // existido. La consulta se protegia con `to_regclass(...) IS NULL`,
+          // pero ese guard no sirve aqui: PostgreSQL resuelve las referencias a
+          // relaciones al ANALIZAR la sentencia, asi que la rama del ELSE
+          // reventaba aunque la condicion del CASE fuese verdadera. De ahi el
+          // `relation "billing_payments" does not exist` diario en produccion,
+          // que el `catch` de arriba convertia en un cero silencioso: el panel
+          // llevaba mostrando gasto 0 a todo el mundo.
+          //
+          // `saas_invoices` es la tabla real de facturacion por inquilino y
+          // guarda el importe en euros y la fecha de cobro.
           const spendRows = await this.db.query<SpendRow>(
-            `SELECT CASE
-               WHEN to_regclass('public.billing_payments') IS NULL THEN 0
-               ELSE COALESCE((SELECT SUM(amount_cents) / 100.0 FROM billing_payments WHERE tenant_id = $1), 0)
-             END AS total`,
+            `SELECT COALESCE(SUM(amount_eur), 0) AS total
+               FROM saas_invoices
+              WHERE tenant_id = $1 AND paid_at IS NOT NULL`,
             [clientId],
           );
           return toNum(spendRows[0]?.total);

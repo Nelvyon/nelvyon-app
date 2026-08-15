@@ -1,8 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import {
   getSaasPwaService,
-  requireSaasContext,
-} from "@nelvyon/saas";
+  requireSaasContext, saasErrorBody, saasErrorStatus } from "@nelvyon/saas";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -22,7 +21,9 @@ export async function GET(req: NextRequest) {
   } catch (e) {
     if ((e as { status?: number }).status === 401)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+    // Un tenant ausente o un permiso denegado tienen su propio codigo;
+    // colapsarlos en 500 los convertia en averias que no eran.
+    return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
 }
 
@@ -67,6 +68,8 @@ export async function DELETE(req: NextRequest) {
   } catch (e) {
     if ((e as { status?: number }).status === 401)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+    // Un tenant ausente o un permiso denegado tienen su propio codigo;
+    // colapsarlos en 500 los convertia en averias que no eran.
+    return NextResponse.json(saasErrorBody(e), { status: saasErrorStatus(e) });
   }
 }

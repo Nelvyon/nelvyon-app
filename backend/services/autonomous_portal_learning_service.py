@@ -149,7 +149,7 @@ async def _insert_db(db: AsyncSession, payload: Dict[str, Any]) -> None:
             ) VALUES (
               :id, :workspace_id, :template_id, :category, :sector, :service, :objective, :channel, :language, :level,
               :qa_score, :approved_by_client, :revisions_count, :conversion_rate, :lead_count, :client_rating,
-              :delivery_time_hours, :result_status, :notes, :metadata::jsonb, NOW()
+              :delivery_time_hours, :result_status, :notes, CAST(:metadata AS jsonb), NOW()
             )
             """
         ),

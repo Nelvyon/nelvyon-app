@@ -186,7 +186,7 @@ class MarketplaceService:
     async def get_agency_profile(self, agency_id: str) -> dict[str, Any]:
         await self.ensure_schema()
         r = await self.session.execute(
-            text("SELECT * FROM agency_profiles WHERE id = :id::uuid AND active = TRUE"),
+            text("SELECT * FROM agency_profiles WHERE id = CAST(:id AS uuid) AND active = TRUE"),
             {"id": agency_id},
         )
         row = r.fetchone()
@@ -199,7 +199,7 @@ class MarketplaceService:
                 """
                 SELECT id, reviewer_workspace_id, rating, review, created_at
                 FROM agency_reviews
-                WHERE agency_id = :id::uuid
+                WHERE agency_id = CAST(:id AS uuid)
                 ORDER BY created_at DESC
                 LIMIT 20
                 """
@@ -221,7 +221,7 @@ class MarketplaceService:
             raise ValueError("Rating must be between 1 and 5")
 
         agency = await self.session.execute(
-            text("SELECT id FROM agency_profiles WHERE id = :id::uuid"),
+            text("SELECT id FROM agency_profiles WHERE id = CAST(:id AS uuid)"),
             {"id": agency_id},
         )
         if not agency.fetchone():
@@ -232,7 +232,7 @@ class MarketplaceService:
             text(
                 """
                 INSERT INTO agency_reviews (id, agency_id, reviewer_workspace_id, rating, review)
-                VALUES (:id, :aid::uuid, :rws, :rating, :review)
+                VALUES (:id, CAST(:aid AS uuid), :rws, :rating, :review)
                 ON CONFLICT (agency_id, reviewer_workspace_id) DO UPDATE SET
                     rating = EXCLUDED.rating,
                     review = EXCLUDED.review,
@@ -252,7 +252,7 @@ class MarketplaceService:
             text(
                 """
                 SELECT AVG(rating)::numeric(3,2) AS avg_rating, COUNT(*) AS cnt
-                FROM agency_reviews WHERE agency_id = :aid::uuid
+                FROM agency_reviews WHERE agency_id = CAST(:aid AS uuid)
                 """
             ),
             {"aid": agency_id},
@@ -263,7 +263,7 @@ class MarketplaceService:
                 """
                 UPDATE agency_profiles
                 SET rating = :rating, reviews_count = :cnt, updated_at = NOW()
-                WHERE id = :aid::uuid
+                WHERE id = CAST(:aid AS uuid)
                 """
             ),
             {
@@ -389,7 +389,7 @@ class MarketplaceService:
     async def purchase_item(self, item_id: str, buyer_workspace_id: int) -> dict[str, Any]:
         await self.ensure_schema()
         r = await self.session.execute(
-            text("SELECT * FROM marketplace_items WHERE id = :id::uuid AND active = TRUE"),
+            text("SELECT * FROM marketplace_items WHERE id = CAST(:id AS uuid) AND active = TRUE"),
             {"id": item_id},
         )
         item = _row(r.fetchone())
@@ -403,7 +403,7 @@ class MarketplaceService:
             text(
                 """
                 INSERT INTO marketplace_purchases (id, item_id, buyer_workspace_id, amount, currency, status)
-                VALUES (:id, :item_id::uuid, :buyer, :amount, :currency, 'completed')
+                VALUES (:id, CAST(:item_id AS uuid), :buyer, :amount, :currency, 'completed')
                 """
             ),
             {
@@ -456,7 +456,7 @@ class MarketplaceService:
             text(
                 """
                 INSERT INTO marketplace_item_reviews (id, item_id, reviewer_workspace_id, rating, review)
-                VALUES (:id, :item_id::uuid, :reviewer, :rating, :review)
+                VALUES (:id, CAST(:item_id AS uuid), :reviewer, :rating, :review)
                 ON CONFLICT (item_id, reviewer_workspace_id) DO UPDATE
                 SET rating = EXCLUDED.rating, review = EXCLUDED.review
                 """
@@ -474,13 +474,13 @@ class MarketplaceService:
                 """
                 UPDATE marketplace_items
                 SET rating = (
-                    SELECT ROUND(AVG(rating)::numeric, 2) FROM marketplace_item_reviews WHERE item_id = :item_id::uuid
+                    SELECT ROUND(AVG(rating)::numeric, 2) FROM marketplace_item_reviews WHERE item_id = CAST(:item_id AS uuid)
                 ),
                 reviews_count = (
-                    SELECT COUNT(*) FROM marketplace_item_reviews WHERE item_id = :item_id::uuid
+                    SELECT COUNT(*) FROM marketplace_item_reviews WHERE item_id = CAST(:item_id AS uuid)
                 ),
                 updated_at = NOW()
-                WHERE id = :item_id::uuid
+                WHERE id = CAST(:item_id AS uuid)
                 """
             ),
             {"item_id": item_id},

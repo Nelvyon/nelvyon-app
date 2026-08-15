@@ -70,7 +70,15 @@ export class SaasCeoBriefService {
         [tenantId],
       ),
       this.db.query<{ c: string }>(
-        `SELECT COUNT(*)::text AS c FROM saas_inbox_conversations
+        // `saas_inbox_conversations` no existe. El modulo de bandeja tiene
+        // `saas_inbox_agent_settings`, `_routing`, `_sla_policies` y
+        // `_suggestions`, pero las conversaciones viven en `saas_conversations`,
+        // con `tenant_id` y `status`: justo lo que necesita esta cuenta.
+        //
+        // El `.catch` de la linea siguiente devolvia 0, asi que el error no se
+        // veia por HTTP y el resumen del CEO llevaba tiempo afirmando que no
+        // habia ninguna conversacion abierta.
+        `SELECT COUNT(*)::text AS c FROM saas_conversations
          WHERE tenant_id = $1 AND status IN ('open','pending')`,
         [tenantId],
       ).catch(() => [{ c: "0" }]),

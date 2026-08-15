@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getSaasPartnerZoneService, requireSaasContext } from "@nelvyon/saas";
+import { getSaasPartnerZoneService, requireSaasContext, saasErrorBody, saasErrorStatus } from "@nelvyon/saas";
 import { getPartnerProgramSnapshot } from "../../../../../../../backend/agency/PartnerProgramFacade";
 
 export const dynamic = "force-dynamic";
@@ -31,7 +31,10 @@ export async function GET(req: NextRequest) {
   } catch (e) {
     if ((e as { status?: number }).status === 401)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    console.error("[partner GET]", e);
-    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+    const estado = saasErrorStatus(e);
+    // Solo es incidencia lo que de verdad lo es. Un tenant ausente o un
+    // permiso denegado son respuestas del contrato, no averias.
+    if (estado >= 500) console.error("[partner GET]", e);
+    return NextResponse.json(saasErrorBody(e), { status: estado });
   }
 }

@@ -266,7 +266,7 @@ async def refresh_token(session, account_id: str, tenant_id: int) -> dict[str, A
     from sqlalchemy import text
 
     r = await session.execute(
-        text("SELECT * FROM social_accounts WHERE id = :id::uuid AND tenant_id = :tid"),
+        text("SELECT * FROM social_accounts WHERE id = CAST(:id AS uuid) AND tenant_id = :tid"),
         {"id": account_id, "tid": tenant_id},
     )
     row = r.fetchone()
@@ -311,7 +311,7 @@ async def refresh_token(session, account_id: str, tenant_id: int) -> dict[str, A
             """
             UPDATE social_accounts
             SET oauth_token = :token, token_expires_at = :exp, status = 'active', updated_at = NOW()
-            WHERE id = :id::uuid
+            WHERE id = CAST(:id AS uuid)
             """
         ),
         {

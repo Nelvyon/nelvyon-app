@@ -105,7 +105,7 @@ class TemplateService:
                 """
                 SELECT id, workspace_id, name, type, subject, content, variables, is_public, created_at, updated_at
                 FROM templates
-                WHERE id = :id::uuid
+                WHERE id = CAST(:id AS uuid)
                   AND (workspace_id = :ws OR is_public = TRUE)
                 """
             ),
@@ -180,7 +180,7 @@ class TemplateService:
             text(
                 f"""
                 UPDATE templates SET {', '.join(sets)}
-                WHERE id = :id::uuid AND workspace_id = :ws
+                WHERE id = CAST(:id AS uuid) AND workspace_id = :ws
                 """
             ),
             params,
@@ -194,7 +194,7 @@ class TemplateService:
     async def delete_template(self, template_id: str) -> bool:
         r = await self.session.execute(
             text(
-                "DELETE FROM templates WHERE id = :id::uuid AND workspace_id = :ws"
+                "DELETE FROM templates WHERE id = CAST(:id AS uuid) AND workspace_id = :ws"
             ),
             {"id": template_id, "ws": self.workspace_id},
         )
@@ -245,7 +245,7 @@ class TemplateService:
             vars_list = json.loads(vars_list)
 
         full = await self.session.execute(
-            text("SELECT content, subject FROM templates WHERE id = :id::uuid"),
+            text("SELECT content, subject FROM templates WHERE id = CAST(:id AS uuid)"),
             {"id": template_id},
         )
         row = full.fetchone()

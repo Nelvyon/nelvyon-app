@@ -103,14 +103,14 @@ class FunnelBuilderService:
             if next_id:
                 await self.session.execute(
                     text(
-                        "UPDATE funnel_steps SET next_step_id = :next::uuid WHERE id = :id::uuid"
+                        "UPDATE funnel_steps SET next_step_id = CAST(:next AS uuid) WHERE id = CAST(:id AS uuid)"
                     ),
                     {"id": step_ids[i], "next": next_id},
                 )
             elif i < len(step_ids) - 1:
                 await self.session.execute(
                     text(
-                        "UPDATE funnel_steps SET next_step_id = :next::uuid WHERE id = :id::uuid"
+                        "UPDATE funnel_steps SET next_step_id = CAST(:next AS uuid) WHERE id = CAST(:id AS uuid)"
                     ),
                     {"id": step_ids[i], "next": step_ids[i + 1]},
                 )
@@ -121,7 +121,7 @@ class FunnelBuilderService:
         await self.ensure_schema()
         await self._set_workspace(workspace_id)
         r = await self.session.execute(
-            text("SELECT * FROM funnels WHERE id = :id::uuid AND workspace_id = :ws"),
+            text("SELECT * FROM funnels WHERE id = CAST(:id AS uuid) AND workspace_id = :ws"),
             {"id": funnel_id, "ws": workspace_id},
         )
         funnel = _row(r.fetchone())
@@ -180,14 +180,14 @@ class FunnelBuilderService:
 
         await self.session.execute(
             text(
-                f"UPDATE funnels SET {', '.join(sets)} WHERE id = :id::uuid AND workspace_id = :ws"
+                f"UPDATE funnels SET {', '.join(sets)} WHERE id = CAST(:id AS uuid) AND workspace_id = :ws"
             ),
             params,
         )
 
         if "steps" in updates:
             await self.session.execute(
-                text("DELETE FROM funnel_steps WHERE funnel_id = :fid::uuid"),
+                text("DELETE FROM funnel_steps WHERE funnel_id = CAST(:fid AS uuid)"),
                 {"fid": funnel_id},
             )
             steps = updates["steps"]
@@ -219,7 +219,7 @@ class FunnelBuilderService:
             for i in range(len(step_ids) - 1):
                 await self.session.execute(
                     text(
-                        "UPDATE funnel_steps SET next_step_id = :next::uuid WHERE id = :id::uuid"
+                        "UPDATE funnel_steps SET next_step_id = CAST(:next AS uuid) WHERE id = CAST(:id AS uuid)"
                     ),
                     {"id": step_ids[i], "next": step_ids[i + 1]},
                 )
@@ -232,7 +232,7 @@ class FunnelBuilderService:
         await self._set_workspace(workspace_id)
         r = await self.session.execute(
             text(
-                "DELETE FROM funnels WHERE id = :id::uuid AND workspace_id = :ws RETURNING id"
+                "DELETE FROM funnels WHERE id = CAST(:id AS uuid) AND workspace_id = :ws RETURNING id"
             ),
             {"id": funnel_id, "ws": workspace_id},
         )
@@ -249,7 +249,7 @@ class FunnelBuilderService:
                 """
                 UPDATE funnels
                 SET campaign_id = :cid, updated_at = NOW()
-                WHERE id = :id::uuid AND workspace_id = :ws
+                WHERE id = CAST(:id AS uuid) AND workspace_id = :ws
                 RETURNING id
                 """
             ),
@@ -290,7 +290,7 @@ class FunnelBuilderService:
                     """
                     SELECT event_type, COUNT(*) AS cnt
                     FROM landing_analytics
-                    WHERE page_id = :pid::uuid
+                    WHERE page_id = CAST(:pid AS uuid)
                     GROUP BY event_type
                     """
                 ),
@@ -310,7 +310,7 @@ class FunnelBuilderService:
                     """
                     SELECT COALESCE(SUM((metadata->>'revenue')::numeric), 0) AS rev
                     FROM landing_analytics
-                    WHERE page_id = :pid::uuid AND event_type = 'conversion'
+                    WHERE page_id = CAST(:pid AS uuid) AND event_type = 'conversion'
                     """
                 ),
                 {"pid": lpid},

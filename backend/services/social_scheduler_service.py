@@ -141,7 +141,7 @@ class SocialSchedulerService:
                 """
                 UPDATE social_accounts
                 SET status = 'disconnected', updated_at = NOW()
-                WHERE id = :id::uuid AND tenant_id = :tid
+                WHERE id = CAST(:id AS uuid) AND tenant_id = :tid
                 """
             ),
             {"id": account_id, "tid": tenant_id},
@@ -264,7 +264,7 @@ class SocialSchedulerService:
             params["ptype"] = updates["post_type"]
 
         await self.session.execute(
-            text(f"UPDATE social_posts SET {', '.join(sets)} WHERE id = :id::uuid"),
+            text(f"UPDATE social_posts SET {', '.join(sets)} WHERE id = CAST(:id AS uuid)"),
             params,
         )
         await self.session.commit()
@@ -274,7 +274,7 @@ class SocialSchedulerService:
     async def delete_post(self, post_id: str) -> bool:
         await self.ensure_schema()
         r = await self.session.execute(
-            text("DELETE FROM social_posts WHERE id = :id::uuid RETURNING id"),
+            text("DELETE FROM social_posts WHERE id = CAST(:id AS uuid) RETURNING id"),
             {"id": post_id},
         )
         await self.session.commit()
@@ -392,7 +392,7 @@ class SocialSchedulerService:
                     published_at = CASE WHEN :status = 'published' THEN NOW() ELSE published_at END,
                     error_message = :err,
                     updated_at = NOW()
-                WHERE id = :id::uuid
+                WHERE id = CAST(:id AS uuid)
                 """
             ),
             {
@@ -448,7 +448,7 @@ class SocialSchedulerService:
                 """
                 SELECT a.* FROM social_post_analytics a
                 JOIN social_posts p ON p.id = a.post_id
-                WHERE a.post_id = :pid::uuid AND p.tenant_id = :tid
+                WHERE a.post_id = CAST(:pid AS uuid) AND p.tenant_id = :tid
                 ORDER BY a.fetched_at DESC
                 """
             ),
@@ -458,7 +458,7 @@ class SocialSchedulerService:
         if not rows:
             await self._seed_analytics_stub(post_id)
             r = await self.session.execute(
-                text("SELECT * FROM social_post_analytics WHERE post_id = :pid::uuid"),
+                text("SELECT * FROM social_post_analytics WHERE post_id = CAST(:pid AS uuid)"),
                 {"pid": post_id},
             )
             rows = [_row(x) for x in r.fetchall()]
@@ -565,7 +565,7 @@ class SocialSchedulerService:
                     error_message = :err,
                     updated_at = NOW(),
                     status = CASE WHEN retry_count + 1 >= 3 THEN 'failed' ELSE status END
-                WHERE id = :id::uuid
+                WHERE id = CAST(:id AS uuid)
                 """
             ),
             {"id": post_id, "err": error[:2000]},
@@ -581,7 +581,7 @@ class SocialSchedulerService:
 
     async def _get_post_raw(self, post_id: str) -> dict[str, Any] | None:
         r = await self.session.execute(
-            text("SELECT * FROM social_posts WHERE id = :id::uuid"),
+            text("SELECT * FROM social_posts WHERE id = CAST(:id AS uuid)"),
             {"id": post_id},
         )
         row = r.fetchone()
@@ -590,7 +590,7 @@ class SocialSchedulerService:
     async def _get_account_raw(self, account_uuid: str, tenant_id: int) -> dict[str, Any] | None:
         r = await self.session.execute(
             text(
-                "SELECT * FROM social_accounts WHERE id = :id::uuid AND tenant_id = :tid"
+                "SELECT * FROM social_accounts WHERE id = CAST(:id AS uuid) AND tenant_id = :tid"
             ),
             {"id": account_uuid, "tid": tenant_id},
         )

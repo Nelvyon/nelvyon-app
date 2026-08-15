@@ -266,7 +266,7 @@ class OsStoreBuilderService:
         await self.ensure_schema()
         if workspace_id is not None:
             await self._set_workspace(workspace_id)
-        q = "SELECT * FROM os_store_projects WHERE id = :id::uuid"
+        q = "SELECT * FROM os_store_projects WHERE id = CAST(:id AS uuid)"
         params: dict[str, Any] = {"id": project_id}
         if workspace_id is not None:
             q += " AND workspace_id = :ws"
@@ -315,7 +315,7 @@ class OsStoreBuilderService:
                 )
                 global_slug = f"store-{subdomain}-{page_slug}"
                 await self.session.execute(
-                    text("UPDATE landing_pages SET slug = :slug WHERE id = :id::uuid"),
+                    text("UPDATE landing_pages SET slug = :slug WHERE id = CAST(:id AS uuid)"),
                     {"slug": global_slug, "id": lp["id"]},
                 )
                 await self._upsert_store_page(
@@ -359,7 +359,7 @@ class OsStoreBuilderService:
                         status = 'ready',
                         error_message = NULL,
                         updated_at = NOW()
-                    WHERE id = :id::uuid
+                    WHERE id = CAST(:id AS uuid)
                     """
                 ),
                 {
@@ -395,7 +395,7 @@ class OsStoreBuilderService:
                 await landing_svc.publish_page(lp_id, workspace_id)
                 await self.session.execute(
                     text(
-                        "UPDATE os_store_pages SET is_published = TRUE, updated_at = NOW() WHERE id = :id::uuid"
+                        "UPDATE os_store_pages SET is_published = TRUE, updated_at = NOW() WHERE id = CAST(:id AS uuid)"
                     ),
                     {"id": page["id"]},
                 )
@@ -405,7 +405,7 @@ class OsStoreBuilderService:
                 """
                 UPDATE os_store_projects
                 SET status = 'published', domain_verified = :verified, updated_at = NOW()
-                WHERE id = :id::uuid AND workspace_id = :ws
+                WHERE id = CAST(:id AS uuid) AND workspace_id = :ws
                 """
             ),
             {
@@ -475,7 +475,7 @@ class OsStoreBuilderService:
 
         await self.session.execute(
             text(
-                f"UPDATE os_store_products SET {', '.join(sets)} WHERE id = :id::uuid AND project_id = :pid::uuid"
+                f"UPDATE os_store_products SET {', '.join(sets)} WHERE id = CAST(:id AS uuid) AND project_id = CAST(:pid AS uuid)"
             ),
             params,
         )
@@ -499,7 +499,7 @@ class OsStoreBuilderService:
                 """
                 UPDATE os_store_products
                 SET is_active = FALSE, stripe_status = 'archived', updated_at = NOW()
-                WHERE id = :id::uuid AND project_id = :pid::uuid
+                WHERE id = CAST(:id AS uuid) AND project_id = CAST(:pid AS uuid)
                 """
             ),
             {"id": product_id, "pid": project_id},
@@ -838,7 +838,7 @@ class OsStoreBuilderService:
                 """
                 SELECT status, COUNT(*) AS cnt, COALESCE(SUM(total_cents), 0) AS revenue
                 FROM os_store_orders
-                WHERE project_id = :pid::uuid
+                WHERE project_id = CAST(:pid AS uuid)
                 GROUP BY status
                 """
             ),
@@ -865,7 +865,7 @@ class OsStoreBuilderService:
                        SUM((item->>'quantity')::int) AS qty
                 FROM os_store_orders o,
                      jsonb_array_elements(o.items) AS item
-                WHERE o.project_id = :pid::uuid AND o.status IN ('paid', 'shipped', 'delivered')
+                WHERE o.project_id = CAST(:pid AS uuid) AND o.status IN ('paid', 'shipped', 'delivered')
                 GROUP BY 1, 2
                 ORDER BY qty DESC
                 LIMIT 10
@@ -880,7 +880,7 @@ class OsStoreBuilderService:
         if home_page and home_page.get("landing_page_id"):
             vr = await self.session.execute(
                 text(
-                    "SELECT COUNT(*) FROM landing_analytics WHERE page_id = :pid::uuid AND event_type = 'impression'"
+                    "SELECT COUNT(*) FROM landing_analytics WHERE page_id = CAST(:pid AS uuid) AND event_type = 'impression'"
                 ),
                 {"pid": home_page["landing_page_id"]},
             )
@@ -973,10 +973,26 @@ class OsStoreBuilderService:
         }
 
     async def delete_project(self, project_id: str, workspace_id: int) -> bool:
+        """Borra un proyecto del workspace dado. False si ahi no existe.
+
+        El identificador se valida ANTES de tocar la base. Sin esa comprobacion,
+        un `project_id` que no sea un UUID hace fallar el CAST dentro de
+        PostgreSQL y la peticion sale como 500, cuando lo correcto es tratarla
+        como lo que es: no hay ningun proyecto con ese identificador.
+
+        El filtro por `workspace_id` viaja en la MISMA sentencia que el borrado,
+        no en una comprobacion previa: asi acertar un UUID de otro workspace no
+        borra nada, sin ventana entre comprobar y borrar.
+        """
+        try:
+            uuid.UUID(str(project_id))
+        except (ValueError, AttributeError, TypeError):
+            return False
+
         await self._set_workspace(workspace_id)
         r = await self.session.execute(
             text(
-                "DELETE FROM os_store_projects WHERE id = :id::uuid AND workspace_id = :ws RETURNING id"
+                "DELETE FROM os_store_projects WHERE id = CAST(:id AS uuid) AND workspace_id = :ws RETURNING id"
             ),
             {"id": project_id, "ws": workspace_id},
         )
@@ -1244,7 +1260,7 @@ class OsStoreBuilderService:
         seo = self._build_seo_artifacts(project, products, project.get("subdomain") or "store")
         await self.session.execute(
             text(
-                "UPDATE os_store_projects SET seo_artifacts = CAST(:seo AS jsonb), updated_at = NOW() WHERE id = :id::uuid"
+                "UPDATE os_store_projects SET seo_artifacts = CAST(:seo AS jsonb), updated_at = NOW() WHERE id = CAST(:id AS uuid)"
             ),
             {"id": project_id, "seo": _json_dumps(seo)},
         )
@@ -1260,7 +1276,7 @@ class OsStoreBuilderService:
                 SELECT sp.*, lp.blocks, lp.meta, lp.name, lp.form_fields
                 FROM os_store_pages sp
                 LEFT JOIN landing_pages lp ON lp.id = sp.landing_page_id
-                WHERE sp.project_id = :pid::uuid AND sp.page_slug = :slug AND sp.is_published = TRUE
+                WHERE sp.project_id = CAST(:pid AS uuid) AND sp.page_slug = :slug AND sp.is_published = TRUE
                 """
             ),
             {"pid": project["id"], "slug": page_slug},
@@ -1314,7 +1330,7 @@ class OsStoreBuilderService:
             text(
                 """
                 SELECT * FROM os_store_discounts
-                WHERE project_id = :pid::uuid AND code = :code AND is_active = TRUE
+                WHERE project_id = CAST(:pid AS uuid) AND code = :code AND is_active = TRUE
                 """
             ),
             {"pid": project_id, "code": code.upper()},
@@ -1326,7 +1342,7 @@ class OsStoreBuilderService:
     ) -> None:
         existing = await self.session.execute(
             text(
-                "SELECT id FROM os_store_pages WHERE project_id = :pid::uuid AND page_slug = :slug"
+                "SELECT id FROM os_store_pages WHERE project_id = CAST(:pid AS uuid) AND page_slug = :slug"
             ),
             {"pid": project_id, "slug": slug},
         )
@@ -1335,8 +1351,8 @@ class OsStoreBuilderService:
                 text(
                     """
                     UPDATE os_store_pages
-                    SET landing_page_id = :lp::uuid, order_index = :ord, updated_at = NOW()
-                    WHERE project_id = :pid::uuid AND page_slug = :slug
+                    SET landing_page_id = CAST(:lp AS uuid), order_index = :ord, updated_at = NOW()
+                    WHERE project_id = CAST(:pid AS uuid) AND page_slug = :slug
                     """
                 ),
                 {"lp": lp_id, "ord": order_idx, "pid": project_id, "slug": slug},
@@ -1348,7 +1364,7 @@ class OsStoreBuilderService:
                     INSERT INTO os_store_pages (
                         project_id, workspace_id, page_type, page_slug, landing_page_id, order_index
                     )
-                    VALUES (:pid, :ws, :ptype, :slug, :lp::uuid, :ord)
+                    VALUES (:pid, :ws, :ptype, :slug, CAST(:lp AS uuid), :ord)
                     """
                 ),
                 {
@@ -1364,14 +1380,14 @@ class OsStoreBuilderService:
     async def _list_pages(self, project_id: str) -> list[dict]:
         r = await self.session.execute(
             text(
-                "SELECT * FROM os_store_pages WHERE project_id = :pid::uuid ORDER BY order_index"
+                "SELECT * FROM os_store_pages WHERE project_id = CAST(:pid AS uuid) ORDER BY order_index"
             ),
             {"pid": project_id},
         )
         return [_row(x) for x in r.fetchall()]
 
     async def _list_products(self, project_id: str, *, active_only: bool = False) -> list[dict]:
-        q = "SELECT * FROM os_store_products WHERE project_id = :pid::uuid"
+        q = "SELECT * FROM os_store_products WHERE project_id = CAST(:pid AS uuid)"
         if active_only:
             q += " AND is_active = TRUE"
         q += " ORDER BY created_at DESC"
@@ -1381,7 +1397,7 @@ class OsStoreBuilderService:
     async def _get_product(self, product_id: str, project_id: str) -> dict | None:
         r = await self.session.execute(
             text(
-                "SELECT * FROM os_store_products WHERE id = :id::uuid AND project_id = :pid::uuid"
+                "SELECT * FROM os_store_products WHERE id = CAST(:id AS uuid) AND project_id = CAST(:pid AS uuid)"
             ),
             {"id": product_id, "pid": project_id},
         )
@@ -1392,7 +1408,7 @@ class OsStoreBuilderService:
             text(
                 """
                 SELECT * FROM os_store_products
-                WHERE project_id = :pid::uuid AND slug = :slug AND is_active = TRUE
+                WHERE project_id = CAST(:pid AS uuid) AND slug = :slug AND is_active = TRUE
                 """
             ),
             {"pid": project_id, "slug": slug},
@@ -1402,7 +1418,7 @@ class OsStoreBuilderService:
     async def _get_store_page_by_type(self, project_id: str, page_type: str) -> dict | None:
         r = await self.session.execute(
             text(
-                "SELECT * FROM os_store_pages WHERE project_id = :pid::uuid AND page_type = :pt LIMIT 1"
+                "SELECT * FROM os_store_pages WHERE project_id = CAST(:pid AS uuid) AND page_type = :pt LIMIT 1"
             ),
             {"pid": project_id, "pt": page_type},
         )
@@ -1410,7 +1426,7 @@ class OsStoreBuilderService:
 
     async def _get_project_raw(self, project_id: str) -> dict | None:
         r = await self.session.execute(
-            text("SELECT * FROM os_store_projects WHERE id = :id::uuid"),
+            text("SELECT * FROM os_store_projects WHERE id = CAST(:id AS uuid)"),
             {"id": project_id},
         )
         return _row(r.fetchone()) or None
@@ -1421,7 +1437,7 @@ class OsStoreBuilderService:
                 """
                 UPDATE os_store_projects
                 SET status = :status, error_message = :err, updated_at = NOW()
-                WHERE id = :id::uuid
+                WHERE id = CAST(:id AS uuid)
                 """
             ),
             {"id": project_id, "status": status, "err": error},
@@ -1459,7 +1475,7 @@ class OsStoreBuilderService:
             meta: dict[str, Any] = {}
             if lp_id:
                 r = await self.session.execute(
-                    text("SELECT blocks, meta FROM landing_pages WHERE id = :id::uuid"),
+                    text("SELECT blocks, meta FROM landing_pages WHERE id = CAST(:id AS uuid)"),
                     {"id": lp_id},
                 )
                 lp = _row(r.fetchone())
@@ -1497,7 +1513,7 @@ class OsStoreBuilderService:
                     """
                     UPDATE os_store_projects
                     SET store_info = CAST(:info AS jsonb), updated_at = NOW()
-                    WHERE id = :id::uuid
+                    WHERE id = CAST(:id AS uuid)
                     """
                 ),
                 {"info": _json_dumps(store_info), "id": project_id},

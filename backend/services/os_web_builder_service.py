@@ -269,7 +269,7 @@ class OsWebBuilderService:
     ) -> dict[str, Any]:
         await self.ensure_schema()
         r = await self.session.execute(
-            text("SELECT * FROM os_website_templates WHERE id = :id::uuid"),
+            text("SELECT * FROM os_website_templates WHERE id = CAST(:id AS uuid)"),
             {"id": template_id},
         )
         tpl = _row(r.fetchone())
@@ -316,7 +316,7 @@ class OsWebBuilderService:
         await self.ensure_schema()
         if workspace_id is not None:
             await self._set_workspace(workspace_id)
-        q = "SELECT * FROM os_website_projects WHERE id = :id::uuid"
+        q = "SELECT * FROM os_website_projects WHERE id = CAST(:id AS uuid)"
         params: dict[str, Any] = {"id": project_id}
         if workspace_id is not None:
             q += " AND workspace_id = :ws"
@@ -381,7 +381,7 @@ class OsWebBuilderService:
                 await self.session.execute(
                     text(
                         """
-                        UPDATE landing_pages SET slug = :slug WHERE id = :id::uuid
+                        UPDATE landing_pages SET slug = :slug WHERE id = CAST(:id AS uuid)
                         """
                     ),
                     {"slug": global_slug, "id": lp_id},
@@ -393,8 +393,8 @@ class OsWebBuilderService:
                         text(
                             """
                             UPDATE os_website_pages
-                            SET landing_page_id = :lp::uuid, order_index = :ord, updated_at = NOW()
-                            WHERE id = :id::uuid
+                            SET landing_page_id = CAST(:lp AS uuid), order_index = :ord, updated_at = NOW()
+                            WHERE id = CAST(:id AS uuid)
                             """
                         ),
                         {"lp": lp_id, "ord": idx, "id": existing["id"]},
@@ -407,7 +407,7 @@ class OsWebBuilderService:
                                 project_id, workspace_id, page_type, page_slug,
                                 landing_page_id, order_index
                             )
-                            VALUES (:pid, :ws, :ptype, :slug, :lp::uuid, :ord)
+                            VALUES (:pid, :ws, :ptype, :slug, CAST(:lp AS uuid), :ord)
                             """
                         ),
                         {
@@ -452,7 +452,7 @@ class OsWebBuilderService:
                         status = 'ready',
                         error_message = NULL,
                         updated_at = NOW()
-                    WHERE id = :id::uuid
+                    WHERE id = CAST(:id AS uuid)
                     """
                 ),
                 {"id": project_id, "seo": _json_dumps(seo), "cnt": len(pages_to_build)},
@@ -491,7 +491,7 @@ class OsWebBuilderService:
                     text(
                         """
                         UPDATE os_website_pages SET is_published = TRUE, updated_at = NOW()
-                        WHERE id = :id::uuid
+                        WHERE id = CAST(:id AS uuid)
                         """
                     ),
                     {"id": page["id"]},
@@ -502,7 +502,7 @@ class OsWebBuilderService:
                 """
                 UPDATE os_website_projects
                 SET status = 'published', domain_verified = :verified, updated_at = NOW()
-                WHERE id = :id::uuid AND workspace_id = :ws
+                WHERE id = CAST(:id AS uuid) AND workspace_id = :ws
                 """
             ),
             {
@@ -563,7 +563,7 @@ class OsWebBuilderService:
             lp_id = lp["id"]
             await self.session.execute(
                 text(
-                    "UPDATE os_website_pages SET landing_page_id = :lp::uuid WHERE id = :id::uuid"
+                    "UPDATE os_website_pages SET landing_page_id = CAST(:lp AS uuid) WHERE id = CAST(:id AS uuid)"
                 ),
                 {"lp": lp_id, "id": page_id},
             )
@@ -599,13 +599,13 @@ class OsWebBuilderService:
         )
         global_slug = f"{subdomain}-{page_slug}"
         await self.session.execute(
-            text("UPDATE landing_pages SET slug = :slug WHERE id = :id::uuid"),
+            text("UPDATE landing_pages SET slug = :slug WHERE id = CAST(:id AS uuid)"),
             {"slug": global_slug, "id": lp["id"]},
         )
 
         ord_r = await self.session.execute(
             text(
-                "SELECT COALESCE(MAX(order_index), -1) + 1 AS n FROM os_website_pages WHERE project_id = :pid::uuid"
+                "SELECT COALESCE(MAX(order_index), -1) + 1 AS n FROM os_website_pages WHERE project_id = CAST(:pid AS uuid)"
             ),
             {"pid": project_id},
         )
@@ -617,7 +617,7 @@ class OsWebBuilderService:
                 INSERT INTO os_website_pages (
                     project_id, workspace_id, page_type, page_slug, landing_page_id, order_index
                 )
-                VALUES (:pid, :ws, :ptype, :slug, :lp::uuid, :ord)
+                VALUES (:pid, :ws, :ptype, :slug, CAST(:lp AS uuid), :ord)
                 """
             ),
             {
@@ -634,7 +634,7 @@ class OsWebBuilderService:
                 """
                 UPDATE os_website_projects
                 SET pages_count = pages_count + 1, updated_at = NOW()
-                WHERE id = :id::uuid
+                WHERE id = CAST(:id AS uuid)
                 """
             ),
             {"id": project_id},
@@ -647,7 +647,7 @@ class OsWebBuilderService:
         await self._set_workspace(workspace_id)
         r = await self.session.execute(
             text(
-                "DELETE FROM os_website_projects WHERE id = :id::uuid AND workspace_id = :ws RETURNING id"
+                "DELETE FROM os_website_projects WHERE id = CAST(:id AS uuid) AND workspace_id = :ws RETURNING id"
             ),
             {"id": project_id, "ws": workspace_id},
         )
@@ -717,7 +717,7 @@ class OsWebBuilderService:
                 SELECT sp.*, lp.blocks, lp.meta, lp.name, lp.form_fields
                 FROM os_website_pages sp
                 LEFT JOIN landing_pages lp ON lp.id = sp.landing_page_id
-                WHERE sp.project_id = :pid::uuid AND sp.page_slug = :slug AND sp.is_published = TRUE
+                WHERE sp.project_id = CAST(:pid AS uuid) AND sp.page_slug = :slug AND sp.is_published = TRUE
                 """
             ),
             {"pid": project["id"], "slug": slug},
@@ -763,7 +763,7 @@ class OsWebBuilderService:
                     SELECT event_type, COUNT(*) AS cnt,
                            metadata->>'referrer' AS referrer
                     FROM landing_analytics
-                    WHERE page_id = :pid::uuid
+                    WHERE page_id = CAST(:pid AS uuid)
                     GROUP BY event_type, metadata->>'referrer'
                     """
                 ),
@@ -825,7 +825,7 @@ class OsWebBuilderService:
                 """
                 UPDATE os_website_projects
                 SET status = :status, error_message = :err, updated_at = NOW()
-                WHERE id = :id::uuid
+                WHERE id = CAST(:id AS uuid)
                 """
             ),
             {"id": project_id, "status": status, "err": error},
@@ -834,7 +834,7 @@ class OsWebBuilderService:
 
     async def _get_project_raw(self, project_id: str) -> dict[str, Any] | None:
         r = await self.session.execute(
-            text("SELECT * FROM os_website_projects WHERE id = :id::uuid"),
+            text("SELECT * FROM os_website_projects WHERE id = CAST(:id AS uuid)"),
             {"id": project_id},
         )
         return _row(r.fetchone()) or None
@@ -846,7 +846,7 @@ class OsWebBuilderService:
                 SELECT sp.*, lp.name AS page_name, lp.status AS landing_status
                 FROM os_website_pages sp
                 LEFT JOIN landing_pages lp ON lp.id = sp.landing_page_id
-                WHERE sp.project_id = :pid::uuid
+                WHERE sp.project_id = CAST(:pid AS uuid)
                 ORDER BY sp.order_index ASC
                 """
             ),
@@ -859,7 +859,7 @@ class OsWebBuilderService:
             text(
                 """
                 SELECT * FROM os_website_pages
-                WHERE project_id = :pid::uuid AND page_slug = :slug
+                WHERE project_id = CAST(:pid AS uuid) AND page_slug = :slug
                 """
             ),
             {"pid": project_id, "slug": page_slug},
@@ -871,7 +871,7 @@ class OsWebBuilderService:
             text(
                 """
                 SELECT page_slug, page_type FROM os_website_pages
-                WHERE project_id = :pid::uuid AND is_published = TRUE
+                WHERE project_id = CAST(:pid AS uuid) AND is_published = TRUE
                 ORDER BY order_index
                 """
             ),
@@ -1076,7 +1076,7 @@ class OsWebBuilderService:
             meta: dict[str, Any] = {}
             if lp_id:
                 r = await self.session.execute(
-                    text("SELECT blocks, meta FROM landing_pages WHERE id = :id::uuid"),
+                    text("SELECT blocks, meta FROM landing_pages WHERE id = CAST(:id AS uuid)"),
                     {"id": lp_id},
                 )
                 lp = _row(r.fetchone())
@@ -1114,7 +1114,7 @@ class OsWebBuilderService:
                     """
                     UPDATE os_website_projects
                     SET business_info = CAST(:info AS jsonb), updated_at = NOW()
-                    WHERE id = :id::uuid
+                    WHERE id = CAST(:id AS uuid)
                     """
                 ),
                 {"info": _json_dumps(business), "id": project_id},
@@ -1162,7 +1162,7 @@ class OsWebBuilderService:
                 SET static_version = :ver,
                     static_cdn_base = :cdn,
                     updated_at = NOW()
-                WHERE id = :id::uuid AND workspace_id = :ws
+                WHERE id = CAST(:id AS uuid) AND workspace_id = :ws
                 """
             ),
             {
