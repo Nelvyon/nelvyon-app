@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
-import { Figtree } from "next/font/google";
+import localFont from "next/font/local";
 import type { ReactNode } from "react";
 
-const figtree = Figtree({
-  subsets: ["latin"],
+// Autoalojada: el build no debe depender de que Google sirva la fuente. Ver
+// `src/fonts/README.md`.
+const figtree = localFont({
+  src: "../../../fonts/figtree-latin-variable.woff2",
+  weight: "300 900",
+  style: "normal",
   display: "swap",
   variable: "--font-formacion-capacitacion-premium",
 });

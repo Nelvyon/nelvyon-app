@@ -1,7 +1,14 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("getAppBaseUrl", () => {
-  const original = process.env.NEXT_PUBLIC_APP_URL;
+  // Capturado DENTRO del hook: `process.env` es del proceso y vitest aisla
+  // modulos, no procesos, asi que un valor congelado al cargar el modulo seria
+  // el que dejo otro fichero del mismo worker.
+  let original: typeof process.env.NEXT_PUBLIC_APP_URL;
+
+  beforeEach(() => {
+    original = process.env.NEXT_PUBLIC_APP_URL;
+  });
 
   afterEach(() => {
     if (original === undefined) delete process.env.NEXT_PUBLIC_APP_URL;

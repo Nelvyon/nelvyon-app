@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { Outfit } from "next/font/google";
 import localFont from "next/font/local";
 
 import { MarketingChrome } from "@/components/marketing/MarketingChrome";
@@ -9,8 +8,9 @@ import { siteBrand } from "@/features/public-web";
 
 import "@/features/public-web/styles/public-web.css";
 
-// Manrope autoalojada: sus ficheros del subconjunto latin devolvian 404 desde
-// Google y tumbaban el build. Ver `src/fonts/README.md`.
+// Ambas autoalojadas: los ficheros del subconjunto latin de Manrope devolvian
+// 404 desde Google y tumbaban el build, y el resto de familias corria el mismo
+// riesgo. Ver `src/fonts/README.md`.
 const sans = localFont({
   src: "../../fonts/manrope-latin-variable.woff2",
   weight: "200 800",
@@ -19,8 +19,10 @@ const sans = localFont({
   display: "swap",
 });
 
-const display = Outfit({
-  subsets: ["latin"],
+const display = localFont({
+  src: "../../fonts/outfit-latin-variable.woff2",
+  weight: "100 900",
+  style: "normal",
   variable: "--font-nv-display",
   display: "swap",
 });

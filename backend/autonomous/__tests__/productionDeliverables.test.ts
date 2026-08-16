@@ -1,4 +1,4 @@
-import { describe, expect, it, afterEach } from "vitest";
+import { describe, expect, it, afterEach, beforeEach } from "vitest";
 
 import { buildOsPublishPayload } from "../publish/osPublishPayload";
 import {
@@ -33,18 +33,34 @@ describe("productionDeliverableUrls", () => {
 });
 
 describe("loadTemplateRegistry production", () => {
+  // Capturado DENTRO del hook: `process.env` es del proceso y vitest aisla
+  // modulos, no procesos, asi que un valor congelado al cargar el modulo seria
+  // el que dejo otro fichero del mismo worker.
+  let prevNodeEnv: typeof process.env.NODE_ENV;
+
+  beforeEach(() => {
+    prevNodeEnv = process.env.NODE_ENV;
+  });
+
+  afterEach(() => {
+    process.env.NODE_ENV = prevNodeEnv;
+  });
+
   it("uses bundled registry in production without disk", () => {
-    const prev = process.env.NODE_ENV;
     process.env.NODE_ENV = "production";
     const reg = loadTemplateRegistry();
     expect(reg.templates.length).toBe(getBundledTemplateRegistryCount());
     expect(reg.templates.length).toBeGreaterThan(10);
-    process.env.NODE_ENV = prev;
   });
 });
 
 describe("buildOsPublishPayload production", () => {
-  const prev = process.env.AUTONOMOUS_PRODUCTION;
+  // Capturado DENTRO del hook, por el mismo motivo.
+  let prev: typeof process.env.AUTONOMOUS_PRODUCTION;
+
+  beforeEach(() => {
+    prev = process.env.AUTONOMOUS_PRODUCTION;
+  });
 
   afterEach(() => {
     if (prev === undefined) delete process.env.AUTONOMOUS_PRODUCTION;

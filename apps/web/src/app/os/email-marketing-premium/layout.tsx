@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
-import { DM_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import type { ReactNode } from "react";
 
-const dmSans = DM_Sans({
-  subsets: ["latin"],
+// Autoalojada: el build no debe depender de que Google sirva la fuente. Ver
+// `src/fonts/README.md`.
+const dmSans = localFont({
+  src: "../../../fonts/dm-sans-latin-variable.woff2",
+  weight: "100 1000",
+  style: "normal",
   display: "swap",
   variable: "--font-email-marketing-premium",
 });

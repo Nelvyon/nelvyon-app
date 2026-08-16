@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
-import { Lexend } from "next/font/google";
+import localFont from "next/font/local";
 import type { ReactNode } from "react";
 
-const lexend = Lexend({
-  subsets: ["latin"],
+// Autoalojada: el build no debe depender de que Google sirva la fuente. Ver
+// `src/fonts/README.md`.
+const lexend = localFont({
+  src: "../../../fonts/lexend-latin-variable.woff2",
+  weight: "100 900",
+  style: "normal",
   display: "swap",
   variable: "--font-voz-premium",
 });

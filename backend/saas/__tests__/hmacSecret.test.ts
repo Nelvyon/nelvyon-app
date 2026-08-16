@@ -1,9 +1,18 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { requireHmacSecret } from "../hmacSecret";
 
-const ORIGINAL_JWT = process.env.JWT_SECRET;
-const ORIGINAL_NEXT = process.env.NEXTAUTH_SECRET;
-const ORIGINAL_TRACK = process.env.TRACKING_SECRET;
+// Capturado DENTRO del hook: `process.env` es del proceso y vitest aisla
+// modulos, no procesos, asi que un valor congelado al cargar el modulo seria
+// el que dejo otro fichero del mismo worker.
+let ORIGINAL_JWT: typeof process.env.JWT_SECRET;
+let ORIGINAL_NEXT: typeof process.env.NEXTAUTH_SECRET;
+let ORIGINAL_TRACK: typeof process.env.TRACKING_SECRET;
+
+beforeEach(() => {
+  ORIGINAL_JWT = process.env.JWT_SECRET;
+  ORIGINAL_NEXT = process.env.NEXTAUTH_SECRET;
+  ORIGINAL_TRACK = process.env.TRACKING_SECRET;
+});
 
 afterEach(() => {
   if (ORIGINAL_JWT === undefined) delete process.env.JWT_SECRET;

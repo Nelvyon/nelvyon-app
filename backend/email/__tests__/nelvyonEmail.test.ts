@@ -9,9 +9,13 @@ import { passwordResetTemplate } from "../templates/passwordReset";
 import { welcomeTemplate } from "../templates/welcome";
 
 describe("NelvyonEmailService mock mode", () => {
-  const envBackup = process.env.RESEND_API_KEY;
+  // Capturado DENTRO del hook: `process.env` es del proceso y vitest aisla
+  // modulos, no procesos, asi que un valor congelado al cargar el modulo seria
+  // el que dejo otro fichero del mismo worker.
+  let envBackup: typeof process.env.RESEND_API_KEY;
 
   beforeEach(() => {
+    envBackup = process.env.RESEND_API_KEY;
     delete process.env.RESEND_API_KEY;
   });
   afterEach(() => {

@@ -32,10 +32,24 @@ export type PlatformAction =
   /** Vincular la cuenta Stripe Connect que recibe el dinero. */
   | "partners.connect.manage"
   /** Conectar la integración de reputación. */
-  | "platform.reputation.manage";
+  | "platform.reputation.manage"
+  /** Ver reglas y flujos de automatización. */
+  | "platform.automations.read"
+  /** Crear o editar una automatización. La matriz de producto la abre a `operator`. */
+  | "platform.automations.write"
+  /** Borrar una automatización. La matriz la reserva a `admin`. */
+  | "platform.automations.delete"
+  /** Ver proyectos y productos de la tienda. */
+  | "platform.ecommerce.read"
+  /** Crear un proyecto o un producto. La matriz la abre a `member`, y esa política se conserva. */
+  | "platform.ecommerce.create"
+  /** Editar la tienda: generar, publicar, descuentos y actualizar producto. `operator`. */
+  | "platform.ecommerce.edit"
+  /** Borrar proyecto o producto. La matriz la reserva a `admin`. */
+  | "platform.ecommerce.delete";
 
-/** Roles que `mapWorkspaceRoleToSaas` reconoce y que `workspace_members` puede contener. */
-export type PlatformRole = "owner" | "admin" | "member" | "viewer";
+/** Roles que `workspace_members` puede contener. Los cinco de `core/rbac.py`. */
+export type PlatformRole = "owner" | "admin" | "operator" | "member" | "viewer";
 
 /**
  * Matriz rol → capabilities.
@@ -55,6 +69,13 @@ const ROLE_CAPABILITIES: Record<PlatformRole, readonly PlatformAction[]> = {
     "partners.portal.invite",
     "partners.connect.manage",
     "platform.reputation.manage",
+    "platform.automations.read",
+    "platform.automations.write",
+    "platform.automations.delete",
+    "platform.ecommerce.read",
+    "platform.ecommerce.create",
+    "platform.ecommerce.edit",
+    "platform.ecommerce.delete",
   ],
   admin: [
     "platform.crm.write",
@@ -62,8 +83,55 @@ const ROLE_CAPABILITIES: Record<PlatformRole, readonly PlatformAction[]> = {
     "partners.billing.manage",
     "partners.portal.invite",
     "platform.reputation.manage",
+    "platform.automations.read",
+    "platform.automations.write",
+    "platform.automations.delete",
+    "platform.ecommerce.read",
+    "platform.ecommerce.create",
+    "platform.ecommerce.edit",
+    "platform.ecommerce.delete",
   ],
-  member: ["platform.crm.write", "platform.support.write"],
+  /**
+   * `operator` — autoridad de trabajo, sin borrado ni plataforma.
+   *
+   * Antes se colapsaba en `member`, asi que la interfaz le mostraba menos de lo
+   * que el upstream ya le concedia: `require_workspace_operator` le deja mutar.
+   * La divergencia no protegia nada y hacia imposible declarar capabilities
+   * fieles.
+   *
+   * Las capabilities salen de `roleMatrix.ts`, no de una decision nueva:
+   * automations create/edit a operator y delete a admin; ecommerce edit a
+   * operator y delete a admin.
+   */
+  operator: [
+    "platform.crm.write",
+    "platform.support.write",
+    "platform.automations.read",
+    "platform.automations.write",
+    "platform.ecommerce.read",
+    "platform.ecommerce.create",
+    "platform.ecommerce.edit",
+  ],
+  /**
+   * `member` conserva EXACTAMENTE lo que tenia, mas las lecturas y el `create`
+   * de ecommerce que la matriz ya le reconoce. No se le retira nada: la
+   * politica vigente le permite crear proyectos y productos.
+   */
+  member: [
+    "platform.crm.write",
+    "platform.support.write",
+    "platform.automations.read",
+    "platform.ecommerce.read",
+    "platform.ecommerce.create",
+  ],
+  /**
+   * `viewer` conserva EXACTAMENTE lo que tenia.
+   *
+   * No recibe las lecturas nuevas: `roleMatrix.ts` fija `automations.view` y
+   * `ecommerce.view` en `member`, y la certificacion de produccion comprobo que
+   * un viewer recibe 403 en la tienda. Concederselas aqui habria sido ampliar
+   * privilegios por el camino de «parece razonable que pueda ver».
+   */
   viewer: ["platform.support.write"],
 };
 
@@ -80,8 +148,9 @@ export function normalizePlatformRole(raw: string | null | undefined): PlatformR
   const r = (raw ?? "").trim().toLowerCase();
   if (r === "owner") return "owner";
   if (r === "admin") return "admin";
-  // `operator` es el nombre heredado de `member` en workspaces antiguos.
-  if (r === "member" || r === "operator") return "member";
+  // `operator` es un rol propio, no un alias de `member`. Ver ROLE_CAPABILITIES.
+  if (r === "operator") return "operator";
+  if (r === "member") return "member";
   if (r === "viewer") return "viewer";
   return null;
 }

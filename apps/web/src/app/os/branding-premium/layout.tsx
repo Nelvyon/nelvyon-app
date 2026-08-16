@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import type { ReactNode } from "react";
 
-const jakarta = Plus_Jakarta_Sans({
-  subsets: ["latin"],
+// Autoalojada: el build no debe depender de que Google sirva la fuente. Ver
+// `src/fonts/README.md`.
+const jakarta = localFont({
+  src: "../../../fonts/plus-jakarta-sans-latin-variable.woff2",
+  weight: "200 800",
+  style: "normal",
   display: "swap",
   variable: "--font-branding-premium",
 });

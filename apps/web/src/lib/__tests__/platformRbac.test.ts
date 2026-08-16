@@ -118,8 +118,12 @@ describe("un rol desconocido no hereda autoridad", () => {
     expect(canPlatformPerform(null, "partners.billing.charge")).toBe(false);
   });
 
-  it("`operator` sí es el nombre heredado de member", () => {
-    expect(normalizePlatformRole("operator")).toBe("member");
+  it("`operator` es un rol propio, no un alias de member", () => {
+    // Antes se colapsaba, y eso concedía al operator MENOS de lo que el
+    // upstream ya le permite: `require_workspace_operator` le deja mutar
+    // mientras esta capa decía que no. La divergencia no protegía nada e
+    // impedía declarar capabilities fieles. Ver `rolesDesacoplados.test.ts`.
+    expect(normalizePlatformRole("operator")).toBe("operator");
     expect(normalizePlatformRole("OWNER")).toBe("owner");
   });
 });
