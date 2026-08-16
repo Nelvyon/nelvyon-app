@@ -161,8 +161,23 @@ def decode_access_token(token: str) -> Dict[str, Any]:
         logger.info("Authentication token has expired")
         raise AccessTokenError("Token has expired") from exc
     except JWTError as exc:
-        # Log error type only, not the full exception which may contain sensitive token data
-        logger.warning("Token validation failed: %s", type(exc).__name__)
+        # DEBUG, no WARNING, y no por bajar el volumen: es que aqui no ha
+        # pasado nada malo todavia.
+        #
+        # NELVYON valida dos clases de JWT. `get_current_user` prueba primero
+        # esta —la nativa, firmada con JWT_SECRET_KEY— y, si no encaja, prueba
+        # la del BFF. Como casi todo el trafico real llega con la segunda, este
+        # fallo es el PASO NORMAL de casi todas las peticiones legitimas.
+        #
+        # Registrarlo como aviso llenaba produccion de ruido —92 en una sola
+        # ventana de logs— que ademas describia mal lo ocurrido: parecia que
+        # hubiera credenciales invalidas cuando lo que habia era usuarios
+        # perfectamente autenticados. Enterraba los avisos de verdad.
+        #
+        # El rechazo REAL —cuando fallan los dos esquemas— si deja aviso, y lo
+        # emite `get_current_user`, que es quien sabe que ya no queda nada por
+        # probar. Solo se registra el tipo de error, nunca el token.
+        logger.debug("Token validation failed: %s", type(exc).__name__)
         raise AccessTokenError("Invalid authentication token") from exc
 
 
