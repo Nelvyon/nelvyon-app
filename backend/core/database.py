@@ -186,6 +186,16 @@ class DatabaseManager:
 
             logger.info("Creating async session maker...")
             self.async_session_maker = async_sessionmaker(self.engine, class_=AsyncSession, expire_on_commit=False)
+            # El contexto de inquilino se fija al empezar CADA transaccion.
+            # Ver `core/contexto_rls.py`: es inocuo mientras el rol de conexion
+            # conserve BYPASSRLS, y es lo que hace falta para poder retirarselo
+            # algun dia sin que las politicas denieguen en silencio.
+            try:
+                from core.contexto_rls import registrar as _registrar_contexto
+
+                _registrar_contexto(self.async_session_maker)
+            except Exception:  # noqa: BLE001 — nunca impedir el arranque por esto
+                logger.warning("No se pudo enganchar el contexto de inquilino a las sesiones")
             logger.info("Async session maker created successfully")
 
             logger.info("Database connection initialized successfully")

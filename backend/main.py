@@ -625,34 +625,65 @@ async def health_ready():
         record_counter("nelvyon.health", tags={"result": "degraded", "reason": "db_query"})
         return JSONResponse(status_code=503, content=body)
 
-    # Estado de Redis, INFORMATIVO: no decide el codigo de respuesta.
+    # Dependencias, cada una con su criticidad DECLARADA.
     #
-    # Redis no es dependencia requerida de esta aplicacion. Sin el, las colas
-    # usan un almacen en memoria que si encola y desencola, y el limitador de
-    # peticiones cuenta por proceso en vez de globalmente. Son degradaciones
-    # reales pero acotadas, y ninguna impide servir.
+    # No basta con decir que algo esta caido: hay que decir si eso importa. Una
+    # base inalcanzable y un Redis inalcanzable no son la misma noticia, y
+    # mezclarlos en un mismo campo obliga a quien lee a saberse de memoria cual
+    # es cual. Aqui la criticidad viaja con el estado.
     #
-    # Aun asi tiene que verse. Antes solo aparecia en una linea de log del
-    # arranque: en produccion llevaba caido desde vete a saber cuando y no habia
-    # forma de saberlo sin rebuscar en los registros. Exponerlo aqui no es
-    # convertir una averia en «healthy» —el estado sigue siendo el de la base—,
-    # es dejar de esconder una degradacion.
-    body["redis"] = _estado_de_redis()
+    # `required` decide el codigo de respuesta; `optional` nunca. Por eso Redis
+    # degradado no convierte readiness en 503 —seria un falso rojo— y la base
+    # caida si —seria un falso verde—.
+    body["dependencies"] = {
+        "postgres": {"criticality": "required", "state": "ok"},
+        "redis": {"criticality": "optional", **_estado_de_redis()},
+    }
+    # Se conserva el campo plano por compatibilidad con lo ya desplegado.
+    body["redis"] = body["dependencies"]["redis"]["state"]
 
     record_counter("nelvyon.health", tags={"result": "ok"})
     return body
 
 
-def _estado_de_redis() -> str:
-    """`ok`, `fallback_en_memoria` o `no_configurado`. Nunca lanza."""
-    if not (os.environ.get("REDIS_URL") or "").strip():
-        return "no_configurado"
+def _estado_de_redis() -> dict:
+    """Estado de Redis y que se pierde exactamente sin el. Nunca lanza.
+
+    POR QUE ES `optional` Y NO UN EUFEMISMO
+    ---------------------------------------
+    Se trazaron todos sus consumidores. Cada uno degrada, ninguno falla:
+
+        limitador     cuenta por proceso en vez de global. NO abre la mano: si
+                      la consulta al almacen revienta, responde 429.
+        colas         `QueueService` encola y desencola en memoria; la cola ARQ
+                      queda inerte porque nada la alimenta.
+        cache         por proceso, solo menos eficaz.
+        pub/sub chat  canales en memoria.
+        estado OAuth  en memoria, con su TTL.
+
+    Los dos ultimos solo serian correctos con UN proceso, y hoy lo es: el API
+    arranca `uvicorn` sin `--workers` y sin replicas declaradas. Si algun dia se
+    escala horizontalmente, Redis pasa a ser REQUIRED y esto hay que revisarlo
+    —queda dicho aqui para que no se descubra por sorpresa—.
+
+    Lo que si se pierde siempre es DURABILIDAD: un reinicio se lleva por delante
+    la cache, los contadores, las tareas encoladas y los `state` de OAuth en
+    vuelo.
+    """
+    url = (os.environ.get("REDIS_URL") or "").strip()
+    if not url:
+        return {"state": "not_configured", "impact": "sin durabilidad entre reinicios"}
     try:
         from core.redis_adapter import redis_client
 
-        return "ok" if getattr(redis_client, "_using_redis", False) else "fallback_en_memoria"
+        if getattr(redis_client, "_using_redis", False):
+            return {"state": "ok", "impact": None}
+        return {
+            "state": "degraded_memory",
+            "impact": "cache, colas, pub/sub y contadores en memoria del proceso; se pierden al reiniciar",
+        }
     except Exception:  # noqa: BLE001 — el diagnostico no puede tumbar readiness
-        return "desconocido"
+        return {"state": "unknown", "impact": "no se pudo consultar el adaptador"}
 
 
 def run_in_debug_mode(app: FastAPI):

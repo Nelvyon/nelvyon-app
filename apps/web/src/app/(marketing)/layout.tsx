@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { Manrope, Outfit } from "next/font/google";
+import { Outfit } from "next/font/google";
+import localFont from "next/font/local";
 
 import { MarketingChrome } from "@/components/marketing/MarketingChrome";
 import { getAppBaseUrl } from "@/lib/appUrl";
@@ -8,8 +9,12 @@ import { siteBrand } from "@/features/public-web";
 
 import "@/features/public-web/styles/public-web.css";
 
-const sans = Manrope({
-  subsets: ["latin"],
+// Manrope autoalojada: sus ficheros del subconjunto latin devolvian 404 desde
+// Google y tumbaban el build. Ver `src/fonts/README.md`.
+const sans = localFont({
+  src: "../../fonts/manrope-latin-variable.woff2",
+  weight: "200 800",
+  style: "normal",
   variable: "--font-nv-sans",
   display: "swap",
 });

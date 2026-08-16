@@ -51,7 +51,7 @@ function buildCrossTenantBlock(hasPrivateModeSubtask: boolean): string {
   if (!hasPrivateModeSubtask) return base;
   return `${base}
 
-Resumen PRIVATE_MODE=ON: egress restringido a localhost, LAN privada Docker y hosts allowlist; Internet público bloqueado salvo ventana owner autorizada. Aislamiento multi-tenant mediante RLS PostgreSQL y set_config('app.tenant_id'). Un cliente nunca recupera datos de otro tenant.`;
+Resumen PRIVATE_MODE=ON: egress restringido a localhost, LAN privada Docker y hosts allowlist; Internet público bloqueado salvo ventana owner autorizada. Aislamiento multi-tenant por filtrado de inquilino en la aplicacion, certificado A/B con escrituras reales y con manipulacion de X-Workspace-Id. Las politicas RLS de PostgreSQL estan declaradas y verificadas, pero HOY no forman parte de la frontera efectiva: la aplicacion se conecta con un rol que las evita.`;
 }
 
 function buildSecretBlock(): string {
