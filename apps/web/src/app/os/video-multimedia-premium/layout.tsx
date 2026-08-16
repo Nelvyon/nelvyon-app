@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
-import { Space_Grotesk } from "next/font/google";
+import localFont from "next/font/local";
 import type { ReactNode } from "react";
 
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
+// Autoalojada: el build no debe depender de que Google sirva la fuente. Ver
+// `src/fonts/README.md`.
+const spaceGrotesk = localFont({
+  src: "../../../fonts/space-grotesk-latin-variable.woff2",
+  weight: "300 700",
+  style: "normal",
   display: "swap",
   variable: "--font-video-multimedia-premium",
 });

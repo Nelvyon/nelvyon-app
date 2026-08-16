@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
-import { Newsreader } from "next/font/google";
+import localFont from "next/font/local";
 import type { ReactNode } from "react";
 
-const newsreader = Newsreader({
-  subsets: ["latin"],
+// Autoalojada: el build no debe depender de que Google sirva la fuente. Ver
+// `src/fonts/README.md`.
+const newsreader = localFont({
+  src: "../../../fonts/newsreader-latin-variable.woff2",
+  weight: "200 800",
+  style: "normal",
   display: "swap",
   variable: "--font-contenido-copywriting-premium",
 });

@@ -10,10 +10,18 @@ function supabaseConfig(): { baseUrl: string; serviceKey: string; mock: boolean 
     process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() ||
     ""
   ).replace(/\/$/, "");
-  const serviceKey =
-    process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() ||
-    process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY?.trim() ||
-    "";
+  // La clave de servicio NO se lee de una variable `NEXT_PUBLIC_`.
+  //
+  // Next incrusta todo lo que empieza por `NEXT_PUBLIC_` en el bundle que
+  // descarga el navegador. Una clave de rol de servicio evita la seguridad de
+  // fila de la base entera, asi que ahi seria equivalente a publicarla.
+  //
+  // Hoy esa variable no esta definida en produccion y `supabaseClient.ts` tiene
+  // un guard que lanza si aparece en el navegador, pero el fallback INVITABA a
+  // configurarla: bastaba con que alguien la anadiera «porque la otra no
+  // funcionaba» para exponerla. Un camino que solo es seguro mientras nadie lo
+  // use no es seguro.
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || "";
   return { baseUrl, serviceKey, mock: !baseUrl || !serviceKey };
 }
 

@@ -29,17 +29,27 @@ const TENANT = "tenant-s33-001";
 // ── Encryption key for tests ──────────────────────────────────────────────────
 const TEST_ENC_KEY = "0".repeat(64); // 32 bytes hex
 
+// El valor previo se captura DENTRO del hook y se repone ahi: `process.env` es
+// del proceso y vitest aisla modulos, no procesos, asi que un valor congelado
+// al cargar el modulo seria el que dejo otro fichero del mismo worker.
+let prevEncKey: typeof process.env.SAAS_SSO_ENCRYPTION_KEY;
+
+beforeEach(() => {
+  prevEncKey = process.env.SAAS_SSO_ENCRYPTION_KEY;
+});
+
+afterEach(() => {
+  if (prevEncKey === undefined) delete process.env.SAAS_SSO_ENCRYPTION_KEY;
+  else process.env.SAAS_SSO_ENCRYPTION_KEY = prevEncKey;
+});
+
 function withEncKey<T>(fn: () => T): T {
-  const prev = process.env.SAAS_SSO_ENCRYPTION_KEY;
   process.env.SAAS_SSO_ENCRYPTION_KEY = TEST_ENC_KEY;
-  try { return fn(); }
-  finally { process.env.SAAS_SSO_ENCRYPTION_KEY = prev; }
+  return fn();
 }
 async function withEncKeyAsync<T>(fn: () => Promise<T>): Promise<T> {
-  const prev = process.env.SAAS_SSO_ENCRYPTION_KEY;
   process.env.SAAS_SSO_ENCRYPTION_KEY = TEST_ENC_KEY;
-  try { return await fn(); }
-  finally { process.env.SAAS_SSO_ENCRYPTION_KEY = prev; }
+  return await fn();
 }
 
 // ── SaasSsoService ────────────────────────────────────────────────────────────
@@ -204,10 +214,9 @@ describe("encryptSecret / decryptSecret", () => {
   });
 
   it("throws CONFIG_ERROR when env key is missing", () => {
-    const prev = process.env.SAAS_SSO_ENCRYPTION_KEY;
+    // El valor previo lo captura el `beforeEach` y lo repone el `afterEach`.
     delete process.env.SAAS_SSO_ENCRYPTION_KEY;
     expect(() => encryptSecret("x")).toThrow();
-    process.env.SAAS_SSO_ENCRYPTION_KEY = prev;
   });
 
   it("produces different ciphertext each call (random IV)", () => {

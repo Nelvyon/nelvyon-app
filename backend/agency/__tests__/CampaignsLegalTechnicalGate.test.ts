@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   assertCampaignsLegalTechnicalGateIntegrity,
   evaluateCampaignsLegalTechnicalReadiness,
@@ -167,7 +167,14 @@ describe("CampaignsLegalTechnicalGate — technical reinforcement fields (ADR-05
 });
 
 describe("getCampaignLaunchBlockReason", () => {
-  const savedBypass = process.env.NELVYON_CAMPAIGN_LAUNCH_TEST_BYPASS;
+  // Capturado DENTRO del hook: `process.env` es del proceso y vitest aisla
+  // modulos, no procesos, asi que un valor congelado al cargar el modulo seria
+  // el que dejo otro fichero del mismo worker.
+  let savedBypass: typeof process.env.NELVYON_CAMPAIGN_LAUNCH_TEST_BYPASS;
+
+  beforeEach(() => {
+    savedBypass = process.env.NELVYON_CAMPAIGN_LAUNCH_TEST_BYPASS;
+  });
 
   afterEach(() => {
     if (savedBypass !== undefined) process.env.NELVYON_CAMPAIGN_LAUNCH_TEST_BYPASS = savedBypass;

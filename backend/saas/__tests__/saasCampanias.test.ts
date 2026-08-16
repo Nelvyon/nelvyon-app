@@ -250,13 +250,21 @@ function makeDb() {
 }
 
 describe("SaasCampaniasService", () => {
+  // Capturado DENTRO del hook: `process.env` es del proceso y vitest aisla
+  // modulos, no procesos, asi que un valor congelado al cargar el modulo seria
+  // el que dejo otro fichero del mismo worker.
+  let savedBypass: typeof process.env.NELVYON_CAMPAIGN_LAUNCH_TEST_BYPASS;
+
   beforeEach(() => {
+    savedBypass = process.env.NELVYON_CAMPAIGN_LAUNCH_TEST_BYPASS;
     process.env.SES_ACCESS_KEY_ID = "test-key";
     process.env.SES_SECRET_ACCESS_KEY = "test-secret";
     process.env.SES_FROM_EMAIL = "noreply@test.com";
   });
 
   afterEach(() => {
+    if (savedBypass !== undefined) process.env.NELVYON_CAMPAIGN_LAUNCH_TEST_BYPASS = savedBypass;
+    else delete process.env.NELVYON_CAMPAIGN_LAUNCH_TEST_BYPASS;
     vi.restoreAllMocks();
   });
 
@@ -450,18 +458,13 @@ describe("SaasCampaniasService", () => {
   });
 
   it("launchCampania sin bypass del gate legal lanza FORBIDDEN (claimReadyLegal=false)", async () => {
-    const savedBypass = process.env.NELVYON_CAMPAIGN_LAUNCH_TEST_BYPASS;
+    // El valor previo lo captura el `beforeEach` y lo repone el `afterEach`.
     delete process.env.NELVYON_CAMPAIGN_LAUNCH_TEST_BYPASS;
-    try {
-      const db = makeDb();
-      db.contacts.push({ id: "ct-1", tenant_id: "t1", email: "a@test.com", status: "lead", pipeline_stage: "new", tags: [] });
-      const svc = new SaasCampaniasService(db);
-      const c = await svc.createCampania("t1", { name: "A", body: "B", channel: "email" });
-      await expect(svc.launchCampania("t1", c.id)).rejects.toMatchObject({ code: "FORBIDDEN" });
-    } finally {
-      if (savedBypass !== undefined) process.env.NELVYON_CAMPAIGN_LAUNCH_TEST_BYPASS = savedBypass;
-      else delete process.env.NELVYON_CAMPAIGN_LAUNCH_TEST_BYPASS;
-    }
+    const db = makeDb();
+    db.contacts.push({ id: "ct-1", tenant_id: "t1", email: "a@test.com", status: "lead", pipeline_stage: "new", tags: [] });
+    const svc = new SaasCampaniasService(db);
+    const c = await svc.createCampania("t1", { name: "A", body: "B", channel: "email" });
+    await expect(svc.launchCampania("t1", c.id)).rejects.toMatchObject({ code: "FORBIDDEN" });
   });
 
   it("launchCampania email falla si SES no configurado", async () => {

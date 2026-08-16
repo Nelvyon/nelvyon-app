@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
-import { Lora } from "next/font/google";
+import localFont from "next/font/local";
 import type { ReactNode } from "react";
 
-const lora = Lora({
-  subsets: ["latin"],
+// Autoalojada: el build no debe depender de que Google sirva la fuente. Ver
+// `src/fonts/README.md`.
+const lora = localFont({
+  src: "../../../fonts/lora-latin-variable.woff2",
+  weight: "400 700",
+  style: "normal",
   display: "swap",
   variable: "--font-reputacion-orm-premium",
 });

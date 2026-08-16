@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
-import { Exo_2 } from "next/font/google";
+import localFont from "next/font/local";
 import type { ReactNode } from "react";
 
-const exo2 = Exo_2({
-  subsets: ["latin"],
+// Autoalojada: el build no debe depender de que Google sirva la fuente. Ver
+// `src/fonts/README.md`.
+const exo2 = localFont({
+  src: "../../../fonts/exo-2-latin-variable.woff2",
+  weight: "100 900",
+  style: "normal",
   display: "swap",
   variable: "--font-3d-inmersivo-premium",
 });

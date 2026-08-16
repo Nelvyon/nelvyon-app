@@ -64,26 +64,19 @@ def test_el_barrido_ve_ficheros_de_test():
     assert len(ficheros) > 100, f"solo {len(ficheros)} ficheros .test.ts; barrido roto"
 
 
-#: Ficheros que YA arrastraban el patron cuando se detecto. No es una excusa:
-#: es el inventario del hallazgo, y esta aqui para que se vea. Lo que el test
-#: impide es que la lista CREZCA.
+#: Inventario a cero. Aqui hubo 11 ficheros con el patron —el mismo que hacia
+#: fallar `authSessionSecurity.test.ts` una de cada cinco corridas—: todos
+#: capturan ya el valor DENTRO de un `beforeEach`, asi que no queda deuda que
+#: tolerar.
 #:
-#: `authSessionSecurity.test.ts` NO esta: era el que fallaba de verdad, una de
-#: cada cinco corridas, y se arreglo. Los demas son el mismo patron latente,
-#: sin fallo observado todavia.
-DEUDA_CONOCIDA = {
-    "apps/web/src/lib/__tests__/appUrl.test.ts",
-    "backend/agency/__tests__/CampaignsLegalTechnicalGate.test.ts",
-    "backend/agency/__tests__/OAuthMultiTenantFramework.test.ts",
-    "backend/autonomous/__tests__/productionDeliverables.test.ts",
-    "backend/email/__tests__/nelvyonEmail.test.ts",
-    "backend/os-agents/__tests__/model-router.test.ts",
-    "backend/saas/__tests__/hmacSecret.test.ts",
-    "backend/saas/__tests__/saasCampanias.test.ts",
-    "backend/saas/__tests__/saasOnboarding.test.ts",
-    "backend/saas/__tests__/saasSsoAuditS33.test.ts",
-    "backend/stripe/__tests__/webhookHandler.test.ts",
-}
+#: Con el conjunto vacio, `test_la_deuda_de_capturas_no_crece` deja de ser un
+#: tope de deuda y pasa a ser un guard puro contra la reintroduccion: cualquier
+#: fichero que vuelva a congelar `process.env` fuera de un hook para
+#: reinyectarlo despues sale en `nuevos` y rompe el test.
+#:
+#: Si algun dia hiciera falta reintroducir una entrada aqui, tiene que venir con
+#: el motivo tecnico concreto escrito al lado. Vaciarla otra vez es el objetivo.
+DEUDA_CONOCIDA = set()
 
 
 def test_el_fichero_que_fallaba_ya_no_tiene_el_patron():

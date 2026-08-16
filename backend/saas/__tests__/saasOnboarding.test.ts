@@ -133,9 +133,13 @@ function authRequest(userId: string): Request {
 }
 
 describe("SaasOnboardingService", () => {
-  const savedDatabaseUrl = process.env.DATABASE_URL;
+  // Capturado DENTRO del hook: `process.env` es del proceso y vitest aisla
+  // modulos, no procesos, asi que un valor congelado al cargar el modulo seria
+  // el que dejo otro fichero del mismo worker.
+  let savedDatabaseUrl: typeof process.env.DATABASE_URL;
 
   beforeEach(() => {
+    savedDatabaseUrl = process.env.DATABASE_URL;
     delete process.env.DATABASE_URL;
     resetSaasOnboardingServiceForTests();
   });
@@ -225,9 +229,11 @@ describe("SaasOnboardingService", () => {
 });
 
 describe("API SaaS onboarding", () => {
-  const savedDatabaseUrl = process.env.DATABASE_URL;
+  // Capturado DENTRO del hook, por el mismo motivo.
+  let savedDatabaseUrl: typeof process.env.DATABASE_URL;
 
   beforeEach(() => {
+    savedDatabaseUrl = process.env.DATABASE_URL;
     delete process.env.DATABASE_URL;
     resetSaasOnboardingServiceForTests();
   });

@@ -15,9 +15,18 @@ import {
 } from "../OAuthMultiTenantFramework";
 
 describe("OAuthMultiTenantFramework — token vault (AES-256-GCM)", () => {
-  const savedKey = process.env.NELVYON_OAUTH_MT_ENCRYPTION_KEY;
-  const savedNodeEnv = process.env.NODE_ENV;
-  const savedVitest = process.env.VITEST;
+  // Capturado DENTRO del hook: `process.env` es del proceso y vitest aisla
+  // modulos, no procesos, asi que un valor congelado al cargar el modulo seria
+  // el que dejo otro fichero del mismo worker.
+  let savedKey: typeof process.env.NELVYON_OAUTH_MT_ENCRYPTION_KEY;
+  let savedNodeEnv: typeof process.env.NODE_ENV;
+  let savedVitest: typeof process.env.VITEST;
+
+  beforeEach(() => {
+    savedKey = process.env.NELVYON_OAUTH_MT_ENCRYPTION_KEY;
+    savedNodeEnv = process.env.NODE_ENV;
+    savedVitest = process.env.VITEST;
+  });
 
   afterEach(() => {
     if (savedKey !== undefined) process.env.NELVYON_OAUTH_MT_ENCRYPTION_KEY = savedKey;

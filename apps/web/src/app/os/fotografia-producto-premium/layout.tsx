@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
-import { Playfair_Display } from "next/font/google";
+import localFont from "next/font/local";
 import type { ReactNode } from "react";
 
-const playfair = Playfair_Display({
-  subsets: ["latin"],
+// Autoalojada: el build no debe depender de que Google sirva la fuente. Ver
+// `src/fonts/README.md`.
+const playfair = localFont({
+  src: "../../../fonts/playfair-display-latin-variable.woff2",
+  weight: "400 900",
+  style: "normal",
   display: "swap",
   variable: "--font-fotografia-producto-premium",
 });

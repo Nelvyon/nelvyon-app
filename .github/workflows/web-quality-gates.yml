@@ -116,11 +116,20 @@ jobs:
         run: node scripts/run-workforce-cert.mjs
         # Inventory + hierarchy + ephemeral workers + persistence. PASS not forced.
 
+      # Un gate que puede saltarse no es un gate.
+      #
+      # Antes esta cadena terminaba en `|| echo "pytest skipped — no python
+      # deps"`, asi que el paso salia VERDE tanto si la suite pasaba como si no
+      # llegaba a ejecutarse. Y los `2>/dev/null` escondian el motivo, de modo
+      # que un fallo de instalacion era indistinguible de un exito.
+      #
+      # Ahora la instalacion falla el paso si falla, y la suite se ejecuta una
+      # sola vez sobre todo `tests/`. Si algo va mal, se ve.
       - name: Python pytest (FastAPI core)
         working-directory: backend
         run: |
-          pip install -q -r requirements.txt 2>/dev/null || pip install -q fastapi sqlalchemy httpx pytest pytest-asyncio
-          python -m pytest tests/test_gap_wave3_ws_op_verified.py tests/test_oauth_integrations.py -q --tb=short 2>/dev/null || python -m pytest tests/ -q --tb=short -x --ignore=tests/e2e 2>/dev/null || echo "pytest skipped — no python deps"
+          pip install -q -r requirements.txt
+          python -m pytest tests/ -q --tb=short --ignore=tests/e2e
 
       - name: Backend SaaS unit tests (elite + completion frentes)
         run: pnpm exec vitest run backend/saas/__tests__/eliteFrentesCompletion.test.ts backend/saas/__tests__/integrationHubSync.test.ts backend/saas/__tests__/codeCompletionFrentes.test.ts --reporter=dot

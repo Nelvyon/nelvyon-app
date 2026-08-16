@@ -191,12 +191,24 @@ describe("processStripeEvent", () => {
 });
 
 describe("verifyStripeWebhook security", () => {
+  // Capturado DENTRO del hook: `process.env` es del proceso y vitest aisla
+  // modulos, no procesos, asi que un valor congelado al cargar el modulo seria
+  // el que dejo otro fichero del mismo worker.
+  let prev: typeof process.env.STRIPE_WEBHOOK_SECRET;
+
+  beforeEach(() => {
+    prev = process.env.STRIPE_WEBHOOK_SECRET;
+  });
+
+  afterEach(() => {
+    if (prev === undefined) delete process.env.STRIPE_WEBHOOK_SECRET;
+    else process.env.STRIPE_WEBHOOK_SECRET = prev;
+  });
+
   it("requires STRIPE_WEBHOOK_SECRET", async () => {
-    const prev = process.env.STRIPE_WEBHOOK_SECRET;
     delete process.env.STRIPE_WEBHOOK_SECRET;
     process.env.STRIPE_SECRET_KEY = "sk_test";
     const { verifyStripeWebhook } = await import("../webhookHandler");
     expect(() => verifyStripeWebhook("{}", "sig")).toThrow(/STRIPE_WEBHOOK_SECRET/);
-    process.env.STRIPE_WEBHOOK_SECRET = prev;
   });
 });

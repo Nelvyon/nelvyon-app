@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
-import { Source_Sans_3 } from "next/font/google";
+import localFont from "next/font/local";
 import type { ReactNode } from "react";
 
-const sourceSans = Source_Sans_3({
-  subsets: ["latin"],
+// Autoalojada: el build no debe depender de que Google sirva la fuente. Ver
+// `src/fonts/README.md`.
+const sourceSans = localFont({
+  src: "../../../fonts/source-sans-3-latin-variable.woff2",
+  weight: "200 900",
+  style: "normal",
   display: "swap",
   variable: "--font-seo-premium",
 });

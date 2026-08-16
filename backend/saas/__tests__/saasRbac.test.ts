@@ -30,8 +30,13 @@ describe("saasRbac", () => {
   });
 
   it("maps workspace roles to SaaS roles", () => {
+    // `operator` deja de colapsarse en `member`: es un rol propio con autoridad
+    // de trabajo, tal y como ya lo trataba `require_workspace_operator` en el
+    // upstream. Ver `apps/web/src/lib/__tests__/rolesDesacoplados.test.ts`.
     expect(mapWorkspaceRoleToSaas("owner")).toBe("owner");
-    expect(mapWorkspaceRoleToSaas("operator")).toBe("member");
+    expect(mapWorkspaceRoleToSaas("admin")).toBe("admin");
+    expect(mapWorkspaceRoleToSaas("operator")).toBe("operator");
+    expect(mapWorkspaceRoleToSaas("member")).toBe("member");
     expect(mapWorkspaceRoleToSaas("viewer")).toBe("viewer");
   });
 });

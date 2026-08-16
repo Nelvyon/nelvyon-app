@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ModelRouter } from "../llm/ModelRouter";
 import { LlmClient, resetLlmClientSingletonForTests } from "../LlmClient";
@@ -31,9 +31,6 @@ describe("ModelRouter", () => {
 });
 
 describe("LlmClient fallback", () => {
-  const originalFetch = globalThis.fetch;
-  const originalKey = process.env.OPENAI_API_KEY;
-  const originalAllow = process.env.AUTONOMOUS_ALLOW_OPENAI;
   const ollamaKeys = [
     "OLLAMA_HOST",
     "OLLAMA_BASE_URL",
@@ -41,7 +38,21 @@ describe("LlmClient fallback", () => {
     "NELVYON_LOCAL_AI_URL",
     "LOCAL_AI_BASE_URL",
   ] as const;
-  const originalOllama = Object.fromEntries(ollamaKeys.map((k) => [k, process.env[k]]));
+
+  // Capturado DENTRO del hook: `process.env` (y `globalThis`) son del proceso y
+  // vitest aisla modulos, no procesos, asi que un valor congelado al cargar el
+  // modulo seria el que dejo otro fichero del mismo worker.
+  let originalFetch: typeof globalThis.fetch;
+  let originalKey: typeof process.env.OPENAI_API_KEY;
+  let originalAllow: typeof process.env.AUTONOMOUS_ALLOW_OPENAI;
+  let originalOllama: Record<string, string | undefined>;
+
+  beforeEach(() => {
+    originalFetch = globalThis.fetch;
+    originalKey = process.env.OPENAI_API_KEY;
+    originalAllow = process.env.AUTONOMOUS_ALLOW_OPENAI;
+    originalOllama = Object.fromEntries(ollamaKeys.map((k) => [k, process.env[k]]));
+  });
 
   afterEach(() => {
     globalThis.fetch = originalFetch;
