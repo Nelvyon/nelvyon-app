@@ -112,12 +112,47 @@ async def _mark_error_note(db: AsyncSession, event_id: str, msg: str) -> None:
         await db.rollback()
 
 
-async def process_stripe_event(db: AsyncSession, event: Dict[str, Any]) -> Tuple[str, Dict[str, Any]]:
+async def process_stripe_event(
+    db: AsyncSession,
+    event: Dict[str, Any],
+    *,
+    db_suscripciones: Optional[AsyncSession] = None,
+) -> Tuple[str, Dict[str, Any]]:
     """
     Run webhook handlers with idempotency.
 
     Returns:
         (outcome, payload) where outcome includes 'duplicate' | 'ok' | 'unhandled' | 'error' | 'retry'
+
+    `db_suscripciones` — LA SESION PRIVILEGIADA, Y SOLO PARA `subscriptions`
+    ------------------------------------------------------------------------
+    Stripe es un actor de SISTEMA: su webhook llega sin JWT y sin usuario. Las
+    politicas de `subscriptions` conceden por sujeto (el titular) o por
+    pertenencia al workspace (migracion 543), y este camino no tiene ninguna de
+    las dos cosas. Bajo un rol sin BYPASSRLS la escritura fallaria y la
+    sincronizacion de cobros se pararia.
+
+    La salida es la misma que para los barridos de fondo —el rol `nelvyon_jobs`,
+    via `core.database.sesion_de_barrido()`— pero acotada al minimo: SOLO
+    `SubscriptionsService` la recibe. Todo lo demas sigue usando `db`:
+
+      * `stripe_webhook_events` (la idempotencia) — comprobado: NO tiene RLS.
+      * `saas_tenants` (`_maybe_sync_saas_tenant_plan`) — comprobado: NO tiene RLS.
+
+    Ninguno de los dos necesita privilegio, asi que no lo recibe. Una credencial
+    que evita RLS tiene que tocar la menor superficie posible.
+
+    Si no se pasa, se usa `db`. Eso es exactamente la conducta anterior a este
+    cambio, y es lo que ocurre mientras el operador no reparta
+    `NELVYON_JOBS_DATABASE_URL`.
+
+    DOS SESIONES, DOS TRANSACCIONES: NO SE PIERDE NINGUNA ATOMICIDAD
+    ---------------------------------------------------------------
+    La reclamacion de idempotencia ya se confirmaba en su propio `commit()`
+    antes de llamar a los handlers —es el diseno single-flight—, asi que la
+    escritura de la suscripcion nunca estuvo en la misma transaccion que la
+    marca de procesado. Separar las sesiones no rompe una garantia que existiera:
+    ante un fallo a medias, Stripe reintenta y la reclamacion vuelve a decidir.
     """
     event_id = event.get("id") or ""
     event_type = event.get("type") or ""
@@ -179,7 +214,8 @@ async def process_stripe_event(db: AsyncSession, event: Dict[str, Any]) -> Tuple
             }
         return "duplicate", {"status": "duplicate", "stripe_event_id": event_id, "event_type": event_type}
 
-    sub_service = SubscriptionsService(db)
+    # El unico punto que recibe la sesion privilegiada. Ver el docstring.
+    sub_service = SubscriptionsService(db_suscripciones if db_suscripciones is not None else db)
 
     try:
         checkout_effect: Optional[bool] = None

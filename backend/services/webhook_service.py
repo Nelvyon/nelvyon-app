@@ -18,6 +18,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import db_manager
+from core.tenant_context import contexto_de_inquilino
 
 logger = logging.getLogger(__name__)
 
@@ -444,15 +445,29 @@ async def emit_webhook_event(
     event: str,
     payload: dict[str, Any],
 ) -> None:
-    """Deliver webhook using a fresh DB session (safe for background tasks)."""
+    """Deliver webhook using a fresh DB session (safe for background tasks).
+
+    CONTEXTO EXPLICITO, NO HEREDADO
+    -------------------------------
+    `schedule_webhook_event` tiene dos caminos. Con bucle vivo usa
+    `loop.create_task`, que copia los ContextVar del llamador. Sin bucle abre un
+    `threading.Thread` con `asyncio.run`: un hilo NUEVO no hereda ningun
+    ContextVar, asi que ahi el contexto de inquilino llega vacio siempre.
+
+    Como el `workspace_id` viaja en la firma, se fija aqui explicitamente y los
+    dos caminos quedan iguales. Sin esto, bajo un rol sin BYPASSRLS el webhook
+    no fallaria: no encontraria endpoints que notificar, y el evento se
+    perderia en silencio.
+    """
     try:
         if not db_manager.async_session_maker:
             await db_manager.ensure_initialized()
         if not db_manager.async_session_maker:
             return
-        async with db_manager.async_session_maker() as session:
-            svc = WebhookService(session, workspace_id)
-            await svc.trigger_webhook(event, payload, workspace_id=workspace_id)
+        with contexto_de_inquilino(workspace_id):
+            async with db_manager.async_session_maker() as session:
+                svc = WebhookService(session, workspace_id)
+                await svc.trigger_webhook(event, payload, workspace_id=workspace_id)
     except Exception as exc:
         logger.warning(
             "webhook emit failed ws=%s event=%s: %s",
@@ -489,11 +504,16 @@ async def dispatch_webhook(
     event: str,
     data: dict[str, Any],
 ) -> list[dict[str, Any]]:
-    """Universal webhook dispatch — HMAC-signed POST with exponential retry."""
+    """Universal webhook dispatch — HMAC-signed POST with exponential retry.
+
+    Mismo motivo que `emit_webhook_event`: abre su propia sesion y puede
+    llamarse desde fondo, asi que declara su inquilino en vez de heredarlo.
+    """
     if not db_manager.async_session_maker:
         await db_manager.ensure_initialized()
     if not db_manager.async_session_maker:
         return []
-    async with db_manager.async_session_maker() as session:
-        svc = WebhookService(session, workspace_id)
-        return await svc.trigger_webhook(event, data, workspace_id=workspace_id)
+    with contexto_de_inquilino(workspace_id):
+        async with db_manager.async_session_maker() as session:
+            svc = WebhookService(session, workspace_id)
+            return await svc.trigger_webhook(event, data, workspace_id=workspace_id)

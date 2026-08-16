@@ -41,11 +41,43 @@ from typing import Any, Callable, Coroutine, Dict, List, Optional
 from core.job_observability import record_job_outcome
 from core.job_contracts import CONTRACT_JOB_TYPES, validate_job_payload
 from core.structured_log import log_structured
+from core.tenant_context import contexto_de_inquilino
 
 logger = logging.getLogger(__name__)
 
 # Type for job handlers
 JobHandler = Callable[[Dict[str, Any]], Coroutine[Any, Any, Optional[str]]]
+
+
+def _inquilino_del_job(payload: Dict[str, Any]) -> tuple[Optional[int], Optional[str]]:
+    """El inquilino que declara la carga del job, si lo declara.
+
+    POR QUE AQUI Y NO EN CADA HANDLER
+    ---------------------------------
+    Un job corre en un worker, no en una peticion: el ContextVar de
+    `core/tenant_context.py` esta vacio cuando el handler abre su sesion. Bajo un
+    rol sin BYPASSRLS eso no falla —devuelve cero filas—, asi que un job sin
+    permiso es indistinguible de un job sin trabajo.
+
+    El contrato de jobs (`core/job_contracts.py`) ya obliga a `workspace_id` y
+    `actor_user_id` en los tipos contratados, y los handlers de
+    `core/nelvyon_job_handlers.py` los exigen igual. Fijar el contexto en el
+    punto de despacho cubre TODOS los handlers —los de hoy y los que se
+    registren manana— en vez de repetir el mismo envoltorio en cada uno y
+    confiar en que nadie lo olvide.
+
+    Un job sin `workspace_id` no recibe contexto: no se inventa uno. Sigue
+    denegando, que es el lado seguro, y el guard permanente lo delata.
+    """
+    raw_ws = payload.get("workspace_id")
+    actor = payload.get("actor_user_id")
+    workspace_id: Optional[int] = None
+    if raw_ws is not None:
+        try:
+            workspace_id = int(raw_ws)
+        except (TypeError, ValueError):
+            workspace_id = None
+    return workspace_id, (str(actor) if actor else None)
 
 
 class JobStatus(str, Enum):
@@ -310,7 +342,9 @@ class ARQJobQueue:
             self._jobs[job_id].attempts = attempts
 
         try:
-            result = await handler(payload)
+            _ws, _actor = _inquilino_del_job(payload)
+            with contexto_de_inquilino(_ws, _actor):
+                result = await handler(payload)
             await self._redis_pool.set(f"job:{job_id}:status", "completed", ex=86400)
             if result:
                 await self._redis_pool.set(f"job:{job_id}:result", str(result), ex=86400)
@@ -502,7 +536,11 @@ class AsyncJobQueue:
             #
             # Copia superficial:  expone , asi que mutarlo
             # filtraria estas claves internas por .
-            result = await handler({**job.payload, "_job_id": job.id, "_attempt": job.attempts})
+            _ws, _actor = _inquilino_del_job(job.payload)
+            with contexto_de_inquilino(_ws, _actor):
+                result = await handler(
+                    {**job.payload, "_job_id": job.id, "_attempt": job.attempts}
+                )
             job.status = JobStatus.COMPLETED
             job.result = result
             job.completed_at = datetime.now(timezone.utc).isoformat()

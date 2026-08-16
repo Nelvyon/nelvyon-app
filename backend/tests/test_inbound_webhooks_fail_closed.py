@@ -330,9 +330,15 @@ def test_la_verificacion_va_antes_del_efecto(clave):
     fichero, funcion = clave
     cuerpo = _cuerpo(fichero, funcion)
     posicion_verificacion = cuerpo.index(VERIFICACION_EXIGIDA[clave])
+    # `process_stripe_event` y `sesion_de_barrido` se anaden con el reparto de
+    # roles RLS: el webhook de Stripe es un actor de sistema y abre una sesion
+    # del rol `nelvyon_jobs`, que BYPASSA RLS. Abrirla antes de verificar la
+    # firma convertiria cada peticion anonima —falsa incluida— en una conexion
+    # privilegiada. `if marca in cuerpo` deja el resto de webhooks intactos.
     for marca in ("get_helpdesk_service", "get_booking_service", "get_dialer_service",
                   "SmsService.ensure_schema", "bounce_handler", "handle_webhook",
-                  "process_incoming_webhook", "handle_webhook_event"):
+                  "process_incoming_webhook", "handle_webhook_event",
+                  "process_stripe_event", "sesion_de_barrido"):
         if marca in cuerpo:
             assert posicion_verificacion < cuerpo.index(marca), (
                 f"{fichero}::{funcion} llama a {marca} antes de verificar"

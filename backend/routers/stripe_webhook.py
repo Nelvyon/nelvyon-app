@@ -6,6 +6,17 @@ Stripe Webhook — signature verification (raw body), idempotency (stripe_webhoo
 - 4xx: invalid signature / payload.
 - 503: Stripe not configured, concurrent claim on same event, or checkout handler could not apply (retry).
 - 5xx: transient processing failure (Stripe retries).
+
+ACTOR DE SISTEMA
+----------------
+Este webhook llega sin JWT y sin usuario, y aun asi tiene que escribir
+`subscriptions`, que bajo RLS concede por titular o por pertenencia al
+workspace (migracion 543). No tiene ninguna de las dos cosas.
+
+Por eso —y SOLO despues de verificar la firma— se abre una sesion de
+`core.database.sesion_de_barrido()`, ligada al rol `nelvyon_jobs`, y se pasa
+unicamente a la escritura de suscripciones. La idempotencia y el resto del
+handler siguen con la sesion normal.
 """
 import logging
 import os
@@ -17,7 +28,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from stripe import SignatureVerificationError
 
 from core.config import settings
-from core.database import get_db
+from core.database import get_db, sesion_de_barrido
 from services.stripe_webhook_processor import process_stripe_event
 
 logger = logging.getLogger(__name__)
@@ -64,8 +75,18 @@ async def stripe_webhook(
         extra={"stripe_event_id": event_id, "event_type": event_type},
     )
 
+    # La sesion privilegiada se abre AQUI y no antes: por encima de esta linea
+    # solo hay verificacion de firma, y una peticion con firma invalida no debe
+    # llegar siquiera a tocar una credencial que evita RLS.
+    #
+    # Sin `NELVYON_JOBS_DATABASE_URL`, `sesion_de_barrido()` devuelve una sesion
+    # del motor de siempre: misma conexion, mismo rol, conducta identica a la de
+    # antes de este cambio.
     try:
-        outcome, body = await process_stripe_event(db, event)
+        async with await sesion_de_barrido() as db_suscripciones:
+            outcome, body = await process_stripe_event(
+                db, event, db_suscripciones=db_suscripciones
+            )
     except Exception as e:
         logger.exception("stripe.webhook processing failed event_id=%s", event_id)
         raise HTTPException(status_code=500, detail="Webhook processing failed") from e

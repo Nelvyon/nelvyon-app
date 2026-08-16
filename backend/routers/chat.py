@@ -13,8 +13,10 @@ from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from sqlalchemy import text
+
 from core.database import db_manager, get_db
-from core.tenant_context import get_tenant_context
+from core.tenant_context import contexto_de_inquilino, get_tenant_context
 from dependencies.auth import bearer_scheme, get_access_token, get_current_user
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_admin, require_workspace_member, require_workspace_operator
 from schemas.auth import UserResponse
@@ -79,6 +81,69 @@ def _visitor_cookie_name(tenant_id: int) -> str:
     return f"nelvyon_chat_vid_{tenant_id}"
 
 
+async def _inquilino_de_la_conversacion(db: AsyncSession, conversation_id: str) -> int | None:
+    """Resuelve el workspace de una conversacion LEYENDOLO DE LA BASE.
+
+    POR QUE NO SE PUEDE HACER DE OTRA FORMA
+    ---------------------------------------
+    El widget de LiveChat es publico y anonimo: no hay JWT, y `TenantMiddleware`
+    —que es `BaseHTTPMiddleware`— ni siquiera se ejecuta en el WebSocket. Asi
+    que estas rutas llegan con el contexto de inquilino VACIO.
+
+    Y hay huevo y gallina: `chat_conversations` tiene RLS por
+    `current_tenant_id()`, de modo que para saber de quien es la conversacion
+    habria que leer la fila que la politica esta protegiendo. Sin contexto, esa
+    lectura devuelve cero filas SIN ERROR, y el handler concluye «conversacion
+    no encontrada» para todos los visitantes.
+
+    `nelvyon_livechat_tenant_de_conversacion` (migracion 543) rompe el ciclo:
+    es `SECURITY DEFINER` con `search_path` fijado, devuelve solo el entero y
+    lee el inquilino de la base. No se deduce de ningun dato que envie el
+    cliente, y el endpoint publico no necesita credencial que bypasse RLS.
+
+    LO QUE ESTO NO ES
+    -----------------
+    No es el control de acceso de estas rutas. El endpoint es publico y no lleva
+    token: la autorizacion efectiva es la POSESION del `conversation_id` —un
+    UUID v4, no adivinable, pero obtenible por cualquiera para su propia
+    conversacion— mas las comprobaciones que ya hay aqui (cookie de visitante,
+    o Bearer y workspace para agentes). Esto solo restaura el ACOTADO por
+    inquilino para que el camino funcione bajo RLS.
+    """
+    try:
+        fila = await db.execute(
+            text(
+                "SELECT public.nelvyon_livechat_tenant_de_conversacion("
+                "CAST(:cid AS uuid))"
+            ),
+            {"cid": str(conversation_id)},
+        )
+        tenant_id = fila.scalar()
+    except Exception:  # noqa: BLE001
+        # Sin resolvedor —base antigua sin la 543, o id mal formado— se sigue
+        # sin contexto. Es el comportamiento de antes, no uno peor.
+        logger.debug("no se pudo resolver el inquilino de la conversacion %s", conversation_id)
+        return None
+    if tenant_id is None:
+        return None
+    return int(tenant_id)
+
+
+async def _fijar_inquilino_de_la_conversacion(db: AsyncSession, conversation_id: str) -> int | None:
+    """Resuelve y aplica el contexto a la sesion EN CURSO.
+
+    Hay que fijarlo a mano sobre esta sesion: su transaccion ya empezo —y con
+    ella ya corrio el enganche `after_begin` de `core/contexto_rls.py`— cuando
+    el ContextVar aun estaba vacio. Reaplicarlo aqui es lo que hace que las
+    consultas siguientes del mismo handler vean su inquilino.
+    """
+    tenant_id = await _inquilino_de_la_conversacion(db, conversation_id)
+    if tenant_id is None:
+        return None
+    await TenantService(db).set_tenant_context(tenant_id)
+    return tenant_id
+
+
 def _resolve_visitor_id(request: Request, tenant_id: int, body_visitor: str | None) -> str:
     if body_visitor:
         return body_visitor.strip()
@@ -96,6 +161,13 @@ async def create_conversation(
 ):
     """Public — start chat from embedded widget."""
     visitor_id = _resolve_visitor_id(request, body.tenant_id, body.visitor_id)
+    # El inquilino lo DECLARA el cliente, porque un widget publico tiene que
+    # poder decir con quien quiere hablar. Fijarlo aqui no concede nada nuevo:
+    # es el mismo valor que este handler ya usa para crear la fila, y la unica
+    # politica que interviene es la de INSERT, que exige que la fila creada sea
+    # de ese mismo inquilino. No es un control de acceso, y no se pretende que
+    # lo sea.
+    await TenantService(db).set_tenant_context(int(body.tenant_id))
     svc = get_livechat_service(db, body.tenant_id)
     try:
         conv = await svc.create_conversation(
@@ -157,6 +229,9 @@ async def send_chat_message(
     db: AsyncSession = Depends(get_db),
 ):
     """Public for visitors; agents require Bearer/cookie + X-Workspace-Id."""
+    # Ruta publica: el contexto de inquilino llega vacio. Se resuelve de la base
+    # a partir del identificador de conversacion antes de tocar nada.
+    await _fijar_inquilino_de_la_conversacion(db, conversation_id)
     svc = get_livechat_service(db)
     conv = await svc.get_conversation(conversation_id)
     if not conv:
@@ -208,6 +283,8 @@ async def get_chat_messages(
     db: AsyncSession = Depends(get_db),
 ):
     """Public for widget visitor (cookie) or admin."""
+    # Misma razon que en `send_chat_message`.
+    await _fijar_inquilino_de_la_conversacion(db, conversation_id)
     svc = get_livechat_service(db)
     conv = await svc.get_conversation(conversation_id)
     if not conv:
@@ -481,11 +558,42 @@ async def embed_widget_script(request: Request):
 
 @livechat_router.websocket("/ws/{conversation_id}")
 async def chat_websocket(websocket: WebSocket, conversation_id: str):
-    """Real-time chat via Redis Pub/Sub."""
+    """Real-time chat via Redis Pub/Sub.
+
+    CONTEXTO DE INQUILINO EN UN WEBSOCKET
+    -------------------------------------
+    `TenantMiddleware` hereda de `BaseHTTPMiddleware`, que solo procesa scope
+    `http`: una conexion WebSocket NUNCA pasa por el. Y `/api/chat/ws/` es
+    publica, asi que tampoco hay JWT del que sacar el inquilino.
+
+    Sin contexto, `chat_conversations` —RLS por `current_tenant_id()`— devolvia
+    cero filas sin error y este handler cerraba con 4004 a todos los visitantes:
+    el chat en vivo caido, sin un solo log.
+
+    El inquilino se resuelve de la base con
+    `nelvyon_livechat_tenant_de_conversacion` (SECURITY DEFINER, migracion 543)
+    y se fija para TODO el resto de la conexion, porque el bucle de mensajes
+    abre sesiones nuevas y cada una necesita su contexto.
+    """
     await websocket.accept()
     if not db_manager.async_session_maker:
         await db_manager.ensure_initialized()
 
+    # Esta primera sesion se abre a proposito SIN contexto: es la que lo
+    # averigua. La funcion resolvedora no depende de RLS.
+    async with db_manager.async_session_maker() as session:
+        tenant_id = await _inquilino_de_la_conversacion(session, conversation_id)
+
+    if tenant_id is None:
+        await websocket.close(code=4004)
+        return
+
+    with contexto_de_inquilino(tenant_id):
+        await _chat_websocket_con_contexto(websocket, conversation_id)
+
+
+async def _chat_websocket_con_contexto(websocket: WebSocket, conversation_id: str) -> None:
+    """El bucle del WebSocket, ya con el inquilino fijado por el llamador."""
     async with db_manager.async_session_maker() as session:
         svc = get_livechat_service(session)
         conv = await svc.get_conversation(conversation_id)

@@ -63,6 +63,11 @@ class DatabaseManager:
         self.async_session_maker = None
         self._init_lock = asyncio.Lock()  # Protect initialization process
         self._table_creation_lock = asyncio.Lock()  # Protect table creation process
+        # Motor y sesion para barridos de fondo entre inquilinos. Ver
+        # `ensure_jobs_session_maker`.
+        self.jobs_engine = None
+        self.jobs_session_maker = None
+        self._jobs_init_lock = asyncio.Lock()
 
     @staticmethod
     def _sanitize_query_params(url):
@@ -209,6 +214,15 @@ class DatabaseManager:
         In Lambda environments, this ensures connections are cleanly closed
         before container freeze/reuse, avoiding "server closed the connection unexpectedly" errors.
         """
+        if self.jobs_engine is not None:
+            try:
+                await self.jobs_engine.dispose()
+            except Exception as e:  # noqa: BLE001
+                logger.warning(f"Error disposing jobs database engine: {e}")
+            finally:
+                self.jobs_engine = None
+                self.jobs_session_maker = None
+
         if not self.engine:
             return  # Already closed
 
@@ -557,6 +571,43 @@ class DatabaseManager:
 
         return sql
 
+    async def ensure_jobs_session_maker(self):
+        """El session maker de los barridos de fondo entre inquilinos.
+
+        Sin `NELVYON_JOBS_DATABASE_URL` devuelve el session maker normal, asi que
+        la conducta es identica a la de hoy. Con ella, abre un motor propio
+        —pool pequeno: son tres bucles, no trafico— ligado al rol `nelvyon_jobs`.
+
+        Este motor NO lleva el enganche de contexto de inquilino: un barrido
+        cross-tenant no tiene un inquilino que fijar, y `nelvyon_jobs` bypassa
+        RLS por diseno. Es la unica excepcion declarada, y esta acotada a los
+        tres bucles que la necesitan.
+        """
+        url_jobs = _url_de_jobs()
+        if not url_jobs:
+            await self.ensure_initialized()
+            return self.async_session_maker
+        if self.jobs_session_maker is not None:
+            return self.jobs_session_maker
+        async with self._jobs_init_lock:
+            if self.jobs_session_maker is not None:
+                return self.jobs_session_maker
+            normalizada = self._normalize_async_database_url(url_jobs)
+            self.jobs_engine = create_async_engine(
+                normalizada,
+                echo=False,
+                pool_pre_ping=True,
+                pool_size=2,
+                max_overflow=2,
+                pool_recycle=3600,
+                pool_timeout=30,
+            )
+            self.jobs_session_maker = async_sessionmaker(
+                self.jobs_engine, class_=AsyncSession, expire_on_commit=False
+            )
+            logger.info("Jobs session maker created (rol de barridos de fondo)")
+            return self.jobs_session_maker
+
     async def ensure_initialized(self):
         """Ensure database is initialized - used for lazy loading in Lambda environments"""
         # Quick check without lock (double-checked locking pattern)
@@ -587,6 +638,39 @@ class DatabaseManager:
 
 
 db_manager = DatabaseManager()
+
+
+def _url_de_jobs() -> str:
+    """DSN del rol de jobs, o cadena vacia si el operador no lo ha repartido."""
+    return (os.environ.get("NELVYON_JOBS_DATABASE_URL") or "").strip()
+
+
+async def sesion_de_barrido():
+    """Sesion para los barridos de fondo que recorren VARIOS inquilinos.
+
+    QUE PROBLEMA RESUELVE
+    ---------------------
+    Tres bucles de fondo —el planificador social, el de informes y el de
+    reentrenamiento— no trabajan para un inquilino: preguntan «que hay pendiente
+    en toda la base» y luego reparten. No pueden fijar un `app.tenant_id` porque
+    todavia no saben cual, y bajo un rol sin BYPASSRLS esa primera consulta
+    devolveria cero filas SIN ERROR. El planificador social dejaria de publicar
+    y nadie se enteraria: un worker que no encuentra trabajo tiene exactamente
+    la misma pinta que un worker sin permiso para verlo.
+
+    La salida no es darle BYPASSRLS al trafico normal —eso seria apagar RLS con
+    otro nombre— sino usar aqui, y solo aqui, el rol `nelvyon_jobs` que la
+    migracion 540 declara justo para esto.
+
+    CONDUCTA HOY
+    ------------
+    Si `NELVYON_JOBS_DATABASE_URL` no esta puesta, devuelve la sesion normal.
+    Es decir: mientras el operador no reparta la credencial, esto no cambia
+    absolutamente nada. El cambio de rol es un acto explicito, no un efecto
+    secundario de desplegar.
+    """
+    maker = await db_manager.ensure_jobs_session_maker()
+    return maker()
 
 
 async def get_db() -> AsyncSession:

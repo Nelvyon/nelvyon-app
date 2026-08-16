@@ -5,7 +5,7 @@ from __future__ import annotations
 import asyncio
 import logging
 
-from core.database import db_manager
+from core.database import db_manager, sesion_de_barrido
 from services.social_scheduler_service import SocialSchedulerService
 
 logger = logging.getLogger(__name__)
@@ -16,12 +16,22 @@ _BACKOFF_BASE = 2
 
 
 async def _process_due_posts() -> None:
+    """Barrido CROSS-TENANT: `fetch_due_scheduled_posts` no filtra por inquilino.
+
+    `social_posts` tiene RLS con `tenant_id = current_tenant_id()`, y este bucle
+    no puede fijar un inquilino porque su pregunta es precisamente «de quien hay
+    trabajo». Bajo un rol sin BYPASSRLS y sin contexto, esa consulta devuelve
+    cero filas SIN ERROR: el planificador dejaria de publicar en silencio.
+
+    Por eso usa `sesion_de_barrido()`, ligada al rol `nelvyon_jobs`. Mientras el
+    operador no reparta esa credencial, la sesion es la misma de siempre.
+    """
     if not db_manager.async_session_maker:
         await db_manager.ensure_initialized()
     if not db_manager.async_session_maker:
         return
 
-    async with db_manager.async_session_maker() as session:
+    async with await sesion_de_barrido() as session:
         svc = SocialSchedulerService(session)
         posts = await svc.fetch_due_scheduled_posts()
         for post in posts:

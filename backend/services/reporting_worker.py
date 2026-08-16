@@ -9,7 +9,7 @@ from zoneinfo import ZoneInfo
 
 from sqlalchemy import text
 
-from core.database import db_manager
+from core.database import db_manager, sesion_de_barrido
 from services.reporting_service import ReportingService
 
 logger = logging.getLogger(__name__)
@@ -80,12 +80,18 @@ def _parse_dt(value) -> datetime:
 
 
 async def _tick() -> None:
+    """Barrido CROSS-TENANT: recorre TODOS los workspaces con miembros activos.
+
+    Igual que el planificador social, no tiene un inquilino que fijar cuando
+    pregunta a quien le toca informe. Usa `sesion_de_barrido()` por el mismo
+    motivo, y por la misma via.
+    """
     if not db_manager.async_session_maker:
         await db_manager.ensure_initialized()
     if not db_manager.async_session_maker:
         return
 
-    async with db_manager.async_session_maker() as session:
+    async with await sesion_de_barrido() as session:
         svc = ReportingService(session, 0)
         await svc.ensure_schema()
         rows = await session.execute(text("SELECT * FROM report_schedules"))

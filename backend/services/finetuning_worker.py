@@ -5,7 +5,7 @@ from __future__ import annotations
 import asyncio
 import logging
 
-from core.database import db_manager
+from core.database import db_manager, sesion_de_barrido
 from services.finetuning_service import FineTuningService, RETRAIN_INTERVAL_DAYS
 
 logger = logging.getLogger(__name__)
@@ -15,12 +15,19 @@ _CHECK_INTERVAL_SEC = 24 * 3600  # daily scan
 
 
 async def _retrain_tick() -> None:
+    """Barrido CROSS-TENANT: `list_auto_retrain_candidates` devuelve N workspaces.
+
+    Ademas la recoleccion de ejemplos de `start_auto_retrain` lee tablas con RLS
+    (`social_posts`, `chatbot_conversations`, `campaigns`). Sin contexto
+    devolveria conjuntos vacios y reentrenaria con nada, sin un solo error.
+    Misma solucion que los otros dos barridos: `sesion_de_barrido()`.
+    """
     if not db_manager.async_session_maker:
         await db_manager.ensure_initialized()
     if not db_manager.async_session_maker:
         return
 
-    async with db_manager.async_session_maker() as session:
+    async with await sesion_de_barrido() as session:
         svc = FineTuningService(session)
         candidates = await svc.list_auto_retrain_candidates(max_age_days=RETRAIN_INTERVAL_DAYS)
         for workspace_id in candidates:
