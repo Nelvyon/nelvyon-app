@@ -50,11 +50,35 @@
     <meta name="theme-color" content="#ffffff">
 
     <!--==============================
-	  Google Fonts
+	  Fuentes locales
 	============================== -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@100..800&family=Urbanist:ital,wght@0,100..900;1,100..900&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <!-- Autoalojadas bajo /fonts: ninguna peticion sale a un CDN de terceros.
+         Mismas familias (--title-font, --title-font2, --body-font de
+         assets/css/style.css), mismo eje de peso y mismo font-display que
+         servia Google. Detalle y licencias en apps/web/src/fonts/README.md. -->
+    <style>
+      @font-face {
+        font-family: 'Sora';
+        font-style: normal;
+        font-weight: 100 800;
+        font-display: swap;
+        src: url('/fonts/sora-latin-variable.woff2') format('woff2');
+      }
+      @font-face {
+        font-family: 'Urbanist';
+        font-style: normal;
+        font-weight: 100 900;
+        font-display: swap;
+        src: url('/fonts/urbanist-latin-variable.woff2') format('woff2');
+      }
+      @font-face {
+        font-family: 'Work Sans';
+        font-style: normal;
+        font-weight: 100 900;
+        font-display: swap;
+        src: url('/fonts/work-sans-latin-variable.woff2') format('woff2');
+      }
+    </style>
 
     <!--==============================
 	    All CSS File

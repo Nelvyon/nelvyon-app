@@ -278,46 +278,80 @@ def test_el_contexto_se_engancha_al_empezar_cada_transaccion():
     assert '"after_begin"' in fuente
 
 
-# ── por que RLS sigue sin activarse, medido ─────────────────────────────────
+# ── los huecos que impedian activar RLS, ahora cerrados ─────────────────────
+
+#: Las cinco tablas que siguen sin política de INSERT DESPUÉS de la migración
+#: `540_rls_politicas_completas.sql`, y por qué. Son catálogos globales sin
+#: columna de propiedad: la única política de escritura posible sería
+#: `WITH CHECK (true)`, que abriría contenido compartido a cualquier rol con el
+#: GRANT. Las escribe el rol de fondo `nelvyon_jobs`, declarado en esa migración.
+RESIDUO_SIN_INSERT = {
+    "landing_templates",
+    "os_store_templates",
+    "os_website_templates",
+    "changelog_entries",
+    "roadmap_items",
+}
+
 
 @requiere_pg
 @pytest.mark.asyncio
 async def test_cuantas_tablas_quedarian_inaccesibles_si_se_activara_rls(escenario):
-    """La razón de que el privilegio NO se retire todavía, en números.
+    """Los huecos que impedían activar RLS, medidos otra vez. Ahora en cero.
 
-    No es una opinión ni una precaución vaga: hay tablas con RLS que carecen de
-    la política correspondiente a la operación, y sobre esas el rol restringido
-    no denegaría «de más» — denegaría TODO, y en silencio, porque una política
-    ausente devuelve cero filas en vez de un error.
+    Hasta la 540 este test documentaba un estado roto —28 tablas con RLS sin
+    INSERT, 13 sin SELECT, 10 sin ninguna política— y solo fallaba si el número
+    CRECÍA. Sobre esas tablas el rol restringido no denegaría «de más»:
+    denegaría TODO, y en silencio, porque una política ausente devuelve cero
+    filas en vez de un error.
 
-    Este test no exige que el número sea cero: documenta el estado real y falla
-    si CRECE, para que nadie añada una tabla con RLS sin su política. Cuando
-    llegue a cero, junto con un mecanismo explícito para jobs y migraciones
-    —que corren sin contexto de petición y hoy serían denegados en las 317—,
-    retirar BYPASSRLS pasará a ser una decisión con evidencia.
+    Ya no admite margen. `sin_select` y `sin_ninguna` tienen que ser cero, y
+    `sin_insert` tiene que ser EXACTAMENTE el residuo declarado arriba. La
+    comparación es de conjuntos y no de cuentas a propósito: así falla tanto si
+    aparece una tabla nueva con RLS y sin política como si desaparece una de las
+    cinco porque alguien le abrió la escritura sin pensarlo.
+
+    Con esto, y con el mecanismo explícito para jobs de la sección 8 de la 540
+    —un rol dedicado con BYPASSRLS, no políticas abiertas—, retirar el
+    privilegio pasa a ser una decisión con evidencia. Sigue sin darse ese paso
+    aquí: necesita su propia ventana de despliegue.
     """
     admin, _a, _b = escenario
-    huecos = {
-        "sin_insert": await admin.fetchval(
-            "SELECT count(*) FROM pg_tables t WHERE t.schemaname='public' AND t.rowsecurity "
-            "AND NOT EXISTS (SELECT 1 FROM pg_policies p WHERE p.schemaname='public' "
-            "AND p.tablename=t.tablename AND p.cmd IN ('INSERT','ALL'))"
-        ),
-        "sin_select": await admin.fetchval(
-            "SELECT count(*) FROM pg_tables t WHERE t.schemaname='public' AND t.rowsecurity "
-            "AND NOT EXISTS (SELECT 1 FROM pg_policies p WHERE p.schemaname='public' "
-            "AND p.tablename=t.tablename AND p.cmd IN ('SELECT','ALL'))"
-        ),
-        "sin_ninguna": await admin.fetchval(
-            "SELECT count(*) FROM pg_tables t WHERE t.schemaname='public' AND t.rowsecurity "
+
+    async def sin(verbo: str) -> set[str]:
+        return {
+            f["tablename"] for f in await admin.fetch(
+                "SELECT t.tablename FROM pg_tables t "
+                "WHERE t.schemaname='public' AND t.rowsecurity AND NOT EXISTS ("
+                "  SELECT 1 FROM pg_policies p WHERE p.schemaname='public' "
+                "  AND p.tablename=t.tablename AND p.cmd IN ($1, 'ALL'))",
+                verbo,
+            )
+        }
+
+    sin_ninguna = {
+        f["tablename"] for f in await admin.fetch(
+            "SELECT t.tablename FROM pg_tables t WHERE t.schemaname='public' AND t.rowsecurity "
             "AND NOT EXISTS (SELECT 1 FROM pg_policies p WHERE p.schemaname='public' "
             "AND p.tablename=t.tablename)"
-        ),
-    }
-    MEDIDO = {"sin_insert": 28, "sin_select": 13, "sin_ninguna": 10}
-    for clave, tope in MEDIDO.items():
-        assert huecos[clave] <= tope, (
-            f"{clave}: {huecos[clave]} tablas, medido {tope}. Ha crecido: se añadió "
-            "una tabla con RLS sin su política, y bajo un rol sin BYPASSRLS eso "
-            "deniega en silencio."
         )
+    }
+    assert sin_ninguna == set(), (
+        f"tablas con RLS y sin NINGUNA política: {sorted(sin_ninguna)}. Eran 10 y la "
+        "540 las cerró todas; bajo un rol sin BYPASSRLS estas denegarían TODO."
+    )
+
+    sin_select = await sin("SELECT")
+    assert sin_select == set(), (
+        f"tablas con RLS y sin política de SELECT: {sorted(sin_select)}. Eran 13 y la "
+        "540 las cerró todas; sin SELECT la tabla devuelve vacío, no un error."
+    )
+
+    sin_insert = await sin("INSERT")
+    assert sin_insert == RESIDUO_SIN_INSERT, (
+        "el residuo sin INSERT ya no es el declarado. "
+        f"sobran={sorted(sin_insert - RESIDUO_SIN_INSERT)} "
+        f"faltan={sorted(RESIDUO_SIN_INSERT - sin_insert)}. "
+        "Eran 28; quedan 5 catálogos globales, cada uno con su motivo escrito en "
+        "la sección 7 de la 540."
+    )

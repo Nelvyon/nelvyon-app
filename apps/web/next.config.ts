@@ -55,6 +55,13 @@ const nextConfig: NextConfig = {
     ],
   },
   outputFileTracingIncludes: {
+    // El certificado del LMS incrusta estos woff2 en base64 al generar su HTML
+    // (`src/lib/fonts/fuentesEmbebidas.ts`). Nadie los importa como modulo, asi
+    // que el trazado no los veria y no los copiaria a la salida del servidor.
+    "/api/saas/lms/cert/**": [
+      "src/fonts/playfair-display-latin-variable.woff2",
+      "src/fonts/inter-latin-variable.woff2",
+    ],
     "/api/**/*": [
       "../../backend/autonomous/templates/registry.json",
       "../../backend/autonomous/templates/**/*.json",

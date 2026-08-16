@@ -5,6 +5,7 @@
  */
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
+import { cssFuentesEmbebidas } from "@/lib/fonts/fuentesEmbebidas";
 import { DbClient } from "@/../../backend/db/DbClient";
 import { escapeHtml } from "@/../../backend/saas/htmlEscape";
 import { requireHmacSecret } from "@/../../backend/saas/hmacSecret";
@@ -62,6 +63,15 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   const certIdSafe = escapeHtml(cert.id);
   const issuedSafe = escapeHtml(issuedDate);
 
+  // Playfair Display e Inter van incrustadas en base64 desde `src/fonts`. Antes
+  // se pedian a la CSS API de Google con un `@import`, asi que abrir el
+  // certificado —o imprimirlo— dependia de un CDN de terceros y le anunciaba la
+  // visita. Mismas familias, mismos pesos efectivos: los ficheros son variables
+  // y cubren el rango que se declaraba (400/700 de Playfair, 300/400/500 de
+  // Inter, mas el 600 en linea del titulo del curso, que antes ni se pedia y el
+  // navegador tenia que fingir engordando el 500).
+  const fuentes = cssFuentesEmbebidas("Playfair Display", "Inter");
+
   const html = `<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -69,7 +79,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Certificado — ${courseTitle}</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500&display=swap');
+    ${fuentes}
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: #f8f7f2; font-family: 'Inter', sans-serif; display: flex; min-height: 100vh; align-items: center; justify-content: center; padding: 2rem; }
     .cert { background: #fff; width: 800px; max-width: 100%; padding: 60px 70px; border: 3px solid #0084ff; position: relative; box-shadow: 0 8px 40px rgba(0,0,0,.12); }

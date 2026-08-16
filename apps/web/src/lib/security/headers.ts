@@ -5,12 +5,21 @@
 export const CONTENT_SECURITY_POLICY = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://eu.i.posthog.com https://js.stripe.com",
-  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  // Sin origenes de terceros para tipografia: ya no queda quien los pida. La
+  // aplicacion carga sus dieciseis familias con `next/font/local` desde
+  // `src/fonts` (ver `src/fonts/README.md`), el certificado del LMS incrusta las
+  // suyas en base64 con `src/lib/fonts/fuentesEmbebidas.ts` y el pack estatico
+  // de `public/` —las 19 paginas de `public/www` y `public/w3crm/css/style.css`—
+  // declara sus `@font-face` contra `public/fonts`, servido en este mismo
+  // origen. El guard de `app/__tests__/fuentesLocales.test.ts` barre `src` y
+  // `public` para que la dependencia no vuelva por la puerta de atras.
+  "style-src 'self' 'unsafe-inline'",
   // `data:` es necesario para las fuentes embebidas en base64 dentro de
-  // `assets/css/app.min.css` y `swiper-bundle.min.css` del pack publico; sin
-  // ello la CSP las bloqueaba y cada pagina emitia un error de consola. Son
-  // fuentes autocontenidas, no suponen una peticion a terceros.
-  "font-src 'self' data: https://fonts.gstatic.com",
+  // `assets/css/app.min.css` y `swiper-bundle.min.css` del pack publico —y para
+  // el certificado del LMS, que incrusta las suyas del mismo modo—; sin ello la
+  // CSP las bloqueaba y cada pagina emitia un error de consola. Son fuentes
+  // autocontenidas, no suponen una peticion a terceros.
+  "font-src 'self' data:",
   "img-src 'self' data: blob: https:",
   "connect-src 'self' https://eu.i.posthog.com https://eu.posthog.com https://api.stripe.com https://*.sentry.io",
   "frame-src https://js.stripe.com https://hooks.stripe.com https://www.google.com https://maps.google.com",

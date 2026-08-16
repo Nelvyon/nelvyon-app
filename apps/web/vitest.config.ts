@@ -43,6 +43,12 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      // Varias rutas del App Router alcanzan `backend/` como `@/../../backend/...`.
+      // Next lo resuelve, pero Vite hace sustitucion textual sobre el alias `@` y
+      // el resultado mezcla separadores en Windows, asi que no encontraba el
+      // fichero y el test ni siquiera podia importar la ruta. Va antes que `@`
+      // porque el alias mas especifico tiene que ganar.
+      "@/../../backend": path.resolve(__dirname, "../../backend"),
       "@": path.resolve(__dirname, "./src"),
       "@nelvyon/os-agents/constants": path.resolve(__dirname, "../../backend/os-agents/constants.ts"),
       "@nelvyon/os-agents": path.resolve(__dirname, "../../backend/os-agents/index.ts"),

@@ -53,12 +53,6 @@
         _page-user-lock
 
 */
-@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;700;900&display=swap");
-@import url("https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800");
-@import url("https://fonts.googleapis.com/css?family=Open+Sans:400,600,700");
-@import url("https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700");
-@import url("https://fonts.googleapis.com/css?family=Roboto:400,500,700");
-@import url("https://fonts.googleapis.com/css?family=Nunito:400,600,700");
 @import url("./../icons/simple-line-icons/css/simple-line-icons.css");
 @import url("./../icons/fontawesome6/css/all.min.css");
 @import url("./../icons/fontawesome/css/all.min.css");
@@ -74,6 +68,78 @@
 @import url(./../vendor/aos/css/aos.min.css);
 @import url(./../vendor/perfect-scrollbar/css/perfect-scrollbar.css);
 @import url(./../vendor/metismenu/css/metisMenu.min.css);
+/* Fuentes autoalojadas bajo /fonts: ninguna peticion sale a un CDN de terceros.
+   Sustituyen a los @import que este fichero hacia a la CSS API de Google. Son
+   los mismos subconjuntos latin que servia Google, en formato woff2 y con el
+   mismo font-display: swap; los ejes de peso variables cubren todos los pesos
+   que pedian aquellos @import. Detalle y licencias (OFL 1.1) en
+   apps/web/src/fonts/README.md.
+
+   Montserrat y Nunito se importaban pero ningun selector de esta hoja ni del
+   pack las nombra: no se autoalojan porque no se usan. */
+@font-face {
+  font-family: "Cairo";
+  font-style: normal;
+  font-weight: 200 1000;
+  font-display: swap;
+  src: url("/fonts/cairo-latin-variable.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url("/fonts/poppins-latin-300.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/poppins-latin-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/poppins-latin-500.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/poppins-latin-600.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/poppins-latin-700.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("/fonts/poppins-latin-800.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Open Sans";
+  font-style: normal;
+  font-weight: 300 800;
+  font-display: swap;
+  src: url("/fonts/open-sans-latin-variable.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Roboto";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/roboto-latin-variable.woff2") format("woff2");
+}
 :root {
   --primary: #0D99FF;
   --secondary: #2C2C2C;

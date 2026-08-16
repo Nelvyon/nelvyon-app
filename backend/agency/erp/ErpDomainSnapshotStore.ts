@@ -2,7 +2,10 @@
  * Durable ERP domain snapshot store (Blocks 26–29).
  *
  * Persists JSON payloads in `erp_domain_snapshots` with optimistic versioning.
- * Always sets `app.tenant_id` via set_config(…, true) inside transactions.
+ * Always sets `app.tenant_id` via set_config(…, true) inside transactions —
+ * lecturas incluidas, desde la migracion 542: las politicas ERP dejaron de
+ * abrir cuando el contexto falta, asi que una consulta sin GUC ya no devuelve
+ * «todo» sino «nada».
  */
 
 import { randomUUID } from "node:crypto";
@@ -70,14 +73,31 @@ async function setTenantGuc(client: pg.PoolClient, tenantId: string): Promise<vo
 export class ErpDomainSnapshotStore {
   constructor(private readonly db: DbClient = DbClient.getInstance()) {}
 
+  /**
+   * Read path. Runs inside a transaction ONLY to fix `app.tenant_id` first.
+   *
+   * Era el unico camino de esta clase que no fijaba el GUC: todas las
+   * escrituras llaman a `setTenantGuc`, la lectura no. Con la politica de RLS
+   * original —`nelvyon_erp_tenant_text() IS NULL OR tenant_id = ...`— daba
+   * igual, porque sin contexto la politica abria todo y el filtro por
+   * `tenant_id = $1` de aqui abajo hacia el trabajo.
+   *
+   * La migracion 542 quita esa rama para que la ausencia de contexto cierre en
+   * vez de abrir. Sin este `set_config`, esta consulta pasaria a devolver cero
+   * filas: el ERP arrancaria vacio para todo el mundo, sin un solo error. Por
+   * eso el cambio de politica y este de aqui van juntos.
+   */
   async loadSnapshot(tenantId: string, domain: ErpDomain): Promise<ErpSnapshotRow | null> {
-    const rows = await this.db.query<SnapshotDbRow>(
-      `SELECT payload, version
-         FROM erp_domain_snapshots
-        WHERE tenant_id = $1 AND domain = $2`,
-      [tenantId, domain],
-    );
-    const row = rows[0];
+    const row = await this.db.withTransaction(async (client) => {
+      await setTenantGuc(client, tenantId);
+      const result = await client.query<SnapshotDbRow>(
+        `SELECT payload, version
+           FROM erp_domain_snapshots
+          WHERE tenant_id = $1 AND domain = $2`,
+        [tenantId, domain],
+      );
+      return result.rows[0];
+    });
     if (!row) return null;
     return {
       payload: asPayload(row.payload),
