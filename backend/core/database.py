@@ -199,8 +199,18 @@ class DatabaseManager:
                 from core.contexto_rls import registrar as _registrar_contexto
 
                 _registrar_contexto(self.async_session_maker)
-            except Exception:  # noqa: BLE001 — nunca impedir el arranque por esto
-                logger.warning("No se pudo enganchar el contexto de inquilino a las sesiones")
+                logger.info("Contexto de inquilino enganchado a las sesiones")
+            except Exception as exc:  # noqa: BLE001 — nunca impedir el arranque por esto
+                # En ERROR y con la causa. Este fallo estuvo oculto tras un
+                # WARNING sin diagnostico: el gancho no llegaba a instalarse y
+                # solo se noto al retirar BYPASSRLS, cuando cada consulta
+                # autenticada empezo a devolver cero filas sin dar error.
+                logger.error(
+                    "No se pudo enganchar el contexto de inquilino a las sesiones: %s. "
+                    "Con un rol sin BYPASSRLS esto deja toda consulta autenticada sin "
+                    "contexto y las politicas devuelven cero filas en silencio.",
+                    exc, exc_info=True,
+                )
             logger.info("Async session maker created successfully")
 
             logger.info("Database connection initialized successfully")

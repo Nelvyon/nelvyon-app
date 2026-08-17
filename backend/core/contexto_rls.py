@@ -78,10 +78,15 @@ def sentencias_de_contexto(tenant_id: int | None, user_id: str | None) -> list[t
 def aplicar_contexto(sesion) -> int:
     """Fija el contexto de la peticion en la transaccion en curso.
 
+    `sesion` es cualquier cosa con `.execute()`: una `Session` o la `Connection`
+    que entrega `after_begin`. Se acepta cualquiera de las dos porque el gancho
+    usa la conexion y las pruebas usan la sesion.
+
     Devuelve cuantas variables se fijaron. Nunca lanza: un fallo aqui no puede
-    tumbar una peticion, porque hoy el contexto no decide nada. Cuando decida
-    —cuando el rol pierda BYPASSRLS—, la ausencia de contexto se manifiesta como
-    denegacion, que es el lado seguro.
+    tumbar una peticion. Con el rol sin BYPASSRLS, la ausencia de contexto se
+    manifiesta como denegacion, que es el lado seguro — pero denegar en silencio
+    tambien es un fallo, por eso se registra en DEBUG y hay un guard que
+    comprueba que el gancho esta puesto.
     """
     tenant_id = get_tenant_context()
     user_id = get_tenant_user_id()
@@ -98,14 +103,71 @@ def aplicar_contexto(sesion) -> int:
     return aplicadas
 
 
-def registrar(session_maker) -> None:
-    """Engancha la aplicacion del contexto al inicio de cada transaccion."""
+def clase_de_sesion_sincrona(session_maker):
+    """La clase sobre la que SI existe `after_begin`.
 
-    @event.listens_for(session_maker.class_, "after_begin")
+    EL FALLO QUE ESTO CORRIGE
+    ------------------------
+    `async_sessionmaker.class_` es `AsyncSession`, y `AsyncSession` NO tiene el
+    evento `after_begin`: los eventos de ORM viven en la `Session` sincrona que
+    `AsyncSession` envuelve. Engancharse a la clase asincrona lanza
+
+        InvalidRequestError: No such event 'after_begin' for target AsyncSession
+
+    y como quien llamaba a `registrar()` capturaba la excepcion para no impedir el
+    arranque, el gancho no se instalaba NUNCA y el unico rastro era una linea de
+    WARNING. Mientras el rol de conexion conservo BYPASSRLS daba igual, porque el
+    contexto no decidia nada. En el momento en que se le retiro, cada consulta
+    autenticada paso a evaluarse sin contexto: cero filas, sin error. Datos
+    legitimos invisibles.
+    """
+    return getattr(session_maker.class_, "sync_session_class", None) or session_maker.class_
+
+
+#: Clase enganchada -> listener instalado. Sirve para no duplicar el gancho y
+#: para que un guard pueda preguntar si esta puesto sin hurgar en los internos
+#: de SQLAlchemy.
+_ENGANCHADAS: dict[int, object] = {}
+
+
+def listener_instalado(objetivo):
+    """El listener enganchado a esa clase, o `None`. Para guards y pruebas."""
+    return _ENGANCHADAS.get(id(objetivo))
+
+
+def registrar(session_maker):
+    """Engancha la aplicacion del contexto al inicio de cada transaccion.
+
+    Devuelve el listener instalado, o `None` si ya lo estaba.
+
+    IDEMPOTENTE, Y POR QUE IMPORTA
+    ------------------------------
+    El evento se registra sobre la `Session` SINCRONA, que es una clase
+    compartida por todo el proceso: no es un gancho por motor ni por sesion. Dos
+    llamadas a `registrar()` —dos `DatabaseManager`, un reinicio del pool, una
+    prueba que lo invoca otra vez— dejarian dos listeners y el contexto se
+    fijaria dos veces por transaccion. No es incorrecto, pero es un viaje de ida
+    y vuelta a la base por cada transaccion y por cada duplicado.
+
+    Que sea global tambien tiene una consecuencia buena: la sesion de barridos
+    (`sesion_de_barrido`) recibe el mismo trato sin configurar nada, y los jobs
+    que declaran su inquilino con `contexto_de_inquilino` lo ven aplicado.
+    """
+    objetivo = clase_de_sesion_sincrona(session_maker)
+    if id(objetivo) in _ENGANCHADAS:
+        return None
+
+    @event.listens_for(objetivo, "after_begin")
     def _al_empezar(session, transaction, connection):  # noqa: ANN001
         # `after_begin` se dispara una vez por transaccion, incluidas las que
         # nacen despues de un commit dentro de la misma peticion.
         if session.info.get(_MARCA) is transaction:
             return
         session.info[_MARCA] = transaction
-        aplicar_contexto(session)
+        # Se escribe por la CONEXION que entrega el evento, no por la sesion:
+        # dentro de `after_begin` la sesion todavia esta estableciendo su
+        # transaccion, y pedirle un `execute` la reentra.
+        aplicar_contexto(connection)
+
+    _ENGANCHADAS[id(objetivo)] = _al_empezar
+    return _al_empezar
