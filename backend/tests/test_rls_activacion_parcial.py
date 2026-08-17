@@ -1376,15 +1376,37 @@ def rol_jobs(admin):
     La migracion 540 lo crea `NOLOGIN` a proposito: declara el mecanismo y deja
     el reparto de credenciales como acto explicito del operador. Aqui se le dan
     para poder certificarlo, y solo aqui.
+
+    LO QUE ESTA FIXTURE HACIA MAL
+    -----------------------------
+    Hasta la 544 concedia ademas
+    `GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public`. Eso
+    fabricaba un entorno mas permisivo que el real y es la razon exacta por la que
+    la bateria daba verde mientras produccion estaba rota: alli el rol solo tenia
+    privilegios sobre cinco catalogos, y el webhook de Stripe habria muerto con
+    `permission denied for table subscriptions`.
+
+    Una prueba que se concede a si misma los permisos que deberia estar
+    verificando no verifica nada. Ahora la fixture solo reparte credenciales; los
+    privilegios los tiene que haber puesto la migracion 544, y si no estan, la
+    comprobacion de abajo lo dice en vez de taparlo.
     """
     cur = admin.cursor()
     cur.execute("SELECT 1 FROM pg_roles WHERE rolname = 'nelvyon_jobs'")
     if cur.fetchone() is None:
         pytest.fail("falta el rol nelvyon_jobs; aplicar la migracion 540")
+
     cur.execute("ALTER ROLE nelvyon_jobs LOGIN PASSWORD 'nelvyon_jobs_cert'")
-    cur.execute("GRANT USAGE ON SCHEMA public TO nelvyon_jobs")
-    cur.execute("GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO nelvyon_jobs")
-    cur.execute("GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO nelvyon_jobs")
+
+    cur.execute(
+        "SELECT has_table_privilege('nelvyon_jobs', 'public.subscriptions', 'INSERT')")
+    if not cur.fetchone()[0]:
+        pytest.fail(
+            "nelvyon_jobs no puede insertar en subscriptions: falta la migracion "
+            "544. Sin ella el webhook de Stripe se rompe en cuanto la API deje de "
+            "usar un rol con BYPASSRLS."
+        )
+
     yield _dsn_del_rol(DSN, "nelvyon_jobs", "nelvyon_jobs_cert")
     # Se le retira LOGIN al terminar: el rol vuelve a como lo dejo la 540.
     cur.execute("ALTER ROLE nelvyon_jobs NOLOGIN")
