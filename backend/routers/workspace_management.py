@@ -122,6 +122,11 @@ async def _ensure_default_workspace(db: AsyncSession, user_id: str) -> Workspace
         created_at=datetime.now(timezone.utc),
     )
     db.add(default_ws)
+    await db.flush()
+    # Sin `current_user` en este camino: `_ensure_default_workspace` solo recibe
+    # el identificador. El correo es opcional en la pertenencia y se rellena
+    # cuando el usuario pase por una ruta que si lo conoce.
+    await _asegurar_pertenencia_owner(db, default_ws.id, user_id, None)
     await db.commit()
     await db.refresh(default_ws)
     logger.info("Auto-created default workspace %s for user %s", default_ws.id, user_id)
@@ -276,10 +281,15 @@ async def create_workspace(
         created_at=datetime.now(timezone.utc),
     )
     db.add(ws)
+    # `flush` y no `commit`: la pertenencia entra en la MISMA transaccion. Si
+    # fallara, no queda un workspace huerfano al que su dueño no puede acceder.
+    await db.flush()
+    await _asegurar_pertenencia_owner(db, ws.id, user_id,
+                                      getattr(current_user, "email", None))
     await db.commit()
     await db.refresh(ws)
 
-    logger.info(f"Workspace created: {ws.id} by user {user_id}")
+    logger.info(f"Workspace created: {ws.id} by user {user_id} (owner registrado)")
 
     return WorkspaceResponse(
         id=ws.id,
@@ -293,6 +303,54 @@ async def create_workspace(
         role="owner",
         members_count=1,
         created_at=ws.created_at.isoformat() if ws.created_at else None,
+    )
+
+
+async def _asegurar_pertenencia_owner(db, workspace_id: int, user_id: str,
+                                      email: str | None) -> None:
+    """Deja al creador como `owner` en `workspace_members`. Idempotente.
+
+    EL FALLO QUE ESTO CORRIGE
+    ------------------------
+    Crear un workspace insertaba la fila en `workspaces` y devolvia
+    `role: "owner", members_count: 1` — pero NUNCA escribia la pertenencia. La
+    respuesta mentia.
+
+    Con RLS activo eso deja al creador fuera de su propio workspace:
+    `nelvyon_user_in_workspace()` consulta esta tabla, asi que todas las politicas
+    `os_*` le deniegan y el producto aparece vacio para quien acaba de crearlo.
+
+    Se veia en produccion sin necesidad de leer codigo: 3 workspaces y 1 sola
+    pertenencia. Dos duenos sin acceso a lo suyo.
+
+    `ON CONFLICT DO NOTHING` sobre la restriccion de la 550 hace que un doble clic
+    o un reintento no dupliquen la fila.
+
+    EL CERROJO
+    ----------
+    Se toma el cerrojo de la fila del workspace antes de insertar. Aqui el
+    workspace acaba de crearse en esta misma transaccion, asi que no hay carrera
+    posible contra el tope de asientos — pero la regla es de la casa y no admite
+    excepciones por conveniencia: toda escritura en `workspace_members` serializa
+    contra su workspace. Si mañana esta funcion se reutiliza en un camino donde el
+    workspace ya existia, el cerrojo ya esta puesto.
+    """
+    await db.execute(
+        select(Workspaces.id).where(Workspaces.id == int(workspace_id)).with_for_update()
+    )
+    await db.execute(
+        text(
+            "INSERT INTO workspace_members "
+            "  (workspace_id, user_id, email, role, status, joined_at, created_at) "
+            "VALUES (:ws, :uid, :email, 'owner', 'active', :ahora, :ahora) "
+            # El indice de la 550 es PARCIAL —excluye invitaciones sin
+            # aceptar— y tanto PostgreSQL como SQLite exigen repetir su
+            # predicado aqui para poder acogerse a el.
+            "ON CONFLICT (workspace_id, user_id) "
+            "WHERE user_id IS NOT NULL AND user_id != '' DO NOTHING"
+        ),
+        {"ws": int(workspace_id), "uid": str(user_id), "email": email,
+         "ahora": datetime.now(timezone.utc).isoformat()},
     )
 
 
