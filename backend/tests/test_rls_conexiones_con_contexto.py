@@ -71,6 +71,15 @@ MARCAS_DE_CONTEXTO = ("contexto_de_inquilino", "sesion_de_barrido")
 #: guard: es una decision que merece una conversacion, no un `import`.
 CONSUMIDORES_DE_LA_SESION_PRIVILEGIADA = {
     "core/database.py": "es donde se define; el motor de jobs vive aqui y en ningun otro sitio",
+    "services/autopilot_loop.py": (
+        "barrido cross-tenant: el planner descubre trabajo de TODOS los "
+        "workspaces con Autopilot encendido, y el executor toma de una cola "
+        "compartida. Con la sesion normal, RLS ocultaria todos los workspaces "
+        "menos el del contexto — que en un bucle de fondo no existe. El acotado "
+        "no se pierde: lo pone la propia consulta del planner, que exige "
+        "pertenencia activa, y el resultado de cada trabajo cuenta solo su "
+        "workspace (probado: 1 y no 8)"
+    ),
     "services/vigilante_negocio.py": (
         "barrido cross-tenant: mide la salud de TODOS los inquilinos a la vez. "
         "Se desplego primero con la sesion normal y produccion informo 0 clientes "

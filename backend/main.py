@@ -233,6 +233,19 @@ async def startup_event():
         app.state.vigilante = arrancar_vigilante()
     except Exception as e:
         logger.error("Vigilante de negocio no arranco: %s", e, exc_info=True)
+
+    # Autopilot: planner y executor, cada uno con su intervalo. Separados del
+    # vigilante a proposito — un planner lento no puede frenar la ejecucion, y un
+    # executor atascado no puede impedir que se programe el trabajo de mañana.
+    try:
+        from services.autopilot_loop import arrancar as arrancar_autopilot
+
+        app.state.autopilot = arrancar_autopilot()
+    except Exception as e:
+        # Que Autopilot no arranque NO puede tumbar el API: los 14 servicios OS
+        # siguen sirviendo peticiones manuales exactamente igual.
+        logger.error("Autopilot no arranco: %s", e, exc_info=True)
+        app.state.autopilot = []
     # MODULE_STARTUP_END
 
     # Critical configuration warnings (non-fatal — allow graceful degradation)
@@ -282,6 +295,15 @@ async def shutdown_event():
     if tarea_vigilante is not None:
         tarea_vigilante.cancel()
         logger.info("Vigilante de negocio detenido")
+
+    tareas_autopilot = getattr(app.state, "autopilot", None)
+    if tareas_autopilot:
+        try:
+            from services.autopilot_loop import detener as detener_autopilot
+
+            await detener_autopilot(tareas_autopilot)
+        except Exception as e:
+            logger.warning("Autopilot no se detuvo limpiamente: %s", e)
 
     try:
         from services.os_web_builder_worker import stop_website_generation_workers
@@ -602,6 +624,23 @@ def root():
         "status": "operational",
         "environment": ENVIRONMENT,
     }
+
+
+@app.get("/health/autopilot")
+async def health_autopilot():
+    """Salud de AUTOPILOT, separada de la del API a proposito.
+
+    Que el proceso viva no dice nada sobre si Autopilot esta trabajando: sus
+    bucles pueden estar estancados con el API perfectamente sano. Esta ruta
+    responde esa otra pregunta, y nunca devuelve 5xx — un Autopilot degradado no
+    puede hacer que el orquestador reinicie el contenedor y tumbe el trafico.
+    """
+    try:
+        from services.autopilot_loop import estado
+
+        return estado()
+    except Exception as exc:  # noqa: BLE001
+        return {"status": "unknown", "reason": type(exc).__name__}
 
 
 @app.get("/health/business")
