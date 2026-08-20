@@ -71,6 +71,19 @@ MARCAS_DE_CONTEXTO = ("contexto_de_inquilino", "sesion_de_barrido")
 #: guard: es una decision que merece una conversacion, no un `import`.
 CONSUMIDORES_DE_LA_SESION_PRIVILEGIADA = {
     "core/database.py": "es donde se define; el motor de jobs vive aqui y en ningun otro sitio",
+    "services/vigilante_negocio.py": (
+        "barrido cross-tenant: mide la salud de TODOS los inquilinos a la vez. "
+        "Se desplego primero con la sesion normal y produccion informo 0 clientes "
+        "teniendo 1101 — sin peticion autenticada detras, `nelvyon_app` no tiene "
+        "contexto y RLS le oculta todo, asi que la vigilancia habria aprendido una "
+        "linea base de cero y jamas habria detectado una caida. Solo LEE conteos; "
+        "escribe unicamente en sus propias tablas de operacion"
+    ),
+    "main.py": (
+        "expone `/health/business`, que es la misma medicion cross-tenant que el "
+        "vigilante y por el mismo motivo. Es una ruta publica de solo lectura: "
+        "devuelve conteos agregados, nunca filas de ningun inquilino"
+    ),
     "services/social_scheduler_worker.py": (
         "barrido cross-tenant: pregunta que posts vencen en TODA la base, asi "
         "que no hay un inquilino que fijar antes de preguntar"

@@ -169,13 +169,15 @@ async def una_pasada(sesion, ahora: Optional[datetime] = None) -> dict[str, Any]
 
 
 async def _bucle() -> None:
-    from core.database import db_manager
+    from core.database import db_manager, sesion_de_barrido
 
     while True:
         try:
             await db_manager.ensure_initialized()
             if db_manager.async_session_maker:
-                async with db_manager.async_session_maker() as sesion:
+                # Barrido cross-tenant: con la sesion normal, RLS ocultaria todas
+                # las filas de inquilino y la vigilancia mediria ceros.
+                async with await sesion_de_barrido() as sesion:
                     resultado = await una_pasada(sesion)
                 if resultado["salud"] != "ok":
                     logger.warning("vigilante: %s", resultado)

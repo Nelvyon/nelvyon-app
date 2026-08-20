@@ -616,14 +616,18 @@ async def health_business():
     Nunca devuelve 5xx por una anomalia de negocio: mezclarlas haria que Railway
     reiniciara el contenedor por una caida de ventas. El estado va en el cuerpo.
     """
-    from core.database import db_manager
+    from core.database import db_manager, sesion_de_barrido
     from core.salud_negocio import revisar
 
     try:
         await db_manager.ensure_initialized()
         if not db_manager.async_session_maker:
             return {"status": "unknown", "reason": "sin sesion de base de datos"}
-        async with db_manager.async_session_maker() as sesion:
+        # SESION DE BARRIDO, no la normal. Esta ruta no tiene peticion autenticada
+        # detras, asi que con `nelvyon_app` RLS le ocultaria TODAS las filas de
+        # inquilino: se desplego asi y produccion informo 0 clientes teniendo 1101.
+        # La vigilancia es cross-tenant por definicion; esa es la via certificada.
+        async with await sesion_de_barrido() as sesion:
             return await revisar(sesion)
     except Exception as exc:  # noqa: BLE001
         logger.error("health/business fallo: %s", exc, exc_info=True)

@@ -200,3 +200,58 @@ async def test_recorrido_completo_aprende_y_luego_detecta():
             await s.execute(text("DELETE FROM business_health_baseline"))
             await s.commit()
         await motor.dispose()
+
+
+# ── el vigilante tiene que VER lo que vigila ────────────────────────────────
+
+
+@pytest.mark.skipif(not DSN, reason="sin NELVYON_PG_CERT_DSN")
+@pytest.mark.asyncio
+async def test_el_vigilante_ve_las_filas_reales_y_no_ceros_de_rls():
+    """EL FALLO QUE SE DETECTO EN PRODUCCION.
+
+    `/health/business` se desplego usando la sesion normal. Corre sin peticion
+    autenticada detras, asi que `nelvyon_app` no tiene contexto y RLS le oculta
+    TODAS las filas de inquilino. Produccion informo:
+
+        clientes_visibles: 0     teniendo 1101
+        entregables_producidos: 0 teniendo 5050
+
+    La consecuencia era peor que el sintoma: la vigilancia habria aprendido una
+    linea base de cero y desde ahi jamas podria detectar una caida. Un detector
+    ciego que responde `status: ok` da por cubierto lo que no mira.
+
+    Esta prueba compara lo que ve la vigilancia con lo que hay de verdad. Se salta
+    si el entorno no tiene datos: sin filas no distingue un cero legitimo de uno
+    causado por RLS, y un verde vacio aqui no significaria nada.
+    """
+    from sqlalchemy import text
+    from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
+    from core.salud_negocio import revisar
+
+    dsn = DSN.replace("postgresql://", "postgresql+asyncpg://").replace(
+        "@localhost:", "@127.0.0.1:")
+    motor = create_async_engine(dsn)
+    maker = async_sessionmaker(motor, expire_on_commit=False)
+    try:
+        async with maker() as s:
+            real = int((await s.execute(
+                text("SELECT count(*) FROM os_clients"))).scalar() or 0)
+        if real == 0:
+            pytest.skip("sin clientes en este entorno: el cero no seria concluyente")
+
+        async with maker() as s:
+            informe = await revisar(s)
+
+        visto = informe["measurements"].get("clientes_visibles")
+        assert visto == real, (
+            f"la vigilancia ve {visto} clientes y hay {real}. Si la diferencia es "
+            f"cero contra un numero, esta midiendo con un rol sin contexto y RLS "
+            f"le esta ocultando todo."
+        )
+    finally:
+        async with maker() as s:
+            await s.execute(text("DELETE FROM business_health_baseline"))
+            await s.commit()
+        await motor.dispose()
