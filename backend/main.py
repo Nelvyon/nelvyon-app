@@ -222,6 +222,17 @@ async def startup_event():
         await start_reporting_worker()
     except Exception as e:
         logger.warning("Executive reporting worker failed to start: %s", e)
+
+    # Vigilante de negocio: cada 15 minutos revisa la salud de NEGOCIO, abre
+    # incidentes, intenta recuperarlos solo y avisa de lo que sobrevive. Vive
+    # aqui, con los demas barridos, para no depender de infraestructura nueva ni
+    # del ordenador de nadie.
+    try:
+        from services.vigilante_negocio import arrancar as arrancar_vigilante
+
+        app.state.vigilante = arrancar_vigilante()
+    except Exception as e:
+        logger.error("Vigilante de negocio no arranco: %s", e, exc_info=True)
     # MODULE_STARTUP_END
 
     # Critical configuration warnings (non-fatal — allow graceful degradation)
@@ -266,6 +277,11 @@ async def shutdown_event():
         await stop_reporting_worker()
     except Exception as e:
         logger.warning("Executive reporting worker shutdown failed: %s", e)
+
+    tarea_vigilante = getattr(app.state, "vigilante", None)
+    if tarea_vigilante is not None:
+        tarea_vigilante.cancel()
+        logger.info("Vigilante de negocio detenido")
 
     try:
         from services.os_web_builder_worker import stop_website_generation_workers
