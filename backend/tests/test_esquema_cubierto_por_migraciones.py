@@ -49,7 +49,17 @@ pytestmark = pytest.mark.skipif(
 #:
 #: Anadir algo aqui exige justificarlo por escrito. Una excepcion que ya no
 #: excepciona nada solo sirve para tapar la siguiente.
-SIN_TABLA_NI_EN_PRODUCCION: set[str] = set()
+#: Modelos que NO deben tener tabla, con su motivo.
+#:
+#: `zz_modelo_sin_inquilino` lo declara `test_workspace_mixin_fails_closed` para
+#: comprobar que el mixin falla cerrado ante un modelo sin columna de inquilino.
+#: Vive solo en ese fichero — pero `Base.metadata` es un registro global y pytest
+#: IMPORTA todos los modulos de prueba durante la coleccion, antes de ejecutar
+#: ninguno, asi que aparece aqui aunque su fichero corra despues.
+#:
+#: Excluirlo no afloja nada: si algun dia alguien creara esa tabla de verdad, el
+#: guard inverso —el que comprueba que no sobran tablas— lo diria.
+SIN_TABLA_NI_EN_PRODUCCION: set[str] = {"zz_modelo_sin_inquilino"}
 
 
 def _tablas_de_los_modelos() -> set[str]:

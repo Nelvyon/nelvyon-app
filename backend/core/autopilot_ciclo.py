@@ -100,6 +100,72 @@ SELECT c.workspace_id,
 """
 
 
+#: Workspaces reales, activos, con dueño y sin Autopilot todavia.
+#:
+#: POR QUE EL PROVISIONING VIVE AQUI Y NO EN LA RUTA QUE CREA EL WORKSPACE
+#: -----------------------------------------------------------------------
+#: Se intento primero desde `routers/workspace_management.py`, y no funciona:
+#: `autopilot_workspace_settings` tiene RLS FORZADO con politicas de SELECT y
+#: UPDATE pero ninguna de INSERT, asi que el rol de la aplicacion recibe «new row
+#: violates row-level security policy». Habria fallado en silencio con cada
+#: cliente real, registrando una excepcion que nadie mira.
+#:
+#: La salida no es aflojar RLS ni darle BYPASSRLS al trafico normal. Es reconocer
+#: que encender Autopilot NO es una accion del usuario: es una accion del motor,
+#: igual que planificar o vigilar, y por tanto le toca al mismo bucle que ya corre
+#: como `nelvyon_jobs` con los privilegios justos que le dio la 552.
+#:
+#: Ademas cubre mas: un workspace creado por una invitacion, una importacion o un
+#: camino que aun no existe tambien acaba con Autopilot encendido, sin tener que
+#: acordarse de llamar a nada.
+_SQL_SIN_AUTOPILOT = """
+SELECT w.id
+  FROM workspaces w
+  JOIN workspace_members m
+    ON m.workspace_id = w.id AND m.role = 'owner' AND m.status = 'active'
+ WHERE w.status = 'active'
+   AND NOT EXISTS (SELECT 1 FROM autopilot_workspace_settings s
+                    WHERE s.workspace_id = w.id)
+   AND {workspace_real}
+   AND {correo_real}
+ ORDER BY w.id
+ LIMIT 50
+"""
+
+
+async def provisionar_nuevos(sesion) -> dict[str, Any]:
+    """Enciende Autopilot en los workspaces reales que aun no lo tienen.
+
+    Idempotente por construccion: solo mira los que NO tienen ajustes, y
+    `nacer_autopilot` tampoco duplica ni reactiva lo que el cliente apago.
+
+    Los inquilinos de prueba quedan fuera a proposito. Generar trabajo real para
+    clientes falsos no es autonomia, es ruido: ya costo 153 filas inutiles con el
+    CEO brief. Y el limite de 50 por pasada evita que una importacion masiva
+    convierta un ciclo del planner en una tarea de horas.
+    """
+    from core.inquilinos_reales import correo_real, workspace_real
+
+    sql = _SQL_SIN_AUTOPILOT.format(
+        workspace_real=workspace_real("w"), correo_real=correo_real("m.email"))
+    filas = (await sesion.execute(text(sql))).mappings().all()
+
+    encendidos = []
+    for f in filas:
+        try:
+            await nacer_autopilot(sesion, int(f["id"]))
+            encendidos.append(int(f["id"]))
+        except Exception:  # noqa: BLE001
+            # Un workspace que no se puede provisionar no puede impedir que los
+            # demas se provisionen.
+            logger.exception("autopilot: no se pudo provisionar el workspace %s",
+                             f["id"])
+    if encendidos:
+        await sesion.commit()
+        logger.info("autopilot: encendido en %s workspaces nuevos", len(encendidos))
+    return {"candidatos": len(filas), "encendidos": encendidos}
+
+
 async def planear(sesion, ahora: Optional[datetime] = None) -> dict[str, Any]:
     """Programa el trabajo que toca. Idempotente por periodo.
 
@@ -107,6 +173,9 @@ async def planear(sesion, ahora: Optional[datetime] = None) -> dict[str, Any]:
     restriccion unica decida. Dos planners simultaneos producen un solo trabajo.
     """
     ahora = ahora or datetime.now(timezone.utc)
+    # Antes de planificar, se enciende lo que falte: asi un cliente que se dio de
+    # alta hace un minuto entra en ESTA pasada y no en la siguiente.
+    provisionados = await provisionar_nuevos(sesion)
     filas = (await sesion.execute(text(_SQL_ELEGIBLES))).mappings().all()
 
     creados, ya_estaban = [], 0
@@ -123,7 +192,8 @@ async def planear(sesion, ahora: Optional[datetime] = None) -> dict[str, Any]:
         logger.info("autopilot planner: %s trabajos nuevos, %s ya existian",
                     len(creados), ya_estaban)
     return {"elegibles": len(filas), "creados": creados,
-            "ya_existian": ya_estaban}
+            "ya_existian": ya_estaban,
+            "provisionados": provisionados["encendidos"]}
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -211,9 +281,39 @@ def evidencia_de(resultado: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+_CAPACIDADES_CARGADAS = False
+
+
+def asegurar_capacidades() -> None:
+    """Carga las capacidades de los 14 servicios. Idempotente y perezoso.
+
+    Perezoso para no crear un import circular —`autopilot_capacidades` importa
+    `registrar` de aqui— y para que da igual quien sea el punto de entrada: el
+    bucle, una prueba o una consola. Si las capacidades no estuvieran cargadas,
+    `ejecutar_uno` no encontraria ejecutor y escalaria trabajo perfectamente sano.
+    """
+    global _CAPACIDADES_CARGADAS
+    if _CAPACIDADES_CARGADAS:
+        return
+    # Cada modulo se importa por separado a proposito. Si soporte fallara al
+    # cargar, los catorce servicios de OS deben seguir funcionando: un fallo de
+    # import que apagase TODO Autopilot convertiria un modulo roto en una empresa
+    # parada.
+    fallos = []
+    for modulo in ("core.autopilot_capacidades", "core.autopilot_lifecycle"):
+        try:
+            __import__(modulo)
+        except Exception:  # noqa: BLE001
+            fallos.append(modulo)
+            logger.exception("autopilot: no se pudo cargar %s", modulo)
+    if not fallos:
+        _CAPACIDADES_CARGADAS = True
+
+
 async def ejecutar_uno(sesion, trabajador: Optional[str] = None,
                        ahora: Optional[datetime] = None) -> Optional[dict[str, Any]]:
     """Toma un trabajo y lo lleva hasta entregado, o lo devuelve al ciclo."""
+    asegurar_capacidades()
     job = await tomar_trabajo(sesion, trabajador=trabajador, ahora=ahora)
     if job is None:
         await sesion.commit()
@@ -233,12 +333,24 @@ async def ejecutar_uno(sesion, trabajador: Optional[str] = None,
     handler, validador = par
 
     # ── PRODUCIR ────────────────────────────────────────────────────────
+    #
+    # El handler corre dentro de un SAVEPOINT y no por prolijidad. Si falla
+    # contra la base -- una columna que no existe, un CHECK, un deadlock --
+    # PostgreSQL aborta la transaccion entera y a partir de ahi rechaza
+    # cualquier orden. Sin el savepoint, `fallar()` tampoco podria escribir: el
+    # trabajo se quedaria bloqueado en `executing` hasta que expire el cerrojo y
+    # el motivo real se perderia detras de un «transaction is aborted». Con el
+    # savepoint solo se deshace lo que hizo el handler y la sesion sigue viva
+    # para dejar constancia de por que fallo.
     try:
-        resultado = await handler(sesion, job)
+        async with sesion.begin_nested():
+            resultado = await handler(sesion, job)
     except Exception as exc:  # noqa: BLE001
         estado = await fallar(sesion, job_id, EJECUTANDO,
                               f"{type(exc).__name__}: {exc}", cap.max_intentos)
         await sesion.commit()
+        logger.warning("autopilot: trabajo %s fallo en %s: %s",
+                       job_id, capacidad, type(exc).__name__)
         return {"id": job_id, "resultado": "fallo_ejecucion", "estado": estado}
 
     await avanzar(sesion, job_id, EJECUTANDO, PRODUCIDO, resultado=resultado)

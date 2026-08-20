@@ -56,6 +56,12 @@ class Writer:
     conflict_target: frozenset | None
     conflict_por_constraint: str | None
     fichero: str
+    #: `ON CONFLICT (...) WHERE ...`. Un indice unico PARCIAL solo sirve de
+    #: arbitro si la sentencia repite su predicado; PostgreSQL rechaza el INSERT
+    #: si no lo hace. Sin distinguirlo, el analizador daba por rota una escritura
+    #: perfectamente valida — y el «arreglo» evidente habria sido quitar el
+    #: ON CONFLICT, que es justo lo que protege de una carrera.
+    conflict_con_predicado: bool = False
 
 
 _INSERT_RE = re.compile(
@@ -64,6 +70,11 @@ _INSERT_RE = re.compile(
     re.IGNORECASE | re.DOTALL,
 )
 _ON_CONFLICT_COLS_RE = re.compile(r"ON\s+CONFLICT\s*\(\s*(?P<cols>[^)]+?)\s*\)", re.IGNORECASE)
+#: El WHERE que sigue al conflict target, antes de DO NOTHING / DO UPDATE.
+_ON_CONFLICT_WHERE_RE = re.compile(
+    r"ON\s+CONFLICT\s*\([^)]+\)\s*WHERE\s+.+?\s+DO\s+(?:NOTHING|UPDATE)",
+    re.IGNORECASE | re.DOTALL,
+)
 #: `ON CONFLICT ON CONSTRAINT nombre`: arbitro por nombre, no por columnas.
 _ON_CONFLICT_NAME_RE = re.compile(
     r"ON\s+CONFLICT\s+ON\s+CONSTRAINT\s+(?P<nombre>[a-z_][a-z0-9_]*)", re.IGNORECASE
@@ -92,6 +103,7 @@ def analizar_writers(sql: str, fichero: str = "<fixture>") -> list:
             conflict_target=_limpia(cols_target.group("cols")) if cols_target else None,
             conflict_por_constraint=por_nombre.group("nombre").lower() if por_nombre else None,
             fichero=fichero,
+            conflict_con_predicado=bool(_ON_CONFLICT_WHERE_RE.search(resto)),
         ))
     return fuera
 
@@ -119,6 +131,9 @@ class TablaPg:
     not_null_sin_relleno: set = field(default_factory=set)
     pk: frozenset = frozenset()
     arbitros: set = field(default_factory=set)
+    #: Indices unicos PARCIALES o de expresion. Solo valen como arbitro cuando la
+    #: sentencia repite el predicado.
+    arbitros_parciales: set = field(default_factory=set)
     arbitros_por_nombre: set = field(default_factory=set)
     triggers_insert: bool = False
 
@@ -178,9 +193,10 @@ def leer_catalogo(cursor) -> dict:
     for relname, indice, cols, es_pk, parcial in cursor.fetchall():
         t = tabla(relname)
         t.arbitros_por_nombre.add(indice)
-        if parcial:
-            continue
         conjunto = frozenset(cols or ())
+        if parcial:
+            t.arbitros_parciales.add(conjunto)
+            continue
         t.arbitros.add(conjunto)
         if es_pk:
             t.pk = conjunto
@@ -219,11 +235,23 @@ def comparar(writers: list, esquema: dict) -> list:
                     ON_CONFLICT_DRIFT, w.tabla, (w.conflict_por_constraint,), w.fichero,
                     "ON CONFLICT ON CONSTRAINT sin constraint de ese nombre"))
         elif w.conflict_target is not None:
-            if w.conflict_target not in t.arbitros:
+            total = w.conflict_target in t.arbitros
+            # Un indice parcial cuenta SOLO si la sentencia repite su predicado.
+            # Lo contrario tambien es un hallazgo: apuntar a un indice parcial sin
+            # WHERE es un INSERT que PostgreSQL rechaza en produccion y que SQLite
+            # acepta sin rechistar.
+            parcial = w.conflict_target in t.arbitros_parciales
+            if not total and not (parcial and w.conflict_con_predicado):
                 disponibles = sorted(tuple(sorted(a)) for a in t.arbitros)
+                motivo = (
+                    "apunta a un indice unico PARCIAL sin repetir su predicado "
+                    "(`ON CONFLICT (...) WHERE ...`): PostgreSQL lo rechaza"
+                    if parcial else
+                    f"sin PK/UNIQUE con ese conjunto exacto; "
+                    f"disponibles: {disponibles or 'ninguno'}")
                 fuera.append(Hallazgo(
-                    ON_CONFLICT_DRIFT, w.tabla, tuple(sorted(w.conflict_target)), w.fichero,
-                    f"sin PK/UNIQUE con ese conjunto exacto; disponibles: {disponibles or 'ninguno'}"))
+                    ON_CONFLICT_DRIFT, w.tabla, tuple(sorted(w.conflict_target)),
+                    w.fichero, motivo))
 
         for col in sorted(t.not_null_sin_relleno - w.columnas):
             if t.triggers_insert:

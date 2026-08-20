@@ -237,3 +237,65 @@ def test_ningun_on_conflict_sin_arbitro(catalogo):
         h for h in comparar(writers_del_repo(), catalogo) if h.clase == ON_CONFLICT_DRIFT
     ]
     assert not hallazgos, "\n".join(str(h) for h in hallazgos)
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# La regla de los indices unicos PARCIALES
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# El analizador los descartaba como arbitros, sin mas. La migracion 550 creo uno
+# —pertenencia unica por workspace, `WHERE user_id IS NOT NULL AND user_id <> ''`,
+# parcial para no romper las invitaciones pendientes— y desde entonces el guard
+# daba por rota una escritura correcta. El «arreglo» evidente habria sido quitar
+# el ON CONFLICT, que es exactamente lo que protege de la carrera que dejo tres
+# workspaces con una sola pertenencia en produccion.
+#
+# La regla real de PostgreSQL es que un indice parcial SI sirve de arbitro,
+# siempre que la sentencia repita su predicado. Eso es lo que se comprueba, en
+# los dos sentidos: sin el WHERE tiene que seguir siendo un hallazgo.
+
+
+def _esquema_con_indice_parcial():
+    from tests._constraint_drift import TablaPg
+
+    t = TablaPg(columnas={"workspace_id", "user_id", "email"})
+    t.arbitros_parciales.add(frozenset({"workspace_id", "user_id"}))
+    return {"workspace_members": t}
+
+
+_INSERT = ("INSERT INTO workspace_members (workspace_id, user_id, email) "
+           "VALUES (1,'2','x') ON CONFLICT (workspace_id, user_id) ")
+
+
+def test_un_indice_parcial_vale_de_arbitro_si_se_repite_su_predicado():
+    from tests._constraint_drift import analizar_writers, comparar
+
+    w = analizar_writers(
+        _INSERT + "WHERE user_id IS NOT NULL AND user_id != '' DO NOTHING", "x.py")
+    assert w[0].conflict_con_predicado is True
+    assert comparar(w, _esquema_con_indice_parcial()) == []
+
+
+def test_un_indice_parcial_sin_predicado_sigue_siendo_un_hallazgo():
+    """PostgreSQL rechaza ese INSERT. SQLite lo acepta sin rechistar.
+
+    Es justo el tipo de divergencia que solo se ve certificando contra la base de
+    verdad, y por eso este guard existe.
+    """
+    from tests._constraint_drift import analizar_writers, comparar
+
+    w = analizar_writers(_INSERT + "DO NOTHING", "x.py")
+    assert w[0].conflict_con_predicado is False
+    hallazgos = comparar(w, _esquema_con_indice_parcial())
+    assert len(hallazgos) == 1
+    assert "PARCIAL" in hallazgos[0].motivo
+
+
+def test_un_indice_total_no_necesita_predicado():
+    """La regla nueva no puede haber aflojado el caso normal."""
+    from tests._constraint_drift import TablaPg, analizar_writers, comparar
+
+    t = TablaPg(columnas={"workspace_id", "user_id", "email"})
+    t.arbitros.add(frozenset({"workspace_id", "user_id"}))
+    assert comparar(analizar_writers(_INSERT + "DO NOTHING", "x.py"),
+                    {"workspace_members": t}) == []

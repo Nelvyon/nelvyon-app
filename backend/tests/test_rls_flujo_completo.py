@@ -291,6 +291,16 @@ RESIDUO_SIN_INSERT = {
     "os_website_templates",
     "changelog_entries",
     "roadmap_items",
+    # Las tres de Autopilot no son catalogos: las escribe el MOTOR y solo el
+    # motor. Tienen SELECT y UPDATE —un cliente ve sus trabajos y apaga las
+    # capacidades que no quiera— pero no INSERT, a proposito: si un inquilino
+    # pudiera crearse trabajos se saltaria el plan contratado y la clasificacion
+    # de riesgo del catalogo. El motivo largo esta en `RESIDUO_ESCRIBE_EL_MOTOR`
+    # de `test_rls_politicas_completas`, y hay una prueba que comprueba con el rol
+    # de la aplicacion real que ese INSERT sigue rechazandose.
+    "autopilot_jobs",
+    "autopilot_workspace_settings",
+    "autopilot_workspace_capabilities",
 }
 
 

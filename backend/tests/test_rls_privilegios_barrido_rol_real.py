@@ -63,10 +63,52 @@ LECTURA = [
     "public_analytics_events", "tickets", "ticket_messages",
     "workspaces", "workspace_members",
 ]
-CONCEDIDAS = set(ESCRITURA) | set(ACTUALIZACION) | set(LECTURA)
+
+# ── lo que anadieron las migraciones posteriores ────────────────────────────
+#
+# Esta lista llevaba parada en el mapa de la 544 mientras cinco migraciones mas
+# repartian privilegios. Como la bateria entera solo corre con un PostgreSQL de
+# certificacion, nadie lo vio: se saltaba. Cada entrada de abajo esta trazada al
+# codigo que la consume, y si manana sobra una, esta prueba lo dice.
+
+#: 546 y 548-549 — el vigilante de negocio y la autorrecuperacion.
+VIGILANCIA_LECTURA = ["onboarding_progress", "stripe_webhook_events",
+                      "os_clients", "os_deliverables", "os_projects"]
+VIGILANCIA_ESCRITURA = ["business_health_baseline", "business_incidents",
+                        "recovery_circuit"]
+
+#: 551-552 — el nucleo de Autopilot. `autopilot_capabilities` y `plan_rango` son
+#: catalogos: se leen, no se tocan. Los otros tres los ESCRIBE el motor, y solo
+#: el motor: sus tablas tienen RLS forzado sin politica de INSERT, asi que el rol
+#: de la aplicacion no puede crearlos aunque lo intente.
+AUTOPILOT_LECTURA = ["autopilot_capabilities", "plan_rango"]
+AUTOPILOT_ESCRITURA = ["autopilot_jobs", "autopilot_workspace_settings",
+                       "autopilot_workspace_capabilities"]
+
+#: 554 — los 14 servicios de OS. Catorce handlers solo leen; uno escribe, y
+#: escribe UNA columna (`os_tasks.metadata`), otorgada por columna.
+OS_LECTURA = ["os_tasks", "os_cashflow", "os_expenses", "os_deals",
+              "os_store_projects", "os_website_projects"]
+
+#: 555 — soporte y ciclo de vida. Igual: solo `helpdesk_tickets.category` se
+#: escribe, y tambien por columna.
+SOPORTE_LECTURA = ["helpdesk_tickets", "support_templates",
+                   "onboarding_workspace_steps"]
+
+CONCEDIDAS = (
+    set(ESCRITURA) | set(ACTUALIZACION) | set(LECTURA)
+    | set(VIGILANCIA_LECTURA) | set(VIGILANCIA_ESCRITURA)
+    | set(AUTOPILOT_LECTURA) | set(AUTOPILOT_ESCRITURA)
+    | set(OS_LECTURA) | set(SOPORTE_LECTURA)
+)
 
 #: Tablas que el rol NO debe alcanzar. Cada una es un camino de usuario servido
 #: por el API, no un barrido.
+#:
+#: `support_tickets` sigue aqui, y ahora con mas razon. Tuvo SELECT durante un
+#: tiempo porque el vigilante la consultaba para «tickets sin respuesta»… siendo
+#: una tabla vacia que ningun codigo escribe. La comprobacion devolvia cero para
+#: siempre. Corregida para mirar `helpdesk_tickets`, la 555 retira el privilegio.
 PROHIBIDAS = ["oauth_connections", "support_tickets", "workspace_members_invites"]
 
 

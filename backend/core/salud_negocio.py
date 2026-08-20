@@ -241,11 +241,25 @@ COMPROBACIONES: list[Comprobacion] = [
     # ── soporte ───────────────────────────────────────────────────────────
     Comprobacion(
         metrica="tickets_sin_respuesta",
-        descripcion="Tickets abiertos con mas de 24 horas sin actualizar",
+        descripcion="Tickets abiertos con mas de 24 horas sin primera respuesta",
+        # `helpdesk_tickets`, no `support_tickets`.
+        #
+        # Esta comprobacion nacio apuntando a `support_tickets`: una tabla vacia,
+        # sin `workspace_id` y que NINGUN codigo escribe. La base tiene cinco
+        # tablas de tickets y solo una esta viva — `helpdesk_tickets`, con 23
+        # columnas, modelo, router, contrato canonico de estados y quince
+        # consumidores. Preguntando a la muerta, la comprobacion devolvia cero
+        # para siempre: un cliente con un ticket pudriendose una semana no habria
+        # levantado nada, y el silencio era indistinguible de que todo fuera bien.
+        #
+        # Se mide la PRIMERA RESPUESTA y no `updated_at` porque es lo que el
+        # cliente nota. Un ticket que alguien reetiqueta cada hora sin contestarle
+        # esta igual de abandonado.
         sql=(
-            "SELECT count(*) FROM support_tickets "
+            "SELECT count(*) FROM helpdesk_tickets "
             "WHERE status NOT IN ('closed','resolved') "
-            "AND updated_at < now() - interval '24 hours'"
+            "AND first_response_minutes IS NULL "
+            "AND created_at < now() - interval '24 hours'"
         ),
         caida_relevante=0.0,
         severidad=ALTO,
@@ -264,6 +278,109 @@ COMPROBACIONES: list[Comprobacion] = [
         impacto="Si cae, o hay bajas o el aislamiento esta ocultando pertenencias "
                 "legitimas — el segundo caso es un fallo, no una metrica.",
         requiere_humano=True,
+    ),
+    # ── Autopilot: quien vigila al que trabaja solo ───────────────────────
+    #
+    # Hasta aqui el vigilante miraba el negocio pero no miraba a Autopilot, y
+    # Autopilot es justo lo que corre cuando no hay nadie delante. Un motor
+    # autonomo sin supervisor no es autonomia: es una caja negra que puede llevar
+    # semanas parada sin que nadie lo note, porque un motor que no produce tiene
+    # exactamente la misma pinta que uno sin trabajo que hacer.
+    Comprobacion(
+        metrica="autopilot_trabajos_escalados",
+        descripcion="Trabajos de Autopilot que agotaron sus reintentos",
+        sql="SELECT count(*) FROM autopilot_jobs WHERE estado = 'escalated'",
+        caida_relevante=0.0,
+        severidad=ALTO,
+        impacto="Autopilot lo intento hasta rendirse. Cada uno es trabajo que el "
+                "cliente esperaba y no ha recibido, y nadie lo sabra si no se "
+                "avisa: el motor sigue verde porque escalar es su final correcto.",
+        accion_automatica="reintento con backoff antes de escalar",
+        requiere_humano=True,
+        cooldown_min=30,
+        subir_es_malo=True,
+    ),
+    Comprobacion(
+        metrica="autopilot_cola_atascada",
+        descripcion="Trabajos vencidos hace mas de una hora y sin tomar",
+        sql=(
+            "SELECT count(*) FROM autopilot_jobs "
+            "WHERE estado = 'scheduled' "
+            # `programado_para`, no `creado_en`: un trabajo creado hoy y programado
+            # para el lunes no esta atascado, esta esperando su turno.
+            "AND COALESCE(proximo_intento, programado_para) < now() - interval '1 hour'"
+        ),
+        caida_relevante=0.0,
+        severidad=ALTO,
+        impacto="Hay trabajo listo que nadie recoge. O el executor no corre, o "
+                "corre y no llega. Los dos casos se ven igual desde fuera: la cola "
+                "crece en silencio.",
+        cooldown_min=30,
+        subir_es_malo=True,
+    ),
+    Comprobacion(
+        metrica="autopilot_bloqueados_por_worker_muerto",
+        descripcion="Trabajos en ejecucion con el cerrojo ya caducado",
+        sql=(
+            "SELECT count(*) FROM autopilot_jobs "
+            "WHERE estado = 'running' AND locked_until IS NOT NULL "
+            "AND locked_until < now() - interval '30 minutes'"
+        ),
+        caida_relevante=0.0,
+        severidad=MEDIO,
+        impacto="Un contenedor murio a media ejecucion. El cerrojo caduca por "
+                "tiempo y otro worker lo retomara, asi que no es urgente; que se "
+                "repita si lo es, porque significa que algo mata contenedores.",
+        accion_automatica="el cerrojo expira y otro worker retoma el trabajo",
+        cooldown_min=120,
+        subir_es_malo=True,
+    ),
+    Comprobacion(
+        metrica="autopilot_entregas_sin_evidencia",
+        descripcion="Trabajos entregados sin evidencia verificable",
+        sql=(
+            "SELECT count(*) FROM autopilot_jobs "
+            "WHERE estado IN ('delivered','confirmed') AND evidencia IS NULL"
+        ),
+        caida_relevante=0.0,
+        severidad=CRITICO,
+        impacto="No deberia poder existir: hay un CHECK en la tabla que lo impide. "
+                "Si aparece una sola fila, alguien desactivo la restriccion o "
+                "escribio por debajo del nucleo. Es el mismo defecto que ya "
+                "produjo 2742 entregables marcados como entregados sin nada que "
+                "entregar.",
+        requiere_humano=True,
+        cooldown_min=15,
+        subir_es_malo=True,
+    ),
+    Comprobacion(
+        metrica="autopilot_capacidades_sin_ejecutor",
+        descripcion="Trabajos de capacidades que ningun modulo sabe ejecutar",
+        sql=(
+            "SELECT count(*) FROM autopilot_jobs "
+            "WHERE estado = 'escalated' "
+            "AND ultimo_error LIKE 'capacidad sin ejecutor conectado%'"
+        ),
+        caida_relevante=0.0,
+        severidad=ALTO,
+        impacto="El catalogo promete una capacidad que el codigo no implementa. "
+                "Pasa al desplegar una migracion de catalogo sin el modulo que la "
+                "atiende, y convierte trabajo sano en trabajo escalado.",
+        requiere_humano=True,
+        cooldown_min=60,
+        subir_es_malo=True,
+    ),
+    Comprobacion(
+        metrica="autopilot_trabajos_confirmados",
+        descripcion="Trabajos de Autopilot confirmados en total",
+        sql="SELECT count(*) FROM autopilot_jobs WHERE estado = 'confirmed'",
+        caida_relevante=1.0,
+        severidad=CRITICO,
+        impacto="Es el unico numero que dice que Autopilot esta PRODUCIENDO y no "
+                "solo encendido. Un acumulado no puede bajar, asi que si baja es "
+                "que alguien borro trabajo confirmado.",
+        requiere_humano=True,
+        cooldown_min=30,
     ),
 ]
 

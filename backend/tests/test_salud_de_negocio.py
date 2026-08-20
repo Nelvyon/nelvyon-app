@@ -126,8 +126,65 @@ def test_estan_cubiertos_los_caminos_que_importan():
     metricas = {c.metrica for c in COMPROBACIONES}
     for esperada in ("clientes_visibles", "entregables_producidos",
                      "suscripciones_activas", "webhooks_stripe_con_error",
-                     "tickets_sin_respuesta"):
+                     "tickets_sin_respuesta",
+                     # Autopilot es lo que corre cuando no hay nadie delante. Un
+                     # motor autonomo sin supervisor no es autonomia.
+                     "autopilot_trabajos_escalados", "autopilot_cola_atascada",
+                     "autopilot_entregas_sin_evidencia",
+                     "autopilot_trabajos_confirmados"):
         assert esperada in metricas, f"falta la comprobacion {esperada}"
+
+
+def test_ninguna_comprobacion_busca_un_estado_que_no_existe():
+    """Un estado mal escrito devuelve 0 para siempre.
+
+    Y 0 para siempre es indistinguible de «todo bien». La comprobacion del worker
+    muerto nacio buscando `executing` cuando el estado se llama `running`: no
+    habria encontrado nunca nada, y nadie lo habria notado porque su silencio era
+    exactamente el esperado.
+
+    Este guard lo hace imposible: cualquier literal que se compare contra
+    `estado` tiene que ser un estado real de la maquina.
+    """
+    import re
+
+    from core.autopilot import TRANSICIONES
+
+    reales = set(TRANSICIONES) | {e for s in TRANSICIONES.values() for e in s}
+    patron = re.compile(r"estado\s*(?:=|IN)\s*\(?\s*((?:'[a-z_]+'\s*,?\s*)+)")
+    for c in COMPROBACIONES:
+        for grupo in patron.findall(c.sql):
+            for literal in re.findall(r"'([a-z_]+)'", grupo):
+                assert literal in reales, (
+                    f"{c.metrica} busca el estado '{literal}', que no existe. "
+                    f"Estados reales: {sorted(reales)}")
+
+
+def test_lo_que_no_deberia_poder_existir_se_vigila_como_critico():
+    """Una entrega sin evidencia la impide un CHECK de la base.
+
+    Que exista la comprobacion NO es redundante: si aparece una fila, significa
+    que alguien quito la restriccion o escribio por debajo del nucleo, y eso es
+    peor que el problema original.
+    """
+    por_metrica = {c.metrica: c for c in COMPROBACIONES}
+    sin_evidencia = por_metrica["autopilot_entregas_sin_evidencia"]
+    assert sin_evidencia.severidad == "critical"
+    assert sin_evidencia.subir_es_malo is True
+    assert sin_evidencia.cooldown_min <= 15
+
+
+def test_un_motor_parado_no_se_confunde_con_uno_sin_trabajo():
+    """`autopilot_trabajos_confirmados` es acumulado y a la baja a proposito.
+
+    Vigilar «trabajos en cola» diria que todo va bien con la cola vacia, que es
+    exactamente como se ve un motor muerto. Lo que no puede bajar es lo que ya
+    produjo.
+    """
+    por_metrica = {c.metrica: c for c in COMPROBACIONES}
+    confirmados = por_metrica["autopilot_trabajos_confirmados"]
+    assert confirmados.subir_es_malo is False, "producir mas no es una anomalia"
+    assert confirmados.severidad == "critical"
 
 
 def test_el_dinero_se_vigila_mas_de_cerca_que_el_resto():

@@ -596,6 +596,23 @@ RESIDUO_SIN_INSERT = {
     "roadmap_items": "idem, contenido de producto cargado por mantenimiento",
 }
 
+#: Tablas que ESCRIBE el motor y solo el motor.
+#:
+#: Tienen politica de SELECT y de UPDATE —un cliente puede ver sus trabajos y
+#: apagar sus capacidades— pero ninguna de INSERT, y eso es deliberado: crear un
+#: trabajo de Autopilot o darse de alta capacidades no es una accion de usuario.
+#: Lo hace el planner, que corre como `nelvyon_jobs` con BYPASSRLS.
+#:
+#: Una politica de INSERT aqui dejaria que un inquilino se programara trabajo a si
+#: mismo saltandose el plan contratado y la clasificacion de riesgo del catalogo.
+#: Por eso hay una prueba en `test_provisioning_de_inquilinos` que comprueba, con
+#: el rol de la aplicacion de verdad, que ese INSERT sigue siendo rechazado.
+RESIDUO_ESCRIBE_EL_MOTOR = {
+    "autopilot_jobs": "los trabajos los crea el planner, no el inquilino",
+    "autopilot_workspace_settings": "el provisioning es del motor; el cliente apaga con UPDATE",
+    "autopilot_workspace_capabilities": "idem: se activan al nacer, se apagan con UPDATE",
+}
+
 #: Tablas de solo-añadir. La ausencia de UPDATE/DELETE ES el control, no un hueco.
 RESIDUO_INMUTABLE = {
     "audit_logs": "un registro que su inquilino pueda reescribir no audita nada",
@@ -644,9 +661,10 @@ async def test_el_residuo_sin_insert_es_exactamente_el_catalogo_declarado(escena
     """
     admin, _ = escenario
     sin_insert = {f["tablename"] for f in await admin.fetch(_SIN_VERBO, "INSERT")}
-    assert sin_insert == set(RESIDUO_SIN_INSERT), (
-        f"residuo inesperado. sobran={sorted(sin_insert - set(RESIDUO_SIN_INSERT))} "
-        f"faltan={sorted(set(RESIDUO_SIN_INSERT) - sin_insert)}"
+    esperado = set(RESIDUO_SIN_INSERT) | set(RESIDUO_ESCRIBE_EL_MOTOR)
+    assert sin_insert == esperado, (
+        f"residuo inesperado. sobran={sorted(sin_insert - esperado)} "
+        f"faltan={sorted(esperado - sin_insert)}"
     )
 
 
@@ -665,8 +683,12 @@ async def test_las_tablas_de_solo_anadir_son_las_declaradas(escenario):
     sin_update = {f["tablename"] for f in await admin.fetch(_SIN_VERBO, "UPDATE")}
     sin_delete = {f["tablename"] for f in await admin.fetch(_SIN_VERBO, "DELETE")}
 
+    # Las del motor NO entran en `esperado_update`: si tienen politica de UPDATE
+    # a proposito, para que el cliente pueda apagar lo que no quiera. Solo les
+    # falta INSERT, y en DELETE se comportan como los catalogos: borrar el
+    # historial de lo que Autopilot hizo destruiria la evidencia de las entregas.
     esperado_update = set(RESIDUO_INMUTABLE) | set(RESIDUO_SIN_INSERT)
-    esperado_delete = esperado_update | {
+    esperado_delete = esperado_update | set(RESIDUO_ESCRIBE_EL_MOTOR) | {
         "affiliate_profiles", "os_store_orders", "support_tickets",
     }
     assert sin_update == esperado_update, (

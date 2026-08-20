@@ -177,7 +177,15 @@ async def test_el_planner_no_repite_trabajo_del_mismo_periodo(ws):
 # ═══════════════════════════════════════════════════════════════════════════
 
 
-async def test_dos_planners_concurrentes_crean_un_solo_trabajo(ws):
+async def test_dos_planners_concurrentes_no_duplican_trabajo(ws):
+    """Dos replicas planificando a la vez producen UN trabajo por capacidad.
+
+    La version original de esta prueba exigia `total == 1` porque en su momento
+    solo habia una capacidad conectada. Con veintiuna, ese numero media cuantas
+    capacidades hay, no si hubo duplicados — y habria seguido «pasando» mientras
+    el catalogo no creciera. Lo que importa se mide directamente: que ninguna
+    (capacidad, periodo) aparezca dos veces.
+    """
     from core.autopilot_ciclo import planear
 
     async def _planear():
@@ -185,8 +193,19 @@ async def test_dos_planners_concurrentes_crean_un_solo_trabajo(ws):
             return await planear(s)
 
     a, b = await asyncio.gather(_planear(), _planear())
-    total = len(a["creados"]) + len(b["creados"])
-    assert total == 1, f"dos planners crearon {total} trabajos"
+    creados = len(a["creados"]) + len(b["creados"])
+    assert creados > 0, "ninguno de los dos planners programo nada"
+
+    filas = await ws["adm"].fetch(
+        "SELECT capacidad, idempotency_key FROM autopilot_jobs WHERE workspace_id=$1",
+        ws["id"])
+    assert len(filas) == creados, (
+        f"se crearon {creados} trabajos y hay {len(filas)} filas")
+    claves = [f["idempotency_key"] for f in filas]
+    assert len(claves) == len(set(claves)), "hay claves de idempotencia repetidas"
+    capacidades = [f["capacidad"] for f in filas]
+    assert len(capacidades) == len(set(capacidades)), (
+        f"una capacidad se programo dos veces en el mismo periodo: {capacidades}")
 
 
 async def test_dos_workers_concurrentes_no_ejecutan_el_mismo(ws):

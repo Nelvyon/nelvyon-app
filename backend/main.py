@@ -669,8 +669,71 @@ async def health_business():
         async with await sesion_de_barrido() as sesion:
             return await revisar(sesion)
     except Exception as exc:  # noqa: BLE001
-        logger.error("health/business fallo: %s", exc, exc_info=True)
+        # `logger` no existe a nivel de modulo en este fichero. Tal cual estaba,
+        # este `except` lanzaba NameError y la ruta devolvia 500 — justo lo que
+        # su docstring promete que nunca pasa, y solo en el momento en que algo
+        # ya iba mal.
+        logging.getLogger(__name__).error(
+            "health/business fallo: %s", exc, exc_info=True)
         return {"status": "unknown", "reason": type(exc).__name__}
+
+
+@app.get("/control-center")
+async def control_center(request: Request):
+    """El panel del fundador. CERRADO salvo que haya un secreto configurado.
+
+    POR QUE NO REUSA LA AUTENTICACION NORMAL
+    ----------------------------------------
+    Porque esta vista cruza inquilinos por definicion: muestra el estado de TODA
+    la empresa. No hay ningun rol de producto que deba poder verla, asi que no se
+    cuelga de la sesion de un usuario. Se cuelga de un secreto que solo tiene el
+    operador.
+
+    FAIL-CLOSED
+    -----------
+    Sin `NELVYON_CONTROL_CENTER_TOKEN` en el entorno, la ruta responde 404 y no
+    consulta nada. Un panel de plataforma que se abriera solo porque alguien
+    olvido configurarlo seria peor que no tenerlo: expondria todos los inquilinos
+    sin que nadie hubiera decidido abrirlo.
+
+    La comparacion es en tiempo constante. El token va en cabecera, nunca en la
+    URL: las URLs acaban en logs de acceso, en historiales y en referers.
+    """
+    import hmac
+    import os as _os
+
+    esperado = _os.environ.get("NELVYON_CONTROL_CENTER_TOKEN", "")
+    if not esperado:
+        raise HTTPException(status_code=404, detail="Not Found")
+
+    recibido = request.headers.get("x-control-token", "")
+    if not hmac.compare_digest(recibido, esperado):
+        # 404 y no 401: quien no tiene el secreto no debe ni saber que existe.
+        raise HTTPException(status_code=404, detail="Not Found")
+
+    from core.centro_de_control import componer
+    from core.database import db_manager, sesion_de_barrido
+
+    try:
+        await db_manager.ensure_initialized()
+        if not db_manager.async_session_maker:
+            return {"generado_en": None, "veredicto": {
+                "estado": "desconocido", "requiere_atencion": True,
+                "frase": "Sin sesion de base de datos"}, "bloques": {}}
+        async with await sesion_de_barrido() as sesion:
+            return await componer(sesion)
+    except HTTPException:
+        raise
+    except Exception as exc:  # noqa: BLE001
+        # `logger` local, como el resto de este fichero: aqui no hay uno de
+        # modulo, y usarlo sin definirlo daria NameError justo en el camino de
+        # error, tapando el fallo original con otro distinto.
+        logging.getLogger(__name__).error(
+            "control-center fallo: %s", exc, exc_info=True)
+        return {"generado_en": None, "veredicto": {
+            "estado": "desconocido", "requiere_atencion": True,
+            "frase": f"El panel no se pudo componer: {type(exc).__name__}"},
+            "bloques": {}}
 
 
 @app.get("/health/ready")

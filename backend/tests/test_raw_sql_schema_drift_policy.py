@@ -40,8 +40,31 @@ PERMITIDAS: dict[tuple[str, str], dict[str, str]] = {}
 #: capacidades del workspace, ajustes, catalogo, suscripcion y rango de plan— y el
 #: analizador no atribuye columnas cuando hay tantos origenes. No es deriva: esas
 #: tablas las crean las migraciones 551 y 552.
-UNRESOLVED_BASELINE = 121
-UNRESOLVED_POR_MOTIVO = {"join_ambiguo": 92, "multiples_from": 29}
+#: Sube a 123 al conectar los 14 servicios de OS (`core/autopilot_capacidades.py`).
+#: Las dos nuevas son `multiples_from` y salen las dos de la MISMA consulta: la
+#: unica capacidad que escribe, `marcar_vencidas`, usa un CTE que selecciona `id`
+#: y `due_date` de `os_tasks` y luego actualiza esa misma tabla, asi que el
+#: analizador la ve mencionada en dos bloques. Es el caso identico al CTE de
+#: reclamo de trabajo. Que no es deriva lo confirma el propio guard: DRIFT sigue
+#: en 0 con los catorce handlers dentro, es decir, las 27 consultas nuevas leen
+#: solo columnas que el esquema crea de verdad.
+#: Sube a 135 con soporte y ciclo de vida (`core/autopilot_lifecycle.py`). Las
+#: doce nuevas salen de dos consultas: las siete `multiples_from` son las columnas
+#: del CTE que calcula el SLA —el analizador no atribuye columnas a traves de un
+#: CTE— y las cinco `join_ambiguo` son el LEFT JOIN entre `helpdesk_tickets` y
+#: `support_templates` para componer borradores. Como antes, DRIFT sigue en 0: las
+#: columnas existen todas, lo que el analizador no sabe es de que tabla vienen.
+#: Sube a 162 con el provisioning de inquilinos y el Control Center. Las 27
+#: nuevas son todas `join_ambiguo` y salen de dos sitios: el predicado de
+#: `core/inquilinos_reales`, que lleva un `EXISTS` sobre `workspace_members` y se
+#: inserta en seis consultas del panel, y la consulta del planner que busca
+#: workspaces sin Autopilot uniendo `workspaces` con `workspace_members`. El
+#: analizador no atribuye columnas cuando el predicado viene interpolado.
+#:
+#: DRIFT sigue en 0, que es la parte que importa: ninguna de esas consultas
+#: menciona una columna que el esquema no cree.
+UNRESOLVED_BASELINE = 162
+UNRESOLVED_POR_MOTIVO = {"join_ambiguo": 124, "multiples_from": 38}
 
 #: Drift conocido pendiente de decision de migracion. NO es una allowlist: el
 #: test falla si aparece cualquier otro, y falla tambien si estos desaparecen
