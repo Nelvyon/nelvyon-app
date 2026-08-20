@@ -56,6 +56,19 @@ _COMENTARIO = re.compile(r"--[^\n]*")
 #: una tabla que mas de un fichero declara con un conjunto de columnas distinto.
 #: Documentadas, no aceptadas: ver NELVYON_CLOSURE_STATE.md.
 COLISIONES_CONOCIDAS = frozenset({
+    # `conversations` y `deals` no son una colision accidental sino una
+    # transicion deliberada, documentada en la propia 532:
+    #
+    #   401/402 las crean con la forma legacy (`tenant_id`);
+    #   532 las aparta si estan vacias, y deja escrito que «la creara create_all
+    #       con la forma canonica» (`workspace_id`);
+    #   545 crea esa forma canonica por migracion en vez de al arrancar, porque
+    #       `nelvyon_app` ya no tiene CREATE y create_all no puede hacerlo.
+    #
+    # Gana la de numero mas bajo solo mientras la legacy exista; 532 se encarga
+    # de que no exista. El orden 401 -> 532 -> 545 es el que hace que funcione.
+    "conversations",
+    "deals",
     "ab_experiments",
     "ab_variants",
     "affiliate_clicks",

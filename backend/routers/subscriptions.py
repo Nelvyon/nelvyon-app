@@ -7,6 +7,7 @@ from datetime import datetime, date
 from fastapi import APIRouter, Body, Depends, HTTPException, Query
 from fastapi import status as status_codes
 from pydantic import BaseModel, ConfigDict
+from schemas.identificadores import IdentificadorClave
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
@@ -97,7 +98,7 @@ class SubscriptionsUpdateData(BaseModel):
 
 class SubscriptionsResponse(BaseModel):
     """Entity response schema"""
-    id: int
+    id: IdentificadorClave
     user_id: str
     workspace_id: int
     plan_id: str
@@ -134,7 +135,7 @@ class SubscriptionsBatchCreateRequest(BaseModel):
 
 class SubscriptionsBatchUpdateItem(BaseModel):
     """Batch update item"""
-    id: int
+    id: IdentificadorClave
     updates: SubscriptionsUpdateData
 
 
@@ -228,7 +229,11 @@ async def query_subscriptionss_all(
 
 @router.get("/{id}", response_model=SubscriptionsResponse)
 async def get_subscriptions(
-    id: int,
+    # Parametro de RUTA, no campo de respuesta: se deja en `str` a
+    # proposito. Validarlo como uuid cortaria la peticion en 422 antes
+    # de llegar al control de autorizacion, y un identificador ajeno mal
+    # formado debe recibir 403, no una pista de que no existe.
+    id: str,
     fields: str = Query(None, description="Comma-separated list of fields to return"),
     ws_ctx: WorkspaceContext = Depends(require_workspace),
     db: AsyncSession = Depends(get_db),
@@ -372,7 +377,11 @@ async def update_subscriptionss_batch(
 
 @router.put("/{id}", response_model=SubscriptionsResponse)
 async def update_subscriptions(
-    id: int,
+    # Parametro de RUTA, no campo de respuesta: se deja en `str` a
+    # proposito. Validarlo como uuid cortaria la peticion en 422 antes
+    # de llegar al control de autorizacion, y un identificador ajeno mal
+    # formado debe recibir 403, no una pista de que no existe.
+    id: str,
     data: SubscriptionsUpdateData,
     ws_ctx: WorkspaceContext = Depends(require_workspace_operator),
     current_user: UserResponse = Depends(get_current_user),
@@ -451,7 +460,11 @@ async def delete_subscriptionss_batch(
 
 @router.delete("/{id}")
 async def delete_subscriptions(
-    id: int,
+    # Parametro de RUTA, no campo de respuesta: se deja en `str` a
+    # proposito. Validarlo como uuid cortaria la peticion en 422 antes
+    # de llegar al control de autorizacion, y un identificador ajeno mal
+    # formado debe recibir 403, no una pista de que no existe.
+    id: str,
     ws_ctx: WorkspaceContext = Depends(require_workspace_operator),
     current_user: UserResponse = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),

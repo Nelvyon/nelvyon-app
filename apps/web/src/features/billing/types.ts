@@ -88,7 +88,8 @@ export interface VerifyPaymentResponse {
   plan_id?: string | null;
   billing_cycle?: string | null;
   payment_status: string;
-  subscription_id?: number | null;
+  // `subscriptions.id` es `uuid` en PostgreSQL: el API lo publica como cadena.
+  subscription_id?: string | null;
 }
 
 export interface ActiveSubscription {

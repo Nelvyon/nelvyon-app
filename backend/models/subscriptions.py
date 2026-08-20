@@ -1,5 +1,6 @@
 from core.database import Base
-from sqlalchemy import Column, DateTime, Float, ForeignKey, Index, Integer, String
+from sqlalchemy import Column, DateTime, Float, ForeignKey, Index, Integer, String, Uuid
+from sqlalchemy.schema import FetchedValue
 
 
 class Subscriptions(Base):
@@ -16,7 +17,34 @@ class Subscriptions(Base):
         {"extend_existing": True},
     )
 
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True, nullable=False)
+    # EL TIPO CANONICO ES `uuid`: asi esta la columna en PostgreSQL, con
+    # `DEFAULT gen_random_uuid()`, desde que se creo. Declararla `Integer`
+    # hacia que el ORM mintiera — al leer entregaba el objeto `UUID` del
+    # driver y todo consumidor tipado como entero lo rechazaba.
+    #
+    # La variante para SQLite no es una segunda opinion sobre el tipo: es una
+    # concesion al sustrato de pruebas. Buena parte de la suite inserta con
+    # SQL literal sin `id` y se apoya en que SQLite autocomplete la clave, algo
+    # que solo hace con `INTEGER PRIMARY KEY`. En PostgreSQL —el unico motor de
+    # produccion— la columna es y sigue siendo `uuid`.
+    #
+    # Sin `default` ni `server_default` en el modelo, a proposito: cada motor
+    # genera la clave por su cuenta. PostgreSQL con el `DEFAULT
+    # gen_random_uuid()` que la columna ya tiene, SQLite con el autorrelleno de
+    # `INTEGER PRIMARY KEY`. Un default de Python devolveria un objeto `UUID`
+    # que la variante entera no sabe enlazar.
+    #
+    # `FetchedValue()` no emite DDL ninguna: solo le dice al ORM que el valor
+    # lo pone el motor y que hay que leerlo despues del INSERT. Sin eso,
+    # SQLAlchemy solo asume clave autogenerada para enteros y aqui fallaba con
+    # `NULL identity key`.
+    id = Column(
+        Uuid(as_uuid=True).with_variant(Integer(), "sqlite"),
+        primary_key=True,
+        index=True,
+        server_default=FetchedValue(),
+        nullable=False,
+    )
     user_id = Column(String, nullable=False)
     workspace_id = Column(
         Integer,

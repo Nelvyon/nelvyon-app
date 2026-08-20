@@ -7,6 +7,10 @@ from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, ConfigDict, Field
+from schemas.identificadores import (
+    IdentificadorUuid,
+    IdentificadorUuidOpcional,
+)
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
@@ -78,7 +82,7 @@ class OsClientUpdateBody(BaseModel):
 
 
 class OsClientResponse(BaseModel):
-    id: str
+    id: IdentificadorUuid
     workspace_id: int
     created_by_user_id: str
     business_name: str

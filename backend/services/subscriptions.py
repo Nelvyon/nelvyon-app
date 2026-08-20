@@ -32,7 +32,7 @@ class SubscriptionsService:
             logger.error(f"Error creating subscriptions: {str(e)}")
             raise
 
-    async def check_ownership(self, obj_id: int, user_id: str) -> bool:
+    async def check_ownership(self, obj_id: str, user_id: str) -> bool:
         """Check if user owns this record"""
         try:
             obj = await self.get_by_id(obj_id, user_id=user_id)
@@ -43,7 +43,7 @@ class SubscriptionsService:
 
     async def get_by_id(
         self,
-        obj_id: int,
+        obj_id: str,
         user_id: Optional[str] = None,
         workspace_id: Optional[int] = None,
     ) -> Optional[Subscriptions]:
@@ -122,7 +122,7 @@ class SubscriptionsService:
 
     async def update(
         self,
-        obj_id: int,
+        obj_id: str,
         update_data: Dict[str, Any],
         user_id: Optional[str] = None,
         workspace_id: Optional[int] = None,
@@ -146,7 +146,7 @@ class SubscriptionsService:
             logger.error(f"Error updating subscriptions {obj_id}: {str(e)}")
             raise
 
-    async def delete(self, obj_id: int, user_id: Optional[str] = None, workspace_id: Optional[int] = None) -> bool:
+    async def delete(self, obj_id: str, user_id: Optional[str] = None, workspace_id: Optional[int] = None) -> bool:
         """Delete subscriptions (scoped by user_id and/or workspace_id when provided)."""
         try:
             obj = await self.get_by_id(obj_id, user_id=user_id, workspace_id=workspace_id)

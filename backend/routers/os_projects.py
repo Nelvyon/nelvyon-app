@@ -8,6 +8,10 @@ from typing import Any, Dict, List, Optional, Union
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, ConfigDict, Field
+from schemas.identificadores import (
+    IdentificadorUuid,
+    IdentificadorUuidOpcional,
+)
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
@@ -49,9 +53,9 @@ class OsProjectUpdateBody(BaseModel):
 
 
 class OsProjectResponse(BaseModel):
-    id: str
+    id: IdentificadorUuid
     workspace_id: int
-    client_id: str
+    client_id: IdentificadorUuid
     name: str
     description: Optional[str] = None
     status: str

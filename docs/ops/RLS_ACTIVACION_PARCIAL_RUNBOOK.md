@@ -490,3 +490,40 @@ deseable, pero conviene saberlo al leer los logs.
 | `backend/core/tenant_context.py` | `contexto_de_inquilino(...)`: contexto explícito para caminos de fondo, con restauración por token. |
 | `backend/core/database.py` | `sesion_de_barrido()`: la única puerta al rol `nelvyon_jobs`. Quién puede cruzarla está declarado, con motivo, en `CONSUMIDORES_DE_LA_SESION_PRIVILEGIADA` del guard. |
 | `backend/tests/test_rls_webhook_stripe_sistema.py` | El webhook de Stripe como actor de sistema: firma inválida / ausente / sin secreto siguen rechazándose; la sesión privilegiada no se abre si la firma no verifica; solo la recibe `SubscriptionsService`; y sin `NELVYON_JOBS_DATABASE_URL` la conducta es la de siempre. |
+
+## El esquema es de las migraciones, no del arranque
+
+Hasta la migracion 545, 42 tablas del modelo ORM no las creaba ninguna migracion:
+aparecian porque `Base.metadata.create_all()` corre al arrancar el API. Con rol
+superusuario eso funcionaba, y por eso nadie lo noto.
+
+Con RLS parcial el API se conecta como `nelvyon_app`, que **no tiene CREATE** sobre
+`public`. Desde ese momento `create_all` no puede crear nada. Produccion seguia
+bien porque las tablas ya existian, pero:
+
+* una base construida solo con migraciones se quedaba sin ellas;
+* el primer modelo nuevo sin migracion habria roto el arranque en produccion con
+  `permission denied for schema public`.
+
+La 545 crea esas 42 tablas con el DDL exacto que producia `create_all`, de forma
+aditiva e idempotente. Deja fuera `oauth_tokens` y `onboarding_progress`: sus
+modelos existen pero las tablas nunca se crearon —esos modulos no llegan a
+importarse—, asi que crearlas seria anadir esquema, no cerrar deuda.
+
+El guard `test_esquema_cubierto_por_migraciones` impide que la brecha se reabra:
+falla en CI si se anade un modelo sin su migracion.
+
+### `MGX_IGNORE_INIT_DB`
+
+Es la variable correcta —`services/database.py` la comprueba por presencia, no por
+valor— y con ella `initialize_database()` no toca la base; el motor se crea de
+forma perezosa en la primera consulta, con el gancho de contexto igualmente
+instalado.
+
+**No esta puesta en produccion, y no hace falta.** Verificado sobre una base fresca
+con las 545 migraciones y un rol sin CREATE: el API arranca por igual con la
+variable y sin ella, porque `create_all` ya no encuentra nada que crear. Ponerla
+seria una segunda red; el guard de CI es mejor red, porque avisa antes del
+despliegue en vez de convertir el fallo en un error de consulta mas tarde.
+
+Si algun dia se pone, que sea por decision explicita y con esta nota actualizada.

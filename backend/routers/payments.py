@@ -6,6 +6,7 @@ from typing import Optional
 import stripe
 from fastapi import APIRouter, Depends, HTTPException, Request, Query
 from pydantic import BaseModel, Field
+from schemas.identificadores import IdentificadorClaveOpcional
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.billing_catalog import (
@@ -57,7 +58,11 @@ class VerifyPaymentResponse(BaseModel):
     plan_id: Optional[str] = None
     billing_cycle: Optional[str] = None
     payment_status: str
-    subscription_id: Optional[int] = None
+    # `subscriptions.id` es `uuid` en PostgreSQL. Declararlo `int` hacia que
+    # esta respuesta fallara al validar en cuanto hubiera una suscripcion — y
+    # es la ruta que confirma un pago recien hecho, o sea la peor posible para
+    # romperse. Se publica como cadena, igual que el resto de identificadores.
+    subscription_id: IdentificadorClaveOpcional = None
 
 
 class ActiveSubscriptionResponse(BaseModel):

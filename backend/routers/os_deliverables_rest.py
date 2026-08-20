@@ -7,6 +7,10 @@ from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from pydantic import BaseModel, ConfigDict, Field
+from schemas.identificadores import (
+    IdentificadorUuid,
+    IdentificadorUuidOpcional,
+)
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
@@ -62,8 +66,8 @@ class OsDeliverableRejectBody(BaseModel):
 
 
 class OsDeliverableVersionResponse(BaseModel):
-    id: str
-    deliverable_id: str
+    id: IdentificadorUuid
+    deliverable_id: IdentificadorUuid
     version: int
     status: str
     file_url: Optional[str] = None
@@ -78,11 +82,11 @@ class OsDeliverableVersionListResponse(BaseModel):
 
 
 class OsDeliverableResponse(BaseModel):
-    id: str
+    id: IdentificadorUuid
     workspace_id: int
-    client_id: str
-    project_id: str
-    task_id: Optional[str] = None
+    client_id: IdentificadorUuid
+    project_id: IdentificadorUuid
+    task_id: IdentificadorUuidOpcional = None
     title: str
     description: Optional[str] = None
     type: Optional[str] = None
@@ -96,7 +100,7 @@ class OsDeliverableResponse(BaseModel):
     approved_at: Optional[datetime] = None
     published_at: Optional[datetime] = None
     client_reviewed_at: Optional[datetime] = None
-    approved_by_portal_user_id: Optional[str] = None
+    approved_by_portal_user_id: IdentificadorUuidOpcional = None
     metadata: Dict[str, Any] = Field(default_factory=dict)
     archived_at: Optional[datetime] = None
     created_at: Optional[datetime] = None
