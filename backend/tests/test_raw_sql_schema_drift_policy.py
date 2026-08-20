@@ -35,8 +35,13 @@ PERMITIDAS: dict[tuple[str, str], dict[str, str]] = {}
 #: de reclamo de trabajo, que usa un CTE con `FOR UPDATE SKIP LOCKED` y por tanto
 #: menciona `autopilot_jobs` en dos bloques. No es deriva de esquema: el
 #: analizador no sabe seguir un CTE, y esas tablas las crea la migracion 551.
-UNRESOLVED_BASELINE = 116
-UNRESOLVED_POR_MOTIVO = {"join_ambiguo": 87, "multiples_from": 29}
+#: Sube a 121 con el planner de Autopilot (`core/autopilot_ciclo.py`). Las cinco
+#: nuevas son `join_ambiguo`: la consulta de elegibles une cinco tablas —
+#: capacidades del workspace, ajustes, catalogo, suscripcion y rango de plan— y el
+#: analizador no atribuye columnas cuando hay tantos origenes. No es deriva: esas
+#: tablas las crean las migraciones 551 y 552.
+UNRESOLVED_BASELINE = 121
+UNRESOLVED_POR_MOTIVO = {"join_ambiguo": 92, "multiples_from": 29}
 
 #: Drift conocido pendiente de decision de migracion. NO es una allowlist: el
 #: test falla si aparece cualquier otro, y falla tambien si estos desaparecen
