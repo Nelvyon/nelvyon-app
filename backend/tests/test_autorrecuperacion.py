@@ -440,3 +440,70 @@ async def test_solo_interrumpe_lo_grave(limpio, monkeypatch):
 
     resultado = await notificar_pendientes(s)
     assert resultado["enviados"] == 0 and resultado["pendientes"] == 0
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 3. El canal real por SES
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+def test_sin_credenciales_ses_no_se_envia(monkeypatch):
+    """Sin las cuatro variables no hay envio posible, y se dice."""
+    import core.notificador as n
+
+    for v in ("SES_ACCESS_KEY_ID", "SES_SECRET_ACCESS_KEY"):
+        monkeypatch.delenv(v, raising=False)
+    assert n._ses_configurado() is False
+
+
+def test_con_las_cuatro_variables_ses_esta_listo(monkeypatch):
+    import core.notificador as n
+
+    for v, x in (("SES_ACCESS_KEY_ID", "a"), ("SES_SECRET_ACCESS_KEY", "b"),
+                 ("SES_FROM_EMAIL", "c@d.test"), ("SES_REGION", "eu-west-1")):
+        monkeypatch.setenv(v, x)
+    assert n._ses_configurado() is True
+
+
+@pytest.mark.asyncio
+async def test_un_fallo_de_ses_nunca_devuelve_enviado(monkeypatch):
+    """EL LIMITE QUE MAS IMPORTA DEL CANAL.
+
+    Si SES falla y esta funcion devolviera True, el incidente constaria como
+    avisado sin que nadie lo haya visto. Eso es peor que no tener alertas.
+    """
+    import core.notificador as n
+
+    for v, x in (("SES_ACCESS_KEY_ID", "a"), ("SES_SECRET_ACCESS_KEY", "b"),
+                 ("SES_FROM_EMAIL", "c@d.test"), ("SES_REGION", "eu-west-1")):
+        monkeypatch.setenv(v, x)
+    monkeypatch.delenv("NELVYON_ALERTA_WEBHOOK", raising=False)
+    monkeypatch.setenv("NELVYON_ALERTA_EMAIL", "destino@nelvyon.test")
+
+    enviado, error = await n.enviar({
+        "severidad": "critical", "metrica": "prueba", "que_paso": "x",
+        "impacto": "y", "id": 1})
+    assert enviado is False, "un fallo de SES se dio por enviado"
+    assert error, "un fallo sin causa no se puede diagnosticar"
+
+
+def test_el_aviso_no_lleva_secretos():
+    """Ningun secreto puede acabar en el cuerpo del correo ni en los logs."""
+    import core.notificador as n
+
+    cuerpo = n.componer({
+        "severidad": "high", "metrica": "m", "que_paso": "q", "impacto": "i",
+        "id": 3, "intentos": 1, "estado": "abierto", "requiere_humano": True})
+    texto = str(cuerpo).lower()
+    for prohibido in ("secret", "access_key", "password", "token", "whsec", "sk_live"):
+        assert prohibido not in texto, f"el aviso contiene '{prohibido}'"
+
+
+def test_el_webhook_manda_sobre_el_correo(monkeypatch):
+    """Si hay webhook se usa ese: menos privilegio que enviar correo como NELVYON."""
+    import inspect
+
+    import core.notificador as n
+
+    fuente = inspect.getsource(n.enviar)
+    assert fuente.index("_webhook()") < fuente.index("_email()")
