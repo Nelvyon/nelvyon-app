@@ -134,8 +134,45 @@ export class SaasCeoBriefService {
     } catch (e) {
       if (!isPgMissingRelation(e)) throw e;
     }
+    // Fallback: sin configuracion de programacion, se compone brief para los
+    // inquilinos ALCANZABLES, no para todos los que completaron onboarding.
+    //
+    // EL DERROCHE QUE ESTO CORRIGE
+    // ----------------------------
+    // `saas_ceo_brief_settings` esta vacia en produccion, asi que este fallback
+    // dispara SIEMPRE. Filtraba solo por `onboarding_completed = TRUE`, y eso
+    // daba 22 inquilinos de los cuales 20 no tienen ni workspace asignado y 21
+    // no tienen a nadie que pueda entrar a leerlos. Resultado: 153 briefs
+    // generados en tres semanas para inquilinos que nadie puede consultar, y
+    // subiendo cada dia.
+    //
+    // El criterio es ACTIVIDAD, no dominio del correo. Excluir por `.test`
+    // seria fragil —un inquilino real podria usarlo en pruebas legitimas, y uno
+    // de certificacion podria no usarlo— y ademas no describe el problema: lo
+    // que hace inutil un brief es que no exista nadie que pueda leerlo.
+    //
+    // `workspace_members` con `status = 'active'` es esa prueba: es la misma
+    // pertenencia que exige RLS para dejar entrar a alguien al workspace. Si no
+    // hay ninguna, el brief no tiene destinatario posible.
+    //
+    // IDEMPOTENCIA
+    // ------------
+    // Se excluye ademas quien ya recibio brief en las ultimas 20 horas. El
+    // fallback no filtra por hora —no tiene de donde sacarla—, asi que sin esto
+    // un cron horario compondria 24 briefs diarios por inquilino.
     const all = await this.db.query<{ id: string }>(
-      `SELECT id FROM saas_tenants WHERE onboarding_completed = TRUE LIMIT 500`,
+      `SELECT t.id
+         FROM saas_tenants t
+        WHERE t.onboarding_completed = TRUE
+          AND EXISTS (
+                SELECT 1 FROM workspace_members m
+                 WHERE m.workspace_id = t.workspace_id
+                   AND m.status = 'active')
+          AND NOT EXISTS (
+                SELECT 1 FROM saas_ceo_brief_runs r
+                 WHERE r.tenant_id = t.id
+                   AND r.created_at > now() - interval '20 hours')
+        LIMIT 500`,
     );
     return all.map((r) => r.id);
   }
