@@ -30,8 +30,13 @@ PERMITIDAS: dict[tuple[str, str], dict[str, str]] = {}
 #: Bajo de 120 a 113 al alinear `social_posts` con su tabla real: dos consultas
 #: unian por `project_id`, columna que esa tabla nunca tuvo, y el JOIN ambiguo
 #: desaparecio con ellas. El trinquete solo puede apretarse.
-UNRESOLVED_BASELINE = 113
-UNRESOLVED_POR_MOTIVO = {"join_ambiguo": 87, "multiples_from": 26}
+#: Sube de 113 a 116 al entrar el nucleo de Autopilot (`core/autopilot.py`).
+#: Las tres nuevas son del mismo tipo —`multiples_from`— y salen de la consulta
+#: de reclamo de trabajo, que usa un CTE con `FOR UPDATE SKIP LOCKED` y por tanto
+#: menciona `autopilot_jobs` en dos bloques. No es deriva de esquema: el
+#: analizador no sabe seguir un CTE, y esas tablas las crea la migracion 551.
+UNRESOLVED_BASELINE = 116
+UNRESOLVED_POR_MOTIVO = {"join_ambiguo": 87, "multiples_from": 29}
 
 #: Drift conocido pendiente de decision de migracion. NO es una allowlist: el
 #: test falla si aparece cualquier otro, y falla tambien si estos desaparecen
