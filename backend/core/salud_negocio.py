@@ -148,6 +148,76 @@ COMPROBACIONES: list[Comprobacion] = [
         cooldown_min=30,
         subir_es_malo=True,
     ),
+    # ── divergencias del circuito de ingresos ─────────────────────────────
+    #
+    # Cada una es una forma de que el dinero y el estado interno dejen de
+    # cuadrar. Ninguna la ve un health de proceso, y todas significan que alguien
+    # pago y no tiene lo que compro — o al reves.
+    Comprobacion(
+        metrica="suscripciones_sin_workspace",
+        descripcion="Suscripciones cuyo workspace ya no existe",
+        sql=(
+            "SELECT count(*) FROM subscriptions s "
+            "WHERE s.workspace_id IS NOT NULL "
+            "AND NOT EXISTS (SELECT 1 FROM workspaces w WHERE w.id = s.workspace_id)"
+        ),
+        caida_relevante=0.0,
+        severidad=CRITICO,
+        impacto="Alguien paga por un workspace que no existe. El cobro sigue "
+                "corriendo y el cliente no tiene producto.",
+        requiere_humano=True,
+        cooldown_min=15,
+        subir_es_malo=True,
+    ),
+    Comprobacion(
+        metrica="workspaces_sin_miembros",
+        descripcion="Workspaces sin ningun miembro activo",
+        sql=(
+            "SELECT count(*) FROM workspaces w WHERE NOT EXISTS ("
+            "  SELECT 1 FROM workspace_members m "
+            "  WHERE m.workspace_id = w.id AND m.status = 'active')"
+        ),
+        caida_relevante=0.0,
+        severidad=ALTO,
+        impacto="Un workspace al que nadie puede entrar. Si tiene suscripcion, "
+                "es un cliente pagando sin acceso.",
+        requiere_humano=True,
+        cooldown_min=60,
+        subir_es_malo=True,
+    ),
+    Comprobacion(
+        metrica="pagos_sin_suscripcion",
+        descripcion="Checkouts procesados que no dejaron suscripcion",
+        sql=(
+            "SELECT count(*) FROM stripe_webhook_events e "
+            "WHERE e.event_type = 'checkout.session.completed' "
+            "AND e.status = 'processed' "
+            "AND e.processed_at < now() - interval '10 minutes' "
+            "AND NOT EXISTS (SELECT 1 FROM subscriptions s)"
+        ),
+        caida_relevante=0.0,
+        severidad=CRITICO,
+        impacto="Stripe confirmo el cobro y NELVYON no lo registro. El cliente "
+                "pago y no consta como cliente.",
+        requiere_humano=True,
+        cooldown_min=15,
+        subir_es_malo=True,
+    ),
+    Comprobacion(
+        metrica="checkouts_sin_completar",
+        descripcion="Suscripciones pendientes de mas de 24 horas",
+        sql=(
+            "SELECT count(*) FROM subscriptions "
+            "WHERE status = 'pending' AND created_at < now() - interval '24 hours'"
+        ),
+        caida_relevante=0.0,
+        severidad=MEDIO,
+        impacto="Intentos de compra que no llegaron a cobrarse. Cada uno es una "
+                "venta perdida que nadie esta persiguiendo.",
+        cooldown_min=720,
+        subir_es_malo=True,
+    ),
+
     # ── incorporacion ─────────────────────────────────────────────────────
     Comprobacion(
         metrica="onboarding_atascado",

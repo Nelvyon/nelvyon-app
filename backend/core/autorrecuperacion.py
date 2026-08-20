@@ -198,6 +198,14 @@ SOLO_ESCALAR = {
     "miembros_activos",
     "onboarding_atascado",
     "tickets_sin_respuesta",
+    # Divergencias del circuito de ingresos. Ninguna se repara sola: todas
+    # significan que el dinero y el estado no cuadran, y decidir en que direccion
+    # corregirlos es exactamente el tipo de decision que no puede tomar un
+    # proceso automatico de madrugada.
+    "suscripciones_sin_workspace",
+    "workspaces_sin_miembros",
+    "pagos_sin_suscripcion",
+    "checkouts_sin_completar",
 }
 
 
