@@ -39,17 +39,17 @@ pytestmark = pytest.mark.skipif(
     reason="sin NELVYON_PG_CERT_DSN: hace falta una base construida con migraciones",
 )
 
-#: Modelos declarados cuya tabla NO existe en produccion y que por tanto NO se
-#: crean en la 545.
+#: Modelos declarados cuya tabla no crea ninguna migracion.
 #:
-#: No es una lista de excepciones cómoda: es una anomalia documentada. Sus
-#: modulos no llegan a importarse en el arranque, asi que `create_all` nunca las
-#: creo. El codigo que las menciona fallaria hoy si se ejecutase. Crearlas seria
-#: AÑADIR esquema, que es otra decision.
+#: Esta VACIA, y esa es la situacion correcta. Estuvo poblada con `oauth_tokens` y
+#: `onboarding_progress` mientras esas dos tablas solo existian en Alembic —que en
+#: produccion esta desactivado con SKIP_ALEMBIC=1—, asi que el codigo las usaba y
+#: la base no las tenia. La migracion 546 las creo, con RLS, y la exclusion dejo
+#: de ser cierta: lo detecto `test_la_lista_de_exclusiones_sigue_siendo_cierta`.
 #:
-#: Si alguna pasa a usarse de verdad, hay que crearla en una migracion y sacarla
-#: de aqui — no al reves.
-SIN_TABLA_NI_EN_PRODUCCION = {"oauth_tokens", "onboarding_progress"}
+#: Anadir algo aqui exige justificarlo por escrito. Una excepcion que ya no
+#: excepciona nada solo sirve para tapar la siguiente.
+SIN_TABLA_NI_EN_PRODUCCION: set[str] = set()
 
 
 def _tablas_de_los_modelos() -> set[str]:

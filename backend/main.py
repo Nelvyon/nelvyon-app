@@ -588,6 +588,32 @@ def root():
     }
 
 
+@app.get("/health/business")
+async def health_business():
+    """Salud de NEGOCIO. Separada de `/health/ready` a proposito.
+
+    `/health/ready` decide si este proceso puede recibir trafico, y por eso lo
+    consulta el orquestador. Esta ruta responde otra pregunta: si la EMPRESA esta
+    funcionando. Son independientes — el fallo que motivo este endpoint tenia
+    `/health/ready` en verde y el producto vacio para todos los clientes.
+
+    Nunca devuelve 5xx por una anomalia de negocio: mezclarlas haria que Railway
+    reiniciara el contenedor por una caida de ventas. El estado va en el cuerpo.
+    """
+    from core.database import db_manager
+    from core.salud_negocio import revisar
+
+    try:
+        await db_manager.ensure_initialized()
+        if not db_manager.async_session_maker:
+            return {"status": "unknown", "reason": "sin sesion de base de datos"}
+        async with db_manager.async_session_maker() as sesion:
+            return await revisar(sesion)
+    except Exception as exc:  # noqa: BLE001
+        logger.error("health/business fallo: %s", exc, exc_info=True)
+        return {"status": "unknown", "reason": type(exc).__name__}
+
+
 @app.get("/health/ready")
 async def health_ready():
     """Readiness — includes database check (503 if DB unavailable)."""
