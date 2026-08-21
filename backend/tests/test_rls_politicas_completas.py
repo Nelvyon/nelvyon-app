@@ -42,6 +42,8 @@ import uuid as _uuid
 
 import pytest
 
+from tests._guardia_de_roles import alterar_rol
+
 DSN = os.environ.get("NELVYON_PG_CERT_DSN")
 
 requiere_pg = pytest.mark.skipif(
@@ -123,8 +125,8 @@ async def escenario():
     ):
         if await admin.fetchval("SELECT count(*) FROM pg_roles WHERE rolname=$1", rol):
             await admin.execute(f"DROP OWNED BY {rol}")
-            await admin.execute(f"DROP ROLE {rol}")
-        await admin.execute(f"CREATE ROLE {rol} LOGIN PASSWORD '{clave}' {extra}")
+            await alterar_rol(admin, f"DROP ROLE {rol}", DSN)
+        await alterar_rol(admin, f"CREATE ROLE {rol} LOGIN PASSWORD '{clave}' {extra}", DSN)
         await admin.execute(f"GRANT USAGE ON SCHEMA public, auth TO {rol}")
         for tabla in TABLAS:
             await admin.execute(
@@ -192,7 +194,7 @@ async def escenario():
         await limpiar()
         for rol in (ROL, ROL_FONDO):
             await admin.execute(f"DROP OWNED BY {rol}")
-            await admin.execute(f"DROP ROLE IF EXISTS {rol}")
+            await alterar_rol(admin, f"DROP ROLE IF EXISTS {rol}", DSN)
         await admin.close()
 
 

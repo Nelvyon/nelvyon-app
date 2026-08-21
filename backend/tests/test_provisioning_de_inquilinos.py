@@ -26,6 +26,8 @@ import secrets
 
 import pytest
 
+from tests._guardia_de_roles import alterar_rol
+
 DSN = os.environ.get("NELVYON_PG_CERT_DSN")
 DSN_JOBS: str | None = None
 
@@ -262,7 +264,7 @@ async def test_el_rol_de_la_aplicacion_sigue_sin_poder_encender_autopilot(
 
     adm = cuatro_workspaces["adm"]
     w = cuatro_workspaces["w"]["real"]
-    await adm.execute("ALTER ROLE nelvyon_app LOGIN PASSWORD 'cert_app_tmp'")
+    await alterar_rol(adm, "ALTER ROLE nelvyon_app LOGIN PASSWORD 'cert_app_tmp'", DSN)
     try:
         c = await asyncpg.connect(
             _dsn().split("://")[0] + "://nelvyon_app:cert_app_tmp@"
@@ -282,7 +284,7 @@ async def test_el_rol_de_la_aplicacion_sigue_sin_poder_encender_autopilot(
         finally:
             await c.close()
     finally:
-        await adm.execute("ALTER ROLE nelvyon_app NOLOGIN")
+        await alterar_rol(adm, "ALTER ROLE nelvyon_app NOLOGIN", DSN)
 
 
 # ═══════════════════════════════════════════════════════════════════════════

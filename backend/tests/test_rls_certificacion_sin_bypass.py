@@ -51,6 +51,8 @@ import uuid
 
 import pytest
 
+from tests._guardia_de_roles import alterar_rol_sync
+
 DSN = os.environ.get("NELVYON_PG_CERT_DSN")
 
 pytestmark = pytest.mark.skipif(
@@ -72,9 +74,9 @@ def conexiones():
     cur = admin.cursor()
 
     clave = uuid.uuid4().hex
-    cur.execute(f"DROP ROLE IF EXISTS {ROL}")
+    alterar_rol_sync(cur, f"DROP ROLE IF EXISTS {ROL}", DSN)
     # NOSUPERUSER y NOBYPASSRLS explicitos: son la razon de ser del test.
-    cur.execute(f"CREATE ROLE {ROL} LOGIN PASSWORD %s NOSUPERUSER NOBYPASSRLS", (clave,))
+    alterar_rol_sync(cur, f"CREATE ROLE {ROL} LOGIN PASSWORD %s NOSUPERUSER NOBYPASSRLS", DSN, (clave,))
     cur.execute(f"GRANT USAGE ON SCHEMA public TO {ROL}")
     cur.execute(f"GRANT USAGE ON SCHEMA auth TO {ROL}")
     for t in TABLAS:
@@ -92,7 +94,7 @@ def conexiones():
     restringido.close()
     cur.execute(f"REASSIGN OWNED BY {ROL} TO CURRENT_USER")
     cur.execute(f"DROP OWNED BY {ROL}")
-    cur.execute(f"DROP ROLE IF EXISTS {ROL}")
+    alterar_rol_sync(cur, f"DROP ROLE IF EXISTS {ROL}", DSN)
     admin.close()
 
 

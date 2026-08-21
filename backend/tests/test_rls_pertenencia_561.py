@@ -22,6 +22,8 @@ import secrets
 
 import pytest
 
+from tests._guardia_de_roles import alterar_rol
+
 DSN = os.environ.get("NELVYON_PG_CERT_DSN")
 
 pytestmark = [
@@ -89,7 +91,7 @@ async def escenario():
         "WHERE user_id IS NOT NULL AND user_id != '' DO NOTHING",
         bruno_compartido, ana["uid"], ana["correo"])
 
-    await adm.execute(f"ALTER ROLE nelvyon_app LOGIN PASSWORD '{CLAVE_APP}'")
+    await alterar_rol(adm, f"ALTER ROLE nelvyon_app LOGIN PASSWORD '{CLAVE_APP}'", DSN)
     ids = [ana_1, ana_2, bruno_compartido, bruno_privado]
     try:
         yield {"adm": adm, "ana": ana, "bruno": bruno, "ana_1": ana_1,
@@ -103,7 +105,7 @@ async def escenario():
                           f"CERTIFICATION-561-%{marca}")
         await adm.execute("DELETE FROM nelvyon_users WHERE user_id = ANY($1::uuid[])",
                           [ana["uid"], bruno["uid"]])
-        await adm.execute("ALTER ROLE nelvyon_app NOLOGIN")
+        await alterar_rol(adm, "ALTER ROLE nelvyon_app NOLOGIN", DSN)
         await adm.close()
 
 

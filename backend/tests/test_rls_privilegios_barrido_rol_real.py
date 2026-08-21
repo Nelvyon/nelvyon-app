@@ -36,6 +36,8 @@ import secrets
 
 import pytest
 
+from tests._guardia_de_roles import alterar_rol
+
 DSN_ADMIN = os.environ.get("NELVYON_PG_CERT_DSN")
 
 requiere_pg = pytest.mark.skipif(
@@ -148,7 +150,7 @@ async def _retirar_rol(admin) -> None:
         return
     await admin.execute(f"REVOKE ALL ON DATABASE {base} FROM {ROL_CERT}")
     await admin.execute(f"DROP OWNED BY {ROL_CERT}")
-    await admin.execute(f"DROP ROLE IF EXISTS {ROL_CERT}")
+    await alterar_rol(admin, f"DROP ROLE IF EXISTS {ROL_CERT}", DSN_ADMIN)
 
 
 @pytest.fixture
@@ -173,10 +175,12 @@ async def barrido(admin):
     clave = secrets.token_urlsafe(32)
 
     await _retirar_rol(admin)
-    await admin.execute(
+    await alterar_rol(
+        admin,
         f"CREATE ROLE {ROL_CERT} LOGIN PASSWORD '{clave}' "
         f"IN ROLE nelvyon_jobs NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION "
-        f"INHERIT BYPASSRLS"
+        f"INHERIT BYPASSRLS",
+        DSN_ADMIN,
     )
     base = await admin.fetchval("SELECT current_database()")
     await admin.execute(f"GRANT CONNECT ON DATABASE {base} TO {ROL_CERT}")
@@ -318,7 +322,7 @@ async def test_no_puede_alterar_el_esquema(barrido):
 async def test_no_puede_tocar_roles(barrido):
     asyncpg = pytest.importorskip("asyncpg")
     with pytest.raises(asyncpg.exceptions.InsufficientPrivilegeError):
-        await barrido.execute("CREATE ROLE intruso_544 LOGIN")
+        await alterar_rol(barrido, "CREATE ROLE intruso_544 LOGIN", DSN_ADMIN)
 
 
 async def test_no_puede_darse_privilegios(barrido):

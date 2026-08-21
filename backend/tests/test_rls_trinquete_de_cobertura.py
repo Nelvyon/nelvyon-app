@@ -66,7 +66,12 @@ pytestmark = [
 #: autenticadas. Guardan oportunidades, contratos, conversaciones, citas e
 #: ingresos: sin RLS, una consulta que olvidara el filtro devolvia la cartera
 #: comercial de TODOS los inquilinos.
-DEUDA_MAXIMA = 81
+#:
+#: 81 -> 35 con la 563, medida ya contra PRODUCCION y no contra certificacion:
+#: la base de certificacion habia divergido y ocho tablas que alli estaban
+#: vacias tenian datos en produccion, una con 14.178 filas. Las guardas
+#: fail-closed las omiten en vez de ocultarle datos a quien hoy los ve.
+DEUDA_MAXIMA = 35
 
 #: Margen cero a proposito. Un trinquete con holgura deja de ser un trinquete: la
 #: holgura se consume y nadie se entera.

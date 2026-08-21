@@ -36,6 +36,8 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
+from tests._vista_global_limpia import exigir_vista_global_limpia
+
 DSN = os.environ.get("NELVYON_PG_CERT_DSN")
 DSN_JOBS: str | None = None
 
@@ -83,6 +85,9 @@ async def empresa():
     from core.salud_negocio import COMPROBACIONES
 
     adm = await asyncpg.connect(_dsn(), timeout=30)
+    # Mide la vista global: sobre residuo de otra ejecucion mediria la
+    # empresa de otro. Ver `_vista_global_limpia`.
+    await exigir_vista_global_limpia(adm)
     marca = secrets.token_hex(4)
     metricas = [c.metrica for c in COMPROBACIONES]
     await adm.execute("DELETE FROM business_incidents WHERE metrica = ANY($1::text[])",

@@ -22,6 +22,8 @@ import secrets
 
 import pytest
 
+from tests._guardia_de_roles import alterar_rol
+
 DSN = os.environ.get("NELVYON_PG_CERT_DSN")
 
 pytestmark = [
@@ -29,23 +31,25 @@ pytestmark = [
     pytest.mark.asyncio,
 ]
 
-#: Las 29 de los dos lotes. Se prueban TODAS: proteger 28 y olvidar una deja
-#: el agujero exactamente donde nadie mira.
-LOTE_560 = (
-    "apollo_lead_cache", "email_queue", "nelvyon_pack_runs",
-    "os_agent_audit_events", "os_brief_diff_runs", "os_competitor_gap_runs",
-    "os_deliverable_approval_tokens", "os_delivery_certificates",
-    "os_qa_audit_runs", "os_recurring_run_log", "os_retainer_cycles",
-    "os_sector_shield_audits", "os_tasks_legacy_281", "os_truth_guard_audits",
-    "pipeline_deals", "voice_pilot_inbound", "voice_pilot_usage",
-    "workflow_executions", "workflow_rules", "integration_whatsapp",
-    # Lote 562: tablas cuyos escritores son siempre rutas autenticadas. Guardan
-    # oportunidades, contratos, conversaciones, citas e ingresos — no son
-    # tablas menores, y estaban igual de abiertas.
-    "activities", "advisor_session_usage", "appointments", "contracts",
-    "conversations", "deals", "revenue_records",
-    "tenant_branding_activation_logs", "tenant_module_permissions",
-)
+#: Las tablas a probar NO se listan a mano: se DESCUBREN.
+#:
+#: La primera version enumeraba las 20 del lote 560. Al llegar el 562 hubo que
+#: ampliarla, y al llegar el 563 habria habido que ampliarla otra vez — con la
+#: consecuencia obvia de que el dia que alguien olvidara ampliarla, el lote nuevo
+#: quedaria sin probar y la bateria seguiria en verde.
+#:
+#: Se descubren por su politica: `nelvyon_apply_os_workspace_rls` crea siempre
+#: una llamada `<tabla>_os_select`. Toda tabla protegida con ese patron entra
+#: automaticamente, hoy y en cualquier lote futuro.
+_SQL_PROTEGIDAS = """
+SELECT DISTINCT p.tablename
+  FROM pg_policies p
+  JOIN pg_class c ON c.relname = p.tablename
+ WHERE p.schemaname = 'public'
+   AND p.policyname = p.tablename || '_os_select'
+   AND c.relrowsecurity
+ ORDER BY 1
+"""
 
 CLAVE_APP = "cert_app_rls_560"
 
@@ -141,19 +145,25 @@ async def escenario():
     #: correcto. Si no se sembrara nada, la bateria pasaria en verde sin haber
     #: comprobado un solo aislamiento — y esa es exactamente la clase de prueba
     #: que no vale para nada.
+    protegidas = [r["tablename"] for r in await adm.fetch(_SQL_PROTEGIDAS)]
+    assert len(protegidas) >= 20, (
+        f"solo {len(protegidas)} tablas con el patron estandar: la bateria no "
+        f"esta mirando lo que cree que mira")
+
     sembradas: list[str] = []
-    for tabla in LOTE_560:
+    for tabla in protegidas:
         try:
             await _sembrar(adm, tabla, ws["A"]["id"])
             sembradas.append(tabla)
         except Exception as exc:  # noqa: BLE001
             print(f"[siembra] {tabla}: {type(exc).__name__}: {str(exc)[:90]}")
 
-    await adm.execute(f"ALTER ROLE nelvyon_app LOGIN PASSWORD '{CLAVE_APP}'")
+    await alterar_rol(adm, f"ALTER ROLE nelvyon_app LOGIN PASSWORD '{CLAVE_APP}'", DSN)
     try:
-        yield {"ws": ws, "adm": adm, "sembradas": sembradas, "marca": marca}
+        yield {"ws": ws, "adm": adm, "sembradas": sembradas,
+               "protegidas": protegidas, "marca": marca}
     finally:
-        for tabla in LOTE_560:
+        for tabla in sembradas:
             try:
                 await adm.execute(
                     f'DELETE FROM public."{tabla}" WHERE workspace_id = ANY($1::int[])',
@@ -166,7 +176,7 @@ async def escenario():
         await adm.execute("DELETE FROM workspaces WHERE id = ANY($1::int[])", ids)
         await adm.execute("DELETE FROM nelvyon_users WHERE user_id = ANY($1::uuid[])",
                           [v["uid"] for v in ws.values()])
-        await adm.execute("ALTER ROLE nelvyon_app NOLOGIN")
+        await alterar_rol(adm, "ALTER ROLE nelvyon_app NOLOGIN", DSN)
         await adm.close()
 
 
@@ -188,9 +198,9 @@ async def _como(inquilino: dict):
 
 
 async def test_todas_las_tablas_del_lote_estan_protegidas(escenario):
-    """Proteger diecinueve y olvidar una deja el agujero donde nadie mira."""
+    """Proteger casi todas y olvidar una deja el agujero donde nadie mira."""
     faltan = []
-    for tabla in LOTE_560:
+    for tabla in escenario["protegidas"]:
         r = await escenario["adm"].fetchrow(
             "SELECT relrowsecurity, relforcerowsecurity FROM pg_class "
             " WHERE relname = $1", tabla)
@@ -204,7 +214,7 @@ async def test_todas_las_tablas_del_lote_estan_protegidas(escenario):
 async def test_cada_tabla_tiene_los_cuatro_verbos(escenario):
     """Un aislamiento que solo tapa SELECT deja borrar lo que no se puede ver."""
     incompletas = {}
-    for tabla in LOTE_560:
+    for tabla in escenario["protegidas"]:
         cmds = {r["cmd"] for r in await escenario["adm"].fetch(
             "SELECT cmd FROM pg_policies WHERE schemaname='public' AND tablename=$1",
             tabla)}

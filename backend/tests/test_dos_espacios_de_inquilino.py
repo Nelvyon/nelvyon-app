@@ -1,11 +1,20 @@
 """Dos espacios de identidad de inquilino conviviendo en la misma base.
 
-QUE SE ENCONTRO
----------------
-El esquema tiene DOS formas incompatibles de decir «de quien es esta fila»:
+QUE SE ENCONTRO, Y UNA CORRECCION IMPORTANTE
+--------------------------------------------
+El esquema tiene DOS formas de decir «de quien es esta fila»:
 
-    workspace_id  INTEGER   167 columnas   apunta a `workspaces.id`
-    tenant_id     UUID      159 columnas   no apunta a nada: no hay tabla `tenants`
+    workspace_id  INTEGER   153 tablas   apunta a `workspaces.id`      (NELVYON OS)
+    tenant_id     UUID      151 tablas   apunta a `saas_tenants.id`    (NELVYON SaaS)
+
+La primera version de este fichero afirmaba que los `tenant_id` «no apuntan a
+nada porque no hay tabla `tenants`». ERA FALSO. La tabla existe y se llama
+`saas_tenants`: tiene 22 filas y NOVENTA Y SEIS claves ajenas apuntando a ella.
+La prueba buscaba el nombre equivocado y concluyo lo que no era.
+
+No son dos espacios por descuido: son DOS PRODUCTOS compartiendo base de datos.
+Los «22 inquilinos» de los que se hablaba en la operacion son `saas_tenants`, no
+`workspaces` —de esos hay 3—.
 
 No es un detalle de estilo. `services/memory_service` —el almacen vectorial que
 usarian los agentes para recordar— consulta asi:
@@ -92,17 +101,28 @@ async def test_con_un_uuid_la_misma_consulta_si_funciona(conexion):
     assert n == 0
 
 
-async def test_no_existe_la_tabla_a_la_que_apuntarian_los_tenant_id(conexion):
-    """159 columnas apuntan a una tabla que no existe.
+async def test_los_tenant_id_si_tienen_destino_y_esta_referenciado(conexion):
+    """LA CORRECCION.
 
-    Mientras eso sea cierto, ninguna de ellas puede tener una clave ajena, y por
-    tanto nada impide guardar un identificador inventado.
+    La version anterior de esta prueba buscaba una tabla `tenants`, no la
+    encontraba, y concluia que 159 columnas apuntaban a la nada. La tabla existe:
+    se llama `saas_tenants`, y hay noventa y tantas claves ajenas hacia ella.
+
+    Que el espacio uuid este bien formado cambia el diagnostico: no es un
+    descuido que haya que unificar, son dos productos conviviendo. Lo que si es
+    un defecto es que UN modulo —la memoria de los agentes— este consultando el
+    espacio equivocado.
     """
     existe = await conexion.fetchval(
-        "SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='tenants'")
-    assert not existe, (
-        "ha aparecido una tabla `tenants`: revisa si los `tenant_id` uuid ya "
-        "tienen destino y actualiza esta prueba")
+        "SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='saas_tenants'")
+    assert existe, "no existe `saas_tenants`: el espacio uuid quedaria huerfano"
+
+    fks = await conexion.fetchval(
+        "SELECT count(*) FROM pg_constraint WHERE contype='f' "
+        " AND confrelid = 'saas_tenants'::regclass")
+    assert fks > 50, (
+        f"solo {fks} claves ajenas hacia `saas_tenants`: si bajan, alguien esta "
+        f"desmontando el espacio uuid y hay que saberlo")
 
 
 async def test_la_divergencia_de_espacios_no_crece(conexion):

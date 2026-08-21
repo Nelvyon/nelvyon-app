@@ -18,6 +18,8 @@ import os
 
 import pytest
 
+from tests._guardia_de_roles import alterar_rol
+
 DSN = os.environ.get("NELVYON_PG_CERT_DSN")
 
 pytestmark = [
@@ -92,7 +94,7 @@ async def test_el_intento_de_escritura_se_rechaza_de_verdad(admin):
     """Ejecutando, no leyendo el catalogo de privilegios."""
     import asyncpg
 
-    await admin.execute("ALTER ROLE nelvyon_app LOGIN PASSWORD 'cert_app_tmp'")
+    await alterar_rol(admin, "ALTER ROLE nelvyon_app LOGIN PASSWORD 'cert_app_tmp'", DSN)
     try:
         base = _dsn()
         c = await asyncpg.connect(
@@ -110,4 +112,4 @@ async def test_el_intento_de_escritura_se_rechaza_de_verdad(admin):
         finally:
             await c.close()
     finally:
-        await admin.execute("ALTER ROLE nelvyon_app NOLOGIN")
+        await alterar_rol(admin, "ALTER ROLE nelvyon_app NOLOGIN", DSN)

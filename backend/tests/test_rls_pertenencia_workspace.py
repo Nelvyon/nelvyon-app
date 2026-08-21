@@ -41,6 +41,8 @@ import uuid as _uuid
 
 import pytest
 
+from tests._guardia_de_roles import alterar_rol
+
 DSN = os.environ.get("NELVYON_PG_CERT_DSN")
 
 requiere_pg = pytest.mark.skipif(
@@ -100,8 +102,8 @@ async def escenario():
 
     if await admin.fetchval("SELECT count(*) FROM pg_roles WHERE rolname=$1", ROL):
         await admin.execute(f"DROP OWNED BY {ROL}")
-        await admin.execute(f"DROP ROLE {ROL}")
-    await admin.execute(f"CREATE ROLE {ROL} LOGIN PASSWORD '{CLAVE}' NOSUPERUSER NOBYPASSRLS")
+        await alterar_rol(admin, f"DROP ROLE {ROL}", DSN)
+    await alterar_rol(admin, f"CREATE ROLE {ROL} LOGIN PASSWORD '{CLAVE}' NOSUPERUSER NOBYPASSRLS", DSN)
     await admin.execute(f"GRANT USAGE ON SCHEMA public, auth TO {ROL}")
     # Solo la tabla que se prueba. Ni `workspaces` ni `workspace_members`: las
     # leen las funciones SECURITY DEFINER, y que el rol NO tenga GRANT sobre
@@ -143,7 +145,7 @@ async def escenario():
     finally:
         await limpiar()
         await admin.execute(f"DROP OWNED BY {ROL}")
-        await admin.execute(f"DROP ROLE IF EXISTS {ROL}")
+        await alterar_rol(admin, f"DROP ROLE IF EXISTS {ROL}", DSN)
         await admin.close()
 
 

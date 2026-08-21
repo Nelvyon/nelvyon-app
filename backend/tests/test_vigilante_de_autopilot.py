@@ -21,6 +21,8 @@ import secrets
 
 import pytest
 
+from tests._vista_global_limpia import exigir_vista_global_limpia
+
 DSN = os.environ.get("NELVYON_PG_CERT_DSN")
 #: DSN del rol `nelvyon_jobs`, que es el que ejecuta Autopilot EN PRODUCCION.
 #: Se reparte al vuelo desde `_rol_de_barrido` porque el rol no tiene LOGIN de
@@ -74,6 +76,9 @@ async def entorno():
 
     metricas = [c.metrica for c in COMPROBACIONES if c.metrica.startswith("autopilot")]
     adm = await asyncpg.connect(_dsn(), timeout=30)
+    # Mide la vista global: sobre residuo de otra ejecucion mediria la
+    # empresa de otro. Ver `_vista_global_limpia`.
+    await exigir_vista_global_limpia(adm)
     marca = secrets.token_hex(4)
     uid = await adm.fetchval(
         "INSERT INTO nelvyon_users (email, password_hash, full_name) "

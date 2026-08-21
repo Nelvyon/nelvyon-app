@@ -25,6 +25,8 @@ import secrets
 
 import pytest
 
+from tests._guardia_de_roles import alterar_rol
+
 DSN = os.environ.get("NELVYON_PG_CERT_DSN")
 
 pytestmark = [
@@ -176,7 +178,7 @@ async def test_un_purgado_que_falla_no_se_reporta_como_completado(dos_inquilinos
     a = dos_inquilinos["ws"]["A"]
     sujeto = dos_inquilinos["sujeto"]
 
-    await adm.execute("ALTER ROLE nelvyon_app LOGIN PASSWORD 'cert_app_tmp'")
+    await alterar_rol(adm, "ALTER ROLE nelvyon_app LOGIN PASSWORD 'cert_app_tmp'", DSN)
     base = _dsn()
     motor_app = create_async_engine(
         (base.split("://")[0] + "+asyncpg://nelvyon_app:cert_app_tmp@"
@@ -191,7 +193,7 @@ async def test_un_purgado_que_falla_no_se_reporta_como_completado(dos_inquilinos
         assert any("bookings" in f for f in fallos), fallos
     finally:
         await adm.execute("GRANT DELETE ON bookings TO nelvyon_app")
-        await adm.execute("ALTER ROLE nelvyon_app NOLOGIN")
+        await alterar_rol(adm, "ALTER ROLE nelvyon_app NOLOGIN", DSN)
         await motor_app.dispose()
 
 

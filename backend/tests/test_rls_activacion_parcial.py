@@ -51,6 +51,8 @@ import uuid
 
 import pytest
 
+from tests._guardia_de_roles import alterar_rol_sync
+
 DSN = os.environ.get("NELVYON_PG_CERT_DSN")
 
 pytestmark = pytest.mark.skipif(
@@ -147,7 +149,8 @@ def admin():
 def rol_app(admin):
     """Crea (o reafirma) `nelvyon_app` con los permisos exactos. Idempotente."""
     cur = admin.cursor()
-    cur.execute(
+    alterar_rol_sync(
+        cur,
         """
         DO $bloque$
         BEGIN
@@ -160,7 +163,8 @@ def rol_app(admin):
           END IF;
         END
         $bloque$;
-        """.replace("%(clave)s", "'" + CLAVE + "'")
+        """.replace("%(clave)s", "'" + CLAVE + "'"),
+        DSN,
     )
     for plantilla in GRANTS:
         cur.execute(plantilla.format(rol=ROL))
@@ -1424,7 +1428,8 @@ def rol_jobs(admin):
     if cur.fetchone() is None:
         pytest.fail("falta el rol nelvyon_jobs; aplicar la migracion 540")
 
-    cur.execute("ALTER ROLE nelvyon_jobs LOGIN PASSWORD 'nelvyon_jobs_cert'")
+    alterar_rol_sync(
+        cur, "ALTER ROLE nelvyon_jobs LOGIN PASSWORD 'nelvyon_jobs_cert'", DSN)
 
     cur.execute(
         "SELECT has_table_privilege('nelvyon_jobs', 'public.subscriptions', 'INSERT')")
@@ -1437,7 +1442,7 @@ def rol_jobs(admin):
 
     yield _dsn_del_rol(DSN, "nelvyon_jobs", "nelvyon_jobs_cert")
     # Se le retira LOGIN al terminar: el rol vuelve a como lo dejo la 540.
-    cur.execute("ALTER ROLE nelvyon_jobs NOLOGIN")
+    alterar_rol_sync(cur, "ALTER ROLE nelvyon_jobs NOLOGIN", DSN)
 
 
 @pytest.fixture

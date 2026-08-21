@@ -23,6 +23,8 @@ si misma los permisos que deberia estar verificando no verifica nada.
 """
 from __future__ import annotations
 
+from tests._guardia_de_roles import alterar_rol
+
 #: La misma que usa `test_rls_activacion_parcial.rol_jobs`. Solo existe en bases
 #: de certificacion locales; produccion reparte la suya por variable de entorno.
 CLAVE_CERT = "nelvyon_jobs_cert"
@@ -43,7 +45,8 @@ async def dar_login(dsn_admin: str) -> str | None:
     try:
         if not await c.fetchval("SELECT 1 FROM pg_roles WHERE rolname='nelvyon_jobs'"):
             return None
-        await c.execute(f"ALTER ROLE nelvyon_jobs LOGIN PASSWORD '{CLAVE_CERT}'")
+        await alterar_rol(
+            c, f"ALTER ROLE nelvyon_jobs LOGIN PASSWORD '{CLAVE_CERT}'", limpio)
     finally:
         await c.close()
     return _con_rol(limpio, CLAVE_CERT)
@@ -59,7 +62,7 @@ async def retirar_login(dsn_admin: str) -> None:
     except Exception:  # noqa: BLE001
         return
     try:
-        await c.execute("ALTER ROLE nelvyon_jobs NOLOGIN")
+        await alterar_rol(c, "ALTER ROLE nelvyon_jobs NOLOGIN", limpio)
     except Exception:  # noqa: BLE001
         pass
     finally:

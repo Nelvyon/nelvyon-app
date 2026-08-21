@@ -41,6 +41,8 @@ import time
 
 import pytest
 
+from tests._guardia_de_roles import alterar_rol
+
 DSN_ADMIN = os.environ.get("NELVYON_PG_CERT_DSN")
 
 pytestmark = [
@@ -115,7 +117,7 @@ async def _retirar(admin, base):
     if await admin.fetchval("SELECT 1 FROM pg_roles WHERE rolname=$1", ROL_CERT):
         await admin.execute(f"REVOKE ALL ON DATABASE {base} FROM {ROL_CERT}")
         await admin.execute(f"DROP OWNED BY {ROL_CERT}")
-        await admin.execute(f"DROP ROLE IF EXISTS {ROL_CERT}")
+        await alterar_rol(admin, f"DROP ROLE IF EXISTS {ROL_CERT}", DSN_ADMIN)
 
 
 @pytest.fixture
@@ -124,9 +126,11 @@ async def dsn_barrido(admin):
     clave = secrets.token_urlsafe(32)
     base = await admin.fetchval("SELECT current_database()")
     await _retirar(admin, base)
-    await admin.execute(
+    await alterar_rol(
+        admin,
         f"CREATE ROLE {ROL_CERT} LOGIN PASSWORD '{clave}' IN ROLE nelvyon_jobs "
-        f"NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION INHERIT BYPASSRLS"
+        f"NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION INHERIT BYPASSRLS",
+        DSN_ADMIN,
     )
     await admin.execute(f"GRANT CONNECT ON DATABASE {base} TO {ROL_CERT}")
     try:

@@ -85,7 +85,7 @@ def test_el_fichero_que_fallaba_ya_no_tiene_el_patron():
     texto = f.read_text(encoding="utf-8")
     for m in _CAPTURA.finditer(texto):
         nombre, variable = m.group(1), m.group(2)
-        assert not re.search(rf"process\.env\.{variable}\s*=\s*{nombre}", texto), (
+        assert not re.search(rf"process\.env\.{variable}\s*=\s*{nombre}\b", texto), (
             f"vuelve la captura fuera de hook en authSessionSecurity: {nombre}"
         )
 

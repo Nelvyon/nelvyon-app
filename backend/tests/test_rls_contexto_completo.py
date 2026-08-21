@@ -55,6 +55,8 @@ import uuid as _uuid
 
 import pytest
 
+from tests._guardia_de_roles import alterar_rol
+
 DSN = os.environ.get("NELVYON_PG_CERT_DSN")
 
 requiere_pg = pytest.mark.skipif(
@@ -146,8 +148,8 @@ async def test_con_contexto_completo_y_rol_sin_bypass_rls_aisla(admin):
     # que aun cuelgan privilegios.
     await admin.execute(f"DROP OWNED BY {ROL}" if await admin.fetchval(
         "SELECT count(*) FROM pg_roles WHERE rolname=$1", ROL) else "SELECT 1")
-    await admin.execute(f"DROP ROLE IF EXISTS {ROL}")
-    await admin.execute(f"CREATE ROLE {ROL} LOGIN PASSWORD 'ctx-cert' NOSUPERUSER NOBYPASSRLS")
+    await alterar_rol(admin, f"DROP ROLE IF EXISTS {ROL}", DSN)
+    await alterar_rol(admin, f"CREATE ROLE {ROL} LOGIN PASSWORD 'ctx-cert' NOSUPERUSER NOBYPASSRLS", DSN)
     await admin.execute(f"GRANT USAGE ON SCHEMA public, auth TO {ROL}")
     await admin.execute(f"GRANT SELECT, INSERT, UPDATE, DELETE ON public.support_tickets TO {ROL}")
     await admin.execute("DELETE FROM support_tickets WHERE subject LIKE 'ctx-cert%'")
@@ -195,7 +197,7 @@ async def test_con_contexto_completo_y_rol_sin_bypass_rls_aisla(admin):
         await admin.execute("DELETE FROM support_tickets WHERE subject LIKE 'ctx-cert%'")
         await admin.execute("DELETE FROM nelvyon_users WHERE email LIKE 'ctx-cert-%@nelvyon.test'")
         await admin.execute(f"DROP OWNED BY {ROL}")
-        await admin.execute(f"DROP ROLE IF EXISTS {ROL}")
+        await alterar_rol(admin, f"DROP ROLE IF EXISTS {ROL}", DSN)
 
 
 # ── el estado real de produccion, dicho sin adornos ─────────────────────────
