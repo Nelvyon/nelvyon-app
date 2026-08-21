@@ -205,7 +205,7 @@ async def planificar(sesion, workspace_id: int, capacidad: str, periodo: str,
              "ON CONFLICT (idempotency_key) DO NOTHING "
              "RETURNING id"),
         {"ws": int(workspace_id), "cap": capacidad, "k": clave, "e": estado,
-         "ent": json.dumps(entrada or {})})
+         "ent": json.dumps(entrada or {}, default=str)})
     fila = r.first()
     if fila is None:
         return None
@@ -280,7 +280,15 @@ async def avanzar(sesion, job_id: int, desde: str, hasta: str,
     for nombre in ("resultado", "evidencia", "validacion"):
         if nombre in campos:
             asignaciones.append(f"{nombre} = CAST(:{nombre} AS jsonb)")
-            params[nombre] = json.dumps(campos[nombre])
+            # `default=str` no es prolijidad: sin el, cualquier capacidad que
+            # devuelva un tipo nativo de PostgreSQL —UUID, datetime, Decimal—
+            # revienta AQUI, en el ultimo paso, DESPUES de haber hecho todo el
+            # trabajo. Y revienta con un TypeError que no dice que capacidad fue.
+            #
+            # Estuvo latente mientras las capacidades devolvieron solo enteros y
+            # cadenas. La primera que devolvio una fila de la base tal cual lo
+            # descubrio.
+            params[nombre] = json.dumps(campos[nombre], default=str)
     if "ultimo_error" in campos:
         asignaciones.append("ultimo_error = :err")
         params["err"] = str(campos["ultimo_error"])[:2000]

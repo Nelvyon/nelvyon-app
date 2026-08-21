@@ -301,6 +301,12 @@ RESIDUO_SIN_INSERT = {
     "autopilot_jobs",
     "autopilot_workspace_settings",
     "autopilot_workspace_capabilities",
+    # La plantilla de agentes: auditoria, memoria y presupuesto los escribe el
+    # motor. El motivo largo esta en `RESIDUO_ESCRIBE_EL_MOTOR` de
+    # `test_rls_politicas_completas`.
+    "agent_runs",
+    "agent_memory",
+    "agent_budget",
 }
 
 

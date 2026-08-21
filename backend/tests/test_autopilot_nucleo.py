@@ -332,3 +332,77 @@ async def test_el_trabajo_pertenece_a_su_workspace(entorno):
     assert await adm.fetchval(
         "SELECT count(*) FROM pg_policies WHERE schemaname='public' "
         "AND tablename='autopilot_jobs'") >= 2
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Tipos nativos de PostgreSQL en un resultado
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+@pytest.mark.skipif(not os.environ.get("NELVYON_PG_CERT_DSN"),
+                    reason="sin NELVYON_PG_CERT_DSN")
+@pytest.mark.asyncio
+async def test_un_resultado_con_tipos_de_la_base_se_entrega_igual(entorno):
+    """UUID, datetime y Decimal en un resultado NO pueden tumbar la entrega.
+
+    `avanzar()` serializaba con `json.dumps` a secas. Cualquier capacidad que
+    devolviera una fila de la base tal cual reventaba con un TypeError en el
+    ULTIMO paso —despues de haber hecho todo el trabajo— y con un mensaje que no
+    decia siquiera que capacidad habia sido.
+
+    Estuvo latente mientras las capacidades devolvieron solo enteros y cadenas.
+    La primera que devolvio tipos nativos lo descubrio.
+    """
+    import uuid as _uuid
+    from datetime import datetime, timezone
+    from decimal import Decimal
+
+    from core.autopilot import (
+        CONFIRMADO, EJECUTANDO, ENTREGA_PENDIENTE, ENTREGADO, PRODUCIDO,
+        PROGRAMADO, VALIDADO, avanzar, planificar, tomar_trabajo,
+    )
+    from core.autopilot_ciclo import evidencia_de
+
+    ws, maker = entorno["ws"], entorno["maker"]
+    async with maker() as sesion:
+        job = await planificar(sesion, ws, "os_deliverables.snapshot_semanal",
+                               "TIPOS-" + _uuid.uuid4().hex[:6])
+        assert job is not None
+        await sesion.commit()
+        await tomar_trabajo(sesion, trabajador="tipos")
+        await _recorrido_con_tipos(sesion, job, ws)
+
+
+async def _recorrido_con_tipos(sesion, job, ws):
+    import uuid as _uuid
+    from datetime import datetime, timezone
+    from decimal import Decimal
+
+    from core.autopilot import (
+        CONFIRMADO, EJECUTANDO, ENTREGA_PENDIENTE, ENTREGADO, PRODUCIDO,
+        VALIDADO, avanzar,
+    )
+    from core.autopilot_ciclo import evidencia_de
+
+    resultado = {
+        "workspace_id": ws,
+        "identificador": _uuid.uuid4(),
+        "cuando": datetime.now(timezone.utc),
+        "importe": Decimal("12.34"),
+    }
+    assert await avanzar(sesion, job, EJECUTANDO, PRODUCIDO, resultado=resultado)
+    assert await avanzar(sesion, job, PRODUCIDO, VALIDADO,
+                         validacion={"valido": True, "fallos": []})
+    assert await avanzar(sesion, job, VALIDADO, ENTREGA_PENDIENTE)
+    assert await avanzar(sesion, job, ENTREGA_PENDIENTE, ENTREGADO,
+                         evidencia=evidencia_de(resultado))
+    assert await avanzar(sesion, job, ENTREGADO, CONFIRMADO)
+    await sesion.commit()
+
+    from sqlalchemy import text as _t
+
+    fila = (await sesion.execute(
+        _t("SELECT estado, resultado, evidencia FROM autopilot_jobs "
+           "WHERE id = :i"), {"i": job})).mappings().first()
+    assert fila["estado"] == CONFIRMADO
+    assert fila["evidencia"] is not None

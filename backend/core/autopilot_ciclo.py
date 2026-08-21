@@ -273,7 +273,10 @@ def evidencia_de(resultado: dict[str, Any]) -> dict[str, Any]:
     que la entrega corresponde a este resultado y no a otro. Sin esto, `delivered`
     seria de nuevo una palabra sin respaldo.
     """
-    crudo = json.dumps(resultado, sort_keys=True, ensure_ascii=False)
+    # Mismo motivo que en `avanzar`: la huella no puede depender de que el
+    # resultado solo lleve tipos primitivos.
+    crudo = json.dumps(resultado, sort_keys=True, ensure_ascii=False,
+                       default=str)
     return {
         "sha256": hashlib.sha256(crudo.encode()).hexdigest(),
         "bytes": len(crudo.encode()),
@@ -300,7 +303,8 @@ def asegurar_capacidades() -> None:
     # import que apagase TODO Autopilot convertiria un modulo roto en una empresa
     # parada.
     fallos = []
-    for modulo in ("core.autopilot_capacidades", "core.autopilot_lifecycle"):
+    for modulo in ("core.autopilot_capacidades", "core.autopilot_lifecycle",
+                   "core.agentes.puente"):
         try:
             __import__(modulo)
         except Exception:  # noqa: BLE001

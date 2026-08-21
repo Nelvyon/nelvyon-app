@@ -143,20 +143,39 @@ async def test_el_ciclo_entero_sin_una_sola_peticion_manual(ws):
         for j in plan["creados"]
     ], f"el planner no programo trabajo para este workspace: {plan}"
 
-    async with maker() as s:
-        salida = await ejecutar_uno(s, trabajador="e2e")
-    assert salida is not None and salida["resultado"] == "confirmado", salida
+    # Se vacia la cola entera. Cuando esta prueba se escribio habia UNA
+    # capacidad y bastaba con un `ejecutar_uno`; hoy hay treinta y una y el
+    # executor toma la que salga primero, asi que asumir cual seria medir el
+    # orden de la cola en vez del ciclo.
+    confirmados = 0
+    for _ in range(80):
+        async with maker() as s:
+            salida = await ejecutar_uno(s, trabajador="e2e")
+        if salida is None:
+            break
+        assert salida["resultado"] == "confirmado", salida
+        confirmados += 1
+    assert confirmados > 0, "el executor no confirmo nada"
+
+    import json
 
     fila = await adm.fetchrow(
         "SELECT estado, resultado, validacion, evidencia FROM autopilot_jobs "
-        "WHERE id=$1", salida["id"])
+        " WHERE workspace_id=$1 AND capacidad='os_deliverables.snapshot_semanal'",
+        ws["id"])
+    assert fila is not None, "el planner no programo la capacidad de entregables"
     assert fila["estado"] == "confirmed"
     assert fila["evidencia"] is not None, "entregado sin evidencia"
     assert fila["validacion"] is not None, "entregado sin validar"
 
-    import json
     res = json.loads(fila["resultado"])
     assert res["total"] == 3, f"el servicio OS midio mal: {res}"
+
+    # Y ni un trabajo a medias: la cola queda vacia y todo cerrado.
+    a_medias = await adm.fetchval(
+        "SELECT count(*) FROM autopilot_jobs WHERE workspace_id=$1 "
+        "AND estado NOT IN ('confirmed','awaiting_approval')", ws["id"])
+    assert a_medias == 0, f"{a_medias} trabajos quedaron sin cerrar"
 
 
 async def test_el_planner_no_repite_trabajo_del_mismo_periodo(ws):

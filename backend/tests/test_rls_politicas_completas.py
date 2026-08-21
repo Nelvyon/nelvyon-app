@@ -613,6 +613,25 @@ RESIDUO_ESCRIBE_EL_MOTOR = {
     "autopilot_workspace_capabilities": "idem: se activan al nacer, se apagan con UPDATE",
 }
 
+#: La plantilla de agentes: SOLO LECTURA para el inquilino.
+#:
+#: Se separa de `RESIDUO_ESCRIBE_EL_MOTOR` porque no es el mismo caso, aunque lo
+#: parezca. Las tablas de Autopilot dan UPDATE al inquilino a proposito: es su
+#: motor y tiene que poder apagar lo que no quiera. Estas tres no dan ninguno:
+#:
+#:   agent_runs     es la AUDITORIA. Una auditoria que su propio sujeto puede
+#:                  editar no audita nada. Se lee —es suya y ocultarsela seria
+#:                  pedirle que confie sin poder comprobar— pero no se toca.
+#:   agent_memory   lo que NELVYON sabe lo escribe NELVYON. Si el cliente
+#:                  pudiera editarlo, podria plantar hechos falsos que los
+#:                  agentes tomarian como ciertos.
+#:   agent_budget   falsear el consumo es saltarse el limite de gasto.
+RESIDUO_SOLO_LECTURA_DEL_INQUILINO = {
+    "agent_runs": "auditoria: se lee, no se toca",
+    "agent_memory": "lo que NELVYON sabe lo escribe NELVYON",
+    "agent_budget": "falsear el consumo seria saltarse el limite de gasto",
+}
+
 #: Tablas de solo-añadir. La ausencia de UPDATE/DELETE ES el control, no un hueco.
 RESIDUO_INMUTABLE = {
     "audit_logs": "un registro que su inquilino pueda reescribir no audita nada",
@@ -661,7 +680,8 @@ async def test_el_residuo_sin_insert_es_exactamente_el_catalogo_declarado(escena
     """
     admin, _ = escenario
     sin_insert = {f["tablename"] for f in await admin.fetch(_SIN_VERBO, "INSERT")}
-    esperado = set(RESIDUO_SIN_INSERT) | set(RESIDUO_ESCRIBE_EL_MOTOR)
+    esperado = (set(RESIDUO_SIN_INSERT) | set(RESIDUO_ESCRIBE_EL_MOTOR)
+                | set(RESIDUO_SOLO_LECTURA_DEL_INQUILINO))
     assert sin_insert == esperado, (
         f"residuo inesperado. sobran={sorted(sin_insert - esperado)} "
         f"faltan={sorted(esperado - sin_insert)}"
@@ -687,7 +707,11 @@ async def test_las_tablas_de_solo_anadir_son_las_declaradas(escenario):
     # a proposito, para que el cliente pueda apagar lo que no quiera. Solo les
     # falta INSERT, y en DELETE se comportan como los catalogos: borrar el
     # historial de lo que Autopilot hizo destruiria la evidencia de las entregas.
-    esperado_update = set(RESIDUO_INMUTABLE) | set(RESIDUO_SIN_INSERT)
+    # Las de Autopilot NO entran en `esperado_update`: tienen politica de UPDATE
+    # a proposito, para que el cliente pueda apagar lo que no quiera. Las de
+    # agentes SI, porque el inquilino no escribe ninguna de las tres.
+    esperado_update = (set(RESIDUO_INMUTABLE) | set(RESIDUO_SIN_INSERT)
+                       | set(RESIDUO_SOLO_LECTURA_DEL_INQUILINO))
     esperado_delete = esperado_update | set(RESIDUO_ESCRIBE_EL_MOTOR) | {
         "affiliate_profiles", "os_store_orders", "support_tickets",
     }

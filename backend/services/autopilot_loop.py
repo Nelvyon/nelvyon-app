@@ -41,6 +41,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
+from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from typing import Any, Optional
 
@@ -123,11 +124,10 @@ def estado() -> dict[str, Any]:
 
 
 async def tomar_cerrojo_planner(sesion) -> bool:
-    """Solo una replica planifica. Las demas esperan al siguiente ciclo.
+    """Intenta el cerrojo de sesion sobre `sesion`. Se conserva por compatibilidad.
 
-    `pg_try_advisory_lock` no espera: devuelve False de inmediato si otro lo
-    tiene. El cerrojo se libera solo si la sesion muere, asi que un contenedor
-    caido no deja la planificacion bloqueada.
+    NO la usa el bucle. El bucle usa `_cerrojo_de_transaccion`, por el motivo que
+    se explica ahi.
     """
     r = await sesion.execute(
         text("SELECT pg_try_advisory_lock(:k)"), {"k": LOCK_PLANNER})
@@ -139,22 +139,90 @@ async def soltar_cerrojo_planner(sesion) -> None:
         text("SELECT pg_advisory_unlock(:k)"), {"k": LOCK_PLANNER})
 
 
+def _motor_de(sesion):
+    """El motor donde vive el trabajo, no «un» motor cualquiera.
+
+    El cerrojo tiene que tomarse en la MISMA base que la cola. La primera version
+    lo pedia a `db_manager`, y en la suite eso es SQLite mientras la sesion apunta
+    a PostgreSQL: un cerrojo en otra base no protege nada y ademas revienta,
+    porque SQLite no tiene `pg_try_advisory_xact_lock`.
+
+    Se deriva de la propia sesion. Si no se puede, se cae a `db_manager` y, si
+    tampoco, no hay cerrojo y no se planifica: fail-closed.
+    """
+    from core.database import db_manager
+
+    motor = getattr(sesion, "bind", None)
+    if motor is None:
+        try:
+            motor = sesion.get_bind()
+        except Exception:  # noqa: BLE001
+            motor = None
+    if motor is not None and hasattr(motor, "connect"):
+        return motor
+    return db_manager.jobs_engine or db_manager.engine
+
+
+@asynccontextmanager
+async def _cerrojo_de_transaccion(sesion):
+    """Cerrojo del planner sobre una conexion propia y atado a una transaccion.
+
+    POR QUE NO VALE TOMARLO EN LA SESION DEL CICLO
+    ----------------------------------------------
+    `planear()` hace `commit()` por dentro —al provisionar y al terminar— y en
+    SQLAlchemy async un commit DEVUELVE LA CONEXION AL POOL. El
+    `pg_advisory_unlock` posterior se ejecutaba entonces sobre OTRA conexion y no
+    liberaba nada: `pg_advisory_unlock` sobre una sesion que no tiene el cerrojo
+    devuelve false y emite un aviso, nada mas.
+
+    El cerrojo quedaba retenido por una conexion del pool, que sigue viva. Con
+    `pool_size=2` en el motor de barridos, bastaban dos o tres ciclos para que el
+    planner dejara de conseguirlo NUNCA MAS. Y el sintoma era el peor posible:
+    ningun error, `status: healthy`, y la empresa sin programar una sola tarea.
+    Se vio en produccion, con `con_cerrojo: false` en el tercer ciclo.
+
+    POR QUE DE TRANSACCION Y NO DE SESION
+    -------------------------------------
+    `pg_try_advisory_xact_lock` se libera SIEMPRE al terminar la transaccion:
+    commit, rollback, excepcion o muerte del proceso. No hay forma de olvidarse
+    de soltarlo, que es justo el fallo que acaba de ocurrir. Un cerrojo cuya
+    liberacion depende de que alguien se acuerde no es un cerrojo, es una apuesta.
+
+    Cede `True` si lo consiguio y `False` si lo tiene otra replica.
+    """
+    motor = _motor_de(sesion)
+    if motor is None or not hasattr(motor, "connect"):
+        logger.warning("autopilot planner: sin motor donde tomar el cerrojo; "
+                       "no se planifica")
+        yield False
+        return
+    try:
+        conexion_ctx = motor.connect()
+    except Exception:  # noqa: BLE001
+        yield False
+        return
+    async with conexion_ctx as conexion:
+        async with conexion.begin():
+            r = await conexion.execute(
+                text("SELECT pg_try_advisory_xact_lock(:k)"), {"k": LOCK_PLANNER})
+            yield bool(r.scalar())
+
+
 async def un_ciclo_planner(sesion) -> dict[str, Any]:
     """Un ciclo. Se expone aparte para poder probarlo sin el bucle."""
     from core.autopilot_ciclo import planear
 
-    if not await tomar_cerrojo_planner(sesion):
-        _METRICAS["planner_con_cerrojo"] = False
-        logger.info("autopilot planner: otra replica tiene el cerrojo; se omite")
-        return {"omitido": True, "motivo": "otra replica planifica"}
+    async with _cerrojo_de_transaccion(sesion) as tengo_el_cerrojo:
+        if not tengo_el_cerrojo:
+            _METRICAS["planner_con_cerrojo"] = False
+            logger.info("autopilot planner: otra replica tiene el cerrojo; se omite")
+            return {"omitido": True, "motivo": "otra replica planifica"}
 
-    _METRICAS["planner_con_cerrojo"] = True
-    try:
-        resultado = await planear(sesion)
-    finally:
-        await soltar_cerrojo_planner(sesion)
-        await sesion.commit()
-    return resultado
+        _METRICAS["planner_con_cerrojo"] = True
+        try:
+            return await planear(sesion)
+        finally:
+            await sesion.commit()
 
 
 async def un_ciclo_executor(sesion, limite: Optional[int] = None) -> dict[str, Any]:

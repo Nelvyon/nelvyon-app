@@ -215,3 +215,146 @@ def test_el_api_no_se_cae_si_autopilot_no_arranca():
     assert "Autopilot no arranco" in fuente
     assert "app.state.autopilot = []" in fuente, (
         "sin valor por defecto, el apagado fallaria tras un arranque fallido")
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# El cerrojo del planner, ciclo tras ciclo, contra PostgreSQL real
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# La bateria de arriba prueba el cerrojo con dos sesiones a la vez, y esa parte
+# funcionaba. Lo que no probaba nadie era lo que pasa TRAS VARIOS CICLOS con un
+# pool de conexiones, y ahi estaba el fallo:
+#
+#   `planear()` hace commit por dentro -> SQLAlchemy devuelve la conexion al pool
+#   -> el `pg_advisory_unlock` de despues corre en OTRA conexion -> no libera nada
+#   -> el cerrojo queda retenido por una conexion viva del pool -> con pool_size=2
+#      bastan dos o tres ciclos para que el planner no lo consiga NUNCA MAS.
+#
+# Sin error, sin excepcion, con `status: healthy` y la empresa sin programar una
+# sola tarea. Se vio en produccion al tercer ciclo.
+
+_DSN_PG = os.environ.get("NELVYON_PG_CERT_DSN")
+
+
+@pytest.mark.skipif(not _DSN_PG, reason="sin NELVYON_PG_CERT_DSN")
+@pytest.mark.asyncio
+async def test_un_ciclo_del_planner_no_deja_el_cerrojo_retenido():
+    """LA PRUEBA QUE FALTABA.
+
+    No comprueba que el ciclo consiga el cerrojo —eso pasaba tambien con el
+    codigo roto, porque la conexion que lo retenia era la misma que lo volvia a
+    pedir, y los cerrojos de sesion son reentrantes—. Comprueba la propiedad que
+    de verdad importa: que DESPUES del ciclo no quede ni un cerrojo retenido.
+
+    Medido contra la version anterior: 1 cerrojo retenido tras cada ciclo. Con el
+    cerrojo de transaccion: 0.
+
+    El pool se precalienta con dos conexiones a proposito. Con una sola no se ve
+    nada, y ese fue el motivo de que la bateria original diera verde mientras
+    produccion se quedaba sin planificar.
+    """
+    from sqlalchemy import text as _text
+    from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
+    import core.database as bd
+    from services.autopilot_loop import LOCK_PLANNER, un_ciclo_planner
+
+    dsn = _DSN_PG.replace("postgresql+asyncpg://", "postgresql://").replace(
+        "postgresql://", "postgresql+asyncpg://").replace("@localhost:", "@127.0.0.1:")
+    motor = create_async_engine(dsn, pool_size=2, max_overflow=0)
+    auditor = create_async_engine(dsn)
+    previo = bd.db_manager.jobs_engine
+    bd.db_manager.jobs_engine = motor
+    try:
+        a = await motor.connect()
+        b = await motor.connect()
+        await a.close()
+        await b.close()
+
+        maker = async_sessionmaker(motor, expire_on_commit=False)
+        for vuelta in range(4):
+            async with maker() as sesion:
+                await un_ciclo_planner(sesion)
+            async with auditor.connect() as c:
+                retenidos = (await c.execute(_text(
+                    "SELECT count(*) FROM pg_locks WHERE locktype='advisory' "
+                    "AND objid = :k"), {"k": LOCK_PLANNER})).scalar()
+            assert retenidos == 0, (
+                f"el ciclo {vuelta + 1} dejo {retenidos} cerrojo(s) retenido(s). "
+                f"A partir de aqui el planner no programaria NADA, sin un solo "
+                f"error y con el API en verde.")
+    finally:
+        bd.db_manager.jobs_engine = previo
+        await motor.dispose()
+        await auditor.dispose()
+
+
+@pytest.mark.skipif(not _DSN_PG, reason="sin NELVYON_PG_CERT_DSN")
+@pytest.mark.asyncio
+async def test_el_planner_sigue_consiguiendo_el_cerrojo_ciclo_tras_ciclo():
+    """Y el sintoma visible: diez ciclos, los diez planificando."""
+    from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
+    import core.database as bd
+    from services.autopilot_loop import _METRICAS, un_ciclo_planner
+
+    dsn = _DSN_PG.replace("postgresql+asyncpg://", "postgresql://").replace(
+        "postgresql://", "postgresql+asyncpg://").replace("@localhost:", "@127.0.0.1:")
+    # Pool de 2, como el motor de barridos de produccion: es lo que hace que el
+    # fallo aparezca en pocos ciclos en vez de en muchos.
+    motor = create_async_engine(dsn, pool_size=2, max_overflow=0)
+    previo = bd.db_manager.jobs_engine
+    bd.db_manager.jobs_engine = motor
+    try:
+        maker = async_sessionmaker(motor, expire_on_commit=False)
+        for vuelta in range(10):
+            async with maker() as sesion:
+                await un_ciclo_planner(sesion)
+            assert _METRICAS["planner_con_cerrojo"] is True, (
+                f"el planner perdio el cerrojo en el ciclo {vuelta + 1}: a partir "
+                f"de aqui no programaria nada, sin un solo error")
+    finally:
+        bd.db_manager.jobs_engine = previo
+        await motor.dispose()
+
+
+@pytest.mark.skipif(not _DSN_PG, reason="sin NELVYON_PG_CERT_DSN")
+@pytest.mark.asyncio
+async def test_el_cerrojo_se_suelta_aunque_planificar_reviente():
+    """Un fallo al planificar no puede dejar el cerrojo retenido.
+
+    Es la razon de que sea un cerrojo de TRANSACCION: se libera en el commit, en
+    el rollback y si el proceso muere. No depende de que nadie se acuerde.
+    """
+    from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
+    import core.autopilot_ciclo as ciclo
+    import core.database as bd
+    from services.autopilot_loop import _METRICAS, un_ciclo_planner
+
+    dsn = _DSN_PG.replace("postgresql+asyncpg://", "postgresql://").replace(
+        "postgresql://", "postgresql+asyncpg://").replace("@localhost:", "@127.0.0.1:")
+    motor = create_async_engine(dsn, pool_size=2, max_overflow=0)
+    previo_motor, previo_planear = bd.db_manager.jobs_engine, ciclo.planear
+    bd.db_manager.jobs_engine = motor
+    try:
+        maker = async_sessionmaker(motor, expire_on_commit=False)
+
+        async def _revienta(sesion, ahora=None):
+            raise RuntimeError("fallo provocado al planificar")
+
+        ciclo.planear = _revienta
+        for _ in range(3):
+            async with maker() as sesion:
+                with pytest.raises(RuntimeError):
+                    await un_ciclo_planner(sesion)
+
+        ciclo.planear = previo_planear
+        async with maker() as sesion:
+            await un_ciclo_planner(sesion)
+        assert _METRICAS["planner_con_cerrojo"] is True, (
+            "tres fallos dejaron el cerrojo retenido")
+    finally:
+        ciclo.planear = previo_planear
+        bd.db_manager.jobs_engine = previo_motor
+        await motor.dispose()

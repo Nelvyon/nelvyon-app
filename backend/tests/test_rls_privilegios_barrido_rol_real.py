@@ -95,11 +95,22 @@ OS_LECTURA = ["os_tasks", "os_cashflow", "os_expenses", "os_deals",
 SOPORTE_LECTURA = ["helpdesk_tickets", "support_templates",
                    "onboarding_workspace_steps"]
 
+#: 556-558 — la plantilla de agentes.
+#:
+#: El motor escribe la auditoria, la memoria y el presupuesto. El catalogo, las
+#: politicas y el freno de emergencia los lee y NADA MAS: un agente que pudiera
+#: reescribir su propia politica no tiene politica, y uno que pudiera quitarse el
+#: freno no tiene freno. Hay pruebas que lo comprueban ejecutando, no leyendo el
+#: GRANT.
+AGENTES_ESCRITURA = ["agent_runs", "agent_memory", "agent_budget"]
+AGENTES_LECTURA = ["agent_catalog", "agent_policies", "agent_kill_switch"]
+
 CONCEDIDAS = (
     set(ESCRITURA) | set(ACTUALIZACION) | set(LECTURA)
     | set(VIGILANCIA_LECTURA) | set(VIGILANCIA_ESCRITURA)
     | set(AUTOPILOT_LECTURA) | set(AUTOPILOT_ESCRITURA)
     | set(OS_LECTURA) | set(SOPORTE_LECTURA)
+    | set(AGENTES_ESCRITURA) | set(AGENTES_LECTURA)
 )
 
 #: Tablas que el rol NO debe alcanzar. Cada una es un camino de usuario servido
