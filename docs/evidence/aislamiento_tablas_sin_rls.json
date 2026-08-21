@@ -1,0 +1,1838 @@
+[
+  {
+    "tabla": "activities",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [
+      "routers\\global_dashboard.py"
+    ],
+    "escribe": [
+      "routers\\activities.py"
+    ],
+    "modelo": [
+      "models\\activities.py"
+    ],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "advisor_session_usage",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "routers\\advisor_entitlements.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "affiliates",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\affiliate_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "agency_profiles",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\marketplace_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "api_keys",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\api_keys_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "apollo_lead_cache",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [],
+    "modelo": [],
+    "lote": "A",
+    "motivo": "vacia y sin codigo que la toque: protegerla no puede romper nada observable"
+  },
+  {
+    "tabla": "appointments",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "routers\\appointments.py"
+    ],
+    "modelo": [
+      "models\\appointments.py"
+    ],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "automation_jobs",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [
+      "routers\\os_global.py"
+    ],
+    "escribe": [
+      "core\\autorrecuperacion.py"
+    ],
+    "modelo": [
+      "models\\automation_jobs.py"
+    ],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "automation_webhooks",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\automation_webhooks.py"
+    ],
+    "modelo": [
+      "models\\automation_webhooks.py"
+    ],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "blog_posts",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\blog_posts.py"
+    ],
+    "modelo": [
+      "models\\blog_posts.py"
+    ],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "bookings",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\booking_service.py",
+      "services\\gdpr_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "campaigns",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app,nelvyon_jobs",
+    "filas": 0,
+    "lee": [
+      "routers\\e2e_orchestrator.py",
+      "routers\\global_dashboard.py",
+      "services\\agent_orchestrator.py",
+      "services\\ai_service.py",
+      "services\\finetuning_service.py",
+      "services\\gdpr_service.py",
+      "services\\reporting_service.py",
+      "services\\workspace_service.py"
+    ],
+    "escribe": [
+      "routers\\campaigns.py",
+      "routers\\onboarding.py",
+      "services\\campaign_service.py",
+      "services\\onboarding_service.py"
+    ],
+    "modelo": [
+      "models\\campaigns.py"
+    ],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "client_memory",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\memory_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "client_websites",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\web_builder_service.py",
+      "services\\web_publisher_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "connector_configs",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\connector_configs.py"
+    ],
+    "modelo": [
+      "models\\connector_configs.py"
+    ],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "consent_records",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\gdpr_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "contacts",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [
+      "routers\\global_dashboard.py",
+      "routers\\module_analytics.py",
+      "services\\campaign_sender.py",
+      "services\\campaign_service.py",
+      "services\\helpdesk_service.py",
+      "services\\saas_contact_quota.py"
+    ],
+    "escribe": [
+      "routers\\contacts.py",
+      "routers\\e2e_orchestrator.py",
+      "routers\\onboarding.py",
+      "services\\gdpr_service.py"
+    ],
+    "modelo": [
+      "models\\contacts.py"
+    ],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "contracts",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [
+      "routers\\global_dashboard.py",
+      "routers\\module_analytics.py"
+    ],
+    "escribe": [
+      "routers\\e2e_orchestrator.py"
+    ],
+    "modelo": [
+      "models\\contracts.py"
+    ],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "conversations",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "routers\\conversations.py"
+    ],
+    "modelo": [
+      "models\\conversations.py"
+    ],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "cpq_quotes",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\cpq_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "crm_activities",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [
+      "services\\analytics_service.py",
+      "services\\churn_prediction_service.py",
+      "services\\gdpr_service.py",
+      "services\\lead_scoring_service.py",
+      "services\\reports_service.py"
+    ],
+    "escribe": [
+      "services\\crm_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "crm_contacts",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app,nelvyon_jobs",
+    "filas": 0,
+    "lee": [
+      "services\\cdp_service.py",
+      "services\\dialer_advanced_service.py",
+      "services\\dialer_service.py",
+      "services\\reporting_service.py",
+      "services\\saas_contact_quota.py",
+      "services\\sms_service.py",
+      "services\\voice_service.py"
+    ],
+    "escribe": [
+      "services\\crm_service.py",
+      "services\\gdpr_service.py",
+      "services\\lead_scoring_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "crm_deals",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app,nelvyon_jobs",
+    "filas": 0,
+    "lee": [
+      "services\\reporting_service.py",
+      "services\\reports_service.py"
+    ],
+    "escribe": [
+      "services\\crm_service.py",
+      "services\\gdpr_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "data_deletion_requests",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\gdpr_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "deals",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [
+      "routers\\global_dashboard.py"
+    ],
+    "escribe": [
+      "routers\\deals.py",
+      "routers\\e2e_orchestrator.py"
+    ],
+    "modelo": [
+      "models\\deals.py"
+    ],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "dialer_advanced_sessions",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\dialer_advanced_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "email_queue",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [],
+    "modelo": [
+      "models\\workflow_rules.py"
+    ],
+    "lote": "A",
+    "motivo": "vacia y sin codigo que la toque: protegerla no puede romper nada observable"
+  },
+  {
+    "tabla": "email_warmup_accounts",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\email_warmup_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "email_warmup_logs",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\email_warmup_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "executive_reports",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app,nelvyon_jobs",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\reporting_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "facebook_messenger_conversations",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\facebook_messenger_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "facebook_messenger_messages",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\facebook_messenger_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "form_items",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\form_items.py"
+    ],
+    "modelo": [
+      "models\\form_items.py"
+    ],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "funnel_items",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\funnel_items.py"
+    ],
+    "modelo": [
+      "models\\funnel_items.py"
+    ],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "helpdesk_tickets",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app,nelvyon_jobs",
+    "filas": 196,
+    "lee": [
+      "core\\agentes\\herramientas.py",
+      "core\\salud_negocio.py",
+      "routers\\global_dashboard.py",
+      "routers\\module_analytics.py",
+      "services\\churn_prediction_service.py"
+    ],
+    "escribe": [
+      "core\\autopilot_lifecycle.py",
+      "routers\\e2e_orchestrator.py"
+    ],
+    "modelo": [
+      "models\\helpdesk_tickets.py"
+    ],
+    "lote": "E",
+    "motivo": "con datos y con codigo activo: el lote que exige mas cuidado"
+  },
+  {
+    "tabla": "instagram_dm_conversations",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\instagram_dm_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "instagram_dm_messages",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\instagram_dm_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "integration_whatsapp",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [
+      "core\\messaging_integration.py"
+    ],
+    "escribe": [],
+    "modelo": [],
+    "lote": "B",
+    "motivo": "vacia y solo de lectura: una politica de SELECT no puede bloquear escrituras que hoy funcionan"
+  },
+  {
+    "tabla": "intent_events",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\intent_data_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "intent_scores",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\intent_data_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "invoice_sequences",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\invoice_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "invoices",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [
+      "services\\analytics_service.py",
+      "services\\gdpr_service.py"
+    ],
+    "escribe": [
+      "services\\invoice_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "linkedin_inbox",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\linkedin_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "linkedin_outreach",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\linkedin_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "messages",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\messages.py"
+    ],
+    "modelo": [
+      "models\\messages.py"
+    ],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "nelvyon_agents",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [
+      "routers\\module_analytics.py",
+      "services\\workspace_service.py"
+    ],
+    "escribe": [
+      "services\\nelvyon_agents.py"
+    ],
+    "modelo": [
+      "models\\nelvyon_agents.py"
+    ],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "nelvyon_assets",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [
+      "routers\\e2e_orchestrator.py"
+    ],
+    "escribe": [
+      "services\\nelvyon_assets.py"
+    ],
+    "modelo": [
+      "models\\nelvyon_assets.py"
+    ],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "nelvyon_bot_templates",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\nelvyon_bot_templates.py"
+    ],
+    "modelo": [
+      "models\\nelvyon_bot_templates.py"
+    ],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "nelvyon_campaigns",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\nelvyon_campaigns.py"
+    ],
+    "modelo": [
+      "models\\nelvyon_campaigns.py"
+    ],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "nelvyon_clients",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [
+      "routers\\e2e_orchestrator.py",
+      "services\\agent_orchestrator.py",
+      "services\\ai_service.py",
+      "services\\reports_service.py"
+    ],
+    "escribe": [
+      "services\\nelvyon_clients.py"
+    ],
+    "modelo": [
+      "models\\nelvyon_clients.py"
+    ],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "nelvyon_outputs",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [
+      "routers\\e2e_orchestrator.py"
+    ],
+    "escribe": [
+      "services\\nelvyon_outputs.py"
+    ],
+    "modelo": [
+      "models\\nelvyon_outputs.py"
+    ],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "nelvyon_pack_runs",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [],
+    "modelo": [],
+    "lote": "A",
+    "motivo": "vacia y sin codigo que la toque: protegerla no puede romper nada observable"
+  },
+  {
+    "tabla": "nelvyon_products",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\nelvyon_products.py"
+    ],
+    "modelo": [
+      "models\\nelvyon_products.py"
+    ],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "nelvyon_projects",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "routers\\e2e_orchestrator.py",
+      "services\\nelvyon_projects.py"
+    ],
+    "modelo": [
+      "models\\nelvyon_projects.py"
+    ],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "nelvyon_quality_metrics",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\nelvyon_quality_metrics.py"
+    ],
+    "modelo": [
+      "models\\nelvyon_quality_metrics.py"
+    ],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "nelvyon_user_settings",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [
+      "services\\gdpr_service.py"
+    ],
+    "escribe": [
+      "routers\\platform_settings.py",
+      "services\\nelvyon_user_settings.py"
+    ],
+    "modelo": [
+      "models\\nelvyon_user_settings.py"
+    ],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "omnichannel_conversations",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\omnichannel_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "onboarding_workspace_steps",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app,nelvyon_jobs",
+    "filas": 196,
+    "lee": [
+      "core\\autopilot_lifecycle.py"
+    ],
+    "escribe": [
+      "services\\onboarding_service.py"
+    ],
+    "modelo": [],
+    "lote": "E",
+    "motivo": "con datos y con codigo activo: el lote que exige mas cuidado"
+  },
+  {
+    "tabla": "os_agent_audit_events",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [],
+    "modelo": [],
+    "lote": "A",
+    "motivo": "vacia y sin codigo que la toque: protegerla no puede romper nada observable"
+  },
+  {
+    "tabla": "os_brief_diff_runs",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [],
+    "modelo": [],
+    "lote": "A",
+    "motivo": "vacia y sin codigo que la toque: protegerla no puede romper nada observable"
+  },
+  {
+    "tabla": "os_cashflow",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app,nelvyon_jobs",
+    "filas": 162,
+    "lee": [
+      "core\\agentes\\herramientas.py",
+      "core\\autopilot_capacidades.py"
+    ],
+    "escribe": [
+      "services\\os_cashflow.py",
+      "services\\os_expenses.py"
+    ],
+    "modelo": [
+      "models\\os_cashflow.py"
+    ],
+    "lote": "E",
+    "motivo": "con datos y con codigo activo: el lote que exige mas cuidado"
+  },
+  {
+    "tabla": "os_competitor_gap_runs",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [],
+    "modelo": [],
+    "lote": "A",
+    "motivo": "vacia y sin codigo que la toque: protegerla no puede romper nada observable"
+  },
+  {
+    "tabla": "os_deals",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app,nelvyon_jobs",
+    "filas": 81,
+    "lee": [
+      "core\\agentes\\herramientas.py",
+      "core\\autopilot_capacidades.py"
+    ],
+    "escribe": [
+      "services\\os_deals.py"
+    ],
+    "modelo": [
+      "models\\os_deals.py"
+    ],
+    "lote": "E",
+    "motivo": "con datos y con codigo activo: el lote que exige mas cuidado"
+  },
+  {
+    "tabla": "os_deliverable_approval_tokens",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [],
+    "modelo": [],
+    "lote": "A",
+    "motivo": "vacia y sin codigo que la toque: protegerla no puede romper nada observable"
+  },
+  {
+    "tabla": "os_delivery_certificates",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [],
+    "modelo": [],
+    "lote": "A",
+    "motivo": "vacia y sin codigo que la toque: protegerla no puede romper nada observable"
+  },
+  {
+    "tabla": "os_expenses",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app,nelvyon_jobs",
+    "filas": 81,
+    "lee": [
+      "core\\agentes\\herramientas.py",
+      "core\\autopilot_capacidades.py"
+    ],
+    "escribe": [
+      "services\\os_expenses.py"
+    ],
+    "modelo": [
+      "models\\os_expenses.py"
+    ],
+    "lote": "E",
+    "motivo": "con datos y con codigo activo: el lote que exige mas cuidado"
+  },
+  {
+    "tabla": "os_qa_audit_runs",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [],
+    "modelo": [],
+    "lote": "A",
+    "motivo": "vacia y sin codigo que la toque: protegerla no puede romper nada observable"
+  },
+  {
+    "tabla": "os_recurring_run_log",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [],
+    "modelo": [],
+    "lote": "A",
+    "motivo": "vacia y sin codigo que la toque: protegerla no puede romper nada observable"
+  },
+  {
+    "tabla": "os_retainer_cycles",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [],
+    "modelo": [],
+    "lote": "A",
+    "motivo": "vacia y sin codigo que la toque: protegerla no puede romper nada observable"
+  },
+  {
+    "tabla": "os_sector_shield_audits",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [],
+    "modelo": [],
+    "lote": "A",
+    "motivo": "vacia y sin codigo que la toque: protegerla no puede romper nada observable"
+  },
+  {
+    "tabla": "os_tasks_legacy_281",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [],
+    "modelo": [
+      "models\\os_tasks_legacy_281.py"
+    ],
+    "lote": "A",
+    "motivo": "vacia y sin codigo que la toque: protegerla no puede romper nada observable"
+  },
+  {
+    "tabla": "os_truth_guard_audits",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [],
+    "modelo": [],
+    "lote": "A",
+    "motivo": "vacia y sin codigo que la toque: protegerla no puede romper nada observable"
+  },
+  {
+    "tabla": "partner_records",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\partner_records.py"
+    ],
+    "modelo": [
+      "models\\partner_records.py"
+    ],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "pipeline_deals",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [],
+    "modelo": [
+      "models\\pipeline_deals.py"
+    ],
+    "lote": "A",
+    "motivo": "vacia y sin codigo que la toque: protegerla no puede romper nada observable"
+  },
+  {
+    "tabla": "pr_releases",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\pr_digital_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "presentation_history",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\presentation_history.py"
+    ],
+    "modelo": [
+      "models\\presentation_history.py"
+    ],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "public_analytics_events",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app,nelvyon_jobs",
+    "filas": 0,
+    "lee": [
+      "services\\reporting_service.py"
+    ],
+    "escribe": [
+      "routers\\public_api.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "push_subscriptions",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\push_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "report_items",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\report_items.py"
+    ],
+    "modelo": [
+      "models\\report_items.py"
+    ],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "report_schedules",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app,nelvyon_jobs",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\reporting_service.py",
+      "services\\reporting_worker.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "revenue_records",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "routers\\revenue_records.py"
+    ],
+    "modelo": [
+      "models\\revenue_records.py"
+    ],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "saas_tenants",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [
+      "core\\tenant_bridge.py",
+      "services\\audit_service.py",
+      "services\\saas_contact_quota.py"
+    ],
+    "escribe": [
+      "services\\saas_billing_sync.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "sales_records",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [
+      "routers\\global_dashboard.py"
+    ],
+    "escribe": [
+      "services\\sales_records.py"
+    ],
+    "modelo": [
+      "models\\sales_records.py"
+    ],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "segment_results",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\segment_results.py"
+    ],
+    "modelo": [
+      "models\\segment_results.py"
+    ],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "snapchat_ads_campaigns",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\snapchat_ads_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "social_auto_posts",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\social_auto_publish_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "social_auto_settings",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\social_auto_publish_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "template_outcomes",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [
+      "services\\os_autonomous_learning_service.py"
+    ],
+    "escribe": [
+      "services\\autonomous_portal_learning_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "templates",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\template_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "tenant_branding_activation_logs",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [
+      "routers\\os_global.py"
+    ],
+    "escribe": [
+      "routers\\tenant_management.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "tenant_module_permissions",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "routers\\tenant_management.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "text2pay_payments",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\text2pay_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "tickets",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app,nelvyon_jobs",
+    "filas": 0,
+    "lee": [
+      "routers\\tenant_management.py",
+      "services\\finetuning_service.py",
+      "services\\gdpr_service.py"
+    ],
+    "escribe": [
+      "services\\helpdesk_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "tiktok_ads_campaigns",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\tiktok_ads_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "tiktok_dm_conversations",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\tiktok_dm_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "tiktok_dm_messages",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\tiktok_dm_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "visual_workflow_executions",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\workflow_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "voice_pilot_inbound",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [],
+    "modelo": [
+      "models\\voice_pilot.py"
+    ],
+    "lote": "A",
+    "motivo": "vacia y sin codigo que la toque: protegerla no puede romper nada observable"
+  },
+  {
+    "tabla": "voice_pilot_usage",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [],
+    "modelo": [
+      "models\\voice_pilot.py"
+    ],
+    "lote": "A",
+    "motivo": "vacia y sin codigo que la toque: protegerla no puede romper nada observable"
+  },
+  {
+    "tabla": "web_performance_metrics",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\web_performance_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "webhook_deliveries",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\webhook_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "webhook_endpoints",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\webhook_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "website_items",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\website_items.py"
+    ],
+    "modelo": [
+      "models\\website_items.py"
+    ],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "whitelabel_configs",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\whitelabel_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "workflow_executions",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [],
+    "modelo": [
+      "models\\workflow_rules.py"
+    ],
+    "lote": "A",
+    "motivo": "vacia y sin codigo que la toque: protegerla no puede romper nada observable"
+  },
+  {
+    "tabla": "workflow_rules",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [],
+    "modelo": [
+      "models\\workflow_rules.py"
+    ],
+    "lote": "A",
+    "motivo": "vacia y sin codigo que la toque: protegerla no puede romper nada observable"
+  },
+  {
+    "tabla": "workflow_trigger_registry",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\workflow_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "workflows",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "routers\\workflows.py",
+      "services\\workflow_service.py"
+    ],
+    "modelo": [
+      "models\\workflows.py"
+    ],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "workspace_members",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app,nelvyon_jobs",
+    "filas": 156,
+    "lee": [
+      "core\\autopilot_ciclo.py",
+      "core\\inquilinos_reales.py",
+      "core\\salud_negocio.py",
+      "routers\\os_global.py",
+      "routers\\tenant_management.py",
+      "services\\churn_prediction_service.py",
+      "services\\gdpr_service.py",
+      "services\\reporting_service.py",
+      "services\\reporting_worker.py"
+    ],
+    "escribe": [
+      "routers\\workspace_management.py",
+      "services\\workspace_members.py"
+    ],
+    "modelo": [
+      "models\\workspace_members.py"
+    ],
+    "lote": "E",
+    "motivo": "con datos y con codigo activo: el lote que exige mas cuidado"
+  },
+  {
+    "tabla": "workspace_models",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app,nelvyon_jobs",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\finetuning_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  },
+  {
+    "tabla": "workspace_usage",
+    "rls": false,
+    "politicas": 0,
+    "fk_workspace": false,
+    "roles": "nelvyon_app",
+    "filas": 0,
+    "lee": [],
+    "escribe": [
+      "services\\workspace_service.py"
+    ],
+    "modelo": [],
+    "lote": "C",
+    "motivo": "vacia pero con escrituras: hay que acertar la politica de INSERT antes de activarla"
+  }
+]

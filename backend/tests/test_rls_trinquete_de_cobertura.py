@@ -42,12 +42,31 @@ pytestmark = [
     pytest.mark.asyncio,
 ]
 
-#: Tablas con `workspace_id` y SIN RLS, medidas el 2026-08-21 sobre el esquema
-#: completo de 559 migraciones.
+#: Tablas con `workspace_id` y SIN RLS.
 #:
 #: Este numero solo puede BAJAR. Si sube, alguien creo una tabla de inquilino sin
 #: protegerla; si baja, hay que actualizarlo aqui para que la mejora quede fijada.
-DEUDA_MAXIMA = 111
+#:
+#: 111 -> 91 con la migracion 560, que protegio las 20 tablas que ningun codigo
+#: lee ni escribe: el lote de menor riesgo posible, elegido para demostrar el
+#: mecanismo sobre algo que no podia romperse. Verificado en los dos sentidos —
+#: sin RLS el vecino veia, borraba y se apropiaba de las filas ajenas.
+#:
+#: 91 -> 90 con la 561, que protegio `workspaces` y `workspace_members` con una
+#: politica basada en USUARIO y no en workspace actual. La estandar habria dejado
+#: el selector de workspaces vacio justo despues del login.
+#:
+#: Baja UNA y no dos aunque la 561 protegiera dos tablas: `workspaces` no tiene
+#: columna `workspace_id` —ella ES el workspace— asi que nunca entro en este
+#: recuento. La metrica mide «tablas que guardan datos DE un inquilino», y esa
+#: guarda al inquilino mismo. Se deja asi a proposito: cambiar la definicion para
+#: incluirla haria incomparables todas las mediciones anteriores.
+#:
+#: 90 -> 81 con la 562, las nueve tablas cuyos escritores son siempre rutas
+#: autenticadas. Guardan oportunidades, contratos, conversaciones, citas e
+#: ingresos: sin RLS, una consulta que olvidara el filtro devolvia la cartera
+#: comercial de TODOS los inquilinos.
+DEUDA_MAXIMA = 81
 
 #: Margen cero a proposito. Un trinquete con holgura deja de ser un trinquete: la
 #: holgura se consume y nadie se entera.
@@ -209,3 +228,21 @@ ALTER TABLE public.prueba_sin_rls ENABLE ROW LEVEL SECURITY;
             rf"ALTER\s+TABLE[^;]*\b{tabla}\b[^;]*ENABLE\s+ROW\s+LEVEL\s+SECURITY",
             texto, re.IGNORECASE | re.DOTALL))
         assert protege is esperado
+
+
+async def test_las_dos_tablas_fundacionales_estan_protegidas(conexion):
+    """`workspaces` no entra en el recuento de arriba porque no tiene columna
+    `workspace_id`. Que no se cuente no significa que no importe: es la tabla
+    que define quien es cada inquilino.
+    """
+    for tabla in ("workspaces", "workspace_members"):
+        r = await conexion.fetchrow(
+            "SELECT relrowsecurity, relforcerowsecurity FROM pg_class "
+            " WHERE relname = $1", tabla)
+        assert r and r["relrowsecurity"] and r["relforcerowsecurity"], (
+            f"'{tabla}' sin RLS forzado: es la base sobre la que se apoyan todas "
+            f"las demas politicas")
+        cmds = {p["cmd"] for p in await conexion.fetch(
+            "SELECT cmd FROM pg_policies WHERE tablename = $1", tabla)}
+        assert {"SELECT", "INSERT", "UPDATE", "DELETE"} <= cmds, (
+            f"'{tabla}' con politicas incompletas: {sorted(cmds)}")
