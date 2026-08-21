@@ -198,6 +198,46 @@ def test_el_dinero_se_vigila_mas_de_cerca_que_el_resto():
 # ── recorrido completo contra PostgreSQL ────────────────────────────────────
 
 
+@pytest.fixture
+async def entorno_pg():
+    """Motor contra la base de certificacion, con la vigilancia limpia.
+
+    Se limpia AL EMPEZAR: `business_health_baseline` es global y una bateria
+    anterior deja lineas base aprendidas, asi que sin esto el vigilante empieza
+    «entrenado» y alarma en su primera pasada por el estado que le dejo otro
+    fichero.
+    """
+    pytest.importorskip("asyncpg")
+    import asyncpg
+    from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
+    from core.salud_negocio import COMPROBACIONES
+
+    limpio = (DSN or "").replace("postgresql+asyncpg://", "postgresql://")
+    adm = await asyncpg.connect(limpio, timeout=30)
+    metricas = [c.metrica for c in COMPROBACIONES]
+    await adm.execute("DELETE FROM business_incidents WHERE metrica = ANY($1::text[])",
+                      metricas)
+    await adm.execute(
+        "DELETE FROM business_health_baseline WHERE metrica = ANY($1::text[])",
+        metricas)
+
+    motor = create_async_engine(
+        limpio.replace("postgresql://", "postgresql+asyncpg://").replace(
+            "@localhost:", "@127.0.0.1:"))
+    try:
+        yield {"adm": adm, "maker": async_sessionmaker(motor, expire_on_commit=False)}
+    finally:
+        await adm.execute("DELETE FROM business_incidents WHERE metrica = ANY($1::text[])",
+                          metricas)
+        await adm.execute(
+            "DELETE FROM business_health_baseline WHERE metrica = ANY($1::text[])",
+            metricas)
+        await adm.close()
+        await motor.dispose()
+
+
+
 @pytest.mark.skipif(not DSN, reason="sin NELVYON_PG_CERT_DSN")
 @pytest.mark.asyncio
 async def test_recorrido_completo_aprende_y_luego_detecta():
@@ -312,3 +352,81 @@ async def test_el_vigilante_ve_las_filas_reales_y_no_ceros_de_rls():
             await s.execute(text("DELETE FROM business_health_baseline"))
             await s.commit()
         await motor.dispose()
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# `ok` exige haber podido mirarlo TODO
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# El informe siempre trajo `unmeasurable`, pero `status` se calculaba solo con
+# los hallazgos. Quien leyera `status` —que es lo que hace cualquier consumidor
+# razonable— veia verde estando CIEGO en una o varias comprobaciones.
+#
+# Paso en produccion: con el grant de `helpdesk_tickets` sin aplicar,
+# `tickets_sin_respuesta` quedaba fuera de alcance y la ruta respondia
+# `status: ok`. Un ticket pudriendose una semana no habria levantado nada.
+
+
+@pytest.mark.skipif(not DSN, reason="sin NELVYON_PG_CERT_DSN")
+@pytest.mark.asyncio
+async def test_una_comprobacion_ciega_impide_declarar_ok(entorno_pg):
+    """LA PRUEBA DISCRIMINANTE.
+
+    Con el comportamiento anterior esto devolvia `ok`. Perder observabilidad no
+    es un estado sano: si no se pudo mirar todo, tampoco se puede afirmar que no
+    hay anomalias.
+    """
+    from core.salud_negocio import COMPROBACIONES, Comprobacion, revisar
+
+    maker = entorno_pg["maker"]
+    rota = Comprobacion(
+        metrica="metrica_imposible_de_medir",
+        descripcion="Una tabla que no existe",
+        sql="SELECT count(*) FROM tabla_que_no_existe_en_ninguna_parte",
+        caida_relevante=0.5, severidad="high",
+        impacto="solo existe para comprobar que no se puede medir")
+    COMPROBACIONES.append(rota)
+    try:
+        async with maker() as s:
+            informe = await revisar(s)
+            await s.commit()
+
+        assert "metrica_imposible_de_medir" in informe["unmeasurable"]
+        assert informe["status"] == "unknown", (
+            f"con una comprobacion ciega el informe dice '{informe['status']}'. "
+            "Un consumidor que lea solo `status` creeria que todo va bien.")
+        assert informe["observabilidad"]["completa"] is False
+        assert informe["observabilidad"]["medidas"] < informe["observabilidad"]["totales"]
+    finally:
+        COMPROBACIONES.remove(rota)
+
+
+@pytest.mark.skipif(not DSN, reason="sin NELVYON_PG_CERT_DSN")
+@pytest.mark.asyncio
+async def test_con_todo_medible_y_sin_anomalias_si_es_ok(entorno_pg):
+    """Control negativo: sin esto, un `status` que nunca dijera `ok` pasaria
+    la prueba anterior sin significar nada."""
+    from core.salud_negocio import revisar
+
+    async with entorno_pg["maker"]() as s:
+        informe = await revisar(s)
+        await s.commit()
+
+    assert informe["unmeasurable"] == []
+    assert informe["observabilidad"]["completa"] is True
+    assert informe["status"] in ("ok", "anomaly")
+    if not informe["findings"]:
+        assert informe["status"] == "ok"
+
+
+def test_los_tres_estados_son_distinguibles():
+    """`ok`, `anomaly` y `unknown` significan tres cosas distintas.
+
+    Que se colapsen dos de ellos es exactamente el defecto que se corrigio.
+    """
+    from core.salud_negocio import COMPROBACIONES
+
+    assert len({"ok", "anomaly", "unknown"}) == 3
+    # Y el informe declara cuantas comprobaciones hay, para que «unknown» no
+    # obligue a contar a mano si se perdio una o veinte.
+    assert len(COMPROBACIONES) >= 19

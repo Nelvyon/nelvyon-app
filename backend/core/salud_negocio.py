@@ -556,12 +556,40 @@ async def revisar(sesion, ahora: Optional[datetime] = None) -> dict[str, Any]:
             peor = nivel
             break
 
+    # `ok` EXIGE HABER PODIDO MIRARLO TODO
+    # ------------------------------------
+    # Antes esto era `"ok" if not hallazgos else "anomaly"`, y el campo
+    # `unmeasurable` iba aparte. El resultado: quien leyera solo `status` —que es
+    # lo que hace cualquier consumidor razonable— veia verde estando CIEGO en una
+    # o varias comprobaciones.
+    #
+    # Paso de verdad: con el grant de `helpdesk_tickets` sin aplicar todavia,
+    # produccion respondia `status: ok` con `tickets_sin_respuesta` fuera de
+    # alcance. Un ticket pudriendose una semana no habria levantado nada, y el
+    # informe decia que todo iba bien.
+    #
+    # Perder observabilidad NO es un estado sano, y gana a todo lo demas: si no
+    # se pudo mirar todo, tampoco se puede afirmar que no hay anomalias. Los
+    # hallazgos siguen viajando en `findings` — no se ocultan, simplemente no
+    # pueden presentarse como el cuadro completo.
+    if no_medibles:
+        estado = "unknown"
+    elif hallazgos:
+        estado = "anomaly"
+    else:
+        estado = "ok"
+
     return {
-        "status": "ok" if not hallazgos else "anomaly",
+        "status": estado,
         "worst_severity": peor,
         "checked_at": ahora.isoformat(),
         "measurements": medidas,
         "unmeasurable": no_medibles,
+        # Cuantas se pudieron medir de cuantas. Sin esto, «unknown» obliga a
+        # contar a mano para saber si se perdio una comprobacion o veinte.
+        "observabilidad": {"medidas": len(medidas),
+                           "totales": len(COMPROBACIONES),
+                           "completa": not no_medibles},
         "findings": [h.como_dict() for h in hallazgos],
         "needs_human": [h.metrica for h in hallazgos if h.requiere_humano],
     }
