@@ -107,12 +107,36 @@ SOPORTE_LECTURA = ["helpdesk_tickets", "support_templates",
 AGENTES_ESCRITURA = ["agent_runs", "agent_memory", "agent_budget"]
 AGENTES_LECTURA = ["agent_catalog", "agent_policies", "agent_kill_switch"]
 
+#: Migracion 564 — las tablas donde escriben los WEBHOOKS entrantes.
+#:
+#: Llegan firmados por el proveedor pero sin usuario, asi que no satisfacen
+#: ninguna politica de RLS. El aislamiento no lo da la politica sino el
+#: `workspace_id` explicito de cada sentencia, resuelto desde un identificador
+#: que viaja DENTRO del cuerpo firmado.
+#:
+#: `helpdesk_tickets` NO esta en esta lista, y la 564 SI se lo concedio: es un
+#: error mio. `helpdesk_service` no toca esa tabla —escribe `tickets`— asi que el
+#: privilegio sobra, y ademas ensancha el `UPDATE` a nivel de COLUMNA que la 555
+#: habia acotado para el triage de Autopilot. Se deja fuera a proposito para que
+#: esta prueba siga en rojo hasta que una migracion correctiva lo revoque:
+#: ponerlo aqui seria tapar el hallazgo en vez de arreglarlo.
+WEBHOOKS_ATRIBUCION = [
+    "instagram_dm_conversations", "instagram_dm_messages",
+    "facebook_messenger_conversations", "facebook_messenger_messages",
+    "tiktok_dm_conversations", "tiktok_dm_messages",
+    "tickets", "ticket_messages", "contacts",
+    "text2pay_payments", "cpq_quotes", "dialer_calls", "bookings",
+    # de estas dos se DEDUCE el inquilino; solo SELECT
+    "oauth_tokens", "whitelabel_configs",
+]
+
 CONCEDIDAS = (
     set(ESCRITURA) | set(ACTUALIZACION) | set(LECTURA)
     | set(VIGILANCIA_LECTURA) | set(VIGILANCIA_ESCRITURA)
     | set(AUTOPILOT_LECTURA) | set(AUTOPILOT_ESCRITURA)
     | set(OS_LECTURA) | set(SOPORTE_LECTURA)
     | set(AGENTES_ESCRITURA) | set(AGENTES_LECTURA)
+    | set(WEBHOOKS_ATRIBUCION)
 )
 
 #: Tablas que el rol NO debe alcanzar. Cada una es un camino de usuario servido
@@ -393,3 +417,56 @@ async def test_ninguna_tabla_del_alcance_quedo_sin_conceder(admin):
         "`subscriptions` no existe en este entorno: la bateria no esta midiendo "
         "el camino de cobro que dice medir"
     )
+
+
+# ── el trinquete miraba tablas, no privilegios ──────────────────────────────
+
+
+async def test_el_triage_de_autopilot_sigue_acotado_a_una_columna(admin):
+    """`nelvyon_jobs` puede clasificar un ticket y NADA MAS.
+
+    POR QUE ESTA PRUEBA EXISTE
+    --------------------------
+    La 555 le dio un UPDATE a nivel de COLUMNA sobre `helpdesk_tickets` —solo
+    `category`— para que el triage de Autopilot clasifique sin poder cerrar,
+    reasignar ni reescribir notas de resolucion.
+
+    La 564 le concedio UPDATE de TABLA ENTERA, deshaciendo esa decision sobre
+    tickets de clientes reales y con un rol que bypassa RLS. La tabla ni siquiera
+    hacia falta: el camino de webhook escribe `tickets`, no `helpdesk_tickets`.
+
+    `test_no_tiene_privilegios_de_mas` no lo vio, y ese es el punto: compara QUE
+    TABLAS alcanza el rol, no QUE PUEDE HACER en ellas. `helpdesk_tickets` ya
+    estaba en su lista por el SELECT de la 555, asi que pasar de columna a tabla
+    le resulto invisible. Un trinquete que cuenta tablas no detecta un
+    ensanchamiento dentro de una tabla que ya contaba.
+    """
+    if not await admin.fetchval("SELECT to_regclass('public.helpdesk_tickets')"):
+        pytest.skip("helpdesk_tickets no existe en este entorno")
+
+    de_tabla = {
+        r["privilege_type"]
+        for r in await admin.fetch(
+            "SELECT privilege_type FROM information_schema.table_privileges"
+            " WHERE grantee = 'nelvyon_jobs' AND table_schema = 'public'"
+            "   AND table_name = 'helpdesk_tickets'")
+    }
+    assert "UPDATE" not in de_tabla, (
+        "nelvyon_jobs tiene UPDATE de TABLA sobre helpdesk_tickets: puede cerrar, "
+        "reasignar y reescribir tickets de clientes reales. Debe tener solo "
+        "UPDATE(category). Lo concedio la 564 por error; lo retira la 565.")
+    assert "INSERT" not in de_tabla, (
+        "nelvyon_jobs puede INSERTAR en helpdesk_tickets, y ningun camino suyo "
+        "escribe ahi: el webhook de soporte usa `tickets`.")
+
+    columnas = {
+        r["column_name"]
+        for r in await admin.fetch(
+            "SELECT column_name FROM information_schema.column_privileges"
+            " WHERE grantee = 'nelvyon_jobs' AND table_schema = 'public'"
+            "   AND table_name = 'helpdesk_tickets' AND privilege_type = 'UPDATE'")
+    }
+    assert columnas == {"category"}, (
+        f"el triage puede escribir {sorted(columnas) or 'ninguna columna'} y solo "
+        f"debe poder `category`. Si esta vacio, la 565 revoco el UPDATE de tabla "
+        f"sin restituir el de columna y Autopilot ha dejado de poder clasificar.")

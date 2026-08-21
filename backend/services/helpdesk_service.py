@@ -377,11 +377,17 @@ class HelpdeskService:
                     sender_name=sender_name,
                     sender_email=from_email,
                 )
+                # `AND workspace_id`: este camino lo ejecuta ahora el rol de
+                # trabajos, que BYPASSA RLS. Una sentencia acotada solo por `id`
+                # es exactamente el patron que produjo las escrituras cruzadas de
+                # `cpq_quotes` y `text2pay_payments`. El id sale de una consulta
+                # que si filtra, pero eso no puede ser lo unico que lo impida.
                 await self.session.execute(
                     text(
-                        "UPDATE tickets SET status = 'open' WHERE id = :id AND status != 'closed'"
+                        "UPDATE tickets SET status = 'open' "
+                        " WHERE id = :id AND workspace_id = :ws AND status != 'closed'"
                     ),
-                    {"id": ticket_id},
+                    {"id": ticket_id, "ws": self.workspace_id},
                 )
                 await self.session.commit()
                 try:
@@ -463,8 +469,9 @@ class HelpdeskService:
                 sender_phone=from_phone,
             )
             await self.session.execute(
-                text("UPDATE tickets SET status = 'open' WHERE id = :id"),
-                {"id": ticket_id},
+                text("UPDATE tickets SET status = 'open' "
+                     " WHERE id = :id AND workspace_id = :ws"),
+                {"id": ticket_id, "ws": self.workspace_id},
             )
             await self.session.commit()
             try:
