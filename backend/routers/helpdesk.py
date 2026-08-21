@@ -11,12 +11,21 @@ from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
+from core.inquilino_de_webhook import (
+    InquilinoNoAtribuible,
+    cuenta_de_cuerpo,
+    destinatario_de_sns,
+    respuesta_no_atribuible,
+    sesion_de_webhook,
+    workspace_de_cuenta,
+    workspace_de_direccion,
+)
 from core.sns_webhook_signature import verificar_firma_sns
 from core.meta_webhook_signature import verificar_firma_meta
 from core.i18n import request_language, t
 from core.list_cache import list_cached
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
-from services.helpdesk_service import default_helpdesk_workspace_id, get_helpdesk_service
+from services.helpdesk_service import get_helpdesk_service
 
 logger = logging.getLogger(__name__)
 
@@ -64,24 +73,18 @@ def _svc(db: AsyncSession, ws: WorkspaceContext) -> Any:
     return get_helpdesk_service(db, ws.workspace_id)
 
 
-def _resolve_inbound_workspace(request: Request) -> int:
-    q = request.query_params.get("workspace_id")
-    lang = request_language(request)
-    if q:
-        try:
-            return int(q)
-        except ValueError as exc:
-            raise HTTPException(
-                status_code=400,
-                detail=t("invalid_workspace_id_param", lang),
-            ) from exc
-    ws = default_helpdesk_workspace_id()
-    if ws is not None:
-        return ws
-    raise HTTPException(
-        status_code=400,
-        detail=t("helpdesk_workspace_required", lang),
-    )
+async def _workspace_del_correo(sns: dict, db: AsyncSession) -> int:
+    """De quien es este correo entrante.
+
+    ANTES: `request.query_params.get("workspace_id")`. El inquilino lo elegia
+    quien hacia la peticion —es decir, quien atacara— y si no venia se caia a
+    `HELPDESK_DEFAULT_WORKSPACE_ID`, que manda toda la instalacion a un unico
+    workspace. Ni una cosa ni la otra es procedencia.
+
+    AHORA: la direccion a la que se escribio, sacada del cuerpo que Amazon firmo,
+    buscada entre los dominios que cada inquilino verifico por DNS.
+    """
+    return await workspace_de_direccion(db, destinatario_de_sns(sns))
 
 
 @router.post("/inbound/email")
@@ -95,9 +98,20 @@ async def inbound_email_webhook(
     La firma de SNS se comprueba ANTES de crear el ticket. Sin ella cualquiera
     podia inyectar correos con el remitente que quisiera.
     """
-    verificar_firma_sns(await request.json())
-    ws_id = _resolve_inbound_workspace(request)
-    svc = get_helpdesk_service(db, ws_id)
+    sns = await request.json()
+    verificar_firma_sns(sns)
+
+    # Resolver Y escribir con el rol de trabajos. `whitelabel_configs` es de
+    # inquilino y aqui no hay usuario: consultarla con el rol de la aplicacion
+    # devolveria cero filas —sin error— y todo correo legitimo quedaria «no
+    # atribuible», que es una caida silenciosa con otro nombre.
+    escritura = await sesion_de_webhook()
+    try:
+        ws_id = await _workspace_del_correo(sns, escritura)
+    except InquilinoNoAtribuible as exc:
+        await escritura.close()
+        return respuesta_no_atribuible(exc)
+    svc = get_helpdesk_service(escritura, ws_id)
 
     content_type = (request.headers.get("content-type") or "").lower()
     try:
@@ -140,13 +154,23 @@ async def inbound_whatsapp_webhook(
     """
     verificar_firma_meta("whatsapp", await request.body(),
                          request.headers.get("x-hub-signature-256"))
-    ws_id = _resolve_inbound_workspace(request)
-    svc = get_helpdesk_service(db, ws_id)
 
     try:
         raw = await request.json()
     except Exception:
         raw = {}
+
+    # El numero de WhatsApp Business viene dentro del cuerpo firmado y lo conecto
+    # un usuario autenticado. Antes el inquilino salia de `?workspace_id=`.
+    escritura = await sesion_de_webhook()
+    try:
+        ws_id = await workspace_de_cuenta(
+            escritura, "whatsapp",
+            cuenta_de_cuerpo("whatsapp", raw if isinstance(raw, dict) else {}))
+    except InquilinoNoAtribuible as exc:
+        await escritura.close()
+        return respuesta_no_atribuible(exc)
+    svc = get_helpdesk_service(escritura, ws_id)
 
     if isinstance(raw, dict) and raw.get("entry"):
         return await svc.process_whatsapp_webhook_payload(raw)

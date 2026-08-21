@@ -29,6 +29,16 @@ import pathlib
 import re
 import sys
 
+# La consola de Windows usa cp1252 y estos informes llevan caracteres de dibujo.
+# Sin esto el script muere con UnicodeEncodeError DESPUES de hacer todo el
+# trabajo, que es la peor forma posible de fallar: parece un error de la
+# consulta cuando solo es el terminal.
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except (AttributeError, ValueError):  # pragma: no cover - stdout redirigido
+    pass
+
+
 RAIZ = pathlib.Path(__file__).resolve().parents[1]
 BACKEND = RAIZ / "backend"
 

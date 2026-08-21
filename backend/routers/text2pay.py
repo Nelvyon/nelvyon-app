@@ -16,6 +16,12 @@ import stripe
 from stripe import SignatureVerificationError
 
 from core.config import settings
+from core.inquilino_de_webhook import (
+    InquilinoNoAtribuible,
+    respuesta_no_atribuible,
+    sesion_de_webhook,
+    workspace_de_fila,
+)
 from core.database import get_db
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.text2pay_service import get_text2pay_service
@@ -120,5 +126,24 @@ async def stripe_webhook(request: Request, db: AsyncSession = Depends(get_db)):
     except ValueError as exc:
         raise HTTPException(status_code=400, detail="Invalid payload") from exc
 
-    # Workspace 1 default for webhook rows without tenant header
-    return await get_text2pay_service(db, 1).handle_webhook(payload)
+    # De quien es este pago lo dice la FILA del pago, que NELVYON creo cuando un
+    # usuario autenticado lo pidio. El identificador vuelve dentro del cuerpo que
+    # Stripe firmo, asi que no lo eligio un tercero. Antes habia un `1` fijo, y
+    # el UPDATE del servicio no filtraba por workspace: un evento podia marcar
+    # pagado el pago de otro inquilino.
+    obj = (payload.get("data") or {}).get("object") or {}
+    referencia = (obj.get("metadata") or {}).get("text2pay_id")
+    columna = "id"
+    if not referencia and str(obj.get("id") or "").startswith("cs_"):
+        referencia, columna = str(obj["id"]), "stripe_session_id"
+
+    if not referencia:
+        return {"handled": False, "reason": "no text2pay_id in metadata"}
+
+    async with await sesion_de_webhook() as sesion:
+        try:
+            ws = await workspace_de_fila(
+                sesion, "text2pay_payments", columna, str(referencia), "stripe")
+        except InquilinoNoAtribuible as exc:
+            return respuesta_no_atribuible(exc)
+        return await get_text2pay_service(sesion, ws).handle_webhook(payload)

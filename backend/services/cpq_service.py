@@ -289,10 +289,10 @@ class CpqService:
             text(
                 """
                 UPDATE cpq_quotes SET status = 'viewed', viewed_at = COALESCE(viewed_at, :now)
-                WHERE id = :id
+                WHERE id = :id AND workspace_id = :ws
                 """
             ),
-            {"id": quote_id, "now": now},
+            {"id": quote_id, "now": now, "ws": self.workspace_id},
         )
         await self.session.commit()
         return (result.rowcount or 0) > 0

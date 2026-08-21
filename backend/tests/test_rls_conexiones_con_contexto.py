@@ -71,6 +71,19 @@ MARCAS_DE_CONTEXTO = ("contexto_de_inquilino", "sesion_de_barrido")
 #: guard: es una decision que merece una conversacion, no un `import`.
 CONSUMIDORES_DE_LA_SESION_PRIVILEGIADA = {
     "core/database.py": "es donde se define; el motor de jobs vive aqui y en ningun otro sitio",
+    "core/inquilino_de_webhook.py": (
+        "webhooks entrantes: llegan firmados por el proveedor pero SIN usuario, "
+        "asi que no satisfacen ninguna politica de RLS —conceden por titular o "
+        "por pertenencia— y con la sesion normal sus escrituras se denegarian. "
+        "Aqui el acotado NO lo pone la politica sino el `workspace_id` explicito "
+        "de cada sentencia, resuelto desde un identificador que viaja DENTRO del "
+        "cuerpo firmado y que NELVYON ya tenia asociado a un workspace en "
+        "`oauth_tokens` o `whitelabel_configs`. La resolucion tambien va por esta "
+        "sesion a proposito: `oauth_tokens` tiene RLS y con el rol de la "
+        "aplicacion devolveria cero filas SIN error, dejando todo webhook "
+        "legitimo como «no atribuible» — una caida silenciosa. Si no se puede "
+        "atribuir, no se escribe: 202 y cero filas"
+    ),
     "services/autopilot_loop.py": (
         "barrido cross-tenant: el planner descubre trabajo de TODOS los "
         "workspaces con Autopilot encendido, y el executor toma de una cola "

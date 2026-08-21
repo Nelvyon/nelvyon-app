@@ -12,6 +12,13 @@ from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
+from core.inquilino_de_webhook import (
+    InquilinoNoAtribuible,
+    cuenta_de_cuerpo,
+    respuesta_no_atribuible,
+    sesion_de_webhook,
+    workspace_de_cuenta,
+)
 from core.zoom_webhook_signature import (
     CABECERA_FIRMA,
     CABECERA_TS,
@@ -85,17 +92,18 @@ async def zoom_webhook(request: Request, db: AsyncSession = Depends(get_db)):
     if not isinstance(payload, dict):
         raise HTTPException(status_code=400, detail="JSON body required")
 
-    workspace_id = request.query_params.get("workspace_id")
-    if workspace_id:
+    # ANTES el inquilino salia de `?workspace_id=`: lo elegia quien hacia la
+    # peticion. La firma de Zoom demuestra que el cuerpo es de Zoom, no de quien
+    # es; eso lo dice la cuenta que Zoom nombra dentro del cuerpo firmado,
+    # buscada entre las que se conectaron desde dentro del producto.
+    async with await sesion_de_webhook() as sesion:
         try:
-            ws_id = int(workspace_id)
-            svc = get_booking_service(db, ws_id, "zoom-webhook")
-            return await svc.handle_zoom_webhook(payload)
-        except ValueError:
-            pass
-
-    logger.info("Zoom webhook received: %s", payload.get("event"))
-    return {"received": True, "event": payload.get("event")}
+            ws_id = await workspace_de_cuenta(
+                sesion, "zoom", cuenta_de_cuerpo("zoom", payload))
+        except InquilinoNoAtribuible as exc:
+            return respuesta_no_atribuible(exc)
+        svc = get_booking_service(sesion, ws_id, "zoom-webhook")
+        return await svc.handle_zoom_webhook(payload)
 
 
 @router.get("/slots")

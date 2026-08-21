@@ -271,3 +271,104 @@ dependientes. No se tocó producción.
 lanza `Failed`, que cuelga de `BaseException`. Un `pytest.raises(Exception)` no
 lo atrapa, así que la prueba que debía comprobar el rechazo se caía en vez de
 comprobarlo.
+
+---
+
+# BLOQUE WEBHOOKS — atribución de inquilino en escrituras sin usuario
+
+## Lo que se encontró
+
+Verificar la firma y saber **de quién es** el mensaje son dos preguntas distintas.
+Las firmas ya estaban resueltas de un bloque anterior. La atribución no: se
+respondía de tres formas que no son respuestas.
+
+| Severidad | Ruta | De dónde salía el inquilino |
+|---|---|---|
+| **HIGH** | `POST /api/helpdesk/inbound/email` | `?workspace_id=` de la query string |
+| **HIGH** | `POST /api/helpdesk/inbound/whatsapp` | `?workspace_id=` de la query string |
+| **HIGH** | `POST /api/v1/bookings/webhook/zoom` | `?workspace_id=` de la query string |
+| **HIGH** | `POST /api/v1/dialer/webhook/twilio` | `?workspace_id=` con `or 1` de reserva |
+| **HIGH** | `POST /api/instagram-dm/webhook` | literal `1` |
+| **HIGH** | `POST /api/messenger/webhook` | literal `1` |
+| **HIGH** | `POST /api/tiktok-dm/webhook` | literal `1` |
+| **HIGH** | `POST /api/text2pay/webhook` | literal `1` |
+| **MEDIUM** | `POST /api/v1/whatsapp/webhook` | `HELPDESK_DEFAULT_WORKSPACE_ID` |
+| **MEDIUM** | `GET /api/cpq/quotes/{id}/viewed` | literal `1`, **e ignorado**: el `UPDATE` no filtraba por workspace |
+| **MEDIUM** | `POST /api/text2pay/webhook` | el `UPDATE` no filtraba por workspace |
+
+Las dos MEDIUM marcadas «e ignorado» son **escrituras cruzadas reales**, no solo
+un destino equivocado: `UPDATE cpq_quotes SET status='viewed' WHERE id = :id` y
+`UPDATE text2pay_payments SET status = :st WHERE id = :id`, sin `workspace_id`.
+El número que recibía el servicio no se usaba en esas sentencias.
+
+**Por qué no era explotable hoy.** `verificar_firma_meta` falla cerrado (503) y
+en producción no están configurados `META_APP_SECRET` ni los equivalentes, así
+que esas rutas devuelven 503 antes de escribir. El defecto estaba **latente**: se
+activaba en cuanto alguien conectara la integración.
+
+## Lo que se hizo
+
+`core/inquilino_de_webhook.py`. El inquilino solo puede salir de un
+identificador que cumpla las dos cosas: **viene dentro del cuerpo que la firma
+cubre** y **NELVYON ya lo tiene asociado a un workspace** porque un usuario
+autenticado conectó esa cuenta desde dentro del producto.
+
+| Fuente | Qué la hace procedencia |
+|---|---|
+| `oauth_tokens (provider, account_id)` | la fila la escribió un usuario identificado, no el webhook |
+| la fila del propio registro (`text2pay_payments`, `cpq_quotes`, `dialer_calls`) | NELVYON la creó y el identificador volvió firmado |
+| `whitelabel_configs` con `ses_domain_verified` | Amazon comprobó el dominio contra un registro DNS que solo controla su dueño |
+
+Dos ambigüedades que también son un no: **cuenta desconocida** (nadie la conectó)
+y **cuenta duplicada** (dos workspaces la reclaman — es exactamente como se
+robaría el tráfico de otro, y elegir uno sería elegir a quién se lo entregamos).
+Ambas responden `202` con `atribuido: false` y **no escriben nada**. Es 202 y no
+4xx porque los proveedores reintentan ante un error y acaban desactivando el
+endpoint, y no hay nada que el proveedor pueda corregir.
+
+## Dos defectos de lo que yo mismo escribí
+
+**1. La resolución consultaba con el rol de la aplicación.** `oauth_tokens` y
+`dialer_calls` tienen RLS activo y el webhook no tiene usuario: la consulta
+habría devuelto **cero filas sin dar ningún error**, y todo webhook legítimo
+habría quedado «no atribuible». Un aislamiento que se cae hacia «no sé de quién
+es» también deja de funcionar, solo que en silencio. Corregido: resolver y
+escribir ocurren en la **misma** sesión de `nelvyon_jobs`.
+
+**2. `nelvyon_jobs` no tiene ni un privilegio en 16 de las tablas implicadas.**
+Desplegar la conversión sin la migración de grants habría hecho fallar *todas*
+las escrituras de webhook con `permission denied`. Medido contra producción, no
+supuesto.
+
+## Evidencia discriminante
+
+`tests/test_webhooks_atribucion_de_inquilino.py`, 8 casos contra la **ruta HTTP
+real** con firma válida — no contra el servicio, porque el servicio ya hacía su
+parte bien: `instagram_dm_service` acotaba por `self.workspace_id` en todas sus
+consultas. Una prueba del servicio habría pasado en verde con el `1` todavía puesto.
+
+El caso que más importa: cuerpo firmado que nombra la cuenta de A **y
+`?workspace_id=<B>` en la URL**. Acaba en A. Es la versión ejecutable de «no
+confiar en el `workspace_id` que aporta quien llama».
+
+**Comprobación por mutación:** reintroducido el `1` fijo, **7 de los 8 fallan**;
+restaurado, los 8 pasan. Regresión en todo lo tocado: **466 pruebas verdes**.
+
+## Deuda que queda de este bloque
+
+- **Migración 564 pendiente de autorización ADR-064** (grants). Sin ella la
+  conversión no puede desplegarse.
+- **TikTok no es atribuible** con el formato que procesa el servicio: `open_id`,
+  `from_user_id` y `sender_id` son el **remitente**, y atribuir por remitente
+  significaría que quien escribe elige el inquilino. Se aceptan `to_user_id`,
+  `receiver_id`, `account_id` o `shop_id` si vienen; si no, no se atribuye. Los
+  DM de TikTok dejan de procesarse hasta que la integración guarde la cuenta.
+- **`oauth_tokens` permite que dos workspaces declaren la misma cuenta externa**:
+  su clave única es `(workspace_id, user_id, provider)` y no incluye
+  `account_id`. El resolutor se niega ante la ambigüedad, pero cerrarlo en el
+  origen pide un índice único, es decir otra migración.
+- **`ticket_messages` no tiene `workspace_id`**: su aislamiento cuelga del ticket
+  padre. Es la única de las 16 que no se puede acotar por sí misma.
+- **`signaturit` escribe en un diccionario en memoria** (`_mock_store`), no en la
+  base. No es un problema de aislamiento, pero es un mock presentado como
+  capacidad.

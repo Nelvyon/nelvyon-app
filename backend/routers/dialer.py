@@ -10,6 +10,12 @@ from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
+from core.inquilino_de_webhook import (
+    InquilinoNoAtribuible,
+    respuesta_no_atribuible,
+    sesion_de_webhook,
+    workspace_de_fila,
+)
 from core.twilio_webhook_signature import verificar_firma_twilio
 from core.list_cache import list_cached
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
@@ -136,7 +142,6 @@ async def twilio_webhook(
     CallStatus: str = Form(""),
     CallDuration: str = Form("0"),
     RecordingUrl: str = Form(""),
-    workspace_id: int | None = Query(None),
     db: AsyncSession = Depends(get_db),
 ):
     # La firma se comprueba ANTES de tocar la base. Sin ella cualquiera podia
@@ -145,9 +150,22 @@ async def twilio_webhook(
     await verificar_firma_twilio(request)
 
     await DialerService.ensure_schema()
-    ws = int(workspace_id or 1)
-    svc = get_dialer_service(db, ws)
+
+    # ANTES: `int(workspace_id or 1)`, con `workspace_id` viajando en el query
+    # string. El UPDATE si filtraba por `call_sid AND workspace_id`, asi que no
+    # habia escritura cruzada — pero el `or 1` hacia que las llamadas de
+    # cualquier inquilino distinto del 1 dejaran de actualizarse EN SILENCIO, que
+    # es la clase de fallo que no produce ningun sintoma.
+    #
+    # La llamada la creo NELVYON y su fila sabe de quien es. `CallSid` viene en
+    # el cuerpo que Twilio firmo.
     duration = int(CallDuration or 0)
-    return await svc.handle_webhook(
-        CallSid, CallStatus, duration, RecordingUrl or None, workspace_id=ws
-    )
+    async with await sesion_de_webhook() as sesion:
+        try:
+            ws = await workspace_de_fila(
+                sesion, "dialer_calls", "call_sid", CallSid, "twilio")
+        except InquilinoNoAtribuible as exc:
+            return respuesta_no_atribuible(exc)
+        return await get_dialer_service(sesion, ws).handle_webhook(
+            CallSid, CallStatus, duration, RecordingUrl or None, workspace_id=ws
+        )

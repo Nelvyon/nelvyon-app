@@ -10,6 +10,11 @@ from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
+from core.inquilino_de_webhook import (
+    InquilinoNoAtribuible,
+    sesion_de_webhook,
+    workspace_de_fila,
+)
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.cpq_service import PIXEL_GIF, get_cpq_service
 
@@ -103,6 +108,23 @@ async def resend_quote(
 
 @router.get("/quotes/{quote_id}/viewed")
 async def quote_viewed_pixel(quote_id: str, db: AsyncSession = Depends(get_db)):
-    """Tracking pixel — public, no auth."""
-    await get_cpq_service(db, 1).mark_viewed(quote_id)
+    """Pixel de seguimiento — publico, sin autenticacion.
+
+    Un GET que escribe. `mark_viewed` hacia `UPDATE cpq_quotes ... WHERE id = :id`
+    sin filtrar por workspace, y el `1` que recibia el servicio no se usaba: quien
+    conociera un identificador de presupuesto podia marcarlo visto en CUALQUIER
+    inquilino.
+
+    El identificador es la unica credencial que hay aqui —el pixel va dentro del
+    presupuesto que se le manda al cliente— asi que de el sale tambien el
+    inquilino: la fila la creo NELVYON y sabe de quien es. Si no existe, se
+    devuelve el pixel igual y no se escribe nada; decirle a quien prueba
+    identificadores cuales existen seria peor.
+    """
+    async with await sesion_de_webhook() as sesion:
+        try:
+            ws = await workspace_de_fila(sesion, "cpq_quotes", "id", quote_id, "cpq")
+        except InquilinoNoAtribuible:
+            return Response(content=PIXEL_GIF, media_type="image/gif")
+        await get_cpq_service(sesion, ws).mark_viewed(quote_id)
     return Response(content=PIXEL_GIF, media_type="image/gif")

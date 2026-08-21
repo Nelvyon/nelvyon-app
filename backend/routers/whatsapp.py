@@ -8,8 +8,15 @@ from pydantic import BaseModel, Field
 
 from core.database import get_db
 from core.meta_webhook_signature import verificar_firma_meta
+from core.inquilino_de_webhook import (
+    InquilinoNoAtribuible,
+    cuenta_de_cuerpo,
+    respuesta_no_atribuible,
+    sesion_de_webhook,
+    workspace_de_cuenta,
+)
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
-from services.helpdesk_service import default_helpdesk_workspace_id, get_helpdesk_service
+from services.helpdesk_service import get_helpdesk_service
 from core.messaging_integration import assert_workspace_whatsapp_integration
 from services.whatsapp_service import get_whatsapp_service
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -171,13 +178,24 @@ async def receive_webhook(
     service = get_whatsapp_service()
     result = await service.process_incoming_webhook(payload)
 
-    ws_id = default_helpdesk_workspace_id()
-    if ws_id is not None:
-        try:
-            hd = get_helpdesk_service(db, ws_id)
-            helpdesk_out = await hd.process_whatsapp_webhook_payload(payload)
-            result["helpdesk"] = helpdesk_out
-        except Exception as exc:
-            result["helpdesk_error"] = str(exc)
+    # El inquilino sale del numero de WhatsApp Business que Meta nombra dentro
+    # del cuerpo firmado, no de `HELPDESK_DEFAULT_WORKSPACE_ID`: esa variable
+    # mandaba el trafico de TODA la instalacion a un unico workspace, asi que los
+    # mensajes de los clientes de un inquilino acababan en la bandeja de otro.
+    # Resolver y escribir con el rol de trabajos: `oauth_tokens` es de inquilino
+    # y aqui no hay usuario, asi que con el rol de la aplicacion la consulta
+    # devolveria cero filas sin dar ningun error.
+    try:
+        async with await sesion_de_webhook() as sesion:
+            try:
+                ws_id = await workspace_de_cuenta(
+                    sesion, "whatsapp", cuenta_de_cuerpo("whatsapp", payload))
+            except InquilinoNoAtribuible as exc:
+                result["helpdesk"] = respuesta_no_atribuible(exc)
+                return result
+            hd = get_helpdesk_service(sesion, ws_id)
+            result["helpdesk"] = await hd.process_whatsapp_webhook_payload(payload)
+    except Exception as exc:
+        result["helpdesk_error"] = str(exc)
 
     return result

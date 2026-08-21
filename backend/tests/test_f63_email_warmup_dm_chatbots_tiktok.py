@@ -78,10 +78,26 @@ async def test_instagram_webhook_verify(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_instagram_webhook_receive(client: AsyncClient):
+async def test_instagram_webhook_receive(client: AsyncClient, db_session):
+    """El DM entra en el workspace que conecto la cuenta.
+
+    Este cuerpo NO llevaba `entry[].id`, y no hacia falta: el router pasaba un
+    `1` fijo y todo aterrizaba en el mismo workspace. Ahora el inquilino sale de
+    la cuenta que Meta nombra dentro del cuerpo firmado, asi que el cuerpo la
+    lleva y la cuenta esta conectada — que es como llega una entrega real.
+    """
+    from sqlalchemy import text as _sql
+
+    await db_session.execute(
+        _sql("INSERT INTO oauth_tokens (workspace_id, user_id, provider, "
+             "access_token, account_id) "
+             "VALUES (7, 'usuario-f63', 'instagram', 'no-real', 'ig-cuenta-f63')"))
+    await db_session.commit()
+
     payload = {
         "entry": [
             {
+                "id": "ig-cuenta-f63",
                 "messaging": [
                     {
                         "sender": {"id": "ig-user-f63"},
@@ -180,7 +196,7 @@ async def test_fb_messenger_send(client: AsyncClient, auth_headers: dict):
 
 
 @pytest.mark.asyncio
-async def test_tiktok_dm_webhook(client: AsyncClient, monkeypatch):
+async def test_tiktok_dm_webhook(client: AsyncClient, monkeypatch, db_session):
     """El webhook exige ahora el secreto compartido.
 
     TikTok no publica esquema de firma, asi que la autenticidad se establece con
@@ -189,9 +205,22 @@ async def test_tiktok_dm_webhook(client: AsyncClient, monkeypatch):
     quisiera.
     """
     monkeypatch.setenv("TIKTOK_WEBHOOK_SECRET", "secreto-de-prueba-no-real")
+
+    # `open_id` es el REMITENTE. Atribuir por el significaria que quien escribe
+    # elige el inquilino; el receptor es `to_user_id`, y tiene que estar
+    # conectado por alguien.
+    from sqlalchemy import text as _sql
+
+    await db_session.execute(
+        _sql("INSERT INTO oauth_tokens (workspace_id, user_id, provider, "
+             "access_token, account_id) "
+             "VALUES (7, 'usuario-tt-f63', 'tiktok', 'no-real', 'tt-cuenta-f63')"))
+    await db_session.commit()
+
     r = await client.post(
         "/api/tiktok-dm/webhook",
-        json={"events": [{"open_id": "tt-open-f63", "text": "Hola TikTok"}]},
+        json={"to_user_id": "tt-cuenta-f63",
+              "events": [{"open_id": "tt-open-f63", "text": "Hola TikTok"}]},
         headers={"X-Nelvyon-Webhook-Secret": "secreto-de-prueba-no-real"},
     )
     assert r.status_code == 200

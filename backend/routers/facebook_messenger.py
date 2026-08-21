@@ -11,6 +11,13 @@ import json
 
 from core.database import get_db
 from core.meta_webhook_signature import verificar_firma_meta
+from core.inquilino_de_webhook import (
+    InquilinoNoAtribuible,
+    cuenta_de_cuerpo,
+    respuesta_no_atribuible,
+    sesion_de_webhook,
+    workspace_de_cuenta,
+)
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.facebook_messenger_service import get_facebook_messenger_service
 
@@ -47,7 +54,19 @@ async def receive_webhook(request: Request, db: AsyncSession = Depends(get_db)):
     # firma dejaria de casar.
     cuerpo = await request.body()
     verificar_firma_meta("facebook", cuerpo, request.headers.get("x-hub-signature-256"))
-    return await get_facebook_messenger_service(db, 1).handle_webhook(json.loads(cuerpo))
+    payload = json.loads(cuerpo)
+
+    # `entry[].id` es la pagina de Facebook. Quien la conecto desde dentro del
+    # producto decide de quien es este mensaje; antes lo decidia un `1` fijo.
+    # Resolver y escribir en la misma sesion de trabajos: `oauth_tokens` tiene
+    # RLS y aqui no hay usuario que satisfaga ninguna politica.
+    async with await sesion_de_webhook() as sesion:
+        try:
+            ws = await workspace_de_cuenta(
+                sesion, "facebook", cuenta_de_cuerpo("facebook", payload))
+        except InquilinoNoAtribuible as exc:
+            return respuesta_no_atribuible(exc)
+        return await get_facebook_messenger_service(sesion, ws).handle_webhook(payload)
 
 
 @router.get("/conversations")

@@ -7,6 +7,13 @@ from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
+from core.inquilino_de_webhook import (
+    InquilinoNoAtribuible,
+    cuenta_de_cuerpo,
+    respuesta_no_atribuible,
+    sesion_de_webhook,
+    workspace_de_cuenta,
+)
 from core.webhook_shared_secret import verificar_secreto_compartido
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.tiktok_dm_service import get_tiktok_dm_service
@@ -37,7 +44,16 @@ async def receive_webhook(request: Request, db: AsyncSession = Depends(get_db)):
     quisiera.
     """
     verificar_secreto_compartido("tiktok", request)
-    return await get_tiktok_dm_service(db, 1).handle_webhook(await request.json())
+    payload = await request.json()
+
+    # Antes: `1` fijo, y todos los DM de todos los inquilinos al mismo workspace.
+    async with await sesion_de_webhook() as sesion:
+        try:
+            ws = await workspace_de_cuenta(
+                sesion, "tiktok", cuenta_de_cuerpo("tiktok", payload))
+        except InquilinoNoAtribuible as exc:
+            return respuesta_no_atribuible(exc)
+        return await get_tiktok_dm_service(sesion, ws).handle_webhook(payload)
 
 
 @router.get("/conversations")

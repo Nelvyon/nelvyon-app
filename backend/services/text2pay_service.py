@@ -229,9 +229,10 @@ class Text2PayService:
         if not payment_id and obj.get("id", "").startswith("cs_"):
             row = await self.session.execute(
                 text(
-                    "SELECT id FROM text2pay_payments WHERE stripe_session_id = :sid LIMIT 1"
+                    "SELECT id FROM text2pay_payments "
+                    "WHERE stripe_session_id = :sid AND workspace_id = :ws LIMIT 1"
                 ),
-                {"sid": obj.get("id")},
+                {"sid": obj.get("id"), "ws": self.workspace_id},
             )
             found = row.mappings().first()
             if found:
@@ -249,10 +250,10 @@ class Text2PayService:
                 """
                 UPDATE text2pay_payments
                 SET status = :st, paid_at = CASE WHEN :st = 'paid' THEN :now ELSE paid_at END
-                WHERE id = :id
+                WHERE id = :id AND workspace_id = :ws
                 """
             ),
-            {"st": status, "now": now, "id": payment_id},
+            {"st": status, "now": now, "id": payment_id, "ws": self.workspace_id},
         )
         await self.session.commit()
         return {"handled": True, "payment_id": payment_id, "status": status}

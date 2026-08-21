@@ -13,6 +13,13 @@ import json
 
 from core.database import get_db
 from core.meta_webhook_signature import verificar_firma_meta
+from core.inquilino_de_webhook import (
+    InquilinoNoAtribuible,
+    cuenta_de_cuerpo,
+    respuesta_no_atribuible,
+    sesion_de_webhook,
+    workspace_de_cuenta,
+)
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.instagram_dm_service import get_instagram_dm_service
 
@@ -50,7 +57,23 @@ async def receive_webhook(request: Request, db: AsyncSession = Depends(get_db)):
     cuerpo = await request.body()
     verificar_firma_meta("instagram", cuerpo, request.headers.get("x-hub-signature-256"))
     payload = json.loads(cuerpo)
-    return await get_instagram_dm_service(db, 1).handle_webhook(payload)
+
+    # La firma demuestra que el cuerpo viene de Meta. NO dice de quien es: eso
+    # sale de la cuenta que Meta nombra dentro del cuerpo firmado, buscada en las
+    # integraciones que conecto un usuario autenticado. Antes habia un `1` fijo y
+    # los DM de todos los inquilinos caian en el mismo workspace.
+    # Resolver Y escribir van en la MISMA sesion de trabajos. `oauth_tokens`
+    # tiene RLS y este webhook no tiene usuario: consultarla con el rol de la
+    # aplicacion devolveria cero filas —sin error— y todo webhook legitimo
+    # quedaria «no atribuible». Un aislamiento que se cae hacia «no se de quien
+    # es» tambien deja de funcionar, solo que sin ruido.
+    async with await sesion_de_webhook() as sesion:
+        try:
+            ws = await workspace_de_cuenta(
+                sesion, "instagram", cuenta_de_cuerpo("instagram", payload))
+        except InquilinoNoAtribuible as exc:
+            return respuesta_no_atribuible(exc)
+        return await get_instagram_dm_service(sesion, ws).handle_webhook(payload)
 
 
 @router.get("/conversations")
