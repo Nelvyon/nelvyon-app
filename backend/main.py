@@ -736,6 +736,32 @@ async def control_center(request: Request):
             "bloques": {}}
 
 
+@app.get("/health/workers")
+async def health_workers():
+    """Los bucles de fondo: ¿siguen vivos y cuando dieron su ultima vuelta?
+
+    POR QUE HACE FALTA UNA RUTA APARTE
+    ----------------------------------
+    `/health/ready` dice si el proceso puede recibir trafico. `/health/business`
+    dice si la empresa funciona. Esta responde una tercera pregunta que ninguna
+    de las dos cubre: si el TRABAJO DE FONDO se esta haciendo.
+
+    Tres de los seis bucles no publicaban nada. Arrancaban y a partir de ahi eran
+    invisibles: si uno moria o se quedaba mudo, el API respondia 200, el proceso
+    vivia y el trabajo simplemente dejaba de hacerse. Es el mismo modo de fallo
+    del cerrojo del planner, que si se vio porque Autopilot si publica su estado.
+
+    Nunca devuelve 5xx: un bucle degradado no puede hacer que el orquestador
+    reinicie el contenedor y tumbe el trafico.
+    """
+    try:
+        from core import latidos
+
+        return latidos.estado()
+    except Exception as exc:  # noqa: BLE001
+        return {"status": "unknown", "reason": type(exc).__name__}
+
+
 @app.get("/health/ready")
 async def health_ready():
     """Readiness — includes database check (503 if DB unavailable)."""

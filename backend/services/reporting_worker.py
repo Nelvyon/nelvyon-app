@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import asyncio
+
+from core import latidos
 import logging
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
@@ -128,10 +130,17 @@ async def _scheduler_loop() -> None:
     while True:
         try:
             await _tick()
+            # El latido va DESPUES de la vuelta, no antes: latir al empezar
+            # diria «vivo» de un bucle que se cuelga a mitad en cada iteracion.
+            latidos.latir("informes_ejecutivos")
         except asyncio.CancelledError:
             raise
         except Exception as exc:
             logger.warning("Executive report worker tick error: %s", exc)
+            # Un tick que falla TAMBIEN late, con su error. Si no latiera, un
+            # bucle que revienta siempre se veria igual que uno muerto, y son dos
+            # averias distintas con dos arreglos distintos.
+            latidos.latir("informes_ejecutivos", error=f"{type(exc).__name__}: {exc}")
         await asyncio.sleep(_CHECK_INTERVAL_SEC)
 
 
@@ -139,6 +148,7 @@ async def start_reporting_worker() -> None:
     global _worker_task
     if _worker_task and not _worker_task.done():
         return
+    latidos.registrar("informes_ejecutivos", _CHECK_INTERVAL_SEC)
     _worker_task = asyncio.create_task(_scheduler_loop())
     logger.info("Executive reporting worker started (interval=%ss)", _CHECK_INTERVAL_SEC)
 
