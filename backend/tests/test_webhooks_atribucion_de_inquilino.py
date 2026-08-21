@@ -48,6 +48,56 @@ CUENTA_DESCONOCIDA = "17841499999999999"
 CUENTA_DISPUTADA = "17841400000000777"
 
 
+def solo_codigo(ruta) -> str:
+    """El fichero sin comentarios ni docstrings, conservando el resto.
+
+    DOS ERRORES ANTES DE ACERTAR, Y LOS DOS DEJABAN EL GUARD INERTE
+    ---------------------------------------------------------------
+    1. Borraba la LINEA ENTERA de cada token de cadena. Como los patrones
+       prohibidos llevan una cadena dentro —`query_params.get("workspace_id")`—
+       la linea desaparecia antes de buscarla.
+    2. Borrar solo el TRAMO de la cadena tampoco vale: lo que se busca ES el
+       contenido de la cadena. Quitarla deja `query_params.get(      )`, que no
+       casa con nada.
+
+    Lo que hay que quitar no son las cadenas: son los COMENTARIOS y los
+    DOCSTRINGS, que es donde vive la prosa que explica el defecto corregido y
+    provoca los falsos positivos. Una cadena dentro de una expresion es codigo y
+    se queda.
+
+    Un docstring se reconoce porque el token de cadena es toda la sentencia: al
+    quitarlo, su linea queda en blanco.
+
+    Las dos veces el sintoma fue el mismo —el guard en verde con el defecto
+    reintroducido— y solo se vio mutando la ruta a proposito.
+    """
+    import io as _io
+    import tokenize
+
+    lineas = ruta.read_text(encoding="utf-8", errors="replace").split(chr(10))
+    a_borrar = []
+    try:
+        with _io.open(ruta, "rb") as fh:
+            for tok in tokenize.tokenize(fh.readline):
+                if tok.type == tokenize.COMMENT:
+                    a_borrar.append(tok)
+                elif tok.type == tokenize.STRING:
+                    primera = lineas[tok.start[0] - 1]
+                    if not primera[:tok.start[1]].strip():
+                        a_borrar.append(tok)      # la cadena abre la sentencia
+    except (tokenize.TokenError, SyntaxError, IndentationError):
+        return chr(10).join(lineas)
+
+    for tok in a_borrar:
+        (fila_i, col_i), (fila_f, col_f) = tok.start, tok.end
+        for n in range(fila_i, fila_f + 1):
+            linea = lineas[n - 1]
+            desde = col_i if n == fila_i else 0
+            hasta = col_f if n == fila_f else len(linea)
+            lineas[n - 1] = linea[:desde] + " " * max(0, hasta - desde) + linea[hasta:]
+    return chr(10).join(lineas)
+
+
 def _firmar(cuerpo: bytes) -> str:
     return "sha256=" + hmac.new(SECRETO.encode(), cuerpo, hashlib.sha256).hexdigest()
 
@@ -255,21 +305,6 @@ def test_ninguna_ruta_saca_el_inquilino_de_donde_no_debe():
     import re
     import tokenize
 
-    def solo_codigo(ruta: pathlib.Path) -> str:
-        """El fichero sin comentarios ni cadenas, conservando los numeros de linea."""
-        lineas = ruta.read_text(encoding="utf-8", errors="replace").split(chr(10))
-        salida = list(lineas)
-        try:
-            with io.open(ruta, "rb") as fh:
-                for tok in tokenize.tokenize(fh.readline):
-                    if tok.type not in (tokenize.COMMENT, tokenize.STRING):
-                        continue
-                    for n in range(tok.start[0], tok.end[0] + 1):
-                        salida[n - 1] = ""
-        except (tokenize.TokenError, SyntaxError, IndentationError):
-            return chr(10).join(lineas)     # ante la duda, se mira todo
-        return chr(10).join(salida)
-
     raiz = pathlib.Path(__file__).resolve().parents[1] / "routers"
     prohibido = re.compile(
         r"query_params\.get\(\s*['\"]workspace_id"
@@ -293,3 +328,149 @@ def test_ninguna_ruta_saca_el_inquilino_de_donde_no_debe():
         f"de un literal: {culpables}. Tiene que salir de un identificador que "
         f"venga DENTRO del cuerpo firmado y que NELVYON ya tenga asociado a un "
         f"workspace.")
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SMS entrante: la conversacion previa es el vinculo
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Esta ruta se encontro DESPUES de dar el bloque por cerrado, comprobando los
+# invariantes sobre el codigo que iba a desplegarse. Seguia leyendo
+# `?workspace_id=` con `TWILIO_DEFAULT_WORKSPACE_ID` de reserva. Se cerro con el
+# mismo criterio: un SMS entrante es una RESPUESTA a un mensaje que un workspace
+# envio, y esa fila la creo una accion autenticada.
+
+TELEFONO_DE_A = "+34600000001"
+TELEFONO_DE_B = "+34600000002"
+TELEFONO_DISPUTADO = "+34600000777"
+TELEFONO_SIN_HISTORIA = "+34699999999"
+SECRETO_TWILIO = "secreto-twilio-de-prueba"
+
+
+@pytest.fixture
+async def conversaciones_sms(db_session, dos_inquilinos, monkeypatch):
+    """A escribio a un numero; B a otro. Ese es el unico vinculo que cuenta."""
+    monkeypatch.setenv("TWILIO_AUTH_TOKEN", SECRETO_TWILIO)
+    await db_session.execute(text("DELETE FROM sms_messages"))
+    await db_session.execute(text("DELETE FROM sms_conversations"))
+    for ws, tel in ((dos_inquilinos["A"], TELEFONO_DE_A),
+                    (dos_inquilinos["B"], TELEFONO_DE_B)):
+        await db_session.execute(
+            text("INSERT INTO sms_messages (workspace_id, to_number, message, status)"
+                 " VALUES (:ws, :tel, 'hola', 'delivered')"),
+            {"ws": ws, "tel": tel})
+    await db_session.commit()
+    return dos_inquilinos
+
+
+async def _sms_entrante(client, desde: str, texto: str = "respondo"):
+    """Una entrega de Twilio con su firma, como llega de verdad."""
+    import base64
+    import hashlib
+    import hmac as _hmac
+
+    url = "http://test/api/sms/webhook/twilio"
+    campos = {"From": desde, "Body": texto, "MessageSid": f"SM{abs(hash(desde)) % 10**12}"}
+    base = url + "".join(f"{k}{campos[k]}" for k in sorted(campos))
+    firma = base64.b64encode(
+        _hmac.new(SECRETO_TWILIO.encode(), base.encode(), hashlib.sha1).digest()).decode()
+    return await client.post("/api/sms/webhook/twilio", data=campos,
+                             headers={"X-Twilio-Signature": firma})
+
+
+async def _sms_por_workspace(db_session) -> dict[int, int]:
+    filas = (await db_session.execute(text(
+        "SELECT workspace_id, count(*) AS n FROM sms_conversations GROUP BY workspace_id"
+    ))).mappings().all()
+    return {int(f["workspace_id"]): int(f["n"]) for f in filas}
+
+
+async def test_el_sms_entra_en_el_workspace_que_escribio_antes(
+    client, db_session, conversaciones_sms
+):
+    r = await _sms_entrante(client, TELEFONO_DE_A)
+    assert r.status_code == 200, r.text
+    por_ws = await _sms_por_workspace(db_session)
+    assert por_ws.get(conversaciones_sms["A"], 0) > 0, por_ws
+    assert por_ws.get(conversaciones_sms["B"], 0) == 0, (
+        f"la respuesta a A aparecio en B: {por_ws}")
+
+
+async def test_el_query_string_tampoco_decide_en_sms(client, db_session, conversaciones_sms):
+    """El parametro ya no existe; si alguien lo reintroduce, esto lo dice."""
+    r = await client.post(
+        f"/api/sms/webhook/twilio?workspace_id={conversaciones_sms['B']}",
+        data={"From": TELEFONO_DE_A, "Body": "x"},
+        headers={"X-Twilio-Signature": "no-vale"})
+    assert r.status_code in (400, 403), r.status_code   # cae por firma, antes de nada
+    assert await _sms_por_workspace(db_session) == {}
+
+
+async def test_un_numero_al_que_nadie_escribio_no_se_atribuye(
+    client, db_session, conversaciones_sms
+):
+    r = await _sms_entrante(client, TELEFONO_SIN_HISTORIA)
+    assert r.json().get("atribuido") is False, r.json()
+    assert await _sms_por_workspace(db_session) == {}, "se escribio sin poder atribuir"
+
+
+async def test_dos_workspaces_que_escribieron_al_mismo_numero_es_un_no(
+    client, db_session, conversaciones_sms
+):
+    """La respuesta podria ser para cualquiera de los dos. Elegir seria adivinar."""
+    for ws in conversaciones_sms.values():
+        await db_session.execute(
+            text("INSERT INTO sms_messages (workspace_id, to_number, message, status)"
+                 " VALUES (:ws, :tel, 'hola', 'delivered')"),
+            {"ws": ws, "tel": TELEFONO_DISPUTADO})
+    await db_session.commit()
+
+    r = await _sms_entrante(client, TELEFONO_DISPUTADO)
+    assert r.json().get("atribuido") is False
+    assert await _sms_por_workspace(db_session) == {}
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Los invariantes, como prueba y no como comprobacion de una vez
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+def test_los_invariantes_de_atribucion_se_mantienen():
+    """Las tres fuentes prohibidas, sobre CODIGO y no sobre texto.
+
+    `sms.py` se encontro asi: el bloque se dio por cerrado y esta comprobacion,
+    pasada sobre el codigo que iba a desplegarse, revelo una ruta que nadie
+    habia auditado y que seguia leyendo `?workspace_id=`.
+    """
+    import io
+    import pathlib
+    import re
+    import tokenize
+
+    raiz = pathlib.Path(__file__).resolve().parents[1] / "routers"
+    de_quien_llama = re.compile(
+        r"query_params\.get\(\s*['\"]workspace_id"
+        r"|workspace_id\s*:\s*int[^=]*=\s*Query", re.IGNORECASE)
+    de_entorno = re.compile(
+        r"TWILIO_DEFAULT_WORKSPACE_ID|HELPDESK_DEFAULT_WORKSPACE_ID"
+        r"|default_helpdesk_workspace_id")
+    literal_que_escribe = re.compile(
+        r"get_\w+_service\(\s*\w+\s*,\s*\d+\s*\)[^\n]{0,240}?"
+        r"\.(handle_webhook|handle_reply|mark_\w+|process_\w+)")
+
+    culpables, revisados = [], 0
+    for f in sorted(raiz.glob("*.py")):
+        codigo = solo_codigo(f)
+        revisados += 1
+        for patron, motivo in ((de_quien_llama, "lo elige quien llama"),
+                               (de_entorno, "una variable de entorno"),
+                               (literal_que_escribe, "una constante")):
+            for m in patron.finditer(codigo):
+                culpables.append(
+                    f"{f.name}:{codigo[:m.start()].count(chr(10)) + 1} ({motivo})")
+
+    assert revisados >= 40, f"solo se revisaron {revisados} routers"
+    assert not culpables, (
+        f"el inquilino sale de una fuente que no es procedencia: {culpables}. "
+        f"Tiene que salir de una identidad externa vinculada antes por alguien "
+        f"autenticado, y verificable.")

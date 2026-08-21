@@ -12,9 +12,15 @@ from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
+from core.inquilino_de_webhook import (
+    InquilinoNoAtribuible,
+    respuesta_no_atribuible,
+    sesion_de_webhook,
+    workspace_de_conversacion_sms,
+)
 from core.twilio_webhook_signature import verificar_firma_twilio
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
-from services.sms_service import SmsService, get_sms_service
+from services.sms_service import _normalize_phone, SmsService, get_sms_service
 
 logger = logging.getLogger(__name__)
 
@@ -137,15 +143,17 @@ async def register_optout(
 @sms_router.post("/webhook/twilio")
 async def twilio_inbound_webhook(
     request: Request,
-    workspace_id: int | None = Query(None),
     db: AsyncSession = Depends(get_db),
 ):
     """SMS entrante de Twilio.
 
     La firma se comprueba ANTES de leer el cuerpo. Sin ella cualquiera podia
     inyectar mensajes en la bandeja de un cliente, con el remitente que
-    quisiera, y ademas elegir el inquilino: `workspace_id` viaja en el query
-    string y nadie comprobaba que quien lo envia tenga relacion con el.
+    quisiera. La firma se resolvio en un bloque anterior; el inquilino no: salia
+    de `?workspace_id=` —lo pone quien hace la peticion— y de reserva de
+    `TWILIO_DEFAULT_WORKSPACE_ID`, que manda toda la instalacion a un solo
+    workspace. Ahora sale de la conversacion previa: un SMS entrante es una
+    RESPUESTA a un mensaje que un workspace envio a ese numero.
     """
     await verificar_firma_twilio(request)
 
@@ -174,17 +182,18 @@ async def twilio_inbound_webhook(
     if not from_number:
         raise HTTPException(status_code=400, detail="Missing From field")
 
-    ws_id = workspace_id
-    if ws_id is None:
-        default_ws = os.environ.get("TWILIO_DEFAULT_WORKSPACE_ID", "").strip()
-        if default_ws.isdigit():
-            ws_id = int(default_ws)
-    if ws_id is None:
-        raise HTTPException(status_code=400, detail="workspace_id query parameter required")
+    # Resolver y escribir con el rol de trabajos: aqui no hay usuario que
+    # satisfaga ninguna politica de RLS, y `sms_messages` es de inquilino.
+    async with await sesion_de_webhook() as sesion:
+        try:
+            ws_id = await workspace_de_conversacion_sms(
+                sesion, _normalize_phone(from_number))
+        except InquilinoNoAtribuible as exc:
+            return respuesta_no_atribuible(exc)
 
-    svc = get_sms_service(db, ws_id)
-    try:
-        result = await svc.handle_reply(from_number, body_text, twilio_sid=message_sid, workspace_id=ws_id)
-        return {"ok": True, **result}
-    except ValueError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
+        try:
+            result = await get_sms_service(sesion, ws_id).handle_reply(
+                from_number, body_text, twilio_sid=message_sid, workspace_id=ws_id)
+            return {"ok": True, **result}
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc

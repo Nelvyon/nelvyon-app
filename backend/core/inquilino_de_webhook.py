@@ -398,3 +398,43 @@ def destinatario_de_sns(mensaje: dict) -> str | None:
     if isinstance(destinos, str):
         return destinos
     return str(destinos[0]) if destinos else None
+
+
+async def workspace_de_conversacion_sms(sesion: AsyncSession, remitente: str) -> int:
+    """El workspace que escribio antes a este numero.
+
+    Un SMS entrante es una RESPUESTA: llega desde un numero al que NELVYON envio
+    algo, y esa fila de `sms_messages` la creo una accion autenticada. Ese es el
+    vinculo previo y verificable.
+
+    No vale el numero por si mismo —cualquiera puede escribir desde cualquier
+    numero— sino el hecho de que ese numero este en la lista de destinatarios a
+    los que un workspace ya envio. Si nadie le escribio, no hay conversacion que
+    continuar y no se atribuye.
+
+    Si DOS workspaces escribieron al mismo numero, la respuesta podria ser para
+    cualquiera de los dos: se rechaza igual que una cuenta externa disputada.
+    """
+    numero = (remitente or "").strip()
+    if not numero:
+        raise InquilinoNoAtribuible("el cuerpo firmado no trae remitente", "twilio")
+
+    filas = (await sesion.execute(
+        text("""
+            SELECT DISTINCT workspace_id FROM sms_messages
+             WHERE to_number = :numero
+               AND status IN ('sent', 'delivered')
+               AND workspace_id IS NOT NULL
+        """),
+        {"numero": numero},
+    )).scalars().all()
+
+    if not filas:
+        raise InquilinoNoAtribuible(
+            "ningun workspace ha escrito a ese numero", "twilio", numero)
+    if len(filas) > 1:
+        logger.error("webhook_sms_ambiguo",
+                     extra={"webhook_workspaces": sorted(int(w) for w in filas)})
+        raise InquilinoNoAtribuible(
+            f"{len(filas)} workspaces han escrito a ese numero", "twilio", numero)
+    return int(filas[0])

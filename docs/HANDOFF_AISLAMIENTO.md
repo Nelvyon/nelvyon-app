@@ -372,3 +372,54 @@ restaurado, los 8 pasan. Regresión en todo lo tocado: **466 pruebas verdes**.
 - **`signaturit` escribe en un diccionario en memoria** (`_mock_store`), no en la
   base. No es un problema de aislamiento, pero es un mock presentado como
   capacidad.
+
+---
+
+## Una ruta más, encontrada al verificar el despliegue: `sms.py`
+
+El bloque de webhooks se dio por cerrado con 10 rutas convertidas y 8 pruebas en
+verde. Al comprobar los invariantes **sobre el código que iba a desplegarse**
+apareció una undécima que nadie había auditado:
+
+```
+POST /api/sms/webhook/twilio     ws_id = workspace_id            (query string)
+                                 or TWILIO_DEFAULT_WORKSPACE_ID  (entorno)
+```
+
+Las dos fuentes prohibidas, en la misma ruta. Mi inventario AST no la marcó
+porque su detección de escritura no casaba con `handle_reply`.
+
+**Procedencia legítima.** Un SMS entrante es una **respuesta**: llega desde un
+número al que un workspace escribió antes, y esa fila de `sms_messages` la creó
+una acción autenticada. No vale el número por sí mismo —cualquiera escribe desde
+cualquier número— sino el hecho de que ese número esté entre los destinatarios a
+los que un workspace ya envió. Dos workspaces que escribieron al mismo número:
+ambiguo, se rechaza igual que una cuenta externa disputada.
+
+## El guard de invariantes estuvo inerte dos veces seguidas
+
+El chequeo estructural que debía impedir esto **no se disparaba**, y las dos
+veces el síntoma fue idéntico: verde con el defecto reintroducido.
+
+1. `solo_codigo` borraba la **línea entera** de cada token de cadena. Como todos
+   los patrones prohibidos llevan una cadena dentro
+   —`query_params.get("workspace_id")`— la línea desaparecía antes de buscarla.
+   Solo cazaba la forma `Query(...)`, que no lleva cadena. Por eso encontró
+   `sms.py` y no habría encontrado la otra variante.
+2. Borrar solo el **tramo** de la cadena tampoco servía: lo que se busca *es* el
+   contenido de la cadena. Quitarla deja `query_params.get(      )`.
+
+Lo que había que quitar no eran las cadenas sino los **comentarios y
+docstrings**, que es donde vive la prosa que explica el defecto corregido y
+genera los falsos positivos. Una cadena dentro de una expresión es código.
+
+**Cómo se vio.** Mutando la ruta de SMS a propósito: reintroducir el query string
+y comprobar que el guard falla. Sin esa mutación las dos versiones inertes
+habrían pasado por buenas — igual que pasó con el guard de roles.
+
+Los dos ayudantes `solo_codigo` estaban **duplicados** en dos pruebas y solo una
+copia se corrigió en el primer intento. Ahora hay uno solo.
+
+**Estado del bloque:** 11 rutas, `test_webhooks_atribucion_de_inquilino.py` con
+13 casos. Mutación: reintroducido el defecto, **5 fallan** (3 de conducta + los 2
+guards estructurales); restaurado, 13 pasan.
