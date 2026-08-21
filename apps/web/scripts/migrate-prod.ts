@@ -10,6 +10,24 @@
  * Without approval: no-op success if nothing pending; fail deploy if pending > 0.
  *
  * Usage: DATABASE_URL=... pnpm -C apps/web migrate:prod
+ *
+ * QUIEN APLICA LAS MIGRACIONES, Y LA TRAMPA QUE TIENE
+ * ---------------------------------------------------
+ * Solo el servicio `@nelvyon/web`. Es el unico cuyo `preDeployCommand` ejecuta
+ * este script; `nelvyon-app` despliega sin tocar migraciones.
+ *
+ * Y `@nelvyon/web` vigila UNICAMENTE `/apps/web/**`. Un commit que solo anada un
+ * fichero en `backend/db/migrations/` NO lo despierta: Railway marca su
+ * despliegue como SKIPPED, `nelvyon-app` despliega en SUCCESS, y todo parece
+ * haber ido bien — pero la migracion no se ha aplicado. Paso el 2026-08-21 con
+ * la 564: dos despliegues verdes y `_migrations` sin moverse de 463.
+ *
+ * Un `railway redeploy` tampoco sirve: reconstruye el commit YA desplegado, que
+ * es justo el que no lleva la migracion nueva.
+ *
+ * Asi que una migracion llega a produccion cuando su despliegue incluye tambien
+ * algo bajo `apps/web/`. Comprobarlo siempre en el catalogo —`SELECT count(*)
+ * FROM _migrations`— y nunca por el color del despliegue.
  */
 import { spawnSync } from "node:child_process";
 import path from "node:path";
