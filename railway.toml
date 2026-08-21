@@ -7,6 +7,12 @@
 builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
+# Sin esto, el servicio que APLICA las migraciones no vigila donde VIVEN. Un
+# commit que solo anade un fichero en `backend/db/migrations/` marcaba su
+# despliegue como SKIPPED mientras el backend desplegaba en SUCCESS: dos
+# despliegues verdes y ninguna migracion aplicada. Paso con la 564.
+watchPatterns = ["apps/web/**", "backend/db/migrations/**"]
+
 [deploy]
 # Official preDeployCommand (array, max 1). Runs after build, before traffic.
 # ADR-064: migrate:prod is gated — production applies SQL only with

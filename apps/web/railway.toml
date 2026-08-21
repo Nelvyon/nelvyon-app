@@ -2,6 +2,12 @@
 builder = "DOCKERFILE"
 dockerfilePath = "apps/web/Dockerfile"
 
+# Sin esto, el servicio que APLICA las migraciones no vigila donde VIVEN. Un
+# commit que solo anade un fichero en `backend/db/migrations/` marcaba su
+# despliegue como SKIPPED mientras el backend desplegaba en SUCCESS: dos
+# despliegues verdes y ninguna migracion aplicada. Paso con la 564.
+watchPatterns = ["apps/web/**", "backend/db/migrations/**"]
+
 [deploy]
 # Kept in sync with root railway.toml. ADR-064: migrate:prod gated on production
 # (NELVYON_PROD_MIGRATE_APPROVED=1 + APPROVED_BY). Staging auto-applies.
