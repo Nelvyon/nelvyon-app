@@ -437,14 +437,25 @@ async def _sre(caja, p: Peticion, limites: dict) -> Resultado:
         "workspace_id": caja.workspace_id,
         "generado_en": _ahora(),
         "total": len(historial),
+        "ventana": "ultimos 50 trabajos",
         "sub_escalados": escalados,
         "sub_confirmados": por_estado.get("confirmed", 0),
         "por_estado": por_estado,
         "sano": escalados == 0,
         "resumen": (f"{por_estado.get('confirmed', 0)} confirmados, "
-                    f"{escalados} escalados"),
+                    f"{escalados} escalados en los ultimos {len(historial)}"),
     }
-    return Resultado(datos, _confianza(historial))
+    # NO se usa `_confianza(historial)` aqui, y es una distincion real.
+    #
+    # Para el plan semanal, un tope de filas SI es truncamiento: la pregunta es
+    # «todas las tareas pendientes» y ver 50 de 300 puede ordenar mal. Para este
+    # agente la pregunta ES «que ha hecho el motor ULTIMAMENTE», asi que las
+    # ultimas 50 filas son la respuesta COMPLETA, no un recorte de otra mayor.
+    #
+    # Tratarlo como truncamiento hacia que este agente escalara siempre en cuanto
+    # un workspace acumulaba 50 trabajos — es decir, en el primer dia. Lo
+    # descubrio la simulacion de 72 horas.
+    return Resultado(datos, 0.95)
 
 
 # ═══════════════════════════════════════════════════════════════════════════
