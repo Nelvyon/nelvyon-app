@@ -109,6 +109,25 @@ GRANTS = (
     "REVOKE CREATE ON SCHEMA public FROM {rol}",
 )
 
+#: Y la postura NO termina en el GRANT masivo.
+#:
+#: `ON ALL TABLES` reparte escritura sobre todo, y para las tablas de inquilino
+#: eso esta bien: RLS convierte «puede escribir» en «puede escribir LO SUYO». Pero
+#: seis tablas de PLATAFORMA no tienen RLS —no tienen inquilino contra el que
+#: filtrar— y son justamente las que GOBIERNAN el comportamiento del sistema: las
+#: politicas de los agentes, el freno de emergencia, el catalogo, la clasificacion
+#: de riesgo de Autopilot, el mapa de planes y el registro de migraciones.
+#:
+#: Ahi el GRANT es la unica frontera, y estaba abierta. La migracion 559 la cierra.
+#: Esta fixture tiene que reproducir la postura REAL, no la anterior: sin esto,
+#: reconstruia el despliegue con la puerta abierta y tapaba la proteccion en la
+#: base de certificacion — que es exactamente lo que hizo hasta que el guard de
+#: gobierno empezo a fallar en la suite completa.
+REVOCACIONES_DE_GOBIERNO = (
+    "agent_policies", "agent_kill_switch", "agent_catalog",
+    "autopilot_capabilities", "plan_rango", "_migrations",
+)
+
 
 def _dsn_del_rol(dsn_admin: str, rol: str, clave: str) -> str:
     return re.sub(r"//[^@]*@", f"//{rol}:{clave}@", dsn_admin)
@@ -145,6 +164,15 @@ def rol_app(admin):
     )
     for plantilla in GRANTS:
         cur.execute(plantilla.format(rol=ROL))
+    # La postura real incluye la retirada de la 559. Ver el comentario de
+    # `REVOCACIONES_DE_GOBIERNO`.
+    for tabla in REVOCACIONES_DE_GOBIERNO:
+        cur.execute(
+            "SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename=%s",
+            (tabla,))
+        if cur.fetchone():
+            cur.execute(f"REVOKE INSERT, UPDATE, DELETE ON public.{tabla} FROM {ROL}")
+            cur.execute(f"GRANT SELECT ON public.{tabla} TO {ROL}")
     return _dsn_del_rol(DSN, ROL, CLAVE)
 
 

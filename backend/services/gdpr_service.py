@@ -134,26 +134,34 @@ class GDPRService:
         for row in crm:
             await self.anonymize_contact(str(row["id"]))
 
+        fallos: list[str] = []
         if email:
-            await self._purge_by_email(email)
+            fallos = await self._purge_by_email(email)
 
+        # `completed` significa COMPLETADO. Si algo no se pudo purgar, el estado
+        # es `failed` y se dice que falto: marcar completado un borrado a medias
+        # convierte una obligacion legal en una afirmacion falsa, y ademas
+        # oculta el problema justo donde mas caro sale descubrirlo tarde.
+        estado_final = "failed" if fallos else "completed"
         await self.session.execute(
             text(
                 """
                 UPDATE data_deletion_requests
-                SET status = 'completed', completed_at = NOW()
+                SET status = :estado, completed_at = NOW()
                 WHERE id = :id AND workspace_id = :workspace_id
                 """
             ),
-            {"id": req_id, "workspace_id": self.workspace_id},
+            {"id": req_id, "workspace_id": self.workspace_id,
+             "estado": estado_final},
         )
         await self.session.commit()
 
         return {
             "request_id": req_id,
-            "status": "completed",
+            "status": estado_final,
             "user_id": user_id,
             "workspace_id": self.workspace_id,
+            "no_purgado": fallos,
         }
 
     async def anonymize_contact(self, contact_id: str) -> dict[str, Any]:
@@ -534,31 +542,88 @@ class GDPRService:
         except Exception as exc:
             logger.warning("legacy contact delete skipped: %s", exc)
 
-    async def _purge_by_email(self, email: str) -> None:
+    #: Que se purga, donde y con que. Cada entrada declara su tabla para poder
+    #: comprobar ANTES si existe: una tabla ausente no es un fallo de purgado,
+    #: es una tabla ausente, y confundir las dos cosas marcaria como fallida
+    #: toda peticion de borrado del sistema.
+    _PURGADO = (
+        (
+            "campaign_recipients",
+            # Acotado por `campaigns.workspace_id`, igual que la exportacion.
+            """
+            DELETE FROM campaign_recipients cr
+             USING campaigns c
+             WHERE c.id = cr.campaign_id
+               AND c.workspace_id = :workspace_id
+               AND lower(cr.email) = :email
+            """,
+        ),
+        (
+            "bookings",
+            "DELETE FROM bookings WHERE workspace_id = :workspace_id "
+            "AND lower(client_email) = :email",
+        ),
+    )
+
+    async def _purge_by_email(self, email: str) -> list[str]:
+        """Purga el rastro de un correo. Devuelve lo que NO se pudo purgar.
+
+        TRES DEFECTOS QUE ESTABAN AQUI
+        ------------------------------
+        1. `DELETE FROM campaign_recipients WHERE lower(email) = :email` no
+           filtraba por workspace, cuando la otra sentencia SI lo hacia. La
+           peticion de borrado de un cliente habria borrado los destinatarios con
+           ese correo de TODOS los demas inquilinos. Y no es que no se supiera
+           acotar: el camino de EXPORTACION, en este mismo fichero, ya lo hace
+           uniendo con `campaigns`. La sentencia de borrado se olvido.
+
+        2. Los fallos se tragaban con `logger.debug`. Una sentencia que reventaba
+           dejaba el dato SIN BORRAR y la peticion se marcaba `completed`
+           igualmente. A una persona se le decia que sus datos se habian borrado
+           cuando no era cierto, y en materia de proteccion de datos eso no es un
+           detalle tecnico.
+
+        3. Habia una sentencia que anonimizaba `invoices.client_name`,
+           `client_email`, `client_nif` y `client_address`. NINGUNA de esas
+           columnas existe — ni en produccion ni en certificacion. La sentencia no
+           habia funcionado JAMAS, y el `logger.debug` del punto 2 es la razon de
+           que nadie se enterara. Se retira: esa tabla no guarda datos
+           personales, asi que no hay nada que anonimizar en ella. Si algun dia
+           los guarda, `test_invoices_sigue_sin_datos_personales` lo dira.
+
+        UNA TABLA AUSENTE NO ES UN FALLO
+        --------------------------------
+        Se comprueba la existencia ANTES de ejecutar. Tratar «esa tabla no existe
+        en este despliegue» como «no se pudo borrar» marcaria como fallida toda
+        peticion del sistema y volveria el estado inutil.
+        """
         em = email.lower()
-        for stmt, params in [
-            (
-                "DELETE FROM campaign_recipients WHERE lower(email) = :email",
-                {"email": em},
-            ),
-            (
-                """
-                UPDATE invoices
-                SET client_name = 'Anonymized', client_email = NULL,
-                    client_nif = NULL, client_address = NULL, notes = NULL
-                WHERE workspace_id = :workspace_id AND lower(client_email) = :email
-                """,
-                {"workspace_id": self.workspace_id, "email": em},
-            ),
-            (
-                "DELETE FROM bookings WHERE workspace_id = :ws AND lower(client_email) = :email",
-                {"ws": self.workspace_id, "email": em},
-            ),
-        ]:
+        fallos: list[str] = []
+
+        for tabla, stmt in self._PURGADO:
+            existe = await self.session.execute(
+                text("SELECT to_regclass(:t) IS NOT NULL"),
+                {"t": f"public.{tabla}"})
+            if not existe.scalar():
+                logger.info("GDPR: %s no existe en este despliegue; nada que purgar",
+                            tabla)
+                continue
             try:
-                await self.session.execute(text(stmt), params)
-            except Exception as exc:
-                logger.debug("purge stmt skipped: %s", exc)
+                # Cada sentencia en su propio punto de guardado: en PostgreSQL
+                # una que falla aborta la transaccion entera, y sin esto un fallo
+                # dejaria las siguientes sin ejecutar Y sin poder registrar por
+                # que. Es el mismo defecto que ya aparecio en el executor de
+                # Autopilot y en el vigilante.
+                async with self.session.begin_nested():
+                    await self.session.execute(
+                        text(stmt),
+                        {"workspace_id": self.workspace_id, "email": em})
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("GDPR: no se pudo purgar %s: %s",
+                               tabla, type(exc).__name__)
+                fallos.append(f"{tabla}: {type(exc).__name__}")
+
+        return fallos
 
     async def consent_record(
         self,
