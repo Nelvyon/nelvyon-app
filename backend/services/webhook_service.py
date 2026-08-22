@@ -343,21 +343,26 @@ class WebhookService:
             await self.session.execute(
                 text(
                     """
+                    -- ESQUEMA REAL (migracion 405): `success`, `attempt`,
+                    -- `status_code`. NO existen `status`, `attempts`,
+                    -- `response_code`, `last_attempt_at` ni `next_retry_at`.
+                    --
+                    -- Este UPDATE hablaba la definicion de la 507, igual que el
+                    -- INSERT de abajo antes de arreglarse. Con cinco columnas
+                    -- inexistentes lanzaba SIEMPRE, asi que ninguna entrega se
+                    -- actualizaba nunca: ni al tener exito ni al fallar.
                     UPDATE webhook_deliveries
-                    SET status = :status, attempts = :attempts,
-                        response_code = :response_code, response_body = :response_body,
-                        last_attempt_at = :last_attempt_at, next_retry_at = :next_retry_at
+                    SET status_code = :response_code, response_body = :response_body,
+                        success = :exito, attempt = :attempts
                     WHERE id = CAST(:id AS uuid)
                     """
                 ),
                 {
                     "id": delivery_id,
-                    "status": status if status != "retrying" or attempts >= MAX_ATTEMPTS else "failed",
-                    "attempts": attempts,
                     "response_code": response_code,
                     "response_body": response_body,
-                    "last_attempt_at": now,
-                    "next_retry_at": next_retry,
+                    "exito": status == "success",
+                    "attempts": attempts,
                 },
             )
         else:
@@ -395,8 +400,10 @@ class WebhookService:
                     "next_retry_at": next_retry,
                 },
             )
-        if status == "retrying" and attempts >= MAX_ATTEMPTS:
-            status = "failed"
+        # Se quito `if status == "retrying" and attempts >= MAX_ATTEMPTS`, que no
+        # podia darse: `status` solo vale "retrying" cuando `attempts <
+        # MAX_ATTEMPTS` (mas arriba). Era codigo muerto que sugeria una
+        # transicion de estado que no existia.
         await self.session.commit()
         return {
             "delivery_id": delivery_id,
@@ -408,20 +415,38 @@ class WebhookService:
         }
 
     async def retry_failed_webhooks(self) -> dict[str, Any]:
-        """Retry pending/failed deliveries with exponential backoff (max 5 attempts)."""
+        """Reintenta las entregas fallidas con espera exponencial.
+
+        El tope real es `MAX_ATTEMPTS` (3). El docstring decia «max 5 attempts»,
+        que no coincidia con la constante — una discrepancia pequena que hace
+        dudar del resto del fichero cuando se encuentra.
+        """
         await self.ensure_schema()
         now = datetime.now(timezone.utc)
         r = await self.session.execute(
             text(
                 """
-                SELECT d.id, d.endpoint_id, d.event, d.payload, d.attempts,
-                       e.url, e.secret, e.workspace_id
+                -- ESQUEMA REAL: la referencia al endpoint es `webhook_id`, el
+                -- contador es `attempt`, y el resultado vive en `success`. No
+                -- hay `status` ni `next_retry_at`.
+                --
+                -- Esta consulta pedia CUATRO columnas que no existen, asi que
+                -- lanzaba siempre: los webhooks salientes NO REINTENTABAN NUNCA.
+                -- Un corte de un minuto en el endpoint de un cliente perdia el
+                -- evento para siempre, en silencio.
+                --
+                -- El backoff se DERIVA de `created_at` y `attempt` en vez de
+                -- guardarse: mismo resultado exponencial sin necesitar una
+                -- columna nueva, y por tanto sin migracion.
+                SELECT d.id, d.webhook_id AS endpoint_id, d.event, d.payload,
+                       d.attempt AS attempts, e.url, e.secret, e.workspace_id
                 FROM webhook_deliveries d
-                JOIN webhook_endpoints e ON e.id = d.endpoint_id
-                WHERE d.status IN ('pending', 'failed', 'retrying')
-                  AND d.attempts < :max_attempts
-                  AND (d.next_retry_at IS NULL OR d.next_retry_at <= :now)
+                JOIN webhook_endpoints e ON e.id = d.webhook_id
+                WHERE d.success IS NOT TRUE
+                  AND d.attempt < :max_attempts
+                  AND d.created_at + (LEAST(3600, POWER(2, d.attempt)::int) || ' seconds')::interval <= :now
                   AND e.workspace_id = :ws
+                  AND e.active IS NOT FALSE
                 ORDER BY d.created_at ASC
                 LIMIT 50
                 """

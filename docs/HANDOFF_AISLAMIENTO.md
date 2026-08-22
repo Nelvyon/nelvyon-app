@@ -1506,6 +1506,67 @@ Python (`nelvyon_app`, RLS efectiva) y el workspace se **deriva** de la fila del
 escaneado, no de lo que envía el cliente (verificado en `qr_service.py:260`). Es
 defensa en profundidad ausente, no un agujero. Las dos tienen **0 filas**.
 
+## CERRADO + DEUDA DECLARADA — el SQL y el esquema no hablaban la misma definición
+
+### Los webhooks salientes no reintentaban nunca
+
+`webhook_service.py` sufrió esta clase **dos veces**. Alguien arregló el `INSERT`
+—que hablaba la migración 507 cuando la tabla real es la 405— y dejó un comentario
+explicándolo. **No arregló el `UPDATE` ni la consulta de reintentos**: entre las
+dos citaban cinco columnas inexistentes (`status`, `attempts`, `response_code`,
+`last_attempt_at`, `next_retry_at`).
+
+Consecuencia: ninguna entrega saliente se actualizaba nunca, y **los reintentos
+lanzaban siempre**. Un corte de un minuto en el endpoint de un cliente perdía el
+evento para siempre, en silencio.
+
+Corregido contra el esquema real (`webhook_id`, `success`, `attempt`), con el
+backoff **derivado** de `created_at + 2^attempt` — mismo resultado exponencial sin
+columna nueva y **sin migración**. De paso: código muerto retirado (una transición
+de estado imposible) y un docstring que decía «max 5 attempts» con la constante en 3.
+
+Una hipótesis mía era falsa y conviene dejarlo escrito: creí que las entregas
+agotadas se reintentarían para siempre. **No** — la consulta filtra por
+`attempt < MAX`. Comprobarlo evitó reportar un defecto inexistente.
+
+### La guardia, y las 20 que encontró
+
+`test_ninguna_consulta_cita_una_columna_que_no_existe` compara los `INSERT INTO
+t (cols)` y `UPDATE t SET col=` del backend contra una **instantánea del catálogo
+real de producción** (712 tablas, 6.578 columnas, `_migrations` 467). Solo esos
+dos sitios, donde tabla y columna son inequívocos: resolver `SELECT`/`WHERE`
+exigiría analizar alias y produciría falsos positivos, y **un guard con falsos
+positivos se deja de mirar**.
+
+Encontró **20 columnas inexistentes en 8 servicios**:
+
+| Servicio | Qué está roto |
+|---|---|
+| `ab_testing_service` | 6 columnas: hipótesis, métrica, reparto de tráfico, fin, recomendación IA |
+| `affiliate_service` | `affiliate_id` — la tabla atribuye por `code` |
+| `booking_service` | las dos URLs de Zoom: **la reserva no puede guardar la videollamada que dice crear** |
+| `campaign_service` | remitente por campaña |
+| `chatbot_service` | 4, incluida **`workspace_id`: la tabla no tiene columna de inquilino** |
+| `invoice_service` | `pdf_path` y `sent_at` — explica que la descarga de facturas no funcione |
+| `qr_service` | `content` → real `destination_url`; `scan_count` → real `scans` |
+| `workflow_service` | `edges_json` — **las aristas del grafo no tienen dónde guardarse** |
+
+**No se corrigen todas de golpe a propósito.** Tres tienen correspondencia
+evidente (renombrados); el resto **no existe en ninguna forma**, y decidir entre
+«guardarlo en otro sitio» y «falta migración» requiere saber si el producto lo usa
+de verdad. Inventar la correspondencia para poner el número a cero sería peor que
+dejarlo escrito.
+
+Declaradas con su motivo, techo que **solo puede bajar**, y una prueba que exige
+retirar de la lista lo que se arregle — una lista de deuda que conserva entradas
+resueltas deja de creerse, y entonces tampoco se cree cuando señala algo real.
+
+Y otra prueba exige que cada entrada explique **por qué** sigue ahí: cazó mis
+propios «idem» al escribirla.
+
+**DATA_INTEGRITY / MIGRACIÓN**: varias de estas necesitan columnas nuevas. No se
+piden todavía — primero hay que saber cuáles usa el producto de verdad.
+
 ## Otros bloqueos externos
 
 - `MESH_AUTHKEY` — malla privada al Ollama propio. **No es un proveedor de pago.**
