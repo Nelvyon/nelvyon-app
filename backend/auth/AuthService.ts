@@ -5,6 +5,7 @@ import { DbClient } from "../db/DbClient";
 import { sanitizeEnvValue } from "../db/envSanitize";
 import { NelvyonMonitor } from "../monitoring";
 import { OsAgentError } from "../os-agents/OsAgentError";
+import { entrarConInquilino } from "../db/contextoDeInquilino";
 import type { AuthResult, JwtPayload, NelvyonUserRow } from "./types";
 
 const BCRYPT_ROUNDS = 12;
@@ -176,7 +177,22 @@ export class AuthService {
   async verifyToken(token: string): Promise<JwtPayload> {
     try {
       const decoded = jwt.verify(token, this.jwtSecret, { algorithms: ["HS256"] });
-      return parseNelvyonClaims(decoded);
+      const claims = parseNelvyonClaims(decoded);
+      // Fija el inquilino para el resto de la peticion.
+      //
+      // Aqui cubre 233 rutas del OS que usan `getAuthService()` directamente y
+      // las 48 que pasan por `authenticate`, sin tocar ninguna de ellas. El
+      // valor viene del JWT, que esta FIRMADO: no es lo que el cliente dice ser,
+      // es lo que se acaba de verificar que es.
+      //
+      // Las rutas que ademas necesitan workspace pasan despues por
+      // `requireOsWorkspaceAccess`, que lo anade sin borrar esto: el contexto se
+      // fusiona, no se sustituye.
+      //
+      // Inocuo hoy: el rol de produccion es superusuario y ninguna politica se
+      // evalua. Es preparacion certificable.
+      entrarConInquilino({ tenantId: claims.tenantId, userId: claims.userId });
+      return claims;
     } catch (e: unknown) {
       if (e instanceof OsAgentError) {
         throw e;

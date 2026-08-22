@@ -1165,6 +1165,61 @@ superusuario está ahí por 17.
 No se sustituye `postgres` por otro rol con privilegio de sobra: eso movería el
 problema y lo haría más difícil de ver la próxima vez.
 
+### Paso 1 — HECHO y certificado (sin tocar producción)
+
+`backend/db/contextoDeInquilino.ts` + `DbClient` fijan el inquilino de la petición
+en cada consulta, con **ámbito de transacción**. Inocuo mientras el rol siga siendo
+superusuario, exactamente como lo fue `contexto_rls.py` en el lado Python.
+
+**Cobertura medida, no supuesta** — 922 ficheros de ruta:
+
+| | |
+|---:|---|
+| **679** → **854** | fijan contexto |
+| 175 | no tocan la base |
+| **0** | tocan la base sin fijar contexto ni estar declaradas |
+
+Cinco fronteras lo fijan, y con eso quedan cubiertas las 854 sin tocar ni una ruta:
+
+| Frontera | Rutas | Qué fija |
+|---|---:|---|
+| `verifyToken` (`getAuthService` / `authenticate`) | 281 | tenant + usuario del JWT firmado |
+| `requireSaasContext` | 237 | tenant + usuario, tras resolver acceso |
+| `requirePlatformClaims` / `Admin` | 83 | vía `verifyToken` |
+| `requireOsWorkspaceAccess` | 13 | workspace **verificado** |
+| `requirePlatformContext` | 12 | workspace verificado |
+| `requirePublicApiContext` | 10 | tenant de la clave de API |
+
+Las 68 restantes se declaran **una a una con su motivo** (crons, webhooks firmados,
+superficie pública, `auth/*` que es *anterior* a saber quién es).
+
+**Decisiones que importan y por qué:**
+
+- **Ámbito de transacción, no de sesión.** `set_config(..., false)` duraría toda la
+  sesión, y las sesiones son conexiones de un pool: la petición siguiente, de otro
+  cliente, heredaría el inquilino. La fuga la causaría el propio mecanismo.
+- **El contexto se fija DESPUÉS de verificar, no antes.** Fijarlo con la cabecera
+  `X-Workspace-Id` recibida sería fijarlo con lo que el cliente *dice* ser.
+- **Fusiona, no sustituye.** Una petición OS pasa por dos fronteras; si la segunda
+  reemplazara, perdería el `tenantId` que la primera estableció, y las 606 políticas
+  que resuelven por `request.jwt.claim.sub` se quedarían sin sujeto → cero filas.
+
+**Certificación** — `contextoDeInquilino.pg.test.ts`, PostgreSQL real con
+`NELVYON_DB_POOL_MAX=1` para que las peticiones compartan conexión **física**:
+
+- llega el contexto · sobrevive a `await` y `Promise.all` · está puesto desde la
+  primera consulta de `withTransaction`
+- **A → B → A** sin contaminación · **B fija menos variables que A y no hereda las
+  suyas** (la afilada: A→B→A pasa incluso con ámbito de sesión, porque cada petición
+  sobrescribe; solo se ve cuando B fija menos)
+- sin petición no hereda · un error tampoco lo deja puesto · no escapa
+
+**10/10.** Mutación a ámbito de sesión: caen **5**. Mutación quitando la llamada de
+una frontera: el guard nombra esa frontera. Mutación añadiendo una ruta sin
+frontera: el guard la nombra.
+
+Suite vitest completa de `backend`: **5743 passed, 0 failed** (579 ficheros).
+
 ### Orden, y por qué ese orden
 
 1. `DbClient` aprende a fijar contexto de inquilino por petición. **Inocuo**

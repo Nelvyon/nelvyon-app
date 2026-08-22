@@ -9,11 +9,60 @@ const dbRoot = join(__dirname, "..");
 const RUN_SUPABASE_RLS_LIVE = process.env.RUN_SUPABASE_RLS === "1";
 
 describe("RLS audit (MIG 279)", () => {
-  it("DbClient documenta uso de DATABASE_URL / service_role", () => {
+  // Esta prueba EXIGIA que `DbClient.ts` contuviera la palabra `service_role` y
+  // la frase «NEVER use the anon key». Es decir: consagraba como requisito el
+  // comentario que decia que `DATABASE_URL` DEBE ser la URL que se salta RLS.
+  //
+  // Ese comentario es la razon por la que el agujero duro tanto: escrito asi,
+  // cualquiera que intentara poner un rol acotado creeria estar rompiendo el
+  // sistema. Y la prueba lo defendia — habria puesto en rojo la correccion.
+  //
+  // La mitad que SI era cierta —nunca la clave anonima— se conserva. Lo que se
+  // deja de exigir es que el codigo documente su propio bypass.
+  /**
+   * Quita comentarios antes de mirar el codigo.
+   *
+   * Sin esto, una prueba que busca `set_config(..., false)` casa con la PROSA que
+   * explica por que no se usa `false`. Es la tercera vez en este trabajo que un
+   * guard se cree sus propios comentarios: paso con el inventario de botones
+   * muertos, con la ruta retirada cuya lapida la mantenia viva, y aqui.
+   *
+   * Solo se borran las lineas que EMPIEZAN por `//` o `*`: cortar por cualquier
+   * `//` se comeria el resto de una linea con una URL dentro.
+   */
+  const soloCodigo = (src: string): string =>
+    src.replace(/\/\*[\s\S]*?\*\//g, " ")
+       .split(String.fromCharCode(10))
+       .filter((l) => !l.trimStart().startsWith("//") && !l.trimStart().startsWith("*"))
+       .join(String.fromCharCode(10));
+
+  it("DbClient sigue prohibiendo la clave anonima", () => {
     const src = readFileSync(join(dbRoot, "DbClient.ts"), "utf8");
-    expect(src).toContain("service_role");
     expect(src).toContain("DATABASE_URL");
-    expect(src).toContain("NEVER use the anon key");
+    expect(src).toContain("NEXT_PUBLIC_SUPABASE_ANON_KEY");
+  });
+
+  it("DbClient ya no declara el bypass de RLS como requisito", () => {
+    const src = soloCodigo(readFileSync(join(dbRoot, "DbClient.ts"), "utf8"));
+    expect(/must use.*service_role/i.test(src)).toBe(false);
+    expect(/bypasses RLS/i.test(src)).toBe(false);
+  });
+
+  it("DbClient aplica el contexto de inquilino de la peticion", () => {
+    // El mecanismo tiene que estar CABLEADO, no solo existir: `query` y
+    // `withTransaction` deben pedirlo. Comprobar unicamente que el modulo de
+    // contexto existe seria confundir tener la funcion con usarla.
+    const src = readFileSync(join(dbRoot, "DbClient.ts"), "utf8");
+    expect(src).toContain("inquilinoActual");
+    expect(src).toContain("aplicarContexto");
+  });
+
+  it("el contexto que llega a PostgreSQL tiene ambito de TRANSACCION", () => {
+    // Con `set_config(..., false)` duraria la sesion, y las sesiones son
+    // conexiones de un pool que se reutilizan entre inquilinos.
+    const src = soloCodigo(readFileSync(join(dbRoot, "contextoDeInquilino.ts"), "utf8"));
+    expect(src).toContain("set_config('app.tenant_id', $1, true)");
+    expect(/set_config\([^)]*, false\)/.test(src)).toBe(false);
   });
 
   it("migración 279_rls_audit habilita RLS y políticas own", () => {

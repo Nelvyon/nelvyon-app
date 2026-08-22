@@ -2,6 +2,7 @@
  * Next.js middleware for /api/public/v1/* routes.
  */
 import { NextResponse } from "next/server";
+import { entrarConInquilino } from "../../../../backend/db/contextoDeInquilino";
 import {
   checkPublicApiRateLimit,
   getRateLimitRemaining,
@@ -52,5 +53,13 @@ export async function requirePublicApiContext(req: Request, requiredScope: strin
     };
   }
 
+  // Fija el inquilino para el resto de la peticion.
+  //
+  // Esta es la superficie de API publica: el inquilino no viene de una sesion
+  // sino de una CLAVE de API ya validada arriba, con sus scopes y su limite de
+  // uso comprobados. Es tan inquilino como el de una sesion, y por eso merece el
+  // mismo contexto: son las rutas por las que un cliente automatiza contra
+  // NELVYON, y las que menos supervision humana tienen cuando algo se cruza.
+  entrarConInquilino({ tenantId });
   return { ok: true, ctx: { tenantId, scopes, keyId }, rateHeaders };
 }

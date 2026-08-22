@@ -6,6 +6,7 @@ import { getNelvyonAdminService } from "@nelvyon/admin";
 import { OsAgentError } from "@nelvyon/os-agents";
 
 import { listPlatformWorkspaceIds, resolvePlatformWorkspaceRole } from "./platformDbFallback";
+import { entrarConInquilino } from "../../../../backend/db/contextoDeInquilino";
 import {
   canPlatformPerform,
   normalizePlatformRole,
@@ -109,6 +110,16 @@ export async function requirePlatformContext(
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
+  // Fija el inquilino para el RESTO de la peticion: todo lo que consulte el
+  // manejador llevara ya `app.workspace_id` a PostgreSQL.
+  //
+  // AQUI y no antes: la comprobacion de acceso de arriba es la que decide si este
+  // usuario PUEDE trabajar en ese workspace. Fijar el contexto antes seria fijarlo
+  // con el numero que llego en la cabecera —controlado por quien llama— en vez de
+  // con el que se ha verificado.
+  //
+  // Inocuo hoy: el rol de produccion es superusuario y ninguna politica se evalua.
+  entrarConInquilino({ workspaceId, userId: claims.userId });
   return { claims, workspaceId, role, capabilities: platformCapabilitiesFor(role) };
 }
 

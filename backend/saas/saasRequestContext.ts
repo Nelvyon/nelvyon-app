@@ -1,4 +1,6 @@
 import { authenticate, type JwtPayload } from "@nelvyon/auth";
+
+import { entrarConInquilino } from "../db/contextoDeInquilino";
 import { OsAgentError } from "@nelvyon/os-agents";
 
 import { DbClient } from "../db/DbClient";
@@ -206,6 +208,18 @@ export async function requireSaasContext(req: Request, action: SaasAction): Prom
     }
   }
 
+  // El inquilino queda fijado para el RESTO de la peticion: todo lo que consulte
+  // el manejador —servicios, ayudantes, `Promise.all`— llevara ya
+  // `app.tenant_id` y `request.jwt.claim.sub` a PostgreSQL.
+  //
+  // Se hace AQUI, al final, y no antes: las consultas de arriba —resolver el
+  // acceso al tenant, los permisos personalizados, la lista de IPs— son las que
+  // ESTABLECEN quien es. Fijar el contexto antes de saberlo seria fijarlo con lo
+  // que el cliente pidio ser, no con lo que se ha comprobado que es.
+  //
+  // Hoy es INOCUO: el rol de produccion es superusuario y ninguna politica llega
+  // a evaluarse. Es preparacion certificable, no un cambio de conducta.
+  entrarConInquilino({ tenantId: tenant.id, userId: claims.userId });
   return { claims, tenant, role };
 }
 

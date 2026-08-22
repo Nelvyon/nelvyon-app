@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import type { JwtPayload } from "@nelvyon/auth";
 
 import { getPackRun } from "@/lib/packs/packRunStore";
+import { entrarConInquilino } from "../../../../backend/db/contextoDeInquilino";
 import { assertUserCanAccessWorkspace, WorkspaceAccessError } from "@/lib/platformDbFallback";
 
 export function parseWorkspaceHeader(req: Request): number | null {
@@ -29,6 +30,16 @@ export async function requireOsWorkspaceAccess(
     }
     throw e;
   }
+  // Fija el inquilino para el RESTO de la peticion: todo lo que consulte el
+  // manejador llevara ya `app.workspace_id` a PostgreSQL.
+  //
+  // AQUI y no antes: la comprobacion de acceso de arriba es la que decide si este
+  // usuario PUEDE trabajar en ese workspace. Fijar el contexto antes seria fijarlo
+  // con el numero que llego en la cabecera —controlado por quien llama— en vez de
+  // con el que se ha verificado.
+  //
+  // Inocuo hoy: el rol de produccion es superusuario y ninguna politica se evalua.
+  entrarConInquilino({ workspaceId, userId: claims.userId });
   return { workspaceId };
 }
 
