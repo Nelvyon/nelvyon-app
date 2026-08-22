@@ -1024,6 +1024,48 @@ tienen columna de inquilino y RLS apagada; cada una de las 90 está nombrada en
 **exactamente una** de las cuatro migraciones RLS; 0 huérfanas, 0 duplicadas.
 52 + 12 + 15 + 11 = 90.
 
+## HALLAZGO ABIERTO — el lado web no está cubierto por RLS
+
+**Verificado contra producción el 2026-08-22, no supuesto.**
+
+| Servicio | Rol | super | bypassrls | ¿RLS evalúa? |
+|---|---|---|---|---|
+| `nelvyon-app` (FastAPI) | `nelvyon_app` | No | No | **Sí** |
+| `nelvyon-app` (jobs) | `nelvyon_jobs` | No | Sí | No — aísla por `WHERE` explícito |
+| `@nelvyon/web` (Next.js) | **`postgres`** | **Sí** | **Sí** | **No** |
+
+Un superusuario salta RLS incondicionalmente, y `FORCE ROW LEVEL SECURITY` tampoco
+le aplica (FORCE somete al *dueño* de la tabla, no al superusuario). Las **498**
+tablas con RLS y las **1.763** políticas son por tanto **inertes** para el servicio
+que sirve el panel, el SaaS y el OS.
+
+Además `backend/db/DbClient.ts` no fija contexto de inquilino de ninguna clase
+—ni `set_config`, ni `SET LOCAL`— así que aunque el rol dejara de saltarse RLS no
+habría valor contra el que evaluar las políticas. Solo dos módulos TS lo fijan:
+`agency/erp/ErpDomainSnapshotStore.ts` y `local-ai/db.ts`.
+
+### Qué era ya sabido y qué es nuevo
+
+`core/contexto_rls.py` **ya anticipaba** el problema del rol superusuario y por eso
+fija el contexto en cada transacción, declarándose «inocuo hoy». Lo que cambió es
+que la rotación de credencial movió **FastAPI** a `nelvyon_app` y cerró ese lado.
+**El lado web no se movió.** Eso es lo nuevo.
+
+### Consecuencia para 568/569/570/572
+
+Cierran la deuda de aislamiento **del lado Python**. **No** la cierran para el lado
+web. Presentarlas como «aislamiento cerrado» sería falso.
+
+### Estado
+
+`test_el_lado_web_no_esta_cubierto_por_rls` — 2 `xfail` **estrictos**: se ponen en
+rojo en cuanto se arregle, obligando a retirar la marca. La deuda no puede cerrarse
+en silencio ni quedarse olvidada en verde.
+
+**BLOCKED_ON_FOUNDER**: retirar el superusuario al servicio web es un cambio de
+producción con riesgo real (los crons y el mirror ERP escriben entre inquilinos a
+propósito). Necesita ventana propia y su propia certificación.
+
 ## Otros bloqueos externos
 
 - `MESH_AUTHKEY` — malla privada al Ollama propio. **No es un proveedor de pago.**
