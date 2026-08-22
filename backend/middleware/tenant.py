@@ -155,6 +155,42 @@ def _is_automation_webhook_public(path: str, method: str) -> bool:
     return method == "POST" and path.startswith("/api/v1/automation/webhook/trigger/")
 
 
+def _is_webhook_entrante_publico(path: str, method: str) -> bool:
+    """Webhooks entrantes que un proveedor externo llama SIN JWT.
+
+    POR QUE ESTABAN CERRADOS Y POR QUE ES UN DEFECTO
+    ------------------------------------------------
+    Estos seis exigian inquilino y devolvian 401 a Meta, Amazon, Zoom y
+    Signaturit. El proveedor reintenta un rato y acaba desactivando el endpoint.
+    Verificado contra produccion: los seis respondian 401 a un POST cualquiera,
+    mientras `dialer` y `sms` —que si estaban declarados— respondian 400
+    «Missing X-Twilio-Signature», que es la respuesta correcta.
+
+    El sintoma de un webhook inalcanzable es indistinguible del de un webhook al
+    que nadie escribe: cero filas y ningun error.
+
+    POR QUE ES SEGURO ABRIRLOS
+    --------------------------
+    Porque su frontera no es este middleware. Los seis verifican la firma del
+    proveedor ANTES de tocar nada —HMAC de Meta, firma RSA de SNS, HMAC de Zoom,
+    secreto compartido de Signaturit— y despues resuelven el inquilino desde un
+    identificador que viaja DENTRO del cuerpo firmado. Exigir aqui una cabecera
+    de inquilino no anadia seguridad: anadia un 401 al unico que no puede
+    ponerla.
+    """
+    if method != "POST":
+        # Meta valida la suscripcion con un GET que lleva `hub.challenge`.
+        return method == "GET" and path == "/api/whatsapp/webhook"
+    return path in (
+        "/api/whatsapp/webhook",
+        "/api/helpdesk/inbound/email",
+        "/api/helpdesk/inbound/whatsapp",
+        "/api/bookings/webhook/zoom",
+        "/api/contracts/webhook",
+        "/api/monitoring/ses/bounce-webhook",
+    )
+
+
 def _is_public_api(path: str) -> bool:
     return path.startswith("/api/public/v1/")
 
@@ -187,6 +223,8 @@ def _is_public(path: str, method: str = "GET") -> bool:
     if _is_cdp_public(path, method):
         return True
     if _is_dialer_public(path, method):
+        return True
+    if _is_webhook_entrante_publico(path, method):
         return True
     if _is_forms_public(path, method):
         return True

@@ -71,7 +71,16 @@ pytestmark = [
 #: la base de certificacion habia divergido y ocho tablas que alli estaban
 #: vacias tenian datos en produccion, una con 14.178 filas. Las guardas
 #: fail-closed las omiten en vez de ocultarle datos a quien hoy los ve.
-DEUDA_MAXIMA = 35
+#: 35 -> 12 con la 566, que cubre las 23 que la 563 habia excluido a proposito.
+#: Se excluyeron porque las escribian caminos publicos sin usuario, que la
+#: politica habria denegado. Ese motivo dejo de existir cuando el bloque de
+#: webhooks los convirtio al rol `nelvyon_jobs` con `workspace_id` resuelto desde
+#: procedencia verificada, y la 564 les dio los privilegios.
+#:
+#: Las 12 que quedan tienen DATOS en produccion. No se tocan a ciegas: activar
+#: RLS sobre filas existentes puede ocultarselas a quien hoy las ve, asi que cada
+#: una necesita saber quien la lee antes de protegerla.
+DEUDA_MAXIMA = 12
 
 #: Margen cero a proposito. Un trinquete con holgura deja de ser un trinquete: la
 #: holgura se consume y nadie se entera.
