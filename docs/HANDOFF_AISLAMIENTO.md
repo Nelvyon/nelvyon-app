@@ -423,3 +423,83 @@ copia se corrigió en el primer intento. Ahora hay uno solo.
 **Estado del bloque:** 11 rutas, `test_webhooks_atribucion_de_inquilino.py` con
 13 casos. Mutación: reintroducido el defecto, **5 fallan** (3 de conducta + los 2
 guards estructurales); restaurado, 13 pasan.
+
+---
+
+# BLOQUE A — 23 tablas de aislamiento + webhooks inalcanzables
+
+## Baseline de partida (verificado)
+
+Producción `076728b5` · `_migrations` 465 · suite 3.199 PASS / 0 FAIL ·
+`ready` healthy · workers 3/3 · business ok · 0 tracebacks, 0 permission denied,
+0 errores RLS, 0 secretos · 564 y 565 aplicadas y certificadas.
+
+## Hallazgo HIGH: seis webhooks entrantes devolvían 401
+
+`middleware/tenant.py` decide qué es público comparando el path con cadenas
+escritas a mano. Seis no estaban en la lista:
+
+| Ruta | Proveedor | Estado en producción |
+|---|---|---|
+| `POST /api/whatsapp/webhook` | Meta | 401 |
+| `GET /api/whatsapp/webhook` | Meta (validación de suscripción) | 401 |
+| `POST /api/helpdesk/inbound/email` | Amazon SES/SNS | 401 |
+| `POST /api/helpdesk/inbound/whatsapp` | Meta | 401 |
+| `POST /api/bookings/webhook/zoom` | Zoom | 401 |
+| `POST /api/contracts/webhook` | Signaturit | 401 |
+| `POST /api/monitoring/ses/bounce-webhook` | Amazon SES | 401 |
+
+Comparado con `dialer` y `sms`, que **sí** estaban declarados y devuelven
+`400 Missing X-Twilio-Signature` — la respuesta correcta.
+
+WhatsApp Business, el correo entrante de soporte, las citas de Zoom y las firmas
+de contrato llevaban sin poder entrar. **El síntoma de un webhook inalcanzable
+es indistinguible del de uno al que nadie escribe**: cero filas y ningún error.
+
+**Corregido.** Es seguro abrirlos porque su frontera no es el middleware sino la
+firma del proveedor, verificada antes de tocar nada, seguida de la atribución de
+inquilino desde procedencia verificada. Hay prueba: cuatro casos mandan un cuerpo
+**sin firma** a cada ruta abierta y exigen 4xx; si alguna respondiera 2xx,
+abrirla la habría dejado indefensa.
+
+**Mutación:** revertida la apertura → 12 pruebas fallan; restaurada → 32 pasan.
+
+## Cómo se encontró, y el guard que también estuvo inerte
+
+Sondeando producción escribí `/api/v1/dialer/webhook/twilio` en vez de
+`/api/dialer/webhook/twilio`, recibí 401 y lo reporté como defecto del dialer.
+**No lo era: mi path estaba mal.** Pero demostró que un 401 del middleware y una
+ruta inexistente son indistinguibles desde fuera, así que escribí un guard para
+esa clase de defecto — y encontró los seis reales.
+
+Ese guard también nació inerte: leía `app.routes`, que en esta versión de FastAPI
+devuelve envoltorios `_IncludedRouter` con `.path = None` (207 entradas casi
+todas vacías). Declaraba inexistentes rutas que responden en producción. Ahora
+lee el esquema OpenAPI que genera la propia aplicación —885 paths con sus
+prefijos— y exige revisar un mínimo antes de emitir veredicto.
+
+## Migración 566 — las 23 tablas (CERTIFICADA, pendiente de ADR-064)
+
+Las 74 tablas OS vacías en producción menos las 51 de la 563. La 563 las excluyó
+porque las escribían caminos públicos sin usuario; **ese motivo desapareció** al
+convertirlos al rol `nelvyon_jobs` con `workspace_id` de procedencia verificada,
+y la 564 les dio los privilegios.
+
+Aplicada en certificación: **RLS 402 → 425, políticas 1.388 → 1.480, 23 tablas,
+0 omitidas**. Baterías PostgreSQL: **277 pasan**, 1 skip.
+
+Trinquete de cobertura: **35 → 12**. Las 12 restantes tienen datos en producción
+—`contacts`, `helpdesk_tickets`, `nelvyon_campaigns`, `nelvyon_clients`,
+`onboarding_workspace_steps`, `os_cashflow`, `os_deals`, `os_expenses`,
+`saas_tenants`, `visual_workflow_executions`, `workflow_trigger_registry`— y
+activar RLS sobre filas existentes puede ocultárselas a quien hoy las ve. Cada
+una necesita saber quién la lee antes de protegerla.
+
+**No se usó el clasificador por rutas como evidencia**: dio falsos positivos
+demostrables (atribuyó `text2pay_payments` al webhook de Instagram).
+
+## Siguiente acción exacta
+
+1. Pedir ADR-064 para 566.
+2. Las 12 tablas con datos: determinar lectores reales antes de proponer política.
+3. Bloque B: auditar las 147 tablas del espacio SaaS.

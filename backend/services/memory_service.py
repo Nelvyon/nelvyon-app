@@ -42,6 +42,13 @@ def _embedding_to_pgvector(embedding: List[float]) -> str:
 
 
 def _openai_client() -> AsyncOpenAI:
+    """Solo si alguien configuro un endpoint compatible A PROPOSITO.
+
+    Ya no es el camino por defecto: `core.embeddings` prueba primero el Ollama
+    propio y, si no responde, el respaldo lexico. Esta funcion queda para quien
+    quiera apuntar a un endpoint compatible con OpenAI —incluido el propio
+    Ollama en su modo `/v1`— sin cambiar codigo.
+    """
     if not settings.app_ai_base_url or not settings.app_ai_key:
         raise ValueError("AI service not configured. Set APP_AI_BASE_URL and APP_AI_KEY.")
     return AsyncOpenAI(
@@ -50,16 +57,36 @@ def _openai_client() -> AsyncOpenAI:
     )
 
 
-async def _embed(text_input: str) -> List[float]:
-    client = _openai_client()
-    response = await client.embeddings.create(
-        model=EMBEDDING_MODEL,
-        input=text_input,
-    )
-    vector = response.data[0].embedding
-    if len(vector) != EMBEDDING_DIM:
-        logger.warning("Unexpected embedding dimension: %s", len(vector))
-    return vector
+async def _embed(text_input: str) -> tuple[List[float], str]:
+    """El vector y EL NOMBRE DEL MODELO que lo produjo.
+
+    Devolver el modelo no es un detalle: dos embebedores distintos producen
+    espacios distintos, y comparar entre ellos da una similitud que parece un
+    numero y no significa nada. Es la peor clase de fallo porque devuelve
+    resultados en vez de un error, asi que el modelo viaja con cada vector y
+    toda busqueda filtra por el activo.
+
+    ANTES esta funcion exigia OpenAI y lanzaba `ValueError` en produccion, donde
+    `APP_AI_BASE_URL` no esta puesta. Por eso `client_memory` tenia cero filas:
+    no era un problema de tipos —el `workspace_id` se normaliza a uuid v5 y
+    escritura y lectura coinciden— sino de configuracion.
+    """
+    from core.embeddings import embeber
+
+    if settings.app_ai_base_url and settings.app_ai_key:
+        # Endpoint compatible configurado a proposito: se respeta.
+        client = _openai_client()
+        response = await client.embeddings.create(
+            model=EMBEDDING_MODEL, input=text_input)
+        vector = response.data[0].embedding
+        if len(vector) != EMBEDDING_DIM:
+            logger.warning("Unexpected embedding dimension: %s", len(vector))
+        return list(vector), EMBEDDING_MODEL
+
+    v = await embeber(text_input)
+    if v.degradado:
+        logger.info("memoria_embedding_degradado", extra={"memoria_modelo": v.modelo})
+    return v.valores, v.modelo
 
 
 async def save_memory(
@@ -78,9 +105,14 @@ async def save_memory(
         return None
 
     try:
-        embedding = await _embed(content.strip())
+        embedding, modelo = await _embed(content.strip())
         ws_uuid = _normalize_workspace_id(workspace_id)
-        meta_json = json.dumps(metadata or {}, ensure_ascii=False, default=str)
+        # El modelo va DENTRO de metadata: la columna ya existe, asi que esto no
+        # necesita migracion, y sin el nadie podria saber con que espacio
+        # vectorial se escribio esta fila.
+        meta = dict(metadata or {})
+        meta["embedding_model"] = modelo
+        meta_json = json.dumps(meta, ensure_ascii=False, default=str)
         emb_literal = _embedding_to_pgvector(embedding)
 
         async with db_manager.async_session_maker() as session:
@@ -132,7 +164,7 @@ async def search_memory(
         return []
 
     try:
-        query_embedding = await _embed(query.strip())
+        query_embedding, modelo = await _embed(query.strip())
         ws_uuid = _normalize_workspace_id(workspace_id)
         emb_literal = _embedding_to_pgvector(query_embedding)
 
@@ -151,6 +183,11 @@ async def search_memory(
                     WHERE workspace_id = CAST(:workspace_id AS uuid)
                       AND client_id = :client_id
                       AND embedding IS NOT NULL
+                      -- Solo vectores del MISMO modelo. Un recuerdo escrito con
+                      -- otro embebedor vive en otro espacio: su distancia seria
+                      -- un numero sin significado. Se prefiere no encontrarlo a
+                      -- devolverlo con una puntuacion inventada.
+                      AND COALESCE(metadata->>'embedding_model', :modelo) = :modelo
                     ORDER BY embedding <=> CAST(:query_embedding AS vector)
                     LIMIT :limit
                     """
@@ -159,6 +196,7 @@ async def search_memory(
                     "workspace_id": ws_uuid,
                     "client_id": str(client_id),
                     "query_embedding": emb_literal,
+                    "modelo": modelo,
                     "limit": int(limit),
                 },
             )
