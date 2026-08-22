@@ -128,6 +128,37 @@ export function resetOsAgentDataServiceForTests(): void {
 
 // ── Service ───────────────────────────────────────────────────────────────────────
 
+/**
+ * Acceso deliberado a la cache de TODOS los inquilinos.
+ *
+ * `/api/os/agent-data` es de administrador de plataforma y su vista global es
+ * CORRECTA. Lo que se cambia no es el permiso, es que dejara de obtenerse por
+ * omision: un `getSummary()` sin argumentos no distingue «quiero verlo todo» de
+ * «se me olvido el inquilino», y esa ambiguedad es la que produjo el resto de
+ * casos de esta clase.
+ *
+ * Sobre `tenant_id` NULL: `getCached` empareja con `COALESCE(tenant_id,'')`, de
+ * modo que las entradas sin inquilino forman un unico cubo COMPARTIDO. Para
+ * datos SEO de terceros —publicos, indexados por dominio— compartir cache es
+ * razonable; lo que no lo es que ocurra por descuido. Queda escrito aqui para
+ * que sea una decision revisable y no un efecto colateral.
+ */
+export const TODA_LA_CACHE = Symbol("toda-la-cache-de-agentes");
+
+export type AlcanceCache = { tenantId: string } | typeof TODA_LA_CACHE;
+
+function filtroCache(alcance: AlcanceCache, indice: number): { where: string; params: unknown[] } {
+  if (alcance === TODA_LA_CACHE) return { where: "", params: [] };
+  const t = (alcance as { tenantId: string })?.tenantId;
+  if (!t?.trim()) {
+    throw new Error("alcance: falta `tenantId`; pide TODA_LA_CACHE si quieres la vista global");
+  }
+  // `tenant_id` de esta tabla es TEXT, no uuid —a diferencia del resto de tablas
+  // OS— y castear a ::uuid habria reventado contra el motor. Lo caza leer el DDL
+  // real en vez de suponer que todas las columnas de inquilino son iguales.
+  return { where: `tenant_id = $${indice}`, params: [t] };
+}
+
 export class OsAgentDataService {
   constructor(
     private readonly db: SaasPostgresPort,
@@ -316,10 +347,18 @@ export class OsAgentDataService {
         userId: opts.userId ?? null,
         provider, queryType, queryKey, domain, database, payload,
       });
-    } catch { /* cache persistence is best-effort */ }
+    } catch (e) {
+      // Sigue siendo best-effort —fallar al cachear no puede tumbar la consulta
+      // que el usuario pidio— pero deja de ser MUDO. Una cache que nunca escribe
+      // se comporta igual que una cache fria: cada peticion vuelve al proveedor
+      // externo, con su latencia y su coste, y nadie se entera de por que.
+      console.error("[agent-data] la instantanea NO se cacheo:", e);
+    }
   }
 
-  async getSummary(): Promise<AgentDataSummary> {
+  async getSummary(alcance: AlcanceCache): Promise<AgentDataSummary> {
+    const propio = filtroCache(alcance, 1);
+    const filtro = propio.where ? `WHERE ${propio.where}` : "";
     let totalCached = 0;
     let fetches24h = 0;
     let topDomains: Array<{ domain: string; count: number }> = [];
@@ -327,14 +366,16 @@ export class OsAgentDataService {
     try {
       const rows = await this.db.query<{ total: string; recent: string }>(
         `SELECT COUNT(*) AS total, COUNT(*) FILTER (WHERE fetched_at >= NOW() - INTERVAL '24 hours') AS recent
-         FROM os_agent_data_cache`,
+         FROM os_agent_data_cache ${filtro}`,
+        propio.params,
       );
       totalCached = parseInt(rows[0]?.total ?? "0", 10);
       fetches24h = parseInt(rows[0]?.recent ?? "0", 10);
     } catch { /* table missing */ }
     try {
       const rows = await this.db.query<{ domain: string; count: string }>(
-        `SELECT domain, COUNT(*) AS count FROM os_agent_data_cache GROUP BY domain ORDER BY count DESC LIMIT 5`,
+        `SELECT domain, COUNT(*) AS count FROM os_agent_data_cache ${filtro} GROUP BY domain ORDER BY count DESC LIMIT 5`,
+        propio.params,
       );
       topDomains = rows.map((r) => ({ domain: r.domain, count: parseInt(r.count, 10) }));
     } catch { /* ignore */ }
@@ -348,14 +389,16 @@ export class OsAgentDataService {
     return { totalCached, semrushIntegrations, dataforseoConfigured: this.dataforseo.isConfigured(), fetches24h, topDomains };
   }
 
-  async listRecent(limit = 50): Promise<AgentDataRecent[]> {
+  async listRecent(alcance: AlcanceCache, limit = 50): Promise<AgentDataRecent[]> {
+    const propio = filtroCache(alcance, 2);
+    const filtro = propio.where ? `WHERE ${propio.where}` : "";
     const rows = await this.db.query<{
       id: string; domain: string; provider: AgentDataProvider; query_type: AgentQueryType;
       payload: Record<string, unknown>; fetched_at: string; expires_at: string;
     }>(
       `SELECT id, domain, provider, query_type, payload, fetched_at, expires_at
-       FROM os_agent_data_cache ORDER BY fetched_at DESC LIMIT $1`,
-      [Math.min(Math.max(limit, 1), 200)],
+       FROM os_agent_data_cache ${filtro} ORDER BY fetched_at DESC LIMIT $1`,
+      [Math.min(Math.max(limit, 1), 200), ...propio.params],
     );
     const now = Date.now();
     return rows.map((r) => {

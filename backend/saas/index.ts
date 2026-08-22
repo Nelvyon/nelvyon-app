@@ -149,6 +149,7 @@ export {
   type OsDeliveryCertErrorCode,
   buildMinimalPdfFromText,
   certificateToPdfLines,
+  TODOS_LOS_CERTIFICADOS,
 } from "./OsDeliveryCertificateService";
 export {
   OsPackGateService,
@@ -179,6 +180,7 @@ export {
   type CompetitorSnapshot,
   type AgentDataSummary,
   type AgentDataRecent,
+  TODA_LA_CACHE,
 } from "./OsAgentDataService";
 export {
   OsLearningLoopProdService,

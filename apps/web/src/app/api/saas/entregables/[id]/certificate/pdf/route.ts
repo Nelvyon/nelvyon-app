@@ -30,7 +30,12 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
       return NextResponse.json({ error: "No pack run linked to deliverable" }, { status: 404 });
     }
     const certSvc = getOsDeliveryCertificateService();
-    const full = await certSvc.getByPackRun(packRunId);
+    // Acotado tambien aqui aunque el `packRunId` YA venga de una consulta que
+    // comprobo la pertenencia: si esa consulta de arriba cambia —y el JOIN del
+    // que depende se apoya en `saas_tenants.workspace_id`, NULL en 20 de 22
+    // inquilinos— esta linea seria lo unico que quedaria entre un cliente y el
+    // certificado de otro. Cuesta un parametro.
+    const full = await certSvc.getByPackRun(packRunId, { tenantId: auth.tenant.id });
     if (!full) {
       return NextResponse.json({ error: "Certificate not issued yet" }, { status: 404 });
     }

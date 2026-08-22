@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { requirePlatformAdmin } from "@/lib/platformBffAuth";
-import { getOsDeliveryCertificateService } from "@nelvyon/saas";
+import { TODOS_LOS_CERTIFICADOS, getOsDeliveryCertificateService } from "@nelvyon/saas";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -15,8 +15,11 @@ export async function GET(req: Request) {
     const packId = searchParams.get("packId") ?? undefined;
     const svc = getOsDeliveryCertificateService();
     const [summary, certificates] = await Promise.all([
-      svc.getSummary(),
-      svc.listCertificates(50, packId ? { packId } : {}),
+      // Vista GLOBAL, deliberada: ruta de administrador de plataforma
+      // (`requirePlatformAdmin` devuelve 403 a quien no lo sea). Antes el
+      // alcance global se obtenia por OMISION; ahora esta escrito.
+      svc.getSummary(TODOS_LOS_CERTIFICADOS),
+      svc.listCertificates(TODOS_LOS_CERTIFICADOS, 50, packId ? { packId } : {}),
     ]);
     return NextResponse.json({ summary, certificates });
   } catch (e) {

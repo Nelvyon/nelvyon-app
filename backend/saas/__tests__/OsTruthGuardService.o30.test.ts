@@ -3,6 +3,7 @@
  */
 import { describe, expect, it, vi } from "vitest";
 import {
+  TODOS_LOS_INQUILINOS_TRUTH,
   OsTruthGuardService,
   normalizeText,
   evaluateClaims,
@@ -14,6 +15,13 @@ import {
   type TruthLegalPort,
 } from "../OsTruthGuardService";
 import type { SaasPostgresPort } from "../SaasOnboardingService";
+
+// Las lecturas de este servicio exigen ahora un ALCANCE explicito: el inquilino
+// era un parametro opcional y omitirlo devolvia los datos de todos. Estas
+// pruebas se actualizan a la firma nueva; el aislamiento en si se certifica
+// contra PostgreSQL real en `aislamiento_os_lado_web.pg.test.ts`, porque un
+// doble de base de datos no puede demostrar que un WHERE haga lo que dice.
+
 
 function makeDb(handler: (sql: string, params: unknown[]) => unknown[]): SaasPostgresPort {
   return { query: vi.fn().mockImplementation(async (sql: string, params: unknown[]) => handler(sql, params)) } as unknown as SaasPostgresPort;
@@ -132,7 +140,7 @@ describe("O30 — persist + list + summary", () => {
       return [];
     });
     const svc = new OsTruthGuardService(db, cleanClaims, cleanLegal);
-    const rows = await svc.listAudits({ channel: "email" });
+    const rows = await svc.listAudits(TODOS_LOS_INQUILINOS_TRUTH, { channel: "email" });
     expect(rows).toHaveLength(1);
     expect(rows[0]!.channel).toBe("email");
   });
@@ -145,7 +153,7 @@ describe("O30 — persist + list + summary", () => {
       return [];
     });
     const svc = new OsTruthGuardService(db, cleanClaims, cleanLegal);
-    const s = await svc.getSummary();
+    const s = await svc.getSummary(TODOS_LOS_INQUILINOS_TRUTH);
     expect(s.total).toBe(4);
     expect(s.passed).toBe(3);
     expect(s.blocked).toBe(1);

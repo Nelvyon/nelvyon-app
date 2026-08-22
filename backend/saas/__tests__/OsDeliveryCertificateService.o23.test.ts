@@ -3,6 +3,7 @@
  */
 import { describe, expect, it, vi } from "vitest";
 import {
+  TODOS_LOS_CERTIFICADOS,
   OsDeliveryCertificateService,
   OsDeliveryCertError,
   type PackRunPort,
@@ -11,6 +12,13 @@ import {
   type CertPackRun,
 } from "@nelvyon/saas";
 import type { SaasPostgresPort } from "../SaasOnboardingService";
+
+// Las lecturas de este servicio exigen ahora un ALCANCE explicito: el inquilino
+// era un parametro opcional y omitirlo devolvia los datos de todos. Estas
+// pruebas se actualizan a la firma nueva; el aislamiento en si se certifica
+// contra PostgreSQL real en `aislamiento_os_lado_web.pg.test.ts`, porque un
+// doble de base de datos no puede demostrar que un WHERE haga lo que dice.
+
 
 function makeDb(handler: (sql: string, params: unknown[]) => unknown[]): SaasPostgresPort {
   return {
@@ -172,19 +180,19 @@ describe("OsDeliveryCertificateService — queries", () => {
   it("getCertificate maps row with html", async () => {
     const db = makeDb(() => [certRow()]);
     const svc = new OsDeliveryCertificateService(db, packRunPort(null), qaPort, { syncQaCertificate: async () => {} });
-    const c = await svc.getCertificate("cert-1");
+    const c = await svc.getCertificate("cert-1", TODOS_LOS_CERTIFICADOS);
     expect(c.htmlBody).toBe("<html>cert</html>");
   });
 
   it("getCertificate throws NOT_FOUND when absent", async () => {
     const svc = new OsDeliveryCertificateService(makeDb(() => []), packRunPort(null), qaPort, { syncQaCertificate: async () => {} });
-    await expect(svc.getCertificate("x")).rejects.toThrow(OsDeliveryCertError);
+    await expect(svc.getCertificate("x", TODOS_LOS_CERTIFICADOS)).rejects.toThrow(OsDeliveryCertError);
   });
 
   it("listCertificates excludes html + applies packId filter", async () => {
     const db = makeDb(() => [certRow()]) as SaasPostgresPort & { query: ReturnType<typeof vi.fn> };
     const svc = new OsDeliveryCertificateService(db, packRunPort(null), qaPort, { syncQaCertificate: async () => {} });
-    const list = await svc.listCertificates(50, { packId: "local-business-growth" });
+    const list = await svc.listCertificates(TODOS_LOS_CERTIFICADOS, 50, { packId: "local-business-growth" });
     expect(list[0]!.htmlBody).toBeUndefined();
     const params = (db.query as ReturnType<typeof vi.fn>).mock.calls[0][1] as unknown[];
     expect(params).toContain("local-business-growth");
@@ -193,7 +201,7 @@ describe("OsDeliveryCertificateService — queries", () => {
   it("getSummary aggregates issued + avg qa", async () => {
     const db = makeDb(() => [{ total: "10", issued: "8", failed: "1", avg_qa: "90.4", last_issued: "2026-06-01T00:00:00Z" }]);
     const svc = new OsDeliveryCertificateService(db, packRunPort(null), qaPort, { syncQaCertificate: async () => {} });
-    const s = await svc.getSummary();
+    const s = await svc.getSummary(TODOS_LOS_CERTIFICADOS);
     expect(s.total).toBe(10);
     expect(s.issued).toBe(8);
     expect(s.avgQaScore).toBe(90);

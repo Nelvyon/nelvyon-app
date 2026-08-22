@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { requirePlatformAdmin } from "@/lib/platformBffAuth";
-import { getOsAgentDataService } from "@nelvyon/saas";
+import { TODA_LA_CACHE, getOsAgentDataService } from "@nelvyon/saas";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -11,7 +11,10 @@ export async function GET(req: Request) {
 
   try {
     const svc = getOsAgentDataService();
-    const [summary, recent] = await Promise.all([svc.getSummary(), svc.listRecent(50)]);
+    // Vista GLOBAL, deliberada: `requirePlatformAdmin` devuelve 403 a quien no
+    // sea administrador de plataforma. Escrita, no obtenida por omision.
+    const [summary, recent] = await Promise.all([
+      svc.getSummary(TODA_LA_CACHE), svc.listRecent(TODA_LA_CACHE, 50)]);
     return NextResponse.json({
       summary,
       recent,

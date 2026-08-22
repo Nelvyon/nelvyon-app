@@ -1180,6 +1180,36 @@ El paso 3 es el que decide. En el lado Python fue el que costó, y saltárselo a
 convertiría un fallo de aislamiento en una caída: con RLS activa y sin contexto,
 las consultas no dan error — devuelven **cero filas**.
 
+## LATENTE — `saas_tenants.workspace_id` NULL en 20 de 22
+
+Medido en producción, **no supuesto**, y la primera hipótesis era falsa:
+
+```
+inquilinos                         22
+  con workspace_id                  2
+  SIN workspace_id                 20
+
+entregables                      5050
+  alcanzables por el JOIN        5050
+  INALCANZABLES                     0
+```
+
+`/api/saas/entregables/[id]/certificate/pdf` resuelve el pack con
+`JOIN saas_tenants t ON t.workspace_id = d.workspace_id`. Supuse que estaría roto
+para 20 de 22 inquilinos y **no lo está**: esos 20 no tienen ningún entregable,
+así que los 5.050 existentes son todos alcanzables. Se registra el fallo de mi
+hipótesis para que nadie lo herede como hecho.
+
+**Pero es frágil por construcción**: en cuanto uno de esos 20 inquilinos genere su
+primer entregable, esa ruta le devolverá 404 «No pack run linked to deliverable»
+sin un solo error en el log — el síntoma será «mi certificado no se descarga».
+
+Mitigación aplicada: la llamada posterior ya va acotada por `tenantId`, así que si
+ese JOIN cambia no queda un camino abierto al certificado de otro.
+
+**DATA_INTEGRITY_DECISION**: rellenar `saas_tenants.workspace_id` para los 20
+requiere demostrar la correspondencia. No se inventa.
+
 ## Otros bloqueos externos
 
 - `MESH_AUTHKEY` — malla privada al Ollama propio. **No es un proveedor de pago.**

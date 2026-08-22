@@ -3,11 +3,19 @@
  */
 import { describe, expect, it, vi, afterEach } from "vitest";
 import {
+  TODA_LA_CACHE,
   OsAgentDataService,
   type SemrushPort,
   type DataForSeoPort,
 } from "@nelvyon/saas";
 import type { SaasPostgresPort } from "../SaasOnboardingService";
+
+// Las lecturas de este servicio exigen ahora un ALCANCE explicito: el inquilino
+// era un parametro opcional y omitirlo devolvia los datos de todos. Estas
+// pruebas se actualizan a la firma nueva; el aislamiento en si se certifica
+// contra PostgreSQL real en `aislamiento_os_lado_web.pg.test.ts`, porque un
+// doble de base de datos no puede demostrar que un WHERE haga lo que dice.
+
 
 function makeDb(handler: (sql: string, params: unknown[]) => unknown[]): SaasPostgresPort {
   return {
@@ -196,7 +204,7 @@ describe("OsAgentDataService — summary/recent", () => {
       return [];
     });
     const svc = new OsAgentDataService(db, semrushPort(), dfsPort(true));
-    const s = await svc.getSummary();
+    const s = await svc.getSummary(TODA_LA_CACHE);
     expect(s.totalCached).toBe(12);
     expect(s.fetches24h).toBe(3);
     expect(s.semrushIntegrations).toBe(2);
@@ -210,7 +218,7 @@ describe("OsAgentDataService — summary/recent", () => {
       { id: "c1", domain: "foo.com", provider: "semrush", query_type: "keywords", payload: { keywords: [{}, {}] }, fetched_at: "", expires_at: future },
     ]);
     const svc = new OsAgentDataService(db, semrushPort(), dfsPort(false));
-    const recent = await svc.listRecent();
+    const recent = await svc.listRecent(TODA_LA_CACHE);
     expect(recent[0]!.keywordCount).toBe(2);
     expect(recent[0]!.expired).toBe(false);
   });

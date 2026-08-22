@@ -43,6 +43,8 @@ import {
 } from "../OsRegulatedSectorShieldService";
 import { OsTruthGuardService } from "../OsTruthGuardService";
 import { OsAgentAuditTrailService } from "../OsAgentAuditTrailService";
+import { OsDeliveryCertificateService, TODOS_LOS_CERTIFICADOS } from "../OsDeliveryCertificateService";
+import { OsAgentDataService, TODA_LA_CACHE } from "../OsAgentDataService";
 import type { SaasPostgresPort } from "../SaasOnboardingService";
 
 const DSN = process.env.NELVYON_WEB_CERT_DSN;
@@ -69,7 +71,7 @@ describeSiHayPg("aislamiento OS del lado web (PostgreSQL real)", () => {
   afterAll(async () => { await pool?.end(); });
 
   beforeEach(async () => {
-    await pool.query("TRUNCATE os_truth_guard_audits, os_agent_audit_events, os_sector_shield_audits");
+    await pool.query("TRUNCATE os_truth_guard_audits, os_agent_audit_events, os_sector_shield_audits, os_delivery_certificates, os_agent_data_cache");
     for (const [ws, pack] of [[WS_A, PACK_A], [WS_B, PACK_B]] as const) {
       // La marca lleva el numero de workspace DENTRO del contenido. Asi, si una
       // consulta se colara, no habria que deducirlo de un recuento: la fila
@@ -89,6 +91,15 @@ describeSiHayPg("aislamiento OS del lado web (PostgreSQL real)", () => {
         `INSERT INTO os_sector_shield_audits (sector_id, workspace_id, pack_run_id, status, claims_violations)
          VALUES ('dental',$1,$2::uuid,'blocked',$3::jsonb)`,
         [ws, pack, JSON.stringify([`curacion garantizada de ${marca}`])]);
+      await pool.query(
+        `INSERT INTO os_delivery_certificates (pack_run_id, pack_id, workspace_id, status, qa_score, html_body)
+         VALUES ($2::uuid,$3,$1,'issued',90,$4)`,
+        [ws, pack, `PACK-${marca}`, `<html>entregable de ${marca}</html>`]);
+      await pool.query(
+        `INSERT INTO os_agent_data_cache (tenant_id, provider, query_type, query_key, domain, expires_at, payload)
+         VALUES ($1,'semrush','keywords',$2,$3, NOW() + INTERVAL '1 hour', $4::jsonb)`,
+        [String(ws), `clave-${marca}`, `dominio-${ws}.example`,
+         JSON.stringify({ keywords: [marca] })]);
     }
   });
 
@@ -219,6 +230,114 @@ describeSiHayPg("aislamiento OS del lado web (PostgreSQL real)", () => {
       expect(ajeno).toHaveLength(0);
       const propio = await svc().getTrailForPackRun(PACK_A, { workspaceId: WS_A });
       expect(propio.length).toBeGreaterThan(0); // control positivo
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Certificados de entrega — 674 filas reales en produccion, con `html_body`
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  describe("certificados de entrega", () => {
+    // `packRuns` es obligatorio en el constructor; estas pruebas solo tocan
+    // lecturas, asi que un puerto que no responde nada es suficiente y ademas
+    // garantiza que ninguna de ellas dependa de el sin que se note.
+    const svc = () => new OsDeliveryCertificateService(
+      db, { getPackRun: async () => null } as never);
+
+    it("A ve los suyos (control positivo)", async () => {
+      const l = await svc().listCertificates({ workspaceId: WS_A });
+      expect(l.length).toBeGreaterThan(0);
+    });
+
+    it("A no ve ninguno de B", async () => {
+      const l = await svc().listCertificates({ workspaceId: WS_A });
+      expect(l.some((c) => JSON.stringify(c).includes(`workspace-${WS_B}`))).toBe(false);
+    });
+
+    it("B ve los suyos (control positivo del otro lado)", async () => {
+      expect((await svc().listCertificates({ workspaceId: WS_B })).length).toBeGreaterThan(0);
+    });
+
+    it("B no ve ninguno de A", async () => {
+      const l = await svc().listCertificates({ workspaceId: WS_B });
+      expect(l.some((c) => JSON.stringify(c).includes(`workspace-${WS_A}`))).toBe(false);
+    });
+
+    it("sin inquilino, denegado (no «todos»)", async () => {
+      // @ts-expect-error se comprueba el guardia en ejecucion, no el tipo
+      await expect(svc().listCertificates(undefined)).rejects.toThrow();
+    });
+
+    it("el certificado de otro no se descarga pidiendolo por su pack", async () => {
+      // `html_body` es el entregable COMPLETO del cliente. Conocer el packRunId
+      // bastaba para bajarselo.
+      expect(await svc().getByPackRun(PACK_B, { workspaceId: WS_A })).toBeNull();
+      expect(await svc().getByPackRun(PACK_A, { workspaceId: WS_A })).not.toBeNull();
+    });
+
+    it("pedir por id un certificado ajeno da NOT_FOUND, no el certificado", async () => {
+      const ajeno = (await svc().listCertificates({ workspaceId: WS_B }))[0]!;
+      await expect(svc().getCertificate(ajeno.id, { workspaceId: WS_A })).rejects.toThrow();
+      // control positivo: el propio si se entrega
+      const propio = (await svc().listCertificates({ workspaceId: WS_A }))[0]!;
+      expect((await svc().getCertificate(propio.id, { workspaceId: WS_A })).id).toBe(propio.id);
+    });
+
+    it("el resumen no promedia la calidad de entrega de los demas", async () => {
+      const a = await svc().getSummary({ workspaceId: WS_A });
+      const todos = await svc().getSummary(TODOS_LOS_CERTIFICADOS);
+      expect(a.total).toBe(1);
+      expect(todos.total).toBe(2);
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Cache de datos de agentes — `tenant_id` aqui es TEXT, no uuid
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  describe("cache de datos de agentes", () => {
+    // Los puertos externos se inyectan para que estas pruebas no intenten
+    // cargar los adaptadores de SEMrush/DataForSeo: aqui se certifica el
+    // aislamiento de la cache, no la integracion con el proveedor.
+    const svc = () => new OsAgentDataService(
+      db,
+      { isConfigured: () => false } as never,
+      { isConfigured: () => false } as never);
+
+    it("A ve lo suyo (control positivo)", async () => {
+      const r = await svc().listRecent({ tenantId: String(WS_A) });
+      expect(r.length).toBeGreaterThan(0);
+    });
+
+    it("A no ve la cache de B", async () => {
+      const r = await svc().listRecent({ tenantId: String(WS_A) });
+      expect(r.some((x) => JSON.stringify(x).includes(`dominio-${WS_B}`))).toBe(false);
+    });
+
+    it("B ve lo suyo (control positivo del otro lado)", async () => {
+      expect((await svc().listRecent({ tenantId: String(WS_B) })).length).toBeGreaterThan(0);
+    });
+
+    it("sin inquilino, denegado (no «toda la cache»)", async () => {
+      // @ts-expect-error se comprueba el guardia en ejecucion, no el tipo
+      await expect(svc().listRecent(undefined)).rejects.toThrow();
+    });
+
+    it("la vista global sigue disponible para el administrador", async () => {
+      const todos = await svc().getSummary(TODA_LA_CACHE);
+      const a = await svc().getSummary({ tenantId: String(WS_A) });
+      expect(todos.totalCached).toBe(2);
+      expect(a.totalCached).toBe(1);
+    });
+
+    it("la cache de un inquilino no se sirve a otro", async () => {
+      // Es lo que hace peligrosa una cache: acertar la clave devuelve el
+      // resultado ya calculado de otro. Aqui la clave lleva la marca del
+      // inquilino, pero un atacante la construiria igual: lo que separa es el
+      // `tenant_id`, no lo dificil que sea adivinar la clave.
+      const claveDeB = `clave-pertenece-al-workspace-${WS_B}`;
+      expect(await svc().getCached(claveDeB, "keywords", String(WS_A))).toBeNull();
+      expect(await svc().getCached(claveDeB, "keywords", String(WS_B))).not.toBeNull();
     });
   });
 });

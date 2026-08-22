@@ -3,6 +3,7 @@
  */
 import { describe, expect, it, vi } from "vitest";
 import {
+  TODO_EL_RASTRO,
   OsAgentAuditTrailService,
   normalizeAgentLogEntry,
   buildTrailSummary,
@@ -11,6 +12,13 @@ import {
   type AgentAuditEvent,
 } from "@nelvyon/saas";
 import type { SaasPostgresPort } from "../SaasOnboardingService";
+
+// Las lecturas de este servicio exigen ahora un ALCANCE explicito: el inquilino
+// era un parametro opcional y omitirlo devolvia los datos de todos. Estas
+// pruebas se actualizan a la firma nueva; el aislamiento en si se certifica
+// contra PostgreSQL real en `aislamiento_os_lado_web.pg.test.ts`, porque un
+// doble de base de datos no puede demostrar que un WHERE haga lo que dice.
+
 
 function makeDb(handler: (sql: string, params: unknown[]) => unknown[]): { db: SaasPostgresPort; calls: Array<{ sql: string; params: unknown[] }> } {
   const calls: Array<{ sql: string; params: unknown[] }> = [];
@@ -145,7 +153,7 @@ describe("O28 — getTrailForPackRun", () => {
       eventRow({ id: "b", sku: "LANDING", step_order: 1, agent_id: "copy" }),
       eventRow({ id: "c", sku: "SEO", step_order: 0, agent_id: "seo" }),
     ]);
-    const trails = await new OsAgentAuditTrailService(db).getTrailForPackRun("run-1");
+    const trails = await new OsAgentAuditTrailService(db).getTrailForPackRun("run-1", TODO_EL_RASTRO);
     expect(trails).toHaveLength(2);
     const landing = trails.find((t) => t.sku === "LANDING")!;
     expect(landing.agentCount).toBe(2);
@@ -158,20 +166,20 @@ describe("O28 — getTrailForPackRun", () => {
 describe("O28 — listEvents", () => {
   it("filters by agentId", async () => {
     const { db, calls } = makeDb(() => [eventRow()]);
-    await new OsAgentAuditTrailService(db).listEvents({ agentId: "copywriter" });
+    await new OsAgentAuditTrailService(db).listEvents(TODO_EL_RASTRO, { agentId: "copywriter" });
     expect(calls[0]!.sql).toContain("agent_id = $1");
     expect(calls[0]!.params).toContain("copywriter");
   });
 
   it("filters by packRunId", async () => {
     const { db, calls } = makeDb(() => [eventRow()]);
-    await new OsAgentAuditTrailService(db).listEvents({ packRunId: "run-1" });
+    await new OsAgentAuditTrailService(db).listEvents(TODO_EL_RASTRO, { packRunId: "run-1" });
     expect(calls[0]!.sql).toContain("pack_run_id = $1::uuid");
   });
 
   it("preserves llm_mode + agent_status on map", async () => {
     const { db } = makeDb(() => [eventRow({ llm_mode: "real", agent_status: "failed" })]);
-    const list = await new OsAgentAuditTrailService(db).listEvents({});
+    const list = await new OsAgentAuditTrailService(db).listEvents(TODO_EL_RASTRO);
     expect(list[0]!.llmMode).toBe("real");
     expect(list[0]!.agentStatus).toBe("failed");
   });
@@ -186,7 +194,7 @@ describe("O28 — getSummary + hasTrail", () => {
       if (sql.includes("GROUP BY agent_id")) return [{ agent_id: "copywriter", count: "8" }];
       return [];
     });
-    const s = await new OsAgentAuditTrailService(db).getSummary();
+    const s = await new OsAgentAuditTrailService(db).getSummary(TODO_EL_RASTRO);
     expect(s.totalEvents).toBe(20);
     expect(s.packRuns).toBe(4);
     expect(s.uniqueAgents).toBe(6);
@@ -197,12 +205,12 @@ describe("O28 — getSummary + hasTrail", () => {
   it("hasTrail true/false", async () => {
     const dbTrue = makeDb(() => [{ exists: true }]).db;
     const dbFalse = makeDb(() => [{ exists: false }]).db;
-    expect(await new OsAgentAuditTrailService(dbTrue).hasTrail("run-1")).toBe(true);
-    expect(await new OsAgentAuditTrailService(dbFalse).hasTrail("run-2")).toBe(false);
+    expect(await new OsAgentAuditTrailService(dbTrue).hasTrail("run-1", TODO_EL_RASTRO)).toBe(true);
+    expect(await new OsAgentAuditTrailService(dbFalse).hasTrail("run-2", TODO_EL_RASTRO)).toBe(false);
   });
 
   it("hasTrail false on error", async () => {
     const db = makeDb(() => { throw new Error("no table"); }).db;
-    expect(await new OsAgentAuditTrailService(db).hasTrail("run-1")).toBe(false);
+    expect(await new OsAgentAuditTrailService(db).hasTrail("run-1", TODO_EL_RASTRO)).toBe(false);
   });
 });

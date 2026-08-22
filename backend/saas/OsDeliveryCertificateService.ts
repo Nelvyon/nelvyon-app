@@ -10,6 +10,44 @@
 import { createHash } from "node:crypto";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 
+/**
+ * Acceso deliberado a los certificados de TODOS los inquilinos.
+ *
+ * Symbol y no `undefined`: hasta ahora `scope` era OPCIONAL en `getCertificate`
+ * y `getByPackRun`, y `listCertificates`/`getSummary` no lo tenian siquiera.
+ * Omitirlo devolvia los certificados de entrega de todos los clientes —con su
+ * `html_body` completo dentro—, y bastaba con no tener el inquilino a mano.
+ */
+export const TODOS_LOS_CERTIFICADOS = Symbol("todos-los-certificados");
+
+export type AlcanceCert =
+  | { tenantId: string }
+  | { workspaceId: number }
+  | typeof TODOS_LOS_CERTIFICADOS;
+
+/**
+ * El predicado del alcance. Los dos espacios de identidad conviven en la tabla
+ * (`tenant_id uuid` y `workspace_id integer`) y quien llama tiene uno u otro.
+ *
+ * En produccion las 674 filas tienen `workspace_id` y ninguna `tenant_id`, asi
+ * que el camino real hoy es el entero; el uuid se mantiene porque las rutas del
+ * SaaS lo traen en el JWT y escribiran por ahi.
+ */
+function filtroCert(alcance: AlcanceCert, indice: number): { where: string; params: unknown[] } {
+  if (alcance === TODOS_LOS_CERTIFICADOS) return { where: "", params: [] };
+  if (alcance && "tenantId" in alcance) {
+    if (!alcance.tenantId?.trim()) throw new Error("alcance: tenantId vacio");
+    return { where: `tenant_id = $${indice}::uuid`, params: [alcance.tenantId] };
+  }
+  const ws = (alcance as { workspaceId: number })?.workspaceId;
+  if (!Number.isInteger(ws)) {
+    throw new Error(
+      "alcance: falta inquilino. Antes era opcional y omitirlo devolvia los " +
+      "certificados de todos; pide TODOS_LOS_CERTIFICADOS si de verdad lo quieres");
+  }
+  return { where: `workspace_id = $${indice}`, params: [ws] };
+}
+
 // ── Ports ───────────────────────────────────────────────────────────────────────
 
 export type CertPackRun = {
@@ -385,7 +423,16 @@ export class OsDeliveryCertificateService {
 
     // cert_url points to the authenticated HTML viewer
     const certUrl = `/api/os/certificates/${cert.id}/html`;
-    await this.db.query(`UPDATE os_delivery_certificates SET cert_url = $2, updated_at = NOW() WHERE id = $1`, [cert.id, certUrl]);
+    // Acotado tambien en la escritura: `cert.id` sale de una fila que ya se
+    // leyo acotada, pero un UPDATE por id suelto es exactamente el patron que
+    // deja de ser seguro en cuanto alguien reutiliza el metodo con un id de
+    // fuera. El coste es un parametro; el de no hacerlo, escribir sobre el
+    // certificado de otro cliente.
+    await this.db.query(
+      `UPDATE os_delivery_certificates SET cert_url = $2, updated_at = NOW()
+        WHERE id = $1 AND (($3::uuid IS NOT NULL AND tenant_id = $3::uuid)
+                        OR ($4::int  IS NOT NULL AND workspace_id = $4::int))`,
+      [cert.id, certUrl, cert.tenantId ?? null, cert.workspaceId ?? null]);
     cert.certUrl = certUrl;
 
     // Best-effort vault sync (S50) — never fatal
@@ -430,45 +477,43 @@ export class OsDeliveryCertificateService {
     return rowToCert(rows[0]!, true);
   }
 
-  async getCertificate(
-    id: string,
-    scope?: { tenantId?: string | null; workspaceId?: number | null },
-  ): Promise<DeliveryCertificate> {
-    const params: unknown[] = [id];
+  /**
+   * Un certificado por id, ACOTADO al inquilino.
+   *
+   * El `id` lo aporta quien llama. Sin acotar, conocerlo bastaba para descargar
+   * el certificado de entrega de otro cliente, `html_body` incluido: el
+   * entregable completo.
+   */
+  async getCertificate(id: string, alcance: AlcanceCert): Promise<DeliveryCertificate> {
+    const propio = filtroCert(alcance, 2);
+    const params: unknown[] = [id, ...propio.params];
     let sql = `SELECT * FROM os_delivery_certificates WHERE id = $1`;
-    if (scope?.tenantId) {
-      sql += ` AND tenant_id = $2::uuid`;
-      params.push(scope.tenantId);
-    } else if (scope?.workspaceId != null) {
-      sql += ` AND workspace_id = $2`;
-      params.push(scope.workspaceId);
-    }
+    if (propio.where) sql += ` AND ${propio.where}`;
     const rows = await this.db.query<CertRow>(sql, params);
     if (!rows[0]) throw new OsDeliveryCertError("NOT_FOUND", `Certificado ${id} no encontrado`);
     return rowToCert(rows[0], true);
   }
 
-  async getByPackRun(
-    packRunId: string,
-    scope?: { tenantId?: string | null; workspaceId?: number | null },
-  ): Promise<DeliveryCertificate | null> {
-    const params: unknown[] = [packRunId];
+  /** El certificado de un pack, ACOTADO al inquilino. */
+  async getByPackRun(packRunId: string, alcance: AlcanceCert): Promise<DeliveryCertificate | null> {
+    const propio = filtroCert(alcance, 2);
+    const params: unknown[] = [packRunId, ...propio.params];
     let sql = `SELECT * FROM os_delivery_certificates WHERE pack_run_id = $1`;
-    if (scope?.tenantId) {
-      sql += ` AND tenant_id = $2::uuid`;
-      params.push(scope.tenantId);
-    } else if (scope?.workspaceId != null) {
-      sql += ` AND workspace_id = $2`;
-      params.push(scope.workspaceId);
-    }
+    if (propio.where) sql += ` AND ${propio.where}`;
     const rows = await this.db.query<CertRow>(sql, params);
     return rows[0] ? rowToCert(rows[0], true) : null;
   }
 
-  async listCertificates(limit = 50, filters: { packId?: string } = {}): Promise<DeliveryCertificate[]> {
-    const conditions: string[] = [];
-    const params: unknown[] = [];
-    let idx = 1;
+  /** Certificados DEL INQUILINO. Antes listaba los de todos. */
+  async listCertificates(
+    alcance: AlcanceCert,
+    limit = 50,
+    filters: { packId?: string } = {},
+  ): Promise<DeliveryCertificate[]> {
+    const propio = filtroCert(alcance, 1);
+    const conditions: string[] = propio.where ? [propio.where] : [];
+    const params: unknown[] = [...propio.params];
+    let idx = params.length + 1;
     if (filters.packId) { conditions.push(`pack_id = $${idx++}`); params.push(filters.packId); }
     const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
     const rows = await this.db.query<CertRow>(
@@ -478,14 +523,18 @@ export class OsDeliveryCertificateService {
     return rows.map((r) => rowToCert(r, false));
   }
 
-  async getSummary(): Promise<CertSummary> {
+  /** Resumen DEL INQUILINO. Antes promediaba la calidad de entrega de todos. */
+  async getSummary(alcance: AlcanceCert): Promise<CertSummary> {
+    const propio = filtroCert(alcance, 1);
+    const filtro = propio.where ? `WHERE ${propio.where}` : "";
     const rows = await this.db.query<{ total: string; issued: string; failed: string; avg_qa: string | null; last_issued: string | null }>(
       `SELECT COUNT(*) AS total,
               COUNT(*) FILTER (WHERE status = 'issued') AS issued,
               COUNT(*) FILTER (WHERE status = 'failed') AS failed,
               AVG(qa_score) FILTER (WHERE status = 'issued') AS avg_qa,
               MAX(issued_at) AS last_issued
-       FROM os_delivery_certificates`,
+       FROM os_delivery_certificates ${filtro}`,
+      propio.params,
     );
     const r = rows[0];
     return {
