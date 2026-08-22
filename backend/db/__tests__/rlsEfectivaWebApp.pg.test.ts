@@ -28,6 +28,16 @@
  * Una configuración que no deje ver NADA a NADIE aprueba las cuatro negativas y
  * no aísla: sólo está rota. Por cada denegación hay su permiso correspondiente.
  *
+ * FIXTURE PROPIA
+ * --------------
+ * Usa `cert_os_rls` y no una tabla compartida. Al principio reutilizaba
+ * `os_truth_guard_audits`, que otro fichero de pruebas también siembra: vitest
+ * ejecuta los ficheros en PARALELO, así que la siembra de uno vaciaba la del otro
+ * y aparecía un fallo que parecía de aislamiento y era de fixture.
+ *
+ * Un falso rojo cuesta lo mismo que un falso verde: los dos hacen desconfiar de
+ * la prueba en vez del código.
+ *
  * Se salta sin `NELVYON_WEB_APP_CERT_DSN`.
  */
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
@@ -91,10 +101,10 @@ describeSiHayRol("RLS efectiva con nelvyon_web_app (PostgreSQL real)", () => {
   afterAll(async () => { await pool?.end(); await siembra?.end(); });
 
   beforeEach(async () => {
-    await siembra.query("TRUNCATE os_truth_guard_audits");
+    await siembra.query("TRUNCATE cert_os_rls");
     for (const ws of [WS_A, WS_B]) {
       await siembra.query(
-        `INSERT INTO os_truth_guard_audits (channel, workspace_id, status, content_preview)
+        `INSERT INTO cert_os_rls (channel, workspace_id, status, content_preview)
          VALUES ('landing',$1,'blocked',$2), ('email',$1,'passed',$2)`,
         [ws, `fila-del-workspace-${ws}`]);
     }
@@ -121,21 +131,21 @@ describeSiHayRol("RLS efectiva con nelvyon_web_app (PostgreSQL real)", () => {
 
   it("SELECT · A ve lo suyo y SOLO lo suyo", async () => {
     const filas = await comoWebApp(A, async (c) =>
-      (await c.query("SELECT workspace_id, content_preview FROM os_truth_guard_audits")).rows);
+      (await c.query("SELECT workspace_id, content_preview FROM cert_os_rls")).rows);
     expect(filas.length).toBe(2);                                  // control positivo
     expect(filas.every((f) => f.workspace_id === WS_A)).toBe(true);
   });
 
   it("SELECT · B ve lo suyo y SOLO lo suyo", async () => {
     const filas = await comoWebApp(B, async (c) =>
-      (await c.query("SELECT workspace_id FROM os_truth_guard_audits")).rows);
+      (await c.query("SELECT workspace_id FROM cert_os_rls")).rows);
     expect(filas.length).toBe(2);
     expect(filas.every((f) => f.workspace_id === WS_B)).toBe(true);
   });
 
   it("SELECT · sin contexto no se ve NADA (fail-closed)", async () => {
     const filas = await comoWebApp({}, async (c) =>
-      (await c.query("SELECT * FROM os_truth_guard_audits")).rows);
+      (await c.query("SELECT * FROM cert_os_rls")).rows);
     expect(filas).toHaveLength(0);
   });
 
@@ -145,7 +155,7 @@ describeSiHayRol("RLS efectiva con nelvyon_web_app (PostgreSQL real)", () => {
 
   it("INSERT · A puede escribir en lo suyo", async () => {
     const r = await comoWebApp(A, async (c) =>
-      c.query(`INSERT INTO os_truth_guard_audits (channel, workspace_id, status)
+      c.query(`INSERT INTO cert_os_rls (channel, workspace_id, status)
                VALUES ('ads',$1,'passed') RETURNING id`, [WS_A]));
     expect(r.rowCount).toBe(1);
   });
@@ -155,13 +165,13 @@ describeSiHayRol("RLS efectiva con nelvyon_web_app (PostgreSQL real)", () => {
     // error, no silencio — escribir en el inquilino ajeno y creer que fue bien
     // seria peor que no poder escribir.
     await expect(comoWebApp(A, async (c) =>
-      c.query(`INSERT INTO os_truth_guard_audits (channel, workspace_id, status)
+      c.query(`INSERT INTO cert_os_rls (channel, workspace_id, status)
                VALUES ('ads',$1,'passed')`, [WS_B]))).rejects.toThrow(/row-level security/i);
   });
 
   it("UPDATE · A modifica lo suyo", async () => {
     const r = await comoWebApp(A, async (c) =>
-      c.query("UPDATE os_truth_guard_audits SET status = 'warning'"));
+      c.query("UPDATE cert_os_rls SET status = 'warning'"));
     expect(r.rowCount).toBe(2);                                    // control positivo
   });
 
@@ -169,22 +179,22 @@ describeSiHayRol("RLS efectiva con nelvyon_web_app (PostgreSQL real)", () => {
     // La consulta no lleva `WHERE workspace_id`: si el aislamiento dependiera de
     // la consulta, este UPDATE reescribiria las cuatro filas.
     await comoWebApp(A, async (c) =>
-      c.query("UPDATE os_truth_guard_audits SET status = 'tocado-por-A'"));
+      c.query("UPDATE cert_os_rls SET status = 'tocado-por-A'"));
     const deB = await siembra.query(
-      "SELECT count(*)::int AS n FROM os_truth_guard_audits WHERE workspace_id = $1 AND status = 'tocado-por-A'",
+      "SELECT count(*)::int AS n FROM cert_os_rls WHERE workspace_id = $1 AND status = 'tocado-por-A'",
       [WS_B]);
     expect(deB.rows[0].n).toBe(0);
   });
 
   it("DELETE · A borra lo suyo", async () => {
-    const r = await comoWebApp(A, async (c) => c.query("DELETE FROM os_truth_guard_audits"));
+    const r = await comoWebApp(A, async (c) => c.query("DELETE FROM cert_os_rls"));
     expect(r.rowCount).toBe(2);
   });
 
   it("DELETE · un DELETE sin filtro no borra NI UNA fila de B", async () => {
-    await comoWebApp(A, async (c) => c.query("DELETE FROM os_truth_guard_audits"));
+    await comoWebApp(A, async (c) => c.query("DELETE FROM cert_os_rls"));
     const quedan = await siembra.query(
-      "SELECT count(*)::int AS n FROM os_truth_guard_audits WHERE workspace_id = $1", [WS_B]);
+      "SELECT count(*)::int AS n FROM cert_os_rls WHERE workspace_id = $1", [WS_B]);
     expect(quedan.rows[0].n).toBe(2);
   });
 
@@ -207,11 +217,11 @@ describeSiHayRol("RLS efectiva con nelvyon_web_app (PostgreSQL real)", () => {
     try {
       const ctx = { ws: WS_A, usuario: viewer };
       const leidas = await comoWebApp(ctx, async (c) =>
-        (await c.query("SELECT * FROM os_truth_guard_audits")).rows);
+        (await c.query("SELECT * FROM cert_os_rls")).rows);
       expect(leidas).toHaveLength(2);                       // control positivo: SI lee
 
       await expect(comoWebApp(ctx, async (c) =>
-        c.query(`INSERT INTO os_truth_guard_audits (channel, workspace_id, status)
+        c.query(`INSERT INTO cert_os_rls (channel, workspace_id, status)
                  VALUES ('ads',$1,'passed')`, [WS_A])))
         .rejects.toThrow(/row-level security/i);            // y NO escribe
     } finally {
@@ -225,13 +235,13 @@ describeSiHayRol("RLS efectiva con nelvyon_web_app (PostgreSQL real)", () => {
 
   it("contexto incompleto · con workspace pero sin usuario, nada", async () => {
     const filas = await comoWebApp({ ws: WS_A }, async (c) =>
-      (await c.query("SELECT * FROM os_truth_guard_audits")).rows);
+      (await c.query("SELECT * FROM cert_os_rls")).rows);
     expect(filas).toHaveLength(0);
   });
 
   it("contexto incompleto · con usuario pero sin workspace, nada", async () => {
     const filas = await comoWebApp({ usuario: USUARIO_A }, async (c) =>
-      (await c.query("SELECT * FROM os_truth_guard_audits")).rows);
+      (await c.query("SELECT * FROM cert_os_rls")).rows);
     expect(filas).toHaveLength(0);
   });
 
@@ -240,13 +250,13 @@ describeSiHayRol("RLS efectiva con nelvyon_web_app (PostgreSQL real)", () => {
     // `app.workspace_id`, bastaria con declarar otro numero. La politica exige
     // ADEMAS pertenencia, comprobada contra `workspaces`/`workspace_members`.
     const filas = await comoWebApp({ ws: WS_B, usuario: USUARIO_A }, async (c) =>
-      (await c.query("SELECT * FROM os_truth_guard_audits")).rows);
+      (await c.query("SELECT * FROM cert_os_rls")).rows);
     expect(filas).toHaveLength(0);
   });
 
   it("contexto falso · un usuario que no existe no ve nada", async () => {
     const filas = await comoWebApp({ ws: WS_A, usuario: AJENO }, async (c) =>
-      (await c.query("SELECT * FROM os_truth_guard_audits")).rows);
+      (await c.query("SELECT * FROM cert_os_rls")).rows);
     expect(filas).toHaveLength(0);
   });
 
@@ -258,11 +268,11 @@ describeSiHayRol("RLS efectiva con nelvyon_web_app (PostgreSQL real)", () => {
     // `max: 1` en el pool: las tres comparten conexion. Si el contexto
     // sobreviviera al COMMIT, la segunda o la tercera lo notarian.
     const a1 = await comoWebApp(A, async (c) =>
-      (await c.query("SELECT workspace_id FROM os_truth_guard_audits")).rows);
+      (await c.query("SELECT workspace_id FROM cert_os_rls")).rows);
     const b = await comoWebApp(B, async (c) =>
-      (await c.query("SELECT workspace_id FROM os_truth_guard_audits")).rows);
+      (await c.query("SELECT workspace_id FROM cert_os_rls")).rows);
     const a2 = await comoWebApp(A, async (c) =>
-      (await c.query("SELECT workspace_id FROM os_truth_guard_audits")).rows);
+      (await c.query("SELECT workspace_id FROM cert_os_rls")).rows);
 
     expect(a1.every((f) => f.workspace_id === WS_A)).toBe(true);
     expect(b.every((f) => f.workspace_id === WS_B)).toBe(true);
@@ -272,11 +282,11 @@ describeSiHayRol("RLS efectiva con nelvyon_web_app (PostgreSQL real)", () => {
   });
 
   it("A → sin contexto → A: la del medio no hereda y las de fuera si ven", async () => {
-    await comoWebApp(A, async (c) => c.query("SELECT * FROM os_truth_guard_audits"));
+    await comoWebApp(A, async (c) => c.query("SELECT * FROM cert_os_rls"));
     const medio = await comoWebApp({}, async (c) =>
-      (await c.query("SELECT * FROM os_truth_guard_audits")).rows);
+      (await c.query("SELECT * FROM cert_os_rls")).rows);
     const despues = await comoWebApp(A, async (c) =>
-      (await c.query("SELECT * FROM os_truth_guard_audits")).rows);
+      (await c.query("SELECT * FROM cert_os_rls")).rows);
     expect(medio).toHaveLength(0);       // no heredo
     expect(despues).toHaveLength(2);     // y no se quedo roto tampoco
   });
@@ -285,7 +295,7 @@ describeSiHayRol("RLS efectiva con nelvyon_web_app (PostgreSQL real)", () => {
     await expect(comoWebApp(A, async (c) =>
       c.query("SELECT 1 FROM tabla_que_no_existe"))).rejects.toThrow();
     const sinCtx = await comoWebApp({}, async (c) =>
-      (await c.query("SELECT * FROM os_truth_guard_audits")).rows);
+      (await c.query("SELECT * FROM cert_os_rls")).rows);
     expect(sinCtx).toHaveLength(0);
   });
 
@@ -307,6 +317,6 @@ describeSiHayRol("RLS efectiva con nelvyon_web_app (PostgreSQL real)", () => {
     // TRUNCATE no pasa por RLS: saltaria el aislamiento entero de una sentencia.
     // Por eso no se concede, aunque DELETE si.
     await expect(comoWebApp(A, async (c) =>
-      c.query("TRUNCATE os_truth_guard_audits"))).rejects.toThrow();
+      c.query("TRUNCATE cert_os_rls"))).rejects.toThrow();
   });
 });

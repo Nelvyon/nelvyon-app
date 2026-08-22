@@ -318,14 +318,46 @@ export class SaasCpqEnterpriseService {
   }
 
   async processDueDunning(limit = 50): Promise<{ processed: number; failed: number }> {
+    // Lo que quedo 'processing' por un proceso que murio vuelve a la cola. Sin
+    // esto, cambiar el duplicado por un recordatorio que no sale nunca seria un
+    // mal negocio: el duplicado se ve, el silencio no.
+    const recuperadas = await this.db.query<{ id: string }>(
+      `UPDATE saas_dunning_events SET status = 'pending'
+        WHERE status = 'processing' AND scheduled_at < NOW() - INTERVAL '30 minutes'
+        RETURNING id`,
+    );
+    if (recuperadas.length > 0) {
+      console.warn(`[dunning] ${recuperadas.length} recordatorios atascados vuelven a la cola`);
+    }
+
     const rows = await this.db.query<DunningRow & { client_email: string | null; invoice_number: string; total: string }>(
-      `SELECT d.*, c.email AS client_email, i.invoice_number, i.total
-       FROM saas_dunning_events d
+      // Se RECLAMAN las filas antes de enviar, en una sola sentencia.
+      //
+      // Antes se seleccionaban las pendientes, se enviaba el recordatorio de pago
+      // y sólo después se marcaba. Dos ejecuciones solapadas del cron mandaban el
+      // MISMO recordatorio dos veces al mismo cliente — y esto no es una
+      // notificación cualquiera: es una reclamación de cobro. Repetirla daña la
+      // relación del cliente de NELVYON con el suyo, y no deja rastro de error.
+      //
+      // `SKIP LOCKED` reparte lotes distintos entre ejecuciones sin que se
+      // esperen, y sin mantener bloqueos abiertos durante la llamada a SES.
+      `WITH tomadas AS (
+         UPDATE saas_dunning_events
+            SET status = 'processing'
+          WHERE id IN (
+            SELECT id FROM saas_dunning_events
+             WHERE status = 'pending' AND scheduled_at <= NOW()
+             ORDER BY scheduled_at
+             LIMIT $1
+             FOR UPDATE SKIP LOCKED
+          )
+          RETURNING *
+       )
+       SELECT d.*, c.email AS client_email, i.invoice_number, i.total
+       FROM tomadas d
        JOIN invoices i ON i.id = d.invoice_id
        LEFT JOIN saas_contacts c ON c.id = i.contact_id
-       WHERE d.status = 'pending' AND d.scheduled_at <= NOW()
-       ORDER BY d.scheduled_at
-       LIMIT $1`,
+       ORDER BY d.scheduled_at`,
       [limit],
     );
 

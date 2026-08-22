@@ -1418,6 +1418,47 @@ creados: sin nadie que los use, no hacen nada.
 - Las **69 tablas** de familia directa dependen de la aplicación para aislar.
   Está comprobado que la aplicación lo hace, pero no hay segunda red ahí.
 
+## CERRADO — colas de trabajo que entregaban la misma fila dos veces
+
+Auditando `nelvyon_web_jobs` (BYPASSRLS → aísla solo por `WHERE`) se recorrieron
+los **2.491 módulos alcanzables** desde las 16 rutas de cron:
+
+```
+mutaciones alcanzables desde crons : 325
+  sin columna de inquilino         :  81   → 42 acotadas por `id` que el propio
+                                             job seleccionó (patrón correcto)
+  SIN NINGUN WHERE                 :   0   ← no hay updates globales a ciegas
+```
+
+Pero apareció otra cosa. **4 colas de trabajo, ninguna con reclamación**:
+
+| Tabla | Consecuencia de la carrera |
+|---|---|
+| `email_queue` | el cliente recibe el mismo correo dos veces |
+| `saas_dunning_events` | **recordatorio de cobro duplicado** al cliente de un cliente |
+
+El patrón era `SELECT ... status='pending' LIMIT n` → enviar → `UPDATE ... SET
+status='sent'`. **El estado se actualizaba después de enviar**, y la ventana la
+abre precisamente la llamada al proveedor de correo, que es lenta. Dos
+ejecuciones solapadas del cron —o un reintento sobre una lenta— mandan lo mismo
+dos veces. Sin error, sin log, y lo ve solo el destinatario.
+
+**Corregido** con `UPDATE ... WHERE id IN (SELECT ... FOR UPDATE SKIP LOCKED)
+RETURNING`: reclama y devuelve en una sola sentencia, sin mantener bloqueos
+abiertos durante la llamada de red.
+
+Y con **recuperación de atascados**: lo que queda tomado por un proceso muerto
+vuelve a la cola pasados 15/30 min. Sin eso, cambiar el duplicado por «el correo
+no sale nunca» habría sido un mal negocio — **un mensaje repetido se ve; uno que
+no llega, no**.
+
+`colasNoDuplicanTrabajo.pg.test.ts` — 6/6 contra PostgreSQL real, con dos y con
+diez reclamaciones **concurrentes de verdad**. Incluye el **control que reproduce
+la forma anterior y comprueba que sí solapaba**: sin él, el verde podría venir de
+una tabla vacía en vez del `SKIP LOCKED`. Y el control inverso: lo tomado hace un
+momento **no** se recupera, porque una ventana mal puesta convertiría la
+recuperación en la causa del duplicado.
+
 ## Otros bloqueos externos
 
 - `MESH_AUTHKEY` — malla privada al Ollama propio. **No es un proveedor de pago.**

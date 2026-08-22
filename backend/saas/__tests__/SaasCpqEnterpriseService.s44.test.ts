@@ -188,6 +188,10 @@ describe("processDueDunning", () => {
   it("marks pending events as sent (SES mocked)", async () => {
     const db = {
       query: vi.fn()
+        // 1a llamada: la recuperacion de eventos atascados, que ahora corre antes
+        // de reclamar. Devuelve vacio porque en esta prueba no hay ninguno.
+        .mockResolvedValueOnce([])
+        // 2a: la reclamacion atomica, que sustituyo al SELECT suelto.
         .mockResolvedValueOnce([{
           id: "ev1", tenant_id: "t1", invoice_id: "inv1", attempt_number: 1,
           channel: "email", status: "pending",
@@ -208,6 +212,10 @@ describe("processDueDunning", () => {
 
     const db = {
       query: vi.fn()
+        // 1a llamada: la recuperacion de eventos atascados, que ahora corre antes
+        // de reclamar. Devuelve vacio porque en esta prueba no hay ninguno.
+        .mockResolvedValueOnce([])
+        // 2a: la reclamacion atomica, que sustituyo al SELECT suelto.
         .mockResolvedValueOnce([{
           id: "ev2", tenant_id: "t1", invoice_id: "inv1", attempt_number: 1,
           channel: "email", status: "pending",

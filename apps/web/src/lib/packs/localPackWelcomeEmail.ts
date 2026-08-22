@@ -214,36 +214,94 @@ async function fetchQueueByIds(ids: number[]): Promise<QueueEmailRow[]> {
   );
 }
 
+/**
+ * Reclama las filas ANTES de enviar, en una sola sentencia atómica.
+ *
+ * EL DEFECTO QUE CIERRA
+ * ---------------------
+ * Antes se hacía `SELECT ... WHERE status = 'pending' ... LIMIT n`, se enviaba, y
+ * sólo DESPUÉS se marcaba el estado. Dos ejecuciones solapadas del cron —o un
+ * reintento del planificador sobre una ejecución lenta— seleccionaban las MISMAS
+ * filas y enviaban el MISMO correo dos veces.
+ *
+ * No daba error, no aparecía en ningún log como fallo, y el síntoma lo veía sólo
+ * el destinatario: un cliente recibiendo dos veces lo mismo. La ventana la abre
+ * la llamada al proveedor de correo, que es lenta por definición.
+ *
+ * POR QUE `FOR UPDATE SKIP LOCKED` Y NO UNA TRANSACCION LARGA
+ * ------------------------------------------------------------
+ * Envolver el envío entero en una transacción también lo evitaría, pero
+ * mantendría bloqueos abiertos durante una llamada de red a un tercero: un
+ * proveedor lento bloquearía la tabla para todo el mundo.
+ *
+ * `SKIP LOCKED` hace que cada ejecución se lleve un lote distinto sin esperarse
+ * entre ellas, y el `UPDATE ... RETURNING` deja las filas marcadas como tomadas
+ * antes de que empiece el envío. La transacción dura lo que tarda un UPDATE.
+ *
+ * SI EL PROCESO MUERE A MEDIAS
+ * -----------------------------
+ * Las filas quedan en el estado intermedio y nadie las recogería nunca. Por eso
+ * `recuperarAtascados` las devuelve a `pending` pasado un tiempo prudencial: sin
+ * eso, cambiar un defecto de duplicado por uno de correo que no sale sería un mal
+ * negocio.
+ */
+
+/** Estado intermedio: la fila está tomada por una ejecución y aún no ha salido. */
+const ENVIANDO = "sending";
+
+/** Minutos tras los cuales una fila tomada se considera abandonada. */
+const MINUTOS_ATASCADO = 15;
+
+/**
+ * Devuelve a `pending` lo que quedó tomado por un proceso que murió.
+ *
+ * Sin esto, la corrección del duplicado habría creado un problema peor: correos
+ * que no salen nunca y nadie sabe por qué. Un mensaje repetido molesta; uno que
+ * no llega, no se ve.
+ */
+async function recuperarAtascados(): Promise<number> {
+  const r = await db().query<{ id: number }>(
+    `UPDATE email_queue
+        SET status = 'pending'
+      WHERE status = $1
+        AND COALESCE(sent_at, created_at) < NOW() - ($2 || ' minutes')::interval
+      RETURNING id`,
+    [ENVIANDO, String(MINUTOS_ATASCADO)],
+  );
+  if (r.length > 0) {
+    console.warn(`[email_queue] ${r.length} envios quedaron atascados y vuelven a la cola`);
+  }
+  return r.length;
+}
+
 export async function processPendingLocalWelcomeEmails(params: {
   limit?: number;
   workspaceId?: number;
 } = {}): Promise<{ processed: number; sent: number; failed: number; noApiKey: number; skipped: number }> {
   const limit = Math.min(Math.max(params.limit ?? 100, 1), 500);
   const withSchedule = await hasScheduledAtColumn();
-  const rows = withSchedule
-    ? await db().query<QueueEmailRow>(
-      `SELECT id, subject, body_text, body_html, to_email, to_name, status, error_message,
-              scheduled_at::text AS scheduled_at
-       FROM email_queue
-       WHERE email_type = 'campaign'
-         AND status = 'pending'
-         AND COALESCE(scheduled_at, created_at) <= NOW()
-         AND ($1::int IS NULL OR workspace_id = $1)
-       ORDER BY COALESCE(scheduled_at, created_at) ASC, id ASC
-       LIMIT $2`,
-      [params.workspaceId ?? null, limit],
-    )
-    : await db().query<QueueEmailRow>(
-      `SELECT id, subject, body_text, body_html, to_email, to_name, status, error_message,
-              NULL::text AS scheduled_at
-       FROM email_queue
-       WHERE email_type = 'campaign'
-         AND status = 'pending'
-         AND ($1::int IS NULL OR workspace_id = $1)
-       ORDER BY created_at ASC, id ASC
-       LIMIT $2`,
-      [params.workspaceId ?? null, limit],
-    );
+  await recuperarAtascados();
+  const orden = withSchedule
+    ? "COALESCE(scheduled_at, created_at) ASC, id ASC"
+    : "created_at ASC, id ASC";
+  const vencidos = withSchedule ? "AND COALESCE(scheduled_at, created_at) <= NOW()" : "";
+  const rows = await db().query<QueueEmailRow>(
+    `UPDATE email_queue
+        SET status = '${ENVIANDO}'
+      WHERE id IN (
+        SELECT id FROM email_queue
+         WHERE email_type = 'campaign'
+           AND status = 'pending'
+           ${vencidos}
+           AND ($1::int IS NULL OR workspace_id = $1)
+         ORDER BY ${orden}
+         LIMIT $2
+         FOR UPDATE SKIP LOCKED
+      )
+      RETURNING id, subject, body_text, body_html, to_email, to_name, status, error_message,
+                ${withSchedule ? "scheduled_at::text AS scheduled_at" : "NULL::text AS scheduled_at"}`,
+    [params.workspaceId ?? null, limit],
+  );
 
   let sent = 0;
   let failed = 0;
