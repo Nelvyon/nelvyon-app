@@ -136,33 +136,72 @@ def test_publicar_en_redes_sigue_siendo_jamas_automatico():
         "publicar en nombre del cliente sin que nadie lo apruebe")
 
 
-@pytest.mark.parametrize("modo", ["AUTOMATIC_SAFE", "AUTOMATIC_WITH_LIMITS"])
-def test_ninguna_politica_puede_automatizar_publicar(modo):
-    """El guard de la politica, ejecutado.
+@pytest.mark.skipif(not DSN, reason="sin NELVYON_PG_CERT_DSN")
+@pytest.mark.asyncio
+async def test_la_politica_real_deniega_publicar():
+    """Contra `decidir`, que es la funcion que decide de verdad.
 
-    No basta con que `redes.publicar` este en la lista: hay que comprobar que
-    la funcion que decide lo respeta.
+    No basta con que `redes.publicar` este en `JAMAS_AUTOMATICO`: hay que
+    comprobar que la funcion que consulta la politica lo respeta. Una lista que
+    nadie mira no protege nada.
     """
-    from core.agentes.politicas import evaluar
+    from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-    d = evaluar("redes.redactar_borrador", "redes.publicar", modo, {})
-    assert not d.permitido, (
-        f"la politica dejo publicar en modo {modo}: {d}")
+    from core.agentes.politicas import decidir
+
+    url = (DSN or "").replace("postgresql://", "postgresql+asyncpg://")
+    motor = create_async_engine(url, pool_size=1, max_overflow=1)
+    try:
+        async with async_sessionmaker(motor, expire_on_commit=False)() as s:
+            d = await decidir(s, "redes.redactar_borrador", "redes.publicar")
+        assert not d.permitido, (
+            f"la politica dejo publicar en redes: {d}")
+    finally:
+        await motor.dispose()
 
 
-def test_redactar_un_borrador_no_es_publicarlo():
-    """Control: si TODO estuviera denegado, el equipo no serviria para nada.
+@pytest.mark.skipif(not DSN, reason="sin NELVYON_PG_CERT_DSN")
+@pytest.mark.asyncio
+async def test_redactar_un_borrador_si_esta_permitido_con_aprobacion():
+    """CONTROL. Si TODO estuviera denegado el equipo seria una lista de nombres.
 
-    Redactar tiene que poder ocurrir —con aprobacion— o estos agentes serian
-    una lista de nombres que nunca hacen nada.
+    Redactar tiene que poder ocurrir; lo que no puede es publicarse solo.
     """
-    from core.agentes.politicas import evaluar
+    from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-    d = evaluar("redes.redactar_borrador", "contenido.redactar",
-                "HUMAN_APPROVAL_REQUIRED", {})
-    assert d.permitido or d.modo == "HUMAN_APPROVAL_REQUIRED", (
-        f"redactar un borrador quedo denegado por completo: {d}. El equipo de "
-        f"redes no podria hacer nada.")
+    from core.agentes.politicas import decidir
+
+    url = (DSN or "").replace("postgresql://", "postgresql+asyncpg://")
+    motor = create_async_engine(url, pool_size=1, max_overflow=1)
+    try:
+        async with async_sessionmaker(motor, expire_on_commit=False)() as s:
+            d = await decidir(s, "redes.redactar_borrador", "contenido.redactar")
+        assert d.modo == "HUMAN_APPROVAL_REQUIRED", (
+            f"redactar un borrador quedo en modo {d.modo}: un texto que sale con "
+            f"la marca del cliente tiene que esperar aprobacion")
+    finally:
+        await motor.dispose()
+
+
+@pytest.mark.skipif(not DSN, reason="sin NELVYON_PG_CERT_DSN")
+@pytest.mark.asyncio
+async def test_los_de_solo_lectura_no_esperan_a_nadie():
+    """Y el control simetrico: un parte que solo lee no puede exigir aprobacion,
+    o el equipo no serviria para operar sin el fundador delante."""
+    from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
+    from core.agentes.politicas import decidir
+
+    url = (DSN or "").replace("postgresql://", "postgresql+asyncpg://")
+    motor = create_async_engine(url, pool_size=1, max_overflow=1)
+    try:
+        async with async_sessionmaker(motor, expire_on_commit=False)() as s:
+            for agente in ("redes.parte_de_publicacion", "redes.revisar_cola"):
+                d = await decidir(s, agente, "informe.componer")
+                assert d.permitido and d.modo == "AUTOMATIC_SAFE", (
+                    f"{agente} no puede componer su parte: {d}")
+    finally:
+        await motor.dispose()
 
 
 # ═══════════════════════════════════════════════════════════════════════════

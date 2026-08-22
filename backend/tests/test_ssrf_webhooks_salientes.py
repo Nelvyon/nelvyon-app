@@ -110,20 +110,56 @@ async def test_registrar_un_webhook_interno_falla(db_session):
     with pytest.raises(ValueError) as exc:
         await svc.register_webhook(
             url="http://postgres.railway.internal:5432/",
-            events=["deliverable.published"])
+            events=["contact.created"])
     assert "no permitida" in str(exc.value).lower()
 
 
 @pytest.mark.asyncio
-async def test_registrar_uno_publico_si_funciona(db_session):
-    """Control del anterior contra el servicio real."""
+async def test_registrar_uno_publico_si_funciona(db_session, monkeypatch):
+    """Control del anterior contra el servicio real.
+
+    Se falsea la RESOLUCION, no el guard: `hooks.ejemplo-publico.com` no existe
+    de verdad, y el guard rechaza lo que no resuelve —que es correcto y
+    fail-closed—. Falsear `getaddrinfo` deja que el resto del guard actue tal
+    cual sobre una IP publica, y ademas hace la prueba hermetica: sin red
+    seguiria midiendo lo que dice medir.
+
+    Falsear el guard en su lugar convertiria este control en decoracion.
+    """
+    import socket
+
+    def _resuelve_publica(host, puerto, *args, **kwargs):
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", puerto))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", _resuelve_publica)
+
     from services.webhook_service import WebhookService
 
     svc = WebhookService(db_session, workspace_id=1)
     creado = await svc.register_webhook(
         url="https://hooks.ejemplo-publico.com/nelvyon",
-        events=["deliverable.published"])
+        events=["contact.created"])
     assert creado and creado.get("id")
+
+
+@pytest.mark.asyncio
+async def test_un_dominio_publico_que_resuelve_a_privada_se_rechaza(monkeypatch):
+    """EL CASO QUE MAS IMPORTA DE TODO EL FICHERO.
+
+    El nombre es publico y la comprobacion sintactica lo aprobaria. Lo que lo
+    delata es RESOLVERLO: apunta a `127.0.0.1`. Es exactamente el ataque de
+    rebinding, y sin la resolucion el guard seria cosmetico.
+    """
+    import socket
+
+    def _resuelve_a_loopback(host, puerto, *args, **kwargs):
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("127.0.0.1", puerto))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", _resuelve_a_loopback)
+
+    with pytest.raises(DestinoNoPermitido) as exc:
+        comprobar_destino("https://parece-publico.com/webhook")
+    assert "interna" in str(exc.value)
 
 
 # ═══════════════════════════════════════════════════════════════════════════

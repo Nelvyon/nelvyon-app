@@ -459,6 +459,74 @@ async def list_workspace_members(
 
 # ── Invite member ────────────────────────────────────────────────────────────
 
+#: Jerarquia de roles DENTRO de un workspace. No la habia, y por eso un operator
+#: podia invitar a alguien como `admin`.
+#:
+#: Es un esquema distinto del `ROLE_HIERARCHY` de `rbac_management`
+#: (`super_admin/admin/manager/user/viewer`), que es de plataforma. Aquel si
+#: comprobaba que un admin no pudiera asignar `super_admin`; este no comprobaba
+#: nada.
+JERARQUIA_WORKSPACE = {"owner": 4, "admin": 3, "operator": 2, "member": 1, "viewer": 0}
+
+
+def _rechaza_tocar_a_un_superior(rol_del_miembro: str | None,
+                                 rol_de_quien_actua: str | None) -> None:
+    """Nadie modifica a alguien de rango superior al suyo.
+
+    `_rechaza_escalada` mira el rol que se CONCEDE. Falta el simetrico: un
+    operator no puede ascender a nadie por encima de si, pero si podia DEGRADAR
+    a un admin o a un owner hasta `viewer`. No es escalada, es lo contrario, y
+    hace igual de dano: un operator descontento podia dejar sin acceso a quien
+    manda en el workspace.
+    """
+    nivel_miembro = JERARQUIA_WORKSPACE.get((rol_del_miembro or "").strip().lower())
+    nivel_propio = JERARQUIA_WORKSPACE.get((rol_de_quien_actua or "").strip().lower())
+    if nivel_propio is None:
+        raise HTTPException(
+            status_code=403,
+            detail="No se puede determinar tu rol en el workspace")
+    if nivel_miembro is not None and nivel_miembro > nivel_propio:
+        raise HTTPException(
+            status_code=403,
+            detail=(
+                f"No puedes modificar a un miembro con rol '{rol_del_miembro}', "
+                f"que esta por encima del tuyo ('{rol_de_quien_actua}')"))
+
+
+def _rechaza_escalada(rol_invitado: str, rol_de_quien_invita: str | None) -> None:
+    """Nadie concede un rol por encima del suyo.
+
+    LA ESCALADA QUE ESTO CIERRA
+    ---------------------------
+    `require_workspace_operator` admite owner, admin Y operator. La ruta de
+    invitacion aceptaba `admin` sin mirar quien invitaba, asi que un operator
+    —que esta explicitamente por debajo— podia invitar a una direccion que
+    controlara con rol `admin`, aceptar la invitacion y quedarse de admin.
+
+    No hacia falta ningun fallo: era el camino normal de la funcion.
+
+    Se permite conceder el MISMO nivel —invitar a un companero de tu rango es lo
+    normal— pero nunca uno superior.
+    """
+    nivel_invitado = JERARQUIA_WORKSPACE.get((rol_invitado or "").strip().lower())
+    nivel_propio = JERARQUIA_WORKSPACE.get((rol_de_quien_invita or "").strip().lower())
+
+    if nivel_invitado is None:
+        raise HTTPException(status_code=400, detail=f"Rol desconocido: {rol_invitado}")
+    if nivel_propio is None:
+        # Fail-closed: si no se sabe que rol tiene quien invita, no se concede
+        # nada. Un rol desconocido no puede tratarse como el mas alto.
+        raise HTTPException(
+            status_code=403,
+            detail="No se puede determinar tu rol en el workspace")
+    if nivel_invitado > nivel_propio:
+        raise HTTPException(
+            status_code=403,
+            detail=(
+                f"No puedes conceder el rol '{rol_invitado}', que esta por encima "
+                f"del tuyo ('{rol_de_quien_invita}')"))
+
+
 @router.post("/members/invite", response_model=MemberResponse, status_code=201)
 async def invite_member(
     data: MemberInviteRequest,
@@ -471,6 +539,7 @@ async def invite_member(
             status_code=400,
             detail="Invalid role. Must be: admin, operator, member, viewer",
         )
+    _rechaza_escalada(data.role, ctx.role_in_workspace)
     # Check if already a member
     existing = await db.execute(
         select(Workspace_members).where(
@@ -589,6 +658,8 @@ async def update_member_role(
             status_code=400,
             detail="Invalid role. Must be: admin, operator, member, viewer",
         )
+    _rechaza_tocar_a_un_superior(member.role, ctx.role_in_workspace)
+    _rechaza_escalada(data.role, ctx.role_in_workspace)
 
     member.role = data.role
     await db.commit()
@@ -622,6 +693,10 @@ async def remove_member(
     member = result.scalar_one_or_none()
     if not member:
         raise HTTPException(status_code=404, detail="Member not found")
+
+    # Sin esto, un operator podia EXPULSAR al propietario del workspace. Ni
+    # siquiera hacia falta degradarlo antes: esta ruta no miraba ningun rol.
+    _rechaza_tocar_a_un_superior(member.role, ctx.role_in_workspace)
 
     await db.delete(member)
     await db.commit()
