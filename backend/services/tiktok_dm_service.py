@@ -49,6 +49,18 @@ class TikTokDMService:
         return {"processed": processed, "mock": _mock_mode()}
 
     async def _inbound(self, open_id: str, text_in: str, meta: dict | None = None) -> dict[str, Any]:
+        # Idempotencia: los proveedores REINTENTAN cuando la respuesta tarda o
+        # falla, y sin esto un timeout de 15 segundos metia el mismo mensaje dos
+        # veces en la bandeja. Nadie lo veria como un error: se veria como que el
+        # cliente escribio dos veces.
+        from core.idempotencia_entrante import identificador_del_proveedor, ya_procesado
+
+        ident = identificador_del_proveedor(meta)
+        if await ya_procesado(self.session, "tiktok_dm_messages", self.workspace_id, ident):
+            logger.info("dm_entrante_duplicado",
+                        extra={"dm_identificador": ident})
+            return {"duplicado": True, "identificador": ident}
+
         conv = await self._get_or_create_conv(open_id)
         await self._save_message(conv["id"], "in", text_in, meta)
         if not conv.get("bot_enabled", 1):

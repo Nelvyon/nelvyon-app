@@ -726,3 +726,138 @@ consultas estaban inventadas (`social_auto_posts` tiene `caption`, no `content`;
 1. Certificar 569, 570, 571 y pedir ADR-064 de los cuatro juntos.
 2. Las 16 SaaS uuid con datos.
 3. Bloque F: seguridad sistemática.
+
+---
+
+# BLOQUE F — seguridad: dos clases que no estaban cubiertas
+
+Inventariando la cobertura del bloque F contra las baterías existentes, dos
+clases aparecían en **cero** ficheros de prueba. No estaban mal cubiertas: no
+estaban cubiertas.
+
+## SSRF — HIGH, y no era ciego
+
+`webhook_service.register_webhook` aceptaba cualquier URL con `url.strip()` y
+después hacía `POST` a ella. Un inquilino podía apuntarla a la base de datos
+interna, al endpoint de metadatos de la nube o a la propia aplicación.
+
+**Y la respuesta se guarda en `webhook_deliveries.response_body` —2000
+caracteres— y se le devuelve al inquilino.** Podía *leer* el servicio interno.
+
+Dos superficies más:
+- `productive_job_handlers`: URL del payload **con `follow_redirects=True`** — un
+  302 hacia `169.254.169.254` saltaba cualquier comprobación previa.
+- `dalle_service._download_image`: comprobaba **solo el esquema**;
+  `http://169.254.169.254/` empieza por `http://`.
+
+**`core/salida_segura`**: esquema, puerto, y resolución DNS rechazando toda IP
+privada/loopback/enlace-local/reservada/multicast, más sufijos internos. Se
+comprueba **dos veces** —al registrar y justo antes de conectar— porque repuntar
+el DNS después de registrar es el ataque clásico contra un guard que solo valida
+al registrar. `follow_redirects=False` en los tres sitios.
+
+La prueba que más importa: un dominio **público** que resuelve a `127.0.0.1`. Sin
+la resolución, el guard sería cosmético.
+
+## Escalada de privilegios — HIGH, tres vectores
+
+`require_workspace_operator` admite owner, admin **y operator**, y las tres rutas
+de gestión de miembros no miraban jerarquía:
+
+| Ruta | Qué permitía a un *operator* |
+|---|---|
+| `POST /members/invite` | invitar con rol **`admin`** → aceptar → ser admin |
+| `PUT /members/{id}/role` | **degradar a un admin** |
+| `DELETE /members/{id}` | **expulsar al propietario** — no miraba ningún rol |
+
+Ninguno necesitaba un fallo: era el comportamiento normal de la función.
+
+`rbac_management` **sí** comprobaba jerarquía, pero para el esquema de
+*plataforma*. El de *workspace* no tenía ninguna.
+
+Mutación: neutralizados los tres guards, **10 pruebas fallan**; restaurados, 54
+pasan.
+
+## Cuatro migraciones certificadas, pendientes de ADR-064
+
+| Mig | Resultado en certificación |
+|---|---|
+| **568** | 51 aplicadas, 1 omitida (`client_memory`, `workspace_id` uuid) |
+| **569** | 11 aplicadas, 1 omitida (`saas_tenants`, 2 filas con `workspace_id` NULL) |
+| **570** | 15 aplicadas, 0 omitidas |
+| **571** | 3 agentes de redes + 3 políticas |
+
+En las cuatro: `tablas 712 → 712`, `funciones 175 → 175`, **0 tablas con dos
+familias de políticas**.
+
+Deuda en certificación tras las cuatro: **OS 4 · SaaS 11**.
+
+---
+
+# BLOQUE F (cont.) — replay, IDOR y botones muertos
+
+## Replay — solo Stripe tenía idempotencia
+
+De los **doce** webhooks entrantes, solo el de Stripe comprobaba si un evento ya
+se había procesado. Los otros once, nada.
+
+**No es un escenario de ataque: es operación normal.** Los proveedores reintentan
+cuando la respuesta tarda o falla; Meta reintenta durante horas. Un timeout de 15
+segundos metía el mismo DM dos veces en la bandeja — y nadie lo vería como un
+error, sino como que el cliente escribió dos veces.
+
+`core/idempotencia_entrante` deduplica por el identificador de mensaje del
+proveedor (`mid` de Meta, `MessageSid` de Twilio, `MessageId` de SNS), leyéndolo
+del `jsonb` que los servicios **ya** guardan: **sin tabla nueva ni migración**.
+
+Dos decisiones que se dicen en vez de esconderse:
+- **No cierra la carrera** de dos entregas simultáneas. La ventana pasa de
+  minutos a milisegundos; cerrarla del todo pide un índice único → migración,
+  anotada como candidata.
+- **Sin identificador no bloquea.** Deduplicar de más sería peor: se perderían
+  mensajes reales de proveedores que no lo mandan.
+
+Y el `workspace_id` va siempre en la comprobación: dos inquilinos pueden recibir
+el mismo identificador si comparten una cuenta mal configurada, y deduplicar
+entre ellos **perdería** el mensaje de uno.
+
+## IDOR — limpio a escala
+
+**455 rutas con parámetro de ruta, 0 IDOR real** de la clase «`WHERE id = :id`
+sin acotar por inquilino». La única marcada era `cpq`, ya corregida.
+
+## Botones muertos — y tres errores míos antes de acertar
+
+| Intento | Huérfanas | Por qué estaba mal |
+|---|---|---|
+| 1º | **483** | contaba prefijos que el código concatena con una variable |
+| 2º | **96** | miraba solo `app/api` e ignoraba `pages/api` (396 rutas más) |
+| 3º | **3** | extraía «llamadas» de todo `src`, **incluidas las propias rutas** |
+
+**El número grande daba miedo y era falso.** Un inventario mal construido produce
+pánico primero y desconfianza después, cuando resulta que no era nada.
+
+Findings reales, sobre 565 llamadas de cliente y 1.807 rutas servidas:
+
+| Ruta | Qué pasa |
+|---|---|
+| `POST /api/v1/storage/upload` | El backend expone `upload-url` (URL prefirmada), **no** subida multipart. La subida desde el panel da 404 |
+| `/api/integrations/google-analytics` | Declarado en `connectorRegistry` con `apiRoutePrefix` y **sin ninguna ruta detrás** |
+| `/api/integrations/google-search-console` | Igual |
+
+Los dos conectores son «capacidad anunciada en la interfaz que no puede
+conectarse». De 11 conectores declarados, 9 tienen implementación.
+
+Guard permanente con **doble control**: exige un mínimo de llamadas y de rutas
+antes de emitir veredicto —un fallo de extracción daría cero huérfanas y
+parecería bueno— y exige que las declaradas **sigan** sin ruta, para que la lista
+no conserve deuda ya resuelta.
+
+## Migración 572 preparada
+
+Las 9 SaaS uuid con datos que se pueden proteger. **Séptima guarda**: ninguna fila
+apuntando a un inquilino inexistente.
+
+Medido en producción: `saas_pack_entitlements` tiene **10 de 32 inquilinos
+huérfanos** y `saas_autopilot_settings` **5 de 6**. Protegerlas las escondería
+para siempre — y esos huérfanos son un hallazgo de integridad por sí mismos.
