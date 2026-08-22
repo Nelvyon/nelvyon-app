@@ -10,7 +10,7 @@ export const OS_CONNECTOR_REGISTRY: ConnectorDefinition[] = [
     envKeys: ["GA4_PROPERTY_ID", "GOOGLE_OAUTH_CLIENT_ID", "GOOGLE_OAUTH_CLIENT_SECRET"],
     scopes: ["https://www.googleapis.com/auth/analytics.readonly"],
     servicePath: "backend/integrations/GoogleAnalytics4Service.ts",
-    apiRoutePrefix: "/api/integrations/google-analytics",
+    apiRoutePrefix: "/api/integrations/ga4",
     notes: "OAuth connect + summary metrics.",
   },
   {
@@ -21,7 +21,7 @@ export const OS_CONNECTOR_REGISTRY: ConnectorDefinition[] = [
     envKeys: ["GOOGLE_OAUTH_CLIENT_ID", "GOOGLE_OAUTH_CLIENT_SECRET"],
     scopes: ["https://www.googleapis.com/auth/webmasters.readonly"],
     servicePath: "backend/integrations/GoogleSearchConsoleService.ts",
-    apiRoutePrefix: "/api/integrations/google-search-console",
+    apiRoutePrefix: "/api/integrations/search-console",
   },
   {
     id: "google-ads",
@@ -117,7 +117,7 @@ export const OS_CONNECTOR_REGISTRY: ConnectorDefinition[] = [
     category: "email",
     status: "live",
     envKeys: ["SES_REGION", "SES_ACCESS_KEY_ID", "SES_SECRET_ACCESS_KEY", "SES_FROM_EMAIL"],
-    servicePath: "apps/web/src/lib/email/sesMailer.ts",
+    servicePath: "backend/email/sesClient.ts",
     notes: "Transactional email — register, packs welcome/nurture.",
   },
   {

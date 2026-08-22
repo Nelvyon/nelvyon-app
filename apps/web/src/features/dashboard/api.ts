@@ -147,12 +147,13 @@ export const dashboardStorageApi = {
       `/api/v1/storage/list-objects?bucket=${encodeURIComponent(bucket)}&prefix=${encodeURIComponent(prefix)}`,
       { tenantScoped: true },
     ),
-  upload: (bucket: string, file: File) => {
-    const fd = new FormData();
-    fd.append("file", file);
-    fd.append("bucket", bucket);
-    return apiClient.postMultipart("/api/v1/storage/upload", fd, { tenantScoped: true });
-  },
+  // `upload` se quito: hacia POST multipart a `/api/v1/storage/upload`, que no
+  // existe. El backend expone `upload-url`, que devuelve una URL prefirmada para
+  // subir DIRECTAMENTE al almacen: son dos flujos distintos, no dos nombres del
+  // mismo. Nadie llamaba a este ayudante, asi que no rompia ninguna pantalla; lo
+  // que hacia era esperar a que alguien lo cableara a un boton y se encontrara un
+  // 404 sin traza en el backend. Cuando haga falta subir desde el panel, se
+  // implementa el flujo real de dos pasos y se prueba.
   delete: (bucket: string, key: string) =>
     apiClient.delete(`/api/v1/storage/delete-object?bucket=${encodeURIComponent(bucket)}&key=${encodeURIComponent(key)}`, {
       tenantScoped: true,

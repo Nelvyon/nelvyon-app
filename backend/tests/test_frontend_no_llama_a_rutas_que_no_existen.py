@@ -40,15 +40,22 @@ WEB = RAIZ / "apps" / "web" / "src"
 #: Llamadas que hoy NO tienen ruta detras, con su motivo. Cada una es un boton
 #: muerto o una capacidad anunciada sin implementar, y se declara para que el
 #: numero no crezca en silencio.
-HUERFANAS_CONOCIDAS = {
-    "/api/v1/storage/upload":
-        "el backend expone `upload-url` (URL prefirmada), no una subida "
-        "multipart directa. La subida desde el panel devuelve 404.",
-    "/api/integrations/google-analytics":
-        "declarado en connectorRegistry con `apiRoutePrefix` y sin ninguna ruta "
-        "detras: el conector aparece en la interfaz y no puede conectarse.",
-    "/api/integrations/google-search-console":
-        "igual que el anterior.",
+HUERFANAS_CONOCIDAS: dict[str, str] = {
+    # Vacia, y por ahora es lo correcto. Las tres que hubo se resolvieron en vez
+    # de heredarse:
+    #
+    #   `/api/v1/storage/upload`   ayudante muerto que nadie llamaba, retirado.
+    #                              El backend expone `upload-url` (prefirmada);
+    #                              son dos flujos distintos, no dos nombres.
+    #   `/api/integrations/google-analytics`
+    #   `/api/integrations/google-search-console`
+    #                              NO faltaban: las carpetas reales se llaman
+    #                              `ga4/` y `search-console/`, con doce endpoints
+    #                              entre las dos. Lo que fallaba era el
+    #                              `apiRoutePrefix` del registro de conectores.
+    #
+    # Se deja el diccionario en vez de borrarlo: la deuda futura se declara aqui,
+    # con su motivo, para que el numero no crezca en silencio.
 }
 
 
@@ -80,6 +87,24 @@ def _rutas_servidas() -> set[str]:
     return servidas
 
 
+def _sin_comentarios(texto: str) -> str:
+    """Quita comentarios de linea y de bloque, y NADA mas.
+
+    Hizo falta en cuanto se retiro un ayudante muerto dejando escrito por que:
+    el comentario nombraba `/api/v1/storage/upload` entre acentos graves y el
+    extractor lo contaba como una llamada. La ruta seguia «rota» eternamente
+    porque su propia lapida la mantenia viva.
+
+    Solo se borran las lineas que EMPIEZAN por `//` o `*`, no cualquier `//`
+    suelto: hacerlo a lo bruto se comeria el resto de una linea con
+    `"https://host/api/x"` dentro y dejaria de ver llamadas reales. Un extractor
+    que pierde llamadas es peor que uno que sobra: aprueba sin mirar.
+    """
+    texto = re.sub(r"/\*.*?\*/", " ", texto, flags=re.S)
+    return chr(10).join(l for l in texto.splitlines()
+                     if not l.lstrip().startswith(("//", "*")))
+
+
 def _llamadas_del_cliente() -> set[str]:
     """Solo codigo de cliente: se excluyen las carpetas que IMPLEMENTAN rutas."""
     patron = re.compile(r"""["'`](/api/[A-Za-z0-9/_.\-]+)""")
@@ -88,7 +113,8 @@ def _llamadas_del_cliente() -> set[str]:
         partes = f.relative_to(WEB).parts
         if "api" in partes or "__tests__" in partes:
             continue
-        fuera.update(patron.findall(f.read_text(encoding="utf-8", errors="replace")))
+        fuera.update(patron.findall(
+            _sin_comentarios(f.read_text(encoding="utf-8", errors="replace"))))
     return fuera
 
 
