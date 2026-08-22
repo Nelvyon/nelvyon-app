@@ -202,6 +202,10 @@ def test_las_baterias_que_tocan_roles_estan_declaradas():
         "test_rls_pertenencia_workspace.py",
         "test_rls_politicas_completas.py",
         "test_stripe_webhook_persistencia_rol_restringido.py",
+        # Bateria adversaria del espacio SaaS: reparte LOGIN temporal a
+        # `nelvyon_app` para probar el aislamiento con el rol real, igual que
+        # las de OS. Pasa por `alterar_rol`, asi que el guard la cubre.
+        "test_rls_saas_cross_tenant.py",
     } | SOLO_MENCIONAN
     # La primera version solo buscaba `ALTER`. Con eso el inventario daba por
     # cubiertas ocho baterias que en realidad hacen `CREATE ROLE` y

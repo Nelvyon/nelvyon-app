@@ -346,3 +346,47 @@ async def test_el_inquilino_a_si_ve_lo_suyo(entorno):
         f"el inquilino NO ve sus propias filas en {len(invisibles)} tablas: "
         f"{invisibles[:12]}. RLS estaria denegando a todo el mundo, y las pruebas "
         f"de aislamiento pasarian en verde con el producto roto.")
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Dos familias de politicas sobre la misma tabla ENSANCHAN el acceso
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+async def test_ninguna_tabla_tiene_dos_familias_de_politicas(entorno):
+    """En PostgreSQL, varias politicas PERMISSIVE para el mismo comando se
+    combinan con **OR**. Dos familias sobre una tabla no la protegen el doble:
+    la hacen alcanzable por CUALQUIERA de los dos caminos.
+
+    COMO APARECIO
+    -------------
+    `api_keys` e `invoices` tienen `workspace_id` INTEGER **y** `tenant_id` UUID.
+    La 566 les dio la familia `_os_*` y la primera version de la 567 les anadio
+    encima la `_saas_tenant*`: ocho politicas, cuatro de cada una. Revisando el
+    SQL no se veia; se vio mirando el catalogo DESPUES de aplicar.
+
+    Una tabla que vive en los dos espacios de identidad necesita una decision
+    explicita sobre cual manda, no dos politicas sumandose.
+    """
+    dobles = await entorno["adm"].fetch("""
+        SELECT tablename,
+               count(*) FILTER (WHERE policyname LIKE '%_os_select')          AS os,
+               count(*) FILTER (WHERE policyname LIKE '%_saas_tenant_select') AS saas,
+               count(*) FILTER (WHERE policyname LIKE '%_select_own')         AS own
+          FROM pg_policies
+         WHERE schemaname = 'public'
+         GROUP BY tablename
+        HAVING (count(*) FILTER (WHERE policyname LIKE '%_os_select') > 0)::int
+             + (count(*) FILTER (WHERE policyname LIKE '%_saas_tenant_select') > 0)::int
+             + (count(*) FILTER (WHERE policyname LIKE '%_select_own') > 0)::int > 1
+         ORDER BY 1
+    """)
+    detalle = [
+        "{}: os={} saas={} own={}".format(r["tablename"], r["os"], r["saas"], r["own"])
+        for r in dobles
+    ]
+    assert not dobles, (
+        f"estas tablas tienen mas de una familia de politicas de SELECT: "
+        f"{detalle}. Al ser PERMISSIVE se combinan con OR, asi que la fila es "
+        f"alcanzable por cualquiera de los caminos: ensancha el acceso en vez de "
+        f"restringirlo. Hay que decidir explicitamente cual manda.")
