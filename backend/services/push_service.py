@@ -252,8 +252,16 @@ class PushService:
         try:
             from pywebpush import WebPushException, webpush
         except ImportError as exc:
-            logger.warning("pywebpush not installed — mock send: %s", exc)
-            return {"ok": True, "mock": True, "reason": "pywebpush_missing"}
+            # `ok: True` era mentira: sin `pywebpush` no se envio nada. Quien
+            # llamara veia exito, el usuario no recibia la notificacion y no
+            # quedaba ningun rastro de que faltara una dependencia.
+            #
+            # Se distingue del modo mock DECLARADO, que si es un `ok` legitimo
+            # porque alguien lo pidio a proposito.
+            logger.error("push_dependencia_ausente",
+                         extra={"push_motivo": str(exc)[:120]})
+            return {"ok": False, "enviado": False, "motivo": "pywebpush_missing",
+                    "detalle": "falta la dependencia de envio; no se envio nada"}
 
         subscription_info = {
             "endpoint": subscription["endpoint"],

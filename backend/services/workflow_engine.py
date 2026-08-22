@@ -183,8 +183,19 @@ class WorkflowEngineService:
 
         try:
             conditions = json.loads(rule.trigger_config)
-        except (json.JSONDecodeError, TypeError):
-            return True
+        except (json.JSONDecodeError, TypeError) as exc:
+            # FAIL-CLOSED. Antes devolvia True: una configuracion de condiciones
+            # corrupta hacia que la regla COINCIDIERA CON TODO y disparara su
+            # accion en cada evento — correos, mensajes o tareas a quien no
+            # tocaba, sin un solo error en el log.
+            #
+            # «No se pueden leer las condiciones» no es «no hay condiciones».
+            logger.error(
+                "workflow_condiciones_ilegibles",
+                extra={"workflow_regla": getattr(rule, "id", None),
+                       "workflow_motivo": type(exc).__name__},
+            )
+            return False
 
         for key, expected in conditions.items():
             if key in trigger_data:
