@@ -1066,6 +1066,33 @@ en silencio ni quedarse olvidada en verde.
 producción con riesgo real (los crons y el mirror ERP escriben entre inquilinos a
 propósito). Necesita ventana propia y su propia certificación.
 
+## CLASE ABIERTA — servicios OS tras `requirePlatformClaims`
+
+`requirePlatformClaims` **autentica, no autoriza** (lo dice su propio comentario).
+Las rutas que lo usan admiten a cualquier usuario con sesión válida, de cualquier
+inquilino. Si además el servicio detrás no filtra, es lectura cruzada — y la RLS
+no lo tapa, porque el lado web es superusuario.
+
+| Servicio | Tabla | Estado |
+|---|---|---|
+| `OsRegulatedSectorShieldService` | `os_sector_shield_audits` | **CERRADO** (`ae951907`) |
+| `OsTruthGuardService` | `os_truth_guard_audits` | pendiente |
+| `OsAgentAuditTrailService` | `os_agent_audit_events` | pendiente · 1 `catch` vacío |
+| `OsDeliveryCertificateService` | `os_delivery_certificates` | pendiente · 2 `catch` vacíos |
+| `OsAgentDataService` | `os_agent_data_cache` | pendiente · 5 `catch` vacíos |
+
+Patrón de cierre, ya validado en el primero:
+
+1. el escritor **atribuye** (`AlcanceDeAuditoria` sobre los dos espacios de identidad);
+2. los lectores **acotan**, y lo global exige escribir `TODOS_LOS_INQUILINOS`;
+3. los `catch` vacíos dejan de devolver éxito;
+4. pruebas sobre el **SQL que sale**, no sobre lo que el servicio dice hacer;
+5. mutación: neutralizar el filtro tiene que tumbar pruebas.
+
+Queda por decidir si estas rutas deben pasar de `requirePlatformClaims` a
+`requirePlatformContext(req, action)`, que sí autoriza. Es un cambio de contrato
+de API y necesita revisión aparte.
+
 ## Otros bloqueos externos
 
 - `MESH_AUTHKEY` — malla privada al Ollama propio. **No es un proveedor de pago.**
