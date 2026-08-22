@@ -55,9 +55,9 @@ class _Regla:
 ])
 def test_una_configuracion_corrupta_no_dispara_la_regla(config):
     """LA PRUEBA. Antes devolvia True y la regla se aplicaba a TODO."""
-    from services.workflow_engine import WorkflowEngine
+    from services.workflow_engine import WorkflowEngineService
 
-    motor = WorkflowEngine.__new__(WorkflowEngine)
+    motor = WorkflowEngineService.__new__(WorkflowEngineService)
     assert motor._matches_conditions(_Regla(config), {"lo": "que sea"}) is False, (
         "una regla con condiciones ilegibles coincidio: se aplicaria a todos los "
         "eventos y dispararia su accion sobre quien no toca")
@@ -69,18 +69,18 @@ def test_sin_condiciones_si_coincide_siempre():
     Una regla SIN condiciones se aplica siempre a proposito. Si la correccion
     hubiera confundido los dos casos, se romperian las reglas legitimas.
     """
-    from services.workflow_engine import WorkflowEngine
+    from services.workflow_engine import WorkflowEngineService
 
-    motor = WorkflowEngine.__new__(WorkflowEngine)
+    motor = WorkflowEngineService.__new__(WorkflowEngineService)
     assert motor._matches_conditions(_Regla(None), {"x": 1}) is True
     assert motor._matches_conditions(_Regla(""), {"x": 1}) is True
 
 
 def test_unas_condiciones_validas_siguen_evaluandose():
     """Control del control: la correccion no puede denegarlo todo."""
-    from services.workflow_engine import WorkflowEngine
+    from services.workflow_engine import WorkflowEngineService
 
-    motor = WorkflowEngine.__new__(WorkflowEngine)
+    motor = WorkflowEngineService.__new__(WorkflowEngineService)
     regla = _Regla(json.dumps({"estado": "activo"}))
     assert motor._matches_conditions(regla, {"estado": "activo"}) is True
     assert motor._matches_conditions(regla, {"estado": "pausado"}) is False

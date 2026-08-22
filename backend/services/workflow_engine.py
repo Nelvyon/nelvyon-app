@@ -183,7 +183,17 @@ class WorkflowEngineService:
 
         try:
             conditions = json.loads(rule.trigger_config)
-        except (json.JSONDecodeError, TypeError) as exc:
+        except (ValueError, TypeError) as exc:
+            # `ValueError` y no `json.JSONDecodeError`: con un `trigger_config`
+            # BINARIO, `json.loads` intenta detectar la codificacion y lanza
+            # `UnicodeDecodeError`, que no es `JSONDecodeError`. La primera
+            # version de esta correccion no lo capturaba, asi que en vez de
+            # fallar cerrado REVENTABA — cambiar un fail-open por una excepcion
+            # no es arreglarlo.
+            #
+            # `UnicodeDecodeError` y `JSONDecodeError` cuelgan las dos de
+            # `ValueError`, asi que una sola clausula cubre los dos casos sin
+            # tragarse nada mas.
             # FAIL-CLOSED. Antes devolvia True: una configuracion de condiciones
             # corrupta hacia que la regla COINCIDIERA CON TODO y disparara su
             # accion en cada evento — correos, mensajes o tareas a quien no

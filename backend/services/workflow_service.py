@@ -350,11 +350,19 @@ class WorkflowService:
                 UPDATE visual_workflow_executions
                 SET status = :status, steps_log = {json_bind(self.session, 'steps')},
                     error_message = :err, completed_at = :now
-                WHERE id = :eid
+                WHERE id = :eid AND workspace_id = :ws
                 """
             ),
             {
                 "eid": execution_id,
+                # La MISMA local que uso el INSERT de arriba, no `self.workspace_id`:
+                # el servicio puede construirse sin workspace (`get_workflow_service`
+                # lo admite None) y `execute_workflow` lo resuelve despues desde la
+                # fila del workflow. Acotar con `self.` dejaria `workspace_id = NULL`,
+                # que no casa con nada: el UPDATE no fallaria, simplemente no haria
+                # nada, y la ejecucion se quedaria en `running` para siempre sin un
+                # solo error. Un no-op silencioso es peor que la falta de acotado.
+                "ws": workspace_id,
                 "status": status,
                 "steps": _json_dumps(steps_log),
                 "err": error_message,
@@ -647,10 +655,11 @@ class WorkflowService:
                     UPDATE visual_workflow_executions
                     SET steps_log = {json_bind(session, 'steps')},
                         status = 'completed', completed_at = :now
-                    WHERE id = :eid
+                    WHERE id = :eid AND workspace_id = :ws
                     """
                 ),
-                {"eid": execution_id, "steps": _json_dumps(steps), "now": datetime.now(timezone.utc)},
+                {"eid": execution_id, "ws": workspace_id,
+                 "steps": _json_dumps(steps), "now": datetime.now(timezone.utc)},
             )
             await session.commit()
 

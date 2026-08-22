@@ -1047,3 +1047,26 @@ Después: auditoría Web + SaaS + OS completos → E2E empresarial → recovery 
 Founder-Absent → auditoría nueva desde cero.
 
 `FOUNDER_ABSENT` = **NO_GO**.
+
+## Integridad — hallazgo abierto, decisión del fundador
+
+| Tabla | Filas | Huérfanas | Inquilinos huérfanos |
+|---|---|---|---|
+| `saas_pack_entitlements` | 172 | **10** | 10 (una fila cada uno) |
+| `saas_autopilot_settings` | 6 | **5** | 5 |
+
+Filas que apuntan a `saas_tenants` que **no existen**. Casi con certeza restos de
+los 22 inquilinos de prueba históricos.
+
+**Por qué está bloqueado**: resolverlo modifica datos de producción, y hay dos
+salidas legítimas que no puedo elegir yo —borrar las filas huérfanas, o recrear
+los inquilinos que faltan—. Son decisiones de producto con consecuencias
+distintas: la primera pierde el registro de un *entitlement* comprado; la segunda
+resucita inquilinos que quizá se dieron de baja a propósito.
+
+**Mientras tanto no hay riesgo**: la 7ª guarda de la 572 excluye esas dos tablas,
+así que no se protegen y por tanto no se ocultan. La deuda es que siguen sin RLS.
+
+**El arreglo de fondo** es la clave ajena: las **9 tablas que la tienen no tienen
+ni un huérfano**, y las 2 que no la tienen concentran todos. Añadirla exige
+limpiar antes, así que va después de tu decisión.

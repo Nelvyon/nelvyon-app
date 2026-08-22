@@ -62,13 +62,18 @@ def _rutas_servidas() -> set[str]:
     from main import app
 
     servidas = set(app.openapi().get("paths", {}))
-    for base, sufijo in ((WEB / "app" / "api", "app"), (WEB / "pages" / "api", "pages")):
+    for sufijo in ("app", "pages"):
+        # La ruta publica se cuenta SIEMPRE desde la carpeta del router, nunca
+        # desde `src`. La primera version restaba `src` para `pages`, asi que sus
+        # 396 rutas quedaban registradas como `/pages/api/...` y no casaban con
+        # ninguna llamada: aparecian nueve huerfanas que si estaban servidas.
+        base = WEB / sufijo / "api"
         if not base.exists():
             continue
         for f in base.rglob("*.ts*"):
             if sufijo == "app" and f.stem != "route":
                 continue
-            rel = f.relative_to(WEB / sufijo if sufijo == "app" else WEB)
+            rel = f.relative_to(WEB / sufijo)
             ruta = "/" + str(rel.parent if sufijo == "app" else
                              rel.with_suffix("")).replace("\\", "/")
             servidas.add(ruta.replace("/index", "") or "/")
