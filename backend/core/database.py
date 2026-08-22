@@ -683,6 +683,42 @@ async def sesion_de_barrido():
     return maker()
 
 
+def _es_control_de_flujo_http(e: BaseException) -> bool:
+    """¿Es esto una respuesta HTTP normal disfrazada de excepcion?
+
+    `StarletteHTTPException` ya estaba exenta: un 404 o un 401 no son un fallo de
+    base de datos. Faltaba el otro caso, que es MAS frecuente:
+    `RequestValidationError`, que FastAPI lanza cuando el cuerpo de la peticion no
+    encaja con el esquema.
+
+    Esa excepcion atraviesa el generador de `get_db` y quedaba registrada como
+    `db.session_error` a nivel ERROR, con traza. Es decir: un cliente mandando un
+    JSON incompleto producia en los logs algo indistinguible de una caida de la
+    base de datos.
+
+    Se vio al abrir los seis webhooks entrantes que devolvian 401. En cuanto se
+    volvieron alcanzables, dos sondas con `{}` generaron cuatro `db.session_error`
+    con ocho trazas. Ninguna respuesta 5xx: solo ruido con la etiqueta equivocada,
+    del tipo que hace perder tiempo a las 3 de la manana buscando un problema de
+    base de datos que no existe.
+    """
+    if isinstance(e, StarletteHTTPException):
+        return True
+    try:
+        from fastapi.exceptions import RequestValidationError
+        if isinstance(e, RequestValidationError):
+            return True
+    except ImportError:  # pragma: no cover
+        pass
+    try:
+        from pydantic import ValidationError
+        if isinstance(e, ValidationError):
+            return True
+    except ImportError:  # pragma: no cover
+        pass
+    return False
+
+
 async def get_db() -> AsyncSession:
     """FastAPI dependency for database session with lazy initialization support"""
     start_time = time.time()
@@ -718,8 +754,9 @@ async def get_db() -> AsyncSession:
             try:
                 yield session
             except Exception as e:
-                # HTTP control flow must not hit ERROR logs with exc_info (can leak detail / chain).
-                if isinstance(e, StarletteHTTPException):
+                # El control de flujo HTTP no puede aparecer como error de base de
+                # datos: ni un 404, ni un 401, ni un cuerpo que no valida.
+                if _es_control_de_flujo_http(e):
                     raise
                 log_structured(
                     logger,
@@ -735,7 +772,7 @@ async def get_db() -> AsyncSession:
                 logger.debug(f"[DB_OP] Database session cleanup after {time.time() - start_time:.4f}s")
                 # Session is automatically closed by the async context manager when exiting 'async with'
     except Exception as e:
-        if isinstance(e, StarletteHTTPException):
+        if _es_control_de_flujo_http(e):
             raise
         log_structured(
             logger,

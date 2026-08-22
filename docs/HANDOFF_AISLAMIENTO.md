@@ -595,3 +595,70 @@ filtro de workspace, 3 pruebas de aislamiento fallan.
 3. Las 12 tablas OS con datos y las 16 SaaS uuid con datos.
 4. Las 14 SaaS con `tenant_id` no-uuid.
 5. Bloque E: RBAC.
+
+---
+
+# ESTADO TRAS 566, 567 Y EL BLOQUE DE CÓDIGO
+
+## Producción certificada
+
+| | |
+|---|---|
+| SHA backend | `eab087bd` · web `f62916af` |
+| `_migrations` | **467** (564, 565, 566, 567 aplicadas) |
+| RLS activo / FORCE / políticas | **498 / 447 / 1.763** |
+| Suite | **3.259 pasan, 2 saltadas, 0 fallos** |
+| Salud | `ready` · `workers` 3/3 · `business` ok |
+| Datos | 1.101 clientes · 5.050 entregables · 22 tenants |
+
+## Deuda de aislamiento
+
+| Espacio | Inicio de sesión | Ahora |
+|---|---|---|
+| OS sin RLS | 109 | **63** (51 del lote 563 certificado sin autorizar + 12 con datos) |
+| SaaS sin RLS | 158 | **31** (16 uuid con datos + 14 `tenant_id` no-uuid + 1) |
+
+## Los seis webhooks, ya alcanzables
+
+Verificado contra producción tras el despliegue: ninguno devuelve 401 y ninguno
+2xx sin firma.
+
+| Ruta | Antes | Ahora |
+|---|---|---|
+| `/api/whatsapp/webhook` | 401 | 503 (secreto no configurado — fail-closed) |
+| `/api/helpdesk/inbound/email` | 401 | 422 (cuerpo inválido) |
+| `/api/helpdesk/inbound/whatsapp` | 401 | 422 |
+| `/api/bookings/webhook/zoom` | 401 | 503 |
+| `/api/contracts/webhook` | 401 | 503 |
+| `/api/monitoring/ses/bounce-webhook` | 401 | 400 «Missing SNS signature fields» |
+
+## Un defecto que solo apareció al abrirlos
+
+Las sondas produjeron **8 «tracebacks» en los logs**. No era una regresión:
+**0 respuestas 5xx servidas**, y los 4 eventos estaban dentro de mi ventana de
+sondeo, ninguno fuera.
+
+Pero la etiqueta era falsa: `RequestValidationError` atravesaba el generador de
+`get_db` y se registraba como **`db.session_error` a nivel ERROR con traza**. Un
+cliente mandando un JSON incompleto generaba en los logs algo indistinguible de
+una base de datos caída.
+
+`StarletteHTTPException` ya estaba exenta —alguien vio el problema para los 404 y
+401— pero faltaba el caso más frecuente. Mientras esas rutas devolvían 401 el
+defecto era inalcanzable; abrirlas lo destapó.
+
+**Por qué importa**: el ruido con la etiqueta equivocada es una pista falsa. Y al
+revés, y peor: cuando la base falle de verdad, su error estará mezclado con los
+de todos los clientes que mandaron un campo de menos.
+
+Corregido, con un control que exige que un fallo REAL de base siga registrándose
+—una exención demasiado ancha sería peor que el problema—. Mutación: 2 pruebas
+fallan con el defecto, 4 pasan sin él.
+
+## Siguiente acción exacta
+
+1. Desplegar la corrección de observabilidad.
+2. Las **12 tablas OS con datos**: determinar lectores reales.
+3. Las **16 SaaS uuid con datos** y las **14 con `tenant_id` no-uuid**.
+4. Bloque E completo: RBAC más allá del plano de entidades.
+5. Memory/RAG: `BLOCKED_EXTERNALLY: MESH_AUTHKEY`, sin proveedor de pago.
