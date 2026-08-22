@@ -503,3 +503,95 @@ demostrables (atribuyó `text2pay_payments` al webhook de Instagram).
 1. Pedir ADR-064 para 566.
 2. Las 12 tablas con datos: determinar lectores reales antes de proponer política.
 3. Bloque B: auditar las 147 tablas del espacio SaaS.
+
+---
+
+# BLOQUE B — espacio SaaS
+
+## Una cifra que venía mal, corregida
+
+No son 147 tablas sino **220 con `tenant_id`**. Medido contra producción:
+
+| | |
+|---|---|
+| con RLS | 62 |
+| sin RLS | 158 → de ellas **141 vacías**, 17 con datos |
+| tipos | uuid 163 · text 39 · varchar 12 · integer 6 |
+
+Los tipos no-uuid **no pueden usar la política estándar**: es un problema de
+tipado equivalente al que tenía `client_memory`, y necesita decisión propia.
+
+## El patrón que asumí era el minoritario
+
+Iba a usar `nelvyon_apply_rls_tenant_id`, que encontré buscando funciones por
+nombre. Al medir las políticas **reales** resultó que lo usa **una tabla**.
+Conviven tres:
+
+| Patrón | Expresión | Políticas |
+|---|---|---|
+| `_os_select` / `_os_mutate` | `nelvyon_os_workspace_*(workspace_id)` | 44 — son tablas OS que además tienen `tenant_id` |
+| **`_saas_tenant*`** | `tenant_id = nelvyon_current_saas_tenant_uuid()` | **12 — el dominante** |
+| `_select_own` | `nelvyon_current_tenant_id()` | 4 (1 tabla) |
+
+`nelvyon_current_saas_tenant_uuid()` resuelve el inquilino SaaS desde el
+workspace de la sesión: es el puente que ya existe entre los dos espacios de
+identidad.
+
+**Sin esa medición habría certificado fielmente la ejecución de una lista con el
+patrón equivocado** — exactamente lo que pasó con `helpdesk_tickets` en la 564.
+
+## Migración 567 (CERTIFICADA en local, pendiente de ADR-064)
+
+Políticas creadas **en línea**: no añade funciones. Aplicada en certificación:
+
+```
+567: RLS aplicado a 125 tablas SaaS, 2 omitidas
+     (local_ai_audit y local_ai_ingest_jobs no existen en esta base)
+RLS 425 -> 548   políticas 1480 -> 1980
+tablas 712 -> 712   funciones 175 -> 175      <- solo RLS y políticas
+```
+
+## Batería adversaria SaaS — no existía
+
+El espacio OS tenía la suya desde el lote 560. El SaaS **no tenía ninguna**: se
+comprobaba que las políticas existieran en el catálogo, que es justo el tipo de
+evidencia que esta sesión ha demostrado insuficiente.
+
+`test_rls_saas_cross_tenant.py`, autodescubridora por nombre de política, con los
+cuatro verbos y un control positivo —que A **sí** vea lo suyo, porque una
+política rota que denegara a todos pasaría las tres pruebas de aislamiento en
+verde con el producto muerto.
+
+**Su primera versión sembraba solo `(tenant_id)` y cubría 13 de 126 tablas.** Una
+batería que prueba el 10% de lo que dice cubrir es peor que ninguna, porque
+informa de una cobertura que no tiene. Ahora introspecciona las columnas
+obligatorias y las rellena por tipo.
+
+## Bloque C — Memory/RAG, diagnóstico corregido
+
+**Mi afirmación anterior era falsa.** Dije que fallaba por un choque entero/uuid;
+el servicio normaliza el entero a un uuid v5 determinista y escritura y lectura
+coinciden. Mi prueba medía el SQL crudo, no el producto.
+
+**Causa real**: `APP_AI_BASE_URL` no está en producción y `_openai_client()` la
+exige, así que toda llamada a embeddings lanzaba `ValueError`.
+
+**NELVYON ya tenía IA propia** en `backend/local-ai/` (Ollama, coste 0, malla
+privada) y **ningún módulo Python la conocía**. `core/embeddings.py` es el puente:
+Ollama propio → respaldo léxico determinista → OpenAI solo si se configura a
+propósito. Cada vector guarda su modelo en `metadata` y las búsquedas filtran por
+él, porque comparar entre espacios vectoriales distintos devuelve un número sin
+significado.
+
+18 pruebas verdes, E2E contra PostgreSQL con pgvector. Mutación: quitado el
+filtro de workspace, 3 pruebas de aislamiento fallan.
+
+**BLOCKED_EXTERNALLY: MESH_AUTHKEY** — no es un proveedor de pago.
+
+## Siguiente acción exacta
+
+1. Terminar la batería adversaria SaaS y presentar 567 para ADR-064.
+2. Desplegar los 2 commits pendientes (webhooks inalcanzables + memoria).
+3. Las 12 tablas OS con datos y las 16 SaaS uuid con datos.
+4. Las 14 SaaS con `tenant_id` no-uuid.
+5. Bloque E: RBAC.
