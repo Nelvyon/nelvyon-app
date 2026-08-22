@@ -63,13 +63,10 @@ _ASIGNACION = re.compile(r"(?:^|,)\s*([a-z_][a-z0-9_]*)\s*=", re.I)
 #:
 #: El techo solo puede BAJAR. Una entrada nueva rompe la prueba.
 DERIVA_DECLARADA: dict[tuple[str, str], str] = {
-    # ── Correspondencia evidente: se corrigen ya ──
-    ("qr_codes", "content"):
-        "la columna real es `destination_url`; `content` era de la definicion vieja",
-    ("qr_codes", "scan_count"):
-        "la columna real es `scans`",
-    ("chatbot_conversations", "lead_captured"):
-        "la columna real es `captured_lead` — estan invertidas las dos palabras",
+    # ── Las tres de correspondencia evidente se CORRIGIERON: `content` no
+    #    existia y sobraba, `scan_count` era `scans`, `lead_captured` era
+    #    `captured_lead`. Sus funciones siguen rotas por OTRAS columnas que
+    #    no existen en ninguna forma; esas siguen abajo. ──
 
     # ── Sin correspondencia: la columna NO EXISTE en ninguna forma ──
     ("ab_experiments", "hypothesis"):

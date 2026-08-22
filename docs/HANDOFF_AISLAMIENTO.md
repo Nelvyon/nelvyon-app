@@ -1638,6 +1638,53 @@ propios «idem» al escribirla.
 **DATA_INTEGRITY / MIGRACIÓN**: varias de estas necesitan columnas nuevas. No se
 piden todavía — primero hay que saber cuáles usa el producto de verdad.
 
+## BLOCKED_ON_FOUNDER — ALCANCE_DE_PRODUCTO: 8 funciones que el esquema no puede sostener
+
+Las 20 derivas no son 20 columnas sueltas: son **8 funciones rotas por varios
+sitios cada una**. Medido comparando lo que el esquema tiene contra lo que el
+código pide.
+
+| Función | El esquema tiene | El código pide y **no existe** |
+|---|---|---|
+| **QR** | nombre, `destination_url`, colores, `scans`, `last_scanned_at` | `short_code`, `qr_type`, `is_dynamic`, `image_base64` |
+| **A/B testing** | nombre, `status`, `channel`, `winner_variant` | hipótesis, métrica, reparto de tráfico, fin, recomendación IA — y las tablas `ab_variants`/`ab_events` |
+| **Reservas** | `booking_date`+`booking_time`, `duration` | `start_at`, `duration_minutes`, `service_name`, **3 columnas de Zoom** |
+| **Campañas** | asunto, contenido, contadores | remitente por campaña, `campaign_recipients` |
+| **Chatbot** | `captured_lead`, `messages`, `session_id` | **`workspace_id`**, `visitor_info`, `last_message_at`, `message_count` |
+| **Facturas** | totales, impuestos, estado | `pdf_path`, `sent_at` |
+| **Workflows** | `nodes_json` | `edges_json`, y las tablas `visual_workflow_executions`, `workflow_nodes`, `workflow_trigger_registry` |
+| **Afiliados** | atribuye por `code` | `affiliate_id` |
+
+**`short_code` es el caso más claro**: sin esa columna el redirect `/qr/{código}`
+no puede existir, así que **el QR dinámico —el producto entero— no es
+implementable contra este esquema.** No es un renombrado.
+
+Y `chatbot_conversations` **no tiene columna de inquilino**: se acota
+indirectamente por `chatbot_id`. Añadirla es una decisión de aislamiento, no una
+migración cosmética.
+
+### Lo que sí se corrigió (3, y por qué solo 3)
+
+`content` no existía y sobraba · `scan_count` era `scans` · `lead_captured` era
+`captured_lead`. Renombrados exactos, mismo significado.
+
+**Las tres funciones siguen rotas** por las otras columnas. Lo digo porque bajar
+el contador de 20 a 17 sin decir esto sería exactamente el «maquillaje de estado»
+que no debo hacer: ninguna de las tres correcciones hace que su función funcione.
+
+### La decisión que hace falta
+
+Por cada función: **¿NELVYON la vende?** Si sí, hay que migrar el esquema al
+producto real. Si no, hay que retirar el código en vez de mantener consultas que
+lanzan.
+
+No la tomo yo: inventar cuatro columnas para QR o tres tablas para el editor de
+workflows sería construir infraestructura para algo que quizá no se vende.
+
+**Contexto que importa para decidirlo**: las 8 tablas tienen **0 filas** y
+662 de 710 tablas de producción están vacías. Ninguna de estas funciones se ha
+ejecutado nunca.
+
 ## Otros bloqueos externos
 
 - `MESH_AUTHKEY` — malla privada al Ollama propio. **No es un proveedor de pago.**

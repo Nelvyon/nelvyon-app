@@ -231,7 +231,11 @@ class QrService:
         result = await self.session.execute(
             text(
                 """
-                UPDATE qr_codes SET destination_url = :url, content = :url
+                -- `content` NO es columna de `qr_codes` (esquema real,
+                -- migracion 416): la tabla guarda `destination_url` y ya se
+                -- actualiza arriba. Citarla hacia que este UPDATE lanzara
+                -- siempre, asi que un QR dinamico nunca podia cambiar de destino.
+                UPDATE qr_codes SET destination_url = :url
                 WHERE id = CAST(:id AS uuid) AND tenant_id = CAST(:inquilino AS uuid)
                 RETURNING *
                 """
@@ -282,7 +286,11 @@ class QrService:
             },
         )
         await self.session.execute(
-            text("UPDATE qr_codes SET scan_count = scan_count + 1 WHERE id = CAST(:id AS uuid)"),
+                        # La columna real es `scans`, no `scan_count`. Tambien se pone
+            # `last_scanned_at`, que existe y no se estaba usando: sin ella no se
+            # puede distinguir un QR sin escaneos de uno que dejo de usarse.
+            text("UPDATE qr_codes SET scans = COALESCE(scans, 0) + 1, "
+                 "last_scanned_at = NOW() WHERE id = CAST(:id AS uuid)"),
             {"id": qr["id"]},
         )
         await self.session.commit()

@@ -202,7 +202,7 @@ class ChatbotService:
                     c.*,
                     COUNT(conv.id) FILTER (WHERE conv.started_at >= :day_start) AS conversations_today,
                     COUNT(conv.id) AS conversations_total,
-                    COUNT(conv.id) FILTER (WHERE conv.lead_captured) AS leads_captured
+                    COUNT(conv.id) FILTER (WHERE conv.captured_lead) AS leads_captured
                 FROM chatbots c
                 LEFT JOIN chatbot_conversations conv ON conv.chatbot_id = c.id
                 WHERE c.workspace_id = :ws
@@ -354,7 +354,11 @@ class ChatbotService:
                 UPDATE chatbot_conversations
                 SET messages = CAST(:messages AS jsonb),
                     visitor_info = CAST(:visitor AS jsonb),
-                    lead_captured = :lead,
+                    -- La columna real es `captured_lead`: estan invertidas
+                    -- las dos palabras. Con el nombre equivocado este UPDATE
+                    -- lanzaba, asi que una conversacion nunca podia marcarse
+                    -- como lead capturado.
+                    captured_lead = :lead,
                     escalated = :escalated,
                     last_message_at = NOW()
                 WHERE id = CAST(:id AS uuid)
