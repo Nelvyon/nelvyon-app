@@ -983,6 +983,19 @@ y por la misma causa. Se resuelven juntos con la IA propia.
 ## Estado de producción
 
 `_migrations` **467** (564, 565, 566, 567 aplicadas) · SHA backend `9e420a95`
+
+### Puerta verde — 2026-08-22
+
+`3366 passed · 4 skipped · 0 failed` en 40:51 sobre SHA **`77e2ecf4`**, con
+certificación PostgreSQL **incluida** (`NELVYON_PG_CERT_DSN` exportado).
+
+Los 4 saltos, con motivo cada uno: 2 leen el fichero de la 571 (apartada del
+árbol), 1 exige una PostgreSQL virgen (`NELVYON_PG_VIRGEN_DSN`), 1 por una tabla
+ausente en este entorno. Ninguno es un salto silencioso.
+
+Una corrida anterior sobre el mismo árbol dio 588 saltos y **no valía**: se lanzó
+sin el DSN de certificación y se saltaba entera la batería de PostgreSQL. Un
+verde con 588 saltos y uno con 4 no son el mismo verde.
 RLS **498** · FORCE **447** · políticas **1.763** · 1.101 clientes · 22 tenants
 `ready` · `workers` 3/3 · `business` ok · 0 5xx · 0 permission denied · 0 secretos
 
@@ -1092,6 +1105,80 @@ Patrón de cierre, ya validado en el primero:
 Queda por decidir si estas rutas deben pasar de `requirePlatformClaims` a
 `requirePlatformContext(req, action)`, que sí autoriza. Es un cambio de contrato
 de API y necesita revisión aparte.
+
+## INVENTARIO EFECTIVO DE CONEXIONES — todos los servicios de producción
+
+Medido servicio por servicio, leyendo el rol de cada cadena de conexión y sus
+privilegios reales en el catálogo. No se dedujo del catálogo de tablas: el
+hallazgo del web demuestra que el catálogo no basta.
+
+| Servicio | Variable | Rol | super | bypassrls | Contexto tenant | RLS efectiva |
+|---|---|---|---|---|---|---|
+| `nelvyon-app` | `DATABASE_URL` | `nelvyon_app` | No | No | sí, por transacción | **Sí** |
+| `nelvyon-app` | `NELVYON_JOBS_DATABASE_URL` | `nelvyon_jobs` | No | Sí | n/a | No — aísla por `WHERE` |
+| `@nelvyon/web` | `DATABASE_URL` | **`postgres`** | **Sí** | **Sí** | **ninguno** | **No** |
+| `@nelvyon/web` | `LOCAL_AI_DATABASE_URL` | `nelvyon_local_ai_app` | No | No | sí (`app.tenant_id`) | **Sí** |
+| `ideal-victory` | — | — | — | — | — | sin base de datos |
+| `comfortable-empathy` | — | — | — | — | — | sin base de datos |
+| `shadcnui` | — | — | — | — | — | sin base de datos |
+| `Postgres-w2aK` | — | — | — | — | — | sin base de datos |
+
+**No hay ninguna otra conexión privilegiada escondida.** Las únicas cuatro
+cadenas de conexión de todo el entorno de producción están en esta tabla.
+
+### El precedente que hace tratable la remediación
+
+`nelvyon_local_ai_app` es del **propio servicio web**, va contra la **misma base**,
+y es un rol mínimo de verdad: **6 tablas** con grants explícitos, **sin herencia de
+roles**, sin superusuario, sin BYPASSRLS. Y `local-ai/db.ts` fija `app.tenant_id`
+en cada consulta.
+
+Es decir: el patrón que hace falta ya funciona en producción, en el mismo
+servicio, contra la misma base. No hay que inventarlo, hay que extenderlo.
+
+## PLAN — retirar `postgres` del servicio web
+
+**No ejecutado. BLOCKED_ON_FOUNDER.**
+
+### Clasificación de los 520 ficheros que tocan la conexión privilegiada
+
+| Consumidores | Clase | Necesita cross-tenant |
+|---:|---|---|
+| 240 | rutas de API | **TENANT_SCOPED** — no |
+| 246 | servicios de dominio | hereda de quien llama — no |
+| 17 | librerías de packs/partners | TENANT_SCOPED por parámetro — no |
+| 6 | crons (`/api/cron/*`) | **CROSS_TENANT_INTERNAL** — sí |
+| 5 | plano `platform/*` | **CROSS_TENANT_INTERNAL** — sí |
+| 6 | `db/migrate.ts`, seeds, admin | **MIGRATION_ADMIN** — sí |
+
+**503 de 520 no necesitan privilegio alguno sobre otros inquilinos.** El
+superusuario está ahí por 17.
+
+### Destino
+
+| Rol nuevo | Para | super | bypassrls | Contexto |
+|---|---|---|---|---|
+| `nelvyon_web_app` | rutas + servicios de dominio | No | **No** | `set_config` por petición |
+| `nelvyon_web_jobs` | crons y plano platform | No | Sí | aísla por `WHERE` explícito |
+| credencial de migración | solo `migrate:prod` | — | — | fuera del runtime |
+
+No se sustituye `postgres` por otro rol con privilegio de sobra: eso movería el
+problema y lo haría más difícil de ver la próxima vez.
+
+### Orden, y por qué ese orden
+
+1. `DbClient` aprende a fijar contexto de inquilino por petición. **Inocuo**
+   mientras el rol siga siendo superusuario — igual que lo fue `contexto_rls.py`
+   en el lado Python— y por tanto certificable sin cambiar conducta.
+2. Certificar con `nelvyon_web_app` contra la base de certificación: las cinco
+   preguntas (A→A, A→B, B→B, B→A, sin contexto) por cada superficie.
+3. Demostrar que **todas** las rutas pasan por el contexto. Las que no —crons,
+   platform, mantenimiento— se declaran y se mueven a `nelvyon_web_jobs`.
+4. Solo entonces, ventana de cambio de credencial en producción.
+
+El paso 3 es el que decide. En el lado Python fue el que costó, y saltárselo aquí
+convertiría un fallo de aislamiento en una caída: con RLS activa y sin contexto,
+las consultas no dan error — devuelven **cero filas**.
 
 ## Otros bloqueos externos
 
