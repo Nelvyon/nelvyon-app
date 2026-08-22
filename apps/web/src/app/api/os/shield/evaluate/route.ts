@@ -20,7 +20,7 @@ export async function POST(req: Request) {
       sectorId: body.sectorId,
       packRunId: body.packRunId ?? null,
       htmlOrText: body.text,
-    });
+    }, { tenantId: claims.tenantId });
     return NextResponse.json({ result });
   } catch (e) {
     console.error("[os/shield/evaluate POST]", e);

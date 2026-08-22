@@ -4,6 +4,7 @@
 import { describe, expect, it, vi } from "vitest";
 import {
   OsRegulatedSectorShieldService,
+  TODOS_LOS_INQUILINOS,
   scanClaims,
   hasRequiredDisclaimer,
   computeShieldStatus,
@@ -131,6 +132,9 @@ describe("O27 — evaluateShield", () => {
   });
 });
 
+const TENANT = "11111111-1111-1111-1111-111111111111";
+const OTRO_TENANT = "22222222-2222-2222-2222-222222222222";
+
 // ── persist / evaluateAndPersist ─────────────────────────────────────────────────
 
 describe("O27 — persistence", () => {
@@ -138,7 +142,7 @@ describe("O27 — persistence", () => {
     const sqls: string[] = [];
     const db = makeDb((sql) => { sqls.push(sql); return sql.includes("INSERT") ? [{ id: "audit-1" }] : []; });
     const svc = new OsRegulatedSectorShieldService(db, sectorPort(true), cleanQa);
-    const r = await svc.evaluateAndPersist({ sectorId: "dental", htmlOrText: DENTAL_DISCLAIMER });
+    const r = await svc.evaluateAndPersist({ sectorId: "dental", htmlOrText: DENTAL_DISCLAIMER }, { tenantId: TENANT });
     expect(r.id).toBe("audit-1");
     expect(sqls.some((s) => s.includes("INSERT INTO os_sector_shield_audits"))).toBe(true);
   });
@@ -146,7 +150,7 @@ describe("O27 — persistence", () => {
   it("evaluateAndPersist survives a persist failure", async () => {
     const db = makeDb((sql) => { if (sql.includes("INSERT")) throw new Error("db down"); return []; });
     const svc = new OsRegulatedSectorShieldService(db, sectorPort(true), cleanQa);
-    const r = await svc.evaluateAndPersist({ sectorId: "dental", htmlOrText: DENTAL_DISCLAIMER });
+    const r = await svc.evaluateAndPersist({ sectorId: "dental", htmlOrText: DENTAL_DISCLAIMER }, { tenantId: TENANT });
     expect(r.id).toBeUndefined();
     expect(r.status).toBe("passed");
   });
@@ -190,7 +194,7 @@ describe("O27 — queries", () => {
       status: "blocked", regulated: true, disclaimer_ok: false, claims_ok: true,
       disclaimer_text: "x", claims_violations: [], checks: [], metadata: {}, audited_at: "2026-06-01T00:00:00Z",
     }]);
-    const list = await new OsRegulatedSectorShieldService(db, sectorPort(true), cleanQa).listAudits({ sectorId: "dental" });
+    const list = await new OsRegulatedSectorShieldService(db, sectorPort(true), cleanQa).listAudits({ tenantId: TENANT }, { sectorId: "dental" });
     expect(list).toHaveLength(1);
     expect(list[0]!.status).toBe("blocked");
   });
@@ -204,11 +208,83 @@ describe("O27 — queries", () => {
       if (sql.includes("jsonb_array_elements_text")) return [{ violation: "curación garantizada", count: "2" }];
       return [];
     });
-    const s = await new OsRegulatedSectorShieldService(db, sectorPort(true), cleanQa).getSummary();
+    const s = await new OsRegulatedSectorShieldService(db, sectorPort(true), cleanQa).getSummary({ tenantId: TENANT });
     expect(s.total).toBe(8);
     expect(s.blocked).toBe(3);
     expect(s.passed).toBe(5);
     expect(s.regulatedAudits).toBe(5);
     expect(s.topViolations[0]!.violation).toBe("curación garantizada");
+  });
+});
+
+// ── Aislamiento entre inquilinos ────────────────────────────────────────────────
+//
+// Estas cuatro nacen de tres defectos encadenados encontrados en este servicio:
+//
+//   1. `persistAudit` no escribia `tenant_id` ni `workspace_id`. Las 2.761 filas
+//      que hay en produccion tienen los dos a NULL: no se sabe de quien es
+//      ninguna, y por eso no se puede activar RLS sobre la tabla.
+//   2. `listAudits` y `getSummary` no filtraban por nadie. La ruta
+//      `/api/os/shield` solo exige SESION —`requirePlatformClaims` autentica, no
+//      autoriza—, la tabla no tiene RLS y la conexion del lado web es
+//      superusuario: cualquier usuario autenticado de cualquier inquilino veia
+//      los incumplimientos de los demas.
+//   3. `evaluateAndPersist` hacia `catch { /* best-effort */ }`. Un fallo al
+//      guardar devolvia el resultado como si estuviera guardado.
+//
+// Se comprueba el SQL que sale, no lo que el servicio dice hacer.
+
+describe("O27 — aislamiento entre inquilinos", () => {
+  it("persistAudit atribuye la auditoria a su dueño", async () => {
+    const params: unknown[][] = [];
+    const db = makeDb((sql, p) => { params.push((p ?? []) as unknown[]); return sql.includes("INSERT") ? [{ id: "a1" }] : []; });
+    const svc = new OsRegulatedSectorShieldService(db, sectorPort(true), cleanQa);
+    await svc.evaluateAndPersist({ sectorId: "dental", htmlOrText: DENTAL_DISCLAIMER }, { tenantId: TENANT });
+    expect(params.some((ps) => ps.includes(TENANT))).toBe(true);
+  });
+
+  it("persistAudit se niega a guardar una auditoria sin dueño", async () => {
+    const svc = new OsRegulatedSectorShieldService(makeDb(() => []), sectorPort(true), cleanQa);
+    // @ts-expect-error se comprueba el guardia en tiempo de ejecucion, no el tipo
+    await expect(svc.persistAudit({ claimsViolations: [], checks: [], metadata: {} }, undefined))
+      .rejects.toThrow();
+  });
+
+  it("listAudits acota por inquilino en el SQL que sale", async () => {
+    let sql = "";
+    const params: unknown[] = [];
+    const db = makeDb((q, p) => { sql = q; params.push(...((p ?? []) as unknown[])); return []; });
+    await new OsRegulatedSectorShieldService(db, sectorPort(true), cleanQa)
+      .listAudits({ tenantId: OTRO_TENANT }, { limit: 10 });
+    expect(sql).toContain("tenant_id =");
+    expect(params).toContain(OTRO_TENANT);
+  });
+
+  it("getSummary acota por inquilino en el SQL que sale", async () => {
+    const sqls: string[] = [];
+    const db = makeDb((q) => { sqls.push(q); return []; });
+    await new OsRegulatedSectorShieldService(db, sectorPort(true), cleanQa).getSummary({ tenantId: TENANT });
+    // las DOS consultas del resumen: el recuento y el top de violaciones
+    expect(sqls.filter((q) => q.includes("os_sector_shield_audits")).every((q) => q.includes("tenant_id ="))).toBe(true);
+  });
+
+  it("lo global sigue siendo posible, pero hay que escribirlo", async () => {
+    // EL CONTROL. Los crons de la plataforma necesitan la foto de todos, y
+    // romperlos para cerrar el agujero seria cambiar un fallo por otro. Lo que
+    // cambia es que ahora se ve en el codigo quien pide acceso global.
+    let sql = "";
+    const db = makeDb((q) => { sql = q; return []; });
+    await new OsRegulatedSectorShieldService(db, sectorPort(true), cleanQa)
+      .listAudits(TODOS_LOS_INQUILINOS, { limit: 5 });
+    expect(sql).not.toContain("tenant_id =");
+  });
+
+  it("un fallo al guardar deja de parecer un exito", async () => {
+    const db = makeDb((sql) => { if (sql.includes("INSERT")) throw new Error("db down"); return []; });
+    const svc = new OsRegulatedSectorShieldService(db, sectorPort(true), cleanQa);
+    const r = await svc.evaluateAndPersist({ sectorId: "dental", htmlOrText: DENTAL_DISCLAIMER }, { tenantId: TENANT });
+    expect(r.persistError).toBeTruthy();
+    // y la evaluacion sigue siendo util: el veredicto vale aunque no se guardara
+    expect(r.status).toBe("passed");
   });
 });

@@ -53,6 +53,10 @@ export {
 } from "./OsAgentAuditTrailService";
 export {
   OsRegulatedSectorShieldService,
+  // El centinela de acceso global y el tipo del alcance viajan con el servicio:
+  // sin reexportarlos, un consumidor no puede pedir la vista de todos los
+  // inquilinos ni escribir el alcance, y acabaria buscando la forma de saltarselo.
+  TODOS_LOS_INQUILINOS,
   OsShieldError,
   getOsRegulatedSectorShieldService,
   resetOsRegulatedSectorShieldServiceForTests,
@@ -69,6 +73,7 @@ export {
   type ShieldSummary,
   type OsShieldErrorCode,
 } from "./OsRegulatedSectorShieldService";
+export type { AlcanceDeAuditoria } from "./OsRegulatedSectorShieldService";
 export {
   OsTemplateDnaService,
   OsTemplateDnaError,

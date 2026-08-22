@@ -423,7 +423,7 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
       packRunId: params.packRunId,
       deliverableRef: params.sku,
       htmlOrText: shieldText,
-    });
+    }, { workspaceId: params.workspaceId });
     shieldStatus = shield.status;
   } catch {
     shieldStatus = undefined;

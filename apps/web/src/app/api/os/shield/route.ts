@@ -14,8 +14,8 @@ export async function GET(req: Request) {
     const status = searchParams.get("status") as ShieldStatus | null;
     const svc = getOsRegulatedSectorShieldService();
     const [summary, audits] = await Promise.all([
-      svc.getSummary(),
-      svc.listAudits({ status: status ?? undefined, limit: 100 }),
+      svc.getSummary({ tenantId: claims.tenantId }),
+      svc.listAudits({ tenantId: claims.tenantId }, { status: status ?? undefined, limit: 100 }),
     ]);
     return NextResponse.json({ summary, audits });
   } catch (e) {

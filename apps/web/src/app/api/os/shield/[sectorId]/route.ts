@@ -12,7 +12,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ sectorId: strin
   try {
     const { sectorId } = await ctx.params;
     const svc = getOsRegulatedSectorShieldService();
-    const audits = await svc.listAudits({ sectorId, limit: 50 });
+    const audits = await svc.listAudits({ tenantId: claims.tenantId }, { sectorId, limit: 50 });
     return NextResponse.json({ sectorId, disclaimer: EU_DISCLAIMERS[sectorId] ?? null, audits });
   } catch (e) {
     console.error("[os/shield/[sectorId] GET]", e);

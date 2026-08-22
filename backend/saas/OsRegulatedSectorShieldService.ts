@@ -9,6 +9,55 @@
  */
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 
+/**
+ * Acceso deliberado a las auditorias de TODOS los inquilinos.
+ *
+ * Existe para los crons de la plataforma, que legitimamente necesitan la foto
+ * global. Es un simbolo y no un `undefined` ni una cadena vacia porque lo global
+ * tiene que ESCRIBIRSE: olvidar un parametro no puede volver a significar «damelo
+ * todo», que es exactamente como llego aqui el problema.
+ */
+export const TODOS_LOS_INQUILINOS = Symbol("todos-los-inquilinos");
+
+/**
+ * De quien es una auditoria.
+ *
+ * `os_sector_shield_audits` tiene las DOS columnas —`tenant_id uuid` y
+ * `workspace_id integer`— porque en NELVYON conviven dos espacios de identidad:
+ * el OS numera workspaces y el SaaS identifica inquilinos por UUID. Quien llama
+ * tiene uno o el otro, no los dos: las rutas del panel traen `tenantId` en el
+ * JWT y el orquestador de packs trabaja con `workspaceId`.
+ *
+ * Se modela explicito en vez de elegir uno y convertir: `saas_tenants.workspace_id`
+ * esta a NULL en 20 de 22 filas, asi que HOY la conversion no existe para la
+ * mayoria. Fingir que si la hay produciria atribuciones inventadas, que es peor
+ * que no atribuir.
+ *
+ * CONSECUENCIA QUE HAY QUE SABER: mientras ese mapeo siga roto, una auditoria
+ * escrita con `workspaceId` no la ve quien pregunta por `tenantId`. Eso es una
+ * limitacion conocida y acotada —cada uno ve lo suyo, nadie ve lo ajeno— y se
+ * cierra cuando se arregle `saas_tenants.workspace_id`. Nunca al reves: preferir
+ * no mostrar de menos antes que mostrar de mas.
+ */
+export type AlcanceDeAuditoria =
+  | { tenantId: string }
+  | { workspaceId: number }
+  | typeof TODOS_LOS_INQUILINOS;
+
+/** El WHERE del alcance, o vacio si es global. Centralizado para que no diverja. */
+function filtroDeAlcance(
+  alcance: AlcanceDeAuditoria,
+  primerIndice = 1,
+): { where: string; params: unknown[] } {
+  if (alcance === TODOS_LOS_INQUILINOS) return { where: "", params: [] };
+  if ("tenantId" in alcance) {
+    if (!alcance.tenantId?.trim()) throw new Error("alcance: tenantId vacio");
+    return { where: `tenant_id = $${primerIndice}::uuid`, params: [alcance.tenantId] };
+  }
+  if (!Number.isInteger(alcance.workspaceId)) throw new Error("alcance: workspaceId no es un entero");
+  return { where: `workspace_id = $${primerIndice}`, params: [alcance.workspaceId] };
+}
+
 // ── EU disclaimer library (v1, ES) ───────────────────────────────────────────────
 
 export const EU_DISCLAIMERS: Record<string, string> = {
@@ -74,6 +123,9 @@ export type ShieldAuditResult = {
   claimsViolations: string[];
   checks: ShieldCheck[];
   metadata: Record<string, unknown>;
+  /** Presente si la auditoria NO se pudo persistir. Antes ese fallo se tragaba
+   *  entero y el resultado volvia como si estuviera guardado. */
+  persistError?: string;
 };
 
 export type ShieldSummary = {
@@ -246,14 +298,33 @@ export class OsRegulatedSectorShieldService {
     };
   }
 
-  async persistAudit(result: ShieldAuditResult): Promise<string> {
+  /**
+   * Guarda la auditoria ATRIBUIDA a su inquilino.
+   *
+   * Antes no escribia `tenant_id` ni `workspace_id`, y por eso las 2.761 filas
+   * que hay en produccion tienen los dos a NULL: no se puede saber de quien es
+   * ninguna. Eso es lo que impide activar RLS sobre esta tabla — protegerla hoy
+   * no la aseguraria, la volveria invisible para todos.
+   *
+   * `tenantId` es obligatorio a proposito. Un valor por defecto habria dejado el
+   * mismo agujero con mejor aspecto.
+   */
+  async persistAudit(result: ShieldAuditResult, duenno: AlcanceDeAuditoria): Promise<string> {
+    if (duenno === TODOS_LOS_INQUILINOS) {
+      throw new Error("persistAudit: una auditoria no puede escribirse «para todos»; necesita dueno");
+    }
+    const esUuid = "tenantId" in duenno;
+    if (esUuid && !duenno.tenantId?.trim()) throw new Error("persistAudit: tenantId vacio");
+    if (!esUuid && !Number.isInteger(duenno.workspaceId)) throw new Error("persistAudit: workspaceId no es un entero");
     const rows = await this.db.query<{ id: string }>(
       `INSERT INTO os_sector_shield_audits
-         (pack_run_id, deliverable_ref, sector_id, status, regulated, disclaimer_ok, claims_ok,
+         (tenant_id, workspace_id, pack_run_id, deliverable_ref, sector_id, status, regulated, disclaimer_ok, claims_ok,
           disclaimer_text, claims_violations, checks, metadata)
-       VALUES ($1::uuid,$2,$3,$4,$5,$6,$7,$8,$9::jsonb,$10::jsonb,$11::jsonb)
+       VALUES ($1::uuid,$2::int,$3::uuid,$4,$5,$6,$7,$8,$9,$10,$11::jsonb,$12::jsonb,$13::jsonb)
        RETURNING id`,
       [
+        esUuid ? duenno.tenantId : null,
+        esUuid ? null : duenno.workspaceId,
         result.packRunId, result.deliverableRef, result.sectorId, result.status, result.regulated,
         result.disclaimerOk, result.claimsOk, result.disclaimerText,
         JSON.stringify(result.claimsViolations), JSON.stringify(result.checks), JSON.stringify(result.metadata),
@@ -262,9 +333,25 @@ export class OsRegulatedSectorShieldService {
     return rows[0]!.id;
   }
 
-  async evaluateAndPersist(input: { sectorId: string; packRunId?: string | null; deliverableRef?: string | null; htmlOrText: string; metadata?: Record<string, unknown> }): Promise<ShieldAuditResult> {
+  async evaluateAndPersist(
+    input: { sectorId: string; packRunId?: string | null; deliverableRef?: string | null; htmlOrText: string; metadata?: Record<string, unknown> },
+    duenno: AlcanceDeAuditoria,
+  ): Promise<ShieldAuditResult> {
     const result = await this.evaluateShield(input);
-    try { result.id = await this.persistAudit(result); } catch { /* audit best-effort */ }
+    try {
+      result.id = await this.persistAudit(result, duenno);
+    } catch (e) {
+      // Antes: `catch { /* audit best-effort */ }`. Se tragaba el error entero y
+      // devolvia el resultado como si se hubiera guardado, con `result.id`
+      // silenciosamente `undefined`. En un shield de CUMPLIMIENTO eso es lo peor
+      // que puede pasar: la pantalla dice que la revision quedo registrada y en
+      // la base no hay nada que ensenar a un regulador.
+      //
+      // Se sigue sin romper la evaluacion —el veredicto es util aunque no se
+      // haya podido persistir— pero ahora queda traza y el llamante puede verlo.
+      result.persistError = e instanceof Error ? e.message : String(e);
+      console.error("[shield] la auditoria NO se persistio:", e);
+    }
     return result;
   }
 
@@ -282,10 +369,28 @@ export class OsRegulatedSectorShieldService {
     return { allowed: true };
   }
 
-  async listAudits(filters: { sectorId?: string; status?: ShieldStatus; limit?: number } = {}): Promise<Array<ShieldAuditResult & { auditedAt: string }>> {
-    const conditions: string[] = [];
-    const params: unknown[] = [];
-    let idx = 1;
+  /**
+   * Lista auditorias DEL INQUILINO indicado.
+   *
+   * `tenantId` va en el primer parametro y es obligatorio: antes esta consulta
+   * devolvia las auditorias de TODOS. La ruta `/api/os/shield` solo exige sesion
+   * —`requirePlatformClaims` autentica, no autoriza—, la tabla no tiene RLS y la
+   * conexion del lado web es superusuario, asi que cualquier usuario autenticado
+   * de cualquier inquilino veia los incumplimientos de los demas: que entregable,
+   * que afirmaciones prohibidas y en que sector.
+   *
+   * Para los usos legitimos entre inquilinos —crons de la plataforma— existe
+   * `TODOS_LOS_INQUILINOS`, que hay que escribir. Lo global deja de ser el
+   * comportamiento por defecto y pasa a ser una decision visible en el codigo.
+   */
+  async listAudits(
+    alcance: AlcanceDeAuditoria,
+    filters: { sectorId?: string; status?: ShieldStatus; limit?: number } = {},
+  ): Promise<Array<ShieldAuditResult & { auditedAt: string }>> {
+    const propio = filtroDeAlcance(alcance);
+    const conditions: string[] = propio.where ? [propio.where] : [];
+    const params: unknown[] = [...propio.params];
+    let idx = params.length + 1;
     if (filters.sectorId) { conditions.push(`sector_id = $${idx++}`); params.push(filters.sectorId); }
     if (filters.status) { conditions.push(`status = $${idx++}`); params.push(filters.status); }
     const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
@@ -296,10 +401,15 @@ export class OsRegulatedSectorShieldService {
     return rows.map(rowToAudit);
   }
 
-  async getSummary(): Promise<ShieldSummary> {
+  /** Resumen DEL INQUILINO. Antes contaba las auditorias de todos. */
+  async getSummary(alcance: AlcanceDeAuditoria): Promise<ShieldSummary> {
+    const propio = filtroDeAlcance(alcance);
+    const filtro = propio.where ? `WHERE ${propio.where}` : "";
+    const args = propio.params;
     const rows = await this.db.query<{ status: ShieldStatus; count: string; regulated_count: string }>(
       `SELECT status, COUNT(*) AS count, COUNT(*) FILTER (WHERE regulated) AS regulated_count
-       FROM os_sector_shield_audits GROUP BY status`,
+       FROM os_sector_shield_audits ${filtro} GROUP BY status`,
+      args,
     );
     const summary: ShieldSummary = { total: 0, blocked: 0, passed: 0, warning: 0, regulatedAudits: 0, topViolations: [] };
     for (const r of rows) {
@@ -314,7 +424,8 @@ export class OsRegulatedSectorShieldService {
       const v = await this.db.query<{ violation: string; count: string }>(
         `SELECT violation, COUNT(*) AS count
          FROM os_sector_shield_audits, jsonb_array_elements_text(claims_violations) AS violation
-         GROUP BY violation ORDER BY count DESC LIMIT 5`,
+         ${filtro} GROUP BY violation ORDER BY count DESC LIMIT 5`,
+        args,
       );
       summary.topViolations = v.map((x) => ({ violation: x.violation, count: parseInt(x.count, 10) }));
     } catch { /* ignore */ }
