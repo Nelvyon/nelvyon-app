@@ -14,6 +14,8 @@ from pathlib import Path
 from typing import Any
 
 import httpx
+
+from core.salida_segura import DestinoNoPermitido, comprobar_destino
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -105,6 +107,15 @@ class WebhookService:
         if not normalized:
             raise ValueError("At least one event is required")
 
+        # SSRF: sin esto, un inquilino podia registrar un webhook apuntando al
+        # Postgres interno, al endpoint de metadatos de la nube o a la propia
+        # aplicacion — y leer la respuesta, porque se guarda en
+        # `webhook_deliveries.response_body` y se le devuelve.
+        try:
+            comprobar_destino(url)
+        except DestinoNoPermitido as exc:
+            raise ValueError(f"URL de webhook no permitida: {exc}") from exc
+
         webhook_secret = secret or secrets.token_urlsafe(32)
         endpoint_id = str(uuid.uuid4())
         r = await self.session.execute(
@@ -172,6 +183,10 @@ class WebhookService:
         params: dict[str, Any] = {"id": endpoint_id, "ws": self.workspace_id}
         if url is not None:
             sets.append("url = :url")
+            try:
+                comprobar_destino(url)
+            except DestinoNoPermitido as exc:
+                raise ValueError(f"URL de webhook no permitida: {exc}") from exc
             params["url"] = url.strip()
         if events is not None:
             invalid = [e for e in events if e not in SUPPORTED_EVENTS]
@@ -276,8 +291,26 @@ class WebhookService:
         response_code: int | None = None
         response_body: str | None = None
 
+        # Se vuelve a comprobar justo antes de conectar. No es redundante: entre
+        # el registro y la entrega pueden pasar semanas, y repuntar el DNS de un
+        # dominio propio hacia `127.0.0.1` es el ataque clasico contra un guard
+        # que solo valida al registrar.
+        destino_bloqueado: str | None = None
         try:
-            async with httpx.AsyncClient(timeout=15.0) as client:
+            comprobar_destino(url)
+        except DestinoNoPermitido as exc:
+            destino_bloqueado = str(exc)
+            logger.warning("webhook_destino_bloqueado",
+                           extra={"webhook_motivo": destino_bloqueado})
+
+        try:
+            if destino_bloqueado:
+                # No se hace la peticion. Se registra como entrega fallida con el
+                # motivo, que es lo que el inquilino necesita para corregir su
+                # configuracion — y lo que deja rastro si alguien lo intento a
+                # proposito.
+                raise DestinoNoPermitido(destino_bloqueado)
+            async with httpx.AsyncClient(timeout=15.0, follow_redirects=False) as client:
                 resp = await client.post(
                     url,
                     content=body_bytes,

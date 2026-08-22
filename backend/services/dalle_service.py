@@ -86,9 +86,17 @@ class DalleService:
     @staticmethod
     async def _download_image(image_url: str) -> bytes:
         url = image_url.strip()
-        if not url.startswith(("http://", "https://")):
-            raise ValueError("image_url must be an http(s) URL")
-        async with httpx.AsyncClient(timeout=120.0, follow_redirects=True) as client:
+        # Comprobar el esquema no basta: `http://169.254.169.254/` empieza por
+        # `http://` y es el endpoint de metadatos de la nube. Y con
+        # `follow_redirects=True` bastaba una URL publica que redirigiera.
+        from core.salida_segura import DestinoNoPermitido, comprobar_destino
+
+        try:
+            comprobar_destino(url)
+        except DestinoNoPermitido as exc:
+            raise ValueError(f"image_url no permitida: {exc}") from exc
+
+        async with httpx.AsyncClient(timeout=120.0, follow_redirects=False) as client:
             response = await client.get(url)
             response.raise_for_status()
             return response.content

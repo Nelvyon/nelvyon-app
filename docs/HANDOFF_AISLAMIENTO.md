@@ -662,3 +662,67 @@ fallan con el defecto, 4 pasan sin él.
 3. Las **16 SaaS uuid con datos** y las **14 con `tenant_id` no-uuid**.
 4. Bloque E completo: RBAC más allá del plano de entidades.
 5. Memory/RAG: `BLOCKED_EXTERNALLY: MESH_AUTHKEY`, sin proveedor de pago.
+
+---
+
+# MODO ACELERACIÓN — bloque en curso
+
+## Cuatro migraciones preparadas y certificándose
+
+| Mig | Qué | Estado |
+|---|---|---|
+| **568** | 52 tablas OS vacías restantes (sustituye a la 563, remedida) | Aplicada en cert: **51 aplicadas, 1 omitida** (`client_memory`, `workspace_id` uuid — la guarda la **nombra**) |
+| **569** | 12 tablas OS **con datos** | Escrita, con dos guardas nuevas |
+| **570** | 14 SaaS con `tenant_id` no-uuid | Escrita, política por tipo |
+| **571** | Equipo de agentes de **redes sociales** | Escrita + 3 herramientas ya ejecutadas contra PostgreSQL |
+
+## 569 — las dos guardas que ningún lote anterior necesitaba
+
+Todos los lotes previos tocaban tablas **vacías**, donde RLS no puede ocultar
+nada. Aquí sí hay datos, y sobre datos existentes RLS puede hacer algo peor que
+fallar: volverlos **invisibles sin dar error**.
+
+**Quinta guarda — ninguna fila con `workspace_id` NULL.** Medido en producción:
+
+| Tabla | Filas | `workspace_id` NULL |
+|---|---|---|
+| `os_sector_shield_audits` | 2.761 | **2.761** |
+| `saas_tenants` | 22 | **20** |
+
+Las dos quedan fuera. Protegerlas las escondería para siempre.
+
+**Sexta guarda — el workspace dueño tiene quien lo vea.** La política concede por
+**pertenencia**: un workspace sin miembros activos no la satisface para nadie.
+Medido: las 10 tablas del lote tienen sus datos en el workspace 1, que existe,
+está activo y tiene **1 miembro activo**. Los workspaces 2 y 3 tienen **cero**.
+
+## Los cinco de doble espacio, resueltos
+
+`os_agent_audit_events`, `os_qa_audit_runs`, `os_sector_shield_audits`,
+`os_truth_guard_audits`, `os_delivery_certificates` tienen `workspace_id` **y**
+`tenant_id`. **El `tenant_id` está al 100% NULL en las cinco**, así que manda
+`workspace_id` y la ambigüedad no existe: es columna muerta.
+
+## 571 — el equipo de redes, y por qué no publica
+
+`redes.publicar` está en `JAMAS_AUTOMATICO` desde el primer día. Los tres agentes
+**miran y redactan**; publicar sigue siendo humano. El de borradores exige
+`HUMAN_APPROVAL_REQUIRED`.
+
+Tres herramientas nuevas, **solo lectura**, acotadas por `workspace_id`, y
+**ejecutadas contra PostgreSQL antes de escribir la migración** — dos de las tres
+consultas estaban inventadas (`social_auto_posts` tiene `caption`, no `content`;
+`social_auto_settings` no tiene `platform`) y **solo se vio ejecutándolas**.
+
+## Deuda proyectada
+
+| Espacio | Ahora | Tras 568+569+570 |
+|---|---|---|
+| OS sin RLS | 63 | **2** (`os_sector_shield_audits`, `saas_tenants`) |
+| SaaS sin RLS | 31 | **17** (16 uuid con datos + `saas_activation_checklist`) |
+
+## Siguiente acción exacta
+
+1. Certificar 569, 570, 571 y pedir ADR-064 de los cuatro juntos.
+2. Las 16 SaaS uuid con datos.
+3. Bloque F: seguridad sistemática.

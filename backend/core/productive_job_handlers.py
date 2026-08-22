@@ -234,8 +234,19 @@ async def handle_contract_webhook(payload: Dict[str, Any]) -> str:
         "X-Nelvyon-Delivery-Attempt": str(payload.get("_attempt") or 1),
     }
 
+    # SSRF: `url` viene del payload del trabajo, asi que puede apuntar a la red
+    # interna. Y `follow_redirects=True` lo empeoraba: una URL publica que
+    # devolviera un 302 hacia `169.254.169.254` alcanzaba el endpoint de
+    # metadatos aunque la comprobacion previa hubiera pasado.
+    from core.salida_segura import DestinoNoPermitido, comprobar_destino
+
+    try:
+        comprobar_destino(url)
+    except DestinoNoPermitido as exc:
+        raise ValueError(f"destino de webhook no permitido: {exc}") from exc
+
     timeout = httpx.Timeout(20.0, connect=10.0)
-    async with httpx.AsyncClient(timeout=timeout, follow_redirects=True) as client:
+    async with httpx.AsyncClient(timeout=timeout, follow_redirects=False) as client:
         if method == "GET":
             resp = await client.get(url, headers=cabeceras)
         elif method == "POST":

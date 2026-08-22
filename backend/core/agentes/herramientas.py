@@ -213,3 +213,57 @@ async def _historial(sesion, workspace_id: int, limite: int = 20):
           FROM autopilot_jobs WHERE workspace_id = :ws
          ORDER BY creado_en DESC LIMIT :n
     """, {"ws": workspace_id, "n": min(int(limite), MAX_FILAS)})
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Redes sociales — SOLO LECTURA
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# `redes.publicar` esta en JAMAS_AUTOMATICO desde el primer dia: ningun agente
+# publica, ni con aprobacion. Estas herramientas existen para que el equipo de
+# redes pueda MIRAR —que se publico, que rindio, que hay en cola— y redactar
+# borradores que un humano decide si salen.
+#
+# Todas acotan por `workspace_id` explicito, como el resto del catalogo.
+
+
+@registrar("redes.publicaciones", "Publicaciones sociales del workspace y su estado.")
+async def _redes_publicaciones(sesion, workspace_id: int, limite: int = 20):
+    return await _filas(sesion, """
+        SELECT id, platform, status, scheduled_at, published_at,
+               left(coalesce(caption, ''), 160) AS extracto,
+               metrics_json
+          FROM social_auto_posts
+         WHERE workspace_id = :ws
+         ORDER BY coalesce(published_at, scheduled_at) DESC NULLS LAST
+         LIMIT :n
+    """, {"ws": workspace_id, "n": min(int(limite), MAX_FILAS)})
+
+
+@registrar("redes.cola", "Lo que esta programado y todavia no ha salido.")
+async def _redes_cola(sesion, workspace_id: int, limite: int = 20):
+    return await _filas(sesion, """
+        SELECT id, platform, scheduled_at,
+               (scheduled_at < now()) AS vencida,
+               left(coalesce(caption, ''), 160) AS extracto
+          FROM social_auto_posts
+         WHERE workspace_id = :ws
+           AND status IN ('scheduled', 'pending', 'queued')
+         ORDER BY scheduled_at NULLS LAST
+         LIMIT :n
+    """, {"ws": workspace_id, "n": min(int(limite), MAX_FILAS)})
+
+
+@registrar("redes.ajustes", "Como esta configurada la publicacion automatica.")
+async def _redes_ajustes(sesion, workspace_id: int, limite: int = 20):
+    """Que canales hay activos y con que cadencia.
+
+    Sirve para que el agente diga «no hay nada configurado» en vez de «no hay
+    nada que publicar»: son dos diagnosticos distintos y solo uno es accionable.
+    """
+    return await _filas(sesion, """
+        SELECT client_id, enabled, frequency, sector, updated_at
+          FROM social_auto_settings
+         WHERE workspace_id = :ws
+         LIMIT :n
+    """, {"ws": workspace_id, "n": min(int(limite), MAX_FILAS)})
