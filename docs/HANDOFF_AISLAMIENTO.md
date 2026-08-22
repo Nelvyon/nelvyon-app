@@ -861,3 +861,65 @@ apuntando a un inquilino inexistente.
 Medido en producción: `saas_pack_entitlements` tiene **10 de 32 inquilinos
 huérfanos** y `saas_autopilot_settings` **5 de 6**. Protegerlas las escondería
 para siempre — y esos huérfanos son un hallazgo de integridad por sí mismos.
+
+---
+
+# BLOQUE PENDIENTE (añadido a la directiva) — CAPA MCP / EQUIPOS DE AGENTES
+
+> **No iniciado.** Entra DESPUÉS de cerrar: RLS pendiente → tablas con datos →
+> SaaS especial → RBAC → SSRF → escalada → replay → deuda desconocida.
+> Se registra aquí para que sobreviva a un cambio de sesión.
+
+## Qué se pide
+
+Arquitectura agentic empresarial completa, no agentes sueltos:
+
+```
+ORQUESTADOR MAESTRO → jefe de departamento → especialista
+   → herramientas/MCP/APIs/OS → QA independiente → supervisor
+   → entrega → seguimiento/recovery/escalado
+```
+
+**Capa de herramientas propia.** Cada una con: alcance · permisos mínimos ·
+workspace/tenant explícito · auditoría · idempotencia · límites · rate limiting ·
+timeout · retry/backoff · validación de entrada y salida · fail-closed ·
+protección cross-tenant · política de aprobación para lo sensible.
+
+**Ocho departamentos**: dirección, ventas, marketing, servicios al cliente,
+delivery, finanzas, tecnología, control.
+
+**Especialización por nicho** — restaurante ≠ inmobiliaria ≠ clínica ≠ ecommerce
+≠ B2B. Cargable sin reconstruir el núcleo: conocimiento, tono, objetivos,
+métricas, regulación, funnel, oferta, canales, riesgos, benchmarks, plantillas.
+
+**Calidad**: especialista → QA independiente → evaluator → política → supervisor.
+Bajo umbral ⇒ RETRY / REPLAN / ESCALATE, nunca entregar.
+
+**Mapa de servicios**: cada servicio vendido debe demostrar
+`SERVICE → DEPARTMENT → SPECIALISTS → TOOLS → INPUTS → PLAN → EXECUTION → QA →
+DELIVERY → KPI → SUPPORT/RENEWAL`. Sin flujo completo ⇒ **NOT_READY**, y el
+catálogo no puede anunciarlo.
+
+**Coste**: IA propia/local. Sin OpenAI ni proveedores de pago nuevos.
+
+**GO** solo con: BUILT + CONNECTED + TOOLS + MEMORY + PERMISSIONS + TESTED +
+ADVERSARIAL + QA + E2E + DEPLOYED + CERTIFIED.
+
+## Punto de partida que ya existe
+
+| Pieza | Estado |
+|---|---|
+| `core/agentes/politicas.py` | deny por defecto · `JAMAS_AUTOMATICO` (18 acciones) · `NUNCA_DESDE_UN_AGENTE` (9) · 4 modos |
+| `core/agentes/herramientas.py` | **13 herramientas**, todas solo lectura y acotadas por `workspace_id` |
+| `core/agentes/runtime.py` | 10 comprobaciones ordenadas |
+| `core/agentes/router_modelos.py` | fail-closed, **sin fallback a OpenAI** |
+| `core/agentes/presupuesto.py` | presupuesto + kill switches |
+| `agent_catalog` / `agent_policies` | 12 agentes en 9 departamentos · 20 políticas · gobierno **de solo lectura** para la app (mig. 559) |
+| `core/embeddings.py` | Ollama propio → respaldo léxico · coste 0 |
+
+**Lo que falta**: orquestador maestro, jefes de departamento, QA independiente,
+supervisor, capa de nicho, mapa de servicios, y ~igual de importante, herramientas
+de ESCRITURA con las 13 propiedades exigidas (hoy todas son de lectura).
+
+**571 (equipo de redes) queda apartada** por decisión del fundador hasta diseñar
+la arquitectura global.
