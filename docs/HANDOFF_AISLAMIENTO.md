@@ -1265,6 +1265,107 @@ ese JOIN cambia no queda un camino abierto al certificado de otro.
 **DATA_INTEGRITY_DECISION**: rellenar `saas_tenants.workspace_id` para los 20
 requiere demostrar la correspondencia. No se inventa.
 
+## BLOCKED_ON_FOUNDER: WEB_DB_ROLE_CUTOVER
+
+Preparado y certificado hasta el límite seguro. **Nada aplicado en producción.**
+
+### Roles
+
+| Rol | super | bypassrls | createdb/role | Para |
+|---|---|---|---|---|
+| `nelvyon_web_app` | No | **No** | No | tráfico normal — las políticas deciden |
+| `nelvyon_web_jobs` | No | **Sí** | No | crons y plano `platform` |
+| credencial de migración | — | — | — | sólo `migrate:prod`, fuera del runtime |
+
+`nelvyon_web_jobs` **sí** lleva BYPASSRLS y hay que decirlo claro: trabaja entre
+inquilinos por necesidad, así que su aislamiento depende del `WHERE` explícito de
+cada consulta — el mismo contrato que `nelvyon_jobs` en el lado Python. No es
+«otro rol seguro».
+
+### Grants — del uso real, no del catálogo
+
+**485 tablas** de 710. Las 225 restantes el runtime no las toca y estos roles no
+las ven. Verbos concedidos por tabla según lo medido: 464 INSERT, 292 SELECT,
+148 UPDATE, 63 DELETE. Sin TRUNCATE, sin REFERENCES, sin TRIGGER, sin CREATE
+sobre el esquema, sin pertenencia a ningún otro rol.
+
+**La reducción de tablas es la parte pequeña, y conviene no venderla como el
+logro.** Se intentó repartir tablas entre «peticiones» y «crons» por la ruta del
+fichero y no separa nada: el SQL vive en los servicios de dominio y los crons
+llaman a los mismos servicios. La ganancia real es que `nelvyon_web_app` deja de
+saltarse RLS.
+
+### Evidencia — 21/21 con el rol real
+
+`backend/db/__tests__/rlsEfectivaWebApp.pg.test.ts`. Las consultas se escriben
+**a propósito sin ningún filtro de inquilino**: todo lo que separa a A de B son
+las políticas.
+
+| | A→A | A→B |
+|---|---|---|
+| SELECT | ve sus 2 filas | 0 filas de B |
+| INSERT | escribe | **error** `row-level security`, no silencio |
+| UPDATE | 2 filas | `UPDATE` sin `WHERE` no toca ni una de B |
+| DELETE | 2 filas | `DELETE` sin `WHERE` no borra ni una de B |
+
+Y además: sin contexto → 0 filas · sólo workspace → 0 · sólo usuario → 0 ·
+**declarar el workspace de B sin pertenecer** → 0 · usuario inexistente → 0 ·
+A→B→A sobre la **misma conexión física** (`max: 1`) → cada uno lo suyo ·
+A→sin contexto→A → la del medio no hereda y la última sigue viendo ·
+error dentro de la transacción no deja contexto · no puede crear objetos ·
+`permission denied` en tabla no concedida · no puede `TRUNCATE`.
+
+**RBAC en la propia base**: un miembro `viewer` **lee** lo de su workspace y
+**no puede escribir** — `nelvyon_workspace_can_mutate` exige `owner|admin|operator`.
+Una escalada en la capa de aplicación no bastaría para escribir.
+
+Las funciones que deciden se extrajeron del catálogo **en vivo** con
+`pg_get_functiondef` y se instalaron tal cual: escribir una versión «equivalente»
+habría certificado la mía, no la que va a decidir.
+
+**Mutación obligatoria** — `ALTER ROLE nelvyon_web_app BYPASSRLS` → caen **14**.
+Si no caen, la certificación mide otra cosa.
+
+### Que una ruta no alcance la conexión privilegiada
+
+No es una convención: `DbClient` lee **únicamente** `DATABASE_URL`, y
+`test_el_runtime_no_alcanza_la_conexion_privilegiada` comprueba además que ningún
+fichero de runtime construya su propio pool ni lea la variable del rol
+privilegiado. Los 5 pools que sí existen están declarados con su motivo.
+Mutación: un fichero nuevo con `new Pool()` → las dos guardias lo nombran.
+
+### Procedimiento de cutover
+
+1. Crear los dos roles en producción con `backend/db/certificacion/roles_web.sql`
+   y contraseñas nuevas (**no** las de certificación).
+2. Ejecutar los `GRANT`. Aditivo: no toca a `postgres` ni a ningún rol existente.
+3. `DbJobsClient` para la conexión cross-tenant + mover los crons y `platform/*`.
+4. **Ventana de observación con `postgres` todavía puesto**: el contexto ya viaja
+   (desplegado y no-op), así que se puede ver en logs que llega antes de depender
+   de él.
+5. Cambiar `DATABASE_URL` del servicio web a `nelvyon_web_app`.
+6. Verificar `/api/health/live`, `/api/health/ready`, `/health/ia`, un panel SaaS
+   real y un panel OS real, y **contar filas**: la señal de fallo no es un 500,
+   son cero filas donde había datos.
+7. Sólo después, revocar privilegios de `postgres` sobre el esquema.
+
+### Rollback
+
+Devolver `DATABASE_URL` a la credencial anterior. **Reversible en un cambio de
+variable**, sin migración y sin tocar datos. Los roles nuevos pueden quedarse
+creados: sin nadie que los use, no hacen nada.
+
+### Riesgo residual
+
+- **El modo de fallo es silencioso.** Con RLS activa y contexto ausente las
+  consultas no dan error: devuelven **cero filas**. Por eso el paso 6 cuenta filas
+  y no sólo mira códigos HTTP.
+- Las 68 rutas sin contexto declarado son públicas, crons o webhooks. Si alguna
+  resultara ser tenant-scoped, devolvería vacío tras el cutover.
+- La certificación cubre 4 tablas OS con el patrón `nelvyon_apply_os_workspace_rls`,
+  que es el dominante. Las familias de política SaaS (`_saas_tenant*`) no están
+  certificadas todavía con este rol: **es el siguiente trabajo**, no una omisión.
+
 ## Otros bloqueos externos
 
 - `MESH_AUTHKEY` — malla privada al Ollama propio. **No es un proveedor de pago.**
