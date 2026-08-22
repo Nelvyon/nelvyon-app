@@ -1039,6 +1039,23 @@ GRANT INSERT ON public.youtubeads_results TO nelvyon_web_jobs;
 GRANT INSERT ON public.youtubers_results TO nelvyon_web_jobs;
 GRANT INSERT ON public.zapier_results TO nelvyon_web_jobs;
 
+-- ── USAGE sobre el esquema `auth` — IMPRESCINDIBLE ──
+--
+-- Lo encontro la certificacion de las familias SaaS, no la lectura del catalogo:
+-- 12 pruebas fallaron con `permission denied for schema auth`.
+--
+-- `nelvyon_jwt_user_id()` y `nelvyon_jwt_sub_text()` NO son SECURITY DEFINER, asi
+-- que se ejecutan como quien llama y necesitan alcanzar `auth.uid()`. Son la base
+-- de la familia de politica mas usada: 804 politicas sobre 201 tablas.
+--
+-- Sin este GRANT, el cutover no habria degradado nada: habria REVENTADO en el
+-- momento en que la primera peticion tocara cualquiera de esas 201 tablas.
+--
+-- Precedente comprobado en produccion: `nelvyon_app` —el rol del lado Python, que
+-- lleva meses funcionando con RLS efectiva— SI tiene este privilegio.
+-- `nelvyon_jobs` no lo tiene y no le hace falta, porque salta RLS.
+GRANT USAGE ON SCHEMA auth TO nelvyon_web_app;
+
 -- Secuencias: necesarias para los INSERT con id serial. Solo USAGE.
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO nelvyon_web_app, nelvyon_web_jobs;
 

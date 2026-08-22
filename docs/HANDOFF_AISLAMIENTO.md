@@ -1295,7 +1295,56 @@ fichero y no separa nada: el SQL vive en los servicios de dominio y los crons
 llaman a los mismos servicios. La ganancia real es que `nelvyon_web_app` deja de
 saltarse RLS.
 
-### Evidencia — 21/21 con el rol real
+### Evidencia — 68/68 con el rol real (21 OS + 47 SaaS)
+
+#### Las cinco familias de política, todas certificadas
+
+Las 1.763 políticas se reducen a **46 formas**; cinco cubren el **91%**, y sus
+semánticas **no son equivalentes** — certificar una «representativa» habría dejado
+cuatro sin comprobar.
+
+| Políticas | Tablas | Forma | El inquilino… |
+|---:|---:|---|---|
+| 804 | 201 | `user_id = nelvyon_jwt_user_id()` | **derivado** del JWT |
+| 512 | 136 | `tenant_id = nelvyon_current_saas_tenant_uuid()` | **derivado** del usuario |
+| 208 | 52 | `nelvyon_os_workspace_select/mutate(...)` | id **+ pertenencia** |
+| 79 | 36 | `workspace_id = current_tenant_id()` | **directo** de la sesión |
+| 33 | 33 | `tenant_id = nelvyon_erp_tenant_text()` | **directo** de la sesión |
+
+#### La diferencia que hay que saber
+
+Las familias **derivadas** y las **OS** niegan aunque el contexto viniera mal: el
+inquilino no se lee de la sesión, o se comprueba pertenencia contra
+`workspaces`/`workspace_members`.
+
+Las dos **directas** —**69 tablas**— se fían de `app.tenant_id`. No es un agujero:
+esa variable la fija el servidor tras verificar, y hay un guard que comprueba que
+así sea en las 854 rutas. Pero significa que **en esas 69 tablas el aislamiento
+descansa enteramente en la aplicación**, mientras que en las otras la base es una
+segunda red.
+
+`rlsFamiliasSaas.pg.test.ts` lo demuestra en las dos direcciones en vez de
+afirmarlo: declarar el inquilino ajeno **no sirve** en las derivadas y **sí** en
+las directas. Es un hecho conocido y comprobado, no una sorpresa futura.
+
+#### El fallo que habría reventado el cutover
+
+La certificación SaaS falló al primer intento con **`permission denied for schema
+auth`** en 12 pruebas. `nelvyon_jwt_user_id()` y `nelvyon_jwt_sub_text()` **no son
+`SECURITY DEFINER`**: se ejecutan como quien llama y necesitan alcanzar
+`auth.uid()`. Son la base de la familia más usada — **804 políticas sobre 201
+tablas**.
+
+Sin `GRANT USAGE ON SCHEMA auth TO nelvyon_web_app`, el cutover no habría
+degradado nada: **habría reventado** en cuanto la primera petición tocara
+cualquiera de esas 201 tablas. Precedente comprobado: `nelvyon_app`, el rol del
+lado Python que lleva meses con RLS efectiva, **sí** tiene ese privilegio.
+
+Esto no sale del catálogo. Sale de ejecutar.
+
+#### La matriz, por familia y por operación
+
+
 
 `backend/db/__tests__/rlsEfectivaWebApp.pg.test.ts`. Las consultas se escriben
 **a propósito sin ningún filtro de inquilino**: todo lo que separa a A de B son
@@ -1323,7 +1372,7 @@ Las funciones que deciden se extrajeron del catálogo **en vivo** con
 `pg_get_functiondef` y se instalaron tal cual: escribir una versión «equivalente»
 habría certificado la mía, no la que va a decidir.
 
-**Mutación obligatoria** — `ALTER ROLE nelvyon_web_app BYPASSRLS` → caen **14**.
+**Mutación obligatoria** — `ALTER ROLE nelvyon_web_app BYPASSRLS` → caen **63 de 68**.
 Si no caen, la certificación mide otra cosa.
 
 ### Que una ruta no alcance la conexión privilegiada
@@ -1362,9 +1411,12 @@ creados: sin nadie que los use, no hacen nada.
   y no sólo mira códigos HTTP.
 - Las 68 rutas sin contexto declarado son públicas, crons o webhooks. Si alguna
   resultara ser tenant-scoped, devolvería vacío tras el cutover.
-- La certificación cubre 4 tablas OS con el patrón `nelvyon_apply_os_workspace_rls`,
-  que es el dominante. Las familias de política SaaS (`_saas_tenant*`) no están
-  certificadas todavía con este rol: **es el siguiente trabajo**, no una omisión.
+- **Las cinco familias están certificadas** (68/68). Lo que no está certificado
+  todavía es `nelvyon_web_jobs`: lleva BYPASSRLS, así que su aislamiento depende
+  del `WHERE` de cada consulta y hay que auditarlo consulta a consulta. Es el
+  siguiente trabajo.
+- Las **69 tablas** de familia directa dependen de la aplicación para aislar.
+  Está comprobado que la aplicación lo hace, pero no hay segunda red ahí.
 
 ## Otros bloqueos externos
 
