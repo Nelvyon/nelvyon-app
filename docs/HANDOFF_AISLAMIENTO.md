@@ -999,6 +999,31 @@ RLS **498** · FORCE **447** · políticas **1.763** · 1.101 clientes · 22 ten
 **571 (equipo de redes) APARTADA** por decisión del fundador hasta diseñar la
 arquitectura completa de agentes.
 
+### Y por qué apartarla no bastaba con no pedir su autorización
+
+La puerta ADR-064 es **binaria**: `NELVYON_PROD_MIGRATE_APPROVED=1` habilita
+`migrate:prod`, y `migrate:prod` aplica **todas** las migraciones pendientes del
+commit desplegado. No sabe distinguir «estas cinco sí, esa no».
+
+Con la 571 dentro del árbol, la ventana abierta para 568/569/570/572/573 la habría
+aplicado también — una migración apartada explícitamente, dentro de una ventana
+que el propio fundador abrió, con el deploy en verde y sin un error en el log.
+
+Los commits de 567 y 572 llevan «NO MERGEAR» en el asunto. Un mensaje de commit no
+ejecuta nada. Lo que protege de verdad:
+
+- la 571 **no está** en el árbol desplegable (`git rm`, commit `6065607a`);
+- `backend/db/migrations/APARTADAS.md` guarda motivo, SHA256 y el comando de vuelta
+  (`git show d4126605:…`);
+- `test_las_migraciones_apartadas_no_estan_en_el_arbol` falla si alguna vuelve;
+- las 2 pruebas que leían ese fichero se saltan mientras no esté, con el motivo
+  escrito, y se reactivan solas cuando vuelva.
+
+**Verificado contra producción** (no contra la memoria de la sesión): 90 tablas
+tienen columna de inquilino y RLS apagada; cada una de las 90 está nombrada en
+**exactamente una** de las cuatro migraciones RLS; 0 huérfanas, 0 duplicadas.
+52 + 12 + 15 + 11 = 90.
+
 ## Otros bloqueos externos
 
 - `MESH_AUTHKEY` — malla privada al Ollama propio. **No es un proveedor de pago.**

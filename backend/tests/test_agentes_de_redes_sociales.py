@@ -23,10 +23,29 @@ decision de un agente.
 from __future__ import annotations
 
 import os
+import pathlib
 
 import pytest
 
 DSN = os.environ.get("NELVYON_PG_CERT_DSN")
+
+#: La 571 esta APARTADA por decision del fundador (ver `db/migrations/APARTADAS.md`):
+#: quiere el sistema de agentes disenado como el equipo completo antes de fijar su
+#: esquema, asi que el fichero no viaja en el commit desplegable. La puerta ADR-064
+#: aprueba TODAS las pendientes a la vez, y dejarlo dentro la aplicaria sin permiso.
+#:
+#: Las dos pruebas que LEEN ese fichero se saltan mientras no este, en vez de
+#: borrarse: cuando la 571 vuelva, vuelven con ella sin que nadie tenga que
+#: acordarse. Las otras pruebas de este fichero —que las herramientas existen, se
+#: ejecutan contra PostgreSQL y no publican— NO dependen de la migracion y siguen
+#: corriendo.
+MIGRACION_571 = (pathlib.Path(__file__).resolve().parents[1]
+                 / "db" / "migrations" / "571_equipo_de_redes_sociales.sql")
+
+sin_571 = pytest.mark.skipif(
+    not MIGRACION_571.exists(),
+    reason="la migracion 571 esta apartada (db/migrations/APARTADAS.md): no esta "
+           "en el arbol desplegable, asi que no hay fichero que leer")
 
 AGENTES = [
     "redes.parte_de_publicacion",
@@ -209,6 +228,7 @@ async def test_los_de_solo_lectura_no_esperan_a_nadie():
 # ═══════════════════════════════════════════════════════════════════════════
 
 
+@sin_571
 def test_la_migracion_solo_declara_herramientas_que_existen():
     """Una migracion que registra un agente con una herramienta inexistente crea
     una capacidad que fallara la primera vez que alguien la use."""
@@ -233,6 +253,7 @@ def test_la_migracion_solo_declara_herramientas_que_existen():
         f"{faltan}")
 
 
+@sin_571
 def test_los_tres_agentes_estan_en_la_migracion():
     import pathlib
 
