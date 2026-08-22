@@ -46,6 +46,25 @@ PAID_PLANS = frozenset({"pro", "growth", "business", "enterprise", "agency", "pa
 
 _EXCLUDED = frozenset({"/health", "/health/ready", "/docs", "/openapi.json", "/redoc"})
 
+#: Rutas PUBLICAS que no cuelgan de `/api/` y por tanto quedaban SIN limite.
+#:
+#: El filtro era `not path.startswith("/api/")`, asi que estas seis atendian
+#: peticiones ilimitadas desde internet:
+#:
+#:     /p/{slug}                    paginas publicadas
+#:     /qr/{short_code}             redirecciones de QR
+#:     /site/{subdomain}            webs de cliente
+#:     /site/{subdomain}/{page}
+#:     /store/{subdomain}           tiendas
+#:     /store/{subdomain}/checkout  <- ESTA ESCRIBE
+#:
+#: La ultima crea pedidos sin autenticacion. Sin limite, cualquiera podia
+#: generar pedidos indefinidamente contra la tienda de un cliente.
+#:
+#: Se limitan por prefijo: son publicas a proposito y deben seguir siendolo, pero
+#: publicas no significa ilimitadas.
+_PUBLICAS_SIN_API = ("/p/", "/qr/", "/site/", "/store/")
+
 
 def _client_ip(request: Request) -> str:
     """Origen de red fiable. Ver `core.identidad_peticion.ip_del_cliente`."""
@@ -103,7 +122,9 @@ class IntelligentRateLimitMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
 
         path = request.url.path
-        if path in _EXCLUDED or not path.startswith("/api/"):
+        if path in _EXCLUDED:
+            return await call_next(request)
+        if not path.startswith("/api/") and not path.startswith(_PUBLICAS_SIN_API):
             return await call_next(request)
 
         tier, subject, limit, window = _resolve_tier(request)

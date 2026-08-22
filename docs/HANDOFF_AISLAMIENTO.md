@@ -923,3 +923,53 @@ de ESCRITURA con las 13 propiedades exigidas (hoy todas son de lectura).
 
 **571 (equipo de redes) queda apartada** por decisión del fundador hasta diseñar
 la arquitectura global.
+
+---
+
+# BLOQUE F (cont.) — fail-open, rate limiting y subidas
+
+## Dos fail-open que devolvían éxito
+
+Recorriendo los `except` de seguridad/permisos/validación que devuelven `True` o
+`{"ok": True}`. Tres candidatos; uno correcto, dos no.
+
+| Dónde | Qué hacía |
+|---|---|
+| `workflow_engine._matches_conditions` | JSON de condiciones corrupto ⇒ `return True`: **la regla coincidía con TODO** y disparaba su acción en cada evento |
+| `push_service._send` | Sin `pywebpush` ⇒ `{"ok": True}`: una notificación que **nunca salió** reportada como enviada |
+| `regions._is_private_ip` | IP ilegible ⇒ `True` (privada) — **correcto**, fail-closed |
+
+«No se pueden leer las condiciones» **no** es «no hay condiciones». El modo mock
+*declarado* de push se conserva: ese `ok` sí es legítimo porque alguien lo pidió
+— confundir «no puedo enviar» con «me pediste que no enviara» habría sido
+corregir una mentira creando otra.
+
+## Rate limiting — seis rutas públicas sin límite
+
+El filtro era `not path.startswith("/api/")`, así que estas quedaban fuera:
+
+`/p/{slug}` · `/qr/{short_code}` · `/site/{subdomain}` · `/site/{sub}/{page}` ·
+`/store/{subdomain}` · **`/store/{subdomain}/checkout`**
+
+La última **crea pedidos sin autenticación**. Sin límite, cualquiera podía
+generar pedidos indefinidamente contra la tienda de un cliente.
+
+Corregido por prefijo. Con control: `/health` sigue **sin** límite — limitarlo
+haría que el orquestador de la nube reiniciara el servicio por creerlo caído.
+
+**El limitador ya era fail-closed** ante fallo de Redis: correcto, sin cambios.
+
+## Subidas y path traversal — limpio en los cuatro puntos
+
+| Punto | Cómo se protege |
+|---|---|
+| `os_deliverables` | `sanitize_upload_filename`: quita ruta, rechaza `.`/`..`, regex, extensión permitida |
+| `social` | Extensión **derivada del MIME validado**, ruta `{tenant}/{uuid}`. El traversal que escapaba al prefijo de otro tenant ya estaba corregido en un ciclo anterior |
+| `contracts` | `Path().suffix` — no puede contener separador |
+| `voice_commands` | Solo `BytesIO.name` para el multipart; sin escritura en disco |
+
+## Hallazgo que conecta con Memory
+
+`voice_commands_service.transcribe_command` usa `_openai_client()`, que exige
+`APP_AI_BASE_URL`. **Los comandos de voz están tan inoperativos como la memoria**,
+y por la misma causa. Se resuelven juntos con la IA propia.

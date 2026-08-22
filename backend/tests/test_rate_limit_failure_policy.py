@@ -96,3 +96,44 @@ def test_el_limitador_no_vuelve_a_fallar_abierto():
     i = src.index("except Exception as exc:")
     tramo = src[i : i + 400]
     assert '"allowed": False' in tramo, "el limitador empezo a fallar ABIERTO"
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Publico no significa ilimitado
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+def test_las_rutas_publicas_fuera_de_api_tambien_se_limitan():
+    """El filtro era `not path.startswith("/api/")`, y dejaba fuera seis rutas
+    publicas que atienden internet directamente.
+
+    La peor: `POST /store/{subdomain}/checkout`, que CREA PEDIDOS sin
+    autenticacion. Sin limite, cualquiera podia generar pedidos indefinidamente
+    contra la tienda de un cliente.
+
+    Son publicas a proposito y deben seguir siendolo. Publicas no significa
+    ilimitadas.
+    """
+    from middleware.rate_limit import _EXCLUDED, _PUBLICAS_SIN_API
+
+    def se_limita(p: str) -> bool:
+        return p not in _EXCLUDED and (
+            p.startswith("/api/") or p.startswith(_PUBLICAS_SIN_API))
+
+    for ruta in ("/store/mi-tienda/checkout", "/store/mi-tienda",
+                 "/qr/abc123", "/p/mi-pagina",
+                 "/site/cliente", "/site/cliente/contacto"):
+        assert se_limita(ruta), f"{ruta} sigue sin limite de tasa"
+
+
+def test_la_salud_y_los_estaticos_siguen_sin_limite():
+    """CONTROL. Limitar `/health` haria que el propio orquestador de la nube
+    reiniciara el servicio por creerlo caido — la correccion seria peor."""
+    from middleware.rate_limit import _EXCLUDED, _PUBLICAS_SIN_API
+
+    def se_limita(p: str) -> bool:
+        return p not in _EXCLUDED and (
+            p.startswith("/api/") or p.startswith(_PUBLICAS_SIN_API))
+
+    for ruta in ("/health", "/health/ready", "/docs", "/favicon.ico", "/robots.txt"):
+        assert not se_limita(ruta), f"{ruta} quedo limitada y no debe estarlo"
