@@ -61,7 +61,14 @@ async def test_la_entrega_lleva_la_cabecera_y_el_reintento_la_repite(monkeypatch
     """
     import httpx
 
+    import socket
+
     from core import productive_job_handlers as handlers
+
+    def _resuelve_publica(host, puerto, *args, **kwargs):
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", puerto))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", _resuelve_publica)
 
     enviadas: list[dict] = []
 
@@ -87,7 +94,11 @@ async def test_la_entrega_lleva_la_cabecera_y_el_reintento_la_repite(monkeypatch
     monkeypatch.setattr(handlers, "_actor_has_workspace_access", _acceso)
 
     payload = {
-        "url": "http://receptor.local/hook",
+        # `receptor.local` era el host ficticio original. El guard de SSRF lo
+        # rechaza —y hace bien: `.local` es un nombre de red interna— asi que se
+        # usa un host publico y se falsea la RESOLUCION, no el guard. Lo que esta
+        # prueba mide es la cabecera de idempotencia, no el destino.
+        "url": "http://receptor-publico.example/hook",
         "method": "POST",
         "payload": {"evento": "x"},
         "workspace_id": 1,

@@ -80,7 +80,19 @@ pytestmark = [
 #: Las 12 que quedan tienen DATOS en produccion. No se tocan a ciegas: activar
 #: RLS sobre filas existentes puede ocultarselas a quien hoy las ve, asi que cada
 #: una necesita saber quien la lee antes de protegerla.
-DEUDA_MAXIMA = 12
+#: 12 -> 4 con las migraciones 568, 569, 570 y 572.
+#:
+#: Las cuatro que quedan en certificacion son las que NINGUNA guarda deja tocar
+#: todavia, y cada una por un motivo distinto y documentado:
+#:
+#:   client_memory              `workspace_id` es UUID, no INTEGER: la politica
+#:                              no compila. Se resuelve con la identidad canonica.
+#:   os_sector_shield_audits    2761 filas y LAS 2761 con `workspace_id` NULL
+#:   saas_tenants               20 de 22 filas con `workspace_id` NULL
+#:   (la cuarta varia segun el estado de la base de certificacion)
+#:
+#: Protegerlas hoy no las aseguraria: las volveria invisibles.
+DEUDA_MAXIMA = 4
 
 #: Margen cero a proposito. Un trinquete con holgura deja de ser un trinquete: la
 #: holgura se consume y nadie se entera.
