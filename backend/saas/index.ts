@@ -17,6 +17,7 @@
   type TruthSummary,
   type TruthClaimsPort,
   type TruthLegalPort,
+  TODOS_LOS_INQUILINOS_TRUTH,
 } from "./OsTruthGuardService";
 export {
   OsBriefDiffRerunService,
@@ -50,6 +51,7 @@ export {
   type AgentAuditTrail,
   type AgentAuditSummary,
   type AgentInsertPayload,
+  TODO_EL_RASTRO,
 } from "./OsAgentAuditTrailService";
 export {
   OsRegulatedSectorShieldService,

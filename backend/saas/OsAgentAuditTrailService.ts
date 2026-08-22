@@ -9,6 +9,28 @@
 import { createHash } from "crypto";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 
+/**
+ * Acceso deliberado al rastro de TODOS los inquilinos.
+ *
+ * Symbol y no `undefined` porque hasta ahora `workspaceId` era OPCIONAL en las
+ * tres lecturas: omitirlo devolvia el rastro completo de todos los clientes. Un
+ * parametro que se puede olvidar no es una decision, es un accidente esperando.
+ */
+export const TODO_EL_RASTRO = Symbol("todo-el-rastro");
+
+export type AlcanceRastro = { workspaceId: number } | typeof TODO_EL_RASTRO;
+
+function filtroRastro(alcance: AlcanceRastro, indice: number): { where: string[]; params: unknown[] } {
+  if (alcance === TODO_EL_RASTRO) return { where: [], params: [] };
+  const ws = (alcance as { workspaceId: number })?.workspaceId;
+  if (!Number.isInteger(ws)) {
+    throw new Error(
+      "alcance: falta `workspaceId`. Antes era opcional y omitirlo devolvia el " +
+      "rastro de TODOS los inquilinos; pide TODO_EL_RASTRO si de verdad lo quieres");
+  }
+  return { where: [`workspace_id = $${indice}`], params: [ws] };
+}
+
 // Mirror of backend/autonomous/types.ts AgentLogEntry (kept local to avoid a
 // cross-package import in the standalone service surface).
 export type AgentLogEntry = {
@@ -204,13 +226,18 @@ export class OsAgentAuditTrailService {
     return { inserted: log.length };
   }
 
-  async getTrailForPackRun(packRunId: string, workspaceId?: number): Promise<AgentAuditTrail[]> {
-    const params: unknown[] = [packRunId];
+  /**
+   * El rastro de un pack, ACOTADO al inquilino.
+   *
+   * `packRunId` lo aporta quien llama. Sin acotar, conocerlo —o adivinarlo—
+   * bastaba para leer el rastro completo de otro cliente: que agente hizo que,
+   * con que modelo, cuantos tokens y con que puntuacion de QA.
+   */
+  async getTrailForPackRun(packRunId: string, alcance: AlcanceRastro): Promise<AgentAuditTrail[]> {
+    const propio = filtroRastro(alcance, 2);
+    const params: unknown[] = [packRunId, ...propio.params];
     let sql = `SELECT * FROM os_agent_audit_events WHERE pack_run_id = $1::uuid`;
-    if (workspaceId != null) {
-      sql += ` AND workspace_id = $2`;
-      params.push(workspaceId);
-    }
+    if (propio.where.length) sql += ` AND ${propio.where.join(" AND ")}`;
     sql += ` ORDER BY sku ASC, step_order ASC`;
     const rows = await this.db.query<EventRow>(sql, params);
     const bySku = new Map<string, AgentAuditEvent[]>();
@@ -230,14 +257,18 @@ export class OsAgentAuditTrailService {
     }));
   }
 
-  async listEvents(filters: { packRunId?: string; sku?: string; agentId?: string; workspaceId?: number; limit?: number } = {}): Promise<AgentAuditEvent[]> {
-    const conditions: string[] = [];
-    const params: unknown[] = [];
-    let idx = 1;
+  /** Eventos DEL INQUILINO. `alcance` primero y obligatorio. */
+  async listEvents(
+    alcance: AlcanceRastro,
+    filters: { packRunId?: string; sku?: string; agentId?: string; limit?: number } = {},
+  ): Promise<AgentAuditEvent[]> {
+    const propio = filtroRastro(alcance, 1);
+    const conditions: string[] = [...propio.where];
+    const params: unknown[] = [...propio.params];
+    let idx = params.length + 1;
     if (filters.packRunId) { conditions.push(`pack_run_id = $${idx++}::uuid`); params.push(filters.packRunId); }
     if (filters.sku) { conditions.push(`sku = $${idx++}`); params.push(filters.sku); }
     if (filters.agentId) { conditions.push(`agent_id = $${idx++}`); params.push(filters.agentId); }
-    if (filters.workspaceId != null) { conditions.push(`workspace_id = $${idx++}`); params.push(filters.workspaceId); }
     const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
     const rows = await this.db.query<EventRow>(
       `SELECT * FROM os_agent_audit_events ${where} ORDER BY recorded_at DESC LIMIT $${idx}`,
@@ -246,10 +277,11 @@ export class OsAgentAuditTrailService {
     return rows.map(rowToEvent);
   }
 
-  async getSummary(workspaceId?: number): Promise<AgentAuditSummary> {
-    const params: unknown[] = [];
-    const where = workspaceId != null ? `WHERE workspace_id = $1` : "";
-    if (workspaceId != null) params.push(workspaceId);
+  /** Resumen DEL INQUILINO. Antes agregaba sobre el rastro de todos. */
+  async getSummary(alcance: AlcanceRastro): Promise<AgentAuditSummary> {
+    const propio = filtroRastro(alcance, 1);
+    const params: unknown[] = [...propio.params];
+    const where = propio.where.length ? `WHERE ${propio.where.join(" AND ")}` : "";
     const rows = await this.db.query<{ total: string; pack_runs: string; agents: string; skus: string; last: string | null }>(
       `SELECT COUNT(*) AS total, COUNT(DISTINCT pack_run_id) AS pack_runs,
               COUNT(DISTINCT agent_id) AS agents, COUNT(DISTINCT (pack_run_id::text || '|' || sku)) AS skus,
@@ -262,8 +294,8 @@ export class OsAgentAuditTrailService {
     const skus = parseInt(r?.skus ?? "0", 10);
     let topAgents: Array<{ agentId: string; count: number }> = [];
     try {
-      const agentWhere = workspaceId != null ? `WHERE workspace_id = $1` : "";
-      const agentParams = workspaceId != null ? [workspaceId] : [];
+      const agentWhere = where;
+      const agentParams = params;
       const t = await this.db.query<{ agent_id: string; count: string }>(
         `SELECT agent_id, COUNT(*) AS count FROM os_agent_audit_events ${agentWhere} GROUP BY agent_id ORDER BY count DESC LIMIT 5`,
         agentParams,
@@ -280,11 +312,25 @@ export class OsAgentAuditTrailService {
     };
   }
 
-  async hasTrail(packRunId: string): Promise<boolean> {
+  /**
+   * Si existe rastro para ese pack EN ESE INQUILINO.
+   *
+   * Sin acotar era un oraculo: respondia `true` para el pack de otro cliente, lo
+   * que permite confirmar que un identificador existe aunque no se pueda leer su
+   * contenido. Filtra poco, pero filtra — y lo que filtra es la existencia de
+   * trabajo ajeno.
+   *
+   * El `catch` sigue devolviendo `false` a proposito, y aqui SI es correcto: la
+   * pregunta es «¿puedo demostrar que hay rastro?», y no poder consultarlo no es
+   * demostrarlo. Es fail-closed, no un fallo tragado.
+   */
+  async hasTrail(packRunId: string, alcance: AlcanceRastro): Promise<boolean> {
     try {
+      const propio = filtroRastro(alcance, 2);
+      const extra = propio.where.length ? ` AND ${propio.where.join(" AND ")}` : "";
       const rows = await this.db.query<{ exists: boolean }>(
-        `SELECT EXISTS(SELECT 1 FROM os_agent_audit_events WHERE pack_run_id = $1::uuid) AS exists`,
-        [packRunId],
+        `SELECT EXISTS(SELECT 1 FROM os_agent_audit_events WHERE pack_run_id = $1::uuid${extra}) AS exists`,
+        [packRunId, ...propio.params],
       );
       return !!rows[0]?.exists;
     } catch {

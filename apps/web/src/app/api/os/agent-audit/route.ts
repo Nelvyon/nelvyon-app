@@ -18,12 +18,11 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const svc = getOsAgentAuditTrailService();
     const [summary, events] = await Promise.all([
-      svc.getSummary(workspaceId),
-      svc.listEvents({
+      svc.getSummary({ workspaceId }),
+      svc.listEvents({ workspaceId }, {
         packRunId: searchParams.get("packRunId") ?? undefined,
         sku: searchParams.get("sku") ?? undefined,
         agentId: searchParams.get("agentId") ?? undefined,
-        workspaceId,
         limit: 100,
       }),
     ]);

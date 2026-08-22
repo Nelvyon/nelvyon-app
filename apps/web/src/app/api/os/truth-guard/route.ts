@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { requirePlatformAdmin } from "@/lib/platformBffAuth";
-import { getOsTruthGuardService, type TruthChannel, type TruthStatus } from "@nelvyon/saas";
+import { TODOS_LOS_INQUILINOS_TRUTH, getOsTruthGuardService, type TruthChannel, type TruthStatus } from "@nelvyon/saas";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -17,8 +17,12 @@ export async function GET(req: Request) {
     const packRunId = searchParams.get("packRunId") ?? undefined;
     const svc = getOsTruthGuardService();
     const [summary, audits] = await Promise.all([
-      svc.getSummary(),
-      svc.listAudits({ channel: channel ?? undefined, status: status ?? undefined, packRunId, limit: 100 }),
+      // Vista GLOBAL, deliberada: esta ruta es de administrador de plataforma
+      // (`requirePlatformAdmin` devuelve 403 a quien no lo sea) y su proposito es
+      // precisamente la foto entre inquilinos. Antes el alcance global se obtenia
+      // por OMISION, que se parece demasiado a un descuido; ahora esta escrito.
+      svc.getSummary(TODOS_LOS_INQUILINOS_TRUTH),
+      svc.listAudits(TODOS_LOS_INQUILINOS_TRUTH, { channel: channel ?? undefined, status: status ?? undefined, packRunId, limit: 100 }),
     ]);
     return NextResponse.json({ summary, audits });
   } catch (e) {

@@ -23,10 +23,9 @@ export async function POST(req: Request) {
     if (!(await packRunBelongsToWorkspace(body.packRunId.trim(), workspaceId))) {
       return notFoundResponse();
     }
-    const events = await getOsAgentAuditTrailService().listEvents({
+    const events = await getOsAgentAuditTrailService().listEvents({ workspaceId }, {
       packRunId: body.packRunId.trim(),
       sku: body.sku ?? undefined,
-      workspaceId,
       limit: 500,
     });
     if (events.length === 0) {

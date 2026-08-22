@@ -19,7 +19,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ packRunId: stri
     if (!(await packRunBelongsToWorkspace(packRunId, workspaceId))) {
       return notFoundResponse();
     }
-    const trails = await getOsAgentAuditTrailService().getTrailForPackRun(packRunId, workspaceId);
+    const trails = await getOsAgentAuditTrailService().getTrailForPackRun(packRunId, { workspaceId });
     if (trails.length === 0) {
       return notFoundResponse();
     }

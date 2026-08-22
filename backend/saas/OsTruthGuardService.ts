@@ -4,6 +4,31 @@
  * Reuses O27 scanClaims + O18 legal slice — no LLM, no legal advice.
  */
 import type { SaasPostgresPort } from "./SaasOnboardingService";
+
+/**
+ * Acceso deliberado a las auditorias de TODOS los inquilinos.
+ *
+ * Los crons de la plataforma necesitan la foto global y romperlos para cerrar el
+ * agujero seria cambiar un fallo por otro. Es un Symbol y no un `undefined`
+ * porque el alcance global tiene que ESCRIBIRSE: hasta ahora `workspaceId` era
+ * OPCIONAL, asi que omitirlo —por descuido o por no tenerlo a mano— devolvia las
+ * auditorias de todos los clientes sin que nada lo advirtiera.
+ */
+export const TODOS_LOS_INQUILINOS_TRUTH = Symbol("todos-los-inquilinos-truth");
+
+export type AlcanceTruth = { workspaceId: number } | typeof TODOS_LOS_INQUILINOS_TRUTH;
+
+function filtroTruth(alcance: AlcanceTruth, indice: number): { where: string[]; params: unknown[] } {
+  if (alcance === TODOS_LOS_INQUILINOS_TRUTH) return { where: [], params: [] };
+  if (!alcance || !Number.isInteger((alcance as { workspaceId: number }).workspaceId)) {
+    throw new Error(
+      "alcance: falta `workspaceId`. Antes era opcional y omitirlo devolvia las " +
+      "auditorias de TODOS los inquilinos; ahora hay que decir de quien, o pedir " +
+      "TODOS_LOS_INQUILINOS_TRUTH explicitamente");
+  }
+  return { where: [`workspace_id = $${indice}`], params: [(alcance as { workspaceId: number }).workspaceId] };
+}
+
 import { scanClaims } from "./OsRegulatedSectorShieldService";
 
 // ── Constants ───────────────────────────────────────────────────────────────────
@@ -47,6 +72,8 @@ export type TruthAuditResult = {
   workspaceId?: number | null;
   sectorId?: string | null;
   metadata: Record<string, unknown>;
+  /** Presente si la auditoria NO se pudo persistir. */
+  persistError?: string;
 };
 
 export type TruthSummary = {
@@ -329,8 +356,13 @@ export class OsTruthGuardService {
     const result = await this.evaluate(input);
     try {
       result.id = await this.persistAudit(result);
-    } catch {
-      /* audit best-effort */
+    } catch (e) {
+      // Antes: `catch { /* audit best-effort */ }`. Devolvia el resultado como
+      // si estuviera guardado, con `result.id` en `undefined` y sin una linea en
+      // el log. Una revision pre-publicacion que dice haberse registrado y no
+      // esta en la base es peor que no tener revision: se confia en ella.
+      result.persistError = e instanceof Error ? e.message : String(e);
+      console.error("[truth-guard] la auditoria NO se persistio:", e);
     }
     return result;
   }
@@ -342,16 +374,25 @@ export class OsTruthGuardService {
     return { allowed: true };
   }
 
-  async listAudits(filters: {
+  /**
+   * Lista auditorias DEL INQUILINO indicado.
+   *
+   * `alcance` es el primer parametro y es obligatorio. Antes `workspaceId` vivia
+   * dentro de `filters` y era opcional: `listAudits({})` —o `listAudits()`—
+   * devolvia las auditorias de todos los clientes. No hacia falta un atacante
+   * para provocarlo, bastaba con no tener el workspace a mano al escribir la
+   * llamada.
+   */
+  async listAudits(alcance: AlcanceTruth, filters: {
     channel?: TruthChannel;
     status?: TruthStatus;
     packRunId?: string;
-    workspaceId?: number;
     limit?: number;
   } = {}): Promise<Array<TruthAuditResult & { auditedAt: string }>> {
-    const conditions: string[] = [];
-    const params: unknown[] = [];
-    let idx = 1;
+    const propio = filtroTruth(alcance, 1);
+    const conditions: string[] = [...propio.where];
+    const params: unknown[] = [...propio.params];
+    let idx = params.length + 1;
     if (filters.channel) {
       conditions.push(`channel = $${idx++}`);
       params.push(filters.channel);
@@ -363,10 +404,6 @@ export class OsTruthGuardService {
     if (filters.packRunId) {
       conditions.push(`pack_run_id = $${idx++}::uuid`);
       params.push(filters.packRunId);
-    }
-    if (filters.workspaceId != null) {
-      conditions.push(`workspace_id = $${idx++}`);
-      params.push(filters.workspaceId);
     }
     const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
     const rows = await this.db.query<AuditRow>(
@@ -384,12 +421,18 @@ export class OsTruthGuardService {
     return rows[0] ? rowToAudit(rows[0]) : null;
   }
 
-  async getSummary(): Promise<TruthSummary> {
+  /** Resumen DEL INQUILINO. Antes agregaba sobre las auditorias de todos. */
+  async getSummary(alcance: AlcanceTruth): Promise<TruthSummary> {
+    const propio = filtroTruth(alcance, 1);
+    const filtro = propio.where.length ? `WHERE ${propio.where.join(" AND ")}` : "";
+    const args = propio.params;
     const rows = await this.db.query<{ status: TruthStatus; count: string }>(
-      `SELECT status, COUNT(*) AS count FROM os_truth_guard_audits GROUP BY status`,
+      `SELECT status, COUNT(*) AS count FROM os_truth_guard_audits ${filtro} GROUP BY status`,
+      args,
     );
     const byChannelRows = await this.db.query<{ channel: TruthChannel; count: string }>(
-      `SELECT channel, COUNT(*) AS count FROM os_truth_guard_audits GROUP BY channel`,
+      `SELECT channel, COUNT(*) AS count FROM os_truth_guard_audits ${filtro} GROUP BY channel`,
+      args,
     ).catch(() => [] as Array<{ channel: TruthChannel; count: string }>);
 
     const summary: TruthSummary = {
@@ -414,7 +457,8 @@ export class OsTruthGuardService {
       const v = await this.db.query<{ violation: string; count: string }>(
         `SELECT violation, COUNT(*) AS count
          FROM os_truth_guard_audits, jsonb_array_elements_text(violations) AS violation
-         GROUP BY violation ORDER BY count DESC LIMIT 5`,
+         ${filtro} GROUP BY violation ORDER BY count DESC LIMIT 5`,
+        args,
       );
       summary.topViolations = v.map((x) => ({ violation: x.violation, count: parseInt(x.count, 10) }));
     } catch {
