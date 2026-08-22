@@ -160,12 +160,14 @@ class QrService:
                 """
             ),
             {
-                "ws": ws,
+                # El SQL de arriba pide `:inquilino` y `:contenido`. Antes se
+                # pasaban `ws` y `content`: la consulta no llegaba a ejecutarse
+                # nunca, porque SQLAlchemy exige que TODO parametro nombrado este
+                # ligado. `qr_type`, `config` e `image_base64` no son columnas de
+                # `qr_codes` (migracion 416), asi que tampoco se pasan.
+                "inquilino": inquilino,
                 "name": name or content[:40],
-                "type": qt,
-                "content": content,
-                "cfg": _json_dumps(cfg),
-                "img": image_b64,
+                "contenido": content,
             },
         )
         row = _row(result.mappings().first())
@@ -206,7 +208,7 @@ class QrService:
                 """
             ),
             {
-                "ws": ws,
+                "inquilino": inquilino,
                 "name": name or "QR dinámico",
                 "dest": destination_url,
                 "cfg": _json_dumps(cfg),
@@ -234,7 +236,7 @@ class QrService:
                 RETURNING *
                 """
             ),
-            {"id": qr_id, "ws": self.workspace_id, "url": new_destination_url},
+            {"id": qr_id, "inquilino": inquilino, "url": new_destination_url},
         )
         row = result.mappings().first()
         if not row:
@@ -294,7 +296,7 @@ class QrService:
         await self._set_tenant(self.workspace_id)
         qr = await self.session.execute(
             text("SELECT * FROM qr_codes WHERE id = CAST(:id AS uuid) AND tenant_id = CAST(:inquilino AS uuid)"),
-            {"id": qr_id, "ws": self.workspace_id},
+            {"id": qr_id, "inquilino": inquilino},
         )
         q = qr.mappings().first()
         if not q:
@@ -349,7 +351,7 @@ class QrService:
                 FROM qr_codes WHERE tenant_id = CAST(:inquilino AS uuid) ORDER BY created_at DESC
                 """
             ),
-            {"ws": ws},
+            {"inquilino": inquilino},
         )
         return [_row(r) for r in result.mappings().all()]
 

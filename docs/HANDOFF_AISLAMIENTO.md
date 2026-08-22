@@ -1459,6 +1459,53 @@ una tabla vacía en vez del `SKIP LOCKED`. Y el control inverso: lo tomado hace 
 momento **no** se recupera, porque una ventana mal puesta convertiría la
 recuperación en la causa del duplicado.
 
+## CERRADO — la función de códigos QR estaba entera caída
+
+Encontrado auditando el 9% de familias RLS que quedaba, no buscándolo.
+
+`qr_service.py` tenía **cinco** consultas rotas. Alguien reescribió el SQL para
+acotar por `tenant_id = CAST(:inquilino AS uuid)` —los comentarios del fichero
+explican incluso el esquema real de la migración 416— y **dejó los diccionarios
+de parámetros con la clave anterior, `ws`**.
+
+Crear un QR, actualizarlo, borrarlo, listarlos y ver sus estadísticas **lanzaban
+una excepción siempre**.
+
+SQLAlchemy no se queja al escribir la consulta: se queja al ejecutarla. Y ninguna
+prueba pasaba por ahí, así que el fallo no salía en ningún informe — saldría en un
+ticket de soporte semanas después, descrito como «los QR no funcionan». Misma
+clase que los seis webhooks que devolvían 401: código que se creía funcionando
+porque nada lo ejecutaba.
+
+**Guard permanente**: `test_ninguna_consulta_pide_un_parametro_que_nadie_liga`
+revisa las **687** llamadas `execute(text(...), {...})` del backend. Ahora **0**
+sin ligar. Mutación: devolver el fallo → lo nombra.
+
+Tuvo un falso positivo que hubo que quitar: `calendar_service` usa
+`{**otro, "clave": v}` y las claves las aporta el spread. **Un extractor que da
+falsos positivos se deja de mirar, y entonces tampoco se mira cuando acierta.**
+
+## Las 46 familias RLS, clasificadas — el 9% restante
+
+| Clase | Formas | Veredicto |
+|---|---|---|
+| Acotan por inquilino | 5 grandes + 12 menores | **certificadas** (68/68) |
+| Catálogos públicos de NELVYON | 5 tablas (`changelog_entries`, plantillas, `roadmap_items`) | `USING (true)` **por diseño** |
+| Tablero público de sugerencias | `feedback_items` | público con `upvotes`, **por diseño** |
+| Contenido publicado | `status='published'`, `is_active`, y sus hijos por subconsulta | superficie pública, **por diseño** |
+| Ingesta pública | `cdp_events`, `qr_scans` (`WITH CHECK (true)`) | ver abajo |
+
+**Lo que un recuento de catálogo declara «protegido» y no lo está**: una política
+`USING (true)` deja `relrowsecurity = true` y `policies > 0`. Un inventario que
+cuente tablas con RLS las da por buenas. Son **8**, y hace falta mirar la
+expresión, no el recuento.
+
+`cdp_events` y `qr_scans` tienen `WITH CHECK (true)` en su INSERT público: la base
+no valida el `workspace_id`. **No es una puerta abierta** — las escribe el lado
+Python (`nelvyon_app`, RLS efectiva) y el workspace se **deriva** de la fila del QR
+escaneado, no de lo que envía el cliente (verificado en `qr_service.py:260`). Es
+defensa en profundidad ausente, no un agujero. Las dos tienen **0 filas**.
+
 ## Otros bloqueos externos
 
 - `MESH_AUTHKEY` — malla privada al Ollama propio. **No es un proveedor de pago.**
