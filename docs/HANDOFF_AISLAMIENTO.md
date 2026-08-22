@@ -973,3 +973,77 @@ haría que el orquestador de la nube reiniciara el servicio por creerlo caído.
 `voice_commands_service.transcribe_command` usa `_openai_client()`, que exige
 `APP_AI_BASE_URL`. **Los comandos de voz están tan inoperativos como la memoria**,
 y por la misma causa. Se resuelven juntos con la IA propia.
+
+---
+
+# NEXT_SESSION_START_HERE
+
+> Actualizado tras cerrar el bloque de seguridad. Lee esto primero.
+
+## Estado de producción
+
+`_migrations` **467** (564, 565, 566, 567 aplicadas) · SHA backend `9e420a95`
+RLS **498** · FORCE **447** · políticas **1.763** · 1.101 clientes · 22 tenants
+`ready` · `workers` 3/3 · `business` ok · 0 5xx · 0 permission denied · 0 secretos
+
+## BLOQUEADO — necesita ADR-064 del fundador
+
+| Mig | Qué | Certificada |
+|---|---|---|
+| 568 | 52 tablas OS vacías (sustituye a 563) | 51 aplicadas, 1 omitida |
+| 569 | 12 OS con datos → 10 aplica, 2 omite | guardas 5ª y 6ª |
+| 570 | 15 SaaS `tenant_id` no-uuid | 15 aplicadas |
+| 572 | 11 SaaS uuid con datos → 9 aplica, 2 omite | 7ª guarda **probada disparando** |
+| 573 | Índices de inquilino en tablas sociales | idempotente |
+
+**571 (equipo de redes) APARTADA** por decisión del fundador hasta diseñar la
+arquitectura completa de agentes.
+
+## Otros bloqueos externos
+
+- `MESH_AUTHKEY` — malla privada al Ollama propio. **No es un proveedor de pago.**
+  Sin ella: memoria **degradada** (respaldo léxico) y voz **no disponible**.
+- Despliegue de código: hay commits certificados sin desplegar (SSRF, escalada,
+  replay, fail-closed, rate limiting, `/health/ia`).
+
+## Deuda de aislamiento restante — 4 tablas, todas con motivo
+
+| Tabla | Por qué no se puede proteger hoy |
+|---|---|
+| `client_memory` | `workspace_id` es UUID, no INTEGER: la política no compila |
+| `os_sector_shield_audits` | 2.761 filas, **las 2.761** con `workspace_id` NULL |
+| `saas_tenants` | 20 de 22 filas con `workspace_id` NULL |
+
+Protegerlas hoy no las aseguraría: las volvería **invisibles**.
+
+## Integridad de datos — hallazgo abierto
+
+`saas_pack_entitlements` tiene **10 de 32 inquilinos huérfanos** y
+`saas_autopilot_settings` **5 de 6**: filas que apuntan a `saas_tenants` que no
+existen. **Las 9 tablas con clave ajena no tienen huérfanos; las 2 sin FK, sí.**
+El arreglo de fondo es añadir la FK tras limpiar; hasta entonces la 7ª guarda las
+excluye.
+
+## Bloque de seguridad — cerrado
+
+| Clase | Resultado |
+|---|---|
+| SSRF | **HIGH corregido** — 3 superficies; la respuesta se devolvía al inquilino |
+| Escalada de privilegios | **HIGH corregido** — 3 vectores (invitar admin, degradar, expulsar) |
+| Replay | 11 de 12 webhooks duplicaban; deduplicación sin migración |
+| Rate limiting | 6 rutas públicas sin límite, una **crea pedidos** |
+| Fail-open | 2 corregidos (condiciones ilegibles ⇒ coincidía con todo; push «ok» sin enviar) |
+| IDOR | 455 rutas revisadas, **0** reales |
+| Uploads / traversal | limpio en los 4 puntos |
+| Botones muertos | 3 reales de 565 llamadas |
+| Observabilidad IA | `/health/ia` nuevo: degradado ≠ ausente |
+
+## SIGUIENTE BLOQUE — Agent Tool / MCP Layer
+
+Registrado arriba con su punto de partida. **No iniciado.** Entra cuando se
+cierre el despliegue de seguridad.
+
+Después: auditoría Web + SaaS + OS completos → E2E empresarial → recovery →
+Founder-Absent → auditoría nueva desde cero.
+
+`FOUNDER_ABSENT` = **NO_GO**.

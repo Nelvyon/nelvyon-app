@@ -762,6 +762,85 @@ async def health_workers():
         return {"status": "unknown", "reason": type(exc).__name__}
 
 
+@app.get("/health/ia")
+async def health_ia():
+    """La IA PROPIA de NELVYON: ¿esta ahi, y que capacidades quedan degradadas?
+
+    POR QUE HACE FALTA
+    ------------------
+    NELVYON tiene su propia pila de IA —Ollama en hardware propio, coste cero— y
+    dos capacidades dependen de ella: la memoria de los agentes y los comandos de
+    voz. Las dos estaban CAIDAS en produccion y nadie lo sabia:
+
+        `_openai_client()` exige `APP_AI_BASE_URL`, que no esta configurada, asi
+        que cada llamada lanzaba `ValueError`. `client_memory` tiene cero filas
+        exactamente por eso.
+
+    Y no habia forma de verlo desde fuera. `/health/ready` decia 200,
+    `/health/business` decia `ok`, y la memoria simplemente no existia. Una
+    capacidad apagada sin senal es indistinguible de una capacidad que nadie usa.
+
+    QUE RESPONDE
+    ------------
+    Que proveedor esta activo, si responde, y —lo que mas importa— QUE
+    CAPACIDADES quedan degradadas y con que consecuencia concreta. No un booleano:
+    una frase que se pueda leer y actuar.
+
+    Nunca devuelve 5xx: una IA degradada no puede hacer que el orquestador
+    reinicie el contenedor.
+    """
+    try:
+        from core.config import settings
+        from core.embeddings import MODELO_RESPALDO, estado
+
+        emb = await estado()
+        capacidades: list[dict] = []
+
+        if emb.get("estado") in ("inalcanzable", "degradado"):
+            capacidades.append({
+                "capacidad": "memoria_de_agentes",
+                "estado": "degradada",
+                "consecuencia": (
+                    f"se embebe con `{MODELO_RESPALDO}`, que encuentra "
+                    f"coincidencias de PALABRAS pero no de significado. Los "
+                    f"recuerdos se guardan y se recuperan; la calidad de la "
+                    f"busqueda es menor."),
+            })
+        else:
+            capacidades.append({"capacidad": "memoria_de_agentes", "estado": "ok"})
+
+        # La transcripcion NO puede degradarse: no hay respaldo local para voz.
+        hay_transcripcion = bool(settings.app_ai_base_url and settings.app_ai_key)
+        capacidades.append({
+            "capacidad": "comandos_de_voz",
+            "estado": "ok" if hay_transcripcion else "no_disponible",
+            "consecuencia": None if hay_transcripcion else (
+                "`transcribe_command` exige un endpoint compatible con OpenAI y "
+                "no hay respaldo local para voz. Los comandos de voz no "
+                "funcionan; no se degradan, no estan."),
+        })
+
+        peor = "ok"
+        for c in capacidades:
+            if c["estado"] == "no_disponible":
+                peor = "no_disponible"
+                break
+            if c["estado"] == "degradada":
+                peor = "degradada"
+
+        return {
+            "status": peor,
+            "coste_por_llamada": False,
+            "embeddings": emb,
+            "capacidades": capacidades,
+            "bloqueo_externo": (
+                None if emb.get("estado") == "ok"
+                else "MESH_AUTHKEY: falta la malla privada hacia el Ollama propio"),
+        }
+    except Exception as exc:  # noqa: BLE001
+        return {"status": "unknown", "reason": type(exc).__name__}
+
+
 @app.get("/health/ready")
 async def health_ready():
     """Readiness — includes database check (503 if DB unavailable)."""
