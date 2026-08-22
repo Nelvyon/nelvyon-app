@@ -976,6 +976,77 @@ y por la misma causa. Se resuelven juntos con la IA propia.
 
 ---
 
+# LO QUE HAY EN PRODUCCIÓN — medido, y cambia el encuadre de todo
+
+**Medido el 2026-08-22 contra la base de producción. No es una impresión.**
+
+```
+tablas en `public`                       710
+   VACÍAS                                662
+```
+
+Y la actividad que hay no es de clientes:
+
+| Tabla | Filas | Qué son en realidad |
+|---|---:|---|
+| `os_deliverables` | 5.050 | **todos del `workspace_id = 1`**, entre el 29-jun y el 22-jul |
+| `os_agent_audit_events` | 14.178 | del mismo workspace |
+| `email_queue` | 723 | **todos a `@nelvyon.test`**, todos en estado `no_api_key` |
+| `saas_tenants` | 22 | `PAI-A-*`, `PAI-B-*`, `CertCRM-A/B`, `Co-wfA/B`, `Co-seqSmoke`, `Emu Smoke Co`, `QA Audit Co` |
+| `workspaces` | 3 | los tres llamados «Mi Workspace» |
+
+**Vacías por completo**: `qr_codes`, `ab_experiments`, `bookings`, `campaigns`,
+`invoices`, `chatbot_conversations`, `workflows`, `affiliate_clicks`,
+`affiliate_profiles`, `saas_*` casi enteras.
+
+## Qué significa
+
+**NELVYON no tiene todavía clientes en producción.** Todo lo que hay es residuo de
+corridas de certificación y humo.
+
+Eso responde de paso la pregunta de integridad que quedaba abierta: los 20 de 22
+`saas_tenants.workspace_id` a NULL **no son datos ambiguos de clientes**. Son
+fixtures de certificación (`PAI-` = pruebas de aislamiento) que nunca llegaron a
+crear un workspace. No hay propietario que reconstruir porque no hay propietario.
+
+La instrucción original del fundador decía que los workspaces de certificación se
+marcaran como CERTIFICATION y **se eliminaran al terminar**. No se hizo, y el
+residuo ha pasado a ser el conjunto de datos entero.
+
+## Corrección a mi propio lenguaje
+
+He descrito varios defectos con su impacto en cliente: «el cliente recibe el mismo
+correo dos veces», «recordatorio de cobro duplicado», «los QR no funcionan», «la
+descarga de facturas falla».
+
+Los defectos **son reales** —el código haría eso— pero **ningún cliente los ha
+sufrido**, porque no hay clientes. Era impacto potencial y lo presenté como
+observado. Se corrige aquí para que nadie herede la urgencia equivocada.
+
+Los 723 correos de `email_queue` estaban en `no_api_key`: ni siquiera salieron.
+
+## Y qué cambia en las prioridades
+
+Las 20 derivas esquema↔código están en funciones que **nunca se han ejecutado**.
+Arreglar `zoom_join_url` de una reserva que nadie ha hecho vale menos que
+determinar **qué promete NELVYON y qué tiene que funcionar de verdad** el día que
+entre el primer cliente.
+
+Esa decisión es del fundador, no mía: **BLOCKED_ON_FOUNDER — ALCANCE_DE_PRODUCTO**.
+
+Lo que sí se hace sin preguntar: cerrar las derivas de correspondencia inequívoca,
+mantener el trinquete para que no crezcan, y seguir con seguridad y aislamiento,
+que aplican igual el primer día que haya un cliente real.
+
+## Y lo que esto NO cambia
+
+- El aislamiento importa **antes** del primer cliente, no después. El día que
+  entren dos, ya tiene que estar cerrado.
+- `email_queue` con 723 filas demuestra que la carrera de la cola era real: la
+  tabla se usa de verdad, aunque sea con datos de humo.
+- La deriva de los webhooks salientes habría aparecido con el primer cliente que
+  configurara uno.
+
 # NEXT_SESSION_START_HERE
 
 > Actualizado tras cerrar el bloque de seguridad. Lee esto primero.
