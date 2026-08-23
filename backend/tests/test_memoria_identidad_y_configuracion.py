@@ -96,12 +96,39 @@ def test_sin_endpoint_de_embeddings_el_servicio_corta(monkeypatch):
     from core.config import settings
     from services import memory_service
 
+    # El interruptor maestro va ENCENDIDO a proposito.
+    #
+    # Lo que esta prueba mide es que falta la URL, y para llegar a esa
+    # comprobacion hay que pasar antes por el interruptor, que ahora manda por
+    # encima de todo. Sin encenderlo se corta antes y con otro motivo —tambien
+    # legible, pero otro—, y la prueba dejaria de medir lo que dice medir.
+    monkeypatch.setenv("NELVYON_AI_ENABLED", "1")
     monkeypatch.setattr(settings, "app_ai_base_url", "", raising=False)
     monkeypatch.setattr(settings, "app_ai_key", "sk-lo-que-sea", raising=False)
 
     with pytest.raises(ValueError) as exc:
         memory_service._openai_client()
     assert "not configured" in str(exc.value).lower()
+
+
+def test_con_el_interruptor_apagado_corta_antes_y_lo_dice(monkeypatch):
+    """El otro corte, que ahora va primero y tiene su propio motivo.
+
+    Con `NELVYON_AI_ENABLED=0` no se llega a mirar la configuracion: no hay que
+    mirarla, porque no se va a llamar a nadie. Lo que importa es que el motivo
+    sea explicito y distinto del de «falta la URL», para que quien lea el error
+    sepa cual de las dos cosas arreglar.
+    """
+    from core.config import settings
+    from services import memory_service
+
+    monkeypatch.delenv("NELVYON_AI_ENABLED", raising=False)
+    monkeypatch.setattr(settings, "app_ai_base_url", "https://ia.interna/v1", raising=False)
+    monkeypatch.setattr(settings, "app_ai_key", "sk-lo-que-sea", raising=False)
+
+    with pytest.raises(ValueError) as exc:
+        memory_service._openai_client()
+    assert "NELVYON_AI_ENABLED" in str(exc.value)
 
 
 def test_con_las_dos_variables_el_cliente_se_construye(monkeypatch):
@@ -112,6 +139,9 @@ def test_con_las_dos_variables_el_cliente_se_construye(monkeypatch):
     from core.config import settings
     from services import memory_service
 
+    # Con el interruptor encendido: hacen falta las DOS condiciones —interruptor
+    # y configuracion—, y este control comprueba la segunda.
+    monkeypatch.setenv("NELVYON_AI_ENABLED", "1")
     monkeypatch.setattr(settings, "app_ai_base_url", "https://ejemplo.invalid/v1",
                         raising=False)
     monkeypatch.setattr(settings, "app_ai_key", "sk-lo-que-sea", raising=False)

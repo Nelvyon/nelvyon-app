@@ -25,7 +25,7 @@
  * derecha a izquierda, con `TRUSTED_PROXY_HOPS`— desde el lado Python. El lado
  * Next hacia lo contrario. Esto lo iguala, misma variable de entorno.
  */
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { getClientIp } from "../rateLimit";
 
@@ -34,10 +34,19 @@ function peticion(cabeceras: Record<string, string>): never {
   return { headers: new Headers(cabeceras) } as never;
 }
 
-const SALTOS = process.env.TRUSTED_PROXY_HOPS;
+// El valor se captura DENTRO de `beforeEach`, no al cargar el modulo.
+//
+// Fuera de un hook se congela lo que dejo otro fichero del mismo worker de
+// vitest, y el `afterEach` acabaria restaurando el valor de ESE otro fichero en
+// vez del que habia al empezar esta prueba. Lo detecto
+// `test_tests_no_capturan_env_al_cargar.py`, que existe justo para esto.
+let saltosOriginales: string | undefined;
+
+beforeEach(() => { saltosOriginales = process.env.TRUSTED_PROXY_HOPS; });
+
 afterEach(() => {
-  if (SALTOS === undefined) delete process.env.TRUSTED_PROXY_HOPS;
-  else process.env.TRUSTED_PROXY_HOPS = SALTOS;
+  if (saltosOriginales === undefined) delete process.env.TRUSTED_PROXY_HOPS;
+  else process.env.TRUSTED_PROXY_HOPS = saltosOriginales;
 });
 
 describe("la IP que se usa como clave de limite", () => {

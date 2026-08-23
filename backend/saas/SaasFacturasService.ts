@@ -82,6 +82,23 @@ function mapRow(row: Record<string, unknown>): Factura {
 }
 
 function calcTotals(lineItems: FacturaLineItem[], taxRate: number) {
+  // El `total` de cada linea lo calcula el LLAMANTE, y la ruta pasa el cuerpo
+  // sin validarlo. La interfaz lo manda bien —`qty * unitPrice`—, pero cualquier
+  // otro cliente que lo omita hacia que la suma diera `NaN`... y `NaN` es un
+  // valor valido en una columna `numeric` de PostgreSQL: se guardaba, sin error,
+  // en el subtotal y en el total de una factura.
+  //
+  // Se RECHAZA en vez de calcularlo por nuestra cuenta: una linea puede llevar
+  // un total que no sea `cantidad × precio` —un descuento pactado, por ejemplo—,
+  // asi que recalcularlo cambiaria facturas que hoy son correctas. Lo que no
+  // puede pasar es guardar un numero que no es un numero.
+  for (const linea of lineItems) {
+    if (!Number.isFinite(linea.total)) {
+      throw Object.assign(
+        new Error(`Linea sin total valido: ${linea.description ?? "(sin descripcion)"}`),
+        { code: "VALIDATION" });
+    }
+  }
   const subtotal = lineItems.reduce((s, i) => s + i.total, 0);
   const taxAmount = Math.round(subtotal * (taxRate / 100) * 100) / 100;
   const total = Math.round((subtotal + taxAmount) * 100) / 100;

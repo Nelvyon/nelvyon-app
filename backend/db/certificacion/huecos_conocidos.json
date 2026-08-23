@@ -39,8 +39,8 @@
    "origen": "backend/saas/InvoicingService.ts",
    "vivo": false,
    "en_produccion": false,
-   "clase": "TABLA_EQUIVOCADA_PROBABLE",
-   "nota": "Tres migraciones crean `invoices` (054, 415, 507) y gana la primera por IF NOT EXISTS: quedan `invoices_pkey` e `invoices_pkey1`. La forma resultante es la de inquilino (tenant_id, line_items) y el servicio escribe la de usuario (user_id, items). Existe ademas `saas_invoices`. Elegir a cual pertenece es alcance de producto."
+   "clase": "CODIGO_MUERTO",
+   "nota": "RESUELTO EL DIAGNOSTICO. La tabla `invoices` tiene DOS escritores y solo uno esta vivo: `SaasFacturasService`, al que llaman las rutas /api/saas/facturas*, y que usa la forma de inquilino (tenant_id, line_items) — la que la tabla tiene de verdad. `InvoicingService` escribe la forma de USUARIO (user_id, items, client_name...) y NADIE lo llama: solo lo referencian el barril backend/saas/index.ts y su propia prueba unitaria, que pasa porque usa un doble de base. Asi que el contrato de facturas ya esta definido y funciona: /api/saas/facturas -> SaasFacturasService -> invoices, y /api/saas/invoices -> SaasInvoiceService -> saas_invoices. Decision minima pendiente, y es UNA: borrar `InvoicingService` con su export del barril y su prueba, o conectarlo a algo. No lo borro yo."
   },
   {
    "tabla": "ab_tests",
@@ -53,8 +53,8 @@
    "origen": "backend/saas/ABTestingService.ts",
    "vivo": false,
    "en_produccion": false,
-   "clase": "TABLA_EQUIVOCADA_PROBABLE",
-   "nota": "Coexisten `ab_tests`, `ab_experiments`, `ab_variants` y `ab_events`. Cuatro columnas de siete sin encajar apunta a que el servicio escribe en la tabla de otra generacion."
+   "clase": "CODIGO_MUERTO",
+   "nota": "RESUELTO EL DIAGNOSTICO. El A/B vivo es /api/saas/ab-testing -> SaasAbTestingService -> ab_tests, y ESE si casa con la tabla (id, tenant_id, name, type, status, variants, winner_variant_id, confidence). `ABTestingService` escribe otra forma y NADIE lo llama: solo el barril y su prueba unitaria con doble de base. Decision minima pendiente, y es UNA: borrarlo con su export y su prueba, o conectarlo. No lo borro yo."
   }
  ],
  "_cerrados_por_la_576": [
