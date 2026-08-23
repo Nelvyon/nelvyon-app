@@ -97,9 +97,9 @@
   },
   "workflows": {
    "rutas": 32,
-   "estado": "PENDING",
-   "evidencia": "",
-   "motivo": ""
+   "estado": "FIXED_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoDeWorkflows.pg.test.ts — 14 pruebas contra PostgreSQL real con el servicio REAL: crear, leer, listar, editar y RELEER de la fila, activar, pausar, ejecutar, historial y borrar, mas cuatro negativos de otro inquilino y tres entradas invalidas. Dos defectos encontrados y arreglados: ON CONFLICT sobre un indice PARCIAL sin repetir su condicion (ninguna ejecucion llegaba a registrarse) y un array de JS en columna jsonb (vacio se guardaba como {} en silencio; con elementos reventaba, y el registro del fallo tambien). Tres mutaciones tumban 2, 2 y 1.",
+   "motivo": "PARCIAL: el editor visual —/api/saas/workflows/visual y /visual/[id]— guarda en workflow_nodes, visual_workflow_executions, workflow_trigger_registry y workflows.edges_json, que repara la 575. Escrita y certificada, NO aplicada: ADR-064 = BLOCKED_ON_FOUNDER. En produccion ese editor no puede persistir."
   },
   "ab_testing": {
    "rutas": 7,
