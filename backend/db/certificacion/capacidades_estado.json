@@ -37,9 +37,9 @@
   },
   "prospeccion_cold_email": {
    "rutas": 9,
-   "estado": "PENDING",
-   "evidencia": "",
-   "motivo": ""
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoLote10.pg.test.ts — contra PostgreSQL real con los servicios REALES; listas de prospeccion: la lista aparece en el listado de su inquilino y B no la ve (con control positivo), y B no ve los prospectos de una lista de A. Cruzar listas de prospeccion es entregar la base de datos comercial de un cliente a su competencia. Mutacion: quitar el alcance de inquilino (8 sitios) tumba 2.",
+   "motivo": "PARCIAL: la BUSQUEDA de prospectos usa proveedor externo de datos y el envio de cold email necesita SES/Twilio. BLOCKED_EXTERNALLY; lo certificado es el almacen y su aislamiento."
   },
   "campanias": {
    "rutas": 31,
@@ -145,8 +145,8 @@
   },
   "analytics_reporting": {
    "rutas": 43,
-   "estado": "PENDING",
-   "evidencia": "",
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoLote10.pg.test.ts — contra PostgreSQL real con los servicios REALES; se pregunta al SERVICIO y no a la base: los numeros responden con estructura y no con un objeto vacio —un panel que devuelve {} se pinta a cero y parece que el negocio no existe— y los de A no cuentan lo de B, comparando las DOS respuestas. Si el conteo no filtrara por inquilino, cada cliente veria el negocio de todos los demas sumado al suyo. Mutacion: quitar el alcance de inquilino (4 sitios) tumba 2.",
    "motivo": ""
   },
   "encuestas": {
@@ -163,9 +163,9 @@
   },
   "ads": {
    "rutas": 5,
-   "estado": "PENDING",
-   "evidencia": "",
-   "motivo": ""
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoLote10.pg.test.ts — contra PostgreSQL real con los servicios REALES; las cuentas conectadas de cada inquilino: una cuenta aparece en el listado de SU inquilino y no en el del otro (con control positivo), el estado por plataforma es el del que pregunta, y B no puede desconectar la cuenta de A. Un fallo de alcance aqui no es una lectura de mas: es que alguien gaste el presupuesto publicitario de otro. Mutacion: quitar el alcance de inquilino (7 sitios) tumba 3.",
+   "motivo": "PARCIAL: crear campanas, leer metricas y cambiar presupuestos exige credencial de Google/Meta/TikTok y GENERA COSTE. BLOCKED_EXTERNALLY esa parte; coste externo autorizado = 0 EUR."
   },
   "ecommerce_tienda": {
    "rutas": 14,
@@ -211,9 +211,9 @@
   },
   "dialer_voz_llamadas": {
    "rutas": 19,
-   "estado": "PENDING",
-   "evidencia": "",
-   "motivo": ""
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoLote10.pg.test.ts — contra PostgreSQL real con los servicios REALES; llamar sin proveedor configurado se REHUSA en vez de fingirse —una llamada que se da por hecha sin marcarse deja al comercial creyendo que ya contacto— y el registro de llamadas de A no incluye las de B. Mutacion: quitar el alcance de inquilino (2 sitios) tumba 1.",
+   "motivo": "PARCIAL: marcar de verdad necesita Twilio, que cobra por minuto. BLOCKED_EXTERNALLY."
   },
   "admin_plataforma": {
    "rutas": 12,
@@ -241,8 +241,8 @@
   },
   "salud_infra": {
    "rutas": 26,
-   "estado": "PENDING",
-   "evidencia": "",
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "certificado en el Bloque 1 y REVERIFICADO ahora: 25 pruebas Python + 100 vitest. Las 16 rutas de cron verifican credencial y FALLAN CERRADAS sin secreto; la exencion de /api/health esta acotada y con guardia para que el prefijo no se ensanche ni cuelgue de el nada caro o anonimo; /health sigue usable por la infraestructura —un 429 al sondeo de Railway marca la instancia como caida y la reinicia—; y el limitador cubre las superficies sensibles con la IP derivada de la infraestructura, no elegida por el cliente. Mutacion: las de Bloque 1: ruta de cron nueva sin guardia, exencion ensanchada, y las tres del limitador.",
    "motivo": ""
   }
  }
