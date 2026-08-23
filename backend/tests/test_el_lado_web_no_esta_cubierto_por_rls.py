@@ -50,11 +50,18 @@ LA CONSECUENCIA PARA LAS MIGRACIONES PENDIENTES
 para el lado web. Presentarlas como «aislamiento cerrado» seria falso, y por eso
 se escribe aqui.
 
-POR QUE `xfail` ESTRICTO Y NO UN `skip`
-----------------------------------------
-Un `skip` desaparece del informe. Un `xfail` estricto falla EN CUANTO SE ARREGLE,
-obligando a venir aqui y retirar la marca. La deuda no se puede cerrar en
-silencio ni quedarse olvidada en verde.
+POR QUE `xfail` ESTRICTO Y NO UN `skip`, Y COMO ACABO
+------------------------------------------------------
+Un `skip` desaparece del informe. Un `xfail` estricto falla EN CUANTO SE
+ARREGLE, obligando a venir aqui y retirar la marca.
+
+Funciono: al cablear el contexto de inquilino en `DbClient` las dos pruebas
+se pusieron verdes, el `strict` las convirtio en fallo de la suite de puerta,
+y por eso este fichero esta actualizado en vez de haberse quedado mintiendo
+sobre una deuda ya cerrada.
+
+Lo que NO se ha cerrado es el rol: `@nelvyon/web` sigue conectando como
+`postgres`. Eso es WEB_DB_ROLE_CUTOVER, y esta bloqueado por el fundador.
 """
 from __future__ import annotations
 
@@ -73,12 +80,13 @@ def test_el_cliente_de_base_del_lado_web_existe_donde_se_cree():
         f"no esta `{CLIENTE.relative_to(RAIZ)}`: estas pruebas quedarian inertes")
 
 
-@pytest.mark.xfail(strict=True, reason=
-    "DEUDA CONOCIDA: `@nelvyon/web` conecta como `postgres` (superusuario) y "
-    "`DbClient` no fija contexto de inquilino. Cuando se arregle, esta prueba "
-    "pasa a verde y el xfail estricto la marca en rojo: ven aqui y quita la marca")
 def test_el_cliente_del_lado_web_fija_el_inquilino_de_la_peticion():
-    """LA PRUEBA, hoy en rojo a proposito.
+    """RESUELTA. Era un `xfail` estricto y se puso en rojo al arreglarse.
+
+    El mecanismo hizo justo lo que se le pidio: cuando `DbClient` empezo a fijar
+    el contexto, la prueba paso a verde, el `xfail(strict=True)` lo convirtio en
+    fallo, y eso obligo a venir aqui a retirar la marca. Una deuda que se cierra
+    en silencio vuelve; esta no pudo.
 
     Para que una politica RLS pueda evaluarse hace falta que alguien diga QUIEN
     esta preguntando. En el lado Python lo hace el middleware por peticion. En el
@@ -90,11 +98,10 @@ def test_el_cliente_del_lado_web_fija_el_inquilino_de_la_peticion():
         "saltarse RLS, no habria valor contra el que evaluar las politicas")
 
 
-@pytest.mark.xfail(strict=True, reason=
-    "DEUDA CONOCIDA: el fichero documenta el bypass de RLS como REQUISITO "
-    "(«must use the service_role URL»), no como riesgo asumido")
 def test_el_cliente_no_exige_un_rol_que_salte_rls():
-    """El comentario que convirtio el agujero en requisito.
+    """RESUELTA, por el mismo mecanismo.
+
+    El comentario que convirtio el agujero en requisito.
 
     `DbClient.ts` dice literalmente que `DATABASE_URL` DEBE ser la URL que salta
     RLS. Escrito asi, cualquiera que intente ponerle un rol acotado cree que esta

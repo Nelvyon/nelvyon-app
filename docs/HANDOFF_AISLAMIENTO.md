@@ -1816,56 +1816,53 @@ empobrecería la oferta, que es lo contrario del objetivo.
 independientes. **Ninguna toca datos existentes** —las 8 tablas están vacías—, así
 que el riesgo es el mínimo posible: es el mejor momento, antes del primer cliente.
 
-## CORRECCIÓN — la medida de recovery que publiqué estaba mal
+## RECOVERY — TERCERA medida, y la buena. La conclusión es la contraria
 
-Publiqué «113 tablas no se pueden reconstruir y 8 migraciones abortan». Estaba
-medido con `psql -v ON_ERROR_STOP=1`, que es **más estricto que el runner real**:
-`migrate.ts` trata la 507 sentencia a sentencia tolerando ocho códigos de error.
+**Publiqué dos números equivocados. Los dos eran de mi herramienta, no del código.**
 
-Con la semántica que se usaría de verdad en un despliegue:
+1. «113 tablas, 8 abortos» — medido con `psql -v ON_ERROR_STOP=1`, más estricto
+   que el runner real.
+2. «21 tablas» — con un cortador de SQL propio que **no saltaba comentarios de
+   línea**, así que partía en el `;` de
+   `-- Immutable audit trail (append-only; no updated_at)` y generaba fragmentos
+   inválidos. Llegó a reportar **«1 error de sintaxis en la 507» que no existe**:
+   era mi herramienta inventándolo.
+
+Con un cortador equivalente al real y comparando los mismos tipos de objeto:
 
 ```
-migraciones ejecutadas             473
-fallos DUROS                         2      (no 8)
-tablas creadas                     691      (producción tiene 712)
-faltan en la reconstrucción         21      (no 113)
-sentencias TOLERADAS en la 507     128
+migraciones ejecutadas         473
+fallos DUROS                     0
+objetos creados                711   (producción tiene 712)
 ```
 
-Lo dejo escrito porque el número equivocado ya se publicó, y un número equivocado
-que nadie corrige se hereda como hecho.
+### La cadena SÍ reconstruye el esquema
 
-## RECOVERY — el hallazgo real, que es otro
+Lo que falta se explica entero: `_migrations` (lo crea el runner) y 6 tablas
+`local_ai_*` (otro subsistema). **Hueco genuino: cero.**
 
-La cadena está **casi completa**: 18 de las 21 tablas que faltan **sí las declara
-la 507**. Lo que pasa es que su `CREATE` se toleró en silencio.
+### El hallazgo real es el inverso
 
-El runner tolera —marcando la migración como **APLICADA**— estos códigos:
+**Producción carece de SEIS objetos que una reconstrucción limpia sí crea:**
 
-| | | | |
-|---|---|---|---|
-| `42601` **error de sintaxis** | `42703` columna inexistente | `42P01` **tabla inexistente** | `42883` función inexistente |
-| `42701` columna duplicada | `42710` objeto duplicado | `42830` clave ajena inválida | `42P16` definición inválida |
+`visual_workflow_executions` · `workflow_nodes` · `workflow_trigger_registry` ·
+`os_public_api_keys` · `saas_user_invoices_legacy` · `user_provider_api_keys`
 
-De ahí sale la consecuencia que importa:
+Las tres primeras son **exactamente las que la función de Workflows necesita**.
+**Producción es la anómala, no la cadena** — y no hay que inventar esas tablas,
+hay que averiguar por qué su `CREATE` no prosperó allí.
+
+### La causa: 94 sentencias toleradas
+
+`migrate.ts` tolera ocho códigos en la 507 y **aun así la marca como aplicada**.
+Sobre base virgen se tragan 94: `42883` función inexistente (40), `42703` columna
+inexistente (39), `42P01` tabla inexistente (15).
 
 > **La misma migración produce un esquema distinto según el estado de partida, y
 > en los dos casos informa de éxito.**
 
-- Sobre base virgen: 128 sentencias toleradas → faltan 18 tablas.
-- En producción: se toleró **otro** subconjunto → faltan otras 5, entre ellas
-  `visual_workflow_executions`, `workflow_nodes` y `workflow_trigger_registry`.
-
-**Y esas tres son justo las que la función de Workflows necesita.** La
-reconstrucción virgen **sí las crea**: **producción es la anómala, no la cadena**.
-
-Eso cambia la ficha de Workflows: no hay que inventar tres tablas — **la migración
-ya las declara**. Hay que resolver por qué su `CREATE` falló en producción.
-
-**Alcance, comprobado**: la tolerancia se aplica a **una sola** migración, la 507,
-por constante nombrada. Las demás fallan duro. La versión alarmante —«cualquier
-migración puede aplicarse a medias»— **no es cierta**, y decirlo importa tanto
-como el hallazgo.
+**Alcance comprobado**: la tolerancia se limita a **una** migración por constante
+nombrada. Las demás fallan duro.
 
 ## Lo que ya NO aplica de la versión anterior
 

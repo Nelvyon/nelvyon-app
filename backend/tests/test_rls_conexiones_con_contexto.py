@@ -39,7 +39,15 @@ RAIZ = Path(__file__).resolve().parent.parent
 #: `alembic` y `db/migrations` corren como `postgres`; `scripts` y `migrations`
 #: son utilidades de linea de comandos que se ejecutan a mano, fuera del
 #: proceso; `tests` es este mismo arnes.
-EXCLUIDAS = ("tests", "alembic", "scripts", "migrations", "__pycache__", "node_modules")
+#:
+#: `db/certificacion` se anadio despues: son herramientas que se ejecutan A MANO
+#: para medir el catalogo de produccion en solo lectura y para reconstruir una
+#: base desechable local. No corren dentro del proceso de FastAPI, no actuan en
+#: nombre de ningun inquilino y no leen datos de cliente. Viven bajo `db/` en vez
+#: de `scripts/` porque lo que generan lo consume una prueba, y conviene tener
+#: juntos el generador y lo generado.
+EXCLUIDAS = ("tests", "alembic", "scripts", "migrations", "__pycache__",
+             "node_modules", "certificacion")
 
 #: Formas de abrir una conexion o fabricar sesiones sin pasar por
 #: `core/database.py`.
