@@ -107,7 +107,16 @@ export class SaasSubcuentasService {
       agency: { contacts: 50000, campaigns: 100 },
     };
     const limits = defaultLimits[plan];
-    const tenantId = `sub_${randomUUID().replace(/-/g, "").slice(0, 16)}`;
+    // El identificador es un UUID de verdad.
+    //
+    // Antes se construia `sub_<16 hex>`, y la columna `saas_subcuentas.tenant_id`
+    // es de tipo `uuid`: PostgreSQL responde «invalid input syntax for type uuid»
+    // y el INSERT falla. Es decir, una agencia NO PODIA dar de alta a un cliente.
+    //
+    // El prefijo venia de cuando esa columna era texto. Se quita: la columna
+    // manda, y ademas ese id se usa como inquilino en el resto del sistema, donde
+    // todo lo demas es uuid.
+    const tenantId = randomUUID();
 
     const rows = await this.db.query<Record<string, unknown>>(
       `INSERT INTO saas_subcuentas

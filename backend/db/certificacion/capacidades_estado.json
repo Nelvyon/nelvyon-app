@@ -55,9 +55,9 @@
   },
   "redes_sociales": {
    "rutas": 41,
-   "estado": "PENDING",
-   "evidencia": "",
-   "motivo": ""
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoLote11.pg.test.ts — contra PostgreSQL real con los servicios REALES; crear una publicacion y releerla, B no la ve (con control positivo), B no puede PUBLICARLA —publicar en nombre de otro es escribir en su perfil publico: no hay marcha atras y lo ve todo el mundo— ni borrarla, publicar sin cuenta ACTIVA no deja la publicacion marcada como publicada —una publicacion que se da por publicada y no salio es peor que un error, porque el cliente cree que ya comunico—, y las cuentas conectadas de A no salen en las de B. Mutacion: quitar el alcance de inquilino (6 sitios) tumba 5.",
+   "motivo": "PARCIAL: la publicacion REAL en LinkedIn, Meta, TikTok o X necesita OAuth del cliente. BLOCKED_EXTERNALLY esa parte; lo certificado es el almacen, el aislamiento y que no se finja una publicacion que no ha salido."
   },
   "contenido": {
    "rutas": 14,
@@ -175,8 +175,8 @@
   },
   "erp": {
    "rutas": 5,
-   "estado": "PENDING",
-   "evidencia": "",
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoErp.pg.test.ts — 7 pruebas contra PostgreSQL real. El ERP no guarda filas sueltas: guarda una INSTANTANEA por dominio con numero de version, asi que lo que importa no es el CRUD sino la CONCURRENCIA. Certificado: la instantanea se lee con su version y el payload jsonb vuelve como objeto con su array dentro —no como texto ni como {}—, guardar con la version correcta escribe y sube la version, guardar con una version VIEJA no escribe nada, y CUATRO escrituras SIMULTANEAS desde la misma version dejan exactamente UNA ganadora con una sola subida de version. Sin ese control las cuatro escribirian y tres cambios desapareceran sin dejar rastro: unidades que existen en pantalla y no en el almacen. Ademas: escribir en A no toca la instantanea de B, cada dominio lleva su propia version, y un inquilino sin instantanea no hereda la de otro. Mutaciones: quitar la comprobacion de version tumba 5; quitar el filtro de inquilino tumba 5.",
    "motivo": ""
   },
   "lms_formacion": {
@@ -217,15 +217,15 @@
   },
   "admin_plataforma": {
    "rutas": 12,
-   "estado": "PENDING",
-   "evidencia": "",
+   "estado": "FIXED_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoLote11.pg.test.ts — contra PostgreSQL real con los servicios REALES; subcuentas de agencia. DEFECTO ENCONTRADO Y CORREGIDO: `create` generaba el identificador como `sub_<16 hex>` y la columna `saas_subcuentas.tenant_id` es de tipo `uuid`, asi que PostgreSQL respondia «invalid input syntax for type uuid» y el INSERT fallaba. Una agencia NO PODIA dar de alta a un cliente. El prefijo venia de cuando esa columna era texto. Certificado ademas: la subcuenta aparece en la lista de SU agencia y no en la de otra (con control positivo), B no puede suspender ni cancelar la de A —dejar sin servicio al cliente de otra agencia, y quien lo sufre no sabe por que—, suspender y reactivar la propia persiste, y el consumo no se consulta desde otra agencia. Mutacion: devolver el identificador no-uuid tumba 5.",
    "motivo": ""
   },
   "os": {
    "rutas": 220,
-   "estado": "PENDING",
-   "evidencia": "",
-   "motivo": ""
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "aislamiento del espacio OS por el lado web: 33 pruebas contra PostgreSQL real (backend/saas/__tests__/aislamiento_os_lado_web.pg.test.ts), reverificadas ahora en verde. Mas la CACHE de datos de agente en el lote 11: la respuesta calculada para un inquilino NO se sirve a otro —si la cache no distinguiera inquilino, en datos de mercado eso seria inteligencia competitiva regalada— y el listado reciente no se cruza; mutacion: quitar el alcance tumba 1. Del Bloque 1 se suma que toda capacidad de agente declarada tiene quien la ejecute y que ninguna capacidad irreversible es automatica.",
+   "motivo": "PARCIAL y por diseno: la EJECUCION de los agentes necesita inferencia, y el interruptor maestro NELVYON_AI_ENABLED esta a 0 —cerrado en el Bloque 1 para que ni una ruta pueda gastar—. Certificar el resultado real de cada agente exigiria encenderlo y activar un proveedor de pago. Coste externo autorizado = 0 EUR, asi que esa parte queda fuera de lo ejecutable."
   },
   "ia_privada_memoria": {
    "rutas": 13,
