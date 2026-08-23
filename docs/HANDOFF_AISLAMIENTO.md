@@ -3,6 +3,45 @@
 Documento vivo. Se actualiza al cerrar cada lote, para que otra sesión continúe
 sin rehacer nada.
 
+## GDPR — la supresión de datos no podía completarse, y cancelaba Stripe primero
+
+`deleteUserData` hacía, **en este orden**: (1) cancelar la suscripción de Stripe
+—irreversible, en un tercero— y (2) `DELETE FROM user_provider_api_keys`, **una
+tabla que no existe en producción**.
+
+Resultado: **la suscripción cancelada y los datos del interesado intactos**. Es el
+peor orden posible: la acción externa irreversible primero, y la que de verdad
+pide la ley después, donde ya no llega. La exportación tenía el mismo problema y
+**no devolvía nada**.
+
+**Corregido**: la acción externa va al final, y `tryQuery`/`tryExec` dejan de
+tragarse **cualquier** error — toleran solo «objeto ausente» **con traza** y
+propagan el resto. 6/6, mutación en las dos direcciones.
+
+**Y una prueba mía nació inerte**: remataba con `if (iStripe >= 0) expect(...)`, y
+esa condición nunca se cumplía sin `STRIPE_SECRET_KEY`. Pasaba sin comprobar nada.
+La cazó la mutación.
+
+## Migración 575 — repara lo que la 507 y la 406 no llegaron a crear
+
+**Certificada, NO aplicada.** `BLOCKED_ON_FOUNDER: ADR-064`
+SHA256 `355c543758c7025e2373864857f4d6f1d2bcea6776c8a24de969a226ef862c15`
+
+`workflows.edges_json` · `workflow_nodes` · `visual_workflow_executions` ·
+`workflow_trigger_registry` (507) · `user_provider_api_keys` (406).
+
+**Causa medida**: `workflows` la crea `create_all` al **arrancar**, pero
+`migrate:prod` corre como `preDeployCommand` — **antes**. Las cuatro sentencias
+fallaron con `42P01`, se toleraron, y la 507 quedó registrada como aplicada.
+Comprobado replicando: con `workflows` presente funcionan.
+
+**No es una decisión de alcance** — se aplica lo que la 507 ya declara.
+**Desbloquea el editor visual de workflows.**
+
+Certificación: 4 objetos creados · idempotente · RLS con la familia OS (4+4) y
+`workflow_nodes` acotada **por su workflow padre** · aislamiento **funcional** con
+el rol real: A ve 1, B ve 1, **sin contexto 0**.
+
 ## Punto de partida
 
 - SHA producción certificado: `a86c1167`
