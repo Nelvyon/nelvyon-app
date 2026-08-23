@@ -250,9 +250,31 @@ ninguna acción irreversible es automática
 
 ## Riesgos residuales, por escrito
 
-1. **51 tablas con RLS y sin `FORCE`.** Solo importa si el rol que conecta es el
-   **dueño** de la tabla; la propiedad en producción no es verificable sin
-   tocarla. Uniformar el FORCE es defensa en profundidad barata, pendiente.
+1. **51 tablas con RLS y sin `FORCE`.** Medido sobre la base virgen, no supuesto:
+
+   | quién consulta | FORCE | filas que ve (de 2, con política que deja 1) |
+   |---|---|---|
+   | dueño **no** superusuario | sin FORCE | **2** — se salta su propia política |
+   | dueño **no** superusuario | con FORCE | 1 |
+   | superusuario | con FORCE | **2** — se salta todo, FORCE es irrelevante |
+   | rol que **no** es dueño | sin FORCE | 1 — la política se aplica igual |
+
+   Es decir: la falta de `FORCE` solo importa si el rol que conecta **es dueño de
+   la tabla y no es superusuario**. Hoy el servicio web conecta como `postgres`
+   (superusuario), para el que RLS es inerte con FORCE o sin él — eso ya está
+   recogido en `WEB_DB_ROLE_CUTOVER`. Y para `nelvyon_app`, que no es dueño, la
+   política se aplica igual.
+
+   Queda por saber quién es el dueño de esas 51 tablas en producción, y eso es
+   **una consulta** el día que haya autorización para leer allí:
+
+   ```sql
+   SELECT c.relname, pg_get_userbyid(c.relowner)
+     FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE n.nspname='public' AND c.relrowsecurity AND NOT c.relforcerowsecurity;
+   ```
+
+   No lo doy por bueno ni por malo: está acotado y sé exactamente cómo cerrarlo.
 2. **94 sentencias toleradas en la 507**, contadas por código de error. Mientras
    sigan ahí, esa migración puede volver a aplicarse a medias sin decirlo.
 3. **Cinco caminos vivos escriben columnas que no existen** (categoría 7). No son
