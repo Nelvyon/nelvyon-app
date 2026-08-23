@@ -77,6 +77,7 @@ async def entorno():
     asyncpg = pytest.importorskip("asyncpg")
     limpio = (DSN or "").replace("postgresql+asyncpg://", "postgresql://")
     adm = await asyncpg.connect(limpio, timeout=30)
+    await adm.execute(_TOPES)
 
     marca = secrets.token_hex(4)
     tenants, propietarios, usuarios = {}, {}, []
@@ -156,6 +157,24 @@ async def _columnas_obligatorias(adm, tabla: str) -> list[tuple[str, str]]:
     return [(r["column_name"], r["data_type"]) for r in filas]
 
 
+#: Ninguna consulta de esta bateria puede esperar indefinidamente.
+#:
+#: `asyncpg.connect` tiene tope de CONEXION, pero eso no acota lo que tarde una
+#: sentencia YA conectada. Sin estos dos topes, una espera de cerrojo dejaria la
+#: suite parada sin avanzar ni fallar — y en CI eso no es un rojo, es una
+#: ejecucion que no termina nunca y una afirmacion de aislamiento que nadie llega
+#: a comprobar.
+#:
+#: Con ellos, esperar se convierte en un fallo que DICE en que tabla.
+#:
+#: (Aparte: esta bateria es LENTA a proposito —recorre ~220 tablas abriendo una
+#: conexion por cada una, unos 3 minutos por prueba y unos 12 el fichero—. Es
+#: lentitud, no bloqueo: llegue a matar dos ejecuciones de la suite creyendo lo
+#: contrario. Si alguna vez se acelera, sera reutilizando la conexion —el
+#: contexto de A es el mismo en todas las vueltas— y NO relajando lo que mide.)
+_TOPES = "SET statement_timeout = '15s'; SET lock_timeout = '5s';"
+
+
 async def _sembrar(adm, tabla: str, tid) -> bool:
     """Una fila del inquilino `tid`, rellenando lo obligatorio por tipo.
 
@@ -187,6 +206,7 @@ async def _como_app(dsn_app: str, uid):
     import asyncpg
 
     c = await asyncpg.connect(dsn_app, timeout=20)
+    await c.execute(_TOPES)
     await _fijar_contexto(c, uid)
     return c
 
