@@ -91,9 +91,9 @@
   },
   "reservas": {
    "rutas": 12,
-   "estado": "PENDING",
-   "evidencia": "",
-   "motivo": ""
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoLote7.pg.test.ts — contra PostgreSQL real con los servicios REALES; crear y releer conservando fecha, editar comprobado EN LA FILA, listado por rango que devuelve lo de dentro y nada de fuera, y B no lee, no edita ni borra el evento de A. Mutacion: quitar el alcance de inquilino (4 sitios) tumba 4.",
+   "motivo": "RIESGO RESIDUAL de presentacion: `event_date` es un `date` y pg lo devuelve como medianoche LOCAL, asi que serializarlo con toISOString() en un huso al este de UTC da el dia ANTERIOR. Una reserva del 15 puede mostrarse como 14. El guardado es correcto; el riesgo esta en como se serialice hacia el cliente."
   },
   "workflows": {
    "rutas": 32,
@@ -127,8 +127,8 @@
   },
   "partners_afiliados": {
    "rutas": 19,
-   "estado": "PENDING",
-   "evidencia": "",
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoLote7.pg.test.ts — contra PostgreSQL real con los servicios REALES; registrar partner y releer su codigo, el duplicado se RECHAZA (dos filas para la misma persona serian dos codigos y comisiones repartidas sin que nadie lo note), la comision se calcula y es un numero FINITO, positivo y menor que el importe —ni NaN ni Infinity—, un codigo inventado no crea comision, y las referencias de un partner son solo las suyas con control positivo. Mutacion: quitar el filtro de partner_id en getReferrals tumba 1.",
    "motivo": ""
   },
   "contratos": {
@@ -169,9 +169,9 @@
   },
   "ecommerce_tienda": {
    "rutas": 14,
-   "estado": "PENDING",
-   "evidencia": "",
-   "motivo": ""
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoLote7.pg.test.ts — contra PostgreSQL real con los servicios REALES; producto creado y releido con precio y stock, el precio con decimales se guarda EXACTO —25,50 guardado como 25 o como 25,499999 es dinero perdido o cobrado de mas, y no da ningun error—, un pedido guarda su total cuadrado con las lineas (2 x 25,50 = 51), los ajustes son por inquilino, y B no lee, no edita, no borra el producto de A ni ve su pedido. Mutacion: quitar el alcance de inquilino (11 sitios) tumba 5.",
+   "motivo": "ANOTADO: `createOrder` acepta `unitPrice` del LLAMANTE. La ruta publica de compra lo RESUELVE desde el producto —no lo acepta del comprador—, que es lo correcto y por eso no hay defecto vivo. Pero el contrato del servicio confia en quien llama, igual que el total de linea en facturas: cualquier consumidor futuro que pase el precio del cliente vendera al precio que el cliente elija."
   },
   "erp": {
    "rutas": 5,
@@ -181,8 +181,8 @@
   },
   "lms_formacion": {
    "rutas": 18,
-   "estado": "PENDING",
-   "evidencia": "",
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoLote7.pg.test.ts — contra PostgreSQL real con los servicios REALES; el recorrido entero de una pieza —curso, modulo, leccion, matricula y progreso comprobado en el contador que ve el alumno—, publicar hace visible el curso en el catalogo publico y un curso SIN publicar NO sale (el control del anterior: si todo saliera publicado, publicar no querria decir nada y los borradores serian visibles), B no ve el curso de A ni lo borra, y no ve sus matriculas. Mutacion: quitar el alcance de inquilino (27 sitios) tumba 4.",
    "motivo": ""
   },
   "formularios_captacion": {
