@@ -31,9 +31,9 @@
   },
   "crm": {
    "rutas": 48,
-   "estado": "PENDING",
-   "evidencia": "",
-   "motivo": ""
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoDeCrm.pg.test.ts — 14 pruebas contra PostgreSQL real con los servicios REALES (SaasCrmService y SaasDealsService): crear, leer, listar, editar y RELEER la fila sin pasar por el servicio, actividad, oportunidad, cambio de etapa persistido, metricas que reflejan lo que hay, y borrado. Cinco negativos de otro inquilino: B no lee, no edita y no borra el contacto de A, ni ve ni mueve de etapa su oportunidad. Mutaciones: quitar el filtro de inquilino de getContact tumba 8, de deleteContact tumba 1 y de getDeal tumba 3.",
+   "motivo": "RIESGO RESIDUAL: el correo NO se valida en ninguna capa —ni el servicio ni la ruta—, asi que «no-soy-un-correo» entra y se guarda. La consecuencia llega despues: una campana a ese contacto rebota y la deduplicacion por correo trata la basura como una direccion. No lo arreglo: anadir validacion RECHAZARIA lo que hoy se acepta y rompe importaciones que ahora funcionan. Es decision de producto, incluido que hacer con los contactos ya guardados asi."
   },
   "prospeccion_cold_email": {
    "rutas": 9,
