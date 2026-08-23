@@ -81,7 +81,7 @@
    "rutas": 21,
    "estado": "PENDING",
    "evidencia": "",
-   "motivo": ""
+   "motivo": "Notificaciones ya certificadas en el lote 2, con un DEFECTO CORREGIDO: `markRead` comparaba tenant_id = $3::uuid contra una columna varchar, asi que marcar una notificacion como leida fallaba SIEMPRE. Falta cubrir tickets y conversaciones."
   },
   "chatbot": {
    "rutas": 8,
@@ -103,14 +103,14 @@
   },
   "ab_testing": {
    "rutas": 7,
-   "estado": "PENDING",
-   "evidencia": "",
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoLote2.pg.test.ts — el A/B vivo es /api/saas/ab-testing -> SaasAbTestingService -> ab_tests, y SI casa con la tabla. Certificado: exige al menos DOS variantes (un A/B con una variante no es un experimento, es un envio), variantes que vuelven como ARRAY, eventos que se acumulan en la variante CORRECTA y no en la otra, ganador que persiste en la fila, y B no lee ni toca la prueba de A. `declareWinner` exige envios: declarar un ganador sobre cero datos seria inventar el resultado del experimento.",
    "motivo": ""
   },
   "facturacion_billing": {
    "rutas": 42,
    "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoDePresupuestos.pg.test.ts — 15 pruebas contra PostgreSQL real con SaasQuotesService: importes (subtotal como suma de lineas, descuento e impuesto EN ORDEN, IVA 21% por defecto y 0% cuando se declara, y que lo GUARDADO coincide con lo calculado), numeracion (ocho presupuestos SIMULTANEOS -> ocho numeros distintos; secuencia independiente por inquilino), recorrido completo y borrado sin dejar lineas huerfanas, mas cuatro negativos del inquilino B. Mutaciones: numeracion leer-y-luego-escribir tumba 1; aplicar el impuesto antes del descuento tumba 2. Ademas, del Bloque 1: el reclamo de idempotencia de Stripe certificado contra PostgreSQL real (replay, duplicados simultaneos, estado terminal, atasco) y la resurreccion de membresias por reordenacion, cerrada.",
+   "evidencia": "backend/saas/__tests__/flujoDePresupuestos.pg.test.ts — 15 pruebas contra PostgreSQL real con SaasQuotesService: importes (subtotal como suma de lineas, descuento e impuesto EN ORDEN, IVA 21% por defecto y 0% cuando se declara, y que lo GUARDADO coincide con lo calculado), numeracion (ocho presupuestos SIMULTANEOS -> ocho numeros distintos; secuencia independiente por inquilino), recorrido completo y borrado sin dejar lineas huerfanas, mas cuatro negativos del inquilino B. Mutaciones: numeracion leer-y-luego-escribir tumba 1; aplicar el impuesto antes del descuento tumba 2. Ademas, del Bloque 1: el reclamo de idempotencia de Stripe certificado contra PostgreSQL real (replay, duplicados simultaneos, estado terminal, atasco) y la resurreccion de membresias por reordenacion, cerrada. REFORZADO en el lote 2: contrato de facturas reconstruido —/api/saas/facturas -> SaasFacturasService -> invoices (forma de inquilino), /api/saas/invoices -> SaasInvoiceService -> saas_invoices— con lineas que vuelven como ARRAY, importes calculados Y guardados, y un DEFECTO CORREGIDO: el total de cada linea lo calcula el llamante y la ruta no lo validaba, asi que un cliente que lo omitiera guardaba NaN en subtotal y total (NaN es valor valido en numeric). Ahora se RECHAZA en vez de recalcularlo, porque una linea puede llevar un total pactado distinto de cantidad x precio. Mutacion: quitar la comprobacion tumba 1.",
    "motivo": "PARCIAL: STRIPE_MEMBERSHIP_REACTIVATION = BLOCKED_ON_FOUNDER — el unico evento que lleva a `active` es customer.subscription.created, asi que quien caduca por impago no vuelve nunca aunque pague. Y `InvoicingService` escribe en `invoices` una forma que la tabla no tiene: a que tabla pertenece (invoices vs saas_invoices) es decision de producto."
   },
   "packs_entregables": {

@@ -88,7 +88,13 @@ export class SaasNotificationService {
   async markRead(id: string, userId: string, tenantId: string): Promise<boolean> {
     const rows = await this.db.query<{ id: string }>(
       `UPDATE saas_notifications SET read = true
-       WHERE id = $1::uuid AND user_id = $2 AND tenant_id = $3::uuid AND read = false
+       -- tenant_id es character varying(255), no uuid. Con el molde a uuid
+       -- PostgreSQL responde «operator does not exist: character varying = uuid»
+       -- y el UPDATE falla SIEMPRE: marcar una notificacion como leida no hacia
+       -- nada. El resto de consultas de este mismo fichero la comparan sin
+       -- molde; esta era la unica con el. La columna id SI es uuid y su molde
+       -- se queda.
+       WHERE id = $1::uuid AND user_id = $2 AND tenant_id = $3 AND read = false
        RETURNING id`,
       [id, userId, tenantId],
     );

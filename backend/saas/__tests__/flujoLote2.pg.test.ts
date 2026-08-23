@@ -114,6 +114,28 @@ describeSiHayPg("BLOQUE 2 · lote 2", () => {
       expect(Number(fila.rows[0]?.total)).toBe(2420);
     });
 
+    it("una linea SIN total se rechaza, no se guarda NaN", async () => {
+      // El `total` de cada linea lo calcula el LLAMANTE y la ruta pasa el cuerpo
+      // sin validar. La interfaz lo manda bien, pero cualquier otro cliente que
+      // lo omita hacia que la suma diera NaN... y NaN es un valor VALIDO en una
+      // columna `numeric` de PostgreSQL: se guardaba, sin error, en el subtotal
+      // y en el total de una factura.
+      await expect(svc.create(A, {
+        lineItems: [{ description: "Sin total", quantity: 1, unitPrice: 100 }],
+        taxRate: 21,
+      } as never)).rejects.toThrow();
+
+      const filas = await pool.query("SELECT 1 FROM invoices WHERE tenant_id = $1", [A]);
+      expect(filas.rows).toHaveLength(0);
+    });
+
+    it("EL CONTROL: una factura con totales validos SI se crea", async () => {
+      // Sin este control, rechazarlo TODO aprobaria la prueba de arriba y
+      // dejaria la facturacion sin funcionar.
+      const f = await svc.create(A, factura() as never);
+      expect(f.id).toBeTruthy();
+    });
+
     it("editar PERSISTE en la fila", async () => {
       const f = await svc.create(A, factura() as never);
       await svc.update(A, f.id, { notes: "Pagada por transferencia" } as never);
@@ -186,6 +208,7 @@ describeSiHayPg("BLOQUE 2 · lote 2", () => {
 
     it("registrar un evento se acumula en la variante correcta", async () => {
       const t = await svc.create(A, prueba() as never);
+      await svc.recordEvent(A, t.id, "var_0", "send" as never);
       await svc.recordEvent(A, t.id, "var_0", "open" as never);
       await svc.recordEvent(A, t.id, "var_0", "open" as never);
 
@@ -197,8 +220,13 @@ describeSiHayPg("BLOQUE 2 · lote 2", () => {
     });
 
     it("declarar ganador PERSISTE el ganador", async () => {
+      // `declareWinner` exige que alguna variante tenga ENVIOS: sin envios no
+      // hay tasa de apertura que comparar, y declarar un ganador sobre cero
+      // datos seria inventar el resultado del experimento. Por eso se registra
+      // primero un envio.
       const t = await svc.create(A, prueba() as never);
-      await svc.recordEvent(A, t.id, "var_1", "click" as never);
+      await svc.recordEvent(A, t.id, "var_1", "send" as never);
+      await svc.recordEvent(A, t.id, "var_1", "open" as never);
       await svc.declareWinner(A, t.id);
 
       const fila = await pool.query<{ winner_variant_id: string; status: string }>(
@@ -222,7 +250,8 @@ describeSiHayPg("BLOQUE 2 · lote 2", () => {
     let svc: SaasNotificationService;
     beforeAll(() => { svc = new SaasNotificationService({ db: puerto() as never }); });
     beforeEach(async () => {
-      await pool.query("DELETE FROM saas_notifications WHERE tenant_id = ANY($1)", [[A, B]]).catch(() => {});
+      // `tenant_id` es varchar, no uuid: sin el molde no hay operador que compare.
+      await pool.query("DELETE FROM saas_notifications WHERE tenant_id = ANY($1::text[])", [[A, B]]).catch(() => {});
     });
 
     //: `createNotification` recibe UN objeto con `userId` y `tenantId` dentro, no
@@ -234,43 +263,44 @@ describeSiHayPg("BLOQUE 2 · lote 2", () => {
     });
 
     it("crear → aparece en la lista y cuenta como NO leída", async () => {
-      await svc.createNotification(A, aviso());
-      expect((await svc.getNotifications(A)).length).toBeGreaterThan(0);
-      expect(await svc.getUnreadCount(A)).toBe(1);
+      await svc.createNotification(aviso(A) as never);
+      expect((await svc.getNotifications(A, A)).length).toBeGreaterThan(0);
+      expect(await svc.getUnreadCount(A, A)).toBe(1);
     });
 
     it("marcar una como leída baja el contador, y solo esa", async () => {
-      const n1 = await svc.createNotification(A, aviso("Una") as never);
-      await svc.createNotification(A, aviso("Otra") as never);
-      await svc.markRead(A, n1.id);
+      const n1 = await svc.createNotification(aviso(A, "Una") as never);
+      await svc.createNotification(aviso(A, "Otra") as never);
+      await svc.markRead(n1.id, A, A);
 
-      expect(await svc.getUnreadCount(A)).toBe(1);
+      expect(await svc.getUnreadCount(A, A)).toBe(1);
     });
 
     it("marcar todas deja el contador a cero, y PERSISTE", async () => {
-      await svc.createNotification(A, aviso("Una") as never);
-      await svc.createNotification(A, aviso("Otra") as never);
-      await svc.markAllRead(A);
+      await svc.createNotification(aviso(A, "Una") as never);
+      await svc.createNotification(aviso(A, "Otra") as never);
+      await svc.markAllRead(A, A);
 
-      expect(await svc.getUnreadCount(A)).toBe(0);
+      expect(await svc.getUnreadCount(A, A)).toBe(0);
       const sinLeer = await pool.query(
-        "SELECT 1 FROM saas_notifications WHERE tenant_id = $1 AND read_at IS NULL", [A]);
+        // La columna es `read` (boolean), no `read_at`.
+        "SELECT 1 FROM saas_notifications WHERE tenant_id = $1 AND read = false", [A]);
       expect(sinLeer.rows).toHaveLength(0);
     });
 
     it("marcar todas las de A NO toca las de B", async () => {
       // La prueba que importa: un `markAllRead` sin alcance de inquilino
       // silenciaría los avisos de todos los demás clientes a la vez.
-      await svc.createNotification(A, aviso() as never);
-      await svc.createNotification(B, aviso() as never);
-      await svc.markAllRead(A);
+      await svc.createNotification(aviso(A) as never);
+      await svc.createNotification(aviso(B) as never);
+      await svc.markAllRead(A, A);
 
-      expect(await svc.getUnreadCount(B)).toBe(1);
+      expect(await svc.getUnreadCount(B, B)).toBe(1);
     });
 
     it("B no ve las notificaciones de A", async () => {
-      await svc.createNotification(A, aviso("Privada de A") as never);
-      const deB = await svc.getNotifications(B);
+      await svc.createNotification(aviso(A, "Privada de A") as never);
+      const deB = await svc.getNotifications(B, B);
       expect(deB.map((x) => x.title)).not.toContain("Privada de A");
     });
   });
