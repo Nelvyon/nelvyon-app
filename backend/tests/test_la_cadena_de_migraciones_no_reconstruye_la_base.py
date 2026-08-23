@@ -1,58 +1,53 @@
-"""Cuánto de NELVYON se puede reconstruir desde las migraciones. Medido.
+"""Cuánto de NELVYON se reconstruye desde las migraciones. Medido con la semántica REAL.
 
-EL HALLAZGO
------------
-Se aplicó la cadena entera —473 ficheros— sobre una PostgreSQL **virgen**, sin un
-solo apaño, y se contó:
+UNA MEDICION MIA QUE ESTABA MAL
+--------------------------------
+La primera version de esta prueba decia «113 tablas no se pueden reconstruir y 8
+migraciones abortan». Estaba medido con `psql -v ON_ERROR_STOP=1`, que es MAS
+ESTRICTO que el runner de produccion: `migrate.ts` trata la 507 sentencia a
+sentencia tolerando ocho codigos de error.
 
-    tablas creadas desde las migraciones     602
-    tablas que hay en produccion             712
-    ─────────────────────────────────────────────
-    SOLO en produccion                       113
+Medido con la semantica que se usaria de verdad en un despliegue:
 
-    migraciones que FALLAN sobre base virgen   8
+    migraciones ejecutadas             473
+    fallos DUROS                         2
+    tablas creadas                     691   (produccion tiene 712)
+    faltan en la reconstruccion         21
+    sentencias TOLERADAS en la 507     128
 
-Es decir: **la cadena de migraciones no reconstruye la base.** Faltarían 113
-tablas y 8 migraciones abortarían.
+Se deja escrito porque el numero equivocado ya se publico, y un numero
+equivocado que nadie corrige se hereda como hecho.
 
-POR QUE PRODUCCION SI FUNCIONA
--------------------------------
-`core/database.py` ejecuta `Base.metadata.create_all` **incondicionalmente** al
-arrancar la aplicación. Las 113 tablas las declara SQLAlchemy en `models/`, nunca
-el SQL. Producción llegó a su estado actual porque la app arrancó muchas veces
-junto a las migraciones.
+EL HALLAZGO DE VERDAD, QUE ES OTRO
+-----------------------------------
+La cadena esta casi completa: 18 de las 21 tablas que faltan SI las declara la
+507. Lo que pasa es que su `CREATE` se tolero en silencio.
 
-Y ahí está el riesgo real: `migrate:prod` corre como `preDeployCommand`, es decir
-**antes** de que la aplicación arranque. En un entorno NUEVO —una recuperación de
-desastre, una réplica de staging, un despliegue en otra región— las 8 migraciones
-se ejecutarían antes de que exista lo que necesitan, y fallarían.
+Y el runner tolera —marcando la migracion como APLICADA— estos codigos:
 
-Las 8, con lo que les falta:
+    42601 error de sintaxis        42703 columna inexistente
+    42710 objeto duplicado         42883 funcion inexistente
+    42P01 TABLA INEXISTENTE        42830 clave ajena invalida
+    42701 columna duplicada        42P16 definicion invalida
 
-    507  workflows                    (la crea `models/workflows.py`)
-    524  intent_events
-    525  intent_scores
-    526  pr_releases
-    528  intent_scores
-    543  chat_conversations
-    554  os_store_projects
-    555  onboarding_workspace_steps
+De ahi sale la consecuencia que importa:
 
-QUE VIGILA ESTA PRUEBA
-----------------------
-No reejecuta la cadena: eso tarda minutos y necesita una base desechable. Vigila
-que el **hueco no crezca** — que no se añadan modelos nuevos cuya tabla no declare
-ninguna migración, porque cada uno amplía la parte de NELVYON que no se puede
-reconstruir.
+  **la misma migracion produce un esquema DISTINTO segun el estado de partida,
+  y en los dos casos informa de exito.**
 
-El inventario vive en `db/certificacion/hueco_reconstruccion.json`, medido con
-PostgreSQL real. Se regenera con `qcatalogo.py` + una base virgen.
+  Sobre base virgen se tragan 128 sentencias y faltan 18 tablas.
+  En produccion se trago otro subconjunto y faltan otras 5 — entre ellas
+  `visual_workflow_executions`, `workflow_nodes` y `workflow_trigger_registry`,
+  que son justo las que la funcion de Workflows necesita.
 
-NO ES UN FALLO DE PRODUCCION
------------------------------
-Hoy no rompe nada. Es una propiedad de **recuperación**: si hubiera que levantar
-NELVYON desde cero, el esquema no saldría solo de las migraciones. Conviene que
-sea un número conocido y decreciente, no una sorpresa el día que haga falta.
+Es decir: **la reconstruccion virgen CREA las tres tablas que produccion no
+tiene.** Produccion es la anomala, no la cadena.
+
+ALCANCE
+-------
+Esa tolerancia se aplica a UNA sola migracion, la 507, por constante nombrada
+(`CONSOLIDATED_MIGRATION`). Las demas fallan duro. Conviene decirlo: la version
+alarmante —«cualquier migracion puede aplicarse a medias»— no es cierta.
 """
 from __future__ import annotations
 
@@ -62,20 +57,21 @@ import pathlib
 CERT = pathlib.Path(__file__).resolve().parents[1] / "db" / "certificacion"
 HUECO = CERT / "hueco_reconstruccion.json"
 
-#: Techo del hueco medido el 2026-08-23. Solo puede BAJAR: cada tabla que pase a
-#: declararse en una migración lo reduce.
-TECHO_TABLAS_NO_RECONSTRUIBLES = 113
+#: Techo medido el 2026-08-23 con la semantica real del runner. Solo puede BAJAR.
+TECHO_TABLAS_QUE_FALTAN = 27
 
-#: Migraciones que abortan sobre una base virgen, con lo que les falta.
-MIGRACIONES_QUE_FALLAN = {
-    "507_fastapi_runtime_schemas.sql": "workflows (la crea models/workflows.py)",
-    "524_fastapi_raw_sql_schema_drift.sql": "intent_events",
-    "525_fastapi_raw_sql_schema_drift_batch2.sql": "intent_scores",
-    "526_legacy_not_null_relaxation.sql": "pr_releases",
-    "528_intent_scores_legacy_pk_repair.sql": "intent_scores",
-    "543_rls_politicas_por_workspace.sql": "chat_conversations",
-    "554_privilegios_de_los_14_servicios.sql": "os_store_projects",
-    "555_soporte_y_ciclo_de_vida.sql": "onboarding_workspace_steps",
+#: Codigos que `isTolerableConsolidatedMigrationError` deja pasar marcando la
+#: migracion como aplicada. Cada uno puede esconder una tabla o una columna que
+#: no se creo.
+CODIGOS_TOLERADOS = {
+    "42601": "error de sintaxis",
+    "42701": "columna duplicada",
+    "42703": "columna inexistente",
+    "42710": "objeto duplicado",
+    "42830": "clave ajena invalida",
+    "42883": "funcion inexistente",
+    "42P01": "tabla inexistente",
+    "42P16": "definicion de tabla invalida",
 }
 
 
@@ -84,45 +80,60 @@ def _hueco() -> dict:
 
 
 def test_la_medida_existe_y_es_creible():
-    """Sin el inventario, la comprobación de abajo aprobaría por no tener contra qué."""
+    """Sin el inventario, lo de abajo aprobaria por no tener contra que."""
     assert HUECO.exists(), f"falta {HUECO}"
     d = _hueco()
-    assert d["desde_migraciones"] >= 400, "muy pocas tablas desde migraciones: la medida no vale"
-    assert d["en_produccion"] >= 700, "el catálogo de producción parece incompleto"
+    assert d["virgen"] >= 600, "muy pocas tablas desde migraciones: la medida no vale"
+    assert d["produccion"] >= 700, "el catalogo de produccion parece incompleto"
 
 
 def test_el_hueco_de_reconstruccion_no_crece():
-    """LA PRUEBA. Cada tabla que solo existe por `create_all` es una que no se
-    podría reconstruir desde las migraciones."""
-    n = len(_hueco()["solo_en_produccion"])
-    assert n <= TECHO_TABLAS_NO_RECONSTRUIBLES, (
-        f"{n} tablas de producción no las crea ninguna migración, y el techo era "
-        f"{TECHO_TABLAS_NO_RECONSTRUIBLES}. Alguien añadió un modelo sin su "
-        f"migración: eso amplía la parte de NELVYON que no se puede levantar de "
-        f"cero.")
+    """LA PRUEBA. Cada tabla que no salga de las migraciones es una que no se
+    podria levantar en una recuperacion."""
+    n = len(_hueco()["faltan"])
+    assert n <= TECHO_TABLAS_QUE_FALTAN, (
+        f"{n} tablas de produccion no salen de la cadena de migraciones, y el "
+        f"techo era {TECHO_TABLAS_QUE_FALTAN}: la parte de NELVYON que no se "
+        f"puede levantar de cero ha crecido")
 
 
-def test_las_migraciones_que_fallan_estan_declaradas_con_su_causa():
-    """Una lista sin causas es una lista de excusas.
+def test_la_reconstruccion_virgen_crea_las_tablas_que_produccion_no_tiene():
+    """El hallazgo, comprobado: produccion es la anomala.
 
-    Y la causa importa: las ocho fallan por lo MISMO —dependen de tablas que crea
-    SQLAlchemy y no el SQL—, así que se arreglan igual: declarando esas tablas en
-    una migración.
+    Si algun dia estas tres dejaran de crearse en la virgen, el diagnostico
+    cambiaria —seria la cadena la que no las declara— y habria que revisarlo.
     """
-    for fichero, falta in MIGRACIONES_QUE_FALLAN.items():
-        assert (CERT.parents[0] / "migrations" / fichero).exists(), (
-            f"`{fichero}` ya no existe: quítalo de MIGRACIONES_QUE_FALLAN")
-        assert len(falta) > 3, f"{fichero} no dice qué le falta"
+    sobran = set(_hueco()["sobran"])
+    for t in ("visual_workflow_executions", "workflow_nodes", "workflow_trigger_registry"):
+        assert t in sobran, (
+            f"`{t}` ya no aparece solo en la virgen: o produccion la tiene ya, o "
+            f"la 507 dejo de crearla. En los dos casos, revisa el diagnostico")
 
 
-def test_create_all_sigue_siendo_incondicional():
-    """La premisa del hallazgo, comprobada en vez de supuesta.
+def test_la_tolerancia_del_runner_sigue_documentada():
+    """La causa raiz, vigilada.
 
-    Si algún día `create_all` pasara a estar condicionado —o desapareciera— este
-    razonamiento cambiaría por completo: las 113 tablas dejarían de crearse solas
-    y el problema saltaría en el arranque siguiente.
+    Si alguien anade un codigo a la lista, esta prueba obliga a declararlo aqui
+    y a pensar que puede esconder. Si la quita, tambien.
     """
-    fuente = (CERT.parents[1] / "core" / "database.py").read_text(encoding="utf-8")
-    assert "Base.metadata.create_all" in fuente, (
-        "`create_all` ya no está: revisa si las 113 tablas siguen creándose, "
-        "porque si no, producción dejaría de tenerlas")
+    fuente = (CERT.parents[0] / "splitSqlStatements.ts").read_text(encoding="utf-8")
+    codigo = "\n".join(l for l in fuente.splitlines() if not l.lstrip().startswith(("//", "*", "/*")))
+    for c in CODIGOS_TOLERADOS:
+        assert f'"{c}"' in codigo, (
+            f"el codigo {c} ya no se tolera: quitalo de CODIGOS_TOLERADOS")
+    declarados = sum(1 for l in codigo.splitlines() if l.strip().startswith('"4'))
+    assert declarados == len(CODIGOS_TOLERADOS), (
+        f"el runner tolera {declarados} codigos y aqui hay {len(CODIGOS_TOLERADOS)} "
+        f"declarados: cada uno puede esconder una tabla que no se creo")
+
+
+def test_solo_una_migracion_recibe_trato_tolerante():
+    """El alcance, comprobado en vez de supuesto.
+
+    La version alarmante de este hallazgo —«cualquier migracion puede aplicarse
+    a medias»— NO es cierta, y decirlo importa tanto como el hallazgo.
+    """
+    fuente = (CERT.parents[0] / "migrate.ts").read_text(encoding="utf-8")
+    assert "if (file === CONSOLIDATED_MIGRATION)" in fuente, (
+        "el trato tolerante ya no se limita a una migracion nombrada: ahora si "
+        "podria afectar a cualquiera, y este razonamiento cambia")

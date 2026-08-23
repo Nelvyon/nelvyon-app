@@ -1816,7 +1816,58 @@ empobrecería la oferta, que es lo contrario del objetivo.
 independientes. **Ninguna toca datos existentes** —las 8 tablas están vacías—, así
 que el riesgo es el mínimo posible: es el mejor momento, antes del primer cliente.
 
-## RECOVERY — la cadena de migraciones NO reconstruye la base
+## CORRECCIÓN — la medida de recovery que publiqué estaba mal
+
+Publiqué «113 tablas no se pueden reconstruir y 8 migraciones abortan». Estaba
+medido con `psql -v ON_ERROR_STOP=1`, que es **más estricto que el runner real**:
+`migrate.ts` trata la 507 sentencia a sentencia tolerando ocho códigos de error.
+
+Con la semántica que se usaría de verdad en un despliegue:
+
+```
+migraciones ejecutadas             473
+fallos DUROS                         2      (no 8)
+tablas creadas                     691      (producción tiene 712)
+faltan en la reconstrucción         21      (no 113)
+sentencias TOLERADAS en la 507     128
+```
+
+Lo dejo escrito porque el número equivocado ya se publicó, y un número equivocado
+que nadie corrige se hereda como hecho.
+
+## RECOVERY — el hallazgo real, que es otro
+
+La cadena está **casi completa**: 18 de las 21 tablas que faltan **sí las declara
+la 507**. Lo que pasa es que su `CREATE` se toleró en silencio.
+
+El runner tolera —marcando la migración como **APLICADA**— estos códigos:
+
+| | | | |
+|---|---|---|---|
+| `42601` **error de sintaxis** | `42703` columna inexistente | `42P01` **tabla inexistente** | `42883` función inexistente |
+| `42701` columna duplicada | `42710` objeto duplicado | `42830` clave ajena inválida | `42P16` definición inválida |
+
+De ahí sale la consecuencia que importa:
+
+> **La misma migración produce un esquema distinto según el estado de partida, y
+> en los dos casos informa de éxito.**
+
+- Sobre base virgen: 128 sentencias toleradas → faltan 18 tablas.
+- En producción: se toleró **otro** subconjunto → faltan otras 5, entre ellas
+  `visual_workflow_executions`, `workflow_nodes` y `workflow_trigger_registry`.
+
+**Y esas tres son justo las que la función de Workflows necesita.** La
+reconstrucción virgen **sí las crea**: **producción es la anómala, no la cadena**.
+
+Eso cambia la ficha de Workflows: no hay que inventar tres tablas — **la migración
+ya las declara**. Hay que resolver por qué su `CREATE` falló en producción.
+
+**Alcance, comprobado**: la tolerancia se aplica a **una sola** migración, la 507,
+por constante nombrada. Las demás fallan duro. La versión alarmante —«cualquier
+migración puede aplicarse a medias»— **no es cierta**, y decirlo importa tanto
+como el hallazgo.
+
+## Lo que ya NO aplica de la versión anterior
 
 **Medido ejecutando**, no leyendo: se aplicaron las 473 migraciones sobre una
 PostgreSQL virgen, sin un solo apaño.
