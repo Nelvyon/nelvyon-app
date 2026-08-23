@@ -133,8 +133,8 @@
   },
   "contratos": {
    "rutas": 7,
-   "estado": "PENDING",
-   "evidencia": "",
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoLote1.pg.test.ts — 19 pruebas contra PostgreSQL real con los servicios REALES; crear y releer, enviar a firma con token, FIRMAR y comprobar en la fila que queda `signed` —un contrato que se firma sin quedar firmado es la mentira funcional exacta—, un token inventado no firma nada, anular impide firmar despues, y B no ve el de A. Mutacion: quitar el alcance por usuario (3 sitios) tumba 5.",
    "motivo": ""
   },
   "storage_uploads": {
@@ -151,8 +151,8 @@
   },
   "encuestas": {
    "rutas": 3,
-   "estado": "PENDING",
-   "evidencia": "",
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoLote1.pg.test.ts — 19 pruebas contra PostgreSQL real con los servicios REALES; crear y RELEER conservando las preguntas como ARRAY (no como objeto, que es lo que hace pg con un array de JS), editar comprobado en la FILA, respuesta registrada, borrado, y B no lee ni edita ni borra la de A. Mutacion: quitar el alcance de inquilino (11 sitios) tumba 4.",
    "motivo": ""
   },
   "integraciones": {
@@ -193,14 +193,14 @@
   },
   "web_builder": {
    "rutas": 10,
-   "estado": "PENDING",
-   "evidencia": "",
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoLote1.pg.test.ts — 19 pruebas contra PostgreSQL real con los servicios REALES; crear y RELEER con las secciones como ARRAY, resolucion por SLUG —que es la URL publica: si no resuelve, la pagina existe y nadie la ve—, y B no la ve ni por id ni por slug. Mutacion: quitar el alcance de inquilino (12 sitios) tumba 4.",
    "motivo": ""
   },
   "marca_blanca": {
    "rutas": 3,
-   "estado": "PENDING",
-   "evidencia": "",
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoLote1.pg.test.ts — 19 pruebas contra PostgreSQL real con los servicios REALES; guardar y releer, upsert que ACTUALIZA en vez de duplicar —dos marcas para un inquilino harian que se aplicara la que saliera primero—, el dominio de A no resuelve a la marca de B (esa busqueda va SIN inquilino porque el dominio es lo unico que trae la peticion), y desactivar deja de servirla. Mutacion: quitar el alcance de inquilino (3 sitios) tumba 3.",
    "motivo": ""
   },
   "pwa": {
