@@ -13,8 +13,8 @@
  "capacidades": {
   "auth_onboarding_workspaces": {
    "rutas": 33,
-   "estado": "PENDING",
-   "evidencia": "",
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoLote4.pg.test.ts — contra PostgreSQL real con los servicios REALES; equipo: invitar y aparecer en la lista con su rol, la invitacion genera token CON caducidad —una invitacion sin caducar es una puerta abierta para siempre—, cambiar el rol persiste, suspender y reactivar cambian el estado de verdad, y eliminar lo quita. B no ve, no cambia el rol, no suspende ni elimina al equipo de A: un fallo de alcance ahi es alguien de otra empresa dentro del panel, o alguien que echa del suyo a un companero ajeno. Mutacion: quitar el alcance de inquilino (6 sitios) tumba 5. Del Bloque 1 se suma: las 854 rutas web fijan el inquilino por transaccion con techo de huecos en CERO, y el limite de peticiones cubre login, registro, reset, verify-email, SSO y token.",
    "motivo": ""
   },
   "cuenta_y_suscripcion": {
@@ -43,8 +43,8 @@
   },
   "campanias": {
    "rutas": 31,
-   "estado": "PENDING",
-   "evidencia": "",
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoLote4.pg.test.ts — contra PostgreSQL real con los servicios REALES; crear y releer con canal, asunto y cuerpo; editar comprobado EN LA FILA; programar deja fecha y estado; pausar persiste; un canal inexistente se rechaza; borrar. Lo que mas importa: lanzar SIN proveedor configurado se REHUSA en vez de fingirse —sin ese corte la campana quedaria marcada como lanzada sin haber salido nada, que es la mentira funcional mas cara de esta capacidad porque el cliente cree que ha enviado— y un lanzamiento rehusado NO deja destinatarios a medias, que serian filas listas para un reintento que enviaria dos veces. B no lee, no edita, no lanza, no borra, y no ve ni los destinatarios ni las estadisticas de la campana de A. Mutacion: quitar el alcance de inquilino (21 sitios) tumba 6.",
    "motivo": ""
   },
   "email": {
