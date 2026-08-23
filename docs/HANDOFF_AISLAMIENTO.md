@@ -1816,6 +1816,50 @@ empobrecería la oferta, que es lo contrario del objetivo.
 independientes. **Ninguna toca datos existentes** —las 8 tablas están vacías—, así
 que el riesgo es el mínimo posible: es el mejor momento, antes del primer cliente.
 
+## RECOVERY — la cadena de migraciones NO reconstruye la base
+
+**Medido ejecutando**, no leyendo: se aplicaron las 473 migraciones sobre una
+PostgreSQL virgen, sin un solo apaño.
+
+```
+tablas creadas desde las migraciones     602
+tablas que hay en produccion             712
+─────────────────────────────────────────────
+SOLO en produccion                       113
+
+migraciones que ABORTAN sobre base virgen  8
+```
+
+**Producción funciona porque `core/database.py` ejecuta
+`Base.metadata.create_all` incondicionalmente al arrancar.** Esas 113 tablas las
+declara SQLAlchemy en `models/`, nunca el SQL.
+
+Y ahí está el riesgo: `migrate:prod` corre como `preDeployCommand`, es decir
+**antes** de que la aplicación arranque. En un entorno **nuevo** —recuperación de
+desastre, réplica de staging, despliegue en otra región— esas 8 migraciones se
+ejecutarían antes de que exista lo que necesitan y fallarían:
+
+| Migración | Le falta |
+|---|---|
+| 507 | `workflows` (la crea `models/workflows.py`) |
+| 524 / 525 / 528 | `intent_events`, `intent_scores` |
+| 526 | `pr_releases` |
+| 543 | `chat_conversations` |
+| 554 | `os_store_projects` |
+| 555 | `onboarding_workspace_steps` |
+
+Las ocho fallan por lo **mismo** —dependen de tablas que crea SQLAlchemy y no el
+SQL— así que se arreglan igual: declarándolas en una migración.
+
+**No rompe nada hoy.** Es una propiedad de **recuperación**: si hubiera que
+levantar NELVYON desde cero, el esquema no saldría solo de las migraciones.
+`test_la_cadena_de_migraciones_no_reconstruye_la_base` mantiene el número
+**decreciente** para que no sea una sorpresa el día que haga falta.
+
+**Consecuencia para el plan de limpieza**: la alternativa «recrear la base desde
+cero en vez de borrar selectivamente» **no es viable hoy**. Había que saberlo
+antes de decidir, no durante.
+
 ## Otros bloqueos externos
 
 - `MESH_AUTHKEY` — malla privada al Ollama propio. **No es un proveedor de pago.**
