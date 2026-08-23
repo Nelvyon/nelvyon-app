@@ -76,6 +76,7 @@ export const ORPHAN_CLASSIFICATION: readonly OrphanClassEntry[] = [
   // activo que nadie ha clasificado ES un hueco de conocimiento, y esa es
   // exactamente la señal que el detector debe dar. Se clasifica, no se sube el
   // techo — subirlo habría sido apagar el detector para que no molestara.
+  { path: "docs/BLOQUE_2_LINEA_BASE.md", disposition: "index", domain: ["nelvyon", "development_tech"], priority: 0, title: "Bloque 2 — línea base medida", reason: "Medidas de partida del Bloque 2" },
   { path: "docs/BLOQUE_1_CIERRE.md", disposition: "index", domain: ["nelvyon", "security_privacy"], priority: 0, title: "Bloque 1 — clasificación de cierre", reason: "SSOT del estado de las 18 categorías del Bloque 1" },
   // —— Wave 3: points 1–4 prep (2026-07-26) — remaining top-level orphans ——
   { path: "docs/ARCHITECTURE_LOCAL_AI_RUNTIME.md", disposition: "index", domain: ["nelvyon", "development_tech"], priority: 0, title: "Architecture Local AI Runtime", reason: "Local AI/runtime SSOT" },
