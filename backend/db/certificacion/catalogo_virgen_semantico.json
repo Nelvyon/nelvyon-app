@@ -436,6 +436,13 @@
   ],
   [
    "affiliate_clicks",
+   "affiliate_id",
+   "uuid",
+   "f",
+   ""
+  ],
+  [
+   "affiliate_clicks",
    "code",
    "text",
    "t",
@@ -4260,6 +4267,20 @@
    "campaigns",
    "deal_id",
    "integer",
+   "f",
+   ""
+  ],
+  [
+   "campaigns",
+   "from_email",
+   "text",
+   "f",
+   ""
+  ],
+  [
+   "campaigns",
+   "from_name",
+   "text",
    "f",
    ""
   ],
@@ -26728,10 +26749,24 @@
   ],
   [
    "retail_results",
+   "output",
+   "jsonb",
+   "f",
+   ""
+  ],
+  [
+   "retail_results",
    "result",
    "jsonb",
    "t",
    "'{}'::jsonb"
+  ],
+  [
+   "retail_results",
+   "sector",
+   "text",
+   "f",
+   ""
   ],
   [
    "retail_results",
@@ -29516,6 +29551,13 @@
    "saas_conversations",
    "last_message_at",
    "timestamp with time zone",
+   "f",
+   ""
+  ],
+  [
+   "saas_conversations",
+   "metadata",
+   "jsonb",
    "f",
    ""
   ],
@@ -37820,6 +37862,20 @@
    "integer",
    "t",
    "nextval('security_events_id_seq'::regclass)"
+  ],
+  [
+   "security_events",
+   "message",
+   "text",
+   "f",
+   ""
+  ],
+  [
+   "security_events",
+   "metadata",
+   "jsonb",
+   "f",
+   ""
   ],
   [
    "security_events",

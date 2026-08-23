@@ -38,8 +38,26 @@ usen mera pertenencia y que ninguna lectura justificada sea además sensible.
 
 ## 3. Aislamiento de inquilino / RLS / IDOR — `PASS_CERTIFIED`
 
-- 46 familias de política; las cuatro que cubren el 91 % están certificadas con
-  matriz completa SELECT/INSERT/UPDATE/DELETE (`rlsFamiliasSaas.pg.test.ts`).
+- Medido sobre la base virgen: **2121 políticas en 47 formas distintas**. Las
+  seis mayores cubren el 91 %:
+
+  | políticas | tablas | expresión |
+  |---:|---:|---|
+  | 808 | 202 | `user_id::text = nelvyon_jwt_user_id()::text` |
+  | 548 | 145 | `tenant_id = nelvyon_current_saas_tenant_uuid()` |
+  | 351 | 117 | `nelvyon_os_workspace_mutate(workspace_id)` |
+  | 117 | 117 | `nelvyon_os_workspace_select(workspace_id)` |
+  | 79 | 36 | `workspace_id = current_tenant_id()` |
+  | 36 | 9 | `tenant_id::text = nelvyon_current_saas_tenant_uuid()::text` |
+
+  Certificadas con matriz completa SELECT/INSERT/UPDATE/DELETE
+  (`rlsFamiliasSaas.pg.test.ts`).
+
+  De esas seis, `workspace_id = current_tenant_id()` **confía directamente en la
+  variable de sesión**, sin comprobar pertenencia. Protege contra la consulta que
+  se olvida de filtrar —el fallo real y frecuente— pero no contra quien ya pueda
+  fijar esa variable. Decirlo evita leer «RLS activo» como una garantía más
+  fuerte de la que es.
 - Aislamiento OS por el lado web: 33 casos (`aislamiento_os_lado_web.pg.test.ts`).
 - Contexto por transacción, incluida la prueba afilada: **si B fija menos
   variables que A, no hereda las que A dejó** (`contextoDeInquilino.pg.test.ts`).
