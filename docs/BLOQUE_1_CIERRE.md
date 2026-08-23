@@ -148,8 +148,15 @@ cancelación va al final y los `catch` que se tragaban todo solo toleran `42P01`
 
 ## 10. Stripe / facturación — `PASS_CERTIFIED` + `BLOCKED_ON_FOUNDER`
 
-Firmas verificadas en los seis webhooks de dinero; Paddle es una lápida 410.
-Slack con ventana de 300 s y comparación de tiempo constante.
+Los **siete** webhooks de terceros verifican firma —`stripe`, `stripe-connect`,
+`stripe-membership`, `stripe-store`, `whatsapp`, `ses` y `slack/interactions`—;
+Paddle es una lápida 410 que no procesa nada. Slack, además, con ventana de 300 s
+y comparación de tiempo constante: una firma sin ventana temporal se puede
+reproducir siempre.
+
+`/api/saas/workflows/webhook-in` aparece en el inventario y **no** verifica firma,
+correctamente: no es un webhook de terceros sino un disparador propio, y exige
+JWT con permiso `workflows.execute`.
 
 Una baja de membresía **resucitaba** con un reintento: `active` pisaba un estado
 terminal y `checkAccess` abre el material de pago con `status='active'`. Cerrado.
