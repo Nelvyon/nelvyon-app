@@ -59,13 +59,19 @@ class RateLimiterMiddleware(BaseHTTPMiddleware):
         return self._redis
 
     def _get_client_ip(self, request: Request) -> str:
-        """Extract client IP, respecting X-Forwarded-For."""
-        forwarded = request.headers.get("x-forwarded-for")
-        if forwarded:
-            return forwarded.split(",")[0].strip()
-        if request.client:
-            return request.client.host
-        return "unknown"
+        """Origen de red fiable. Ver `core.identidad_peticion.ip_del_cliente`.
+
+        Antes se leia `x-forwarded-for.split(",")[0]`, que es el extremo del
+        CLIENTE: detras de un proxy que anade al final, ese valor lo escribe
+        quien hace la peticion. Como la IP es la clave del cubo, cambiarla en
+        cada peticion daba un cubo nuevo y el limite dejaba de existir.
+
+        No se reimplementa aqui: se delega, para que los tres limitadores
+        montados en `main.py` tengan UNA sola nocion de origen.
+        """
+        from core.identidad_peticion import ip_del_cliente
+
+        return ip_del_cliente(request)
 
     def _get_workspace_hint(self, request: Request) -> str:
         ws = (request.headers.get("X-Workspace-Id") or "").strip()

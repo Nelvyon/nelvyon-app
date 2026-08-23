@@ -323,7 +323,10 @@ def test_ninguna_ruta_usa_un_logger_que_no_existe():
     import ast
     import pathlib
 
-    arbol = ast.parse(pathlib.Path("main.py").read_text(encoding="utf-8"))
+    # Anclada al FICHERO, no al cwd: con una ruta relativa el veredicto
+    # dependia del directorio desde el que se lanzara pytest.
+    _BACKEND = pathlib.Path(__file__).resolve().parents[1]
+    arbol = ast.parse((_BACKEND / "main.py").read_text(encoding="utf-8"))
     culpables: list[str] = []
 
     def revisar(nodo):

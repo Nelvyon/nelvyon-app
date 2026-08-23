@@ -33,12 +33,17 @@ BLOCK_TTL = 3600
 
 
 def _client_ip(request: Request) -> str:
-    forwarded = request.headers.get("x-forwarded-for")
-    if forwarded:
-        return forwarded.split(",")[0].strip()
-    if request.client:
-        return request.client.host
-    return "unknown"
+    """Origen de red fiable. Ver `core.identidad_peticion.ip_del_cliente`.
+
+    Aqui la clave no solo cuenta: tambien BLOQUEA, y durante `BLOCK_TTL` = una
+    hora. Leyendo `x-forwarded-for.split(",")[0]` esa clave la elegia el cliente,
+    asi que ademas de poder evadir el bloqueo mandando un valor distinto cada
+    vez, se podia mandar la IP de OTRO, gastarle el cupo y dejar a esa persona
+    bloqueada sesenta minutos sin haber hecho nada.
+    """
+    from core.identidad_peticion import ip_del_cliente
+
+    return ip_del_cliente(request)
 
 
 def _is_suspicious_request(request: Request) -> bool:
@@ -53,11 +58,33 @@ def _is_suspicious_request(request: Request) -> bool:
     return False
 
 
+#: A partir de aqui se barren las entradas sin actividad reciente.
+#:
+#: `_ip_hits` es un `defaultdict`: cada IP distinta crea una clave, y la poda de
+#: dentro —`hits[:] = [...]`— vacia la lista pero NO quita la entrada. En un SaaS
+#: publico eso es memoria que solo sube mientras el proceso viva. `_blocked_ips`
+#: si se podaba; este no.
+#:
+#: El barrido va por umbral y no en cada peticion: recorrer el diccionario
+#: entero con cada llamada seria pagar O(n) por peticion para un problema que
+#: solo aparece con muchas IPs distintas.
+_MAX_ENTRADAS = 10_000
+
+
+def _barrer_inactivas(now: float) -> None:
+    """Suelta las entradas cuya ultima peticion quedo fuera de la ventana."""
+    for clave, marcas in list(_ip_hits.items()):
+        if not marcas or now - marcas[-1] >= IP_WINDOW:
+            del _ip_hits[clave]
+
+
 def _track_ip(ip: str, suspicious: bool) -> bool:
     now = time.time()
     for k, exp in list(_blocked_ips.items()):
         if exp <= now:
             del _blocked_ips[k]
+    if len(_ip_hits) > _MAX_ENTRADAS:
+        _barrer_inactivas(now)
     if ip in _blocked_ips:
         return False
 

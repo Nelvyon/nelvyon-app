@@ -367,7 +367,10 @@ async def test_el_catalogo_concede_exactamente_lo_que_los_agentes_usan(
     import re
     import pathlib
 
-    fuente = pathlib.Path("core/agentes/plantilla.py").read_text(encoding="utf-8")
+    # Anclada al FICHERO, no al cwd: con una ruta relativa el veredicto
+    # dependia del directorio desde el que se lanzara pytest.
+    _BACKEND = pathlib.Path(__file__).resolve().parents[1]
+    fuente = (_BACKEND / "core/agentes/plantilla.py").read_text(encoding="utf-8")
     filas = await dos_workspaces["adm"].fetch(
         "SELECT clave, herramientas FROM agent_catalog")
     # Se extrae por bloques de funcion: cada `@registrar_agente` hasta el

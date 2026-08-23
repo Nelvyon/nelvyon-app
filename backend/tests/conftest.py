@@ -489,6 +489,67 @@ async def workspace_headers(auth_headers: dict) -> dict:
     return auth_headers
 
 
+@pytest_asyncio.fixture(scope="module", autouse=True)
+async def _plan_del_workspace_aislado_por_fichero(test_engine, setup_database):
+    """Cada FICHERO de pruebas empieza con el plan base del workspace.
+
+    EL PROBLEMA
+    -----------
+    Las capacidades por plan se resuelven asi:
+
+        SELECT plan_id FROM subscriptions
+        WHERE workspace_id = ? AND status = 'active'
+        ORDER BY id DESC LIMIT 1
+
+    Gana la ULTIMA suscripcion activa insertada. Y varias pruebas insertan
+    suscripciones para el workspace 1 —`starter`, `pro`, `partner`— sin
+    retirarlas. A partir de ahi, el plan del workspace 1 es el que dejo la
+    ultima prueba que lo toco, para todo lo que venga despues en la sesion.
+
+    El sintoma era un 403 «Tu plan no incluye creacion de contactos en este
+    workspace» en pruebas que no tienen nada que ver con planes, y solo segun
+    que otras pruebas hubieran corrido antes. Aislado pasaba; en conjunto no.
+    Eso no es un rojo: es ruido que tapa rojos de verdad y puede volver verde
+    un fallo real.
+
+    POR QUE POR FICHERO Y NO POR PRUEBA
+    -----------------------------------
+    Hay ficheros que insertan una suscripcion en una prueba y la leen en la
+    siguiente. Restaurando despues de CADA prueba se romperian esos casos
+    legitimos. El fichero es la unidad que aisla sin quitar cobertura.
+
+    Sigue el mismo patron que `_restore_voice_plan_env`, que ya existia aqui
+    por esta misma razon.
+    """
+    from sqlalchemy import text as _text
+
+    async with test_engine.begin() as conn:
+        filas = (await conn.execute(_text(
+            "SELECT id, user_id, workspace_id, plan_id, billing_cycle, status"
+            " FROM subscriptions"))).fetchall()
+    antes = [tuple(f) for f in filas]
+
+    yield
+
+    async with test_engine.begin() as conn:
+        ahora = (await conn.execute(_text(
+            "SELECT id, user_id, workspace_id, plan_id, billing_cycle, status"
+            " FROM subscriptions"))).fetchall()
+        if [tuple(f) for f in ahora] == antes:
+            return
+        # Se restaura EXACTAMENTE lo que habia, ni mas ni menos: dejar la tabla
+        # vacia tambien seria un estado inventado, y las pruebas que esperan el
+        # `starter` de base empezarian a fallar por el motivo contrario.
+        await conn.execute(_text("DELETE FROM subscriptions"))
+        for fila in antes:
+            await conn.execute(
+                _text("INSERT INTO subscriptions"
+                      " (id, user_id, workspace_id, plan_id, billing_cycle, status)"
+                      " VALUES (:i, :u, :w, :p, :b, :s)"),
+                {"i": fila[0], "u": fila[1], "w": fila[2],
+                 "p": fila[3], "b": fila[4], "s": fila[5]})
+
+
 @pytest.fixture(autouse=True)
 def _restore_voice_plan_env():
     """Governance tests may delenv VOICE_V1_PLAN_IDS; restore for downstream tests."""

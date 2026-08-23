@@ -93,7 +93,7 @@ _PALABRAS_SQL = {"where", "on", "set", "values", "select", "left", "inner", "joi
 
 def _sin_comentarios(texto: str) -> str:
     texto = re.sub(r"/\*.*?\*/", " ", texto, flags=re.S)
-    return re.sub(r"//[^\n]*", " ", texto)
+    return re.sub(r"(?<!:)//[^\n]*", " ", texto)
 
 
 def tablas_en_sql_crudo_saas() -> set[str]:
@@ -166,7 +166,7 @@ def test_el_barrido_ignora_los_comentarios():
     """
     muestra = "/** @deprecated synced from deals */\nconst q = `SELECT 1 FROM saas_deals`;"
     limpio = re.sub(r"/\*.*?\*/", " ", muestra, flags=re.S)
-    limpio = re.sub(r"//[^\n]*", " ", limpio)
+    limpio = re.sub(r"(?<!:)//[^\n]*", " ", limpio)
     encontradas = set(_TABLA_SQL.findall(limpio))
     assert "deals" not in encontradas, "el barrido cuenta comentarios como consultas"
     assert "saas_deals" in encontradas, "el barrido perdio la consulta real"

@@ -112,7 +112,13 @@ def test_todo_worker_que_main_arranca_publica_su_latido():
     import pathlib
     import re
 
-    fuente = pathlib.Path("main.py").read_text(encoding="utf-8")
+    # Las rutas se anclan al FICHERO, no al directorio desde el que se lance
+    # pytest. Con `Path("main.py")` el veredicto dependia del cwd: desde
+    # `backend/` pasaba y desde la raiz reventaba con FileNotFoundError, asi que
+    # esta prueba daba rojo o verde segun que otras pruebas corrieran antes y
+    # donde. Una prueba cuyo resultado depende de eso no mide nada.
+    BACKEND = pathlib.Path(__file__).resolve().parents[1]
+    fuente = (BACKEND / "main.py").read_text(encoding="utf-8")
     arranques = set(re.findall(r"from services\.(\w+) import (?:start_\w+|arrancar)",
                                fuente))
     # Autopilot y el vigilante publican su estado por su cuenta, con mas detalle
@@ -121,7 +127,7 @@ def test_todo_worker_que_main_arranca_publica_su_latido():
 
     sin_latido = []
     for modulo in arranques - propios:
-        ruta = pathlib.Path("services") / f"{modulo}.py"
+        ruta = BACKEND / "services" / f"{modulo}.py"
         if not ruta.exists():
             continue
         codigo = ruta.read_text(encoding="utf-8")
