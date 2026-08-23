@@ -1729,6 +1729,63 @@ NELVYON_AI_ENABLED = 0        OLLAMA_CONFIGURED = 0
 **Cero proveedores de pago**: la restricción del fundador se respeta. Y encaja con
 las 662 tablas vacías — la plataforma está construida, no operando.
 
+## RESUELTO CON EVIDENCIA — las 2.761 auditorías sin dueño
+
+Ya no es una decisión de integridad: **el dueño es determinista**.
+
+Las tres tablas del mismo lote tienen **exactamente las mismas 2.761 filas**, el
+mismo rango de fechas y **los mismos 1.077 `pack_run_id`**:
+
+```
+os_qa_audit_runs         2761   2026-06-29 .. 2026-07-22   1077 pack_runs
+os_truth_guard_audits    2761   2026-06-29 .. 2026-07-22   1077 pack_runs
+os_sector_shield_audits  2761   2026-06-29 .. 2026-07-22   1077 pack_runs
+
+pack_run_id que estén en shield y NO en truth guard:  0
+esos 1.077 pack_runs pertenecen a:                    workspace 1 (todos)
+```
+
+Y la cobertura del backfill:
+
+```
+filas totales                     2761
+  sin pack_run_id (irresolubles)     0
+  resolubles por pack_run_id      2761   →  100%
+  pack_runs con workspace AMBIGUO    0
+```
+
+El dueño **no se infiere: se lee** de la fila del pack al que pertenece la
+auditoría. No se inventa ningún propietario.
+
+**Migración 574 preparada y certificada** (no aplicada):
+
+- **Guarda 1** — si algo no se puede resolver leyendo su pack, **aborta entera**:
+  atribuir unas sí y otras no dejaría un estado *peor*, porque parecería completo.
+  Probada: con 1 fila irresoluble → `ERROR`.
+- **Guarda 2** — si un pack apuntara a dos workspaces, aborta: el dueño dejaría de
+  ser determinista.
+- **Guarda 3** — después no puede quedar ninguna sin dueño.
+- **Idempotente**: segunda ejecución → «no hay filas sin dueño».
+- **Copia de seguridad** `os_sector_shield_audits_backfill_574` con qué se tocó, y
+  **rollback probado**: devuelve exactamente esas filas a NULL.
+
+No toca `tenant_id`: estas filas son del espacio OS. Rellenar el uuid exigiría un
+mapeo que hoy no existe, y **eso sí sería inventar**.
+
+## CLASIFICACIÓN DE DATOS — `REAL_PRODUCTION_DATA = 0`
+
+| Clase | Tablas | Criterio |
+|---|---:|---|
+| VACÍA | 649 | sin filas |
+| **CERTIFICATION_FIXTURE** | **24** | marcas `e2e`/`nelvyon.test`/`test`, o todas las filas en el workspace 1 |
+| UNKNOWN | 33 | catálogos y config pequeños, sin columna de inquilino ni marcas legibles |
+| SYSTEM_DATA | 4 | `_migrations`, `status_checks`, `changelog_entries`, `roadmap_items` |
+| **REAL_PRODUCTION_DATA** | **0** | — |
+
+Guardado en `db/certificacion/clasificacion_datos.json`. **Nada modificado ni
+borrado**: es la base para una limpieza futura *si* la autorizas, con criterio
+escrito en vez de juicio.
+
 ## Otros bloqueos externos
 
 - `MESH_AUTHKEY` — malla privada al Ollama propio. **No es un proveedor de pago.**

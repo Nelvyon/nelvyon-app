@@ -1,0 +1,317 @@
+{
+ "_comentario": "Clasificacion de los datos de produccion. NADA se ha modificado ni borrado. Base para una limpieza futura si el fundador la autoriza.",
+ "resumen": {
+  "CERTIFICATION_FIXTURE": 24,
+  "REAL_PRODUCTION_DATA": 0,
+  "SYSTEM_DATA": 4,
+  "UNKNOWN": 33,
+  "VACIA": 649
+ },
+ "tablas": {
+  "_migrations": {
+   "clase": "SYSTEM_DATA",
+   "filas": 467,
+   "motivo": "catalogo o configuracion del propio sistema"
+  },
+  "agent_catalog": {
+   "clase": "UNKNOWN",
+   "filas": 12,
+   "motivo": "sin columna de inquilino ni marcas legibles"
+  },
+  "agent_kill_switch": {
+   "clase": "UNKNOWN",
+   "filas": 1,
+   "motivo": "sin columna de inquilino ni marcas legibles"
+  },
+  "agent_policies": {
+   "clase": "UNKNOWN",
+   "filas": 20,
+   "motivo": "sin columna de inquilino ni marcas legibles"
+  },
+  "autopilot_capabilities": {
+   "clase": "UNKNOWN",
+   "filas": 31,
+   "motivo": "sin columna de inquilino ni marcas legibles"
+  },
+  "business_health_baseline": {
+   "clase": "UNKNOWN",
+   "filas": 19,
+   "motivo": "sin columna de inquilino ni marcas legibles"
+  },
+  "business_incidents": {
+   "clase": "UNKNOWN",
+   "filas": 7,
+   "motivo": "sin columna de inquilino ni marcas legibles"
+  },
+  "changelog_entries": {
+   "clase": "SYSTEM_DATA",
+   "filas": 3,
+   "motivo": "catalogo o configuracion del propio sistema"
+  },
+  "contacts": {
+   "clase": "CERTIFICATION_FIXTURE",
+   "filas": 241,
+   "motivo": "contenido con marcas de prueba: ['e2e', 'nelvyon.test', 'test']"
+  },
+  "early_adopter_config": {
+   "clase": "UNKNOWN",
+   "filas": 1,
+   "motivo": "sin columna de inquilino ni marcas legibles"
+  },
+  "email_queue": {
+   "clase": "CERTIFICATION_FIXTURE",
+   "filas": 723,
+   "motivo": "contenido con marcas de prueba: ['e2e', 'nelvyon.test', 'test']"
+  },
+  "local_ai_config": {
+   "clase": "UNKNOWN",
+   "filas": 1,
+   "motivo": "sin columna de inquilino ni marcas legibles"
+  },
+  "local_ai_rag_chunks": {
+   "clase": "UNKNOWN",
+   "filas": 2,
+   "motivo": "sin columna de inquilino ni marcas legibles"
+  },
+  "local_ai_rag_documents": {
+   "clase": "UNKNOWN",
+   "filas": 2,
+   "motivo": "sin columna de inquilino ni marcas legibles"
+  },
+  "nelvyon_campaigns": {
+   "clase": "CERTIFICATION_FIXTURE",
+   "filas": 1319,
+   "motivo": "contenido con marcas de prueba: ['e2e']"
+  },
+  "nelvyon_clients": {
+   "clase": "CERTIFICATION_FIXTURE",
+   "filas": 1101,
+   "motivo": "contenido con marcas de prueba: ['e2e']"
+  },
+  "nelvyon_pack_runs": {
+   "clase": "CERTIFICATION_FIXTURE",
+   "filas": 1103,
+   "motivo": "todas las filas en los workspaces [1], que son los tres de certificacion (\u00abMi Workspace\u00bb)"
+  },
+  "nelvyon_users": {
+   "clase": "CERTIFICATION_FIXTURE",
+   "filas": 25,
+   "motivo": "contenido con marcas de prueba: ['cert', 'e2e', 'nelvyon.test', 'pai-']"
+  },
+  "onboarding": {
+   "clase": "UNKNOWN",
+   "filas": 25,
+   "motivo": "sin columna de inquilino ni marcas legibles"
+  },
+  "os_agent_audit_events": {
+   "clase": "CERTIFICATION_FIXTURE",
+   "filas": 14178,
+   "motivo": "todas las filas en los workspaces [1], que son los tres de certificacion (\u00abMi Workspace\u00bb)"
+  },
+  "os_clients": {
+   "clase": "CERTIFICATION_FIXTURE",
+   "filas": 1101,
+   "motivo": "contenido con marcas de prueba: ['e2e', 'nelvyon.test', 'test']"
+  },
+  "os_deliverable_approval_tokens": {
+   "clase": "CERTIFICATION_FIXTURE",
+   "filas": 302,
+   "motivo": "todas las filas en los workspaces [1], que son los tres de certificacion (\u00abMi Workspace\u00bb)"
+  },
+  "os_deliverable_reviews": {
+   "clase": "CERTIFICATION_FIXTURE",
+   "filas": 173,
+   "motivo": "todas las filas en los workspaces [1], que son los tres de certificacion (\u00abMi Workspace\u00bb)"
+  },
+  "os_deliverables": {
+   "clase": "CERTIFICATION_FIXTURE",
+   "filas": 5050,
+   "motivo": "todas las filas en los workspaces [1], que son los tres de certificacion (\u00abMi Workspace\u00bb)"
+  },
+  "os_delivery_certificates": {
+   "clase": "CERTIFICATION_FIXTURE",
+   "filas": 674,
+   "motivo": "todas las filas en los workspaces [1], que son los tres de certificacion (\u00abMi Workspace\u00bb)"
+  },
+  "os_jobs": {
+   "clase": "UNKNOWN",
+   "filas": 12,
+   "motivo": "sin columna de inquilino ni marcas legibles"
+  },
+  "os_learning_run_log": {
+   "clase": "UNKNOWN",
+   "filas": 2,
+   "motivo": "sin columna de inquilino ni marcas legibles"
+  },
+  "os_portal_invites": {
+   "clase": "CERTIFICATION_FIXTURE",
+   "filas": 1032,
+   "motivo": "contenido con marcas de prueba: ['e2e', 'nelvyon.test', 'test']"
+  },
+  "os_portal_users": {
+   "clase": "CERTIFICATION_FIXTURE",
+   "filas": 1032,
+   "motivo": "contenido con marcas de prueba: ['e2e', 'nelvyon.test', 'test']"
+  },
+  "os_projects": {
+   "clase": "CERTIFICATION_FIXTURE",
+   "filas": 1101,
+   "motivo": "contenido con marcas de prueba: ['e2e']"
+  },
+  "os_qa_audit_runs": {
+   "clase": "CERTIFICATION_FIXTURE",
+   "filas": 2761,
+   "motivo": "todas las filas en los workspaces [1], que son los tres de certificacion (\u00abMi Workspace\u00bb)"
+  },
+  "os_sector_certifications": {
+   "clase": "UNKNOWN",
+   "filas": 25,
+   "motivo": "sin columna de inquilino ni marcas legibles"
+  },
+  "os_sector_shield_audits": {
+   "clase": "UNKNOWN",
+   "filas": 2761,
+   "motivo": "workspaces []: no concluyente"
+  },
+  "os_store_projects": {
+   "clase": "CERTIFICATION_FIXTURE",
+   "filas": 1,
+   "motivo": "contenido con marcas de prueba: ['cert']"
+  },
+  "os_template_dna_scores": {
+   "clase": "UNKNOWN",
+   "filas": 20,
+   "motivo": "sin columna de inquilino ni marcas legibles"
+  },
+  "os_truth_guard_audits": {
+   "clase": "CERTIFICATION_FIXTURE",
+   "filas": 2761,
+   "motivo": "todas las filas en los workspaces [1], que son los tres de certificacion (\u00abMi Workspace\u00bb)"
+  },
+  "plan_rango": {
+   "clase": "UNKNOWN",
+   "filas": 5,
+   "motivo": "sin columna de inquilino ni marcas legibles"
+  },
+  "roadmap_items": {
+   "clase": "SYSTEM_DATA",
+   "filas": 8,
+   "motivo": "catalogo o configuracion del propio sistema"
+  },
+  "saas_activation_checklist": {
+   "clase": "UNKNOWN",
+   "filas": 1,
+   "motivo": "sin columna de inquilino ni marcas legibles"
+  },
+  "saas_affiliate_programs": {
+   "clase": "UNKNOWN",
+   "filas": 1,
+   "motivo": "sin columna de inquilino ni marcas legibles"
+  },
+  "saas_autopilot_settings": {
+   "clase": "UNKNOWN",
+   "filas": 6,
+   "motivo": "sin columna de inquilino ni marcas legibles"
+  },
+  "saas_ceo_brief_runs": {
+   "clase": "UNKNOWN",
+   "filas": 538,
+   "motivo": "sin columna de inquilino ni marcas legibles"
+  },
+  "saas_contacts": {
+   "clase": "CERTIFICATION_FIXTURE",
+   "filas": 1,
+   "motivo": "contenido con marcas de prueba: ['test']"
+  },
+  "saas_deliverability_snapshots": {
+   "clase": "UNKNOWN",
+   "filas": 1,
+   "motivo": "sin columna de inquilino ni marcas legibles"
+  },
+  "saas_exchange_rates": {
+   "clase": "UNKNOWN",
+   "filas": 7,
+   "motivo": "sin columna de inquilino ni marcas legibles"
+  },
+  "saas_loyalty_programs": {
+   "clase": "UNKNOWN",
+   "filas": 1,
+   "motivo": "sin columna de inquilino ni marcas legibles"
+  },
+  "saas_marketplace_apps": {
+   "clase": "UNKNOWN",
+   "filas": 5,
+   "motivo": "sin columna de inquilino ni marcas legibles"
+  },
+  "saas_pack_entitlements": {
+   "clase": "UNKNOWN",
+   "filas": 172,
+   "motivo": "sin columna de inquilino ni marcas legibles"
+  },
+  "saas_private_ai_audit": {
+   "clase": "UNKNOWN",
+   "filas": 3,
+   "motivo": "sin columna de inquilino ni marcas legibles"
+  },
+  "saas_private_ai_settings": {
+   "clase": "UNKNOWN",
+   "filas": 12,
+   "motivo": "sin columna de inquilino ni marcas legibles"
+  },
+  "saas_sequences": {
+   "clase": "CERTIFICATION_FIXTURE",
+   "filas": 1,
+   "motivo": "contenido con marcas de prueba: ['smoke']"
+  },
+  "saas_tenant_memory_settings": {
+   "clase": "UNKNOWN",
+   "filas": 2,
+   "motivo": "sin columna de inquilino ni marcas legibles"
+  },
+  "saas_tenants": {
+   "clase": "CERTIFICATION_FIXTURE",
+   "filas": 22,
+   "motivo": "contenido con marcas de prueba: ['cert', 'certcrm', 'co-seq', 'co-st']"
+  },
+  "saas_workflow_versions": {
+   "clase": "UNKNOWN",
+   "filas": 2,
+   "motivo": "sin columna de inquilino ni marcas legibles"
+  },
+  "saas_workflows": {
+   "clase": "CERTIFICATION_FIXTURE",
+   "filas": 2,
+   "motivo": "contenido con marcas de prueba: ['cert']"
+  },
+  "security_events": {
+   "clase": "UNKNOWN",
+   "filas": 12,
+   "motivo": "sin columna de inquilino ni marcas legibles"
+  },
+  "status_checks": {
+   "clase": "SYSTEM_DATA",
+   "filas": 1410,
+   "motivo": "catalogo o configuracion del propio sistema"
+  },
+  "support_templates": {
+   "clase": "UNKNOWN",
+   "filas": 8,
+   "motivo": "sin columna de inquilino ni marcas legibles"
+  },
+  "usage_limits": {
+   "clase": "UNKNOWN",
+   "filas": 4,
+   "motivo": "sin columna de inquilino ni marcas legibles"
+  },
+  "workspace_members": {
+   "clase": "CERTIFICATION_FIXTURE",
+   "filas": 1,
+   "motivo": "contenido con marcas de prueba: ['nelvyon.test', 'test']"
+  },
+  "workspaces": {
+   "clase": "CERTIFICATION_FIXTURE",
+   "filas": 3,
+   "motivo": "contenido con marcas de prueba: ['mi workspace']"
+  }
+ }
+}
