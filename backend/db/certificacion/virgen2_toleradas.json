@@ -1,0 +1,472 @@
+[
+ {
+  "codigo": "42703",
+  "sql": "CREATE INDEX IF NOT EXISTS ab_experiments_workspace_idx ON ab_experiments (workspace_id, status)",
+  "msg": "column \"workspace_id\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE POLICY ab_experiments_tenant ON ab_experiments FOR ALL USING (workspace_id = current_tenant_id()) WITH ",
+  "msg": "column \"workspace_id\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE POLICY ab_variants_tenant ON ab_variants FOR ALL USING (workspace_id = current_tenant_id()) WITH CHECK ",
+  "msg": "column \"workspace_id\" does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY ab_events_tenant ON ab_events FOR ALL USING (workspace_id = current_tenant_id()) WITH CHECK (wor",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE INDEX IF NOT EXISTS affiliate_clicks_affiliate_idx ON affiliate_clicks (affiliate_id, created_at DESC)",
+  "msg": "column \"affiliate_id\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE INDEX IF NOT EXISTS api_keys_workspace_idx ON api_keys (workspace_id)",
+  "msg": "column \"workspace_id\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE INDEX IF NOT EXISTS bookings_workspace_idx ON bookings (workspace_id)",
+  "msg": "column \"workspace_id\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE INDEX IF NOT EXISTS bookings_workspace_start_idx ON bookings (workspace_id, start_at)",
+  "msg": "column \"workspace_id\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE INDEX IF NOT EXISTS bookings_workspace_status_idx ON bookings (workspace_id, status)",
+  "msg": "column \"workspace_id\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE INDEX IF NOT EXISTS bookings_zoom_meeting_idx ON bookings (zoom_meeting_id) WHERE zoom_meeting_id IS NO",
+  "msg": "column \"zoom_meeting_id\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "ALTER TABLE calendar_events ALTER COLUMN user_id DROP NOT NULL",
+  "msg": "column \"user_id\" of relation \"calendar_events\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "ALTER TABLE calendar_events ALTER COLUMN start_time DROP NOT NULL",
+  "msg": "column \"start_time\" of relation \"calendar_events\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE UNIQUE INDEX IF NOT EXISTS calendar_events_ws_google_idx ON calendar_events (workspace_id, google_event",
+  "msg": "column \"workspace_id\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE INDEX IF NOT EXISTS calendar_events_ws_start_at_idx ON calendar_events (workspace_id, start_at)",
+  "msg": "column \"workspace_id\" does not exist"
+ },
+ {
+  "codigo": "42P01",
+  "sql": "-- === campaigns.sql === -- NELVYON campaign scheduler & deliverability (Postgres) -- Extends legacy `campaign",
+  "msg": "relation \"campaigns\" does not exist"
+ },
+ {
+  "codigo": "42P01",
+  "sql": "ALTER TABLE campaigns ADD COLUMN IF NOT EXISTS from_email TEXT",
+  "msg": "relation \"campaigns\" does not exist"
+ },
+ {
+  "codigo": "42P01",
+  "sql": "CREATE INDEX IF NOT EXISTS campaigns_workspace_status_idx ON campaigns (workspace_id, status)",
+  "msg": "relation \"campaigns\" does not exist"
+ },
+ {
+  "codigo": "42P01",
+  "sql": "CREATE INDEX IF NOT EXISTS campaigns_scheduled_idx ON campaigns (status, scheduled_at) WHERE status = 'schedul",
+  "msg": "relation \"campaigns\" does not exist"
+ },
+ {
+  "codigo": "42P01",
+  "sql": "-- \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac campaign_recipients \u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d\u20ac\u00e2\u201d",
+  "msg": "relation \"campaigns\" does not exist"
+ },
+ {
+  "codigo": "42P01",
+  "sql": "CREATE INDEX IF NOT EXISTS campaign_recipients_campaign_idx ON campaign_recipients (campaign_id)",
+  "msg": "relation \"campaign_recipients\" does not exist"
+ },
+ {
+  "codigo": "42P01",
+  "sql": "CREATE INDEX IF NOT EXISTS campaign_recipients_status_idx ON campaign_recipients (campaign_id, status)",
+  "msg": "relation \"campaign_recipients\" does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY cdp_events_tenant ON cdp_events FOR ALL USING (workspace_id = current_tenant_id()) WITH CHECK (w",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY cdp_identities_tenant ON cdp_identities FOR ALL USING (workspace_id = current_tenant_id()) WITH ",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY cdp_segments_tenant ON cdp_segments FOR ALL USING (workspace_id = current_tenant_id()) WITH CHEC",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE INDEX IF NOT EXISTS chatbot_conversations_bot_idx ON chatbot_conversations (chatbot_id, last_message_at",
+  "msg": "column \"last_message_at\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE INDEX IF NOT EXISTS chatbot_conversations_workspace_idx ON chatbot_conversations (workspace_id, started",
+  "msg": "column \"workspace_id\" does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY chatbots_tenant ON chatbots FOR ALL USING (workspace_id = current_tenant_id()) WITH CHECK (works",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE POLICY chatbot_conversations_tenant ON chatbot_conversations FOR ALL USING (workspace_id = current_tena",
+  "msg": "column \"workspace_id\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE INDEX IF NOT EXISTS crm_contacts_workspace_idx ON crm_contacts (workspace_id)",
+  "msg": "column \"workspace_id\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE INDEX IF NOT EXISTS crm_contacts_email_idx ON crm_contacts (workspace_id, lower(email))",
+  "msg": "column \"workspace_id\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE INDEX IF NOT EXISTS crm_contacts_score_idx ON crm_contacts (workspace_id, score DESC)",
+  "msg": "column \"workspace_id\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE INDEX IF NOT EXISTS crm_activities_workspace_idx ON crm_activities (workspace_id)",
+  "msg": "column \"workspace_id\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE INDEX IF NOT EXISTS crm_activities_deal_idx ON crm_activities (deal_id)",
+  "msg": "column \"deal_id\" does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY dialer_calls_tenant ON dialer_calls FOR ALL USING (workspace_id = current_tenant_id()) WITH CHEC",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY forms_tenant ON forms FOR ALL USING (workspace_id = current_tenant_id()) WITH CHECK (workspace_i",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY form_responses_tenant ON form_responses FOR ALL USING (workspace_id = current_tenant_id()) WITH ",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42P01",
+  "sql": "CREATE TABLE IF NOT EXISTS funnel_steps ( id UUID PRIMARY KEY DEFAULT gen_random_uuid(), funnel_id UUID NOT NU",
+  "msg": "relation \"landing_pages\" does not exist"
+ },
+ {
+  "codigo": "42P01",
+  "sql": "CREATE INDEX IF NOT EXISTS funnel_steps_funnel_idx ON funnel_steps (funnel_id, step_order)",
+  "msg": "relation \"funnel_steps\" does not exist"
+ },
+ {
+  "codigo": "42P01",
+  "sql": "ALTER TABLE funnel_steps ENABLE ROW LEVEL SECURITY",
+  "msg": "relation \"funnel_steps\" does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY funnels_tenant ON funnels FOR ALL USING (workspace_id = current_tenant_id()) WITH CHECK (workspa",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42P01",
+  "sql": "CREATE POLICY funnel_steps_tenant ON funnel_steps FOR ALL USING ( funnel_id IN (SELECT id FROM funnels WHERE w",
+  "msg": "relation \"funnel_steps\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE UNIQUE INDEX IF NOT EXISTS invoices_workspace_number_idx ON invoices (workspace_id, invoice_number)",
+  "msg": "column \"workspace_id\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE INDEX IF NOT EXISTS invoices_workspace_status_idx ON invoices (workspace_id, status)",
+  "msg": "column \"workspace_id\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE INDEX IF NOT EXISTS invoices_workspace_created_idx ON invoices (workspace_id, created_at DESC)",
+  "msg": "column \"workspace_id\" does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY landing_pages_tenant ON landing_pages FOR ALL USING (workspace_id = current_tenant_id()) WITH CH",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY landing_analytics_tenant ON landing_analytics FOR ALL USING ( page_id IN (SELECT id FROM landing",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY chat_conversations_tenant ON chat_conversations FOR ALL USING (tenant_id = current_tenant_id()) ",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY chat_messages_tenant ON chat_messages FOR ALL USING ( conversation_id IN ( SELECT id FROM chat_c",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY lms_courses_tenant ON lms_courses FOR ALL USING (workspace_id = current_tenant_id()) WITH CHECK ",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY lms_modules_tenant ON lms_modules FOR ALL USING (workspace_id = current_tenant_id()) WITH CHECK ",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY lms_lessons_tenant ON lms_lessons FOR ALL USING (workspace_id = current_tenant_id()) WITH CHECK ",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY lms_enrollments_tenant ON lms_enrollments FOR ALL USING (workspace_id = current_tenant_id()) WIT",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY lms_progress_tenant ON lms_progress FOR ALL USING (workspace_id = current_tenant_id()) WITH CHEC",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY loyalty_programs_tenant ON loyalty_programs FOR ALL USING (workspace_id = current_tenant_id()) W",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY loyalty_points_tenant ON loyalty_points FOR ALL USING (workspace_id = current_tenant_id()) WITH ",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY loyalty_transactions_tenant ON loyalty_transactions FOR ALL USING (workspace_id = current_tenant",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY os_store_projects_tenant ON os_store_projects FOR ALL USING (workspace_id = current_tenant_id())",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY os_store_pages_tenant ON os_store_pages FOR ALL USING (workspace_id = current_tenant_id()) WITH ",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY os_store_products_tenant ON os_store_products FOR ALL USING (workspace_id = current_tenant_id())",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY os_store_orders_tenant ON os_store_orders FOR ALL USING (workspace_id = current_tenant_id()) WIT",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY os_store_discounts_tenant ON os_store_discounts FOR ALL USING (workspace_id = current_tenant_id(",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY os_website_projects_tenant ON os_website_projects FOR ALL USING (workspace_id = current_tenant_i",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY os_website_pages_tenant ON os_website_pages FOR ALL USING (workspace_id = current_tenant_id()) W",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE INDEX IF NOT EXISTS idx_invoices_ws_created ON invoices (workspace_id, created_at DESC)",
+  "msg": "column \"workspace_id\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE INDEX IF NOT EXISTS idx_invoices_ws_status ON invoices (workspace_id, status)",
+  "msg": "column \"workspace_id\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE INDEX IF NOT EXISTS idx_qr_codes_ws_created ON qr_codes (workspace_id, created_at DESC)",
+  "msg": "column \"workspace_id\" does not exist"
+ },
+ {
+  "codigo": "42P01",
+  "sql": "CREATE INDEX IF NOT EXISTS idx_qr_scans_qr ON qr_scans (qr_id, scanned_at DESC)",
+  "msg": "relation \"qr_scans\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE INDEX IF NOT EXISTS idx_crm_contacts_ws_created ON crm_contacts (workspace_id, created_at DESC)",
+  "msg": "column \"workspace_id\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE INDEX IF NOT EXISTS idx_crm_activities_ws_created ON crm_activities (workspace_id, created_at DESC)",
+  "msg": "column \"workspace_id\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE INDEX IF NOT EXISTS idx_bookings_ws_created ON bookings (workspace_id, created_at DESC)",
+  "msg": "column \"workspace_id\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE INDEX IF NOT EXISTS idx_bookings_ws_status ON bookings (workspace_id, status)",
+  "msg": "column \"workspace_id\" does not exist"
+ },
+ {
+  "codigo": "42P01",
+  "sql": "CREATE INDEX IF NOT EXISTS idx_webinars_ws_created ON webinars (workspace_id, created_at DESC)",
+  "msg": "relation \"webinars\" does not exist"
+ },
+ {
+  "codigo": "42P01",
+  "sql": "CREATE INDEX IF NOT EXISTS idx_push_subscriptions_ws ON push_subscriptions (workspace_id, created_at DESC)",
+  "msg": "relation \"push_subscriptions\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE INDEX IF NOT EXISTS idx_webhook_deliveries_endpoint ON webhook_deliveries (endpoint_id, created_at DESC",
+  "msg": "column \"endpoint_id\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE INDEX IF NOT EXISTS qr_codes_workspace_idx ON qr_codes (workspace_id, created_at DESC)",
+  "msg": "column \"workspace_id\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE POLICY qr_codes_tenant ON qr_codes FOR ALL USING (workspace_id = current_tenant_id()) WITH CHECK (works",
+  "msg": "column \"workspace_id\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE POLICY qr_codes_public_read ON qr_codes FOR SELECT USING (short_code IS NOT NULL)",
+  "msg": "column \"short_code\" does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY qr_scans_tenant ON qr_scans FOR ALL USING (workspace_id = current_tenant_id()) WITH CHECK (works",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY sms_campaigns_tenant ON sms_campaigns FOR ALL USING (workspace_id = current_tenant_id()) WITH CH",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY sms_messages_tenant ON sms_messages FOR ALL USING (workspace_id = current_tenant_id()) WITH CHEC",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY sms_optouts_tenant ON sms_optouts FOR ALL USING (workspace_id = current_tenant_id()) WITH CHECK ",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY sms_conversations_tenant ON sms_conversations FOR ALL USING (workspace_id = current_tenant_id())",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY social_alerts_tenant ON social_alerts FOR ALL USING (workspace_id = current_tenant_id()) WITH CH",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY social_mentions_tenant ON social_mentions FOR ALL USING (workspace_id = current_tenant_id()) WIT",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY social_accounts_tenant ON social_accounts FOR ALL USING (tenant_id = current_tenant_id()) WITH C",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY social_posts_tenant ON social_posts FOR ALL USING (tenant_id = current_tenant_id()) WITH CHECK (",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY social_post_analytics_tenant ON social_post_analytics FOR ALL USING ( post_id IN (SELECT id FROM",
+  "msg": "function current_tenant_id() does not exist"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY audit_logs_tenant_select ON audit_logs FOR SELECT USING (tenant_id = current_tenant_id())",
+  "msg": "operator does not exist: uuid = integer"
+ },
+ {
+  "codigo": "42883",
+  "sql": "CREATE POLICY audit_logs_tenant_insert ON audit_logs FOR INSERT WITH CHECK (tenant_id = current_tenant_id())",
+  "msg": "operator does not exist: uuid = integer"
+ },
+ {
+  "codigo": "42703",
+  "sql": "-- Critical workspace-scoped tables (workspace_id = tenant_id) DO $$ DECLARE tbl TEXT; BEGIN FOR tbl IN SELECT",
+  "msg": "column \"workspace_id\" does not exist"
+ },
+ {
+  "codigo": "42P01",
+  "sql": "-- === user_language.sql === -- Frente 56 \u00e2\u20ac\u201d User language preference ALTER TABLE users ADD COLUMN IF NOT EXI",
+  "msg": "relation \"users\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE INDEX IF NOT EXISTS webhook_deliveries_endpoint_idx ON webhook_deliveries (endpoint_id, created_at DESC",
+  "msg": "column \"endpoint_id\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE INDEX IF NOT EXISTS webhook_deliveries_retry_idx ON webhook_deliveries (status, next_retry_at) WHERE st",
+  "msg": "column \"status\" does not exist"
+ },
+ {
+  "codigo": "42703",
+  "sql": "CREATE INDEX IF NOT EXISTS api_keys_workspace_idx ON api_keys (workspace_id)",
+  "msg": "column \"workspace_id\" does not exist"
+ }
+]

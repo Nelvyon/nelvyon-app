@@ -5,6 +5,8 @@ import json
 import pathlib
 import sys
 
+import re
+
 import psycopg2
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
@@ -13,6 +15,9 @@ from cortar import sentencias  # noqa: E402
 MIGRACIONES = pathlib.Path(r"C:\Users\Daniel\nelvyon-w3\backend\db\migrations")
 CONSOLIDADA = "507_fastapi_runtime_schemas.sql"
 TOLERADOS = {"42601", "42701", "42703", "42710", "42830", "42883", "42P01", "42P16"}
+#: Comentarios de linea y de bloque.
+_SOLO_COMENTARIOS = re.compile(r'--[^\n]*|/\*.*?\*/', re.S)
+
 BASE = "postgresql://nelvyon_local:nelvyon_local_dev@localhost:5434/"
 SALIDA = pathlib.Path(__file__).parent
 
@@ -25,6 +30,13 @@ def main(db: str) -> None:
     ficheros = sorted(MIGRACIONES.glob("*.sql"), key=lambda p: p.name)
     for f in ficheros:
         sql = io.open(f, encoding="utf-8", errors="replace").read()
+        # Un fichero que solo lleva comentarios es una LAPIDA, no una migracion:
+        # `280_rls_service_role.sql` son 2207 bytes de explicacion y ni una
+        # sentencia. Ejecutarlo daba «can't execute an empty query» y se contaba
+        # como fallo DURO, inventando un problema que no existe. El ejecutor real
+        # tampoco tiene nada que ejecutar ahi.
+        if not _SOLO_COMENTARIOS.sub('', sql).strip():
+            continue
         if f.name == CONSOLIDADA:
             for st in sentencias(sql):
                 try:
