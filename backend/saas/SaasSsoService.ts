@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import type { DbClient } from "../db/DbClient";
+import { assertSafeEgressUrl } from "./safeEgressUrl";
 import { DbClient as DbClientClass } from "../db/DbClient";
 
 export interface SsoConfig {
@@ -114,6 +115,25 @@ export class SaasSsoService {
 
   async upsertConfig(tenantId: string, input: ConfigureSsoInput): Promise<SsoConfig> {
     if (!input.issuer.trim()) throw new SaasSsoError("issuer is required", "VALIDATION");
+
+    // SSRF. `issuer` y `metadataUrl` los elige el INQUILINO, y el servidor hace
+    // peticiones a los dos durante el login: un `POST` al endpoint de token y una
+    // descarga del JWKS. Sin esta comprobacion, un inquilino podia apuntarlos al
+    // endpoint de metadatos de la nube, al PostgreSQL interno o a la propia
+    // aplicacion — y ADEMAS leer la respuesta, porque el callback devolvia 200
+    // caracteres del cuerpo en su 502.
+    //
+    // Solo se validaba que no estuvieran vacios.
+    for (const [campo, valor] of [["issuer", input.issuer], ["metadataUrl", input.metadataUrl]] as const) {
+      if (!valor?.trim()) continue;
+      try {
+        assertSafeEgressUrl(valor.trim());
+      } catch (e) {
+        throw new SaasSsoError(
+          `${campo} no permitido: ${e instanceof Error ? e.message : String(e)}`,
+          "VALIDATION");
+      }
+    }
     if (!input.clientId.trim()) throw new SaasSsoError("clientId is required", "VALIDATION");
     if (!input.clientSecret.trim()) throw new SaasSsoError("clientSecret is required", "VALIDATION");
     if (!["oidc", "saml"].includes(input.provider)) throw new SaasSsoError("provider must be oidc or saml", "VALIDATION");

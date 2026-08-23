@@ -1729,3 +1729,4 @@ export type {
   ProviderStatus,
   LlmCompletionResult,
 } from "../private-ai/types";
+export { assertSafeEgressUrl, isSafeEgressUrl } from "./safeEgressUrl";

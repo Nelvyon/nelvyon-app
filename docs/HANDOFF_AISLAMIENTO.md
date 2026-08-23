@@ -3,6 +3,39 @@
 Documento vivo. Se actualiza al cerrar cada lote, para que otra sesión continúe
 sin rehacer nada.
 
+## SSRF — el SSO permitía apuntar a la red interna, y devolvía la respuesta
+
+`saas_sso_configs.issuer` y `metadata_url` **los elige el inquilino**, y el
+servidor hace peticiones a los dos durante el login: un `POST` al endpoint de
+token y la descarga del JWKS.
+
+La única validación era `if (!input.issuer.trim())` — **que no estuviera vacío**.
+
+Con `issuer = http://169.254.169.254`, el callback hacía un `POST` al endpoint de
+metadatos de la nube. Y devolvía **200 caracteres del cuerpo** en su 502: no era
+solo provocar la petición, era **leer el resultado**. Misma clase que la SSRF de
+lectura de `webhook_deliveries.response_body`.
+
+**El guardia ya existía** — `safeEgressUrl.ts`, con HTTPS obligatorio, sin
+credenciales, RFC1918, link-local, CGNAT, metadata y IPv6 ULA. Lo usaba **un solo
+servicio**. El defecto no era falta de herramienta: era no haberla aplicado.
+
+**Corregido**: se valida al guardar **y otra vez justo antes de conectar** —entre
+las dos cosas pueden pasar semanas y repuntar el DNS es el ataque clásico contra
+un guard que solo valida al registrar— y el cuerpo de la respuesta deja de
+devolverse: va al log del servidor.
+
+**21/21**, con 17 destinos prohibidos comprobados y control positivo (Microsoft,
+Google, Okta **sí** pasan — «nadie puede salir» no es protección, es una avería).
+
+### Y mis dos pruebas negativas eran falsos verdes
+
+Usaban `.rejects.toThrow()`. **Sin el guardia, `upsertConfig` llega a la conexión
+y también lanza**, así que pasaban igual con la validación quitada: la mutación no
+las tumbaba. Lo que distingue «lo rechazó el guardia» de «se rompió más adelante»
+es el **código** del error, no que haya error. Afiladas a `code === "VALIDATION"`,
+las dos mutaciones tumban 2 pruebas cada una.
+
 ## GDPR — la supresión de datos no podía completarse, y cancelaba Stripe primero
 
 `deleteUserData` hacía, **en este orden**: (1) cancelar la suscripción de Stripe
