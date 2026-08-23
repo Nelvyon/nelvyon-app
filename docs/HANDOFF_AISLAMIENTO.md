@@ -142,6 +142,70 @@ de que Stripe entregara desordenado, y era exactamente el agujero de seguridad.
 Lo que hace falta decidir: si `invoice.paid` debe reactivar, y con qué condición.
 No lo doy por supuesto ni lo implemento sin que lo digas.
 
+## Tope de peticion — el lado web no tenia ninguno
+
+En el App Router de Next las rutas **no tienen limite de cuerpo**: el de 1 MB de
+las API de `pages/` no existe aqui, y el `MAX_BODY_SIZE` de FastAPI solo cubre el
+backend de Python. `await req.json()` y `await req.formData()` en
+`/api/forms/[formId]/submit` —que es **anonima**— bufferizaban lo que hiciera
+falta. El limite por IP no ayuda: son 20 peticiones por minuto, pero cada una
+podia traer cientos de megas.
+
+Mismo defecto que ya se cerro en `middlewares/security.py`, con la misma leccion:
+`Content-Length` es una **declaracion** y no siempre viaja. Aqui se cree para
+**rechazar**, nunca para aceptar.
+
+**Cerrado**: `cuerpoConTope.ts`, aplicado a formularios publicos, SAML ACS e
+importacion de contactos. 14 vitest; tres mutaciones tumban 6, 1 y 7.
+
+### Dos cosas que salieron al probarlo
+
+1. **Cancelar el flujo habria sido peor que el defecto.** Al pasarse del tope, lo
+   natural es cancelar. En Node eso deja un rechazo **suelto** —undici sigue
+   encolando despues de cancelar— y un rechazo no capturado **tumba el proceso**:
+   la proteccion contra la caida habria sido la caida. Medidas las tres
+   variantes; solo no cancelar queda limpio. Se sigue sin acumular mas del tope
+   en memoria, que es el vector real; no se ahorra ancho de banda. Hay guardia,
+   porque vitest **avisa** de los rechazos sueltos pero no falla por ellos.
+
+2. **La prueba medía otra cosa.** Corria en el entorno de navegador de la suite y
+   el multipart fallaba con «no boundary found»: la implementacion de jsdom no es
+   la que ejecuta esto en produccion. Fijada al entorno de servidor.
+
+## Coste de IA — la garantia era una casualidad
+
+`isNelvyonAiEnabled()` se documenta como *master switch — when false, no external
+LLM calls* y por defecto vale `0`. `/api/nelvyon-site/chat` llamaba a
+`api.openai.com` **sin consultarlo**: lo unico que evitaba el gasto era que no
+hubiera clave en el entorno.
+
+Hoy no cambia el comportamiento. Cambia **de que depende** que no cambie: el dia
+que alguien defina `OPENAI_API_KEY` para otra cosa, una ruta que atiende al
+publico empezaba a gastar por mensaje, con limite por IP y por tanto sin techo.
+
+**Cerrado**, con guardia de codigo. Mi propio barrido dio antes tres falsos
+positivos por leer comentarios que explican que `saas/chat` y
+`saas/agentes/execute` **antes** llamaban a OpenAI y ya no.
+
+## Proxies comodin — recorrido de ruta
+
+Las rutas `[[...path]]` reciben los segmentos ya decodificados, los unen y los
+pegan tras una base fija. El host no se puede cambiar —no hay SSRF—, pero un
+`%2e%2e` llega como `..`, sobrevive al `fetch`, que normaliza, y la llamada acaba
+en otra familia de endpoints con la cabecera `X-Workspace-Id` que el propio proxy
+firma. **Cerrado** con `subrutaDeProxy` (rechaza, no sanea) + guardia.
+
+## Higiene de la suite — tres fuentes de falsos rojos
+
+| Qué | Efecto |
+|---|---|
+| Tres pruebas leian `Path("main.py")` **relativa** | su veredicto dependia del directorio desde el que se lanzara pytest |
+| El plan del workspace 1 era **estado global** | varias pruebas insertaban una suscripcion activa y la dejaban puesta; despues, pruebas sin relacion con planes recibian 403 «Tu plan no incluye…». Aislado por fichero |
+| `reads first x-forwarded-for hop` | **defendia el defecto**: afirmaba el comportamiento vulnerable, asi que arreglarlo se veia como romper una prueba |
+
+Y un doble de Upstash se quedo obsoleto al cambiar el contador a `pipeline`:
+respondia `{result:1}` a todo y su prueba dejo de medir lo que dice medir.
+
 ## Punto de partida
 
 - SHA producción certificado: `a86c1167`
