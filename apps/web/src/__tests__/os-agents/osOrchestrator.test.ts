@@ -7,6 +7,12 @@ import { OsEventBus, OsJobStore, OsOrchestrator, resetLlmClientSingletonForTests
 describe("OsOrchestrator", () => {
   beforeEach(() => {
     // Prefer mocked OpenAI path; clear shell Ollama pollution that fail-closes the OS client.
+    // El interruptor maestro va explicito: `NELVYON_AI_ENABLED` esta APAGADO por
+    // defecto y ahora manda por encima de `AUTONOMOUS_ALLOW_OPENAI`, de la clave
+    // y de todo lo demas. Esta prueba ejercita a proposito el camino de pago, asi
+    // que tiene que encenderlo — y al escribirlo se ve que hacen falta las DOS
+    // condiciones, no solo el opt-in de siempre.
+    vi.stubEnv("NELVYON_AI_ENABLED", "1");
     vi.stubEnv("OPENAI_API_KEY", "sk-test");
     vi.stubEnv("AUTONOMOUS_ALLOW_OPENAI", "1");
     vi.stubEnv("PRIVATE_MODE", "OFF");

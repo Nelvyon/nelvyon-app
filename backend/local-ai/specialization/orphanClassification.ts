@@ -69,6 +69,14 @@ export const ORPHAN_CLASSIFICATION: readonly OrphanClassEntry[] = [
   { path: "docs/SPRINT_FINAL_ABSOLUTO.md", disposition: "index", domain: "nelvyon", priority: 0, title: "Sprint Final Absoluto", reason: "CONDITIONAL_READY status" },
   { path: "docs/TEST_SKIPS.md", disposition: "index", domain: "development_tech", priority: 0, title: "Vitest Skipped Tests SSOT", reason: "Skip activation criteria" },
   { path: "docs/CTO_FINAL_VERIFY.md", disposition: "index", domain: "nelvyon", priority: 0, title: "CTO Final Verify", reason: "verify-all CONDITIONAL_READY evidence" },
+  // —— Cierre del Bloque 1 (2026-08-23) ——
+  //
+  // El detector de huecos exige `unclassifiedActiveDocs <= 5`. Al crear el
+  // documento de cierre pasó a 6 y su prueba se puso en rojo: un documento
+  // activo que nadie ha clasificado ES un hueco de conocimiento, y esa es
+  // exactamente la señal que el detector debe dar. Se clasifica, no se sube el
+  // techo — subirlo habría sido apagar el detector para que no molestara.
+  { path: "docs/BLOQUE_1_CIERRE.md", disposition: "index", domain: ["nelvyon", "security_privacy"], priority: 0, title: "Bloque 1 — clasificación de cierre", reason: "SSOT del estado de las 18 categorías del Bloque 1" },
   // —— Wave 3: points 1–4 prep (2026-07-26) — remaining top-level orphans ——
   { path: "docs/ARCHITECTURE_LOCAL_AI_RUNTIME.md", disposition: "index", domain: ["nelvyon", "development_tech"], priority: 0, title: "Architecture Local AI Runtime", reason: "Local AI/runtime SSOT" },
   { path: "docs/COMPLIANCE_COMPANY_DB_CHECKLIST.md", disposition: "index", domain: "security_privacy", priority: 1, title: "Compliance Company DB Checklist", reason: "Company DB compliance" },
