@@ -61,15 +61,15 @@
   },
   "contenido": {
    "rutas": 14,
-   "estado": "PENDING",
-   "evidencia": "",
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoLote6.pg.test.ts — contra PostgreSQL real con los servicios REALES; base de conocimiento: categoria, articulo, releer, editar comprobado EN LA FILA, y votos que suman en el articulo CORRECTO y no en el vecino. B no lee, no edita, no borra y tampoco puede VOTAR el articulo de A —comprobado en la fila, no solo en la respuesta—. Snippets: crear, releer, editar persistido, y la busqueda de A no devuelve los de B. Mutacion: quitar el alcance (8 y 4 sitios) tumba 4 y 3.",
    "motivo": ""
   },
   "seo_visibilidad": {
    "rutas": 20,
-   "estado": "PENDING",
-   "evidencia": "",
-   "motivo": ""
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoLote6.pg.test.ts — contra PostgreSQL real con los servicios REALES; anadir una palabra y verla en el listado, anadir varias de golpe, borrar la propia, y B no puede borrar la que sigue A. Control positivo en el aislamiento: A ve las suyas. Mutacion: quitar el alcance de inquilino (3 sitios) tumba 5.",
+   "motivo": "PARCIAL: el enriquecimiento desde Semrush (`enrichTrackedFromSemrush`, `fetchSemrushDomainKeywords`) necesita credencial de pago. BLOCKED_EXTERNALLY para esa parte; coste externo autorizado = 0 EUR."
   },
   "reputacion_sentimiento": {
    "rutas": 12,
@@ -229,9 +229,9 @@
   },
   "ia_privada_memoria": {
    "rutas": 13,
-   "estado": "PENDING",
-   "evidencia": "",
-   "motivo": ""
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoLote6.pg.test.ts — contra PostgreSQL real con los servicios REALES; la memoria de inquilino es lo que la IA lee como CONTEXTO, asi que un trozo cruzado no se queda en una fila mal leida: acaba dentro de una respuesta generada para otro cliente. Certificado: el trozo se lista, la memoria de A no aparece en la de B, la busqueda de B no la encuentra, B no puede borrar un trozo de A, y —la que importa— `buildContextBlock(B)` contiene lo de B y NO contiene nada de A. Con control positivo en las tres. Mutacion: quitar el alcance de inquilino (6 sitios) tumba 4.",
+   "motivo": "PARCIAL: la generacion de embeddings necesita proveedor de pago y esta apagada por el interruptor maestro (NELVYON_AI_ENABLED=0). Lo certificado es el almacen y el contexto, que es donde estaba el riesgo de cruce."
   },
   "gdpr_cumplimiento": {
    "rutas": 8,
