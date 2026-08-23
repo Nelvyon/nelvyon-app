@@ -94,11 +94,25 @@ lo mismo y por eso no se tratan igual:
 | `invoices`, `ab_tests` | el servicio escribe una forma y la tabla tiene otra. **Tres** migraciones crean `invoices` (054, 415, 507) y gana la primera por `IF NOT EXISTS` — quedan `invoices_pkey` e `invoices_pkey1`; existe además `saas_invoices` |
 | `chatbot_conversations.workspace_id` | en una tabla de inquilino no es un campo más: decide el aislamiento y arrastra política de RLS |
 
-No invento columnas ni tenencia. Los once están inventariados con evidencia en
-`huecos_conocidos.json` y hay un **trinquete** que falla si aparece uno nuevo y
-también si uno se arregla y sigue en la lista.
+**Cinco de los once los cierra la migración 576**, escrita y certificada aquí:
+solo `ADD COLUMN IF NOT EXISTS`, sin borrar, sin renombrar, sin backfill y sin
+ninguna columna `NOT NULL`. Probada idempotente aplicándola tres veces seguidas.
+Reconstrucción virgen con ella: 475 migraciones, 0 fallos duros, y los huecos
+bajan de **11 a 4** — exactamente los que dejé fuera a propósito.
 
-**A cuál tabla pertenece cada servicio es alcance de producto: `BLOCKED_ON_FOUNDER`.**
+`SHA256 = f570a0b0700ba210c7b6f2984f42b885ba8f926e6f85ebfb0d6cb93bc1d66b92`
+
+**No está aplicada.** `ADR-064 = BLOCKED_ON_FOUNDER`. Mientras no se aplique,
+esos cinco INSERT siguen fallando en producción.
+
+Los cuatro que quedan **no** son «falta una columna», son una decisión: a qué
+tabla pertenece cada servicio, y qué semántica de tenencia tiene un
+`workspace_id`. **Alcance de producto: `BLOCKED_ON_FOUNDER`.** No invento columnas
+ni tenencia.
+
+Hay un **trinquete** que falla si aparece un hueco nuevo y también si uno deja de
+reproducir y sigue en la lista — para que el inventario no se convierta en algo
+que nadie lee.
 
 ## 8. Migraciones / recuperación — `PASS_CERTIFIED` (con deuda documentada)
 

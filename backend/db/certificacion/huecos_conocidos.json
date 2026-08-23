@@ -1,36 +1,13 @@
 {
- "_comentario": "Columnas que el codigo INSERTA y que la cadena oficial de migraciones NO crea. Medido contra una base VIRGEN reconstruida solo con migraciones, y clasificado contra el catalogo de produccion. Cada entrada dice si el camino esta vivo (alcanzable desde una ruta) y si produccion tampoco tiene la columna. Sirve de trinquete: un hueco NUEVO hace fallar la prueba; estos ya estan documentados y esperan decision.",
+ "_comentario": "Columnas que el codigo INSERTA y que la cadena oficial de migraciones NO crea. Medido contra una base VIRGEN reconstruida solo con migraciones. Trinquete: un hueco NUEVO hace fallar la prueba, y uno que ya no reproduce tambien —para que la lista no se convierta en algo que nadie lee. Los que faltaban por «falta una columna» los cierra la migracion 576; aqui solo quedan los que NO son eso, sino una decision: a que tabla pertenece cada servicio, y que semantica de tenencia tiene un workspace_id. Eso es alcance de producto.",
  "_medido": "2026-08-23",
  "huecos": [
   {
-   "tabla": "security_events",
-   "columnas": ["message", "metadata"],
-   "origen": "backend/services/web_performance_service.py",
-   "vivo": false,
-   "en_produccion": true,
-   "clase": "HUECO_DE_RECUPERACION",
-   "nota": "Produccion SI las tiene —vienen de la rama antigua de alembic, no de la cadena SQL—, asi que hoy funciona y una restauracion desde cero no. Es el caso puro de create_all tapando un hueco."
-  },
-  {
-   "tabla": "campaigns",
-   "columnas": ["from_email", "from_name"],
-   "origen": "backend/services/campaign_service.py",
-   "vivo": true,
-   "en_produccion": false,
-   "clase": "ROTO_HOY",
-   "nota": "Verificado a mano: la tabla no tiene ninguna de las dos, ni en virgen ni en el catalogo de produccion. El INSERT falla con «column does not exist». Camino alcanzable desde ruta."
-  },
-  {
-   "tabla": "affiliate_clicks",
-   "columnas": ["affiliate_id"],
-   "origen": "backend/services/affiliate_service.py",
-   "vivo": true,
-   "en_produccion": false,
-   "clase": "ROTO_HOY"
-  },
-  {
    "tabla": "chatbot_conversations",
-   "columnas": ["visitor_info", "workspace_id"],
+   "columnas": [
+    "visitor_info",
+    "workspace_id"
+   ],
    "origen": "backend/services/chatbot_service.py",
    "vivo": true,
    "en_produccion": false,
@@ -38,16 +15,10 @@
    "nota": "`workspace_id` en una tabla de inquilino no es un campo mas: decide el aislamiento y arrastra politica de RLS. Anadirla sin decidir su politica seria inventar semantica de tenencia."
   },
   {
-   "tabla": "saas_conversations",
-   "columnas": ["metadata"],
-   "origen": "backend/saas/SaasWhatsAppService.ts, backend/saas/SaasWhatsAppCloudService.ts",
-   "vivo": true,
-   "en_produccion": false,
-   "clase": "ROTO_HOY"
-  },
-  {
    "tabla": "saas_tenants",
-   "columnas": ["owner_user_id"],
+   "columnas": [
+    "owner_user_id"
+   ],
    "origen": "backend/saas/SaasSecurityEnterpriseService.ts",
    "vivo": true,
    "en_produccion": false,
@@ -56,7 +27,15 @@
   },
   {
    "tabla": "invoices",
-   "columnas": ["client_address", "client_email", "client_name", "items", "logo_url", "tax_total", "user_id"],
+   "columnas": [
+    "client_address",
+    "client_email",
+    "client_name",
+    "items",
+    "logo_url",
+    "tax_total",
+    "user_id"
+   ],
    "origen": "backend/saas/InvoicingService.ts",
    "vivo": false,
    "en_produccion": false,
@@ -65,20 +44,25 @@
   },
   {
    "tabla": "ab_tests",
-   "columnas": ["duration_days", "metric", "updated_at", "user_id"],
+   "columnas": [
+    "duration_days",
+    "metric",
+    "updated_at",
+    "user_id"
+   ],
    "origen": "backend/saas/ABTestingService.ts",
    "vivo": false,
    "en_produccion": false,
    "clase": "TABLA_EQUIVOCADA_PROBABLE",
    "nota": "Coexisten `ab_tests`, `ab_experiments`, `ab_variants` y `ab_events`. Cuatro columnas de siete sin encajar apunta a que el servicio escribe en la tabla de otra generacion."
-  },
-  {
-   "tabla": "retail_results",
-   "columnas": ["output", "sector"],
-   "origen": "apps/web/src/pages/api/os/agents/retail.ts",
-   "vivo": true,
-   "en_produccion": false,
-   "clase": "ROTO_HOY"
   }
- ]
+ ],
+ "_cerrados_por_la_576": [
+  "affiliate_clicks",
+  "campaigns",
+  "retail_results",
+  "saas_conversations",
+  "security_events"
+ ],
+ "_nota_produccion": "La 576 esta escrita y certificada pero NO aplicada (ADR-064 = BLOCKED_ON_FOUNDER). Mientras no se aplique, esos cinco INSERT siguen fallando en produccion."
 }
