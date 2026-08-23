@@ -17,8 +17,13 @@ evidencia de ausencia.
 ## 1. Auth / sesión — `PASS_CERTIFIED`
 
 `verifyToken` entra en el contexto de inquilino **después** de verificar, nunca
-antes. Las 854 rutas web fijan el inquilino por transacción
-(`test_las_rutas_web_fijan_el_inquilino.py`). Login, registro, reset y el portal
+antes. `test_las_rutas_web_fijan_el_inquilino.py` mantiene el techo de rutas que
+tocan la base sin decir quién pregunta en **cero**, sobre más de 500 rutas
+inventariadas, con las exenciones públicas declaradas una a una y con su motivo
+(sonda de salud, baja por token, certificado LMS verificable…). El techo solo
+puede bajar. Además exige que el `set_config` sea de ámbito de **transacción**:
+uno de sesión duraría más que la petición y la siguiente que reutilizara esa
+conexión heredaría el inquilino. Login, registro, reset y el portal
 tienen cupo con almacén compartido obligatorio en producción; `verify-email`,
 `auth/token` y los tres endpoints de SSO no lo tenían y ahora sí.
 
@@ -27,7 +32,7 @@ El bloqueo de `verify-email` importa más de lo que parece: es una superficie de
 
 ## 2. RBAC / escalada de privilegios — `PASS_CERTIFIED`
 
-`test_workspace_mutation_authz_guard.py` (626 casos) exige que ningún endpoint de
+`test_workspace_mutation_authz_guard.py` (618 casos) exige que ningún endpoint de
 plataforma se conforme con autoridad de workspace, que los *ads* de cliente no
 usen mera pertenencia y que ninguna lectura justificada sea además sensible.
 
