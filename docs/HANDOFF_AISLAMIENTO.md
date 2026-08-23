@@ -1308,6 +1308,13 @@ el recuento de saltos antes de creerse un resultado.
 1. **No lances pytest en paralelo con la suite de puerta.** Comparten
    `backend/test.db` y se contaminan: una ejecución entera se llenó de ERROR por
    eso, y el `exit 0` de un proceso que maté a mano no significaba que pasara.
+
+   Y **la suite no está colgada aunque lo parezca.**
+   `test_rls_saas_cross_tenant.py` recorre ~220 tablas abriendo una conexión por
+   cada una: unos 3 minutos por prueba y unos **12 minutos el fichero**, sin
+   escribir nada en ese rato. Maté dos ejecuciones creyendo que se había
+   bloqueado. Ahora lleva `statement_timeout` y `lock_timeout`, así que si
+   alguna vez es un cerrojo de verdad, lo dirá y dirá en qué tabla.
 2. **Un guardia que quita comentarios borrando desde `//` se come `https://`.**
    Ya ha dado verde tres veces sobre código que sí llamaba fuera. Usar
    `(?<!:)//` y dejar el control puesto en las dos direcciones.
