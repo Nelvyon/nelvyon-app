@@ -115,9 +115,9 @@
   },
   "packs_entregables": {
    "rutas": 30,
-   "estado": "PENDING",
-   "evidencia": "",
-   "motivo": "EN CURSO. El inbox del mismo lote quedo certificado. Aqui falta cerrar dos cosas: `listEntitlements` devuelve vacio aunque `grantFromPlan` SI inserta filas —hay 9 en la tabla tras la ejecucion—, asi que el filtro de lectura no casa con lo escrito; y la lectura cruzada de entregables por id. Ninguna de las dos esta descartada como defecto."
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoLote5.pg.test.ts — packs y entregables contra PostgreSQL real. El catalogo responde, los derechos del plan se conceden y se releen, y los de A no son los de B con control positivo. Consumo: gasta cupo de verdad (launches_used +1 y launches_remaining -1 comprobados en la fila), CUATRO consumos SIMULTANEOS gastan exactamente cuatro —si el decremento fuera leer-y-luego-escribir gastarian menos y el cliente pagaria uno usando varios—, y B no puede gastar el cupo de A, que seria robo silencioso: el cliente descubre que no le quedan lanzamientos sin haber lanzado nada. Revocar marca la fila revocada y B no puede revocar la de A. Entregables: el listado no mezcla inquilinos, el resumen responde con estructura y un entregable ajeno no se lee por id. Mutaciones: decremento leer-y-luego-escribir tumba 2; quitar el alcance de inquilino de consumeLaunch tumba 2.",
+   "motivo": "HALLAZGO documentado, no cambiado: revocar un pack INCLUIDO EN EL PLAN no dura. `canLaunch` llama a `ensurePlanEntitlements` ANTES de comprobar, y eso vuelve a conceder lo que el plan incluye; el indice unico es parcial (solo status='active') asi que la fila revocada no estorba y se crea otra activa. Revocar informa de exito y en la siguiente lectura vuelve a estar permitido. Puede ser lo pretendido —el plan como fuente de verdad— o puede ser que revokeEntitlement prometa mas de lo que cumple. Es semantica de producto."
   },
   "portal_cliente": {
    "rutas": 6,

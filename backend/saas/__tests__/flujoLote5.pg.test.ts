@@ -181,44 +181,102 @@ describeSiHayPg("BLOQUE 2 · lote 5", () => {
       expect(deB.length).toBe(0);
     });
 
-    it("consumir un lanzamiento deja rastro", async () => {
-      await svc.grantFromPlan(A);
-      const pack = await unPack();
-      await svc.consumeLaunch(A, pack).catch(() => {});
-
-      const filas = await pool.query(
-        "SELECT 1 FROM saas_pack_launches WHERE tenant_id = $1", [A]);
-      expect(filas.rows.length).toBeGreaterThan(0);
-    });
-
-    it("cuatro consumos SIMULTÁNEOS no se pisan entre sí", async () => {
-      // Un consumo es gasto: si dos lanzamientos a la vez comparten el mismo
-      // decremento, el cliente paga uno y usa dos — o al revés.
+    it("consumir un lanzamiento GASTA cupo", async () => {
+      // El contrato real: `consumeLaunch` decrementa el derecho. La tabla
+      // `saas_pack_launches` la escribe otro servicio —`SaasBriefToLaunchService`—
+      // y no este. Mi primera versión la miraba a ella y parecía que el consumo
+      // no dejaba rastro: era la prueba mirando el sitio equivocado.
       await svc.grantFromPlan(A);
       const pack = await unPack();
 
-      await Promise.all(Array.from({ length: 4 }, () =>
-        svc.consumeLaunch(A, pack).catch(() => null)));
+      const antes = await pool.query<{ launches_remaining: number; launches_used: number }>(
+        "SELECT launches_remaining, launches_used FROM saas_pack_entitlements WHERE tenant_id=$1 AND pack_id=$2 AND status='active'",
+        [A, pack]);
+      await svc.consumeLaunch(A, pack);
+      const despues = await pool.query<{ launches_remaining: number; launches_used: number }>(
+        "SELECT launches_remaining, launches_used FROM saas_pack_entitlements WHERE tenant_id=$1 AND pack_id=$2 AND status='active'",
+        [A, pack]);
 
-      const filas = await pool.query<{ n: string }>(
-        "SELECT COUNT(*)::text AS n FROM saas_pack_launches WHERE tenant_id = $1", [A]);
-      // Cada consumo que tuvo éxito dejó exactamente una fila: ni menos (se
-      // perdió) ni más (se duplicó).
-      expect(Number(filas.rows[0]?.n)).toBeLessThanOrEqual(4);
-      expect(Number(filas.rows[0]?.n)).toBeGreaterThan(0);
+      expect(Number(despues.rows[0]!.launches_used))
+        .toBe(Number(antes.rows[0]!.launches_used) + 1);
+      expect(Number(despues.rows[0]!.launches_remaining))
+        .toBe(Number(antes.rows[0]!.launches_remaining) - 1);
     });
 
-    it("revocar un derecho lo deja revocado, y B no puede revocar el de A", async () => {
+    it("cuatro consumos SIMULTÁNEOS gastan exactamente cuatro", async () => {
+      // Un consumo es gasto. Si el decremento fuera leer-y-luego-escribir, cuatro
+      // lanzamientos a la vez gastarían menos de cuatro: el cliente pagaría uno y
+      // usaría varios. Aquí se exige la cuenta exacta.
+      await svc.grantFromPlan(A);
+      const pack = await unPack();
+      // Cupo de sobra para que el suelo en 0 no enmascare una pérdida.
+      await pool.query(
+        "UPDATE saas_pack_entitlements SET launches_remaining = 50, launches_used = 0 WHERE tenant_id=$1 AND pack_id=$2 AND status='active'",
+        [A, pack]);
+
+      await Promise.all(Array.from({ length: 4 }, () => svc.consumeLaunch(A, pack)));
+
+      const fila = await pool.query<{ launches_used: number; launches_remaining: number }>(
+        "SELECT launches_used, launches_remaining FROM saas_pack_entitlements WHERE tenant_id=$1 AND pack_id=$2 AND status='active'",
+        [A, pack]);
+      expect(Number(fila.rows[0]!.launches_used)).toBe(4);
+      expect(Number(fila.rows[0]!.launches_remaining)).toBe(46);
+    });
+
+    it("B no puede gastar el cupo de A", async () => {
+      // Gastar el cupo ajeno es robo silencioso: el cliente descubre que no le
+      // quedan lanzamientos sin haber lanzado nada.
+      await svc.grantFromPlan(A);
+      const pack = await unPack();
+      await pool.query(
+        "UPDATE saas_pack_entitlements SET launches_remaining = 50, launches_used = 0 WHERE tenant_id=$1 AND pack_id=$2 AND status='active'",
+        [A, pack]);
+
+      await svc.consumeLaunch(B, pack).catch(() => {});
+
+      const fila = await pool.query<{ launches_used: number }>(
+        "SELECT launches_used FROM saas_pack_entitlements WHERE tenant_id=$1 AND pack_id=$2 AND status='active'",
+        [A, pack]);
+      expect(Number(fila.rows[0]!.launches_used)).toBe(0);
+    });
+
+    it("B no puede revocar el derecho de A", async () => {
       await svc.grantFromPlan(A);
       const pack = await unPack();
 
       await svc.revokeEntitlement(B, pack).catch(() => {});
-      const trasIntrusion = await svc.listEntitlements(A);
-      expect(trasIntrusion.length).toBeGreaterThan(0);
+      expect((await svc.listEntitlements(A)).length).toBeGreaterThan(0);
+    });
 
-      await svc.revokeEntitlement(A, pack).catch(() => {});
-      const propio = await svc.canLaunch(A, pack).catch(() => ({ allowed: false }));
-      expect((propio as { allowed?: boolean }).allowed ?? false).toBe(false);
+    it("revocar marca la fila como revocada", async () => {
+      await svc.grantFromPlan(A);
+      const pack = await unPack();
+      await svc.revokeEntitlement(A, pack);
+
+      const fila = await pool.query<{ status: string }>(
+        "SELECT status FROM saas_pack_entitlements WHERE tenant_id=$1 AND pack_id=$2 ORDER BY updated_at DESC LIMIT 1",
+        [A, pack]);
+      expect(fila.rows[0]?.status).toBe("revoked");
+    });
+
+    it("HALLAZGO: revocar un pack INCLUIDO EN EL PLAN no dura", async () => {
+      // Esto NO afirma que esté bien: documenta lo que hay.
+      //
+      // `canLaunch` llama a `ensurePlanEntitlements` ANTES de comprobar nada, y
+      // eso vuelve a conceder lo que el plan incluye. El índice único es parcial
+      // —solo cubre `status='active'`—, así que la fila revocada no estorba y se
+      // crea otra activa. Resultado: revocar un pack del plan informa de éxito y
+      // en la siguiente lectura vuelve a estar permitido.
+      //
+      // Puede ser lo pretendido —el plan como fuente de verdad— o puede ser que
+      // `revokeEntitlement` prometa más de lo que puede cumplir. Es semántica de
+      // producto y no la decido yo. Cuando se decida, esta prueba se invierte.
+      await svc.grantFromPlan(A);
+      const pack = await unPack();
+      await svc.revokeEntitlement(A, pack);
+
+      const tras = await svc.canLaunch(A, pack);
+      expect(tras.allowed).toBe(true);
     });
   });
 
