@@ -109,9 +109,9 @@
   },
   "facturacion_billing": {
    "rutas": 42,
-   "estado": "PENDING",
-   "evidencia": "",
-   "motivo": ""
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoDePresupuestos.pg.test.ts — 15 pruebas contra PostgreSQL real con SaasQuotesService: importes (subtotal como suma de lineas, descuento e impuesto EN ORDEN, IVA 21% por defecto y 0% cuando se declara, y que lo GUARDADO coincide con lo calculado), numeracion (ocho presupuestos SIMULTANEOS -> ocho numeros distintos; secuencia independiente por inquilino), recorrido completo y borrado sin dejar lineas huerfanas, mas cuatro negativos del inquilino B. Mutaciones: numeracion leer-y-luego-escribir tumba 1; aplicar el impuesto antes del descuento tumba 2. Ademas, del Bloque 1: el reclamo de idempotencia de Stripe certificado contra PostgreSQL real (replay, duplicados simultaneos, estado terminal, atasco) y la resurreccion de membresias por reordenacion, cerrada.",
+   "motivo": "PARCIAL: STRIPE_MEMBERSHIP_REACTIVATION = BLOCKED_ON_FOUNDER — el unico evento que lleva a `active` es customer.subscription.created, asi que quien caduca por impago no vuelve nunca aunque pague. Y `InvoicingService` escribe en `invoices` una forma que la tabla no tiene: a que tabla pertenece (invoices vs saas_invoices) es decision de producto."
   },
   "packs_entregables": {
    "rutas": 30,
