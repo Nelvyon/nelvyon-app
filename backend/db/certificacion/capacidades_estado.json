@@ -19,8 +19,8 @@
   },
   "cuenta_y_suscripcion": {
    "rutas": 12,
-   "estado": "PENDING",
-   "evidencia": "",
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoLote8.pg.test.ts — contra PostgreSQL real con los servicios REALES; claves de API, que son CREDENCIALES: la clave en claro se devuelve UNA vez y no vuelve a aparecer ni en el listado ni EN LA BASE —si se pudiera releer, cualquiera con acceso al panel o a una copia de la base tendria las credenciales de todos—, la recien creada VERIFICA (control positivo, sin el una verificacion rota aprobaria el resto y dejaria la API publica inservible), una REVOCADA deja de verificar, una inventada no verifica, B no puede revocar la de A —cortar la credencial de otro le rompe las integraciones sin que sepa por que— y la lista de A no trae las de B. Mutacion: quitar el alcance de inquilino (2 sitios) tumba 3.",
    "motivo": ""
   },
   "dashboard": {
@@ -73,9 +73,9 @@
   },
   "reputacion_sentimiento": {
    "rutas": 12,
-   "estado": "PENDING",
-   "evidencia": "",
-   "motivo": ""
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoLote8.pg.test.ts — contra PostgreSQL real con los servicios REALES; resenas listadas y estadisticas que cuentan lo que hay, B no ve las de A con control positivo, B no puede responder ni ignorar la resena de A —responder en nombre de otro negocio es publicar en su ficha publica— y responder la propia SI queda guardada. Mutacion: quitar el alcance de inquilino (7 sitios) tumba 4.",
+   "motivo": "PARCIAL: `syncGbpReviews` trae las resenas desde Google Business Profile y necesita credencial OAuth del cliente. BLOCKED_EXTERNALLY esa parte; lo certificado es el almacen, el aislamiento y la respuesta, que es donde estaba el riesgo."
   },
   "inbox_helpdesk": {
    "rutas": 21,
@@ -139,8 +139,8 @@
   },
   "storage_uploads": {
    "rutas": 5,
-   "estado": "PENDING",
-   "evidencia": "",
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoLote8.pg.test.ts — contra PostgreSQL real con los servicios REALES; documentos: crear y releer, la lista de A no incluye los de B con control positivo, y B no lee ni borra el de A — leer cruzado es fuga directa de un fichero del cliente, y borrarlo es destruir algo que no se recupera. Mutacion: quitar el alcance de inquilino (8 sitios) tumba 3.",
    "motivo": ""
   },
   "analytics_reporting": {
@@ -187,8 +187,8 @@
   },
   "formularios_captacion": {
    "rutas": 22,
-   "estado": "PENDING",
-   "evidencia": "",
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoLote8.pg.test.ts — contra PostgreSQL real con los servicios REALES; embudos: crear, releer, anadir paso y publicar persistido; visitantes y conversiones que se cuentan en el paso CORRECTO y no en el vecino; B no lee, no publica ni borra el de A; y la busqueda PUBLICA por slug —que se consulta sin inquilino, porque el slug es lo unico que trae la peticion— no entrega un embudo sin publicar. Mutacion: quitar el alcance de inquilino (13 sitios) tumba 4.",
    "motivo": ""
   },
   "web_builder": {
