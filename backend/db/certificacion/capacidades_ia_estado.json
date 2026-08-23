@@ -1,0 +1,392 @@
+{
+  "bloque": 3,
+  "total": 55,
+  "nota": "Derivado de backend/db/certificacion/capacidades_ia.py. No se edita el conjunto de claves a mano: lo fija el arbol.",
+  "capacidades": {
+    "multinicho_sectores": {
+      "estado": "PENDING",
+      "familia": "ORQUESTACION",
+      "modulos": 1994,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "orquestador_central": {
+      "estado": "PENDING",
+      "familia": "ORQUESTACION",
+      "modulos": 4,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "cola_y_trabajos": {
+      "estado": "PENDING",
+      "familia": "ORQUESTACION",
+      "modulos": 8,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "bus_de_eventos_y_avisos": {
+      "estado": "PENDING",
+      "familia": "ORQUESTACION",
+      "modulos": 4,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "servicio_ads": {
+      "estado": "PENDING",
+      "familia": "SERVICIO",
+      "modulos": 2,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "servicio_advisor_empresarial": {
+      "estado": "PENDING",
+      "familia": "SERVICIO",
+      "modulos": 2,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "servicio_bots": {
+      "estado": "PENDING",
+      "familia": "SERVICIO",
+      "modulos": 2,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "servicio_branding": {
+      "estado": "PENDING",
+      "familia": "SERVICIO",
+      "modulos": 2,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "servicio_comunicaciones": {
+      "estado": "PENDING",
+      "familia": "SERVICIO",
+      "modulos": 2,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "servicio_consultoria_automatizacion": {
+      "estado": "PENDING",
+      "familia": "SERVICIO",
+      "modulos": 2,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "servicio_contenido_copywriting": {
+      "estado": "PENDING",
+      "familia": "SERVICIO",
+      "modulos": 2,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "servicio_diseno_grafico": {
+      "estado": "PENDING",
+      "familia": "SERVICIO",
+      "modulos": 2,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "servicio_ecommerce": {
+      "estado": "PENDING",
+      "familia": "SERVICIO",
+      "modulos": 2,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "servicio_email_marketing": {
+      "estado": "PENDING",
+      "familia": "SERVICIO",
+      "modulos": 2,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "servicio_formacion_capacitacion": {
+      "estado": "PENDING",
+      "familia": "SERVICIO",
+      "modulos": 2,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "servicio_fotografia_producto": {
+      "estado": "PENDING",
+      "familia": "SERVICIO",
+      "modulos": 2,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "servicio_funnel": {
+      "estado": "PENDING",
+      "familia": "SERVICIO",
+      "modulos": 1,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "servicio_influencer_marketing": {
+      "estado": "PENDING",
+      "familia": "SERVICIO",
+      "modulos": 2,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "servicio_integraciones_apis": {
+      "estado": "PENDING",
+      "familia": "SERVICIO",
+      "modulos": 2,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "servicio_landing": {
+      "estado": "PENDING",
+      "familia": "SERVICIO",
+      "modulos": 1,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "servicio_mantenimiento_web": {
+      "estado": "PENDING",
+      "familia": "SERVICIO",
+      "modulos": 2,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "servicio_personal_digital": {
+      "estado": "PENDING",
+      "familia": "SERVICIO",
+      "modulos": 2,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "servicio_reputacion_orm": {
+      "estado": "PENDING",
+      "familia": "SERVICIO",
+      "modulos": 2,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "servicio_seo": {
+      "estado": "PENDING",
+      "familia": "SERVICIO",
+      "modulos": 2,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "servicio_social_media": {
+      "estado": "PENDING",
+      "familia": "SERVICIO",
+      "modulos": 2,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "servicio_tres_d_inmersivo": {
+      "estado": "PENDING",
+      "familia": "SERVICIO",
+      "modulos": 2,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "servicio_video_multimedia": {
+      "estado": "PENDING",
+      "familia": "SERVICIO",
+      "modulos": 2,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "servicio_voz": {
+      "estado": "PENDING",
+      "familia": "SERVICIO",
+      "modulos": 2,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "servicio_web": {
+      "estado": "PENDING",
+      "familia": "SERVICIO",
+      "modulos": 2,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "registro_y_base_de_agentes": {
+      "estado": "PENDING",
+      "familia": "ORQUESTACION",
+      "modulos": 9,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "recuperacion_ante_fallos": {
+      "estado": "PENDING",
+      "familia": "ORQUESTACION",
+      "modulos": 2,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "evaluacion_de_calidad": {
+      "estado": "PENDING",
+      "familia": "ORQUESTACION",
+      "modulos": 6,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "intake_y_objetivo": {
+      "estado": "PENDING",
+      "familia": "ORQUESTACION",
+      "modulos": 3,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "conocimiento_del_cliente": {
+      "estado": "PENDING",
+      "familia": "ORQUESTACION",
+      "modulos": 8,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "reporting_y_roi": {
+      "estado": "PENDING",
+      "familia": "ORQUESTACION",
+      "modulos": 10,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "entregables_y_certificados": {
+      "estado": "PENDING",
+      "familia": "ORQUESTACION",
+      "modulos": 13,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "aprendizaje_autonomo": {
+      "estado": "PENDING",
+      "familia": "ORQUESTACION",
+      "modulos": 5,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "prompts_y_idioma": {
+      "estado": "PENDING",
+      "familia": "ORQUESTACION",
+      "modulos": 3,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "creatividad_y_generacion": {
+      "estado": "PENDING",
+      "familia": "ORQUESTACION",
+      "modulos": 8,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "visibilidad_y_crm_os": {
+      "estado": "PENDING",
+      "familia": "ORQUESTACION",
+      "modulos": 7,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "cliente_llm_y_coste": {
+      "estado": "PENDING",
+      "familia": "ORQUESTACION",
+      "modulos": 4,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "varios_del_nucleo": {
+      "estado": "PENDING",
+      "familia": "ORQUESTACION",
+      "modulos": 3,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "memoria_y_rag": {
+      "estado": "PENDING",
+      "familia": "ORQUESTACION",
+      "modulos": 5,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "ingesta_de_conocimiento": {
+      "estado": "PENDING",
+      "familia": "ORQUESTACION",
+      "modulos": 26,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "enrutado_de_modelo": {
+      "estado": "PENDING",
+      "familia": "ORQUESTACION",
+      "modulos": 18,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "infra_ia_propia": {
+      "estado": "PENDING",
+      "familia": "ORQUESTACION",
+      "modulos": 5,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "agentes_internos": {
+      "estado": "PENDING",
+      "familia": "INTERNOS",
+      "modulos": 5,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "permisos_y_herramientas": {
+      "estado": "PENDING",
+      "familia": "INTERNOS",
+      "modulos": 4,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "rag_privado": {
+      "estado": "PENDING",
+      "familia": "INTERNOS",
+      "modulos": 12,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "orquestacion_privada": {
+      "estado": "PENDING",
+      "familia": "INTERNOS",
+      "modulos": 2,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "aprobaciones_y_gates": {
+      "estado": "PENDING",
+      "familia": "INTERNOS",
+      "modulos": 2,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "trazabilidad_y_auditoria": {
+      "estado": "PENDING",
+      "familia": "INTERNOS",
+      "modulos": 2,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "contexto_de_negocio": {
+      "estado": "PENDING",
+      "familia": "INTERNOS",
+      "modulos": 1,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "memoria_por_inquilino": {
+      "estado": "PENDING",
+      "familia": "INTERNOS",
+      "modulos": 1,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "modo_privado_y_coste": {
+      "estado": "PENDING",
+      "familia": "INTERNOS",
+      "modulos": 2,
+      "evidencia": "",
+      "motivo": ""
+    }
+  }
+}

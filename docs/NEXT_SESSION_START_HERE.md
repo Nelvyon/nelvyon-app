@@ -7,8 +7,8 @@ Estado a **2026-08-23**. Rama `bloque4-webhooks`, worktree `C:\Users\Daniel\nelv
 | Bloque | Estado |
 |---|---|
 | 1 · Seguridad + base técnica | **CERRADO** → `docs/BLOQUE_1_CIERRE.md` |
-| 2 · Web + SaaS + OS completos | **CERRADO** → `docs/BLOQUE_2_CIERRE.md` |
-| 3 · Empresa IA autónoma | **EN CURSO** |
+| 2 · Web + SaaS + OS completos | **CERRADO** en `2b2c3d8e` → `docs/BLOQUE_2_CIERRE.md` |
+| 3 · Empresa IA autónoma | **EN CURSO** → `docs/BLOQUE_3_LINEA_BASE.md` |
 | 4 · Certificación final | pendiente |
 
 El estado por capacidad se **genera**, no se escribe:
@@ -17,6 +17,17 @@ El estado por capacidad se **genera**, no se escribe:
 
 Fuente: `backend/db/certificacion/capacidades_estado.json`.
 Resumen: `docs/BLOQUE_2_ESTADO.md`. Un guardián falla si se separan.
+
+**Bloque 2 · cerrado**: 39/39 clasificadas · 38 certificadas · 1 bloqueada · 0
+pendientes. Puerta: web 7148/0 fallos, Python 3598/0 fallos contra PostgreSQL
+real. SHA `2b2c3d8e`.
+
+**Bloque 3 · denominador cerrado**: `backend/db/certificacion/capacidades_ia.py`
+deriva 2224 módulos de IA en **55 capacidades** con 0 huérfanos —
+25 servicios que NELVYON vende, 21 de orquestación, 9 de la empresa IA interna.
+Estado en `capacidades_ia_estado.json`, guardián en
+`backend/tests/test_el_inventario_de_ia_esta_cerrado.py`.
+Contador: **CERTIFIED + BLOCKED + PENDING = 55**.
 
 ## Bloqueado por el fundador — no lo toques
 

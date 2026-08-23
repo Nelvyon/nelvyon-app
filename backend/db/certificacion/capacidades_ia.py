@@ -25,7 +25,11 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-RAIZ = Path(__file__).resolve().parents[0]
+import os
+
+# En el arbol vive en , de ahi los tres niveles.
+#  existe para poder probarlo desde fuera sin tocar el arbol.
+RAIZ = Path(os.environ.get("NELVYON_RAIZ") or Path(__file__).resolve().parents[3])
 
 CARPETAS = ("backend/os-agents", "backend/local-ai", "backend/private-ai")
 
@@ -62,7 +66,51 @@ MAPA: list[tuple[str, str, str]] = [
     ("agentes_internos",           "INTERNOS",     r"private-ai/(nelvyonAgentRegistry|agents/|core/)"),
     ("permisos_y_herramientas",    "INTERNOS",     r"private-ai/(tools/|adapters/|types)"),
     ("rag_privado",                "INTERNOS",     r"private-ai/(rag/|providers/)"),
+
+    # Estas seis salieron de los HUERFANOS que dejo el primer reparto, y no eran
+    # residuo: son exactamente las piezas que la orden nombra —aprobaciones,
+    # trazabilidad, contexto de negocio, memoria por inquilino, supervision—.
+    # Un mapa que las hubiera metido en un cajon de sastre habria escondido lo
+    # que mas hay que certificar.
+    ("orquestacion_privada",       "INTERNOS",     r"private-ai/(orchestrator/|PrivateAiRouter)"),
+    ("aprobaciones_y_gates",       "INTERNOS",     r"private-ai/(approvals/|sensitiveActions)"),
+    ("trazabilidad_y_auditoria",   "INTERNOS",     r"private-ai/(audit/|observability/)"),
+    ("contexto_de_negocio",        "INTERNOS",     r"private-ai/context/"),
+    ("memoria_por_inquilino",      "INTERNOS",     r"private-ai/memory/"),
+    ("modo_privado_y_coste",       "INTERNOS",     r"private-ai/(privateMode|config)"),
 ]
+
+def _servicios_premium(raiz: Path) -> list[tuple[str, str, str]]:
+    """Una capacidad por agente Premium, DERIVADA del arbol.
+
+    Son los servicios que NELVYON vende. Escribir aqui una lista a mano
+    significaria que anadir un agente nuevo no cambia el denominador y su
+    certificacion no se echa de menos: entraria en produccion sin que nadie lo
+    notara. Derivandolos, aparece solo y el guardian obliga a clasificarlo.
+
+     se queda fuera a proposito: es andamio, no un servicio.
+    """
+    carpeta = raiz / "backend" / "os-agents" / "agents"
+    if not carpeta.exists():
+        return []
+    salida = []
+    for f in sorted(carpeta.glob("*PremiumAgent.ts")):
+        nombre = f.stem                                  # p.ej. SeoPremiumAgent
+        if nombre == "StubPremiumAgent":
+            continue
+        raiz_nombre = nombre[: -len("PremiumAgent")]     # p.ej. Seo
+        slug = re.sub(r"(?<!^)(?=[A-Z])", "_", raiz_nombre).lower()
+        # Casa el agente Y su fichero de prompts ().
+        minuscula = raiz_nombre[0].lower() + raiz_nombre[1:]
+        patron = rf"os-agents/agents/({re.escape(nombre)}|{re.escape(minuscula)}PremiumPrompts)\.ts$"
+        salida.append((f"servicio_{slug}", "SERVICIO", patron))
+    return salida
+
+
+# Los servicios van ANTES del registro generico: si no,  se los tragaria
+# a todos y lo que NELVYON vende quedaria escondido en un cajon de sastre.
+_i = next(i for i, (c, _, _) in enumerate(MAPA) if c == "registro_y_base_de_agentes")
+MAPA[_i:_i] = _servicios_premium(RAIZ)
 
 _COMPILADO = [(c, f, re.compile(p)) for c, f, p in MAPA]
 
@@ -109,6 +157,10 @@ def huerfanos() -> list[str]:
 if __name__ == "__main__":
     r = reparto()
     h = huerfanos()
+    if len(modulos()) < 500:
+        raise SystemExit(
+            f"solo {len(modulos())} modulos: la raiz apunta mal. Cero huerfanos "
+            "sobre cero modulos es un verde que no mide nada.")
     print(f"modulos: {len(modulos())}  capacidades: {len(r)}  huerfanos: {len(h)}")
     for c, f, _ in MAPA:
         print(f"  [{f:12}] {c:28} {len(r[c]):5}")
