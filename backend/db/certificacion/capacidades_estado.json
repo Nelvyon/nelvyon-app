@@ -79,9 +79,9 @@
   },
   "inbox_helpdesk": {
    "rutas": 21,
-   "estado": "PENDING",
-   "evidencia": "",
-   "motivo": "Notificaciones ya certificadas en el lote 2, con un DEFECTO CORREGIDO: `markRead` comparaba tenant_id = $3::uuid contra una columna varchar, asi que marcar una notificacion como leida fallaba SIEMPRE. Falta cubrir tickets y conversaciones."
+   "estado": "FIXED_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoLote5.pg.test.ts — 6 pruebas del inbox contra PostgreSQL real. TRES defectos encontrados, cada uno impedia una operacion entera:\n1) El servicio consultaba `saas_team_members`, tabla que NO EXISTE (la real es `team_members`), y se llama desde createConversation cuando no viene responsable asignado, que es el caso normal: CREAR UNA CONVERSACION reventaba.\n2) `firstMessage` es opcional y su unico uso que daba pista de tipo era un `CASE WHEN $5 IS NOT NULL`; sin molde PostgreSQL responde «could not determine data type of parameter $5». Crear una conversacion SIN primer mensaje —cuando alguien escribe y aun no se ha respondido— tambien reventaba.\n3) En `saas_conversation_messages` conviven las dos formas historicas: `content` (vieja, NOT NULL) y `body` (nueva). El servicio solo escribia `body`, asi que ENVIAR UN MENSAJE fallaba siempre.\nCertificado ademas: el mensaje se relee del hilo, B no lee la conversacion de A ni sus mensajes —un mensaje cruzado no es una fuga, es una conversacion entregada a la persona equivocada—, B no puede responder en ella, y la politica de SLA es por inquilino.\nMutaciones: devolver la tabla inexistente tumba 7; quitar el molde tumba 7; quitar `content` tumba 5; quitar el alcance de inquilino (14 sitios) tumba 9.",
+   "motivo": "ANOTADO, no arreglable sin migracion: mientras `content` y `body` sigan las dos en `saas_conversation_messages`, el mismo texto vive en dos sitios. Quitar el NOT NULL de `content` o retirar la columna es una migracion y ADR-064 esta bloqueado."
   },
   "chatbot": {
    "rutas": 8,
@@ -117,7 +117,7 @@
    "rutas": 30,
    "estado": "PENDING",
    "evidencia": "",
-   "motivo": ""
+   "motivo": "EN CURSO. El inbox del mismo lote quedo certificado. Aqui falta cerrar dos cosas: `listEntitlements` devuelve vacio aunque `grantFromPlan` SI inserta filas —hay 9 en la tabla tras la ejecucion—, asi que el filtro de lectura no casa con lo escrito; y la lectura cruzada de entregables por id. Ninguna de las dos esta descartada como defecto."
   },
   "portal_cliente": {
    "rutas": 6,

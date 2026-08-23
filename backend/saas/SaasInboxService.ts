@@ -253,11 +253,18 @@ export class SaasInboxService {
       assignedTo = await this.assignRoundRobinNew(tenantId);
     }
 
+    // El molde de $5 va explicito.
+    //
+    // `firstMessage` es OPCIONAL, y cuando no viene se pasa `null`. Su unico uso
+    // que da pista de tipo es `CASE WHEN $5 IS NOT NULL`, que no basta:
+    // PostgreSQL responde «could not determine data type of parameter $5» y el
+    // INSERT falla. O sea que crear una conversacion SIN primer mensaje —el caso
+    // normal cuando alguien escribe y todavia no se ha respondido— reventaba.
     const rows = await this.db.query<ConvRow>(
       `INSERT INTO saas_conversations
          (tenant_id, contact_id, channel, assigned_to, last_message, last_message_at,
           thread_id, subject, priority, sla_due_at, updated_at)
-       VALUES ($1,$2,$3,$4,$5,CASE WHEN $5 IS NOT NULL THEN NOW() ELSE NULL END,
+       VALUES ($1,$2,$3,$4,$5::text,CASE WHEN $5::text IS NOT NULL THEN NOW() ELSE NULL END,
                $6,$7,$8, NOW() + ($9 || ' minutes')::INTERVAL, NOW())
        RETURNING id, tenant_id, contact_id, channel, status,
                  COALESCE(priority,'normal') as priority,
@@ -329,11 +336,23 @@ export class SaasInboxService {
     if (!input.body.trim()) throw new SaasInboxError("body is required", "VALIDATION");
     const direction = input.direction ?? "outbound";
     const status = input.status ?? (direction === "inbound" ? "received" : "sent");
+    // El texto va a `body` Y a `content`.
+    //
+    // En esta tabla conviven las DOS formas historicas: `content` es la vieja y
+    // sigue siendo NOT NULL; `body` es la nueva y admite nulos. El servicio solo
+    // escribia `body`, asi que `content` quedaba a NULL y el INSERT fallaba con
+    // «violates not-null constraint». Es decir: ENVIAR UN MENSAJE en el inbox
+    // reventaba siempre.
+    //
+    // Se rellenan las dos con el mismo valor porque es lo unico que se puede
+    // hacer sin tocar el esquema: quitar el NOT NULL de `content` —o retirar la
+    // columna— es una migracion, y ADR-064 esta bloqueado. Queda anotado: mientras
+    // sigan las dos, hay dos sitios donde vive el mismo texto.
     const rows = await this.db.query<MsgRow>(
       `INSERT INTO saas_conversation_messages
-         (conversation_id, tenant_id, direction, channel, body, status,
+         (conversation_id, tenant_id, direction, channel, body, content, status,
           parent_message_id, metadata, external_id)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8::jsonb,$9)
+       VALUES ($1,$2,$3,$4,$5,$5,$6,$7,$8::jsonb,$9)
        ON CONFLICT (external_id) WHERE external_id IS NOT NULL DO NOTHING
        RETURNING id, conversation_id, tenant_id, direction, channel, body, status,
                  external_id, parent_message_id,
@@ -566,7 +585,16 @@ export class SaasInboxService {
 
     // Get active assignable members directly (avoids singleton DB dependency in tests)
     const memberRows = await this.db.query<{ id: string }>(
-      `SELECT id FROM saas_team_members WHERE tenant_id=$1 AND status='active'
+      // La tabla es team_members, no saas_team_members.
+      //
+      // Esa segunda no existe en el esquema, asi que la consulta fallaba con
+      // «relation does not exist»... y esto se llama desde createConversation
+      // cuando no viene un responsable asignado, que es el caso normal. Es decir:
+      // CREAR UNA CONVERSACION en el inbox reventaba.
+      //
+      // El resto del producto usa team_members —SaasTeamService escribe ahi— y
+      // sus columnas encajan una a una: status, role y created_at.
+      `SELECT id FROM team_members WHERE tenant_id=$1 AND status='active'
        AND role IN ('owner','admin','manager','user') ORDER BY created_at ASC`,
       [tenantId],
     );
