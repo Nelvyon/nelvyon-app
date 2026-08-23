@@ -116,6 +116,15 @@ def _slugify(text_val: str) -> str:
 
 
 def _openai_client():
+    # El interruptor maestro manda. Este servicio no pasa por
+    # `core.ai_provider`: tiene su propia copia de esta funcion, como otros 25.
+    # Sin esta linea bastaba con que apareciera una clave en el entorno —puesta
+    # para otra cosa, heredada de una plantilla— para que empezara a gastar.
+    from core.ai_provider import interruptor_de_ia_encendido
+
+    if not interruptor_de_ia_encendido():
+        return None
+
     from openai import AsyncOpenAI
 
     api_key = (

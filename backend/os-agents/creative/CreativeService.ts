@@ -3,6 +3,7 @@ import type { CreativeAsset, CreativeProvider } from "./types";
 
 const IMAGINE_API_BASE = "https://cl.imagineapi.dev";
 const KLING_API_BASE = "https://api.klingai.com/v1";
+import { isNelvyonAiEnabled } from "../../private-ai/config";
 import { resolveMediaProvider } from "../../media-ai/mediaCapabilities";
 
 const OPENAI_IMAGES_URL = "https://api.openai.com/v1/images/generations";
@@ -130,6 +131,11 @@ async function tryMidjourney(prompt: string): Promise<string | null> {
 }
 
 async function tryDalle(prompt: string): Promise<{ url: string; revised?: string } | null> {
+  // El interruptor maestro manda por encima de cualquier otra condicion.
+  // Ver `private-ai/config.ts::isNelvyonAiEnabled`: con el apagado no sale
+  // ninguna llamada a un proveedor externo, exista o no una clave.
+  if (!isNelvyonAiEnabled()) return null;
+
   const key = process.env.OPENAI_API_KEY?.trim();
   if (!key) return null;
 

@@ -41,6 +41,32 @@ def _clean_env(monkeypatch):
         monkeypatch.delenv(name, raising=False)
 
 
+@pytest.fixture
+def _interruptor_encendido(monkeypatch):
+    """Enciende el interruptor maestro.
+
+    Las pruebas de PRECEDENCIA de endpoint miden algo ortogonal al interruptor:
+    dada una configuracion, cual gana. Desde que `resolve_ai_endpoint` respeta
+    `NELVYON_AI_ENABLED` —apagado por defecto— hay que encenderlo para poder
+    medir eso; si no, todas devuelven `None` y no se mide la precedencia, se
+    mide el interruptor, que ya tiene sus propias pruebas.
+
+    No es rebajar nada: la exigencia sube. Lo prueba
+    `test_el_interruptor_apaga_el_embudo_aunque_haya_configuracion`, aqui abajo.
+    """
+    monkeypatch.setenv("NELVYON_AI_ENABLED", "1")
+    yield
+
+
+def test_el_interruptor_apaga_el_embudo_aunque_haya_configuracion(monkeypatch):
+    """Con el interruptor apagado no hay endpoint, este lo que este configurado."""
+    monkeypatch.delenv("NELVYON_AI_ENABLED", raising=False)
+    monkeypatch.setenv("NELVYON_AI_API_KEY", "sk-lo-que-sea")
+    monkeypatch.setenv("NELVYON_AI_BASE_URL", "http://127.0.0.1:11434/v1")
+    assert resolve_ai_endpoint() is None
+    assert get_ai_client() is None
+
+
 def test_sin_configuracion_no_hay_endpoint():
     assert resolve_ai_endpoint() is None
     assert get_ai_client() is None
@@ -59,7 +85,7 @@ def test_una_clave_suelta_no_activa_openai(monkeypatch):
     assert get_ai_client() is None
 
 
-def test_infra_nelvyon_tiene_precedencia(monkeypatch):
+def test_infra_nelvyon_tiene_precedencia(monkeypatch, _interruptor_encendido):
     monkeypatch.setenv("NELVYON_AI_BASE_URL", "http://127.0.0.1:11434/v1")
     monkeypatch.setenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
     endpoint = resolve_ai_endpoint()
@@ -85,7 +111,7 @@ def test_apuntar_a_la_api_publica_no_basta_con_la_variable_del_sdk(monkeypatch):
     assert resolve_ai_endpoint() is None, "se salio a la API publica sin opt-in"
 
 
-def test_url_externa_solo_si_se_configura_explicitamente(monkeypatch):
+def test_url_externa_solo_si_se_configura_explicitamente(monkeypatch, _interruptor_encendido):
     """El opt-in explicito SI se respeta: es una decision del operador."""
     monkeypatch.setenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
     monkeypatch.setenv("NELVYON_ALLOW_EXTERNAL_AI", "1")
@@ -96,7 +122,7 @@ def test_url_externa_solo_si_se_configura_explicitamente(monkeypatch):
     assert ai_capability_status() == "explicit_external"
 
 
-def test_un_runtime_local_por_la_misma_variable_sigue_funcionando(monkeypatch):
+def test_un_runtime_local_por_la_misma_variable_sigue_funcionando(monkeypatch, _interruptor_encendido):
     """
     Contraprueba imprescindible: el bloqueo es del HOST publico, no de la
     variable. Apuntar `OPENAI_BASE_URL` a Ollama tiene que seguir valiendo.
@@ -108,7 +134,7 @@ def test_un_runtime_local_por_la_misma_variable_sigue_funcionando(monkeypatch):
     assert endpoint.external_public is False
 
 
-def test_endpoint_local_sin_clave_recibe_credencial_placeholder(monkeypatch):
+def test_endpoint_local_sin_clave_recibe_credencial_placeholder(monkeypatch, _interruptor_encendido):
     monkeypatch.setenv("NELVYON_AI_BASE_URL", "http://127.0.0.1:11434/v1")
     endpoint = resolve_ai_endpoint()
     assert endpoint is not None

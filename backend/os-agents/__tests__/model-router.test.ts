@@ -56,6 +56,7 @@ describe("LlmClient fallback", () => {
 
   afterEach(() => {
     globalThis.fetch = originalFetch;
+    delete process.env.NELVYON_AI_ENABLED;
     process.env.OPENAI_API_KEY = originalKey;
     if (originalAllow === undefined) delete process.env.AUTONOMOUS_ALLOW_OPENAI;
     else process.env.AUTONOMOUS_ALLOW_OPENAI = originalAllow;
@@ -70,6 +71,12 @@ describe("LlmClient fallback", () => {
     // OpenAI path only: clear local Ollama so the client does not prefer a polluted host.
     for (const k of ollamaKeys) delete process.env[k];
     process.env.OPENAI_API_KEY = "test-key";
+    // El interruptor maestro va explicito: `NELVYON_AI_ENABLED` esta APAGADO por
+    // defecto y ahora manda por encima de `AUTONOMOUS_ALLOW_OPENAI`, de la clave
+    // y de todo lo demas. Esta prueba ejercita a proposito el camino de pago, asi
+    // que tiene que encenderlo — y al escribirlo aqui queda a la vista que hacen
+    // falta las DOS condiciones, no solo el opt-in de siempre.
+    process.env.NELVYON_AI_ENABLED = "1";
     process.env.AUTONOMOUS_ALLOW_OPENAI = "1";
     process.env.PRIVATE_MODE = "OFF";
     const fetchMock = vi

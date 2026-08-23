@@ -14,6 +14,18 @@ class ElevenLabsService:
         )  # Rachel - voz profesional por defecto
 
     async def text_to_speech(self, text: str, voice_id: str = None) -> bytes:
+        # El interruptor maestro manda. La voz tambien cuesta dinero —ElevenLabs
+        # cobra por caracter— y este servicio no pasa por `core.ai_provider`:
+        # construye la peticion con `httpx` y su propia clave. Sin esta linea, lo
+        # unico que evitaba el gasto era que la clave no estuviera puesta.
+        #
+        # Se degrada LANZANDO, que es lo que ya hace esta funcion cuando falta la
+        # clave: los llamantes ya lo tratan y no se confunde con audio real.
+        from core.ai_provider import interruptor_de_ia_encendido
+
+        if not interruptor_de_ia_encendido():
+            raise ValueError("IA desactivada: NELVYON_AI_ENABLED=0")
+
         if not self.api_key:
             raise ValueError("ELEVENLABS_API_KEY not configured")
         vid = voice_id or self.default_voice_id

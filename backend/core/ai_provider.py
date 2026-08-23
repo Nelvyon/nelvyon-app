@@ -71,12 +71,33 @@ def _env(name: str) -> str:
     return (os.environ.get(name) or "").strip()
 
 
+def interruptor_de_ia_encendido() -> bool:
+    """El interruptor maestro: `NELVYON_AI_ENABLED`, apagado por defecto.
+
+    Es el mismo nombre y la misma semantica que `isNelvyonAiEnabled()` del lado
+    TypeScript, que se documenta como *master switch — when false, no provider
+    probes or external LLM calls*. Aqui vive su version Python para que los dos
+    lados tengan UN solo interruptor y no dos verdades.
+
+    Apagado por defecto a proposito: si la variable falta —un despliegue nuevo,
+    una plantilla incompleta, un `.env` que nadie copio— lo que pasa es que no se
+    gasta. El fallo por omision no puede costar dinero.
+    """
+    v = os.environ.get("NELVYON_AI_ENABLED", "0").strip().lower()
+    return v in ("1", "true", "on")
+
+
 def resolve_ai_endpoint() -> Optional[AiEndpoint]:
     """Resuelve el endpoint, o ``None`` si no hay ninguno configurado.
 
     Nunca inventa ``api.openai.com``: sin configuración explícita devuelve
     ``None`` y la capacidad queda NOT_CONFIGURED.
     """
+    # El interruptor manda por encima de cualquier configuracion: con el
+    # apagado no hay endpoint, luego no hay cliente, luego no hay gasto.
+    if not interruptor_de_ia_encendido():
+        return None
+
     nelvyon_base = _env("NELVYON_AI_BASE_URL")
     explicit_base = _env("OPENAI_BASE_URL") or _env("APP_AI_BASE_URL")
 

@@ -68,6 +68,15 @@ def _row(row: Any) -> dict[str, Any]:
 
 
 def _openai_client() -> AsyncOpenAI:
+    # El interruptor maestro manda. Este servicio no pasa por
+    # `core.ai_provider`: tiene su propia copia de esta funcion, como otros 25.
+    # Sin esta linea bastaba con que apareciera una clave en el entorno —puesta
+    # para otra cosa, heredada de una plantilla— para que empezara a gastar.
+    from core.ai_provider import interruptor_de_ia_encendido
+
+    if not interruptor_de_ia_encendido():
+        raise ValueError("IA desactivada: NELVYON_AI_ENABLED=0")
+
     api_key = (
         os.environ.get("OPENAI_API_KEY", "").strip()
         or os.environ.get("APP_AI_KEY", "").strip()

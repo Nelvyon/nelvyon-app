@@ -1,4 +1,5 @@
 import { resolveMediaProvider } from "../../media-ai/mediaCapabilities";
+import { isNelvyonAiEnabled } from "../../private-ai/config";
 
 export type GenerativeResult = {
   url: string;
@@ -36,7 +37,7 @@ function useGenerativeMocks(): boolean {
 }
 
 /** Explicit mock marker — callers must not treat placeholders as real assets. */
-function placeholderResult(path: string, reason: "vitest" | "missing_api_key"): GenerativeResult {
+function placeholderResult(path: string, reason: "vitest" | "missing_api_key" | "ai_disabled"): GenerativeResult {
   return {
     url: `${PLACEHOLDER_BASE}/${path}`,
     metadata: { mock: true, reason },
@@ -61,6 +62,12 @@ function readObject(v: unknown): Record<string, unknown> | null {
 
 export class GenerativeClient {
   static async generateImage(prompt: string, options?: ImageGenerationOptions): Promise<GenerativeResult> {
+    // El interruptor maestro manda. Los cuatro generadores llaman a proveedores
+    // que COBRAN —OpenAI, Runway, Meshy, ElevenLabs—, asi que los cuatro se
+    // apagan igual, y se degrada de forma EXPLICITA: el motivo viaja en el
+    // resultado, nunca un exito inventado.
+    if (!isNelvyonAiEnabled()) return placeholderResult("image.jpg", "ai_disabled");
+
     const key = process.env.OPENAI_API_KEY?.trim();
     if (!key || useGenerativeMocks()) {
       return placeholderResult("image.jpg", useGenerativeMocks() ? "vitest" : "missing_api_key");
@@ -98,6 +105,12 @@ export class GenerativeClient {
   }
 
   static async generateVideo(prompt: string, options?: VideoGenerationOptions): Promise<GenerativeResult> {
+    // El interruptor maestro manda. Los cuatro generadores llaman a proveedores
+    // que COBRAN —OpenAI, Runway, Meshy, ElevenLabs—, asi que los cuatro se
+    // apagan igual, y se degrada de forma EXPLICITA: el motivo viaja en el
+    // resultado, nunca un exito inventado.
+    if (!isNelvyonAiEnabled()) return placeholderResult("video.mp4", "ai_disabled");
+
     const key = process.env.RUNWAY_API_KEY?.trim();
     if (!key || useGenerativeMocks()) {
       return placeholderResult("video.mp4", useGenerativeMocks() ? "vitest" : "missing_api_key");
@@ -157,6 +170,12 @@ export class GenerativeClient {
   }
 
   static async generate3D(prompt: string, options?: ThreeDGenerationOptions): Promise<GenerativeResult> {
+    // El interruptor maestro manda. Los cuatro generadores llaman a proveedores
+    // que COBRAN —OpenAI, Runway, Meshy, ElevenLabs—, asi que los cuatro se
+    // apagan igual, y se degrada de forma EXPLICITA: el motivo viaja en el
+    // resultado, nunca un exito inventado.
+    if (!isNelvyonAiEnabled()) return placeholderResult("model.glb", "ai_disabled");
+
     const key = process.env.MESHY_API_KEY?.trim();
     if (!key || useGenerativeMocks()) {
       return placeholderResult("model.glb", useGenerativeMocks() ? "vitest" : "missing_api_key");
@@ -212,6 +231,12 @@ export class GenerativeClient {
   }
 
   static async generateVoice(text: string, options?: VoiceGenerationOptions): Promise<GenerativeResult> {
+    // El interruptor maestro manda. Los cuatro generadores llaman a proveedores
+    // que COBRAN —OpenAI, Runway, Meshy, ElevenLabs—, asi que los cuatro se
+    // apagan igual, y se degrada de forma EXPLICITA: el motivo viaja en el
+    // resultado, nunca un exito inventado.
+    if (!isNelvyonAiEnabled()) return placeholderResult("audio.mp3", "ai_disabled");
+
     // ElevenLabs solo con doble opt-in explicito, nunca por tener la clave.
     const ttsProvider = resolveMediaProvider("tts");
     const key = ttsProvider.kind === "external" ? process.env.ELEVENLABS_API_KEY?.trim() : "";

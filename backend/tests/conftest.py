@@ -523,19 +523,35 @@ async def _plan_del_workspace_aislado_por_fichero(test_engine, setup_database):
     """
     from sqlalchemy import text as _text
 
-    async with test_engine.begin() as conn:
-        filas = (await conn.execute(_text(
-            "SELECT id, user_id, workspace_id, plan_id, billing_cycle, status"
-            " FROM subscriptions"))).fetchall()
-    antes = [tuple(f) for f in filas]
+    CONSULTA = ("SELECT id, user_id, workspace_id, plan_id, billing_cycle, status"
+                " FROM subscriptions")
+
+    async def _leer():
+        """Las suscripciones, o `None` si la tabla no esta.
+
+        No siempre esta: hay modulos que corren sin el bootstrap completo. La
+        primera version daba por hecho que si, y al desmontar lanzaba
+        `no such table: subscriptions` — un ERROR de teardown en decenas de
+        ficheros que no tienen nada que ver con planes. Un aislamiento que
+        rompe lo que venia a proteger no aisla: hace ruido.
+        """
+        try:
+            async with test_engine.begin() as conn:
+                return [tuple(f) for f in (await conn.execute(_text(CONSULTA))).fetchall()]
+        except Exception:
+            return None
+
+    antes = await _leer()
 
     yield
 
+    if antes is None:
+        return
+    ahora = await _leer()
+    if ahora is None:
+        return
     async with test_engine.begin() as conn:
-        ahora = (await conn.execute(_text(
-            "SELECT id, user_id, workspace_id, plan_id, billing_cycle, status"
-            " FROM subscriptions"))).fetchall()
-        if [tuple(f) for f in ahora] == antes:
+        if ahora == antes:
             return
         # Se restaura EXACTAMENTE lo que habia, ni mas ni menos: dejar la tabla
         # vacia tambien seria un estado inventado, y las pruebas que esperan el

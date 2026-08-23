@@ -39,6 +39,12 @@ describe("llmAdapter — Ollama-first real path", () => {
   it("prefers Ollama over OpenAI when both configured", async () => {
     process.env.OLLAMA_CONFIGURED = "1";
     process.env.OPENAI_API_KEY = "sk-test-should-not-call";
+    // El interruptor maestro va explicito: `NELVYON_AI_ENABLED` esta APAGADO
+    // por defecto y ahora manda por encima de `AUTONOMOUS_ALLOW_OPENAI`, de la
+    // clave y de todo lo demas. Esta prueba ejercita a proposito el camino de
+    // pago, asi que tiene que encenderlo — y al escribirlo aqui queda a la vista
+    // que hacen falta las DOS condiciones, no solo el opt-in de siempre.
+    process.env.NELVYON_AI_ENABLED = "1";
     process.env.AUTONOMOUS_ALLOW_OPENAI = "1";
     process.env.PRIVATE_MODE = "OFF";
     expect(resolveLlmMode()).toBe("real");

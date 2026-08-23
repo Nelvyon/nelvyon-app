@@ -9,6 +9,7 @@ import {
   isPrivateMode,
 } from "../private-ai/privateMode";
 import { getCurrentOpenAiApiKey } from "./llmAsyncContext";
+import { isNelvyonAiEnabled } from "../private-ai/config";
 import { OsAgentError } from "./OsAgentError";
 
 export interface LlmOptions {
@@ -56,6 +57,10 @@ export function isOsOllamaConfigured(): boolean {
  * OFF by default; blocked under PRIVATE_MODE without internet window.
  */
 export function isOsOpenAiAllowed(): boolean {
+  // El interruptor maestro manda por encima de cualquier otra condicion.
+  // Ver `private-ai/config.ts::isNelvyonAiEnabled`: con el apagado no sale
+  // ninguna llamada a un proveedor externo, exista o no una clave.
+  if (!isNelvyonAiEnabled()) return false;
   if (process.env.AUTONOMOUS_ALLOW_OPENAI?.trim() !== "1") return false;
   const key = getCurrentOpenAiApiKey()?.trim() || process.env.OPENAI_API_KEY?.trim();
   if (!key) return false;

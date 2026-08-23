@@ -6,6 +6,7 @@ import type { DbClient } from "../db/DbClient";
 import { DbClient as DbClientClass } from "../db/DbClient";
 import type { ILlmClient } from "../os-agents/LlmClient";
 import { LLM_DEFAULT_MAX_TOKENS, LLM_DEFAULT_MODEL, LlmClient } from "../os-agents/LlmClient";
+import { isNelvyonAiEnabled } from "../private-ai/config";
 
 export type TranscriptionContext = "meeting" | "podcast" | "interview" | "lecture" | "call";
 
@@ -93,6 +94,15 @@ async function defaultWhisperTranscribe(audioUrl: string, language?: string): Pr
   if (provider.kind === "not_configured") {
     throw new MediaCapabilityNotConfigured("stt", provider.reason);
   }
+  // El interruptor maestro manda por encima de cualquier otra condicion.
+  // Se degrada como ya hace el resto de la funcion —lanzando
+  // `MediaCapabilityNotConfigured`, que los llamantes ya tratan— y no
+  // devolviendo `null`, que no encaja con `TranscribeResult` y ademas seria una
+  // forma de fallo distinta a la que este fichero ya usa.
+  if (!isNelvyonAiEnabled()) {
+    throw new MediaCapabilityNotConfigured("stt", "IA desactivada: NELVYON_AI_ENABLED=0");
+  }
+
   const key = process.env.OPENAI_API_KEY?.trim();
   if (!key) {
     throw new MediaCapabilityNotConfigured(

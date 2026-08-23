@@ -49,6 +49,15 @@ def _openai_client() -> AsyncOpenAI:
     quiera apuntar a un endpoint compatible con OpenAI —incluido el propio
     Ollama en su modo `/v1`— sin cambiar codigo.
     """
+    # El interruptor maestro manda. Este servicio no pasa por
+    # `core.ai_provider`: tiene su propia copia de esta funcion, como otros 25.
+    # Sin esta linea bastaba con que apareciera una clave en el entorno —puesta
+    # para otra cosa, heredada de una plantilla— para que empezara a gastar.
+    from core.ai_provider import interruptor_de_ia_encendido
+
+    if not interruptor_de_ia_encendido():
+        raise ValueError("IA desactivada: NELVYON_AI_ENABLED=0")
+
     if not settings.app_ai_base_url or not settings.app_ai_key:
         raise ValueError("AI service not configured. Set APP_AI_BASE_URL and APP_AI_KEY.")
     return AsyncOpenAI(

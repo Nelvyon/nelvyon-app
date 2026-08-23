@@ -59,6 +59,12 @@ describe("LlmClient dual-path contract (ADR-034)", () => {
 
   it("uses OpenAI only with AUTONOMOUS_ALLOW_OPENAI=1 and PRIVATE_MODE off", async () => {
     process.env.OPENAI_API_KEY = "sk-test-contract-only";
+    // El interruptor maestro va explicito: `NELVYON_AI_ENABLED` esta APAGADO
+    // por defecto y ahora manda por encima de `AUTONOMOUS_ALLOW_OPENAI`, de la
+    // clave y de todo lo demas. Esta prueba ejercita a proposito el camino de
+    // pago, asi que tiene que encenderlo — y al escribirlo aqui queda a la vista
+    // que hacen falta las DOS condiciones, no solo el opt-in de siempre.
+    process.env.NELVYON_AI_ENABLED = "1";
     process.env.AUTONOMOUS_ALLOW_OPENAI = "1";
     process.env.PRIVATE_MODE = "OFF";
     expect(isOsOpenAiAllowed()).toBe(true);

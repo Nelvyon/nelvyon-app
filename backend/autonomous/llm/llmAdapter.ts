@@ -20,6 +20,7 @@ import {
 import { parseJsonFromLlm } from "./parseJson";
 import type { AgentRole } from "./promptTemplates";
 import { buildUserPrompt, getSystemPrompt } from "./promptTemplates";
+import { isNelvyonAiEnabled } from "../../private-ai/config";
 
 /**
  * Timeout por defecto de una llamada a Ollama. Réplica de la regla de
@@ -79,6 +80,10 @@ export function isAutonomousOllamaConfigured(): boolean {
  */
 export function isAutonomousOpenAiAllowed(): boolean {
   if (process.env.AUTONOMOUS_ALLOW_OPENAI?.trim() !== "1") return false;
+  // El interruptor maestro manda por encima de cualquier otra condicion.
+  // Ver `private-ai/config.ts::isNelvyonAiEnabled`: con el apagado no sale
+  // ninguna llamada a un proveedor externo, exista o no una clave.
+  if (!isNelvyonAiEnabled()) return false;
   if (!process.env.OPENAI_API_KEY?.trim()) return false;
   if (isPrivateMode() && !isInternetTaskAuthorized()) return false;
   return true;

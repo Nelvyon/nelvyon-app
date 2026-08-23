@@ -1,5 +1,6 @@
 import { DbClient } from "../db/DbClient";
 import { sanitizeEnvValue } from "../db/envSanitize";
+import { isNelvyonAiEnabled } from "../private-ai/config";
 import { isSesEnvConfigured, isStripeEnvConfigured, isOpenAiEnvConfigured, missingEnvKeys } from "../saas/saasEnv";
 
 export type HealthCheckResult = {
@@ -121,6 +122,19 @@ function connectivityResult(started: number, res: Response): HealthCheckResult {
 export async function checkOpenAI(timeoutMs = 3000): Promise<HealthCheckResult> {
   return withGlobalCap(async () => {
     const started = Date.now();
+    // La sonda no gasta tokens —es un HEAD—, pero SI es una llamada externa a un
+    // proveedor de IA, y el interruptor apagado significa cero. Ademas revela que
+    // esta instancia habla con OpenAI a quien mire el trafico saliente.
+    //
+    // Se informa como `degraded` con el motivo explicito, que es lo que ya hace
+    // esta funcion cuando falta configuracion: nunca un `ok` inventado.
+    if (!isNelvyonAiEnabled()) {
+      return {
+        status: "degraded",
+        latencyMs: Date.now() - started,
+        error: "IA desactivada: NELVYON_AI_ENABLED=0",
+      };
+    }
     if (!isOpenAiEnvConfigured()) {
       return {
         status: "degraded",

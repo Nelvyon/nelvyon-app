@@ -123,6 +123,12 @@ describe("/api/health/deep GET", () => {
     process.env.STRIPE_PRICE_ID_STARTER = "price_starter_hc";
     process.env.STRIPE_PRICE_ID_PRO = "price_pro_hc";
     process.env.STRIPE_PRICE_ID_AGENCY = "price_agency_hc";
+    // El interruptor maestro va explicito: `NELVYON_AI_ENABLED` esta APAGADO
+    // por defecto y ahora manda por encima de `AUTONOMOUS_ALLOW_OPENAI`, de la
+    // clave y de todo lo demas. Esta prueba ejercita a proposito el camino de
+    // pago, asi que tiene que encenderlo — y al escribirlo aqui queda a la vista
+    // que hacen falta las DOS condiciones, no solo el opt-in de siempre.
+    process.env.NELVYON_AI_ENABLED = "1";
     process.env.OPENAI_API_KEY = "sk-test-hc";
     global.fetch = vi.fn(async (input: RequestInfo | URL) => {
       const u = String(input);
