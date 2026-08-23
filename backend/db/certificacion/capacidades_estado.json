@@ -1,0 +1,249 @@
+{
+ "_comentario": "Estado de certificacion FUNCIONAL de cada capacidad del Bloque 2. El inventario del Bloque 1 dijo que las rutas existen y no devuelven datos inventados; eso es inventario, NO certificacion. Aqui se registra si un cliente real podria completar el flujo de principio a fin: UI -> accion -> API -> auth/RBAC -> inquilino -> servicio -> DB -> persistencia -> respuesta -> refresco -> resultado observable.",
+ "_estados": {
+  "PENDING": "sin tocar",
+  "TESTING": "en curso",
+  "PASS_CERTIFIED": "flujo completo verificado, con negativo y otro inquilino",
+  "FIXED_CERTIFIED": "estaba roto, arreglado y verificado",
+  "BLOCKED_ON_FOUNDER": "hace falta una decision suya",
+  "BLOCKED_EXTERNALLY": "depende de un tercero o de credenciales/coste",
+  "RESIDUAL_RISK_DOCUMENTED": "conocido, medido y por escrito"
+ },
+ "_arrancado": "2026-08-23",
+ "capacidades": {
+  "auth_onboarding_workspaces": {
+   "rutas": 33,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "cuenta_y_suscripcion": {
+   "rutas": 12,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "dashboard": {
+   "rutas": 14,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "crm": {
+   "rutas": 48,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "prospeccion_cold_email": {
+   "rutas": 9,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "campanias": {
+   "rutas": 31,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "email": {
+   "rutas": 7,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "redes_sociales": {
+   "rutas": 41,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "contenido": {
+   "rutas": 14,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "seo_visibilidad": {
+   "rutas": 20,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "reputacion_sentimiento": {
+   "rutas": 12,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "inbox_helpdesk": {
+   "rutas": 21,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "chatbot": {
+   "rutas": 8,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "reservas": {
+   "rutas": 12,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "workflows": {
+   "rutas": 32,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "ab_testing": {
+   "rutas": 7,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "facturacion_billing": {
+   "rutas": 42,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "packs_entregables": {
+   "rutas": 30,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "portal_cliente": {
+   "rutas": 6,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "partners_afiliados": {
+   "rutas": 19,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "contratos": {
+   "rutas": 7,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "storage_uploads": {
+   "rutas": 5,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "analytics_reporting": {
+   "rutas": 43,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "encuestas": {
+   "rutas": 3,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "integraciones": {
+   "rutas": 67,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "ads": {
+   "rutas": 5,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "ecommerce_tienda": {
+   "rutas": 14,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "erp": {
+   "rutas": 5,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "lms_formacion": {
+   "rutas": 18,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "formularios_captacion": {
+   "rutas": 22,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "web_builder": {
+   "rutas": 10,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "marca_blanca": {
+   "rutas": 3,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "pwa": {
+   "rutas": 4,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "dialer_voz_llamadas": {
+   "rutas": 19,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "admin_plataforma": {
+   "rutas": 12,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "os": {
+   "rutas": 220,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "ia_privada_memoria": {
+   "rutas": 13,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "gdpr_cumplimiento": {
+   "rutas": 8,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  },
+  "salud_infra": {
+   "rutas": 26,
+   "estado": "PENDING",
+   "evidencia": "",
+   "motivo": ""
+  }
+ }
+}

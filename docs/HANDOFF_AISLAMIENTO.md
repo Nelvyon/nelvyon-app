@@ -1269,7 +1269,7 @@ En curso: **Bloque 2 — Web + SaaS + OS completos**.
 | Punto | Motivo |
 |---|---|
 | `WEB_DB_ROLE_CUTOVER` | BLOCKED_ON_FOUNDER — el rol `nelvyon_web_app` está listo y certificado 68/68; cambiar la conexión no me corresponde |
-| `ADR-064` = 568/569/570/572/573/574/575 | BLOCKED_ON_FOUNDER — escritas y certificadas, **no aplicadas** |
+| `ADR-064` = 568/569/570/572/573/574/575/**576** | BLOCKED_ON_FOUNDER — escritas y certificadas, **no aplicadas** |
 | `571` | APARTADA — hay guardia que impide que vuelva al árbol desplegable |
 | `STRIPE_MEMBERSHIP_REACTIVATION` | BLOCKED_ON_FOUNDER — qué evento reactiva una membresía tras regularizar el pago |
 | `InvoicingService` / `ABTestingService` → ¿qué tabla? | BLOCKED_ON_FOUNDER — alcance de producto |

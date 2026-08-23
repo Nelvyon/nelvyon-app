@@ -154,7 +154,7 @@ Deuda de la 507: **94 sentencias toleradas** (39 `42703`, 40 `42883`, 15
 `42P01`) que se dan por aplicadas sin haberlo sido. Detectada y contada; no se
 puede corregir sin tocar el árbol desplegable.
 
-`ADR-064 = 568/569/570/572/573/574/575 = BLOCKED_ON_FOUNDER`. `571 = APARTADA`,
+`ADR-064 = 568/569/570/572/573/574/575/576 = BLOCKED_ON_FOUNDER`. `571 = APARTADA`,
 con guardia que impide que vuelva al árbol.
 
 ## 9. GDPR — `PASS_CERTIFIED`
@@ -284,7 +284,7 @@ ninguna acción irreversible es automática
 | Punto | Estado |
 |---|---|
 | `WEB_DB_ROLE_CUTOVER` | BLOCKED_ON_FOUNDER |
-| `ADR-064` = 568/569/570/572/573/574/575 | BLOCKED_ON_FOUNDER |
+| `ADR-064` = 568/569/570/572/573/574/575/**576** | BLOCKED_ON_FOUNDER |
 | `571` | APARTADA (guardia impide que vuelva al árbol) |
 | `STRIPE_MEMBERSHIP_REACTIVATION` | BLOCKED_ON_FOUNDER |
 | A qué tabla pertenecen `InvoicingService` y `ABTestingService` | BLOCKED_ON_FOUNDER (alcance de producto) |
