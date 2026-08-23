@@ -49,9 +49,9 @@
   },
   "email": {
    "rutas": 7,
-   "estado": "PENDING",
-   "evidencia": "",
-   "motivo": ""
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoLote9.pg.test.ts — SMS: sin proveedor configurado el estado lo DICE en vez de fingir, enviar se REHUSA y no deja un envio fantasma —un SMS que se da por enviado sin salir es lo peor, porque el cliente cree que ha avisado a alguien—, y el registro de A no incluye los de B con control positivo. Mutacion: cubierto por el aislamiento del registro.",
+   "motivo": "PARCIAL: el envio real por Twilio/SES necesita credencial de pago. BLOCKED_EXTERNALLY esa parte; lo certificado es que se rehusa limpiamente y que el registro no se cruza."
   },
   "redes_sociales": {
    "rutas": 41,
@@ -85,8 +85,8 @@
   },
   "chatbot": {
    "rutas": 8,
-   "estado": "PENDING",
-   "evidencia": "",
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoLote9.pg.test.ts — crear y releer la configuracion con `escalateKeywords` volviendo como ARRAY, B no lee el chatbot de A con control positivo, las conversaciones no se cruzan, y el codigo de insercion —que se pega en la web PUBLICA del cliente— lleva el id del chatbot y ningun secreto: si llevara una credencial, estaria publicada. Mutacion: quitar el filtro por usuario (3 sitios) tumba 3.",
    "motivo": ""
   },
   "reservas": {
@@ -121,8 +121,8 @@
   },
   "portal_cliente": {
    "rutas": 6,
-   "estado": "PENDING",
-   "evidencia": "",
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoLote9.pg.test.ts — el portal se abre con un TOKEN y sin sesion: quien aprueba un entregable no tiene cuenta en NELVYON, asi que ese token es TODA la autorizacion. Certificado: un token recien firmado verifica y trae su carga (control positivo, sin el una verificacion que rechazara todo dejaria el portal inservible), uno inventado no verifica, cambiar la CARGA invalida la firma —el ataque evidente: coger el propio y cambiarle el inquilino para aprobar el de otro—, cambiar la FIRMA tampoco cuela, uno CADUCADO se rechaza y lo dice (un enlace que no caduca es una puerta abierta para siempre en el correo de alguien), los malformados se rechazan, y el hash que se guarda para revocar NO es el token: guardarlo entero seria guardar la llave junto a la cerradura. Mutacion: quitar la comprobacion de firma tumba 1; quitar la caducidad tumba 1.",
    "motivo": ""
   },
   "partners_afiliados": {
