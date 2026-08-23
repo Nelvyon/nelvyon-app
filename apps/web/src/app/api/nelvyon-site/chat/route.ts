@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { isNelvyonAiEnabled } from "../../../../../../../backend/private-ai/config";
 import {
   type ChatStage,
   detectSectorHeuristic,
@@ -21,6 +22,18 @@ type Body = {
 };
 
 async function classifySectorWithAI(text: string): Promise<string> {
+  // El interruptor maestro manda. `isNelvyonAiEnabled()` se documenta como
+  // «cuando es false, ninguna llamada externa a un LLM», y esta ruta era la
+  // unica de toda la API web que llamaba a un proveedor de pago sin
+  // consultarlo: lo unico que evitaba el gasto era que no hubiera clave puesta.
+  //
+  // Eso convierte una garantia en una casualidad. El dia que alguien defina
+  // `OPENAI_API_KEY` para otra cosa, esta ruta —que atiende al publico— empieza
+  // a gastar por cada mensaje, y su limite es por IP: muchas IPs, gasto sin
+  // techo. Hoy no cambia nada (no hay clave y el interruptor esta a 0); lo que
+  // cambia es de que depende que no cambie.
+  if (!isNelvyonAiEnabled()) return detectSectorHeuristic(text);
+
   const key = process.env.OPENAI_API_KEY || process.env.APP_AI_KEY;
   if (!key) return detectSectorHeuristic(text);
   const labels = SECTOR_PROFILES.map((s) => s.id).join(", ");

@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { extractToken } from "@nelvyon/auth";
 import { requireSaasContext, saasErrorBody, saasErrorStatus } from "@nelvyon/saas";
 
+import { subrutaDeProxy } from "@/lib/security/subrutaDeProxy";
 import { platformApiBase, stableWorkspaceIdFromTenant } from "@/lib/platformFastApiProxy";
 
 export const dynamic = "force-dynamic";
@@ -18,7 +19,15 @@ async function proxyDialerAdvanced(req: Request, pathSegments: string[] | undefi
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const subpath = (pathSegments ?? []).join("/");
+    // Los segmentos llegan DECODIFICADOS: un `%2e%2e` se convierte en `..` y
+    // sobrevive hasta el `fetch`, que normaliza la ruta y sale de la familia de
+    // endpoints que este proxy debe servir. Ver `subrutaDeProxy`.
+    let subpath: string;
+    try {
+      subpath = subrutaDeProxy(pathSegments);
+    } catch {
+      return NextResponse.json({ error: "Invalid path" }, { status: 400 });
+    }
     const url = new URL(req.url);
     const target = `${platformApiBase()}/api/dialer-advanced/${subpath}${url.search}`;
 
