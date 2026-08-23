@@ -313,9 +313,24 @@ export class SaasMembershipService {
     stripeSubscriptionId: string,
     status: MemberStatus
   ): Promise<void> {
+    // `active` no pisa un estado terminal.
+    //
+    // Stripe NO garantiza el orden de entrega y reintenta durante dias. Sin esta
+    // condicion, un `customer.subscription.created` que llegara —o se reintentara—
+    // DESPUES del `deleted` que ya se proceso devolvia la fila a `active`, y con
+    // ella el acceso al material de pago de alguien que se dio de baja:
+    // `checkAccess` abre justamente con `m.status='active'`.
+    //
+    // No hace falta ningun ataque para provocarlo; basta con que Stripe reintente,
+    // que es su comportamiento normal y documentado.
+    //
+    // Reactivar una suscripcion cancelada no llega por `created` —Stripe manda
+    // `customer.subscription.updated`, que la ruta de membresia no trata—, asi que
+    // un `created` sobre una baja es siempre una entrega fuera de orden.
     await this.db.query(
       `UPDATE saas_membership_members SET status=$3, updated_at=NOW()
-       WHERE tenant_id=$1 AND stripe_subscription_id=$2`,
+       WHERE tenant_id=$1 AND stripe_subscription_id=$2
+         AND NOT ($3 = 'active' AND status IN ('cancelled', 'expired'))`,
       [tenantId, stripeSubscriptionId, status]
     );
   }

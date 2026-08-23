@@ -75,6 +75,73 @@ Certificación: 4 objetos creados · idempotente · RLS con la familia OS (4+4) 
 `workflow_nodes` acotada **por su workflow padre** · aislamiento **funcional** con
 el rol real: A ve 1, B ve 1, **sin contexto 0**.
 
+## Límite de peticiones — la clave del cubo la elegía el cliente
+
+`getClientIp` (Next) y los dos limitadores montados en FastAPI
+—`middlewares/rate_limiter.py` y `middleware/anti_scraping.py`— leían
+`x-forwarded-for.split(",")[0]`, que es el extremo del **cliente**. Detrás de un
+proxy que añade al final:
+
+    manda el atacante : X-Forwarded-For: 9.9.9.9
+    reenvía el proxy  : X-Forwarded-For: 9.9.9.9, <ip real>
+    se leía           : 9.9.9.9
+
+Como la IP es la **clave del cubo**, cambiarla en cada petición estrenaba cubo y
+el límite dejaba de existir. En el otro sentido también estaba roto: dos clientes
+que mandaran el mismo valor caían en el mismo cubo.
+
+En `anti_scraping` era peor: ahí la clave además **bloquea una hora**, así que se
+podía mandar la IP de un tercero, gastarle el cupo y dejarlo fuera sin que
+hubiera hecho nada.
+
+El criterio correcto ya existía en la casa —`identidad_peticion.ip_del_cliente`,
+de derecha a izquierda con `TRUSTED_PROXY_HOPS`— y solo lo usaba uno de los tres.
+
+**Cerrado.** 18 pruebas Python (las tres implementaciones contra la misma
+batería) + 9 vitest. Tres mutaciones tumban pruebas en cada lado.
+
+### Lo demás del mismo bloque
+
+| Hallazgo | Estado |
+|---|---|
+| 4 rutas sensibles con `getRateLimitRule() === null`: `verify-email`, los tres de SSO, `auth/token`, `billing/checkout` | cerrado, con regla y techo |
+| `INCR` + `EXPIRE` en dos peticiones; si fallaba la segunda la clave quedaba sin caducidad y esa IP recibía 429 **para siempre** | cerrado: una sola llamada, `EXPIRE NX` |
+| `_ip_hits` no soltaba nunca sus entradas | cerrado: barrido amortizado |
+| Exención de `/api/health/` — prefijo abierto | guardia puesto; hoy las 4 rutas son legítimas y `/health` sigue usable por la infraestructura |
+| Autenticación de cron (16 rutas) | correcta y **falla cerrada** sin secreto; no tenía ninguna prueba — ahora 16 + guardia |
+
+## Membresías — una baja resucitaba con un reintento de Stripe
+
+`updateMemberStatus` asignaba el estado a pelo y `checkAccess` abre el material
+de pago con `m.status='active'`. Stripe **no garantiza el orden** y reintenta
+durante días: un `customer.subscription.created` entregado después del `deleted`
+ya procesado devolvía la fila a `active`, y con ella el acceso de quien se dio de
+baja. No hace falta ataque; basta con que Stripe reintente.
+
+**Cerrado**: `active` ya no pisa un estado terminal. 8 pruebas contra PostgreSQL
+real, incluido el control que demuestra que la forma anterior **sí** resucitaba.
+
+### ⚠️ DECISIÓN DEL FUNDADOR — el camino de vuelta no existe
+
+Al arreglar lo anterior quedó a la vista un hueco que **no toco porque es
+alcance de producto**, y `ALCANCE_DE_PRODUCTO = BLOCKED_ON_FOUNDER`:
+
+`updateMemberStatus` tiene **un solo llamante**, la ruta
+`/api/webhooks/stripe-membership`, y el único evento que lleva a `active` es
+`customer.subscription.created`. Entonces:
+
+> Un cliente cuyo pago falla pasa a `expired` y **no vuelve a `active` nunca**,
+> aunque arregle su tarjeta y pague. Stripe emite `invoice.paid` y
+> `customer.subscription.updated`, y esa ruta no trata ninguno de los dos.
+
+Es un cliente que paga y se queda sin el material que ha comprado. Antes de mi
+arreglo existía una recuperación **accidental** —un `created` fuera de orden
+podía devolverlo a activo—, pero eso era la coincidencia, no un camino: dependía
+de que Stripe entregara desordenado, y era exactamente el agujero de seguridad.
+
+Lo que hace falta decidir: si `invoice.paid` debe reactivar, y con qué condición.
+No lo doy por supuesto ni lo implemento sin que lo digas.
+
 ## Punto de partida
 
 - SHA producción certificado: `a86c1167`
