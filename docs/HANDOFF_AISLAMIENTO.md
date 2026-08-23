@@ -1252,8 +1252,31 @@ que aplican igual el primer día que haya un cliente real.
 
 # NEXT_SESSION_START_HERE
 
-> Actualizado tras el bloque de recovery. **Lee esto primero.** No hace falta
-> releer el resto del documento para continuar.
+> Actualizado al cierre del Bloque 1. **Lee esto primero.** La clasificación
+> completa de las 18 categorías está en `docs/BLOQUE_1_CIERRE.md`.
+
+## Estado
+
+`BLOQUE_1_EXECUTABLE = CLOSED`. No queda tarea conocida y segura del Bloque 1 que
+se pueda hacer sin una decisión del fundador. Lo que sigue abierto está en la
+tabla de bloqueos de `BLOQUE_1_CIERRE.md`, y **ninguno de esos puntos bloquea el
+Bloque 2**.
+
+En curso: **Bloque 2 — Web + SaaS + OS completos**.
+
+## Lo que NO se puede tocar
+
+| Punto | Motivo |
+|---|---|
+| `WEB_DB_ROLE_CUTOVER` | BLOCKED_ON_FOUNDER — el rol `nelvyon_web_app` está listo y certificado 68/68; cambiar la conexión no me corresponde |
+| `ADR-064` = 568/569/570/572/573/574/575 | BLOCKED_ON_FOUNDER — escritas y certificadas, **no aplicadas** |
+| `571` | APARTADA — hay guardia que impide que vuelva al árbol desplegable |
+| `STRIPE_MEMBERSHIP_REACTIVATION` | BLOCKED_ON_FOUNDER — qué evento reactiva una membresía tras regularizar el pago |
+| `InvoicingService` / `ABTestingService` → ¿qué tabla? | BLOCKED_ON_FOUNDER — alcance de producto |
+| `chatbot_conversations.workspace_id` | BLOCKED_ON_FOUNDER — semántica de tenencia y su política de RLS |
+
+Además, en pie: producción destructiva **no**; nuevos costes externos **0 €**;
+ningún proveedor de IA activado.
 
 ## Dónde está el trabajo
 
@@ -1262,10 +1285,9 @@ Tres árboles de git sobre el mismo repositorio, para no contaminar certificacio
 | Árbol | Rama | Para qué |
 |---|---|---|
 | `C:\Users\Daniel\nelvyon-app` | `desplegar-bloque2` | el original; **no se toca** |
-| `C:\Users\Daniel\nelvyon-w2` | `bloque3-conectores` | donde corre la suite de puerta |
+| `C:\Users\Daniel\nelvyon-w2` | `bloque3-conectores` | segundo árbol, libre |
 | `C:\Users\Daniel\nelvyon-w3` | `bloque4-webhooks` | **donde se trabaja ahora** |
 
-`w2` recibe merges de `w3` para ejecutar la puerta sin bloquear el trabajo.
 `w2` y `w3` tienen `node_modules` enlazados por junction al árbol original.
 
 ## Entorno que hace falta
@@ -1274,54 +1296,32 @@ Tres árboles de git sobre el mismo repositorio, para no contaminar certificacio
 docker start nelvyon-local-ai-postgres        # se paró una vez; arrancarlo si falta
 NELVYON_PG_CERT_DSN=postgresql://nelvyon_local:nelvyon_local_dev@localhost:5434/nelvyon_cert545
 NELVYON_WEB_CERT_DSN=postgresql://nelvyon_local:nelvyon_local_dev@localhost:5434/nelvyon_web_cert
-NELVYON_WEB_APP_CERT_DSN=postgresql://nelvyon_web_app:cert_local_app@localhost:5434/nelvyon_web_cert
+NELVYON_VIRGEN_DSN=postgresql://nelvyon_local:nelvyon_local_dev@localhost:5434/nelvyon_rec_final
 ```
 
-Vitest se ejecuta **desde `apps/web`** (ahí está el alias `@nelvyon/*`):
-`apps/web> ../../node_modules/.pnpm/node_modules/.bin/vitest.CMD run <ruta>`
+**Sin esas variables la suite no falla: se SALTA.** Una ejecución sin ellas dio
+588 saltos silenciosos frente a 4 con ellas, y parecía verde. Comprobar siempre
+el recuento de saltos antes de creerse un resultado.
 
-Producción se consulta con `railway run -e production --service Postgres <python> <script>`
-usando `DATABASE_PUBLIC_URL`. **Desde Git Bash, `railway run` descarta los
-argumentos** — usar PowerShell.
+## Tres cosas que hay que saber antes de tocar nada
 
-## Gates bloqueados (NO ejecutar)
+1. **No lances pytest en paralelo con la suite de puerta.** Comparten
+   `backend/test.db` y se contaminan: una ejecución entera se llenó de ERROR por
+   eso, y el `exit 0` de un proceso que maté a mano no significaba que pasara.
+2. **Un guardia que quita comentarios borrando desde `//` se come `https://`.**
+   Ya ha dado verde tres veces sobre código que sí llamaba fuera. Usar
+   `(?<!:)//` y dejar el control puesto en las dos direcciones.
+3. **Una prueba de servidor no se ejecuta en el entorno de navegador.** El
+   troceado de multipart falla con «no boundary found» bajo jsdom: lo que corre
+   en el servidor se prueba con `// @vitest-environment node`.
 
-| Gate | Qué necesita |
-|---|---|
-| `WEB_DB_ROLE_CUTOVER` | autorización para cambiar `DATABASE_URL` del web a `nelvyon_web_app` |
-| `ADR-064` | 568 · 569 · 570 · 572 · 573 · **574** |
-| `571` | **APARTADA** — fuera del árbol, guardia lo impide |
-| `ALCANCE_DE_PRODUCTO` | decidir las 8 funciones (`docs/FICHAS_ALCANCE_DE_PRODUCTO.md`) |
-| limpieza de fixtures | `docs/PLAN_LIMPIEZA_FIXTURES.md` |
+## Reconstruir la base virgen
 
-## Estado de producción
-
-`_migrations` 467 · **712 objetos** · **662 tablas vacías** ·
-**`REAL_PRODUCTION_DATA = 0`** · IA **apagada** (`NELVYON_AI_ENABLED=0`, cero
-proveedores de pago) · **ningún cambio hecho en producción en toda la sesión**.
-
-## Lo siguiente, en orden
-
-1. **Puerta**: `s35.txt` corriendo en `w2`. Si sale verde, es la referencia.
-2. **Los 6 objetos que producción no tiene** y la cadena sí crea
-   (`visual_workflow_executions`, `workflow_nodes`, `workflow_trigger_registry`,
-   `os_public_api_keys`, `saas_user_invoices_legacy`, `user_provider_api_keys`).
-   Preparar migración de reparación + certificarla. **Esto desbloquea Workflows
-   sin necesitar decisión de alcance**: la 507 ya declara esas tablas.
-3. **SSRF** sobre caminos reales con redirects y DNS; **rate limiting** real.
-4. Bloque 2: auditoría funcional E2E de Web + SaaS + OS.
-
-## Trampas ya pisadas — no repetirlas
-
-- **Mis propias herramientas dieron tres medidas falsas seguidas** en recovery.
-  Un cortador de SQL que no salta comentarios inventó un error de sintaxis; una
-  comparación que mezclaba `relkind` infló el hueco. **Verificar la herramienta
-  antes de publicar el número.**
-- Un guard que se lee **sus propios comentarios**: pasó tres veces. Quitar
-  comentarios antes de extraer.
-- Ampliar un guard puede dejarlo **inerte**: pasó al añadir `SELECT` al filtro de
-  `INSERT|UPDATE`. Los controles «el extractor encuentra N» lo cazaron.
-- No lanzar la suite mientras se toca el árbol, ni compartir fixture entre
-  ficheros: vitest corre en paralelo.
-- `railway run` desde Git Bash descarta argumentos.
-
+```
+docker exec nelvyon-local-ai-postgres psql -U nelvyon_local -d postgres \
+  -c "DROP DATABASE IF EXISTS nelvyon_rec_final" -c "CREATE DATABASE nelvyon_rec_final"
+cd backend/db/certificacion
+python reconstruir_virgen.py nelvyon_rec_final      # 474 migraciones, 0 fallos duros
+python catalogo_semantico.py nelvyon_rec_final catalogo_virgen_semantico.json
+python huecos_de_recuperacion.py nelvyon_rec_final  # 11 huecos, todos inventariados
+```
