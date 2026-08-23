@@ -588,7 +588,22 @@ export class SaasWorkflowService {
     const runRows = await this.db.query<RunRow>(
       `INSERT INTO saas_workflow_runs (workflow_id, tenant_id, trigger_data, status, steps_executed, started_at, idempotency_key)
        VALUES ($1,$2,$3,'running','[]'::jsonb,NOW(),$4)
-       ON CONFLICT (tenant_id, workflow_id, idempotency_key) DO NOTHING
+       -- El indice de la 511 es PARCIAL:
+       --
+       --   CREATE UNIQUE INDEX saas_workflow_runs_tenant_workflow_idempotency
+       --     ON saas_workflow_runs (tenant_id, workflow_id, idempotency_key)
+       --     WHERE idempotency_key IS NOT NULL;
+       --
+       -- ON CONFLICT (cols) solo puede INFERIR un indice parcial si se repite
+       -- su condicion. Sin ese WHERE, PostgreSQL responde «there is no unique
+       -- or exclusion constraint matching the ON CONFLICT specification» y el
+       -- INSERT falla — SIEMPRE, se pase clave de idempotencia o no, porque la
+       -- inferencia ocurre al planificar y no depende del valor.
+       --
+       -- Es decir: ninguna ejecucion de workflow llegaba a registrarse. La ruta
+       -- existia, el servicio existia, y la operacion reventaba al final.
+       ON CONFLICT (tenant_id, workflow_id, idempotency_key)
+         WHERE idempotency_key IS NOT NULL DO NOTHING
        RETURNING id, workflow_id, tenant_id, trigger_data, status, steps_executed, error, started_at, completed_at`,
       [workflowId, tenantId, triggerData, idempotencyKey],
     );
@@ -609,8 +624,8 @@ export class SaasWorkflowService {
     try {
       if (!this.evalConditions(wf.conditions, triggerData)) {
         await this.db.query(
-          `UPDATE saas_workflow_runs SET status='completed', steps_executed=$2, completed_at=NOW() WHERE id=$1 AND tenant_id=$3`,
-          [run.id, stepsExecuted, tenantId],
+          `UPDATE saas_workflow_runs SET status='completed', steps_executed=$2::jsonb, completed_at=NOW() WHERE id=$1 AND tenant_id=$3`,
+          [run.id, JSON.stringify(stepsExecuted), tenantId],
         );
         const rows = await this.getWorkflowRuns(workflowId, tenantId);
         return rows[0] as WorkflowRun;
@@ -830,11 +845,22 @@ export class SaasWorkflowService {
         }
       }
 
+      // `stepsExecuted` va con JSON.stringify y molde explicito.
+      //
+      // `pg` NO serializa un array de JS como JSON: lo manda como array de
+      // PostgreSQL. Medido contra la base real:
+      //
+      //   []              -> se guarda como {}   (un OBJETO vacio, no un array)
+      //   [{a:1},{b:2}]   -> ERROR: invalid input syntax for type json
+      //   JSON.stringify  -> [{"a":1},{"b":2}]   correcto
+      //
+      // O sea: una ejecucion sin pasos guardaba un dato equivocado en silencio, y
+      // una ejecucion CON pasos —el caso normal— reventaba al guardarse.
       await this.db.query(
         `UPDATE saas_workflow_runs
-         SET status='completed', steps_executed=$2, completed_at=NOW()
+         SET status='completed', steps_executed=$2::jsonb, completed_at=NOW()
          WHERE id=$1 AND tenant_id=$3`,
-        [run.id, stepsExecuted, tenantId],
+        [run.id, JSON.stringify(stepsExecuted), tenantId],
       );
       await this.db.query(
         `UPDATE saas_workflows
@@ -848,10 +874,12 @@ export class SaasWorkflowService {
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
       await this.db.query(
+        // Este es el registro del FALLO, y fallaba el tambien: el error de
+        // verdad quedaba tapado por «invalid input syntax for type json».
         `UPDATE saas_workflow_runs
-         SET status='failed', steps_executed=$2, error=$3, completed_at=NOW()
+         SET status='failed', steps_executed=$2::jsonb, error=$3, completed_at=NOW()
          WHERE id=$1 AND tenant_id=$4`,
-        [run.id, stepsExecuted, msg, tenantId],
+        [run.id, JSON.stringify(stepsExecuted), msg, tenantId],
       );
     }
     const rows = await this.getWorkflowRuns(workflowId, tenantId);
