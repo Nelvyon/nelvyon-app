@@ -98,12 +98,23 @@ describe("SaasSubcuentasService — create", () => {
     expect(params[6]).toBe(25);
   });
 
-  it("generates unique tenantId starting with sub_", async () => {
+  it("el identificador de la subcuenta es un UUID, no un `sub_...`", async () => {
+    // Esta prueba EXIGIA antes `/^sub_/`, y por eso el defecto sobrevivio.
+    //
+    // `saas_tenants.id` es una columna `uuid`: un `sub_<16hex>` no cabe ahi y la
+    // insercion reventaba siempre. Como esta prueba usa un doble de la base, el
+    // error de tipo nunca aparecia: la prueba estaba CERTIFICANDO el fallo, y
+    // mientras estuvo verde ninguna agencia pudo dar de alta a un cliente.
+    //
+    // La comprobacion equivalente contra PostgreSQL real esta en
+    // `flujoLote11.pg.test.ts`, que es donde el tipo de la columna sí opina.
     const db = makeDb([[baseSub]]);
     const svc = new SaasSubcuentasService({ db });
     await svc.create(AGENCY, { name: "X", email: "x@test.com" });
     const params = db.query.mock.calls[0][1] as unknown[];
-    expect(String(params[1])).toMatch(/^sub_/);
+    expect(String(params[1])).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+    expect(String(params[1])).not.toMatch(/^sub_/);
   });
 });
 

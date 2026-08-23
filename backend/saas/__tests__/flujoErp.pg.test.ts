@@ -19,8 +19,17 @@ const describeSiHayPg = DSN ? describe : describe.skip;
 
 let pool: import("pg").Pool;
 
-const A = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
-const B = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
+// Cada fichero de certificación usa su PROPIO par de inquilinos.
+//
+// Antes todos compartían `aaaa…`/`bbbb…`, y vitest corre los ficheros en
+// PARALELO contra la misma base: el `beforeEach` de uno borraba las filas que
+// otro acababa de sembrar. Por separado pasaban los 16 y juntos fallaban tres.
+// Eso es un falso rojo —y con otra combinación habría sido un falso verde—.
+//
+// El sufijo sale del nombre del fichero, así que dos ficheros nunca coinciden y
+// no hay que llevar una lista a mano.
+const A = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa04";
+const B = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb04";
 
 /**
  * La escritura con versión esperada, tal como la hace el almacén: se compara la

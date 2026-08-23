@@ -1,249 +1,249 @@
 {
- "_comentario": "Estado de certificacion FUNCIONAL de cada capacidad del Bloque 2. El inventario del Bloque 1 dijo que las rutas existen y no devuelven datos inventados; eso es inventario, NO certificacion. Aqui se registra si un cliente real podria completar el flujo de principio a fin: UI -> accion -> API -> auth/RBAC -> inquilino -> servicio -> DB -> persistencia -> respuesta -> refresco -> resultado observable.",
- "_estados": {
-  "PENDING": "sin tocar",
-  "TESTING": "en curso",
-  "PASS_CERTIFIED": "flujo completo verificado, con negativo y otro inquilino",
-  "FIXED_CERTIFIED": "estaba roto, arreglado y verificado",
-  "BLOCKED_ON_FOUNDER": "hace falta una decision suya",
-  "BLOCKED_EXTERNALLY": "depende de un tercero o de credenciales/coste",
-  "RESIDUAL_RISK_DOCUMENTED": "conocido, medido y por escrito"
- },
- "_arrancado": "2026-08-23",
- "capacidades": {
-  "auth_onboarding_workspaces": {
-   "rutas": 33,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoLote4.pg.test.ts — contra PostgreSQL real con los servicios REALES; equipo: invitar y aparecer en la lista con su rol, la invitacion genera token CON caducidad —una invitacion sin caducar es una puerta abierta para siempre—, cambiar el rol persiste, suspender y reactivar cambian el estado de verdad, y eliminar lo quita. B no ve, no cambia el rol, no suspende ni elimina al equipo de A: un fallo de alcance ahi es alguien de otra empresa dentro del panel, o alguien que echa del suyo a un companero ajeno. Mutacion: quitar el alcance de inquilino (6 sitios) tumba 5. Del Bloque 1 se suma: las 854 rutas web fijan el inquilino por transaccion con techo de huecos en CERO, y el limite de peticiones cubre login, registro, reset, verify-email, SSO y token.",
-   "motivo": ""
+  "_comentario": "Estado de certificacion FUNCIONAL de cada capacidad del Bloque 2. El inventario del Bloque 1 dijo que las rutas existen y no devuelven datos inventados; eso es inventario, NO certificacion. Aqui se registra si un cliente real podria completar el flujo de principio a fin: UI -> accion -> API -> auth/RBAC -> inquilino -> servicio -> DB -> persistencia -> respuesta -> refresco -> resultado observable.",
+  "_estados": {
+    "PENDING": "sin tocar",
+    "TESTING": "en curso",
+    "PASS_CERTIFIED": "flujo completo verificado, con negativo y otro inquilino",
+    "FIXED_CERTIFIED": "estaba roto, arreglado y verificado",
+    "BLOCKED_ON_FOUNDER": "hace falta una decision suya",
+    "BLOCKED_EXTERNALLY": "depende de un tercero o de credenciales/coste",
+    "RESIDUAL_RISK_DOCUMENTED": "conocido, medido y por escrito"
   },
-  "cuenta_y_suscripcion": {
-   "rutas": 12,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoLote8.pg.test.ts — contra PostgreSQL real con los servicios REALES; claves de API, que son CREDENCIALES: la clave en claro se devuelve UNA vez y no vuelve a aparecer ni en el listado ni EN LA BASE —si se pudiera releer, cualquiera con acceso al panel o a una copia de la base tendria las credenciales de todos—, la recien creada VERIFICA (control positivo, sin el una verificacion rota aprobaria el resto y dejaria la API publica inservible), una REVOCADA deja de verificar, una inventada no verifica, B no puede revocar la de A —cortar la credencial de otro le rompe las integraciones sin que sepa por que— y la lista de A no trae las de B. Mutacion: quitar el alcance de inquilino (2 sitios) tumba 3.",
-   "motivo": ""
-  },
-  "dashboard": {
-   "rutas": 14,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoLote3.pg.test.ts — contra PostgreSQL real con los servicios REALES; actividad registrada que aparece en la reciente, la de A sin la de B, metricas que responden con numeros y no con un objeto vacio —un panel que devuelve {} se pinta vacio y parece que no hay negocio—, y un inquilino inexistente no inventa datos. Mutacion: quitar el alcance de getRecentActivity tumba 1.",
-   "motivo": ""
-  },
-  "crm": {
-   "rutas": 48,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoDeCrm.pg.test.ts — 14 pruebas contra PostgreSQL real con los servicios REALES (SaasCrmService y SaasDealsService): crear, leer, listar, editar y RELEER la fila sin pasar por el servicio, actividad, oportunidad, cambio de etapa persistido, metricas que reflejan lo que hay, y borrado. Cinco negativos de otro inquilino: B no lee, no edita y no borra el contacto de A, ni ve ni mueve de etapa su oportunidad. Mutaciones: quitar el filtro de inquilino de getContact tumba 8, de deleteContact tumba 1 y de getDeal tumba 3.",
-   "motivo": "RIESGO RESIDUAL: el correo NO se valida en ninguna capa —ni el servicio ni la ruta—, asi que «no-soy-un-correo» entra y se guarda. La consecuencia llega despues: una campana a ese contacto rebota y la deduplicacion por correo trata la basura como una direccion. No lo arreglo: anadir validacion RECHAZARIA lo que hoy se acepta y rompe importaciones que ahora funcionan. Es decision de producto, incluido que hacer con los contactos ya guardados asi."
-  },
-  "prospeccion_cold_email": {
-   "rutas": 9,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoLote10.pg.test.ts — contra PostgreSQL real con los servicios REALES; listas de prospeccion: la lista aparece en el listado de su inquilino y B no la ve (con control positivo), y B no ve los prospectos de una lista de A. Cruzar listas de prospeccion es entregar la base de datos comercial de un cliente a su competencia. Mutacion: quitar el alcance de inquilino (8 sitios) tumba 2.",
-   "motivo": "PARCIAL: la BUSQUEDA de prospectos usa proveedor externo de datos y el envio de cold email necesita SES/Twilio. BLOCKED_EXTERNALLY; lo certificado es el almacen y su aislamiento."
-  },
-  "campanias": {
-   "rutas": 31,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoLote4.pg.test.ts — contra PostgreSQL real con los servicios REALES; crear y releer con canal, asunto y cuerpo; editar comprobado EN LA FILA; programar deja fecha y estado; pausar persiste; un canal inexistente se rechaza; borrar. Lo que mas importa: lanzar SIN proveedor configurado se REHUSA en vez de fingirse —sin ese corte la campana quedaria marcada como lanzada sin haber salido nada, que es la mentira funcional mas cara de esta capacidad porque el cliente cree que ha enviado— y un lanzamiento rehusado NO deja destinatarios a medias, que serian filas listas para un reintento que enviaria dos veces. B no lee, no edita, no lanza, no borra, y no ve ni los destinatarios ni las estadisticas de la campana de A. Mutacion: quitar el alcance de inquilino (21 sitios) tumba 6.",
-   "motivo": ""
-  },
-  "email": {
-   "rutas": 7,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoLote9.pg.test.ts — SMS: sin proveedor configurado el estado lo DICE en vez de fingir, enviar se REHUSA y no deja un envio fantasma —un SMS que se da por enviado sin salir es lo peor, porque el cliente cree que ha avisado a alguien—, y el registro de A no incluye los de B con control positivo. Mutacion: cubierto por el aislamiento del registro.",
-   "motivo": "PARCIAL: el envio real por Twilio/SES necesita credencial de pago. BLOCKED_EXTERNALLY esa parte; lo certificado es que se rehusa limpiamente y que el registro no se cruza."
-  },
-  "redes_sociales": {
-   "rutas": 41,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoLote11.pg.test.ts — contra PostgreSQL real con los servicios REALES; crear una publicacion y releerla, B no la ve (con control positivo), B no puede PUBLICARLA —publicar en nombre de otro es escribir en su perfil publico: no hay marcha atras y lo ve todo el mundo— ni borrarla, publicar sin cuenta ACTIVA no deja la publicacion marcada como publicada —una publicacion que se da por publicada y no salio es peor que un error, porque el cliente cree que ya comunico—, y las cuentas conectadas de A no salen en las de B. Mutacion: quitar el alcance de inquilino (6 sitios) tumba 5.",
-   "motivo": "PARCIAL: la publicacion REAL en LinkedIn, Meta, TikTok o X necesita OAuth del cliente. BLOCKED_EXTERNALLY esa parte; lo certificado es el almacen, el aislamiento y que no se finja una publicacion que no ha salido."
-  },
-  "contenido": {
-   "rutas": 14,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoLote6.pg.test.ts — contra PostgreSQL real con los servicios REALES; base de conocimiento: categoria, articulo, releer, editar comprobado EN LA FILA, y votos que suman en el articulo CORRECTO y no en el vecino. B no lee, no edita, no borra y tampoco puede VOTAR el articulo de A —comprobado en la fila, no solo en la respuesta—. Snippets: crear, releer, editar persistido, y la busqueda de A no devuelve los de B. Mutacion: quitar el alcance (8 y 4 sitios) tumba 4 y 3.",
-   "motivo": ""
-  },
-  "seo_visibilidad": {
-   "rutas": 20,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoLote6.pg.test.ts — contra PostgreSQL real con los servicios REALES; anadir una palabra y verla en el listado, anadir varias de golpe, borrar la propia, y B no puede borrar la que sigue A. Control positivo en el aislamiento: A ve las suyas. Mutacion: quitar el alcance de inquilino (3 sitios) tumba 5.",
-   "motivo": "PARCIAL: el enriquecimiento desde Semrush (`enrichTrackedFromSemrush`, `fetchSemrushDomainKeywords`) necesita credencial de pago. BLOCKED_EXTERNALLY para esa parte; coste externo autorizado = 0 EUR."
-  },
-  "reputacion_sentimiento": {
-   "rutas": 12,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoLote8.pg.test.ts — contra PostgreSQL real con los servicios REALES; resenas listadas y estadisticas que cuentan lo que hay, B no ve las de A con control positivo, B no puede responder ni ignorar la resena de A —responder en nombre de otro negocio es publicar en su ficha publica— y responder la propia SI queda guardada. Mutacion: quitar el alcance de inquilino (7 sitios) tumba 4.",
-   "motivo": "PARCIAL: `syncGbpReviews` trae las resenas desde Google Business Profile y necesita credencial OAuth del cliente. BLOCKED_EXTERNALLY esa parte; lo certificado es el almacen, el aislamiento y la respuesta, que es donde estaba el riesgo."
-  },
-  "inbox_helpdesk": {
-   "rutas": 21,
-   "estado": "FIXED_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoLote5.pg.test.ts — 6 pruebas del inbox contra PostgreSQL real. TRES defectos encontrados, cada uno impedia una operacion entera:\n1) El servicio consultaba `saas_team_members`, tabla que NO EXISTE (la real es `team_members`), y se llama desde createConversation cuando no viene responsable asignado, que es el caso normal: CREAR UNA CONVERSACION reventaba.\n2) `firstMessage` es opcional y su unico uso que daba pista de tipo era un `CASE WHEN $5 IS NOT NULL`; sin molde PostgreSQL responde «could not determine data type of parameter $5». Crear una conversacion SIN primer mensaje —cuando alguien escribe y aun no se ha respondido— tambien reventaba.\n3) En `saas_conversation_messages` conviven las dos formas historicas: `content` (vieja, NOT NULL) y `body` (nueva). El servicio solo escribia `body`, asi que ENVIAR UN MENSAJE fallaba siempre.\nCertificado ademas: el mensaje se relee del hilo, B no lee la conversacion de A ni sus mensajes —un mensaje cruzado no es una fuga, es una conversacion entregada a la persona equivocada—, B no puede responder en ella, y la politica de SLA es por inquilino.\nMutaciones: devolver la tabla inexistente tumba 7; quitar el molde tumba 7; quitar `content` tumba 5; quitar el alcance de inquilino (14 sitios) tumba 9.",
-   "motivo": "ANOTADO, no arreglable sin migracion: mientras `content` y `body` sigan las dos en `saas_conversation_messages`, el mismo texto vive en dos sitios. Quitar el NOT NULL de `content` o retirar la columna es una migracion y ADR-064 esta bloqueado."
-  },
-  "chatbot": {
-   "rutas": 8,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoLote9.pg.test.ts — crear y releer la configuracion con `escalateKeywords` volviendo como ARRAY, B no lee el chatbot de A con control positivo, las conversaciones no se cruzan, y el codigo de insercion —que se pega en la web PUBLICA del cliente— lleva el id del chatbot y ningun secreto: si llevara una credencial, estaria publicada. Mutacion: quitar el filtro por usuario (3 sitios) tumba 3.",
-   "motivo": ""
-  },
-  "reservas": {
-   "rutas": 12,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoLote7.pg.test.ts — contra PostgreSQL real con los servicios REALES; crear y releer conservando fecha, editar comprobado EN LA FILA, listado por rango que devuelve lo de dentro y nada de fuera, y B no lee, no edita ni borra el evento de A. Mutacion: quitar el alcance de inquilino (4 sitios) tumba 4.",
-   "motivo": "RIESGO RESIDUAL de presentacion: `event_date` es un `date` y pg lo devuelve como medianoche LOCAL, asi que serializarlo con toISOString() en un huso al este de UTC da el dia ANTERIOR. Una reserva del 15 puede mostrarse como 14. El guardado es correcto; el riesgo esta en como se serialice hacia el cliente."
-  },
-  "workflows": {
-   "rutas": 32,
-   "estado": "FIXED_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoDeWorkflows.pg.test.ts — 14 pruebas contra PostgreSQL real con el servicio REAL: crear, leer, listar, editar y RELEER de la fila, activar, pausar, ejecutar, historial y borrar, mas cuatro negativos de otro inquilino y tres entradas invalidas. Dos defectos encontrados y arreglados: ON CONFLICT sobre un indice PARCIAL sin repetir su condicion (ninguna ejecucion llegaba a registrarse) y un array de JS en columna jsonb (vacio se guardaba como {} en silencio; con elementos reventaba, y el registro del fallo tambien). Tres mutaciones tumban 2, 2 y 1.",
-   "motivo": "PARCIAL: el editor visual —/api/saas/workflows/visual y /visual/[id]— guarda en workflow_nodes, visual_workflow_executions, workflow_trigger_registry y workflows.edges_json, que repara la 575. Escrita y certificada, NO aplicada: ADR-064 = BLOCKED_ON_FOUNDER. En produccion ese editor no puede persistir."
-  },
-  "ab_testing": {
-   "rutas": 7,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoLote2.pg.test.ts — el A/B vivo es /api/saas/ab-testing -> SaasAbTestingService -> ab_tests, y SI casa con la tabla. Certificado: exige al menos DOS variantes (un A/B con una variante no es un experimento, es un envio), variantes que vuelven como ARRAY, eventos que se acumulan en la variante CORRECTA y no en la otra, ganador que persiste en la fila, y B no lee ni toca la prueba de A. `declareWinner` exige envios: declarar un ganador sobre cero datos seria inventar el resultado del experimento.",
-   "motivo": ""
-  },
-  "facturacion_billing": {
-   "rutas": 42,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoDePresupuestos.pg.test.ts — 15 pruebas contra PostgreSQL real con SaasQuotesService: importes (subtotal como suma de lineas, descuento e impuesto EN ORDEN, IVA 21% por defecto y 0% cuando se declara, y que lo GUARDADO coincide con lo calculado), numeracion (ocho presupuestos SIMULTANEOS -> ocho numeros distintos; secuencia independiente por inquilino), recorrido completo y borrado sin dejar lineas huerfanas, mas cuatro negativos del inquilino B. Mutaciones: numeracion leer-y-luego-escribir tumba 1; aplicar el impuesto antes del descuento tumba 2. Ademas, del Bloque 1: el reclamo de idempotencia de Stripe certificado contra PostgreSQL real (replay, duplicados simultaneos, estado terminal, atasco) y la resurreccion de membresias por reordenacion, cerrada. REFORZADO en el lote 2: contrato de facturas reconstruido —/api/saas/facturas -> SaasFacturasService -> invoices (forma de inquilino), /api/saas/invoices -> SaasInvoiceService -> saas_invoices— con lineas que vuelven como ARRAY, importes calculados Y guardados, y un DEFECTO CORREGIDO: el total de cada linea lo calcula el llamante y la ruta no lo validaba, asi que un cliente que lo omitiera guardaba NaN en subtotal y total (NaN es valor valido en numeric). Ahora se RECHAZA en vez de recalcularlo, porque una linea puede llevar un total pactado distinto de cantidad x precio. Mutacion: quitar la comprobacion tumba 1.",
-   "motivo": "PARCIAL: STRIPE_MEMBERSHIP_REACTIVATION = BLOCKED_ON_FOUNDER — el unico evento que lleva a `active` es customer.subscription.created, asi que quien caduca por impago no vuelve nunca aunque pague. Y `InvoicingService` escribe en `invoices` una forma que la tabla no tiene: a que tabla pertenece (invoices vs saas_invoices) es decision de producto."
-  },
-  "packs_entregables": {
-   "rutas": 30,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoLote5.pg.test.ts — packs y entregables contra PostgreSQL real. El catalogo responde, los derechos del plan se conceden y se releen, y los de A no son los de B con control positivo. Consumo: gasta cupo de verdad (launches_used +1 y launches_remaining -1 comprobados en la fila), CUATRO consumos SIMULTANEOS gastan exactamente cuatro —si el decremento fuera leer-y-luego-escribir gastarian menos y el cliente pagaria uno usando varios—, y B no puede gastar el cupo de A, que seria robo silencioso: el cliente descubre que no le quedan lanzamientos sin haber lanzado nada. Revocar marca la fila revocada y B no puede revocar la de A. Entregables: el listado no mezcla inquilinos, el resumen responde con estructura y un entregable ajeno no se lee por id. Mutaciones: decremento leer-y-luego-escribir tumba 2; quitar el alcance de inquilino de consumeLaunch tumba 2.",
-   "motivo": "HALLAZGO documentado, no cambiado: revocar un pack INCLUIDO EN EL PLAN no dura. `canLaunch` llama a `ensurePlanEntitlements` ANTES de comprobar, y eso vuelve a conceder lo que el plan incluye; el indice unico es parcial (solo status='active') asi que la fila revocada no estorba y se crea otra activa. Revocar informa de exito y en la siguiente lectura vuelve a estar permitido. Puede ser lo pretendido —el plan como fuente de verdad— o puede ser que revokeEntitlement prometa mas de lo que cumple. Es semantica de producto."
-  },
-  "portal_cliente": {
-   "rutas": 6,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoLote9.pg.test.ts — el portal se abre con un TOKEN y sin sesion: quien aprueba un entregable no tiene cuenta en NELVYON, asi que ese token es TODA la autorizacion. Certificado: un token recien firmado verifica y trae su carga (control positivo, sin el una verificacion que rechazara todo dejaria el portal inservible), uno inventado no verifica, cambiar la CARGA invalida la firma —el ataque evidente: coger el propio y cambiarle el inquilino para aprobar el de otro—, cambiar la FIRMA tampoco cuela, uno CADUCADO se rechaza y lo dice (un enlace que no caduca es una puerta abierta para siempre en el correo de alguien), los malformados se rechazan, y el hash que se guarda para revocar NO es el token: guardarlo entero seria guardar la llave junto a la cerradura. Mutacion: quitar la comprobacion de firma tumba 1; quitar la caducidad tumba 1.",
-   "motivo": ""
-  },
-  "partners_afiliados": {
-   "rutas": 19,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoLote7.pg.test.ts — contra PostgreSQL real con los servicios REALES; registrar partner y releer su codigo, el duplicado se RECHAZA (dos filas para la misma persona serian dos codigos y comisiones repartidas sin que nadie lo note), la comision se calcula y es un numero FINITO, positivo y menor que el importe —ni NaN ni Infinity—, un codigo inventado no crea comision, y las referencias de un partner son solo las suyas con control positivo. Mutacion: quitar el filtro de partner_id en getReferrals tumba 1.",
-   "motivo": ""
-  },
-  "contratos": {
-   "rutas": 7,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoLote1.pg.test.ts — 19 pruebas contra PostgreSQL real con los servicios REALES; crear y releer, enviar a firma con token, FIRMAR y comprobar en la fila que queda `signed` —un contrato que se firma sin quedar firmado es la mentira funcional exacta—, un token inventado no firma nada, anular impide firmar despues, y B no ve el de A. Mutacion: quitar el alcance por usuario (3 sitios) tumba 5.",
-   "motivo": ""
-  },
-  "storage_uploads": {
-   "rutas": 5,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoLote8.pg.test.ts — contra PostgreSQL real con los servicios REALES; documentos: crear y releer, la lista de A no incluye los de B con control positivo, y B no lee ni borra el de A — leer cruzado es fuga directa de un fichero del cliente, y borrarlo es destruir algo que no se recupera. Mutacion: quitar el alcance de inquilino (8 sitios) tumba 3.",
-   "motivo": ""
-  },
-  "analytics_reporting": {
-   "rutas": 43,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoLote10.pg.test.ts — contra PostgreSQL real con los servicios REALES; se pregunta al SERVICIO y no a la base: los numeros responden con estructura y no con un objeto vacio —un panel que devuelve {} se pinta a cero y parece que el negocio no existe— y los de A no cuentan lo de B, comparando las DOS respuestas. Si el conteo no filtrara por inquilino, cada cliente veria el negocio de todos los demas sumado al suyo. Mutacion: quitar el alcance de inquilino (4 sitios) tumba 2.",
-   "motivo": ""
-  },
-  "encuestas": {
-   "rutas": 3,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoLote1.pg.test.ts — 19 pruebas contra PostgreSQL real con los servicios REALES; crear y RELEER conservando las preguntas como ARRAY (no como objeto, que es lo que hace pg con un array de JS), editar comprobado en la FILA, respuesta registrada, borrado, y B no lee ni edita ni borra la de A. Mutacion: quitar el alcance de inquilino (11 sitios) tumba 4.",
-   "motivo": ""
-  },
-  "integraciones": {
-   "rutas": 67,
-   "estado": "BLOCKED_EXTERNALLY",
-   "evidencia": "backend/saas/__tests__/flujoIntegraciones.pg.test.ts — 7 pruebas contra PostgreSQL real sobre lo que SI es interno y es lo de mas riesgo: el almacen de conexiones. Una conexion aparece en la lista de su inquilino y NO en la del otro; el estado por integracion es el del que pregunta; el token de A no viaja en la respuesta de B —filtrarlo seria peor que un estado mal, porque con el se opera la cuenta sin pasar por NELVYON—; desconectar deja la fila desconectada; y B no puede desconectar la de A, que seria una denegacion de servicio silenciosa: sus campanas dejan de publicar y nadie sabe por que. Los tokens se guardan en `access_token_enc`, cifrados en reposo, y `listConnections` ni siquiera los selecciona.",
-   "motivo": "53 de las 67 rutas necesitan una credencial de un tercero —Google, Meta, TikTok, Snapchat, LinkedIn, HubSpot, Salesforce, Twilio, Slack—. Certificar que la llamada al proveedor funciona de verdad exige cuentas reales y GENERA COSTE. Coste externo nuevo autorizado: 0 EUR. Queda fuera de lo ejecutable sin autorizacion."
-  },
-  "ads": {
-   "rutas": 5,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoLote10.pg.test.ts — contra PostgreSQL real con los servicios REALES; las cuentas conectadas de cada inquilino: una cuenta aparece en el listado de SU inquilino y no en el del otro (con control positivo), el estado por plataforma es el del que pregunta, y B no puede desconectar la cuenta de A. Un fallo de alcance aqui no es una lectura de mas: es que alguien gaste el presupuesto publicitario de otro. Mutacion: quitar el alcance de inquilino (7 sitios) tumba 3.",
-   "motivo": "PARCIAL: crear campanas, leer metricas y cambiar presupuestos exige credencial de Google/Meta/TikTok y GENERA COSTE. BLOCKED_EXTERNALLY esa parte; coste externo autorizado = 0 EUR."
-  },
-  "ecommerce_tienda": {
-   "rutas": 14,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoLote7.pg.test.ts — contra PostgreSQL real con los servicios REALES; producto creado y releido con precio y stock, el precio con decimales se guarda EXACTO —25,50 guardado como 25 o como 25,499999 es dinero perdido o cobrado de mas, y no da ningun error—, un pedido guarda su total cuadrado con las lineas (2 x 25,50 = 51), los ajustes son por inquilino, y B no lee, no edita, no borra el producto de A ni ve su pedido. Mutacion: quitar el alcance de inquilino (11 sitios) tumba 5.",
-   "motivo": "ANOTADO: `createOrder` acepta `unitPrice` del LLAMANTE. La ruta publica de compra lo RESUELVE desde el producto —no lo acepta del comprador—, que es lo correcto y por eso no hay defecto vivo. Pero el contrato del servicio confia en quien llama, igual que el total de linea en facturas: cualquier consumidor futuro que pase el precio del cliente vendera al precio que el cliente elija."
-  },
-  "erp": {
-   "rutas": 5,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoErp.pg.test.ts — 7 pruebas contra PostgreSQL real. El ERP no guarda filas sueltas: guarda una INSTANTANEA por dominio con numero de version, asi que lo que importa no es el CRUD sino la CONCURRENCIA. Certificado: la instantanea se lee con su version y el payload jsonb vuelve como objeto con su array dentro —no como texto ni como {}—, guardar con la version correcta escribe y sube la version, guardar con una version VIEJA no escribe nada, y CUATRO escrituras SIMULTANEAS desde la misma version dejan exactamente UNA ganadora con una sola subida de version. Sin ese control las cuatro escribirian y tres cambios desapareceran sin dejar rastro: unidades que existen en pantalla y no en el almacen. Ademas: escribir en A no toca la instantanea de B, cada dominio lleva su propia version, y un inquilino sin instantanea no hereda la de otro. Mutaciones: quitar la comprobacion de version tumba 5; quitar el filtro de inquilino tumba 5.",
-   "motivo": ""
-  },
-  "lms_formacion": {
-   "rutas": 18,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoLote7.pg.test.ts — contra PostgreSQL real con los servicios REALES; el recorrido entero de una pieza —curso, modulo, leccion, matricula y progreso comprobado en el contador que ve el alumno—, publicar hace visible el curso en el catalogo publico y un curso SIN publicar NO sale (el control del anterior: si todo saliera publicado, publicar no querria decir nada y los borradores serian visibles), B no ve el curso de A ni lo borra, y no ve sus matriculas. Mutacion: quitar el alcance de inquilino (27 sitios) tumba 4.",
-   "motivo": ""
-  },
-  "formularios_captacion": {
-   "rutas": 22,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoLote8.pg.test.ts — contra PostgreSQL real con los servicios REALES; embudos: crear, releer, anadir paso y publicar persistido; visitantes y conversiones que se cuentan en el paso CORRECTO y no en el vecino; B no lee, no publica ni borra el de A; y la busqueda PUBLICA por slug —que se consulta sin inquilino, porque el slug es lo unico que trae la peticion— no entrega un embudo sin publicar. Mutacion: quitar el alcance de inquilino (13 sitios) tumba 4.",
-   "motivo": ""
-  },
-  "web_builder": {
-   "rutas": 10,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoLote1.pg.test.ts — 19 pruebas contra PostgreSQL real con los servicios REALES; crear y RELEER con las secciones como ARRAY, resolucion por SLUG —que es la URL publica: si no resuelve, la pagina existe y nadie la ve—, y B no la ve ni por id ni por slug. Mutacion: quitar el alcance de inquilino (12 sitios) tumba 4.",
-   "motivo": ""
-  },
-  "marca_blanca": {
-   "rutas": 3,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoLote1.pg.test.ts — 19 pruebas contra PostgreSQL real con los servicios REALES; guardar y releer, upsert que ACTUALIZA en vez de duplicar —dos marcas para un inquilino harian que se aplicara la que saliera primero—, el dominio de A no resuelve a la marca de B (esa busqueda va SIN inquilino porque el dominio es lo unico que trae la peticion), y desactivar deja de servirla. Mutacion: quitar el alcance de inquilino (3 sitios) tumba 3.",
-   "motivo": ""
-  },
-  "pwa": {
-   "rutas": 4,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoLote3.pg.test.ts — contra PostgreSQL real con los servicios REALES; manifiesto con lo minimo de una PWA, instalacion contada, suscripcion guardada y contada, el MISMO endpoint dos veces no duplica —un duplicado manda el aviso dos veces al mismo dispositivo—, retirarla la quita, y las de B no cuentan para A. La grave: un aviso encolado para A no llega a los dispositivos de B. Mutacion: quitar el alcance de countPushSubscriptions tumba 3.",
-   "motivo": ""
-  },
-  "dialer_voz_llamadas": {
-   "rutas": 19,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoLote10.pg.test.ts — contra PostgreSQL real con los servicios REALES; llamar sin proveedor configurado se REHUSA en vez de fingirse —una llamada que se da por hecha sin marcarse deja al comercial creyendo que ya contacto— y el registro de llamadas de A no incluye las de B. Mutacion: quitar el alcance de inquilino (2 sitios) tumba 1.",
-   "motivo": "PARCIAL: marcar de verdad necesita Twilio, que cobra por minuto. BLOCKED_EXTERNALLY."
-  },
-  "admin_plataforma": {
-   "rutas": 12,
-   "estado": "FIXED_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoLote11.pg.test.ts — contra PostgreSQL real con los servicios REALES; subcuentas de agencia. DEFECTO ENCONTRADO Y CORREGIDO: `create` generaba el identificador como `sub_<16 hex>` y la columna `saas_subcuentas.tenant_id` es de tipo `uuid`, asi que PostgreSQL respondia «invalid input syntax for type uuid» y el INSERT fallaba. Una agencia NO PODIA dar de alta a un cliente. El prefijo venia de cuando esa columna era texto. Certificado ademas: la subcuenta aparece en la lista de SU agencia y no en la de otra (con control positivo), B no puede suspender ni cancelar la de A —dejar sin servicio al cliente de otra agencia, y quien lo sufre no sabe por que—, suspender y reactivar la propia persiste, y el consumo no se consulta desde otra agencia. Mutacion: devolver el identificador no-uuid tumba 5.",
-   "motivo": ""
-  },
-  "os": {
-   "rutas": 220,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "aislamiento del espacio OS por el lado web: 33 pruebas contra PostgreSQL real (backend/saas/__tests__/aislamiento_os_lado_web.pg.test.ts), reverificadas ahora en verde. Mas la CACHE de datos de agente en el lote 11: la respuesta calculada para un inquilino NO se sirve a otro —si la cache no distinguiera inquilino, en datos de mercado eso seria inteligencia competitiva regalada— y el listado reciente no se cruza; mutacion: quitar el alcance tumba 1. Del Bloque 1 se suma que toda capacidad de agente declarada tiene quien la ejecute y que ninguna capacidad irreversible es automatica.",
-   "motivo": "PARCIAL y por diseno: la EJECUCION de los agentes necesita inferencia, y el interruptor maestro NELVYON_AI_ENABLED esta a 0 —cerrado en el Bloque 1 para que ni una ruta pueda gastar—. Certificar el resultado real de cada agente exigiria encenderlo y activar un proveedor de pago. Coste externo autorizado = 0 EUR, asi que esa parte queda fuera de lo ejecutable."
-  },
-  "ia_privada_memoria": {
-   "rutas": 13,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoLote6.pg.test.ts — contra PostgreSQL real con los servicios REALES; la memoria de inquilino es lo que la IA lee como CONTEXTO, asi que un trozo cruzado no se queda en una fila mal leida: acaba dentro de una respuesta generada para otro cliente. Certificado: el trozo se lista, la memoria de A no aparece en la de B, la busqueda de B no la encuentra, B no puede borrar un trozo de A, y —la que importa— `buildContextBlock(B)` contiene lo de B y NO contiene nada de A. Con control positivo en las tres. Mutacion: quitar el alcance de inquilino (6 sitios) tumba 4.",
-   "motivo": "PARCIAL: la generacion de embeddings necesita proveedor de pago y esta apagada por el interruptor maestro (NELVYON_AI_ENABLED=0). Lo certificado es el almacen y el contexto, que es donde estaba el riesgo de cruce."
-  },
-  "gdpr_cumplimiento": {
-   "rutas": 8,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "backend/saas/__tests__/flujoLote3.pg.test.ts — contra PostgreSQL real con los servicios REALES; GDPR no es una funcionalidad, es una obligacion: «la interfaz dice que se borro» con la fila todavia ahi no es un fallo de producto, es un incumplimiento. Por eso se comprueba EN LA BASE. Certificado: la solicitud queda registrada —hay que poder demostrar cuando se pidio—, la exportacion del INTERESADO devuelve sus datos y no un objeto vacio (una exportacion vacia cumple la forma y no la obligacion), no incluye los de otro, el borrado quita la fila de verdad, B no puede borrar pasando el id ajeno, y el bundle del inquilino no arrastra al vecino. EL CONTROL que no puede faltar: borrar lo de A NO toca lo de B — un borrado sin alcance que se ejecute una vez no tiene vuelta atras. Mutacion: quitar el alcance de inquilino de deleteContactById tumba 2.",
-   "motivo": ""
-  },
-  "salud_infra": {
-   "rutas": 26,
-   "estado": "PASS_CERTIFIED",
-   "evidencia": "certificado en el Bloque 1 y REVERIFICADO ahora: 25 pruebas Python + 100 vitest. Las 16 rutas de cron verifican credencial y FALLAN CERRADAS sin secreto; la exencion de /api/health esta acotada y con guardia para que el prefijo no se ensanche ni cuelgue de el nada caro o anonimo; /health sigue usable por la infraestructura —un 429 al sondeo de Railway marca la instancia como caida y la reinicia—; y el limitador cubre las superficies sensibles con la IP derivada de la infraestructura, no elegida por el cliente. Mutacion: las de Bloque 1: ruta de cron nueva sin guardia, exencion ensanchada, y las tres del limitador.",
-   "motivo": ""
+  "_arrancado": "2026-08-23",
+  "capacidades": {
+    "auth_onboarding_workspaces": {
+      "rutas": 33,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoLote4.pg.test.ts — contra PostgreSQL real con los servicios REALES; equipo: invitar y aparecer en la lista con su rol, la invitacion genera token CON caducidad —una invitacion sin caducar es una puerta abierta para siempre—, cambiar el rol persiste, suspender y reactivar cambian el estado de verdad, y eliminar lo quita. B no ve, no cambia el rol, no suspende ni elimina al equipo de A: un fallo de alcance ahi es alguien de otra empresa dentro del panel, o alguien que echa del suyo a un companero ajeno. Mutacion: quitar el alcance de inquilino (6 sitios) tumba 5. Del Bloque 1 se suma: las 854 rutas web fijan el inquilino por transaccion con techo de huecos en CERO, y el limite de peticiones cubre login, registro, reset, verify-email, SSO y token.",
+      "motivo": ""
+    },
+    "cuenta_y_suscripcion": {
+      "rutas": 12,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoLote8.pg.test.ts — contra PostgreSQL real con los servicios REALES; claves de API, que son CREDENCIALES: la clave en claro se devuelve UNA vez y no vuelve a aparecer ni en el listado ni EN LA BASE —si se pudiera releer, cualquiera con acceso al panel o a una copia de la base tendria las credenciales de todos—, la recien creada VERIFICA (control positivo, sin el una verificacion rota aprobaria el resto y dejaria la API publica inservible), una REVOCADA deja de verificar, una inventada no verifica, B no puede revocar la de A —cortar la credencial de otro le rompe las integraciones sin que sepa por que— y la lista de A no trae las de B. Mutacion: quitar el alcance de inquilino (2 sitios) tumba 3.",
+      "motivo": ""
+    },
+    "dashboard": {
+      "rutas": 14,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoLote3.pg.test.ts — contra PostgreSQL real con los servicios REALES; actividad registrada que aparece en la reciente, la de A sin la de B, metricas que responden con numeros y no con un objeto vacio —un panel que devuelve {} se pinta vacio y parece que no hay negocio—, y un inquilino inexistente no inventa datos. Mutacion: quitar el alcance de getRecentActivity tumba 1.",
+      "motivo": ""
+    },
+    "crm": {
+      "rutas": 48,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoDeCrm.pg.test.ts — 14 pruebas contra PostgreSQL real con los servicios REALES (SaasCrmService y SaasDealsService): crear, leer, listar, editar y RELEER la fila sin pasar por el servicio, actividad, oportunidad, cambio de etapa persistido, metricas que reflejan lo que hay, y borrado. Cinco negativos de otro inquilino: B no lee, no edita y no borra el contacto de A, ni ve ni mueve de etapa su oportunidad. Mutaciones: quitar el filtro de inquilino de getContact tumba 8, de deleteContact tumba 1 y de getDeal tumba 3.",
+      "motivo": "RIESGO RESIDUAL: el correo NO se valida en ninguna capa —ni el servicio ni la ruta—, asi que «no-soy-un-correo» entra y se guarda. La consecuencia llega despues: una campana a ese contacto rebota y la deduplicacion por correo trata la basura como una direccion. No lo arreglo: anadir validacion RECHAZARIA lo que hoy se acepta y rompe importaciones que ahora funcionan. Es decision de producto, incluido que hacer con los contactos ya guardados asi."
+    },
+    "prospeccion_cold_email": {
+      "rutas": 9,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoLote10.pg.test.ts — contra PostgreSQL real con los servicios REALES; listas de prospeccion: la lista aparece en el listado de su inquilino y B no la ve (con control positivo), y B no ve los prospectos de una lista de A. Cruzar listas de prospeccion es entregar la base de datos comercial de un cliente a su competencia. Mutacion: quitar el alcance de inquilino (8 sitios) tumba 2.",
+      "motivo": "PARCIAL: la BUSQUEDA de prospectos usa proveedor externo de datos y el envio de cold email necesita SES/Twilio. BLOCKED_EXTERNALLY; lo certificado es el almacen y su aislamiento."
+    },
+    "campanias": {
+      "rutas": 31,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoLote4.pg.test.ts — contra PostgreSQL real con los servicios REALES; crear y releer con canal, asunto y cuerpo; editar comprobado EN LA FILA; programar deja fecha y estado; pausar persiste; un canal inexistente se rechaza; borrar. Lo que mas importa: lanzar SIN proveedor configurado se REHUSA en vez de fingirse —sin ese corte la campana quedaria marcada como lanzada sin haber salido nada, que es la mentira funcional mas cara de esta capacidad porque el cliente cree que ha enviado— y un lanzamiento rehusado NO deja destinatarios a medias, que serian filas listas para un reintento que enviaria dos veces. B no lee, no edita, no lanza, no borra, y no ve ni los destinatarios ni las estadisticas de la campana de A. Mutacion: quitar el alcance de inquilino (21 sitios) tumba 6.",
+      "motivo": ""
+    },
+    "email": {
+      "rutas": 7,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoLote9.pg.test.ts — SMS: sin proveedor configurado el estado lo DICE en vez de fingir, enviar se REHUSA y no deja un envio fantasma —un SMS que se da por enviado sin salir es lo peor, porque el cliente cree que ha avisado a alguien—, y el registro de A no incluye los de B con control positivo. Mutacion: cubierto por el aislamiento del registro.",
+      "motivo": "PARCIAL: el envio real por Twilio/SES necesita credencial de pago. BLOCKED_EXTERNALLY esa parte; lo certificado es que se rehusa limpiamente y que el registro no se cruza."
+    },
+    "redes_sociales": {
+      "rutas": 41,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoLote11.pg.test.ts — contra PostgreSQL real con los servicios REALES; crear una publicacion y releerla, B no la ve (con control positivo), B no puede PUBLICARLA —publicar en nombre de otro es escribir en su perfil publico: no hay marcha atras y lo ve todo el mundo— ni borrarla, publicar sin cuenta ACTIVA no deja la publicacion marcada como publicada —una publicacion que se da por publicada y no salio es peor que un error, porque el cliente cree que ya comunico—, y las cuentas conectadas de A no salen en las de B. Mutacion: quitar el alcance de inquilino (6 sitios) tumba 5.",
+      "motivo": "PARCIAL: la publicacion REAL en LinkedIn, Meta, TikTok o X necesita OAuth del cliente. BLOCKED_EXTERNALLY esa parte; lo certificado es el almacen, el aislamiento y que no se finja una publicacion que no ha salido."
+    },
+    "contenido": {
+      "rutas": 14,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoLote6.pg.test.ts — contra PostgreSQL real con los servicios REALES; base de conocimiento: categoria, articulo, releer, editar comprobado EN LA FILA, y votos que suman en el articulo CORRECTO y no en el vecino. B no lee, no edita, no borra y tampoco puede VOTAR el articulo de A —comprobado en la fila, no solo en la respuesta—. Snippets: crear, releer, editar persistido, y la busqueda de A no devuelve los de B. Mutacion: quitar el alcance (8 y 4 sitios) tumba 4 y 3.",
+      "motivo": ""
+    },
+    "seo_visibilidad": {
+      "rutas": 20,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoLote6.pg.test.ts — contra PostgreSQL real con los servicios REALES; anadir una palabra y verla en el listado, anadir varias de golpe, borrar la propia, y B no puede borrar la que sigue A. Control positivo en el aislamiento: A ve las suyas. Mutacion: quitar el alcance de inquilino (3 sitios) tumba 5.",
+      "motivo": "PARCIAL: el enriquecimiento desde Semrush (`enrichTrackedFromSemrush`, `fetchSemrushDomainKeywords`) necesita credencial de pago. BLOCKED_EXTERNALLY para esa parte; coste externo autorizado = 0 EUR."
+    },
+    "reputacion_sentimiento": {
+      "rutas": 12,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoLote8.pg.test.ts — contra PostgreSQL real con los servicios REALES; resenas listadas y estadisticas que cuentan lo que hay, B no ve las de A con control positivo, B no puede responder ni ignorar la resena de A —responder en nombre de otro negocio es publicar en su ficha publica— y responder la propia SI queda guardada. Mutacion: quitar el alcance de inquilino (7 sitios) tumba 4.",
+      "motivo": "PARCIAL: `syncGbpReviews` trae las resenas desde Google Business Profile y necesita credencial OAuth del cliente. BLOCKED_EXTERNALLY esa parte; lo certificado es el almacen, el aislamiento y la respuesta, que es donde estaba el riesgo."
+    },
+    "inbox_helpdesk": {
+      "rutas": 21,
+      "estado": "FIXED_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoLote5.pg.test.ts — 6 pruebas del inbox contra PostgreSQL real. TRES defectos encontrados, cada uno impedia una operacion entera:\n1) El servicio consultaba `saas_team_members`, tabla que NO EXISTE (la real es `team_members`), y se llama desde createConversation cuando no viene responsable asignado, que es el caso normal: CREAR UNA CONVERSACION reventaba.\n2) `firstMessage` es opcional y su unico uso que daba pista de tipo era un `CASE WHEN $5 IS NOT NULL`; sin molde PostgreSQL responde «could not determine data type of parameter $5». Crear una conversacion SIN primer mensaje —cuando alguien escribe y aun no se ha respondido— tambien reventaba.\n3) En `saas_conversation_messages` conviven las dos formas historicas: `content` (vieja, NOT NULL) y `body` (nueva). El servicio solo escribia `body`, asi que ENVIAR UN MENSAJE fallaba siempre.\nCertificado ademas: el mensaje se relee del hilo, B no lee la conversacion de A ni sus mensajes —un mensaje cruzado no es una fuga, es una conversacion entregada a la persona equivocada—, B no puede responder en ella, y la politica de SLA es por inquilino.\nMutaciones: devolver la tabla inexistente tumba 7; quitar el molde tumba 7; quitar `content` tumba 5; quitar el alcance de inquilino (14 sitios) tumba 9.",
+      "motivo": "ANOTADO, no arreglable sin migracion: mientras `content` y `body` sigan las dos en `saas_conversation_messages`, el mismo texto vive en dos sitios. Quitar el NOT NULL de `content` o retirar la columna es una migracion y ADR-064 esta bloqueado."
+    },
+    "chatbot": {
+      "rutas": 8,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoLote9.pg.test.ts — crear y releer la configuracion con `escalateKeywords` volviendo como ARRAY, B no lee el chatbot de A con control positivo, las conversaciones no se cruzan, y el codigo de insercion —que se pega en la web PUBLICA del cliente— lleva el id del chatbot y ningun secreto: si llevara una credencial, estaria publicada. Mutacion: quitar el filtro por usuario (3 sitios) tumba 3.",
+      "motivo": ""
+    },
+    "reservas": {
+      "rutas": 12,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoLote7.pg.test.ts — contra PostgreSQL real con los servicios REALES; crear y releer conservando fecha, editar comprobado EN LA FILA, listado por rango que devuelve lo de dentro y nada de fuera, y B no lee, no edita ni borra el evento de A. Mutacion: quitar el alcance de inquilino (4 sitios) tumba 4.",
+      "motivo": "RIESGO RESIDUAL de presentacion: `event_date` es un `date` y pg lo devuelve como medianoche LOCAL, asi que serializarlo con toISOString() en un huso al este de UTC da el dia ANTERIOR. Una reserva del 15 puede mostrarse como 14. El guardado es correcto; el riesgo esta en como se serialice hacia el cliente."
+    },
+    "workflows": {
+      "rutas": 32,
+      "estado": "FIXED_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoDeWorkflows.pg.test.ts — 14 pruebas contra PostgreSQL real con el servicio REAL: crear, leer, listar, editar y RELEER de la fila, activar, pausar, ejecutar, historial y borrar, mas cuatro negativos de otro inquilino y tres entradas invalidas. Dos defectos encontrados y arreglados: ON CONFLICT sobre un indice PARCIAL sin repetir su condicion (ninguna ejecucion llegaba a registrarse) y un array de JS en columna jsonb (vacio se guardaba como {} en silencio; con elementos reventaba, y el registro del fallo tambien). Tres mutaciones tumban 2, 2 y 1.",
+      "motivo": "PARCIAL: el editor visual —/api/saas/workflows/visual y /visual/[id]— guarda en workflow_nodes, visual_workflow_executions, workflow_trigger_registry y workflows.edges_json, que repara la 575. Escrita y certificada, NO aplicada: ADR-064 = BLOCKED_ON_FOUNDER. En produccion ese editor no puede persistir."
+    },
+    "ab_testing": {
+      "rutas": 7,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoLote2.pg.test.ts — el A/B vivo es /api/saas/ab-testing -> SaasAbTestingService -> ab_tests, y SI casa con la tabla. Certificado: exige al menos DOS variantes (un A/B con una variante no es un experimento, es un envio), variantes que vuelven como ARRAY, eventos que se acumulan en la variante CORRECTA y no en la otra, ganador que persiste en la fila, y B no lee ni toca la prueba de A. `declareWinner` exige envios: declarar un ganador sobre cero datos seria inventar el resultado del experimento.",
+      "motivo": ""
+    },
+    "facturacion_billing": {
+      "rutas": 42,
+      "estado": "FIXED_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoDePresupuestos.pg.test.ts — 15 pruebas contra PostgreSQL real con SaasQuotesService: importes (subtotal como suma de lineas, descuento e impuesto EN ORDEN, IVA 21% por defecto y 0% cuando se declara, y que lo GUARDADO coincide con lo calculado), numeracion (ocho presupuestos SIMULTANEOS -> ocho numeros distintos; secuencia independiente por inquilino), recorrido completo y borrado sin dejar lineas huerfanas, mas cuatro negativos del inquilino B. Mutaciones: numeracion leer-y-luego-escribir tumba 1; aplicar el impuesto antes del descuento tumba 2. Ademas, del Bloque 1: el reclamo de idempotencia de Stripe certificado contra PostgreSQL real (replay, duplicados simultaneos, estado terminal, atasco) y la resurreccion de membresias por reordenacion, cerrada. REFORZADO en el lote 2: contrato de facturas reconstruido —/api/saas/facturas -> SaasFacturasService -> invoices (forma de inquilino), /api/saas/invoices -> SaasInvoiceService -> saas_invoices— con lineas que vuelven como ARRAY, importes calculados Y guardados, y un DEFECTO CORREGIDO: el total de cada linea lo calcula el llamante y la ruta no lo validaba, asi que un cliente que lo omitiera guardaba NaN en subtotal y total (NaN es valor valido en numeric). Ahora se RECHAZA en vez de recalcularlo, porque una linea puede llevar un total pactado distinto de cantidad x precio. Mutacion: quitar la comprobacion tumba 1.\n\nDEFECTO ENCONTRADO Y CORREGIDO: `calcTotals` de SaasFacturasService aceptaba totales de linea no finitos. `NaN` es un valor VALIDO en una columna `numeric` de PostgreSQL: se guardaba sin error y la factura quedaba con un importe que no es un numero, sin nada que lo delatara. Ahora se rechaza en el calculo. Ademas se corrigio `markRead` de SaasNotificationService, que moldeaba `tenant_id = $3::uuid` contra una columna `varchar`: fallaba SIEMPRE, asi que marcar una notificacion como leida no funcionaba nunca. Mutacion comprobada: reintroducidos los dos defectos, las pruebas caen.",
+      "motivo": "PARCIAL: STRIPE_MEMBERSHIP_REACTIVATION = BLOCKED_ON_FOUNDER — el unico evento que lleva a `active` es customer.subscription.created, asi que quien caduca por impago no vuelve nunca aunque pague. Y `InvoicingService` escribe en `invoices` una forma que la tabla no tiene: a que tabla pertenece (invoices vs saas_invoices) es decision de producto."
+    },
+    "packs_entregables": {
+      "rutas": 30,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoLote5.pg.test.ts — packs y entregables contra PostgreSQL real. El catalogo responde, los derechos del plan se conceden y se releen, y los de A no son los de B con control positivo. Consumo: gasta cupo de verdad (launches_used +1 y launches_remaining -1 comprobados en la fila), CUATRO consumos SIMULTANEOS gastan exactamente cuatro —si el decremento fuera leer-y-luego-escribir gastarian menos y el cliente pagaria uno usando varios—, y B no puede gastar el cupo de A, que seria robo silencioso: el cliente descubre que no le quedan lanzamientos sin haber lanzado nada. Revocar marca la fila revocada y B no puede revocar la de A. Entregables: el listado no mezcla inquilinos, el resumen responde con estructura y un entregable ajeno no se lee por id. Mutaciones: decremento leer-y-luego-escribir tumba 2; quitar el alcance de inquilino de consumeLaunch tumba 2.",
+      "motivo": "HALLAZGO documentado, no cambiado: revocar un pack INCLUIDO EN EL PLAN no dura. `canLaunch` llama a `ensurePlanEntitlements` ANTES de comprobar, y eso vuelve a conceder lo que el plan incluye; el indice unico es parcial (solo status='active') asi que la fila revocada no estorba y se crea otra activa. Revocar informa de exito y en la siguiente lectura vuelve a estar permitido. Puede ser lo pretendido —el plan como fuente de verdad— o puede ser que revokeEntitlement prometa mas de lo que cumple. Es semantica de producto."
+    },
+    "portal_cliente": {
+      "rutas": 6,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoLote9.pg.test.ts — el portal se abre con un TOKEN y sin sesion: quien aprueba un entregable no tiene cuenta en NELVYON, asi que ese token es TODA la autorizacion. Certificado: un token recien firmado verifica y trae su carga (control positivo, sin el una verificacion que rechazara todo dejaria el portal inservible), uno inventado no verifica, cambiar la CARGA invalida la firma —el ataque evidente: coger el propio y cambiarle el inquilino para aprobar el de otro—, cambiar la FIRMA tampoco cuela, uno CADUCADO se rechaza y lo dice (un enlace que no caduca es una puerta abierta para siempre en el correo de alguien), los malformados se rechazan, y el hash que se guarda para revocar NO es el token: guardarlo entero seria guardar la llave junto a la cerradura. Mutacion: quitar la comprobacion de firma tumba 1; quitar la caducidad tumba 1.",
+      "motivo": ""
+    },
+    "partners_afiliados": {
+      "rutas": 19,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoLote7.pg.test.ts — contra PostgreSQL real con los servicios REALES; registrar partner y releer su codigo, el duplicado se RECHAZA (dos filas para la misma persona serian dos codigos y comisiones repartidas sin que nadie lo note), la comision se calcula y es un numero FINITO, positivo y menor que el importe —ni NaN ni Infinity—, un codigo inventado no crea comision, y las referencias de un partner son solo las suyas con control positivo. Mutacion: quitar el filtro de partner_id en getReferrals tumba 1.",
+      "motivo": ""
+    },
+    "contratos": {
+      "rutas": 7,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoLote1.pg.test.ts — 19 pruebas contra PostgreSQL real con los servicios REALES; crear y releer, enviar a firma con token, FIRMAR y comprobar en la fila que queda `signed` —un contrato que se firma sin quedar firmado es la mentira funcional exacta—, un token inventado no firma nada, anular impide firmar despues, y B no ve el de A. Mutacion: quitar el alcance por usuario (3 sitios) tumba 5.",
+      "motivo": ""
+    },
+    "storage_uploads": {
+      "rutas": 5,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoLote8.pg.test.ts — contra PostgreSQL real con los servicios REALES; documentos: crear y releer, la lista de A no incluye los de B con control positivo, y B no lee ni borra el de A — leer cruzado es fuga directa de un fichero del cliente, y borrarlo es destruir algo que no se recupera. Mutacion: quitar el alcance de inquilino (8 sitios) tumba 3.",
+      "motivo": ""
+    },
+    "analytics_reporting": {
+      "rutas": 43,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoLote10.pg.test.ts — contra PostgreSQL real con los servicios REALES; se pregunta al SERVICIO y no a la base: los numeros responden con estructura y no con un objeto vacio —un panel que devuelve {} se pinta a cero y parece que el negocio no existe— y los de A no cuentan lo de B, comparando las DOS respuestas. Si el conteo no filtrara por inquilino, cada cliente veria el negocio de todos los demas sumado al suyo. Mutacion: quitar el alcance de inquilino (4 sitios) tumba 2.",
+      "motivo": ""
+    },
+    "encuestas": {
+      "rutas": 3,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoLote1.pg.test.ts — 19 pruebas contra PostgreSQL real con los servicios REALES; crear y RELEER conservando las preguntas como ARRAY (no como objeto, que es lo que hace pg con un array de JS), editar comprobado en la FILA, respuesta registrada, borrado, y B no lee ni edita ni borra la de A. Mutacion: quitar el alcance de inquilino (11 sitios) tumba 4.",
+      "motivo": ""
+    },
+    "integraciones": {
+      "rutas": 67,
+      "estado": "BLOCKED_EXTERNALLY",
+      "evidencia": "backend/saas/__tests__/flujoIntegraciones.pg.test.ts — 7 pruebas contra PostgreSQL real sobre lo que SI es interno y es lo de mas riesgo: el almacen de conexiones. Una conexion aparece en la lista de su inquilino y NO en la del otro; el estado por integracion es el del que pregunta; el token de A no viaja en la respuesta de B —filtrarlo seria peor que un estado mal, porque con el se opera la cuenta sin pasar por NELVYON—; desconectar deja la fila desconectada; y B no puede desconectar la de A, que seria una denegacion de servicio silenciosa: sus campanas dejan de publicar y nadie sabe por que. Los tokens se guardan en `access_token_enc`, cifrados en reposo, y `listConnections` ni siquiera los selecciona.",
+      "motivo": "53 de las 67 rutas necesitan una credencial de un tercero —Google, Meta, TikTok, Snapchat, LinkedIn, HubSpot, Salesforce, Twilio, Slack—. Certificar que la llamada al proveedor funciona de verdad exige cuentas reales y GENERA COSTE. Coste externo nuevo autorizado: 0 EUR. Queda fuera de lo ejecutable sin autorizacion."
+    },
+    "ads": {
+      "rutas": 5,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoLote10.pg.test.ts — contra PostgreSQL real con los servicios REALES; las cuentas conectadas de cada inquilino: una cuenta aparece en el listado de SU inquilino y no en el del otro (con control positivo), el estado por plataforma es el del que pregunta, y B no puede desconectar la cuenta de A. Un fallo de alcance aqui no es una lectura de mas: es que alguien gaste el presupuesto publicitario de otro. Mutacion: quitar el alcance de inquilino (7 sitios) tumba 3.",
+      "motivo": "PARCIAL: crear campanas, leer metricas y cambiar presupuestos exige credencial de Google/Meta/TikTok y GENERA COSTE. BLOCKED_EXTERNALLY esa parte; coste externo autorizado = 0 EUR."
+    },
+    "ecommerce_tienda": {
+      "rutas": 14,
+      "estado": "FIXED_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoLote7.pg.test.ts — contra PostgreSQL real con los servicios REALES; producto creado y releido con precio y stock, el precio con decimales se guarda EXACTO —25,50 guardado como 25 o como 25,499999 es dinero perdido o cobrado de mas, y no da ningun error—, un pedido guarda su total cuadrado con las lineas (2 x 25,50 = 51), los ajustes son por inquilino, y B no lee, no edita, no borra el producto de A ni ve su pedido. Mutacion: quitar el alcance de inquilino (11 sitios) tumba 5.\n\nDEFECTO ENCONTRADO Y CORREGIDO: `updateSettings` hacia `INSERT INTO store_settings (tenant_id) VALUES ($1) ON CONFLICT DO UPDATE SET ...`. En la PRIMERA configuracion no hay conflicto: el INSERT entra con el tenant_id solo y la rama `DO UPDATE` no llega a ejecutarse, asi que los ajustes se descartaban EN SILENCIO. El comercio se configuraba, la respuesta decia que si, y no se habia guardado nada; a partir de la segunda vez si funcionaba, que es lo que hacia el fallo dificil de ver. Ahora se asegura la fila y DESPUES se aplican los valores, en dos sentencias. Mutacion comprobada: reintroducido el upsert, la prueba cae.",
+      "motivo": "ANOTADO: `createOrder` acepta `unitPrice` del LLAMANTE. La ruta publica de compra lo RESUELVE desde el producto —no lo acepta del comprador—, que es lo correcto y por eso no hay defecto vivo. Pero el contrato del servicio confia en quien llama, igual que el total de linea en facturas: cualquier consumidor futuro que pase el precio del cliente vendera al precio que el cliente elija."
+    },
+    "erp": {
+      "rutas": 5,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoErp.pg.test.ts — 7 pruebas contra PostgreSQL real. El ERP no guarda filas sueltas: guarda una INSTANTANEA por dominio con numero de version, asi que lo que importa no es el CRUD sino la CONCURRENCIA. Certificado: la instantanea se lee con su version y el payload jsonb vuelve como objeto con su array dentro —no como texto ni como {}—, guardar con la version correcta escribe y sube la version, guardar con una version VIEJA no escribe nada, y CUATRO escrituras SIMULTANEAS desde la misma version dejan exactamente UNA ganadora con una sola subida de version. Sin ese control las cuatro escribirian y tres cambios desapareceran sin dejar rastro: unidades que existen en pantalla y no en el almacen. Ademas: escribir en A no toca la instantanea de B, cada dominio lleva su propia version, y un inquilino sin instantanea no hereda la de otro. Mutaciones: quitar la comprobacion de version tumba 5; quitar el filtro de inquilino tumba 5.",
+      "motivo": ""
+    },
+    "lms_formacion": {
+      "rutas": 18,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoLote7.pg.test.ts — contra PostgreSQL real con los servicios REALES; el recorrido entero de una pieza —curso, modulo, leccion, matricula y progreso comprobado en el contador que ve el alumno—, publicar hace visible el curso en el catalogo publico y un curso SIN publicar NO sale (el control del anterior: si todo saliera publicado, publicar no querria decir nada y los borradores serian visibles), B no ve el curso de A ni lo borra, y no ve sus matriculas. Mutacion: quitar el alcance de inquilino (27 sitios) tumba 4.",
+      "motivo": ""
+    },
+    "formularios_captacion": {
+      "rutas": 22,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoLote8.pg.test.ts — contra PostgreSQL real con los servicios REALES; embudos: crear, releer, anadir paso y publicar persistido; visitantes y conversiones que se cuentan en el paso CORRECTO y no en el vecino; B no lee, no publica ni borra el de A; y la busqueda PUBLICA por slug —que se consulta sin inquilino, porque el slug es lo unico que trae la peticion— no entrega un embudo sin publicar. Mutacion: quitar el alcance de inquilino (13 sitios) tumba 4.",
+      "motivo": ""
+    },
+    "web_builder": {
+      "rutas": 10,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoLote1.pg.test.ts — 19 pruebas contra PostgreSQL real con los servicios REALES; crear y RELEER con las secciones como ARRAY, resolucion por SLUG —que es la URL publica: si no resuelve, la pagina existe y nadie la ve—, y B no la ve ni por id ni por slug. Mutacion: quitar el alcance de inquilino (12 sitios) tumba 4.",
+      "motivo": ""
+    },
+    "marca_blanca": {
+      "rutas": 3,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoLote1.pg.test.ts — 19 pruebas contra PostgreSQL real con los servicios REALES; guardar y releer, upsert que ACTUALIZA en vez de duplicar —dos marcas para un inquilino harian que se aplicara la que saliera primero—, el dominio de A no resuelve a la marca de B (esa busqueda va SIN inquilino porque el dominio es lo unico que trae la peticion), y desactivar deja de servirla. Mutacion: quitar el alcance de inquilino (3 sitios) tumba 3.",
+      "motivo": ""
+    },
+    "pwa": {
+      "rutas": 4,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoLote3.pg.test.ts — contra PostgreSQL real con los servicios REALES; manifiesto con lo minimo de una PWA, instalacion contada, suscripcion guardada y contada, el MISMO endpoint dos veces no duplica —un duplicado manda el aviso dos veces al mismo dispositivo—, retirarla la quita, y las de B no cuentan para A. La grave: un aviso encolado para A no llega a los dispositivos de B. Mutacion: quitar el alcance de countPushSubscriptions tumba 3.",
+      "motivo": ""
+    },
+    "dialer_voz_llamadas": {
+      "rutas": 19,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoLote10.pg.test.ts — contra PostgreSQL real con los servicios REALES; llamar sin proveedor configurado se REHUSA en vez de fingirse —una llamada que se da por hecha sin marcarse deja al comercial creyendo que ya contacto— y el registro de llamadas de A no incluye las de B. Mutacion: quitar el alcance de inquilino (2 sitios) tumba 1.",
+      "motivo": "PARCIAL: marcar de verdad necesita Twilio, que cobra por minuto. BLOCKED_EXTERNALLY."
+    },
+    "admin_plataforma": {
+      "rutas": 12,
+      "estado": "FIXED_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoLote11.pg.test.ts — contra PostgreSQL real con los servicios REALES; subcuentas de agencia. DEFECTO ENCONTRADO Y CORREGIDO: `create` generaba el identificador como `sub_<16 hex>` y la columna `saas_subcuentas.tenant_id` es de tipo `uuid`, asi que PostgreSQL respondia «invalid input syntax for type uuid» y el INSERT fallaba. Una agencia NO PODIA dar de alta a un cliente. El prefijo venia de cuando esa columna era texto. Certificado ademas: la subcuenta aparece en la lista de SU agencia y no en la de otra (con control positivo), B no puede suspender ni cancelar la de A —dejar sin servicio al cliente de otra agencia, y quien lo sufre no sabe por que—, suspender y reactivar la propia persiste, y el consumo no se consulta desde otra agencia. Mutacion: devolver el identificador no-uuid tumba 5.",
+      "motivo": ""
+    },
+    "os": {
+      "rutas": 220,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "aislamiento del espacio OS por el lado web: 33 pruebas contra PostgreSQL real (backend/saas/__tests__/aislamiento_os_lado_web.pg.test.ts), reverificadas ahora en verde. Mas la CACHE de datos de agente en el lote 11: la respuesta calculada para un inquilino NO se sirve a otro —si la cache no distinguiera inquilino, en datos de mercado eso seria inteligencia competitiva regalada— y el listado reciente no se cruza; mutacion: quitar el alcance tumba 1. Del Bloque 1 se suma que toda capacidad de agente declarada tiene quien la ejecute y que ninguna capacidad irreversible es automatica.",
+      "motivo": "PARCIAL y por diseno: la EJECUCION de los agentes necesita inferencia, y el interruptor maestro NELVYON_AI_ENABLED esta a 0 —cerrado en el Bloque 1 para que ni una ruta pueda gastar—. Certificar el resultado real de cada agente exigiria encenderlo y activar un proveedor de pago. Coste externo autorizado = 0 EUR, asi que esa parte queda fuera de lo ejecutable."
+    },
+    "ia_privada_memoria": {
+      "rutas": 13,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoLote6.pg.test.ts — contra PostgreSQL real con los servicios REALES; la memoria de inquilino es lo que la IA lee como CONTEXTO, asi que un trozo cruzado no se queda en una fila mal leida: acaba dentro de una respuesta generada para otro cliente. Certificado: el trozo se lista, la memoria de A no aparece en la de B, la busqueda de B no la encuentra, B no puede borrar un trozo de A, y —la que importa— `buildContextBlock(B)` contiene lo de B y NO contiene nada de A. Con control positivo en las tres. Mutacion: quitar el alcance de inquilino (6 sitios) tumba 4.",
+      "motivo": "PARCIAL: la generacion de embeddings necesita proveedor de pago y esta apagada por el interruptor maestro (NELVYON_AI_ENABLED=0). Lo certificado es el almacen y el contexto, que es donde estaba el riesgo de cruce."
+    },
+    "gdpr_cumplimiento": {
+      "rutas": 8,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "backend/saas/__tests__/flujoLote3.pg.test.ts — contra PostgreSQL real con los servicios REALES; GDPR no es una funcionalidad, es una obligacion: «la interfaz dice que se borro» con la fila todavia ahi no es un fallo de producto, es un incumplimiento. Por eso se comprueba EN LA BASE. Certificado: la solicitud queda registrada —hay que poder demostrar cuando se pidio—, la exportacion del INTERESADO devuelve sus datos y no un objeto vacio (una exportacion vacia cumple la forma y no la obligacion), no incluye los de otro, el borrado quita la fila de verdad, B no puede borrar pasando el id ajeno, y el bundle del inquilino no arrastra al vecino. EL CONTROL que no puede faltar: borrar lo de A NO toca lo de B — un borrado sin alcance que se ejecute una vez no tiene vuelta atras. Mutacion: quitar el alcance de inquilino de deleteContactById tumba 2.",
+      "motivo": ""
+    },
+    "salud_infra": {
+      "rutas": 26,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "certificado en el Bloque 1 y REVERIFICADO ahora: 25 pruebas Python + 100 vitest. Las 16 rutas de cron verifican credencial y FALLAN CERRADAS sin secreto; la exencion de /api/health esta acotada y con guardia para que el prefijo no se ensanche ni cuelgue de el nada caro o anonimo; /health sigue usable por la infraestructura —un 429 al sondeo de Railway marca la instancia como caida y la reinicia—; y el limitador cubre las superficies sensibles con la IP derivada de la infraestructura, no elegida por el cliente. Mutacion: las de Bloque 1: ruta de cron nueva sin guardia, exencion ensanchada, y las tres del limitador.",
+      "motivo": ""
+    }
   }
- }
 }

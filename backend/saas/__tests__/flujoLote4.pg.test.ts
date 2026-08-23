@@ -19,8 +19,17 @@ const describeSiHayPg = DSN ? describe : describe.skip;
 
 let pool: import("pg").Pool;
 
-const A = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
-const B = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
+// Cada fichero de certificación usa su PROPIO par de inquilinos.
+//
+// Antes todos compartían `aaaa…`/`bbbb…`, y vitest corre los ficheros en
+// PARALELO contra la misma base: el `beforeEach` de uno borraba las filas que
+// otro acababa de sembrar. Por separado pasaban los 16 y juntos fallaban tres.
+// Eso es un falso rojo —y con otra combinación habría sido un falso verde—.
+//
+// El sufijo sale del nombre del fichero, así que dos ficheros nunca coinciden y
+// no hay que llevar una lista a mano.
+const A = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa11";
+const B = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb11";
 
 function puerto() {
   return {
@@ -39,7 +48,7 @@ async function sembrarInquilinos() {
           created_at, updated_at, email_verified)
        VALUES ($1::uuid, $2, 'x', $3, 'pro', $1::text, NOW(), NOW(), true)
        ON CONFLICT (user_id) DO NOTHING`,
-      [id, `cert-${id.slice(0, 8)}@nelvyon.test`, nombre]);
+      [id, `cert-${id}@nelvyon.test`, nombre]);
     await pool.query(
       `INSERT INTO saas_tenants (id, user_id, company_name, industry, plan)
        VALUES ($1, $1, $2, 'certificacion', 'pro')

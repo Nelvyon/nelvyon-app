@@ -32,6 +32,7 @@ eso no se puede responder mirando produccion ni los modelos.
     NELVYON_VIRGEN_DSN=postgresql://.../nelvyon_rec_final
 """
 import io
+from pathlib import Path
 import json
 import os
 import pathlib
@@ -77,15 +78,64 @@ def _medidos() -> set:
     return encontrados
 
 
+CLASES = {"HUECO_DE_RECUPERACION", "ROTO_HOY", "TABLA_EQUIVOCADA_PROBABLE",
+          "CODIGO_MUERTO"}
+
+
 def test_el_inventario_esta_bien_formado():
     """Control: un inventario vacio o roto haria pasar el trinquete sin mirar."""
     datos = json.load(io.open(INVENTARIO, encoding="utf-8"))
     assert datos["huecos"], "el inventario esta vacio"
     for h in datos["huecos"]:
         assert h["columnas"], h["tabla"]
-        assert h["clase"] in {"HUECO_DE_RECUPERACION", "ROTO_HOY",
-                              "TABLA_EQUIVOCADA_PROBABLE"}, h
+        assert h["clase"] in CLASES, h
         assert "origen" in h and h["origen"], h["tabla"]
+
+
+def test_codigo_muerto_es_una_medicion_y_no_una_excusa():
+    """`CODIGO_MUERTO` archiva un hueco: hay que DEMOSTRAR que esta muerto.
+
+    Es la clase peligrosa del inventario. Las otras tres dicen "esto esta roto y
+    lo sabemos"; esta dice "esto no cuenta". Sin nadie detras seria la escotilla
+    obvia: reetiquetar cualquier hueco incomodo y quitarselo de encima.
+
+    Asi que no basta con escribirlo. Se va al arbol y se comprueba que el fichero
+    de origen no lo importa NADIE salvo el barril y su propia prueba. Si alguien
+    lo conecta manana, esta prueba cae y el hueco vuelve a contar — que es
+    exactamente lo que tiene que pasar, porque entonces ya no estara muerto.
+    """
+    datos = json.load(io.open(INVENTARIO, encoding="utf-8"))
+    sys.path.insert(0, str(RAIZ / "backend" / "db" / "certificacion"))
+    import huecos_de_recuperacion as hr  # noqa: E402
+
+    muertos = [h for h in datos["huecos"] if h["clase"] == "CODIGO_MUERTO"]
+    assert muertos, "no hay entradas CODIGO_MUERTO: esta prueba se quedo sin objeto"
+
+    for h in muertos:
+        assert h.get("vivo") is False, h["tabla"]
+        assert len(h.get("nota", "")) > 80, f"{h['tabla']}: sin diagnostico escrito"
+
+        modulo = Path(h["origen"]).stem          # p.ej. `InvoicingService`
+        citas = []
+        for base in (RAIZ / "backend", RAIZ / "apps" / "web" / "src"):
+            for ext in ("*.ts", "*.tsx"):
+                for f in base.rglob(ext):
+                    if any(x in str(f) for x in hr.EXCLUIDOS):
+                        continue
+                    if f.name.startswith(modulo):        # el propio fichero
+                        continue
+                    if f.name == "index.ts":             # el barril
+                        continue
+                    if "__tests__" in str(f) and modulo in f.name:
+                        continue                         # su prueba unitaria
+                    if modulo in io.open(f, encoding="utf-8",
+                                         errors="replace").read():
+                        citas.append(str(f.relative_to(RAIZ)))
+
+        assert not citas, (
+            f"{modulo} esta inventariado como CODIGO_MUERTO pero lo cita: "
+            f"{sorted(set(citas))[:5]}. Si algo lo usa, NO esta muerto y su hueco "
+            "vuelve a contar como hueco de recuperacion.")
 
 
 @sin_base_virgen

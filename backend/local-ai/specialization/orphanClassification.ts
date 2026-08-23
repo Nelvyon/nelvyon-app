@@ -79,6 +79,9 @@ export const ORPHAN_CLASSIFICATION: readonly OrphanClassEntry[] = [
   { path: "docs/BLOQUE_2_ESTADO.md", disposition: "index", domain: ["nelvyon", "development_tech"], priority: 0, title: "Bloque 2 — estado vivo", reason: "Estado de certificacion de las 39 capacidades" },
   { path: "docs/BLOQUE_2_LINEA_BASE.md", disposition: "index", domain: ["nelvyon", "development_tech"], priority: 0, title: "Bloque 2 — línea base medida", reason: "Medidas de partida del Bloque 2" },
   { path: "docs/BLOQUE_1_CIERRE.md", disposition: "index", domain: ["nelvyon", "security_privacy"], priority: 0, title: "Bloque 1 — clasificación de cierre", reason: "SSOT del estado de las 18 categorías del Bloque 1" },
+  { path: "docs/BLOQUE_2_CIERRE.md", disposition: "index", domain: ["nelvyon", "development_tech"], priority: 0, title: "Bloque 2 — cierre", reason: "Los nueve defectos encontrados, los falsos verdes cerrados y lo que queda bloqueado" },
+  { path: "docs/BLOQUE_3_LINEA_BASE.md", disposition: "index", domain: ["nelvyon", "development_tech"], priority: 0, title: "Bloque 3 — línea base", reason: "Qué se certifica en la empresa IA autónoma y con qué método" },
+  { path: "docs/NEXT_SESSION_START_HERE.md", disposition: "index", domain: ["nelvyon", "development_tech"], priority: 0, title: "Empieza aquí", reason: "Estado de los cuatro bloques, lo bloqueado por el fundador y cómo se ejecuta la puerta" },
   // —— Wave 3: points 1–4 prep (2026-07-26) — remaining top-level orphans ——
   { path: "docs/ARCHITECTURE_LOCAL_AI_RUNTIME.md", disposition: "index", domain: ["nelvyon", "development_tech"], priority: 0, title: "Architecture Local AI Runtime", reason: "Local AI/runtime SSOT" },
   { path: "docs/COMPLIANCE_COMPANY_DB_CHECKLIST.md", disposition: "index", domain: "security_privacy", priority: 1, title: "Compliance Company DB Checklist", reason: "Company DB compliance" },

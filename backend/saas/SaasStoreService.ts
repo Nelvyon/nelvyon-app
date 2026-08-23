@@ -368,9 +368,22 @@ export class SaasStoreService {
     if (patch.storeName !== undefined) { sets.push(`store_name = $${i++}`); params.push(patch.storeName ?? null); }
     if (patch.storeDescription !== undefined) { sets.push(`store_description = $${i++}`); params.push(patch.storeDescription ?? null); }
 
+    // Se asegura la fila y DESPUES se aplican los valores, en dos sentencias.
+    //
+    // Antes era `INSERT INTO store_settings (tenant_id) VALUES ($1) ON CONFLICT
+    // DO UPDATE SET ...`. En la PRIMERA configuracion no hay conflicto: el INSERT
+    // entra con el `tenant_id` solo y la rama `DO UPDATE` no llega a ejecutarse,
+    // asi que los ajustes se descartaban EN SILENCIO. El comercio se configuraba,
+    // la respuesta decia que si, y no se habia guardado nada.
+    //
+    // A partir de la segunda vez si funcionaba, que es lo que hacia el defecto
+    // dificil de ver: solo fallaba la primera.
     await this.db.query(
-      `INSERT INTO store_settings (tenant_id) VALUES ($1)
-       ON CONFLICT (tenant_id) DO UPDATE SET ${sets.join(", ")}`,
+      `INSERT INTO store_settings (tenant_id) VALUES ($1) ON CONFLICT (tenant_id) DO NOTHING`,
+      [tenantId],
+    );
+    await this.db.query(
+      `UPDATE store_settings SET ${sets.join(", ")} WHERE tenant_id = $1`,
       params,
     );
     return this.getSettings(tenantId);

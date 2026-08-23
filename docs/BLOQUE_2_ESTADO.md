@@ -1,90 +1,59 @@
 # BLOQUE 2 — estado vivo
 
-> Se actualiza solo desde `backend/db/certificacion/capacidades_estado.json`.
-> **La fuente es ese fichero**, no este resumen.
+> GENERADO. No se edita a mano: sale de
+> `backend/db/certificacion/capacidades_estado.json` mediante
+> `backend/db/certificacion/estado_bloque2.py`.
+> Un guardian falla si este fichero y el JSON dejan de coincidir.
 
-**14/39 certificadas · 1 bloqueadas · 24 pendientes**
+**38/39 certificadas · 1 bloqueadas · 0 pendientes**
 
-## Certificadas (14)
+Contador inviolable: 38 + 1 + 0 = 39
 
-- `ab_testing`
-- `auth_onboarding_workspaces`
-- `campanias`
-- `contratos`
-- `crm`
-- `dashboard`
-- `encuestas`
-- `facturacion_billing`
-- `gdpr_cumplimiento`
-- `inbox_helpdesk`
-- `marca_blanca`
-- `pwa`
-- `web_builder`
-- `workflows`
+## Certificadas (38)
+
+- `ab_testing` — PASS_CERTIFIED
+- `admin_plataforma` — FIXED_CERTIFIED
+- `ads` — PASS_CERTIFIED
+- `analytics_reporting` — PASS_CERTIFIED
+- `auth_onboarding_workspaces` — PASS_CERTIFIED
+- `campanias` — PASS_CERTIFIED
+- `chatbot` — PASS_CERTIFIED
+- `contenido` — PASS_CERTIFIED
+- `contratos` — PASS_CERTIFIED
+- `crm` — PASS_CERTIFIED
+- `cuenta_y_suscripcion` — PASS_CERTIFIED
+- `dashboard` — PASS_CERTIFIED
+- `dialer_voz_llamadas` — PASS_CERTIFIED
+- `ecommerce_tienda` — FIXED_CERTIFIED
+- `email` — PASS_CERTIFIED
+- `encuestas` — PASS_CERTIFIED
+- `erp` — PASS_CERTIFIED
+- `facturacion_billing` — FIXED_CERTIFIED
+- `formularios_captacion` — PASS_CERTIFIED
+- `gdpr_cumplimiento` — PASS_CERTIFIED
+- `ia_privada_memoria` — PASS_CERTIFIED
+- `inbox_helpdesk` — FIXED_CERTIFIED
+- `lms_formacion` — PASS_CERTIFIED
+- `marca_blanca` — PASS_CERTIFIED
+- `os` — PASS_CERTIFIED
+- `packs_entregables` — PASS_CERTIFIED
+- `partners_afiliados` — PASS_CERTIFIED
+- `portal_cliente` — PASS_CERTIFIED
+- `prospeccion_cold_email` — PASS_CERTIFIED
+- `pwa` — PASS_CERTIFIED
+- `redes_sociales` — PASS_CERTIFIED
+- `reputacion_sentimiento` — PASS_CERTIFIED
+- `reservas` — PASS_CERTIFIED
+- `salud_infra` — PASS_CERTIFIED
+- `seo_visibilidad` — PASS_CERTIFIED
+- `storage_uploads` — PASS_CERTIFIED
+- `web_builder` — PASS_CERTIFIED
+- `workflows` — FIXED_CERTIFIED
 
 ## Bloqueadas (1)
 
-- `integraciones`
+- `integraciones` — BLOCKED_EXTERNALLY
 
-## Pendientes (24)
+## Pendientes (0)
 
-- `admin_plataforma`
-- `ads`
-- `analytics_reporting`
-- `chatbot`
-- `contenido`
-- `cuenta_y_suscripcion`
-- `dialer_voz_llamadas`
-- `ecommerce_tienda`
-- `email`
-- `erp`
-- `formularios_captacion`
-- `ia_privada_memoria`
-- `lms_formacion`
-- `os`
-- `packs_entregables`
-- `partners_afiliados`
-- `portal_cliente`
-- `prospeccion_cold_email`
-- `redes_sociales`
-- `reputacion_sentimiento`
-- `reservas`
-- `salud_infra`
-- `seo_visibilidad`
-- `storage_uploads`
-
-## Cómo continuar
-
-```
-docker start nelvyon-local-ai-postgres
-NELVYON_B2_DSN=postgresql://nelvyon_local:nelvyon_local_dev@localhost:5434/nelvyon_b2_cert
-cd apps/web
-npx vitest run ../../backend/saas/__tests__/flujoLote1.pg.test.ts   # y Lote2..5, Crm, Workflows, Presupuestos, Integraciones
-```
-
-La base `nelvyon_b2_cert` se clona de `nelvyon_rec_final`, que se reconstruye
-solo con las migraciones oficiales:
-
-```
-docker exec nelvyon-local-ai-postgres psql -U nelvyon_local -d postgres   -c "DROP DATABASE IF EXISTS nelvyon_b2_cert"   -c "CREATE DATABASE nelvyon_b2_cert TEMPLATE nelvyon_rec_final"
-```
-
-## Patrón de certificación que funciona
-
-1. Extraer las firmas REALES del servicio antes de escribir nada — la mitad de
-   los falsos rojos salen de suponer la forma de entrada.
-2. Servicio REAL contra PostgreSQL real. Un doble certifica el doble.
-3. Nunca conformarse con lo que devuelve la escritura: RELEER, y varias veces
-   mirar la fila sin pasar por el servicio.
-4. Inquilino A y B a la vez, con control positivo: devolver cero filas a todo el
-   mundo no es aislamiento.
-5. Mutación que reintroduzca el defecto. Si sigue verde, la prueba no vale.
-
-## Errores míos que se repiten, para no volver a pagarlos
-
-- **Comillas invertidas dentro de una plantilla de cadena**: la cierran. Cuatro
-  veces.
-- **Comentarios `--` fuera del literal SQL**: en posición de TypeScript no son
-  comentarios.
-- **`$1` dentro de `python -c "..."`**: el shell se lo come. Usar heredoc.
-- **Suponer la forma de entrada** en vez de leerla del tipo.
+_ninguna._

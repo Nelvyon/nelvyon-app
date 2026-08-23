@@ -1,3 +1,13 @@
+> **HISTÓRICO — no es el estado del Bloque 2.**
+>
+> Este fichero es una lista de deseos de funcionalidad de una concepción
+> anterior del bloque. El Bloque 2 que se cerró es de **certificación**: 39
+> capacidades, cada una probada de punta a punta contra PostgreSQL real.
+>
+> Estado real y vivo: `docs/BLOQUE_2_ESTADO.md` (generado).
+> Qué se encontró y qué queda bloqueado: `docs/BLOQUE_2_CIERRE.md`.
+> Por dónde seguir: `docs/NEXT_SESSION_START_HERE.md`.
+
 # BLOQUE 2 — Objetivo ~85/100 real
 
 ## Ejecuciones

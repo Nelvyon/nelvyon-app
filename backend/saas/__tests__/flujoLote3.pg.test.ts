@@ -23,8 +23,17 @@ const describeSiHayPg = DSN ? describe : describe.skip;
 
 let pool: import("pg").Pool;
 
-const A = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
-const B = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
+// Cada fichero de certificación usa su PROPIO par de inquilinos.
+//
+// Antes todos compartían `aaaa…`/`bbbb…`, y vitest corre los ficheros en
+// PARALELO contra la misma base: el `beforeEach` de uno borraba las filas que
+// otro acababa de sembrar. Por separado pasaban los 16 y juntos fallaban tres.
+// Eso es un falso rojo —y con otra combinación habría sido un falso verde—.
+//
+// El sufijo sale del nombre del fichero, así que dos ficheros nunca coinciden y
+// no hay que llevar una lista a mano.
+const A = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa10";
+const B = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb10";
 
 function puerto() {
   return {
@@ -43,7 +52,7 @@ async function sembrarInquilinos() {
           created_at, updated_at, email_verified)
        VALUES ($1::uuid, $2, 'x', $3, 'pro', $1::text, NOW(), NOW(), true)
        ON CONFLICT (user_id) DO NOTHING`,
-      [id, `cert-${id.slice(0, 8)}@nelvyon.test`, nombre]);
+      [id, `cert-${id}@nelvyon.test`, nombre]);
     await pool.query(
       `INSERT INTO saas_tenants (id, user_id, company_name, industry, plan)
        VALUES ($1, $1, $2, 'certificacion', 'pro')
@@ -255,8 +264,11 @@ describeSiHayPg("BLOQUE 2 · lote 3", () => {
       await svc.savePushSubscription(B, suscripcion("https://push.test/b1") as never);
       await svc.enqueuePushNotification(A, { title: "Solo para A", body: "x" } as never);
 
+      // La asercion tambien va ACOTADA: sin filtro ve las filas que otro fichero
+      // sembro en paralelo.
       const cola = await pool.query<{ tenant_id: string }>(
-        "SELECT tenant_id FROM saas_pwa_push_queue");
+        "SELECT tenant_id FROM saas_pwa_push_queue WHERE tenant_id = ANY($1::uuid[])",
+        [[A, B]]);
       expect(cola.rows.every((r) => r.tenant_id === A)).toBe(true);
     });
   });

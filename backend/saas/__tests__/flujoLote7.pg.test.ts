@@ -25,8 +25,17 @@ const describeSiHayPg = DSN ? describe : describe.skip;
 
 let pool: import("pg").Pool;
 
-const A = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
-const B = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
+// Cada fichero de certificación usa su PROPIO par de inquilinos.
+//
+// Antes todos compartían `aaaa…`/`bbbb…`, y vitest corre los ficheros en
+// PARALELO contra la misma base: el `beforeEach` de uno borraba las filas que
+// otro acababa de sembrar. Por separado pasaban los 16 y juntos fallaban tres.
+// Eso es un falso rojo —y con otra combinación habría sido un falso verde—.
+//
+// El sufijo sale del nombre del fichero, así que dos ficheros nunca coinciden y
+// no hay que llevar una lista a mano.
+const A = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa14";
+const B = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb14";
 
 function puerto() {
   return {
@@ -48,7 +57,7 @@ describeSiHayPg("BLOQUE 2 · lote 7", () => {
             created_at, updated_at, email_verified)
          VALUES ($1::uuid, $2, 'x', $3, 'pro', $1::text, NOW(), NOW(), true)
          ON CONFLICT (user_id) DO NOTHING`,
-        [id, `cert-${id.slice(0, 8)}@nelvyon.test`, nombre]);
+        [id, `cert-${id}@nelvyon.test`, nombre]);
       await pool.query(
         `INSERT INTO saas_tenants (id, user_id, company_name, industry, plan)
          VALUES ($1, $1, $2, 'certificacion', 'pro')
@@ -67,7 +76,11 @@ describeSiHayPg("BLOQUE 2 · lote 7", () => {
     let svc: SaasPartnersService;
     beforeAll(() => { svc = new SaasPartnersService({ db: puerto() as never }); });
     beforeEach(async () => {
-      await pool.query("DELETE FROM saas_partner_referrals").catch(() => {});
+      // Acotado al par de inquilinos de ESTE fichero: un DELETE sin filtro
+      // borraria lo que otro fichero acaba de sembrar, y vitest los corre en paralelo.
+      await pool.query(
+        "DELETE FROM saas_partner_referrals WHERE partner_id IN (SELECT id FROM saas_partners WHERE tenant_id = ANY($1::text[]))",
+        [[A, B]]).catch(() => {});
       await pool.query("DELETE FROM saas_partners WHERE tenant_id = ANY($1)", [[A, B]]).catch(() => {});
     });
 
@@ -101,7 +114,8 @@ describeSiHayPg("BLOQUE 2 · lote 7", () => {
       // sobre el que se calculó. El porcentaje concreto es decisión de negocio y
       // no se fija aquí.
       const fila = await pool.query<{ commission_eur: string }>(
-        "SELECT commission_eur FROM saas_partner_referrals LIMIT 1");
+        "SELECT commission_eur FROM saas_partner_referrals WHERE partner_id IN (SELECT id FROM saas_partners WHERE tenant_id = ANY($1::text[])) LIMIT 1",
+        [[A, B]]);
       const comision = Number(fila.rows[0]!.commission_eur);
       expect(Number.isFinite(comision)).toBe(true);
       expect(comision).toBeGreaterThan(0);
@@ -110,7 +124,11 @@ describeSiHayPg("BLOQUE 2 · lote 7", () => {
 
     it("un código de referido que no existe no crea comisión", async () => {
       await svc.registerReferral("CODIGO-INVENTADO", B, 1000).catch(() => {});
-      const filas = await pool.query("SELECT 1 FROM saas_partner_referrals");
+      // La asercion tambien va ACOTADA: sin filtro ve las filas que otro fichero
+      // sembro en paralelo.
+      const filas = await pool.query(
+        "SELECT 1 FROM saas_partner_referrals WHERE partner_id IN (SELECT id FROM saas_partners WHERE tenant_id = ANY($1::text[]))",
+        [[A, B]]);
       expect(filas.rows).toHaveLength(0);
     });
 
@@ -257,9 +275,12 @@ describeSiHayPg("BLOQUE 2 · lote 7", () => {
     let svc: SaasStoreService;
     beforeAll(() => { svc = new SaasStoreService({ db: puerto() as never }); });
     beforeEach(async () => {
-      await pool.query("DELETE FROM store_order_items").catch(() => {});
+      // Acotado al par de inquilinos de ESTE fichero: un DELETE sin filtro
+      // borraria lo que otro fichero acaba de sembrar, y vitest los corre en paralelo.
+      await pool.query("DELETE FROM store_order_items WHERE tenant_id = ANY($1::uuid[])", [[A, B]]).catch(() => {});
       await pool.query("DELETE FROM store_orders WHERE tenant_id = ANY($1)", [[A, B]]).catch(() => {});
       await pool.query("DELETE FROM products WHERE tenant_id = ANY($1)", [[A, B]]).catch(() => {});
+      await pool.query("DELETE FROM store_settings WHERE tenant_id = ANY($1)", [[A, B]]).catch(() => {});
     });
 
     // `type` tiene un CHECK: one_time | subscription | digital. Un valor

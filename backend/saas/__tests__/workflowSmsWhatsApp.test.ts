@@ -115,8 +115,15 @@ describe("WorkflowAction send_sms", () => {
     // Verify UPDATE was called with steps containing ok:false
     const updateCalls = (db.query.mock.calls as Array<[string, unknown[]]>)
       .filter(([sql]) => sql.includes("UPDATE saas_workflow_runs") && sql.includes("steps_executed"));
-    const stepsArg = updateCalls[0]?.[1]?.[1] as Array<{ action: string; ok: boolean }> | undefined;
-    expect(stepsArg?.[0]?.ok).toBe(false);
+    // Los pasos viajan SERIALIZADOS. `pg` no convierte un array de JS a JSON:
+    // lo manda como literal de array de PostgreSQL, y contra una columna `jsonb`
+    // eso guardaba `{}` o reventaba. Desde el arreglo se envia `JSON.stringify`
+    // con molde `::jsonb`, asi que aqui se comprueba sobre el texto real que
+    // sale hacia la base, no sobre un array que nunca existio en el cable.
+    const enviado = updateCalls[0]?.[1]?.[1];
+    expect(typeof enviado).toBe("string");
+    const stepsArg = JSON.parse(String(enviado)) as Array<{ action: string; ok: boolean }>;
+    expect(stepsArg[0]?.ok).toBe(false);
   });
 });
 

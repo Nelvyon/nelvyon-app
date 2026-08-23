@@ -1,0 +1,71 @@
+# EMPIEZA AQUÍ
+
+Estado a **2026-08-23**. Rama `bloque4-webhooks`, worktree `C:\Users\Daniel\nelvyon-w3`.
+
+## Dónde estamos
+
+| Bloque | Estado |
+|---|---|
+| 1 · Seguridad + base técnica | **CERRADO** → `docs/BLOQUE_1_CIERRE.md` |
+| 2 · Web + SaaS + OS completos | **CERRADO** → `docs/BLOQUE_2_CIERRE.md` |
+| 3 · Empresa IA autónoma | **EN CURSO** |
+| 4 · Certificación final | pendiente |
+
+El estado por capacidad se **genera**, no se escribe:
+
+    python -m backend.db.certificacion.estado_bloque2
+
+Fuente: `backend/db/certificacion/capacidades_estado.json`.
+Resumen: `docs/BLOQUE_2_ESTADO.md`. Un guardián falla si se separan.
+
+## Bloqueado por el fundador — no lo toques
+
+Esto no caduca y **la ausencia del fundador no es autorización**:
+
+- `WEB_DB_ROLE_CUTOVER` — el cambio al rol `nelvyon_web_app`.
+  Bloquea 68 pruebas de RLS que están escritas y listas.
+- **ADR-064**: migraciones `568/569/570/572/573/574/575/576` — no aplicar.
+  La `571` está apartada.
+  La `576` no está aplicada; su SHA es
+  `f570a0b0700ba210c7b6f2984f42b885ba8f926e6f85ebfb0d6cb93bc1d66b92`.
+- `STRIPE_MEMBERSHIP_REACTIVATION`.
+- Producción no se toca. No se borran fixtures de PROD. No hay operaciones
+  destructivas. No se cambian roles ni credenciales.
+- No se abre Canary IA. No se activa OpenAI ni ningún proveedor de pago.
+  **Coste externo nuevo = 0 €.**
+- Email inválido en CRM: el comportamiento actual queda **documentado**, no
+  cambiado. No se cambia semántica de producto sin autorización.
+
+## Dos decisiones que esperan al fundador
+
+Ninguna es urgente y ninguna es mía:
+
+1. `InvoicingService` — código muerto. Borrarlo (con su export del barril y su
+   prueba) **o** conectarlo.
+2. `ABTestingService` — lo mismo.
+
+Mientras tanto están inventariados como `CODIGO_MUERTO` y un guardián falla si
+alguien los conecta.
+
+## Cómo se ejecuta la puerta
+
+Está escrito, con las cuatro tandas y sus variables, en
+`backend/db/certificacion/LEEME.md`. Dos cosas que **no** son opcionales:
+
+- La tanda de RLS va con `--no-file-parallelism`. No es una rebaja: en paralelo
+  esas suites se pisan entre ficheros.
+- La puerta se ejecuta **sola**. Solapar la suite web con la de Python tumbó tres
+  pruebas por `Test timed out in 5000ms` — saturación de la máquina, no producto.
+
+## Reglas de trabajo que se ganaron a base de fallar
+
+- **Antes de contar una mutación, demuestra que se aplicó**: imprime el número de
+  sitios mutados. Un `python -c "..."` en PowerShell se come los `$1` y aplica
+  cero cambios en silencio.
+- **Un verde sin prueba que caiga no cuenta.** Reintroduce el defecto; si sigue
+  verde, la prueba no sirve — corrígela.
+- **Una prueba negativa necesita control positivo.** Devolver cero filas a todo el
+  mundo no es aislamiento, es una consulta rota.
+- **No confundas código muerto con producto.**
+- **No mates una suite por lenta si sigue progresando.** `test_rls_saas_cross_tenant.py`
+  tarda ~14 minutos y no está colgada.
