@@ -24,6 +24,12 @@ export type OrphanClassEntry = {
  */
 export const ORPHAN_CLASSIFICATION: readonly OrphanClassEntry[] = [
   // —— Active: index ——
+  // Documentos del cierre de aislamiento (2026-08). Se clasifican al crearlos:
+  // el detector de huecos cuenta los docs activos SIN clasificar, y anadirlos sin
+  // registrarlos hace que NELVYON tenga documentacion propia que su cerebro no
+  // sabe que existe — que es justo el hueco que ese detector mide.
+  { path: "docs/FICHAS_ALCANCE_DE_PRODUCTO.md", disposition: "index", domain: "development_tech", priority: 1, title: "Fichas de alcance de producto", reason: "Las 8 funciones con deriva esquema/codigo, con evidencia medida y recomendacion" },
+  { path: "docs/PLAN_LIMPIEZA_FIXTURES.md", disposition: "index", domain: "development_tech", priority: 2, title: "Plan de limpieza de fixtures", sourceType: "runbook", reason: "Clasificacion de los datos de produccion y procedimiento seguro de limpieza" },
   { path: "docs/NELVYON_BRAIN_KNOWLEDGE.md", disposition: "index", domain: "nelvyon", priority: 0, title: "Brain Knowledge Coverage", reason: "SSOT cobertura cerebro" },
   { path: "docs/OPS.md", disposition: "index", domain: ["development_tech", "finance_operations"], priority: 0, title: "Ops Manual", sourceType: "runbook", reason: "Ops SSOT" },
   { path: "docs/LAUNCH_READY.md", disposition: "index", domain: "development_tech", priority: 1, title: "Launch Ready Checklist", reason: "Checklist prod" },

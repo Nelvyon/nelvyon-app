@@ -90,10 +90,18 @@ export class DataSubjectService {
       ? await this.db.query(`SELECT * FROM dunning_log WHERE tenant_id = $1 ORDER BY created_at DESC`, [tenantId])
       : [];
 
-    const apiKeys = await this.db.query<ApiKeyExportRow>(
+    // `user_provider_api_keys` NO existe en produccion: su `CREATE` de la
+    // migracion 406 no prospero alli. Con `db.query` directo, la exportacion de
+    // datos de un interesado lanzaba y no se entregaba NADA.
+    //
+    // `tryQuery` tolera solo «objeto ausente» y deja traza; cualquier otro error
+    // sigue propagandose, porque una exportacion incompleta que se presenta como
+    // completa es peor que una que falla.
+    const apiKeys = (await tryQuery(
+      this.db,
       `SELECT id, user_id, provider, created_at, updated_at FROM user_provider_api_keys WHERE user_id = $1`,
       [userId],
-    );
+    )) as ApiKeyExportRow[];
 
     const onboardingRows = await this.db.query(`SELECT * FROM onboarding WHERE user_id = $1 LIMIT 1`, [userId]);
 
@@ -225,9 +233,17 @@ export class DataSubjectService {
     const anonEmail = `user_${emailHash}@${DELETED_EMAIL_DOMAIN}`;
     const deadPassword = createHash("sha256").update(`${userId}:deleted:${Date.now()}`).digest("hex");
 
-    await this.tryCancelStripeSubscription(userId);
-
-    await this.db.query(`DELETE FROM user_provider_api_keys WHERE user_id = $1`, [userId]);
+    // ORDEN. Antes se cancelaba la suscripcion de Stripe AQUI, antes de borrar
+    // nada. La linea siguiente lanzaba en produccion —`user_provider_api_keys`
+    // no existe alli— asi que el resultado era el peor posible:
+    //
+    //   la suscripcion quedaba cancelada, IRREVERSIBLEMENTE y en un tercero,
+    //   y los datos del interesado seguian intactos.
+    //
+    // La accion externa e irreversible va ahora DESPUES de que el borrado en la
+    // base haya terminado. Si el borrado falla, el cliente conserva su
+    // suscripcion y la peticion se reintenta; al reves no habia vuelta atras.
+    await tryExec(this.db, `DELETE FROM user_provider_api_keys WHERE user_id = $1`, [userId]);
     await tryQuery(this.db, `DELETE FROM saas_api_keys WHERE user_id::text = $1`, [userId]);
     await tryExec(this.db, `DELETE FROM onboarding WHERE user_id = $1`, [userId]);
 
@@ -259,6 +275,9 @@ export class DataSubjectService {
     await tryExec(this.db, `UPDATE subscriptions SET status = 'canceled', updated_at = now() WHERE user_id::text = $1`, [
       userId,
     ]);
+
+    // Ya esta borrado y anonimizado. Solo ahora se toca el tercero.
+    await this.tryCancelStripeSubscription(userId);
 
     await this.sendDeletionEmail(userId, u.email, u.full_name ?? "Usuario");
   }
@@ -308,18 +327,43 @@ function redactUserRow(row: Record<string, unknown>): Record<string, unknown> {
   return { ...rest, password_hash: "[REDACTED]" };
 }
 
+/**
+ * Codigos que significan «este objeto no existe en este entorno».
+ *
+ * Son los UNICOS que se toleran. Antes se tragaba cualquier error con un `catch`
+ * vacio, asi que un fallo de permisos, una violacion de restriccion o una caida
+ * de la base durante un borrado GDPR se veian igual que una tabla ausente: en
+ * silencio, y el borrado seguia adelante como si hubiera funcionado.
+ *
+ * En una peticion de supresion eso es lo peor posible: se responde «hecho» al
+ * interesado y el dato sigue ahi.
+ */
+const OBJETO_AUSENTE = new Set(["42P01", "42703"]);
+
+function esObjetoAusente(e: unknown): boolean {
+  return OBJETO_AUSENTE.has(String((e as { code?: string })?.code ?? ""));
+}
+
 async function tryQuery(db: DbClient, sql: string, params: unknown[]): Promise<unknown[]> {
   try {
     return await db.query(sql, params);
-  } catch {
-    return [];
+  } catch (e) {
+    if (esObjetoAusente(e)) {
+      console.warn("[gdpr] objeto ausente en este entorno, se omite:", (e as Error).message);
+      return [];
+    }
+    throw e;
   }
 }
 
 async function tryExec(db: DbClient, sql: string, params: unknown[]): Promise<void> {
   try {
     await db.query(sql, params);
-  } catch {
-    /* table/column puede no existir en entornos antiguos */
+  } catch (e) {
+    if (esObjetoAusente(e)) {
+      console.warn("[gdpr] objeto ausente en este entorno, se omite:", (e as Error).message);
+      return;
+    }
+    throw e;
   }
 }
