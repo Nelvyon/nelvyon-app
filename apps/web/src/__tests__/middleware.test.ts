@@ -43,10 +43,15 @@ describe("security rateLimit", () => {
   });
 
   it("returns 429 when rate limit exceeded", async () => {
+    // El contador y su caducidad van ahora en UNA llamada al endpoint
+    // `pipeline`, no en `/incr/` + `/expire/`. Este doble seguia simulando la
+    // forma antigua, asi que respondia `{result:1}` a todo y la peticion pasaba:
+    // la prueba dejo de medir lo que dice medir en cuanto cambio el codigo.
     global.fetch = vi.fn(async (input: RequestInfo) => {
       const url = String(input);
-      if (url.includes("/incr/")) {
-        return new Response(JSON.stringify({ result: 11 }), { status: 200 });
+      if (url.includes("/pipeline")) {
+        // [INCR -> 11, EXPIRE -> 1]: por encima del techo de 10 de auth-login.
+        return new Response(JSON.stringify([{ result: 11 }, { result: 1 }]), { status: 200 });
       }
       return new Response(JSON.stringify({ result: 1 }), { status: 200 });
     }) as typeof fetch;
@@ -185,10 +190,32 @@ describe("withRequestId", () => {
 });
 
 describe("getClientIp", () => {
-  it("reads first x-forwarded-for hop", () => {
+  /**
+   * Esta prueba DEFENDIA el defecto.
+   *
+   * Se llamaba «reads first x-forwarded-for hop» y afirmaba justo lo que hacia
+   * vulnerable al limitador: quedarse con el primer elemento de la cabecera, que
+   * es el que escribe el cliente. Mientras existiera asi, arreglar el defecto se
+   * veia como romper una prueba, y dejarlo roto se veia como estar en verde.
+   *
+   * El detalle completo esta en `lib/security/__tests__/ipDelCliente.test.ts`.
+   */
+  it("lee el salto que pone el PROXY, no el que manda el cliente", () => {
     const req = mockRequest("https://nelvyon.com/", {
       "x-forwarded-for": "198.51.100.1, 10.0.0.1",
     });
-    expect(getClientIp(req)).toBe("198.51.100.1");
+    // `10.0.0.1` es lo que anadio el proxy; `198.51.100.1` lo eligio quien llamo.
+    expect(getClientIp(req)).toBe("10.0.0.1");
+  });
+
+  it("dos clientes distintos siguen teniendo cubos distintos", () => {
+    // El control: sin el, devolver una constante aprobaria la prueba de arriba.
+    const a = getClientIp(mockRequest("https://nelvyon.com/", {
+      "x-forwarded-for": "9.9.9.9, 10.0.0.1",
+    }));
+    const b = getClientIp(mockRequest("https://nelvyon.com/", {
+      "x-forwarded-for": "9.9.9.9, 10.0.0.2",
+    }));
+    expect(a).not.toBe(b);
   });
 });
