@@ -25,8 +25,8 @@
   },
   "dashboard": {
    "rutas": 14,
-   "estado": "PENDING",
-   "evidencia": "",
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoLote3.pg.test.ts — contra PostgreSQL real con los servicios REALES; actividad registrada que aparece en la reciente, la de A sin la de B, metricas que responden con numeros y no con un objeto vacio —un panel que devuelve {} se pinta vacio y parece que no hay negocio—, y un inquilino inexistente no inventa datos. Mutacion: quitar el alcance de getRecentActivity tumba 1.",
    "motivo": ""
   },
   "crm": {
@@ -205,8 +205,8 @@
   },
   "pwa": {
    "rutas": 4,
-   "estado": "PENDING",
-   "evidencia": "",
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoLote3.pg.test.ts — contra PostgreSQL real con los servicios REALES; manifiesto con lo minimo de una PWA, instalacion contada, suscripcion guardada y contada, el MISMO endpoint dos veces no duplica —un duplicado manda el aviso dos veces al mismo dispositivo—, retirarla la quita, y las de B no cuentan para A. La grave: un aviso encolado para A no llega a los dispositivos de B. Mutacion: quitar el alcance de countPushSubscriptions tumba 3.",
    "motivo": ""
   },
   "dialer_voz_llamadas": {
@@ -235,8 +235,8 @@
   },
   "gdpr_cumplimiento": {
    "rutas": 8,
-   "estado": "PENDING",
-   "evidencia": "",
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/saas/__tests__/flujoLote3.pg.test.ts — contra PostgreSQL real con los servicios REALES; GDPR no es una funcionalidad, es una obligacion: «la interfaz dice que se borro» con la fila todavia ahi no es un fallo de producto, es un incumplimiento. Por eso se comprueba EN LA BASE. Certificado: la solicitud queda registrada —hay que poder demostrar cuando se pidio—, la exportacion del INTERESADO devuelve sus datos y no un objeto vacio (una exportacion vacia cumple la forma y no la obligacion), no incluye los de otro, el borrado quita la fila de verdad, B no puede borrar pasando el id ajeno, y el bundle del inquilino no arrastra al vecino. EL CONTROL que no puede faltar: borrar lo de A NO toca lo de B — un borrado sin alcance que se ejecute una vez no tiene vuelta atras. Mutacion: quitar el alcance de inquilino de deleteContactById tumba 2.",
    "motivo": ""
   },
   "salud_infra": {
