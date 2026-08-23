@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { formDataConTope, jsonConTope, textoConTope } from "@/lib/security/cuerpoConTope";
 import {
   getSaasCrmService,
   SaasCrmError,
@@ -63,18 +64,18 @@ export async function POST(req: Request) {
     let csvText: string;
 
     if (contentType.includes("multipart/form-data")) {
-      const formData = await req.formData();
+      const formData = await formDataConTope(req);
       const file = formData.get("file");
       if (!file || typeof file === "string") return NextResponse.json({ error: "file required in multipart" }, { status: 400 });
       csvText = await (file as File).text();
     } else if (contentType.includes("text/csv") || contentType.includes("text/plain")) {
-      csvText = await req.text();
+      csvText = await textoConTope(req);
     } else if (contentType.includes("application/json")) {
-      const body = await req.json().catch(() => null) as Record<string, unknown> | null;
+      const body = await jsonConTope(req) as Record<string, unknown> | null;
       if (!body?.csv || typeof body.csv !== "string") return NextResponse.json({ error: "csv field required" }, { status: 400 });
       csvText = body.csv;
     } else {
-      csvText = await req.text();
+      csvText = await textoConTope(req);
     }
 
     const rows = parseCSV(csvText);

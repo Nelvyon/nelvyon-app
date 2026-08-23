@@ -67,11 +67,20 @@ def test_la_verificacion_falla_CERRADA_sin_secreto_configurado():
     abiertos a Internet sin que nada falle ni avise.
     """
     fuente = _sin_comentarios(io.open(CRON_AUTH, encoding="utf-8").read())
-    for bloque in re.findall(r"if \(!expected\) \{(.*?)\}", fuente, re.S):
-        assert "401" in bloque, (
+    # Se mira una VENTANA detras de cada `if (!expected)`, no «hasta la primera
+    # llave»: el `}` no codicioso cerraba dentro de `{ error: "Unauthorized" }` y
+    # el bloque capturado se quedaba sin el `status`, asi que este guardia
+    # fallaba sobre un codigo que si es correcto.
+    posiciones = [m.end() for m in re.finditer(r"if \(!expected\)", fuente)]
+    assert posiciones, "desaparecio la comprobacion de secreto ausente"
+    for i in posiciones:
+        ventana = fuente[i:i + 200]
+        assert "401" in ventana, (
             "sin CRON_SECRET la verificacion tiene que rechazar, no dejar pasar: "
-            f"{bloque.strip()[:80]}")
-    assert fuente.count("if (!expected)") == 3, fuente.count("if (!expected)")
+            f"{ventana.strip()[:80]}")
+        assert "return null" not in ventana.split("}")[0], (
+            "sin CRON_SECRET la verificacion esta DEJANDO PASAR")
+    assert len(posiciones) == 3, len(posiciones)
 
 
 def test_los_secretos_se_comparan_en_tiempo_constante():

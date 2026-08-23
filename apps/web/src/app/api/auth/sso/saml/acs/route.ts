@@ -6,10 +6,20 @@ import { NextResponse } from "next/server";
 import { getSaasAuditService, getSaasSsoService } from "@nelvyon/saas";
 
 import { issueSaasSessionRedirect } from "@/lib/sso/issueSaasSession";
+import { CuerpoDemasiadoGrande, formDataConTope } from "@/lib/security/cuerpoConTope";
 import { parseSamlResponse } from "@/lib/sso/samlParse";
 
 export async function POST(req: Request) {
-  const form = await req.formData();
+  // Anonima por definicion: la llama el proveedor de identidad, sin sesion previa.
+  let form: FormData;
+  try {
+    form = await formDataConTope(req);
+  } catch (e) {
+    if (e instanceof CuerpoDemasiadoGrande) {
+      return NextResponse.json({ error: "Request body too large" }, { status: 413 });
+    }
+    throw e;
+  }
   const samlResponse = String(form.get("SAMLResponse") ?? "");
   const relayState = String(form.get("RelayState") ?? "");
 

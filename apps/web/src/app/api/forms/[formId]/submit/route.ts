@@ -4,6 +4,7 @@
  */
 import { NextResponse } from "next/server";
 import { DbClient } from "../../../../../../../../backend/db/DbClient";
+import { CuerpoDemasiadoGrande, formDataConTope, jsonConTope } from "@/lib/security/cuerpoConTope";
 import { dispatchFormSubmitted } from "../../../../../../../../backend/saas/saasWorkflowDispatch";
 
 export const dynamic = "force-dynamic";
@@ -38,13 +39,22 @@ export async function POST(
   let data: Record<string, unknown> = {};
   const ct = req.headers.get("content-type") ?? "";
   const honeypotField = form.honeypot_field || "_hp";
-  if (ct.includes("application/json")) {
-    try { data = (await req.json()) as Record<string, unknown>; } catch { /**/ }
-  } else if (ct.includes("application/x-www-form-urlencoded") || ct.includes("multipart/form-data")) {
-    const fd = await req.formData().catch(() => null);
-    if (fd) fd.forEach((v, k) => { data[k] = v; });
-  } else {
-    try { data = (await req.json()) as Record<string, unknown>; } catch { /**/ }
+  // El cuerpo se lee CON TOPE. Esta ruta es anonima y en el App Router de Next no
+  // hay limite de cuerpo: el `MAX_BODY_SIZE` de FastAPI solo cubre el backend de
+  // Python. El limite por IP no ayuda —20 por minuto— porque cada una de esas 20
+  // podia traer cientos de megas.
+  try {
+    if (ct.includes("application/x-www-form-urlencoded") || ct.includes("multipart/form-data")) {
+      const fd = await formDataConTope(req).catch(() => null);
+      if (fd) fd.forEach((v, k) => { data[k] = v; });
+    } else {
+      data = (await jsonConTope(req)) ?? {};
+    }
+  } catch (e) {
+    if (e instanceof CuerpoDemasiadoGrande) {
+      return NextResponse.json({ error: "Request body too large" }, { status: 413 });
+    }
+    throw e;
   }
 
   // Honeypot: silently discard bots that fill the hidden field
