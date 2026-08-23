@@ -1685,6 +1685,50 @@ workflows sería construir infraestructura para algo que quizá no se vende.
 662 de 710 tablas de producción están vacías. Ninguna de estas funciones se ha
 ejecutado nunca.
 
+## CERTIFICADO — el ciclo completo de un webhook saliente
+
+`test_webhooks_salientes_reintentan_de_verdad` — **12/12** contra PostgreSQL real
+con el esquema de producción (migración 405):
+
+falla → **queda pendiente** · backoff respetado (recién fallada **no** sale;
+pasada la espera **sí**) · éxito → **no vuelve a salir** · intentos agotados →
+**deja de reintentarse** · endpoint desactivado → no recibe nada · **otro
+inquilino no se lleva la entrega** · el cierre **persiste de verdad**.
+
+**5 pruebas de mutación** ejecutan las consultas **anteriores** contra el mismo
+esquema y comprueban que PostgreSQL las rechaza nombrando la columna concreta
+(`endpoint_id`, `status`, `attempts`, `next_retry_at`, `last_attempt_at`). Sin
+ellas, el verde no distinguiría «arreglado» de «esta prueba no toca ese camino».
+
+Contra un doble de base de datos toda esta batería habría pasado con el código
+roto: un doble acepta cualquier nombre de columna, y el fallo era exactamente
+nombres que no existen.
+
+## AUDITORÍA DE FUNCIONALIDAD FANTASMA — lo comprobado y limpio
+
+Decirlo importa tanto como los hallazgos: **no fabrico defectos donde no los hay.**
+
+| Comprobación | Resultado |
+|---|---|
+| `catch` que devuelven éxito en TypeScript | **0** |
+| Fallback de IA (`PrivateAiRouter`) | **honesto**: cae en proveedor `unconfigured`, devuelve `fallbackReason`, y el estado dice «Ningún modelo conectado» |
+| Agente de bandeja: ¿autoenvía texto simulado? | **no** — `if (suggested.mock) → autoReplied: false, reason: "llm_not_configured"`, tras una cadena de puertas: agente activo → escalado → autoReply → confianza → puerta de autonomía → mock |
+| `platform/*` BFF | **correcto**: autentica, autoriza con `assertUserCanAccessWorkspace`, y reenvía el workspace **canónico**, no el crudo |
+
+### La IA está APAGADA en producción, no degradada
+
+Verificado en los dos servicios, sin imprimir ningún valor:
+
+```
+OPENAI_API_KEY, ANTHROPIC_API_KEY, OPENROUTER_API_KEY,
+DEEPSEEK_API_KEY, GROQ_API_KEY, MISTRAL_API_KEY   →  todas AUSENTES
+APP_AI_BASE_URL                                   →  ausente
+NELVYON_AI_ENABLED = 0        OLLAMA_CONFIGURED = 0
+```
+
+**Cero proveedores de pago**: la restricción del fundador se respeta. Y encaja con
+las 662 tablas vacías — la plataforma está construida, no operando.
+
 ## Otros bloqueos externos
 
 - `MESH_AUTHKEY` — malla privada al Ollama propio. **No es un proveedor de pago.**
