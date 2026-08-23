@@ -1786,6 +1786,36 @@ Guardado en `db/certificacion/clasificacion_datos.json`. **Nada modificado ni
 borrado**: es la base para una limpieza futura *si* la autorizas, con criterio
 escrito en vez de juicio.
 
+## FICHAS DE ALCANCE — `docs/FICHAS_ALCANCE_DE_PRODUCTO.md`
+
+Las 8 funciones con deriva, con evidencia medida: rutas de API y páginas contadas
+sobre el árbol, presencia en catálogo/precios buscada en marketing y packs.
+
+**El matiz que cambia casi todas las recomendaciones**: en **6 de 8** el núcleo
+funciona y lo roto es un **borde** —la videollamada de una reserva, el remitente
+de una campaña, dónde se guardó un PDF—. Solo **2** son estructurales: QR (sin
+`short_code` el redirect no puede existir) y Workflows (faltan `edges_json` y
+**tres tablas**).
+
+| Función | En la oferta | Superficie | Recomendación |
+|---|---|---|---|
+| **Workflows** | SÍ | 23 rutas · 99 comp. | **COMPLETAR — prioridad 1** |
+| Campañas | SÍ | 20 · 142 | COMPLETAR (borde) |
+| Facturas | SÍ | 7 · 49 | COMPLETAR (borde) |
+| Reservas | SÍ | 2 · 80 | COMPLETAR (borde) |
+| Chatbot | SÍ | 11 · 22 | COMPLETAR + **aislamiento** |
+| A/B testing | SÍ | 7 · 34 | COMPLETAR (config) |
+| Afiliados | no | 3 · 7 | FUSIONAR las 3 páginas duplicadas |
+| QR | no | 2 · 3 | decidir: estático (ya sirve) vs dinámico (migración) |
+
+**Ninguna se recomienda retirar.** Seis están en lo que NELVYON vende y las otras
+dos tienen núcleo aprovechable. Retirar una función útil por estar incompleta
+empobrecería la oferta, que es lo contrario del objetivo.
+
+**Coste si se completan todas**: ~15 columnas y 3 tablas en 7 migraciones
+independientes. **Ninguna toca datos existentes** —las 8 tablas están vacías—, así
+que el riesgo es el mínimo posible: es el mejor momento, antes del primer cliente.
+
 ## Otros bloqueos externos
 
 - `MESH_AUTHKEY` — malla privada al Ollama propio. **No es un proveedor de pago.**
