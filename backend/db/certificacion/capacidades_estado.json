@@ -157,9 +157,9 @@
   },
   "integraciones": {
    "rutas": 67,
-   "estado": "PENDING",
-   "evidencia": "",
-   "motivo": ""
+   "estado": "BLOCKED_EXTERNALLY",
+   "evidencia": "backend/saas/__tests__/flujoIntegraciones.pg.test.ts — 7 pruebas contra PostgreSQL real sobre lo que SI es interno y es lo de mas riesgo: el almacen de conexiones. Una conexion aparece en la lista de su inquilino y NO en la del otro; el estado por integracion es el del que pregunta; el token de A no viaja en la respuesta de B —filtrarlo seria peor que un estado mal, porque con el se opera la cuenta sin pasar por NELVYON—; desconectar deja la fila desconectada; y B no puede desconectar la de A, que seria una denegacion de servicio silenciosa: sus campanas dejan de publicar y nadie sabe por que. Los tokens se guardan en `access_token_enc`, cifrados en reposo, y `listConnections` ni siquiera los selecciona.",
+   "motivo": "53 de las 67 rutas necesitan una credencial de un tercero —Google, Meta, TikTok, Snapchat, LinkedIn, HubSpot, Salesforce, Twilio, Slack—. Certificar que la llamada al proveedor funciona de verdad exige cuentas reales y GENERA COSTE. Coste externo nuevo autorizado: 0 EUR. Queda fuera de lo ejecutable sin autorizacion."
   },
   "ads": {
    "rutas": 5,
