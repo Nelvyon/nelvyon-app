@@ -4,10 +4,10 @@
   "nota": "Derivado de backend/db/certificacion/capacidades_ia.py. No se edita el conjunto de claves a mano: lo fija el arbol.",
   "capacidades": {
     "multinicho_sectores": {
-      "estado": "PENDING",
+      "estado": "PASS_CERTIFIED",
       "familia": "ORQUESTACION",
       "modulos": 1994,
-      "evidencia": "",
+      "evidencia": "backend/os-agents/__tests__/multinicho.test.ts - 10 pruebas sobre SIETE clases de negocio deliberadamente lejanas: peluqueria de barrio, ecommerce agricola, metalurgica B2B, mudanzas B2C, despacho de abogados, SaaS y clinica. La propiedad no se comprueba en la direccion facil ('funciona con muchos nichos', que siempre parece cierto) sino en la contraria: SI EL RESULTADO NO CAMBIA AL CAMBIAR EL NEGOCIO, EL COMPORTAMIENTO NO VENIA DEL NEGOCIO. Para cuatro servicios Premium se exige que los siete clientes produzcan peticiones DISTINTAS entre si. Se comprueba ademas que ningun agente Premium nombre un cliente concreto en sus pasos -el hardcode que convierte un producto multinicho en uno hecho para uno solo-, que las restricciones legales del cliente (publicidad juridica, publicidad sanitaria) viajen con el encargo, y que el registro no tenga un agente por nicho sino servicios funcionales. Con control del propio banco: los siete clientes son de verdad distintos entre si, porque si dos fueran parecidos la comparacion no probaria nada.",
       "motivo": ""
     },
     "orquestador_central": {
@@ -228,10 +228,10 @@
       "motivo": ""
     },
     "intake_y_objetivo": {
-      "estado": "PENDING",
+      "estado": "PASS_CERTIFIED",
       "familia": "ORQUESTACION",
       "modulos": 3,
-      "evidencia": "",
+      "evidencia": "backend/os-agents/__tests__/costeEIntake.test.ts - la puerta de entrada. Un encargo completo se acepta, uno vacio se rechaza, y faltar un obligatorio se detecta diciendo CUAL -un rechazo que no dice que falta obliga a adivinar, y quien adivina rellena con cualquier cosa para pasar-. Aceptar un encargo incompleto significaria poner a un agente a trabajar sobre huecos, y un agente que rellena huecos inventa. Un servicio desconocido recibe los campos BASE y no un esquema inventado. Durante la certificacion se comprobo que el validador es MAS estricto de lo que aparentaba el tipo: exige URL con esquema y color hexadecimal. Es correcto y son las dos formas mas comunes de que un dato entre roto.",
       "motivo": ""
     },
     "conocimiento_del_cliente": {
@@ -284,10 +284,10 @@
       "motivo": ""
     },
     "cliente_llm_y_coste": {
-      "estado": "PENDING",
+      "estado": "PASS_CERTIFIED",
       "familia": "ORQUESTACION",
       "modulos": 4,
-      "evidencia": "",
+      "evidencia": "backend/os-agents/__tests__/costeEIntake.test.ts - la puerta del gasto. `isOsOpenAiAllowed` exige CUATRO condiciones a la vez y se comprueba quitando cada una por separado: interruptor maestro, autorizacion explicita, clave presente y modo privado con ventana. El caso que el fundador nombro por su nombre -que exista una API key por accidente- se prueba aparte: con el interruptor apagado da igual. Y la deteccion de Ollama es independiente de cualquier clave de pago, porque si dependiera de ella apagar el gasto apagaria tambien lo gratuito. Con control positivo: con las cuatro condiciones a favor SI se permitiria, porque una funcion que devolviera false siempre pasaria todo lo demas.",
       "motivo": ""
     },
     "varios_del_nucleo": {
