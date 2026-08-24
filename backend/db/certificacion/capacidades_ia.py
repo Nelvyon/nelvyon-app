@@ -64,7 +64,10 @@ MAPA: list[tuple[str, str, str]] = [
 
     # ── la empresa IA interna ───────────────────────────────────────────────
     ("agentes_internos",           "INTERNOS",     r"private-ai/(nelvyonAgentRegistry|agents/|core/)"),
-    ("permisos_y_herramientas",    "INTERNOS",     r"private-ai/(tools/|adapters/|types)"),
+    # `skills/` entra aqui y no en una capacidad nueva: el reparto de Skills es
+    # exactamente el mismo problema que el de herramientas -quien puede usar que-
+    # y separarlo habria sido inflar el denominador por comodidad.
+    ("permisos_y_herramientas",    "INTERNOS",     r"private-ai/(tools/|adapters/|types|skills/)"),
     ("rag_privado",                "INTERNOS",     r"private-ai/(rag/|providers/)"),
 
     # Estas seis salieron de los HUERFANOS que dejo el primer reparto, y no eran

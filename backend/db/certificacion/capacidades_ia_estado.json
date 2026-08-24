@@ -333,10 +333,10 @@
       "motivo": ""
     },
     "permisos_y_herramientas": {
-      "estado": "PENDING",
+      "estado": "PASS_CERTIFIED",
       "familia": "INTERNOS",
       "modulos": 4,
-      "evidencia": "",
+      "evidencia": "backend/private-ai/__tests__/registroDeSkills.test.ts - 26 pruebas, y permisosYAprobaciones.test.ts para las herramientas. PROGRAMA DE SKILLS: 16 Skills propias de NELVYON en .claude/skills/, cada una con su SKILL.md y su estandar (no prompts genericos: cada una dice que descalifica un entregable y que nunca se hace). Repartidas entre los 23 agentes internos con MINIMO PRIVILEGIO, y eso se comprueba: un agente de SEO no lleva la Skill de ventas ni la de pago; un redactor no lleva la de analitica; finance, cto, devops y security_compliance no llevan ninguna porque su trabajo no las necesita. NADIE SE AUTORREVISA: los nueve agentes que producen entregables de cliente NO llevan las dos Skills de revision, porque un agente que revisa su propio trabajo no revisa, relee - que es como se consigue un QA que siempre aprueba. Con control positivo en las dos direcciones: alguien SI las lleva, porque quitarselas a todos pasaria la prueba y dejaria el sistema sin QA. Se comprueba ademas que toda Skill del arbol este declarada y toda Skill declarada exista en disco con contenido real. Herramientas: una no concedida se deniega, un override de inquilino puede denegar una concedida, un agente deshabilitado no usa ninguna, y la denegacion gana sobre el permiso extra. Mutacion comprobada: dado al redactor la Skill de revision, la prueba cae. MCP de terceros: NINGUNO instalado, a proposito. Ver docs/SKILLS_Y_MCP.md.",
       "motivo": ""
     },
     "rag_privado": {
@@ -375,10 +375,10 @@
       "motivo": ""
     },
     "memoria_por_inquilino": {
-      "estado": "PENDING",
+      "estado": "PASS_CERTIFIED",
       "familia": "INTERNOS",
       "modulos": 1,
-      "evidencia": "",
+      "evidencia": "backend/private-ai/__tests__/memoriaYRag.pg.test.ts - 13 pruebas contra PostgreSQL real. Ciclo completo: escribir, persistir, recuperar por titulo y por contenido, borrar sin tocar lo demas. Matriz A/B entera con control positivo en cada lado. ADVERSARIOS: la busqueda arma `%consulta%` para un ILIKE, asi que una consulta que sea literalmente `%` casa con todo - se demuestra que ese todo sigue acotado al inquilino que pregunta, y lo mismo con `_` y con la consulta vacia. Sin contexto no se recupera nada. B no puede borrar un fragmento de A. El contenido se devuelve tal cual, sin interpretar -que no llegue al modelo como autoridad lo cubre contextoRecuperadoNoEsAutoridad-. Etiquetas como text[] y metadata como jsonb, comprobado por separado porque `pg` trata cada tipo distinto y confundirlos costo dos capacidades en el Bloque 2. Mutacion comprobada: quitado el filtro de inquilino de list/search/delete (3 sitios), caen 8 pruebas.",
       "motivo": ""
     },
     "modo_privado_y_coste": {
