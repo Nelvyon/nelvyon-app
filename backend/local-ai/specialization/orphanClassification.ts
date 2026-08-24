@@ -80,6 +80,9 @@ export const ORPHAN_CLASSIFICATION: readonly OrphanClassEntry[] = [
   { path: "docs/BLOQUE_2_LINEA_BASE.md", disposition: "index", domain: ["nelvyon", "development_tech"], priority: 0, title: "Bloque 2 — línea base medida", reason: "Medidas de partida del Bloque 2" },
   { path: "docs/BLOQUE_1_CIERRE.md", disposition: "index", domain: ["nelvyon", "security_privacy"], priority: 0, title: "Bloque 1 — clasificación de cierre", reason: "SSOT del estado de las 18 categorías del Bloque 1" },
   { path: "docs/BLOQUE_2_CIERRE.md", disposition: "index", domain: ["nelvyon", "development_tech"], priority: 0, title: "Bloque 2 — cierre", reason: "Los nueve defectos encontrados, los falsos verdes cerrados y lo que queda bloqueado" },
+  { path: "docs/BLOQUE_3_CIERRE.md", disposition: "index", domain: ["nelvyon", "security_privacy"], priority: 0, title: "Bloque 3 — cierre", reason: "Los siete defectos de la empresa IA autonoma, el contrato de estados y las Skills" },
+  { path: "docs/BLOQUE_3_ESTADO.md", disposition: "index", domain: ["nelvyon", "development_tech"], priority: 0, title: "Bloque 3 — estado vivo", reason: "Las 55 capacidades de IA con su estado, generado desde el JSON" },
+  { path: "docs/SKILLS_Y_MCP.md", disposition: "index", domain: ["nelvyon", "development_tech"], priority: 0, title: "Skills y MCP auditados", reason: "Las 16 propias, las 8 oficiales instaladas y la clasificacion de seguridad del resto" },
   { path: "docs/BLOQUE_3_LINEA_BASE.md", disposition: "index", domain: ["nelvyon", "development_tech"], priority: 0, title: "Bloque 3 — línea base", reason: "Qué se certifica en la empresa IA autónoma y con qué método" },
   { path: "docs/NEXT_SESSION_START_HERE.md", disposition: "index", domain: ["nelvyon", "development_tech"], priority: 0, title: "Empieza aquí", reason: "Estado de los cuatro bloques, lo bloqueado por el fundador y cómo se ejecuta la puerta" },
   // —— Wave 3: points 1–4 prep (2026-07-26) — remaining top-level orphans ——

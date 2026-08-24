@@ -81,47 +81,42 @@ Está escrito, con las cuatro tandas y sus variables, en
 - **No mates una suite por lenta si sigue progresando.** `test_rls_saas_cross_tenant.py`
   tarda ~14 minutos y no está colgada.
 
-## Bloque 3 — dónde va
+## Bloque 3 — 55/55, PENDING = 0
 
-**42/55 certificadas · 0 bloqueadas · 13 pendientes.** Estado vivo generado en
-`docs/BLOQUE_3_ESTADO.md`:
+**48 `PASS_CERTIFIED` + 7 `FIXED_CERTIFIED` + 0 bloqueadas + 0 pendientes = 55.**
+SHA candidato `068aba51`. Cierre en `docs/BLOQUE_3_CIERRE.md`.
+
+Estado vivo generado:
 
     python -m backend.db.certificacion.estado_bloque3
 
-### Cómo se ejecuta la certificación del Bloque 3
+### Cómo se ejecuta la puerta del Bloque 3
 
-    NELVYON_B3_DSN=postgresql://nelvyon_local:...@localhost:5434/nelvyon_b2_cert     npx vitest run   # desde apps/web
+    NELVYON_B3_PUERTA=1     NELVYON_B3_DSN=postgresql://nelvyon_local:...@localhost:5434/nelvyon_b2_cert     NELVYON_B2_DSN=postgresql://nelvyon_local:...@localhost:5434/nelvyon_b2_cert     npx vitest run     # desde apps/web
 
 `laPuertaDelBloque3NoPuedeSaltarse` falla si se declara `NELVYON_B3_PUERTA=1` sin
-ese DSN: una puerta sin base se saltaría las suites y diría verde.
+el DSN: una puerta sin base se saltaría las suites y diría verde.
 
-### Las 13 que quedan
+**La puerta se ejecuta sola.** Solapar la suite web con la de Python tumbó tres
+pruebas por `Test timed out in 5000ms` en el Bloque 2 — saturación de máquina, no
+producto.
 
-`aprendizaje_autonomo`, `conocimiento_del_cliente`, `creatividad_y_generacion`,
-`enrutado_de_modelo`, `entregables_y_certificados`, `infra_ia_propia`,
-`ingesta_de_conocimiento`, `memoria_y_rag`, `orquestacion_privada`,
-`prompts_y_idioma`, `rag_privado`, `reporting_y_roi`, `varios_del_nucleo`.
+### Siete defectos encontrados en el Bloque 3
 
-### Defectos encontrados en el Bloque 3, por si se pierde el hilo
+1. Inyección de prompt por diseño (RAG y memoria en el mensaje de sistema).
+2. Escalada de permisos: `forbiddenActions` muerto para 8 de 9 acciones.
+3. La puerta no ejecutaba `backend/private-ai`, `config` ni `http`.
+4. QA que rechazaba lo correcto por buscar `"todo"` como subcadena.
+5. Métrica fabricada: visibilidad en IA presentada como medida.
+6. Degradación silenciosa y permanente del almacén de prompts.
+7. Un literal roto en el orquestador privado, sin cobertura que lo detectara.
 
-1. **Inyección de prompt por diseño** — el material de RAG y memoria se
-   concatenaba en el mensaje de sistema. Corregido en `contextoRecuperado.ts`.
-2. **Escalada de permisos** — `forbiddenActions` estaba muerto para 8 de 9
-   acciones: lo prohibido se degradaba a «pendiente de aprobación».
-3. **La puerta no ejecutaba `backend/private-ai`** ni `config` ni `http`.
-4. **QA que rechazaba lo correcto** — buscaba la cadena `"todo"` como subcadena,
-   y en español eso marca casi cualquier texto legítimo.
-5. **Métrica fabricada** — la visibilidad en IA se presentaba como medida cuando
-   la respuesta la escribía el modelo propio imitando a ChatGPT.
+Los siete con mutación comprobada. Detalle en `docs/BLOQUE_3_CIERRE.md`.
 
-Los cinco con mutación comprobada.
+### Dos trampas técnicas
 
-### Una trampa técnica que costó tiempo
-
-Aplicar arreglos con un script de Python convierte `\b` en un **carácter de
-retroceso real** (0x08). Es invisible al leer el fichero y hace que una expresión
-regular no case nunca. Se detectó mirando los bytes. Usar cadenas crudas.
-
-Y escribir un fichero leído con `newline=""` en Windows **duplica todas las
-líneas**. Leer universal, escribir con `newline="
+- Aplicar arreglos con Python convierte `` en un **carácter de retroceso real**
+  (0x08), invisible al leer, y la regex no casa nunca. Usar cadenas crudas.
+- Escribir un fichero leído con `newline=""` en Windows **duplica las líneas**.
+  Leer universal, escribir con `newline="
 "`.

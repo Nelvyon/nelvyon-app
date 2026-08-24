@@ -240,7 +240,14 @@ describeSiHayPg("BLOQUE 2 · lote 11", () => {
     beforeEach(async () => {
       // Acotado al par de inquilinos de ESTE fichero: un DELETE sin filtro
       // borraria lo que otro fichero acaba de sembrar, y vitest los corre en paralelo.
-      await pool.query("DELETE FROM os_agent_data_cache WHERE tenant_id = ANY($1::uuid[])", [[A, B]]).catch(() => {});
+      // `os_agent_data_cache.tenant_id` es TEXT, no uuid. Moldear a `uuid[]`
+      // hacia fallar el DELETE, y el `.catch` lo escondia: las filas se
+      // acumulaban entre ejecuciones hasta chocar con la clave unica
+      // `os_agent_data_cache_lookup`, y entonces la siembra fallaba -tambien en
+      // silencio- y la prueba se caia tres lineas mas abajo con un `null`
+      // incomprensible. Dos `catch` mudos encadenados para tapar un molde mal
+      // puesto.
+      await pool.query("DELETE FROM os_agent_data_cache WHERE tenant_id = ANY($1::text[])", [[A, B]]);
     });
 
     async function sembrarCache(inquilino: string, clave: string, contenido: string) {
@@ -253,7 +260,10 @@ describeSiHayPg("BLOQUE 2 · lote 11", () => {
             payload, metadata, fetched_at, expires_at)
          VALUES ($1, 'mock', 'keywords', $2, 'cliente.test', 'es',
                  $3::jsonb, '{}'::jsonb, NOW(), NOW() + INTERVAL '1 day')`,
-        [inquilino, clave, JSON.stringify({ dato: contenido })]).catch(() => {});
+        // Sin `.catch` a proposito: si la siembra falla, la prueba tiene que
+        // decir POR QUE. Tragarse el error convertia un fallo de insercion en
+        // una asercion confusa sobre `null` tres lineas mas abajo.
+        [inquilino, clave, JSON.stringify({ dato: contenido })]);
     }
 
     it("EL CONTROL: la caché de A no se sirve a B", async () => {
