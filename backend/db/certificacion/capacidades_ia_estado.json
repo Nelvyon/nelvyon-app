@@ -298,10 +298,10 @@
       "motivo": ""
     },
     "memoria_y_rag": {
-      "estado": "PENDING",
+      "estado": "PASS_CERTIFIED",
       "familia": "ORQUESTACION",
       "modulos": 5,
-      "evidencia": "",
+      "evidencia": "backend/local-ai/__tests__/embeddingsYSalida.test.ts - 12 pruebas. Casi todas NEGATIVAS a proposito: en un embedding lo que importa no es que calcule bien, es que SE NIEGUE cuando no puede. Un vector de dimension equivocada se guarda SIN ERROR en una columna de vectores, y a partir de ahi la busqueda semantica devuelve resultados que parecen ordenados y no lo estan: hay resultados, salen rapido, estan mal, y nadie lo nota. Se comprueba que rechaza texto vacio (un vector de ceros se indexa igual de bien que uno real), dimension distinta (no recorta ni rellena), respuesta sin vector, respuesta que no es JSON -un proxy devuelve HTML con 200- y error HTTP. `isAvailable` dice que NO cuando el servicio no responde, porque decir que si y fallar despues convierte un problema de infraestructura en un fallo a mitad del trabajo del cliente. POLITICA DE SALIDA: el modo privado esta ENCENDIDO por defecto -fallo cerrado: un despliegue olvidado no se convierte en una fuga- y un valor mal escrito como 'PRIVATE_MODE=quizas' NO lo apaga. Con control positivo en las dos direcciones. Mutacion comprobada: quitada la comprobacion de dimension, caen 2 pruebas.",
       "motivo": ""
     },
     "ingesta_de_conocimiento": {
@@ -319,10 +319,10 @@
       "motivo": ""
     },
     "infra_ia_propia": {
-      "estado": "PENDING",
+      "estado": "PASS_CERTIFIED",
       "familia": "ORQUESTACION",
       "modulos": 5,
-      "evidencia": "",
+      "evidencia": "backend/local-ai/__tests__/embeddingsYSalida.test.ts - 12 pruebas. Casi todas NEGATIVAS a proposito: en un embedding lo que importa no es que calcule bien, es que SE NIEGUE cuando no puede. Un vector de dimension equivocada se guarda SIN ERROR en una columna de vectores, y a partir de ahi la busqueda semantica devuelve resultados que parecen ordenados y no lo estan: hay resultados, salen rapido, estan mal, y nadie lo nota. Se comprueba que rechaza texto vacio (un vector de ceros se indexa igual de bien que uno real), dimension distinta (no recorta ni rellena), respuesta sin vector, respuesta que no es JSON -un proxy devuelve HTML con 200- y error HTTP. `isAvailable` dice que NO cuando el servicio no responde, porque decir que si y fallar despues convierte un problema de infraestructura en un fallo a mitad del trabajo del cliente. POLITICA DE SALIDA: el modo privado esta ENCENDIDO por defecto -fallo cerrado: un despliegue olvidado no se convierte en una fuga- y un valor mal escrito como 'PRIVATE_MODE=quizas' NO lo apaga. Con control positivo en las dos direcciones. Mutacion comprobada: quitada la comprobacion de dimension, caen 2 pruebas.",
       "motivo": ""
     },
     "agentes_internos": {
