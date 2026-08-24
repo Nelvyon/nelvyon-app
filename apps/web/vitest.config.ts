@@ -8,37 +8,20 @@ export default defineConfig({
     globals: true,
     include: [
       "src/**/*.{test,spec}.?(c|m)[jt]s?(x)",
-      "../../backend/os-agents/__tests__/**/*.test.ts",
-      "../../backend/media-ai/__tests__/**/*.test.ts",
-      "../../backend/os-agents/**/__tests__/**/*.test.ts",
-      "../../backend/os-core/__tests__/**/*.test.ts",
-      "../../backend/saas/__tests__/**/*.test.ts",
-      "../../backend/saas-reports/__tests__/**/*.test.ts",
-      // `backend/auth` no estaba cubierto por la suite: sus tests existían
-      // fuera del `include` y por tanto nunca corrían en CI.
-      "../../backend/auth/__tests__/**/*.test.ts",
-      "../../backend/admin/__tests__/**/*.test.ts",
-      "../../backend/email/__tests__/**/*.test.ts",
-      "../../backend/monitoring/__tests__/**/*.test.ts",
-      "../../backend/billing/__tests__/**/*.test.ts",
-      "../../backend/db/__tests__/**/*.test.ts",
-      "../../backend/queue/__tests__/**/*.test.ts",
-      "../../backend/gdpr/__tests__/**/*.test.ts",
-      "../../backend/health/__tests__/**/*.test.ts",
-      "../../backend/integrations/__tests__/**/*.test.ts",
-      "../../backend/integrations/google/__tests__/**/*.test.ts",
-      "../../backend/integrations/meta/__tests__/**/*.test.ts",
-      "../../backend/logger/__tests__/**/*.test.ts",
-      "../../backend/support/__tests__/**/*.test.ts",
-      "../../backend/feedback/__tests__/**/*.test.ts",
-      "../../backend/changelog/__tests__/**/*.test.ts",
-      "../../backend/agency/__tests__/**/*.test.ts",
-      "../../backend/local-ai/__tests__/**/*.test.ts",
-      "../../backend/affiliates/__tests__/**/*.test.ts",
-      "../../backend/oauth/__tests__/**/*.test.ts",
-      "../../backend/qa/__tests__/flows/**/*.test.ts",
-      "../../backend/stripe/__tests__/**/*.test.ts",
-      "../../backend/autonomous/__tests__/**/*.test.ts",
+      // UN comodin, no una lista blanca.
+      //
+      // Antes esto era una enumeracion de carpetas de `backend`, y fallaba de
+      // la peor manera posible: cuando alguien anadia un modulo con pruebas, la
+      // suite NO las ejecutaba y seguia diciendo "passed". Nada rojo, ninguna
+      // senal — solo cobertura que no existia.
+      //
+      // Ya habia pasado con `backend/auth` (el comentario que estaba aqui lo
+      // contaba) y volvio a pasar con `backend/config`, `backend/http` y
+      // `backend/private-ai`, que es la empresa IA autonoma entera.
+      //
+      // El comodin lo cierra por construccion, y
+      // `laSuiteNoDejaCarpetasFuera.test.ts` vigila que no vuelva a estrecharse.
+      "../../backend/**/__tests__/**/*.test.ts",
     ],
   },
   resolve: {

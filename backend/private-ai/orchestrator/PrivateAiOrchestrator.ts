@@ -4,6 +4,7 @@ import { PrivateAiApprovalService } from "../approvals/PrivateAiApprovalService"
 import { PrivateAiAuditService } from "../audit/PrivateAiAuditService";
 import { getPrivateAiRouter } from "../core/PrivateAiRouter";
 import { getTenantMemoryAdapter } from "../memory/TenantMemoryAdapter";
+import { construirMensajes, type FragmentoRecuperado } from "../contextoRecuperado";
 import { NelvyonRagStore } from "../rag/NelvyonRagStore";
 import type {
   AgentRunInput,
@@ -117,37 +118,49 @@ export class PrivateAiOrchestrator {
       if (!autoGate.allowed) throw new Error(autoGate.reason ?? "Autonomy gate blocked agent action");
     }
 
-    let ragContext = "";
+    // El material recuperado se junta como DATOS y se entrega aparte.
+    //
+    // Antes se concatenaba dentro del prompt de sistema, que es donde el modelo
+    // busca sus reglas: cualquiera capaz de escribir en la memoria del inquilino
+    // -subir un PDF, pegar una nota, rellenar un formulario que acabe indexado-
+    // podia colar «ignora tus reglas» con el mismo rango que las de NELVYON.
+    // Ver `contextoRecuperado.ts`.
+    const fragmentos: FragmentoRecuperado[] = [];
+
     if (agent.allowedTools.includes("rag.search" as AgentToolId)) {
       try {
         const rag = await this.rag.searchPlatform(input.input.slice(0, 120), 3);
-        if (rag.chunks.length) {
-          ragContext =
-            "\n\nDocumentación Nelvyon (RAG):\n" +
-            rag.chunks.map((c) => `- ${c.title || c.source}: ${c.content.slice(0, 180)}`).join("\n");
+        for (const c of rag.chunks) {
+          fragmentos.push({
+            procedencia: `RAG · ${c.title || c.source}`,
+            contenido: c.content.slice(0, 180),
+          });
         }
       } catch {
         // RAG optional until ingest
       }
     }
 
-    let memoryContext = "";
     if (agent.allowedTools.includes("memory.read")) {
       try {
         const chunks = await this.memory.list(input.tenantId, 5);
-        memoryContext = this.memory.formatForPrompt(chunks);
+        for (const c of chunks) {
+          fragmentos.push({
+            procedencia: `memoria · ${c.title || c.source}`,
+            contenido: String(c.content ?? "").slice(0, 200),
+          });
+        }
       } catch {
         // memory optional
       }
     }
 
-    const messages = [
-      {
-        role: "system" as const,
-        content: `Agente: ${agent.id}\n${agent.systemPrompt}${memoryContext}${ragContext}`,
-      },
-      { role: "user" as const, content: input.input.trim() },
-    ];
+    const messages = construirMensajes(
+      `Agente: ${agent.id}` + "
+" + agent.systemPrompt,
+      fragmentos,
+      input.input,
+    );
 
     const { result, attempted, fallbackReason } = await this.router.complete(
       { messages, maxTokens: agent.limits.maxTokens, temperature: 0.3 },

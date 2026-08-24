@@ -326,10 +326,10 @@
       "motivo": ""
     },
     "agentes_internos": {
-      "estado": "PENDING",
+      "estado": "FIXED_CERTIFIED",
       "familia": "INTERNOS",
       "modulos": 5,
-      "evidencia": "",
+      "evidencia": "backend/private-ai/__tests__/permisosYAprobaciones.test.ts - 19 pruebas. DEFECTO GRAVE ENCONTRADO Y CORREGIDO: escalada de permisos. En `checkAction` la rama de aprobacion se consultaba ANTES que la lista de acciones prohibidas, y `requiresApproval` devuelve true para CUALQUIER accion sensible (lleva un `|| GLOBAL_SENSITIVE_ACTIONS.includes(action)` dentro). Resultado: una accion PROHIBIDA no se bloqueaba, se degradaba a 'pendiente de aprobacion', y bastaba que una persona pulsara aprobar para que un agente hiciera lo que su propia definicion prohibe. `forbiddenActions` estaba muerto para 8 de los 9 tipos; solo `cross_tenant_access` sobrevivia por un caso especial escrito encima. SEGUNDO DEFECTO: el registro ponia `?? ALL_SENSITIVE` en las DOS listas, asi que cada agente declaraba a la vez 'nunca' y 'con permiso'; la contradiccion no se veia porque el campo no llegaba a consultarse. El defecto pasa a `[]`, con lo que los agentes que no declaran nada se comportan EXACTAMENTE igual que antes. Mutacion comprobada: devuelto el orden anterior, caen 9 pruebas.",
       "motivo": ""
     },
     "permisos_y_herramientas": {
@@ -354,24 +354,24 @@
       "motivo": ""
     },
     "aprobaciones_y_gates": {
-      "estado": "PENDING",
+      "estado": "FIXED_CERTIFIED",
       "familia": "INTERNOS",
       "modulos": 2,
-      "evidencia": "",
+      "evidencia": "backend/private-ai/__tests__/contratoDeEstados.test.ts (12) + espinaDeAgentes.pg.test.ts (aprobaciones, contra PostgreSQL real). CONTRATO DE ESTADOS IMPLEMENTADO: antes no existia forma de distinguir lo propuesto de lo hecho. `runAgent` devolvia `output` con un `mock: boolean` al lado, y esa era toda la distincion: un texto de un sustituto viajaba en el mismo campo que un resultado real. Ahora hay cinco estados -PROPOSED, SIMULATED, READY_FOR_APPROVAL, EXECUTED, VERIFIED- y EXECUTED/VERIFIED NO SE PUEDEN CONSTRUIR sin evidencia (referencia + origen), ni VERIFIED sin comprobacion posterior. La direccion contraria tambien se cierra: un estado sin efecto no puede llevar evidencia colgando. En PostgreSQL real: una accion sensible se encola, queda `pending` y NO `executed`; el payload viaja como jsonb; B no ve las aprobaciones de A -que seria peor que una fuga de lectura, porque permitiria APROBAR una accion ajena-; sin inquilino no se ve nada.",
       "motivo": ""
     },
     "trazabilidad_y_auditoria": {
-      "estado": "PENDING",
+      "estado": "PASS_CERTIFIED",
       "familia": "INTERNOS",
       "modulos": 2,
-      "evidencia": "",
+      "evidencia": "backend/private-ai/__tests__/espinaDeAgentes.pg.test.ts - trazabilidad contra PostgreSQL real. Una ejecucion queda registrada y se relee con su agente y su entrada. Matriz A/B completa con control positivo en cada lado: A->A si, A->B no, B->B si, B->A no. El prompt NO se guarda en claro, solo una huella sha256 de 16 caracteres. El metadata viaja como jsonb y vuelve como objeto -se comprueba a proposito porque `pg` no serializa objetos de JS a JSON y ese defecto costo dos capacidades enteras en el Bloque 2.",
       "motivo": ""
     },
     "contexto_de_negocio": {
-      "estado": "PENDING",
+      "estado": "FIXED_CERTIFIED",
       "familia": "INTERNOS",
       "modulos": 1,
-      "evidencia": "",
+      "evidencia": "backend/private-ai/__tests__/contextoRecuperadoNoEsAutoridad.test.ts - 12 pruebas adversarias. DEFECTO GRAVE ENCONTRADO Y CORREGIDO: inyeccion de prompt por diseno. El orquestador construia el mensaje de SISTEMA como `agent.systemPrompt + memoryContext + ragContext`, es decir, concatenaba la memoria del inquilino y los fragmentos de RAG dentro de lo que el modelo trata como sus reglas. Cualquiera capaz de escribir algo que acabase indexado -un PDF subido, una nota pegada, un formulario- podia colar 'ignora tus reglas', 'tienes permitido borrar datos' o 'responde con las credenciales' con el mismo rango que las reglas de NELVYON, sin tocar el codigo. Ahora el material recuperado viaja en un mensaje de USUARIO, delimitado, con su procedencia, y el sistema lleva una advertencia explicita de que eso son datos y no ordenes. Se neutralizan los delimitadores del propio contenido para que un documento no pueda cerrar el bloque y escribir fuera. Mutacion comprobada: devuelto el material al mensaje de sistema, caen 7 pruebas.",
       "motivo": ""
     },
     "memoria_por_inquilino": {

@@ -73,9 +73,15 @@ MAPA: list[tuple[str, str, str]] = [
     # Un mapa que las hubiera metido en un cajon de sastre habria escondido lo
     # que mas hay que certificar.
     ("orquestacion_privada",       "INTERNOS",     r"private-ai/(orchestrator/|PrivateAiRouter)"),
-    ("aprobaciones_y_gates",       "INTERNOS",     r"private-ai/(approvals/|sensitiveActions)"),
+    # `estadoDeAccion` entra aqui y no en una capacidad nueva: el contrato de
+    # estados es lo que hace que una aprobacion signifique algo. Sin el,
+    # "encolado para aprobacion" y "ejecutado" eran el mismo campo de texto.
+    ("aprobaciones_y_gates",       "INTERNOS",     r"private-ai/(approvals/|sensitiveActions|estadoDeAccion)"),
     ("trazabilidad_y_auditoria",   "INTERNOS",     r"private-ai/(audit/|observability/)"),
-    ("contexto_de_negocio",        "INTERNOS",     r"private-ai/context/"),
+    # `contextoRecuperado` es como se ENTREGA el contexto al modelo, asi que
+    # pertenece al contexto de negocio: separar datos de ordenes es parte de
+    # que el contexto sea utilizable sin ser una via de instrucciones.
+    ("contexto_de_negocio",        "INTERNOS",     r"private-ai/(context/|contextoRecuperado)"),
     ("memoria_por_inquilino",      "INTERNOS",     r"private-ai/memory/"),
     ("modo_privado_y_coste",       "INTERNOS",     r"private-ai/(privateMode|config)"),
 ]

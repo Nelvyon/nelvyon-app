@@ -17,7 +17,20 @@ function agent(
       maxRunsPerHour: partial.limits?.maxRunsPerHour ?? 60,
       canAutoExecute: partial.limits?.canAutoExecute ?? false,
     },
-    forbiddenActions: partial.forbiddenActions ?? ALL_SENSITIVE,
+    // Por defecto NADA esta categoricamente prohibido: lo sensible pasa por
+    // aprobacion humana, que es lo que el producto hacia realmente.
+    //
+    // El defecto anterior era `?? ALL_SENSITIVE` en las DOS lineas, es decir,
+    // cada agente declaraba a la vez «esto no se puede hacer nunca» y «esto se
+    // puede hacer con permiso». La contradiccion no se notaba porque
+    // `forbiddenActions` no llegaba a consultarse: la rama de aprobacion iba
+    // antes y se lo comia todo (ver AgentPermissionService).
+    //
+    // Con el orden ya corregido, dejar el defecto en ALL_SENSITIVE bloquearia
+    // todas las acciones sensibles de todos los agentes y el flujo de aprobacion
+    // no llegaria a existir. Asi que el defecto pasa a `[]` y el comportamiento
+    // de los agentes que no declaran nada queda EXACTAMENTE como estaba.
+    forbiddenActions: partial.forbiddenActions ?? [],
     approvalRequiredActions: partial.approvalRequiredActions ?? ALL_SENSITIVE,
   };
 }
