@@ -242,10 +242,10 @@
       "motivo": ""
     },
     "reporting_y_roi": {
-      "estado": "PENDING",
+      "estado": "PASS_CERTIFIED",
       "familia": "ORQUESTACION",
       "modulos": 10,
-      "evidencia": "",
+      "evidencia": "backend/os-agents/__tests__/roiYCreatividad.test.ts - 6 pruebas sobre las cifras que el cliente usa para decidir su presupuesto. Sin gasto el ROI es 0 y NO Infinity; sin conversiones el coste por conversion es 0 y no Infinity -Infinity se pinta en un panel como una cifra mas y nadie lo lee como 'no hay datos'-; sin ninguna fila todo sale a cero y nada sale a NaN, que es el caso de un cliente nuevo; un valor no numerico en la base -de una migracion, de un import- no acaba en el panel como si fuera dinero; y un ROI negativo se reporta negativo en vez de maquillarse, que seria la mentira mas rentable a corto plazo y mas cara despues.",
       "motivo": ""
     },
     "entregables_y_certificados": {
@@ -270,10 +270,10 @@
       "motivo": ""
     },
     "creatividad_y_generacion": {
-      "estado": "PENDING",
+      "estado": "PASS_CERTIFIED",
       "familia": "ORQUESTACION",
       "modulos": 8,
-      "evidencia": "",
+      "evidencia": "backend/os-agents/CreativeService.ts, revisado en el camino real. La propiedad que importa se cumple: cuando los dos proveedores de imagen fallan, el activo se guarda con `status: 'failed'` y `url: null` - NO se inventa una URL. Es el fallo que produciria un entregable con una imagen que no existe, y es de los que el cliente descubre delante de su propio cliente. Ademas rechaza un prompt vacio en vez de generar sobre nada. La generacion real exige proveedor de pago: lo interno esta certificado y la llamada externa queda fuera por la restriccion de coste.",
       "motivo": ""
     },
     "visibilidad_y_crm_os": {
@@ -291,10 +291,10 @@
       "motivo": ""
     },
     "varios_del_nucleo": {
-      "estado": "PENDING",
+      "estado": "PASS_CERTIFIED",
       "familia": "ORQUESTACION",
       "modulos": 3,
-      "evidencia": "",
+      "evidencia": "backend/os-agents/__tests__/nucleoYCoherencia.test.ts - 8 pruebas. El catalogo de servicios vive en TRES sitios -la lista de identificadores, el registro que los instancia y el registro de sectores- y si los tres no dicen lo mismo el producto vende algo que no puede ejecutar o ejecuta algo que no vende. Se comprueba en las dos direcciones: todo identificador declarado se puede INSTANCIAR (el fallo caro: el catalogo lo ofrece, el cliente lo contrata y al ejecutarlo no hay agente detras) y todo agente del registro esta declarado (trabajo hecho que nadie puede pedir). Sin repetidos, sin solapamiento entre Premium y sector -si un id estuviera en los dos, cual se instancia dependeria del orden de resolucion y eso es un bug que aparece y desaparece-, cada agente declara el serviceId con el que se le invoca (si no, la traza atribuiria el trabajo a otro servicio) y ninguno se queda sin pasos (un servicio con cero pasos se completaria al instante devolviendo un resultado vacio que pareceria correcto). Con control positivo: tres listas vacias serian perfectamente coherentes entre si.",
       "motivo": ""
     },
     "memoria_y_rag": {
@@ -347,10 +347,10 @@
       "motivo": ""
     },
     "orquestacion_privada": {
-      "estado": "PENDING",
+      "estado": "FIXED_CERTIFIED",
       "familia": "INTERNOS",
       "modulos": 2,
-      "evidencia": "",
+      "evidencia": "backend/private-ai/__tests__/orquestadorPrivado.test.ts - 9 pruebas del camino completo: peticion -> agente -> permisos de herramienta -> permisos de accion -> aprobacion -> contexto -> modelo -> traza. Un agente desconocido no se inventa; una herramienta no concedida detiene la ejecucion ANTES de llamar a nada; una accion prohibida se bloquea -prueba que solo vale porque el arreglo de AgentPermissionService hizo que forbiddenActions dejara de ser decorativo-; una accion sensible se ENCOLA y el resultado dice que quedo pendiente en vez de devolver un texto que se lea como trabajo terminado. Lo encolado deja traza con su marca, porque una accion que se detiene tambien tiene que constar: si no, en la auditoria parece que nadie la pidio. Con control positivo: `advise` NO pide aprobacion, porque si todo la pidiera el sistema seria seguro e inutil y alguien acabaria quitando el gate entero. DEFECTO PROPIO CORREGIDO: el fichero tenia un literal de cadena roto desde el arreglo de la inyeccion, y NINGUNA prueba lo importaba, asi que llevaba ahi sin detectarse. El orquestador privado no tenia cobertura hasta esta suite.",
       "motivo": ""
     },
     "aprobaciones_y_gates": {

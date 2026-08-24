@@ -156,8 +156,7 @@ export class PrivateAiOrchestrator {
     }
 
     const messages = construirMensajes(
-      `Agente: ${agent.id}` + "
-" + agent.systemPrompt,
+      [`Agente: ${agent.id}`, agent.systemPrompt].join("\n"),
       fragmentos,
       input.input,
     );
