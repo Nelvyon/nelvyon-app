@@ -4,25 +4,30 @@
 > `backend/db/certificacion/capacidades_ia_estado.json` mediante
 > `backend/db/certificacion/estado_bloque3.py`.
 
-**50/55 certificadas · 0 bloqueadas · 5 pendientes**
+**55/55 certificadas · 0 bloqueadas · 0 pendientes**
 
-Contador inviolable: 50 + 0 + 5 = 55
+Contador inviolable: 55 + 0 + 0 = 55
 
 El denominador se DERIVA de 2224 modulos de IA del arbol mediante
 `capacidades_ia.py`. Un guardian falla si un modulo queda huerfano o si
 una capacidad se queda sin modulos: no se puede inflar ni desinflar.
 
-## Certificadas (50)
+## Certificadas (55)
 
 - `agentes_internos` — FIXED_CERTIFIED · INTERNOS · 5 modulos
+- `aprendizaje_autonomo` — PASS_CERTIFIED · ORQUESTACION · 5 modulos
 - `aprobaciones_y_gates` — FIXED_CERTIFIED · INTERNOS · 2 modulos
 - `bus_de_eventos_y_avisos` — PASS_CERTIFIED · ORQUESTACION · 4 modulos
 - `cliente_llm_y_coste` — PASS_CERTIFIED · ORQUESTACION · 4 modulos
 - `cola_y_trabajos` — PASS_CERTIFIED · ORQUESTACION · 8 modulos
+- `conocimiento_del_cliente` — PASS_CERTIFIED · ORQUESTACION · 8 modulos
 - `contexto_de_negocio` — FIXED_CERTIFIED · INTERNOS · 1 modulos
 - `creatividad_y_generacion` — PASS_CERTIFIED · ORQUESTACION · 8 modulos
+- `enrutado_de_modelo` — PASS_CERTIFIED · ORQUESTACION · 18 modulos
+- `entregables_y_certificados` — PASS_CERTIFIED · ORQUESTACION · 13 modulos
 - `evaluacion_de_calidad` — FIXED_CERTIFIED · ORQUESTACION · 6 modulos
 - `infra_ia_propia` — PASS_CERTIFIED · ORQUESTACION · 5 modulos
+- `ingesta_de_conocimiento` — PASS_CERTIFIED · ORQUESTACION · 26 modulos
 - `intake_y_objetivo` — PASS_CERTIFIED · ORQUESTACION · 3 modulos
 - `memoria_por_inquilino` — PASS_CERTIFIED · INTERNOS · 1 modulos
 - `memoria_y_rag` — PASS_CERTIFIED · ORQUESTACION · 5 modulos
@@ -69,10 +74,6 @@ una capacidad se queda sin modulos: no se puede inflar ni desinflar.
 
 _ninguna._
 
-## Pendientes (5)
+## Pendientes (0)
 
-- `aprendizaje_autonomo` — PENDING · ORQUESTACION · 5 modulos
-- `conocimiento_del_cliente` — PENDING · ORQUESTACION · 8 modulos
-- `enrutado_de_modelo` — PENDING · ORQUESTACION · 18 modulos
-- `entregables_y_certificados` — PENDING · ORQUESTACION · 13 modulos
-- `ingesta_de_conocimiento` — PENDING · ORQUESTACION · 26 modulos
+_ninguna._

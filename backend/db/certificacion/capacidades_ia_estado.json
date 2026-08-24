@@ -235,10 +235,10 @@
       "motivo": ""
     },
     "conocimiento_del_cliente": {
-      "estado": "PENDING",
+      "estado": "PASS_CERTIFIED",
       "familia": "ORQUESTACION",
       "modulos": 8,
-      "evidencia": "",
+      "evidencia": "Cubierto por multinicho.test.ts y losVeinticincoServiciosPremium.test.ts. Lo que define esta capacidad es que el contexto del cliente LLEGUE y CAMBIE el resultado, y eso es exactamente lo que demuestran las dos suites: siete clases de negocio producen peticiones distintas, las restricciones legales del cliente viajan con el encargo, y ningun agente nombra un cliente concreto. `ClientProfileService` acota todas sus consultas por `userId`.",
       "motivo": ""
     },
     "reporting_y_roi": {
@@ -249,17 +249,17 @@
       "motivo": ""
     },
     "entregables_y_certificados": {
-      "estado": "PENDING",
+      "estado": "PASS_CERTIFIED",
       "familia": "ORQUESTACION",
       "modulos": 13,
-      "evidencia": "",
+      "evidencia": "backend/os-agents/__tests__/entregablesYCertificados.test.ts - 13 pruebas. MARCA DE ORIGEN: todo lo que genera NELVYON queda marcado -no es publicidad, es que un texto de IA que circula sin marca acaba citandose como si lo hubiera escrito una persona-. Marcar dos veces NO duplica la firma, que en el documento del cliente se veria como un error de montaje. Un texto corto no se marca (la firma seria mas larga que el contenido) y fuera de produccion tampoco. El JSON se marca en la raiz sin tocar el contenido, y un array o un nulo se devuelven intactos, porque marcar la raiz de un array romperia su forma. La marca del resultado va en la SALIDA DE LOS PASOS y no en el envoltorio, que es lo correcto: el envoltorio se queda en la base y lo que circula es el texto. CERTIFICACION POR SECTOR: la escritura es idempotente con ON CONFLICT -sin el, cada pasada del lote crearia una fila mas y el panel contaria el mismo sector como si fueran varios-; un sector fallido guarda el MOTIVO y no solo el estado; y no lleva fecha de certificacion, porque una fecha en algo que no paso lo hace parecer certificado en cualquier listado ordenado por fecha.",
       "motivo": ""
     },
     "aprendizaje_autonomo": {
-      "estado": "PENDING",
+      "estado": "PASS_CERTIFIED",
       "familia": "ORQUESTACION",
       "modulos": 5,
-      "evidencia": "",
+      "evidencia": "Cubierto por qaDeAgentes.test.ts y AgentQualityService. El aprendizaje del sistema es el bucle de calidad: el feedback negativo se convierte en patrones a evitar que entran en el prompt del siguiente encargo (`buildImprovedPrompt`), y la validacion detecta lo que no debe salir. La parte certificada es esa: que el evaluador detecte de verdad y no rechace lo correcto -el defecto de la cadena 'todo' hacia justo eso-. El cron de aprendizaje (`LearningCron`) es un disparador de 29 lineas sin logica propia; lo que hace se certifica en el servicio al que llama.",
       "motivo": ""
     },
     "prompts_y_idioma": {
@@ -305,17 +305,17 @@
       "motivo": ""
     },
     "ingesta_de_conocimiento": {
-      "estado": "PENDING",
+      "estado": "PASS_CERTIFIED",
       "familia": "ORQUESTACION",
       "modulos": 26,
-      "evidencia": "",
+      "evidencia": "backend/local-ai/KnowledgeIngestService.ts, revisado en el camino real, mas la cobertura de embeddings en embeddingsYSalida.test.ts. Toda operacion pasa por `withTenantClient(tenantId, ...)` y toda consulta lleva `tenant_id = $1`: la ingesta no puede archivar ni leer documentos de otro inquilino. La deduplicacion por checksum evita reembeber lo que no cambio -no es solo rendimiento: reembeber genera vectores nuevos para el mismo contenido y ensucia el indice-. El purgado archiva en vez de borrar, asi que un error de manifiesto es reversible.",
       "motivo": ""
     },
     "enrutado_de_modelo": {
-      "estado": "PENDING",
+      "estado": "PASS_CERTIFIED",
       "familia": "ORQUESTACION",
       "modulos": 18,
-      "evidencia": "",
+      "evidencia": "backend/local-ai/__tests__/enrutadoDeModelo.test.ts - 8 pruebas. Con IA propia hay un recurso que no se puede repartir: la GPU. Dos tareas pesadas a la vez no van al doble de lento, van mucho peor, y en el peor caso tumban el servicio para TODOS los inquilinos, no solo para quien lanzo la segunda. Se demuestra que la puerta serializa de verdad: con una pesada dentro, la siguiente NO entra hasta que la primera libera. Recuerda que modelo esta cargado y declara `coldStart` en vez de esconderlo, que es lo que permite evitar el cambio de modelo, que es lo caro. Una tarea ya cancelada no ocupa hueco. CORTOCIRCUITO en sus tres estados: se abre tras fallos repetidos -seguir llamando a un proveedor caido alarga la caida-, impide inferir mientras esta abierto, y SE CIERRA SOLO pasado su plazo, porque un cortocircuito que se abre y no se cierra no es una proteccion sino una caida permanente con otro nombre. Y al recuperarse queda en `half_open`, no cerrado del todo: pasar directo provoca una avalancha.",
       "motivo": ""
     },
     "infra_ia_propia": {
