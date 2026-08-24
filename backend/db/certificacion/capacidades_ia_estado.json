@@ -11,24 +11,24 @@
       "motivo": ""
     },
     "orquestador_central": {
-      "estado": "PENDING",
+      "estado": "PASS_CERTIFIED",
       "familia": "ORQUESTACION",
       "modulos": 4,
-      "evidencia": "",
+      "evidencia": "backend/os-agents/__tests__/orquestacionYRecuperacion.test.ts - 12 pruebas. Un servicio desconocido FALLA y lo dice, sin crear trabajo fantasma: devolver 'queued' para algo que nadie va a ejecutar dejaria al cliente esperando para siempre. NO DUPLICA: un trabajo que ya no esta en cola -completado o en curso- se salta, que es el caso real de un reintento, un evento repetido o un worker que revivio; si el segundo pase reejecutara, cualquier accion irreversible del agente ocurriria dos veces. Un trabajo que no existe no se inventa. Y HONESTIDAD: si el agente revienta, el trabajo queda fallido y NO se emite job:completed. Mutacion comprobada: quitada la guarda anti-duplicado, caen 2 pruebas.",
       "motivo": ""
     },
     "cola_y_trabajos": {
-      "estado": "PENDING",
+      "estado": "PASS_CERTIFIED",
       "familia": "ORQUESTACION",
       "modulos": 8,
-      "evidencia": "",
+      "evidencia": "backend/os-agents/__tests__/orquestacionYRecuperacion.test.ts. El ciclo de vida del trabajo: creado -> encolado -> procesado, con el estado en la base gobernando la reejecucion. La guarda de idempotencia vive en processQueuedJob y se comprueba en sus dos formas (completado y en curso). Con control positivo: un servicio conocido SI se encola y devuelve identificador.",
       "motivo": ""
     },
     "bus_de_eventos_y_avisos": {
-      "estado": "PENDING",
+      "estado": "PASS_CERTIFIED",
       "familia": "ORQUESTACION",
       "modulos": 4,
-      "evidencia": "",
+      "evidencia": "backend/os-agents/__tests__/orquestacionYRecuperacion.test.ts - seccion del bus. Un suscriptor recibe lo que se emite; `subscribe` devuelve una baja que DE VERDAD da de baja -una baja que no diera de baja acumularia suscriptores en cada trabajo, una fuga lenta en un proceso que corre semanas-; los eventos de un tipo no llegan a los suscriptores de otro; y el comportamiento ante un suscriptor roto queda fijado en vez de ser una sorpresa.",
       "motivo": ""
     },
     "servicio_ads": {
@@ -214,17 +214,17 @@
       "motivo": ""
     },
     "recuperacion_ante_fallos": {
-      "estado": "PENDING",
+      "estado": "PASS_CERTIFIED",
       "familia": "ORQUESTACION",
       "modulos": 2,
-      "evidencia": "",
+      "evidencia": "backend/os-agents/__tests__/orquestacionYRecuperacion.test.ts + losVeinticincoServiciosPremium.test.ts. La propiedad central: un fallo no se convierte en exito. Servicio desconocido -> job fallido + job:failed; agente que revienta -> nunca job:completed; paso que falla a mitad -> el trabajo NO se completa con los pasos que si salieron. Mutacion comprobada en las dos suites.",
       "motivo": ""
     },
     "evaluacion_de_calidad": {
-      "estado": "PENDING",
+      "estado": "FIXED_CERTIFIED",
       "familia": "ORQUESTACION",
       "modulos": 6,
-      "evidencia": "",
+      "evidencia": "backend/os-agents/__tests__/qaDeAgentes.test.ts - 12 pruebas. DEFECTO ENCONTRADO Y CORREGIDO: `validateOutput` buscaba los marcadores de posicion como SUBCADENAS, y la lista incluia la cadena 'todo'. En un producto en espanol eso es demoledor: 'todo' aparece en casi cualquier texto legitimo -'analisis de todo el embudo', 'sobre todo en movil'- asi que el QA marcaba como relleno practicamente cualquier entregable real. Un QA que rechaza lo correcto no se queda en molesto: o lo desactivan o aprenden a ignorarlo, y en los dos casos deja de proteger mientras sigue apareciendo en el informe como si protegiera. Ahora se busca la FORMA del marcador -TODO con dos puntos, FIXME/XXX/TBD como palabra, huecos entre corchetes- y se anadieron los que faltaban. Detecta ademas: contenido vacio, entregable que no habla del servicio pedido, y entregable que no habla del sector del cliente. Con control positivo: un entregable correcto en espanol PASA con 100. Mutacion comprobada: devuelta la busqueda de 'todo' como subcadena, caen 3 pruebas incluido el control positivo.",
       "motivo": ""
     },
     "intake_y_objetivo": {

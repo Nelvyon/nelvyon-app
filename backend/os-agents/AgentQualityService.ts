@@ -189,10 +189,29 @@ ${JSON.stringify(context, null, 2)}`;
     }
 
     const normalized = output.toLowerCase();
-    const commonErrorPatterns = ["lorem ipsum", "todo", "placeholder", "n/a", "sin contenido"];
-    for (const pattern of commonErrorPatterns) {
-      if (normalized.includes(pattern)) {
-        issues.push(`Contains common error pattern: ${pattern}`);
+    // Los marcadores de posicion se buscan como MARCADORES, no como subcadenas.
+    //
+    // Antes la lista era `["lorem ipsum", "todo", "placeholder", ...]` con un
+    // `includes`. En un producto en espanol eso es demoledor: "todo" aparece en
+    // casi cualquier texto legitimo -"analisis de TODO el embudo", "sobre TODO
+    // en movil"- asi que el QA marcaba como relleno practicamente cualquier
+    // entregable real.
+    //
+    // Un QA que rechaza lo correcto no se queda en molesto: o lo desactivan, o
+    // aprenden a ignorarlo. En los dos casos deja de proteger, que es peor que
+    // no tenerlo, porque sigue apareciendo en el informe como si protegiera.
+    const marcadores: Array<{ patron: RegExp; nombre: string }> = [
+      { patron: /lorem ipsum/i, nombre: "lorem ipsum" },
+      { patron: /\bTODO\s*:/i, nombre: "TODO:" },
+      { patron: /\b(FIXME|XXX|TBD)\b/i, nombre: "marcador de tarea" },
+      { patron: /\bplaceholder\b/i, nombre: "placeholder" },
+      { patron: /\[(insertar|pendiente|rellenar|texto aqui|titulo aqui)[^\]]*\]/i, nombre: "hueco entre corchetes" },
+      { patron: /\bsin contenido\b/i, nombre: "sin contenido" },
+      { patron: /(^|\s)n\/a(\s|$|\.)/i, nombre: "n/a" },
+    ];
+    for (const { patron, nombre } of marcadores) {
+      if (patron.test(output)) {
+        issues.push(`Contains common error pattern: ${nombre}`);
       }
     }
 
