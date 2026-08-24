@@ -175,3 +175,102 @@ Dos trampas técnicas costaron tiempo y quedan escritas para que no se repitan:
 Y una de método: **una mutación que no se aplica produce un verde que parece una
 prueba**. Ocurrió una vez; se detectó porque el script afirmaba el número de
 sitios mutados. Sin esa afirmación habría contado como evidencia.
+
+---
+
+# BLOQUE_3_EXECUTABLE = CLOSED
+
+Declarado el **2026-08-24** sobre árbol congelado y limpio.
+**SHA certificado: `3feaaf24`**, rama `bloque4-webhooks`.
+
+## Inventario
+
+| | |
+|---|---|
+| Clasificadas | **55 / 55** |
+| Certificadas | **55** (48 `PASS_CERTIFIED` + 7 `FIXED_CERTIFIED`) |
+| Bloqueadas | **0** |
+| Pendientes | **0** |
+
+Contador inviolable: **55 + 0 + 0 = 55**. El denominador se **deriva** de 2224
+módulos de IA del árbol; un guardián falla si un módulo queda huérfano o si una
+capacidad se queda sin módulos. No se puede inflar ni desinflar.
+
+## Evidencia de la puerta
+
+| Tanda | Resultado |
+|---|---|
+| Web completa (808 ficheros) | **7518 pasadas · 0 fallos · 178 saltadas** · 135 s |
+| Python completa, PostgreSQL real | **3607 pasadas · 0 fallos · 10 saltadas** · 9:22 |
+| Aislamiento y RLS, en serie | **95 / 95** |
+| Guardianes de inventario y trinquetes | **23 / 23** |
+
+Las dos puertas se ejecutaron **solas**. Los `.py` del árbol son idénticos entre
+la corrida de Python y el SHA final, así que su evidencia lo certifica.
+
+**El árbol queda limpio después de la puerta.** No lo estaba: `apps/web/.data`
+tenía 17 zips rastreados, ocho de ellos regenerados por cada corrida. Un SHA que
+se ensucia al ejecutar su propia puerta no certifica nada, porque el árbol que se
+midió y el que queda no son el mismo.
+
+## Skips auditados
+
+**Web — 178.** Ninguno oculta una afirmación del Bloque 3:
+
+| | |
+|---|---|
+| 95 | **recuperadas y ejecutadas en serie**: aislamiento OS, migración 523, contexto de inquilino, colas, persistencia ERP |
+| 68 | credencial del rol `nelvyon_web_app` → `WEB_DB_ROLE_CUTOVER` |
+| 16 | `rlsIsolation`: exige un rol **sin** privilegios; apuntada a un superusuario **falla**, y hace bien |
+| 6 | exigen proveedor de IA en vivo → coste externo |
+
+**Python — 10.** La `571` apartada (2), dos listas de deuda **vacías** con control
+positivo, cinco conectores que no declaran ruta, y una tabla ausente que la prueba
+declara en vez de callar.
+
+## Defectos corregidos
+
+Siete, más dos encontrados **por la propia puerta**:
+
+1. Inyección de prompt por diseño.
+2. Escalada de permisos: `forbiddenActions` muerto para 8 de 9 acciones.
+3. La puerta no ejecutaba `backend/private-ai`, `config` ni `http`.
+4. QA que rechazaba lo correcto.
+5. Métrica de visibilidad fabricada.
+6. Degradación silenciosa y permanente del almacén de prompts.
+7. Literal roto en el orquestador privado, sin cobertura que lo detectara.
+8. **`os_agent_data_cache.tenant_id`**: molde `::uuid[]` sobre columna TEXT, con
+   dos `catch` mudos encadenados escondiéndolo.
+9. **`chatbot_configs.user_id`**: el mismo defecto, encontrado barriendo la clase.
+
+Los nueve con **mutación comprobada**: reintroducido el defecto, la prueba cae.
+
+## Barrido de la clase, y su guardián
+
+Tras el octavo defecto barrí la clase entera con evidencia del esquema real, no
+por sospecha. De 259 moldes `::uuid` en producción, tres saltaron: dos eran falsos
+positivos de mi propia expresión regular y el tercero pertenece a código muerto ya
+inventariado. De 49 limpiezas en las suites, una era realmente incorrecta.
+
+El barrido quedó convertido en `losMoldesDeLimpiezaCoincidenConElEsquema.pg.test.ts`:
+compara cada molde con `information_schema`. **Un barrido que se hace una vez no
+protege de nada.**
+
+## Producción y coste
+
+- **Producción: NO TOCADA.** Todo contra bases de certificación.
+- **Ninguna migración bloqueada aplicada.** Verificado: 568–576 → ninguna.
+- Sin cambios de roles ni credenciales. Sin operaciones destructivas.
+- **Coste externo generado: 0 €.** `NELVYON_AI_ENABLED=0`. Ningún proveedor de
+  pago activado. Las 8 Skills externas instaladas son oficiales, locales y
+  gratuitas.
+
+## Gates que siguen pendientes
+
+`WEB_DB_ROLE_CUTOVER` (bloquea 68 pruebas escritas) · ADR-064
+(`568/569/570/572/573/574/575/576`; `571` apartada) ·
+`STRIPE_MEMBERSHIP_REACTIVATION` · decisión sobre `InvoicingService` y
+`ABTestingService` · validación de email en CRM · `chrome-devtools-mcp` pendiente
+de revisión de permisos de red.
+
+Todos **BLOCKED_ON_FOUNDER**. La ausencia del fundador no es autorización.
