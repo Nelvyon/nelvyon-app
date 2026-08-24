@@ -263,10 +263,10 @@
       "motivo": ""
     },
     "prompts_y_idioma": {
-      "estado": "PENDING",
+      "estado": "FIXED_CERTIFIED",
       "familia": "ORQUESTACION",
       "modulos": 3,
-      "evidencia": "",
+      "evidencia": "backend/os-agents/__tests__/promptsYRagDePlataforma.test.ts - 11 pruebas. DEFECTO ENCONTRADO Y CORREGIDO: DEGRADACION SILENCIOSA Y PERMANENTE. `resolveAgentPrompts` caia a un prompt generico ante cualquier fallo del almacen Y LO CACHEABA. Un corte de red de un segundo dejaba a ese agente trabajando con tres frases de relleno durante toda la vida del proceso, y quien lo llamaba recibia un objeto con la MISMA FORMA, sin manera de notarlo: un agente Premium con el prompt generico produce algo que parece un entregable y no lo es. Dos arreglos: el sustituto ya no se cachea -el siguiente intento vuelve a probar, que cuesta una peticion fallida y recuperarse solo lo vale- y el bundle declara su `fuente` ('vault' o 'fallback'). Con control positivo en las dos direcciones: el prompt REAL si se cachea, porque no cachear nada convertiria cada paso de cada agente en una peticion de red. Mutacion comprobada: devuelto el cacheo del sustituto, cae la prueba.",
       "motivo": ""
     },
     "creatividad_y_generacion": {
@@ -340,10 +340,10 @@
       "motivo": ""
     },
     "rag_privado": {
-      "estado": "PENDING",
+      "estado": "PASS_CERTIFIED",
       "familia": "INTERNOS",
       "modulos": 12,
-      "evidencia": "",
+      "evidencia": "backend/os-agents/__tests__/promptsYRagDePlataforma.test.ts - seccion de RAG. Lee SOLO `nelvyon_rag_chunks` y se comprueba sobre el SQL emitido que no toca ninguna tabla de inquilino: el aislamiento aqui no es por cliente -este corpus es de NELVYON- sino que nunca se mezcle con datos de cliente. Una consulta vacia NO llega a consultar la base: sin ese corte, `%%` casaria con todo el corpus y devolveria el limite entero para una pregunta que nadie hizo. El contenido se devuelve tal cual sin interpretar, incluido texto que parezca una orden -que no llegue al modelo como autoridad lo cubre contextoRecuperadoNoEsAutoridad-. Etiquetas ausentes vuelven como lista vacia en vez de reventar.",
       "motivo": ""
     },
     "orquestacion_privada": {
