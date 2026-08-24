@@ -156,10 +156,18 @@ describeSiHayPg("BLOQUE 2 · chatbot y SMS", () => {
     beforeEach(async () => {
       // Acotado al par de inquilinos de ESTE fichero: un DELETE sin filtro
       // borraria lo que otro fichero acaba de sembrar, y vitest los corre en paralelo.
+      // `chatbot_configs.user_id` es UUID, no texto. El molde `::text[]` hacia
+      // fallar los dos DELETE, y el `.catch` lo escondia: la limpieza no
+      // limpiaba nada. Es el mismo defecto que la puerta destapo en
+      // `os_agent_data_cache`, encontrado despues barriendo la clase entera.
+      //
+      // Sin `.catch`: si la limpieza falla, la prueba tiene que decirlo. Una
+      // limpieza que falla en silencio deja que el estado se acumule hasta que
+      // algo choca, y entonces el fallo aparece lejos de su causa.
       await pool.query(
-        "DELETE FROM chatbot_conversations WHERE chatbot_id IN (SELECT id FROM chatbot_configs WHERE user_id = ANY($1::text[]))",
-        [[A, B]]).catch(() => {});
-      await pool.query("DELETE FROM chatbot_configs WHERE user_id = ANY($1::text[])", [[A, B]]).catch(() => {});
+        "DELETE FROM chatbot_conversations WHERE chatbot_id IN (SELECT id FROM chatbot_configs WHERE user_id = ANY($1::uuid[]))",
+        [[A, B]]);
+      await pool.query("DELETE FROM chatbot_configs WHERE user_id = ANY($1::uuid[])", [[A, B]]);
     });
 
     const config = (nombre = "Asistente de A") => ({
