@@ -1,0 +1,9 @@
+
+
+# Salida de las ejecuciones de agentes: bundles y sitios generados.
+#
+# Estaban RASTREADOS por acumulacion -17 ficheros zip de ejecuciones viejas- y
+# eso hacia que el arbol nunca pudiera quedar limpio despues de una puerta: cada
+# corrida regeneraba ocho de ellos y aparecian como modificados. Un SHA
+# certificado que se ensucia solo al certificarlo no es un SHA certificado.
+.data/
