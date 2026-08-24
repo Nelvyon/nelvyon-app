@@ -2,27 +2,20 @@
 
 Estado a 2026-08-24. Rama `bloque4-webhooks`.
 
-## Lo que se ha hecho, y lo que deliberadamente no
+## Resumen
 
-**Se han construido 16 Skills propias** con el estándar de NELVYON, repartidas
-entre los agentes con mínimo privilegio y vigiladas por
-`backend/private-ai/__tests__/registroDeSkills.test.ts`.
+- **16 Skills propias** con el estándar de NELVYON, repartidas con mínimo
+  privilegio y vigiladas por `backend/private-ai/__tests__/registroDeSkills.test.ts`.
+- **8 Skills externas oficiales de Anthropic**, auditadas e instaladas por la vía
+  oficial. Ver [la auditoría del ecosistema](#auditoría-del-ecosistema-de-claude-code).
+- **Ninguna Skill ni MCP de terceros sin verificar.** Cinco candidatos propuestos
+  no existen en las fuentes oficiales y quedan como `UNSAFE` por falta de
+  procedencia, no por sospecha.
+- **Coste externo nuevo: 0 €.**
 
-**No se ha instalado ninguna Skill, plugin ni MCP de terceros.** No es dejadez;
-es la política que el propio encargo fija, aplicada:
-
-> «NO instales automáticamente cualquier repositorio encontrado en Internet.
-> Si una Skill puede ejecutar código o tocar credenciales, trátala como código
-> no confiable hasta revisarla.»
-
-A eso se suma una razón de método: meter código de terceros en el árbol mientras
-está bajo certificación contamina el SHA que se está certificando. Lo correcto es
-cerrar el bloque y hacer la incorporación como un trabajo con su propia puerta.
-
-Y una tercera, la que más pesa: **una Skill de terceros que se instala sin leerla
-es exactamente el vector de inyección que este bloque acaba de cerrar por dentro.**
-Habría sido incoherente arreglar la inyección por RAG y abrir la puerta por el
-lado de las herramientas el mismo día.
+Las externas **no se copiaron al árbol**: `anthropics/skills` no declara licencia,
+así que copiar sus ficheros sería redistribuir código ajeno sin permiso. Se
+instalan por el mecanismo con el que Anthropic los distribuye, que es usarlos.
 
 ---
 
@@ -63,10 +56,10 @@ por la que se le puede desviar.
 
 ---
 
-## MCP y herramientas — evaluación, sin instalar
+## MCP de terceros — evaluación, ninguno instalado
 
-Cada fila dice qué haría falta y por qué está donde está. Ninguna se ha
-instalado.
+Estos son **MCP de proveedores**, distintos de las Skills oficiales de Anthropic
+que sí se instalaron. Cada fila dice qué haría falta y por qué está donde está.
 
 | Herramienta | Para qué | Riesgo principal | Estado |
 |---|---|---|---|
@@ -81,14 +74,14 @@ instalado.
 | **Lighthouse / CWV** | Rendimiento medido | Bajo: se puede ejecutar local | `PENDIENTE_DE_REVISION` — candidato preferente, sin coste y sin cuenta |
 | **Almacenamiento y CMS** | Entregables y publicación | Escritura en sistemas del cliente | `BLOCKED_EXTERNALLY: CUENTA` |
 
-### Los dos candidatos sin coste ni cuenta
+### Playwright: resuelto por otra vía
 
-`Playwright` y `Lighthouse` son los únicos de la lista que pueden funcionar en
-local, sin cuenta y sin gasto. Son también los que más falta hacen: sin ellos,
-`nelvyon-web-qa` y `nelvyon-performance` describen cómo comprobar cosas que hoy
-nadie ejecuta automáticamente.
+La fila de arriba se quedó obsoleta en cuanto se auditó el ecosistema. **Playwright
+ya está instalado**, pero no como MCP de terceros: la Skill oficial de Anthropic
+`webapp-testing` lo trae, es local, sin cuenta y sin coste. Ver la auditoría.
 
-Ese es el trabajo natural del Bloque 4, con su propia revisión de permisos de red.
+Queda `chrome-devtools-mcp` (Chrome DevTools) como candidato para medir
+rendimiento real, `PENDIENTE_DE_REVISION` por sus permisos de red.
 
 ---
 
@@ -111,3 +104,108 @@ Antes de que cualquier Skill o MCP externo entre en el árbol:
 
 Una Skill que ejecuta código o toca credenciales se trata como **código no
 confiable** hasta haber pasado los nueve puntos.
+
+---
+
+# Auditoría del ecosistema de Claude Code
+
+Actualizado el 2026-08-24. **Ningún nombre se ha dado por bueno**: cada uno se ha
+verificado contra su fuente antes de clasificarlo.
+
+## Las dos fuentes oficiales
+
+| Fuente | Qué es | Verificación |
+|---|---|---|
+| `anthropics/skills` | Repositorio público de Agent Skills | 19 Skills, activo (último push 2026-08-21), 171k estrellas |
+| `anthropics/claude-plugins-official` | Directorio de plugins gestionado por Anthropic | 300+ entradas, con procedencia por repositorio |
+
+## Verificación de la lista propuesta
+
+De los 21 nombres, **11 no existen** con ese nombre en ninguna de las dos fuentes
+oficiales. Esa es la razón de comprobar antes de instalar.
+
+| Nombre propuesto | ¿Existe? | Clasificación |
+|---|---|---|
+| Frontend Design | **Sí** — `frontend-design`, Anthropic | `VERIFIED_FREE_SAFE` · **instalada** |
+| Playwright | **No con ese nombre** — es `webapp-testing`, Anthropic, y usa Playwright | `VERIFIED_FREE_SAFE` · **instalada** |
+| Skill Creator | **Sí** — `skill-creator`, Anthropic | `VERIFIED_FREE_SAFE` · **instalada** |
+| MCP Server Dev | **Sí** — `mcp-builder`, Anthropic | `VERIFIED_FREE_SAFE` · **instalada** |
+| Modern Web Guidance | **Sí** — `modern-web-guidance`, Google Chrome | `REDUNDANT` — solapa `nelvyon-web-elite` y `nelvyon-performance` |
+| Lighthouse | **No** — lo más cercano es `chrome-devtools-mcp` | `PENDIENTE_DE_REVISION` — Chrome real, permisos de red por auditar |
+| Code Review | **Sí** — `code-review`, Anthropic | `REDUNDANT` — este proyecto ya usa `/code-review` |
+| Code Simplifier | **Sí** — `code-simplifier`, Anthropic | `REDUNDANT` — ya disponible como `/simplify` |
+| Feature Dev | **Sí** — `feature-dev`, Anthropic | `NOT_APPLICABLE` — no encaja con el método de certificación por bloques |
+| Hookify | **Sí** — `hookify`, Anthropic | `NOT_APPLICABLE` — no hay comportamiento que frenar hoy |
+| Claude Code Setup | **Sí** — `claude-code-setup`, Anthropic | `NOT_APPLICABLE` — el proyecto ya está configurado |
+| CLAUDE.md Management | **Sí** — `claude-md-management`, Anthropic | `NOT_APPLICABLE` — `CLAUDE.md` ya existe y se mantiene a mano |
+| Security Guidance | **Sí** — `claude-security`, Anthropic | `REDUNDANT` — ya disponible como `/security-review` |
+| fakechat | **Sí** — `fakechat`, Anthropic | `NOT_APPLICABLE` — chat local para probar notificaciones |
+| Pydantic AI | **No** — lo que existe es `logfire` de Pydantic (observabilidad Python) | `NOT_APPLICABLE` — el backend de IA es TypeScript |
+| TypeScript LSP | **No aparece** — sí hay LSP de C, C#, Go, Java, Kotlin, Lua | `NOT_APPLICABLE` |
+| Superpowers | **No existe** en fuentes oficiales | `UNSAFE` — sin procedencia verificable |
+| Ralph Loop | **No existe** en fuentes oficiales | `UNSAFE` — sin procedencia verificable |
+| PR Review Toolkit | **No existe** con ese nombre | `UNSAFE` — sin procedencia verificable |
+| Plugin Developer Toolkit | **No existe** con ese nombre | `UNSAFE` — sin procedencia verificable |
+| SearchFit SEO | **No existe** en fuentes oficiales | `UNSAFE` — sin procedencia verificable |
+
+`UNSAFE` aquí no acusa a nadie: significa **no he podido verificar qué es**, y
+esa es razón suficiente para no instalarlo.
+
+## Lo descubierto que sí aporta y no estaba en la lista
+
+Las cuatro Skills de documentos de `anthropics/skills` — `pdf`, `docx`, `xlsx`,
+`pptx` — no venían propuestas y son de las más útiles para una agencia: informes,
+propuestas y hojas de cálculo son entregables reales, no adornos.
+
+`VERIFIED_FREE_SAFE`, **instaladas**, y asignadas a `reporting`, `sales` y
+`ceo_supervisor`, que son quienes entregan al cliente.
+
+## Cómo se instalaron, y por qué así
+
+Por la vía oficial: `extraKnownMarketplaces` en `.claude/settings.json`
+apuntando a `anthropics/skills`. **No se copió ni un fichero al árbol.**
+
+La distinción no es de estilo. El repositorio oficial **no declara licencia** —
+`license: null` en la API de GitHub, y no hay fichero `LICENSE`. Sin licencia,
+copiar los ficheros dentro del repositorio de un cliente sería redistribuir
+código ajeno sin permiso. Instalarlos por el mecanismo con el que Anthropic los
+distribuye es usarlos, que es otra cosa distinta.
+
+Ese mismo motivo descarta la opción de «extraer el conocimiento útil»: sin
+licencia, extraer también es copiar.
+
+## Auditoría de `webapp-testing`, la de más alcance
+
+Es la única de las ocho que **ejecuta algo**, así que es la única que merece
+párrafo propio.
+
+| | |
+|---|---|
+| Qué hace | Automatiza un navegador Chromium con Playwright para comprobar una web |
+| Cuenta o pago | Ninguno |
+| Red | Solo `localhost`. Está diseñada para desarrollo local, no para producción |
+| Filesystem | Lee HTML y escribe capturas |
+| Instalación | Playwright descarga binarios de Chromium en el primer uso |
+| Secretos | No recibe ninguno |
+
+**El binario descargado es la parte que hay que tener presente.** Viene del CDN
+de Playwright (Microsoft) y es el mecanismo estándar de la herramienta, pero es
+descarga de un ejecutable, y eso se dice en vez de esconderlo.
+
+Por eso lleva **mínimo privilegio**: solo `qa` y `development`. Un navegador que
+puede ir a cualquier URL es superficie de SSRF y de inyección por el contenido de
+la propia página; el agente de contenido y el de redes no lo necesitan y no lo
+tienen. Hay una prueba que falla si alguien se lo da.
+
+## Resumen
+
+| Clasificación | Cuántas |
+|---|---|
+| `VERIFIED_FREE_SAFE` · instaladas | **8** |
+| `REDUNDANT` | 4 |
+| `NOT_APPLICABLE` | 7 |
+| `UNSAFE` (sin procedencia verificable) | 5 |
+| `PENDIENTE_DE_REVISION` | 1 (`chrome-devtools-mcp`) |
+| `BLOCKED_EXTERNALLY` / `BLOCKED_ON_FOUNDER` | 10 (tabla anterior) |
+
+Coste externo nuevo: **0 €**.

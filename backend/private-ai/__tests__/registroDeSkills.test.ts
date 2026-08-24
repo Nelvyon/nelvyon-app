@@ -23,6 +23,9 @@ import {
   SKILLS_POR_AGENTE,
   agentePuedeUsar,
   skillsDe,
+  EXTERNAS_POR_AGENTE,
+  SKILLS_EXTERNAS,
+  externasDe,
 } from "../skills/registroDeSkills";
 
 function raizDelProyecto(): string {
@@ -128,5 +131,36 @@ describe("BLOQUE 3 · registro de Skills de NELVYON", () => {
 
   it("un agente desconocido no hereda ninguna Skill", () => {
     expect(skillsDe("agente-que-no-existe")).toEqual([]);
+    expect(externasDe("agente-que-no-existe")).toEqual([]);
+  });
+
+  // -- Skills externas oficiales ---------------------------------------------
+
+  it("las externas estan declaradas en la configuracion de plugins", () => {
+    // Declararlas en el registro y no habilitarlas seria una lista que no carga
+    // nada: los agentes creerian tenerlas y no las tendrian.
+    const cfg = JSON.parse(
+      readFileSync(join(raizDelProyecto(), ".claude", "settings.json"), "utf8"),
+    ) as { enabledPlugins?: Record<string, boolean> };
+    const habilitadas = Object.keys(cfg.enabledPlugins ?? {}).map((k) => k.split("@")[0]!);
+    for (const s of SKILLS_EXTERNAS) {
+      expect(habilitadas, `${s} no esta habilitada`).toContain(s);
+    }
+  });
+
+  it("MINIMO PRIVILEGIO tambien en las externas", () => {
+    // Playwright puede navegar a cualquier URL: es superficie de SSRF y de
+    // inyeccion por el contenido de la propia pagina. Solo la lleva quien tiene
+    // que comprobar una web.
+    expect(externasDe("qa")).toContain("webapp-testing");        // control positivo
+    expect(externasDe("content")).not.toContain("webapp-testing");
+    expect(externasDe("sales")).not.toContain("webapp-testing");
+    expect(externasDe("social_media")).toEqual([]);
+  });
+
+  it("ningun agente lleva todas las externas", () => {
+    for (const [a, lista] of Object.entries(EXTERNAS_POR_AGENTE)) {
+      expect(lista.length, `${a} lleva todas`).toBeLessThan(SKILLS_EXTERNAS.length);
+    }
   });
 });

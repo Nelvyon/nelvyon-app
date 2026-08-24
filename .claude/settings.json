@@ -1,0 +1,26 @@
+{
+  "extraKnownMarketplaces": {
+    "anthropic-skills": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/skills"
+      }
+    },
+    "anthropic-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "webapp-testing@anthropic-skills": true,
+    "skill-creator@anthropic-skills": true,
+    "mcp-builder@anthropic-skills": true,
+    "frontend-design@anthropic-skills": true,
+    "pdf@anthropic-skills": true,
+    "docx@anthropic-skills": true,
+    "xlsx@anthropic-skills": true,
+    "pptx@anthropic-skills": true
+  }
+}

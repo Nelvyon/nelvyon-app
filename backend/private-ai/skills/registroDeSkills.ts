@@ -114,3 +114,55 @@ export const AGENTES_QUE_PRODUCEN: readonly string[] = [
   "meta_ads",
   "tiktok_ads",
 ] as const;
+
+// ────────────────────────────────────────────────────────────────────────────
+// Skills EXTERNAS, oficiales de Anthropic
+// ────────────────────────────────────────────────────────────────────────────
+//
+// Instaladas por la via oficial -`extraKnownMarketplaces` en `.claude/settings.json`
+// apuntando a `anthropics/skills`- y NO copiadas al arbol.
+//
+// La distincion no es formal. El repositorio oficial **no declara licencia**
+// (`license: null` en la API de GitHub, y no hay fichero LICENSE). Sin licencia,
+// copiar los ficheros dentro del repositorio de NELVYON seria redistribuir
+// codigo ajeno sin permiso. Instalarlos por el mecanismo que Anthropic
+// distribuye es usarlos, que es otra cosa.
+//
+// Se eligieron ocho de las diecinueve disponibles. Las once restantes no entran
+// por redundantes con las propias o por no aplicar a este producto: anadir una
+// Skill que nadie va a usar no es cobertura, es ruido en el contexto.
+
+export const SKILLS_EXTERNAS = [
+  "webapp-testing",   // Playwright local: da EJECUCION a nelvyon-web-qa
+  "frontend-design",  // acabado visual; complementa nelvyon-web-elite
+  "skill-creator",    // para construir bien las siguientes Skills propias
+  "mcp-builder",      // para construir los MCP propios de NELVYON
+  "pdf",
+  "docx",
+  "xlsx",
+  "pptx",
+] as const;
+
+export type SkillExterna = (typeof SKILLS_EXTERNAS)[number];
+
+/**
+ * Reparto de las externas, con el mismo criterio de minimo privilegio.
+ *
+ * Las cuatro de documentos van a quien entrega al cliente: informes, propuestas
+ * y hojas de calculo. No a los agentes tecnicos, que no producen entregables de
+ * cliente y solo ganarian superficie.
+ */
+export const EXTERNAS_POR_AGENTE: Readonly<Record<string, readonly SkillExterna[]>> = {
+  qa: ["webapp-testing"],                          // la que hacia falta: QA que EJECUTA
+  development: ["webapp-testing", "frontend-design"],
+  product: ["frontend-design"],
+  cto: ["skill-creator", "mcp-builder"],           // construir herramienta, no usarla
+  reporting: ["pdf", "docx", "xlsx", "pptx"],
+  ceo_supervisor: ["pdf", "docx"],
+  sales: ["pdf", "docx", "pptx"],                  // propuestas
+  marketing: ["pptx"],
+};
+
+export function externasDe(agentId: string): readonly SkillExterna[] {
+  return EXTERNAS_POR_AGENTE[agentId] ?? [];
+}
