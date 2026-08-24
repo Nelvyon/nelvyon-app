@@ -1,6 +1,7 @@
 # BLOQUE 3 — cierre
 
-**Empresa IA autónoma NELVYON.** SHA candidato `068aba51`, rama `bloque4-webhooks`.
+**Empresa IA autónoma NELVYON.** **SHA certificado: `3feaaf24`**, rama
+`bloque4-webhooks`. Este documento se escribió después, sin tocar código.
 
 El estado por capacidad vive en `backend/db/certificacion/capacidades_ia_estado.json`
 y se resume, generado, en `docs/BLOQUE_3_ESTADO.md`. Este documento cuenta lo que
@@ -8,7 +9,11 @@ un listado de estados no puede contar: **qué estaba roto**.
 
 ---
 
-## Los siete defectos
+## Los nueve defectos
+
+Siete aparecieron certificando. Los dos últimos —el 8 y el 9— los encontró la
+**propia puerta final**, y son la misma clase: un molde `::uuid` sobre una
+columna `TEXT` con errores tragados escondiéndolo.
 
 Todos comparten una firma, y no es la del Bloque 2. Allí el patrón era «la
 interfaz dice que sí y la base no cambia». Aquí es peor de explicar y más fácil
@@ -110,6 +115,25 @@ que escribí su suite. El corazón de la empresa IA no tenía cobertura.
 
 Lo apunto porque es el mismo fallo que persigue el bloque, cometido por mí: algo
 que parece funcionar porque nadie lo mira.
+
+### 8 · El molde que la puerta destapó
+
+`os_agent_data_cache.tenant_id` es **TEXT**. La limpieza de la suite moldeaba a
+`::uuid[]`, así que el `DELETE` fallaba **siempre**. Un `.catch(() => {})` se lo
+tragaba. Las filas se acumulaban entre ejecuciones hasta chocar con una clave
+única, y entonces la **siembra** fallaba —también en silencio, por otro `catch`—
+y la prueba se caía tres líneas más abajo con un `expected null to contain ...`
+que no apuntaba a nada.
+
+Dos errores tragados encadenados para tapar un molde mal puesto. Y mientras la
+base estaba limpia, todo pasaba: el fallo aparecía por acumulación, lejos de su
+causa y en otra ejecución.
+
+### 9 · El mismo defecto, encontrado barriendo la clase
+
+`chatbot_configs.user_id` es `uuid` y su limpieza moldeaba a `::text[]`, con su
+propio `catch` mudo. Dos no es casualidad: es una clase, y por eso el barrido se
+convirtió en guardián.
 
 ---
 

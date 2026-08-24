@@ -8,7 +8,7 @@ Estado a **2026-08-23**. Rama `bloque4-webhooks`, worktree `C:\Users\Daniel\nelv
 |---|---|
 | 1 · Seguridad + base técnica | **CERRADO** → `docs/BLOQUE_1_CIERRE.md` |
 | 2 · Web + SaaS + OS completos | **CERRADO** en `2b2c3d8e` → `docs/BLOQUE_2_CIERRE.md` |
-| 3 · Empresa IA autónoma | **EN CURSO** → `docs/BLOQUE_3_LINEA_BASE.md` |
+| 3 · Empresa IA autónoma | **CERRADO** en `3feaaf24` → `docs/BLOQUE_3_CIERRE.md` |
 | 4 · Certificación final | pendiente |
 
 El estado por capacidad se **genera**, no se escribe:
@@ -81,42 +81,42 @@ Está escrito, con las cuatro tandas y sus variables, en
 - **No mates una suite por lenta si sigue progresando.** `test_rls_saas_cross_tenant.py`
   tarda ~14 minutos y no está colgada.
 
-## Bloque 3 — 55/55, PENDING = 0
+## Bloque 3 — CERRADO
 
-**48 `PASS_CERTIFIED` + 7 `FIXED_CERTIFIED` + 0 bloqueadas + 0 pendientes = 55.**
-SHA candidato `068aba51`. Cierre en `docs/BLOQUE_3_CIERRE.md`.
+`BLOQUE_3_EXECUTABLE = CLOSED`. **SHA certificado `3feaaf24`.**
 
-Estado vivo generado:
+**55/55 clasificadas · 48 `PASS` + 7 `FIXED` · 0 bloqueadas · 0 pendientes.**
 
-    python -m backend.db.certificacion.estado_bloque3
+| Puerta | Resultado |
+|---|---|
+| Web (808 ficheros) | 7518 pasadas · 0 fallos · 178 saltadas |
+| Python, PostgreSQL real | 3607 pasadas · 0 fallos · 10 saltadas |
+| Aislamiento y RLS, en serie | 95/95 |
+| Guardianes | 23/23 |
 
-### Cómo se ejecuta la puerta del Bloque 3
+El árbol queda **limpio antes y después** de la puerta: `apps/web/.data` tenía 17
+zips rastreados que cada corrida regeneraba, y un SHA que se ensucia al ejecutar
+su propia puerta no certifica nada.
 
-    NELVYON_B3_PUERTA=1     NELVYON_B3_DSN=postgresql://nelvyon_local:...@localhost:5434/nelvyon_b2_cert     NELVYON_B2_DSN=postgresql://nelvyon_local:...@localhost:5434/nelvyon_b2_cert     npx vitest run     # desde apps/web
+### Cómo repetir la puerta
 
-`laPuertaDelBloque3NoPuedeSaltarse` falla si se declara `NELVYON_B3_PUERTA=1` sin
-el DSN: una puerta sin base se saltaría las suites y diría verde.
+    # Web, sola
+    NELVYON_B3_PUERTA=1     NELVYON_B3_DSN=postgresql://nelvyon_local:...@localhost:5434/nelvyon_b2_cert     NELVYON_B2_DSN=postgresql://nelvyon_local:...@localhost:5434/nelvyon_b2_cert     npx vitest run                                    # desde apps/web
 
-**La puerta se ejecuta sola.** Solapar la suite web con la de Python tumbó tres
-pruebas por `Test timed out in 5000ms` en el Bloque 2 — saturación de máquina, no
-producto.
+    # Aislamiento, EN SERIE
+    NELVYON_WEB_CERT_DSN=...nelvyon_web_cert     MIG523_TEST_DATABASE_URL=...nelvyon_mig_cert     DATABASE_URL=...nelvyon_b2_cert     npx vitest run --no-file-parallelism aislamiento_os_lado_web migration523       reclamoDeEvento contextoDeInquilino laBajaNoResucita colasNoDuplicanTrabajo       ErpDomainSnapshotStore ErpPersistenceRoundtrip
 
-### Siete defectos encontrados en el Bloque 3
+    # Python, sola
+    NELVYON_AI_ENABLED=0 NELVYON_PG_CERT_DSN=...nelvyon_cert545     NELVYON_WEB_CERT_DSN=...nelvyon_web_cert     NELVYON_VIRGEN_DSN=...nelvyon_rec_final     python -m pytest backend/tests -q -p no:randomly
 
-1. Inyección de prompt por diseño (RAG y memoria en el mensaje de sistema).
-2. Escalada de permisos: `forbiddenActions` muerto para 8 de 9 acciones.
-3. La puerta no ejecutaba `backend/private-ai`, `config` ni `http`.
-4. QA que rechazaba lo correcto por buscar `"todo"` como subcadena.
-5. Métrica fabricada: visibilidad en IA presentada como medida.
-6. Degradación silenciosa y permanente del almacén de prompts.
-7. Un literal roto en el orquestador privado, sin cobertura que lo detectara.
+### Bloqueos que esperan al fundador
 
-Los siete con mutación comprobada. Detalle en `docs/BLOQUE_3_CIERRE.md`.
+`WEB_DB_ROLE_CUTOVER` (bloquea 68 pruebas ya escritas) · ADR-064
+(`568/569/570/572/573/574/575/576`; `571` apartada) ·
+`STRIPE_MEMBERSHIP_REACTIVATION` · decisión sobre `InvoicingService` y
+`ABTestingService` · validación de email en CRM · `chrome-devtools-mcp` pendiente
+de revisión de permisos de red.
 
-### Dos trampas técnicas
+### Bloque 4
 
-- Aplicar arreglos con Python convierte `` en un **carácter de retroceso real**
-  (0x08), invisible al leer, y la regex no casa nunca. Usar cadenas crudas.
-- Escribir un fichero leído con `newline=""` en Windows **duplica las líneas**.
-  Leer universal, escribir con `newline="
-"`.
+Arranca **después** de `3feaaf24`, en commits posteriores, sin tocar ese árbol.
