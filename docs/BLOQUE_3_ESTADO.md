@@ -4,15 +4,15 @@
 > `backend/db/certificacion/capacidades_ia_estado.json` mediante
 > `backend/db/certificacion/estado_bloque3.py`.
 
-**41/55 certificadas · 0 bloqueadas · 14 pendientes**
+**42/55 certificadas · 0 bloqueadas · 13 pendientes**
 
-Contador inviolable: 41 + 0 + 14 = 55
+Contador inviolable: 42 + 0 + 13 = 55
 
 El denominador se DERIVA de 2224 modulos de IA del arbol mediante
 `capacidades_ia.py`. Un guardian falla si un modulo queda huerfano o si
 una capacidad se queda sin modulos: no se puede inflar ni desinflar.
 
-## Certificadas (41)
+## Certificadas (42)
 
 - `agentes_internos` — FIXED_CERTIFIED · INTERNOS · 5 modulos
 - `aprobaciones_y_gates` — FIXED_CERTIFIED · INTERNOS · 2 modulos
@@ -55,12 +55,13 @@ una capacidad se queda sin modulos: no se puede inflar ni desinflar.
 - `servicio_voz` — PASS_CERTIFIED · SERVICIO · 2 modulos
 - `servicio_web` — PASS_CERTIFIED · SERVICIO · 2 modulos
 - `trazabilidad_y_auditoria` — PASS_CERTIFIED · INTERNOS · 2 modulos
+- `visibilidad_y_crm_os` — FIXED_CERTIFIED · ORQUESTACION · 7 modulos
 
 ## Bloqueadas (0)
 
 _ninguna._
 
-## Pendientes (14)
+## Pendientes (13)
 
 - `aprendizaje_autonomo` — PENDING · ORQUESTACION · 5 modulos
 - `conocimiento_del_cliente` — PENDING · ORQUESTACION · 8 modulos
@@ -75,4 +76,3 @@ _ninguna._
 - `rag_privado` — PENDING · INTERNOS · 12 modulos
 - `reporting_y_roi` — PENDING · ORQUESTACION · 10 modulos
 - `varios_del_nucleo` — PENDING · ORQUESTACION · 3 modulos
-- `visibilidad_y_crm_os` — PENDING · ORQUESTACION · 7 modulos

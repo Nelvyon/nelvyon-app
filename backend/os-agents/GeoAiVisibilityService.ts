@@ -15,12 +15,32 @@ export interface GeoAiCheck {
   userId: string;
   brandName: string;
   queryUsed: string;
+  /** La plataforma que se ESTABA IMITANDO, no la que respondio. Ver `estado`. */
   platform: string;
   responseText: string;
   brandMentioned: boolean;
   mentionPosition: number | null;
   sentiment: string;
   checkedAt: string;
+  /**
+   * SIEMPRE `SIMULATED`, y por eso esta aqui.
+   *
+   * Esta comprobacion NO pregunta a ChatGPT. Le pide al modelo propio de
+   * NELVYON que imagine como respondera una IA conversacional, y mide sobre esa
+   * respuesta imaginada.
+   *
+   * Sin este campo, un `{ platform: "chatgpt", brandMentioned: true }` se lee
+   * como «ChatGPT menciona tu marca». Y no es verdad: lo que hay es un modelo
+   * local suponiendo. Un cliente que tome decisiones con ese dato esta tomando
+   * decisiones con una metrica inventada, que es exactamente lo que este bloque
+   * persigue.
+   *
+   * Medirlo de verdad exige consultar la plataforma real, con su cuenta y su
+   * coste: queda como bloqueo externo, no como una casilla verde.
+   */
+  estado: "SIMULATED";
+  /** De donde salio realmente la respuesta que se midio. */
+  origen: string;
 }
 
 export interface GeoAiScore {
@@ -133,6 +153,9 @@ Incluye recomendaciones de marcas relevantes, como lo haría una IA conversacion
       const brandMentioned = responseText.toLowerCase().includes(brandName.toLowerCase());
       const mentionPosition = brandMentioned ? detectMentionPosition(brandName, responseText) : null;
       const sentiment = detectSentiment(brandName, responseText);
+      // La verdad viaja CON el dato, no en la documentacion.
+      const estado = "SIMULATED" as const;
+      const origen = `modelo propio de NELVYON imitando a ${platform}`;
 
       const rows = await this.db.query<{
         id: string;
@@ -173,6 +196,8 @@ Incluye recomendaciones de marcas relevantes, como lo haría una IA conversacion
         mentionPosition: r.mentionPosition,
         sentiment: r.sentiment,
         checkedAt: typeof r.checkedAt === "string" ? r.checkedAt : r.checkedAt.toISOString(),
+        estado,
+        origen,
       });
     }
     return out;

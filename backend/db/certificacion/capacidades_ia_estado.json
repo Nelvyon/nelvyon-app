@@ -277,10 +277,10 @@
       "motivo": ""
     },
     "visibilidad_y_crm_os": {
-      "estado": "PENDING",
+      "estado": "FIXED_CERTIFIED",
       "familia": "ORQUESTACION",
       "modulos": 7,
-      "evidencia": "",
+      "evidencia": "backend/os-agents/__tests__/visibilidadNoInventaMetricas.test.ts - 6 pruebas. DEFECTO ENCONTRADO Y CORREGIDO: METRICA FABRICADA. `checkBrandVisibility` NO pregunta a ChatGPT: le pide al modelo propio de NELVYON que imagine como responderia una IA conversacional, y mide sobre esa respuesta imaginada. El resultado se devolvia como `{ platform: 'chatgpt', brandMentioned: true }`, sin nada que dijera que era supuesto. Un cliente lo lee como 'ChatGPT menciona tu marca' y toma decisiones con una metrica inventada. Ahora cada comprobacion lleva `estado: SIMULATED` y `origen` diciendo de donde salio de verdad la respuesta: la verdad viaja CON el dato y no en la documentacion, que nadie lee mirando un panel. Medirlo de verdad exige consultar la plataforma real con su cuenta y su coste, y eso queda como bloqueo externo, no como casilla verde. Mutacion comprobada: presentada la simulacion como EXECUTED, caen 2 pruebas.",
       "motivo": ""
     },
     "cliente_llm_y_coste": {
