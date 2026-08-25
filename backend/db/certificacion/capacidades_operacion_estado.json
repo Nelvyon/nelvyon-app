@@ -74,17 +74,17 @@
       "motivo": ""
     },
     "observabilidad": {
-      "estado": "PENDING",
+      "estado": "PASS_CERTIFIED",
       "familia": "OPERACION",
       "modulos": 8,
-      "evidencia": "",
+      "evidencia": "backend/health/__tests__/saludYObservabilidadNoMienten.test.ts - 10 pruebas. Un healthcheck que devuelve `ok` con la base caida es PEOR que no tenerlo: el balanceador sigue mandando trafico, las alertas callan y el primero en enterarse es un cliente. Certificado: base caida -> `down`, no `ok`; sin secreto de firma o con un secreto demasiado corto -un HMAC de ocho caracteres es criptografia de adorno- -> `down`; con todo bien -> `ok` (control positivo, porque una comprobacion que devolviera siempre `down` dejaria el servicio permanentemente fuera de rotacion). EL ERROR PUBLICO NO FILTRA: `/health` lo mira cualquiera y el mensaje del motor lleva host, puerto y a veces la contrasena. Se comprueba que no aparecen ni la credencial, ni la IP, ni el usuario de base -pero SI se dice que algo falla-. LA SONDA NO CUESTA DINERO: con NELVYON_AI_ENABLED=0 no sale una sola peticion al proveedor. La sonda es un HEAD y no gasta tokens, pero sigue siendo una llamada externa a un proveedor de pago y ademas revela que esta instancia habla con OpenAI a quien mire el trafico saliente. Y apagada NO devuelve un `ok` inventado: devuelve `degraded` con el motivo, porque decir 'ok, no aplica' pintaria verde algo que nadie ha comprobado. LIVENESS != READINESS: `live` no consulta la base y `ready` si. Confundirlas provoca reinicios en cadena: si la base cae y `live` lo reporta, el orquestador mata instancias sanas que solo estaban esperando. Mutacion comprobada: ignorado el interruptor y convertida la base caida en sana, caen 2 pruebas.",
       "motivo": ""
     },
     "salud_y_disponibilidad": {
-      "estado": "PENDING",
+      "estado": "PASS_CERTIFIED",
       "familia": "OPERACION",
       "modulos": 5,
-      "evidencia": "",
+      "evidencia": "backend/health/__tests__/saludYObservabilidadNoMienten.test.ts - 10 pruebas. Un healthcheck que devuelve `ok` con la base caida es PEOR que no tenerlo: el balanceador sigue mandando trafico, las alertas callan y el primero en enterarse es un cliente. Certificado: base caida -> `down`, no `ok`; sin secreto de firma o con un secreto demasiado corto -un HMAC de ocho caracteres es criptografia de adorno- -> `down`; con todo bien -> `ok` (control positivo, porque una comprobacion que devolviera siempre `down` dejaria el servicio permanentemente fuera de rotacion). EL ERROR PUBLICO NO FILTRA: `/health` lo mira cualquiera y el mensaje del motor lleva host, puerto y a veces la contrasena. Se comprueba que no aparecen ni la credencial, ni la IP, ni el usuario de base -pero SI se dice que algo falla-. LA SONDA NO CUESTA DINERO: con NELVYON_AI_ENABLED=0 no sale una sola peticion al proveedor. La sonda es un HEAD y no gasta tokens, pero sigue siendo una llamada externa a un proveedor de pago y ademas revela que esta instancia habla con OpenAI a quien mire el trafico saliente. Y apagada NO devuelve un `ok` inventado: devuelve `degraded` con el motivo, porque decir 'ok, no aplica' pintaria verde algo que nadie ha comprobado. LIVENESS != READINESS: `live` no consulta la base y `ready` si. Confundirlas provoca reinicios en cadena: si la base cae y `live` lo reporta, el orquestador mata instancias sanas que solo estaban esperando. Mutacion comprobada: ignorado el interruptor y convertida la base caida en sana, caen 2 pruebas.",
       "motivo": ""
     },
     "derechos_del_titular": {
