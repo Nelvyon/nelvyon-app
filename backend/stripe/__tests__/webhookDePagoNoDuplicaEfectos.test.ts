@@ -199,8 +199,22 @@ describe("BLOQUE 4 · webhook de pago: efecto exactamente una vez", () => {
 });
 
 describe("BLOQUE 4 · webhook de pago: autenticidad", () => {
-  const previo = process.env.STRIPE_SECRET_KEY;
-  const previoSecreto = process.env.STRIPE_WEBHOOK_SECRET;
+  // El valor previo se captura DENTRO del hook, no en el cuerpo del `describe`.
+  //
+  // Fuera de un hook, la captura ocurre al cargar el modulo, y vitest reutiliza
+  // el proceso entre ficheros: lo que se congelaria no es el entorno original
+  // sino lo que dejo otro fichero del mismo worker. Al restaurar, se le
+  // devolveria a los siguientes un entorno que nunca existio.
+  //
+  // Hay un trinquete que lo vigila -`test_tests_no_capturan_env_al_cargar`- y
+  // fue el que destapo esto en la puerta final del Bloque 4.
+  let previo: string | undefined;
+  let previoSecreto: string | undefined;
+
+  beforeEach(() => {
+    previo = process.env.STRIPE_SECRET_KEY;
+    previoSecreto = process.env.STRIPE_WEBHOOK_SECRET;
+  });
 
   afterEach(() => {
     if (previo === undefined) delete process.env.STRIPE_SECRET_KEY;
