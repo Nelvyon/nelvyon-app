@@ -289,3 +289,29 @@ export async function privateModeFetch(
   }
   return fetch(url, init);
 }
+
+/**
+ * ¿Este host apunta DENTRO de la infraestructura?
+ *
+ * Es el mismo predicado que `isAllowedHost`, con el nombre que corresponde al
+ * otro uso que tiene. En modo privado, «interno» significa permitido; para una
+ * URL que configura un inquilino y a la que NELVYON va a hacer POST, «interno»
+ * significa exactamente lo contrario: prohibido.
+ *
+ * Se expone aparte en vez de reutilizar `isAllowedHost` en las llamadas porque
+ * leer `if (isAllowedHost(host)) return false` en una guarda de SSRF es una
+ * invitación a que alguien lo «corrija» al revés.
+ *
+ * Cubre además el rango IPv6 de uso local (`fc00::/7`), que los patrones IPv4
+ * no podían alcanzar.
+ */
+export function esDestinoInterno(hostname: string): boolean {
+  const host = hostname.toLowerCase().replace(/^\[|\]$/g, "");
+  if (!host) return true;                       // sin host no hay destino válido
+  if (isAllowedHost(host)) return true;
+  // IPv6 de uso local: fc00::/7 abarca fc.. y fd..
+  if (/^f[cd][0-9a-f]{2}:/.test(host)) return true;
+  // IPv6 link-local
+  if (host.startsWith("fe80:")) return true;
+  return false;
+}

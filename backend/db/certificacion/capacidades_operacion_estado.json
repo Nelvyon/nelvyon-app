@@ -11,10 +11,10 @@
       "motivo": ""
     },
     "webhooks_de_canal": {
-      "estado": "PENDING",
+      "estado": "FIXED_CERTIFIED",
       "familia": "ENTRADA",
       "modulos": 3,
-      "evidencia": "",
+      "evidencia": "backend/saas/__tests__/webhooksDeCanalYSalida.test.ts - 20 pruebas. ENTRADA: firma de Slack con firma inventada, cuerpo manipulado con la firma del original, peticion vieja y peticion del futuro -las dos rechazadas por la ventana de 300s- y fallo cerrado sin secreto, con control positivo. WhatsApp verifica HMAC con `timingSafeEqual` y exige `META_WA_APP_SECRET` en produccion. SALIDA - DEFECTO DE SEGURIDAD ENCONTRADO Y CORREGIDO: `isSafeWebhookUrl` solo comprobaba `https:` y que hubiera host. Dejaba pasar 169.254.169.254 -el endpoint de metadatos de la nube-, 127.0.0.1 y cualquier direccion interna. La URL la configura EL INQUILINO y NELVYON hace el POST desde DENTRO de su infraestructura: con el endpoint de metadatos eso son credenciales de la nube. Cerrado reutilizando los rangos privados que ya existian para el modo privado -no hacia falta una lista nueva- expuestos como `esDestinoInterno`, que es el mismo predicado con la intencion opuesta y con nombre honesto: leer `if (isAllowedHost(h)) return false` en una guarda de SSRF es una invitacion a que alguien lo corrija al reves. SEGUNDO HALLAZGO: el `catch` de esa funcion convirtio un import que faltaba en 'todo es inseguro'. Fallo cerrado por casualidad, pero oculto un modulo roto. Mutacion comprobada: quitado el filtro, caen 9 pruebas.",
       "motivo": ""
     },
     "webhooks_de_inquilino": {
@@ -60,10 +60,10 @@
       "motivo": ""
     },
     "cobros_y_suscripciones": {
-      "estado": "PENDING",
+      "estado": "FIXED_CERTIFIED",
       "familia": "DINERO",
       "modulos": 16,
-      "evidencia": "",
+      "evidencia": "backend/billing/__tests__/dineroServidorManda.test.ts - 22 pruebas. El importe NUNCA viaja en la peticion: el cliente manda un `planId` que se normaliza contra una lista fija y el precio se resuelve desde configuracion del servidor. DEFECTO ENCONTRADO: `PLAN_PRICES` era un objeto exportado y MUTABLE - lo descubrio la propia prueba, que lo cambio de verdad y fallo por su propia mutacion, que es la demostracion mas directa posible de que se podia. Cualquier modulo o dependencia comprometida podia reescribir un precio en caliente y el cambio duraba lo que durase el proceso sin dejar rastro. Congelado, junto con la tabla que decide de que precio de Stripe se cobra. REDIRECCION: `resolveCheckoutUrl` compara origen y cae al valor por defecto - una redireccion abierta tras un pago no es una molestia, es phishing con la credibilidad de una pasarela real detras. Se prueban destinos externos, subdominios que imitan el propio (`nelvyon.com.evil.test`), esquemas peligrosos y URLs ilegibles. Y una prueba vigila que la copia local de esa funcion siga siendo identica a la de la ruta: esta duplicada por necesidad y una copia que se separa certifica codigo que ya no corre.",
       "motivo": ""
     },
     "oauth_de_proveedores": {

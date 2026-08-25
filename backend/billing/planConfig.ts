@@ -5,12 +5,12 @@ export type BillablePlan = (typeof BILLABLE_PLANS)[number];
 export const CHECKOUT_STRIPE_PLANS = ["starter", "pro", "agency"] as const;
 export type CheckoutStripePlan = (typeof CHECKOUT_STRIPE_PLANS)[number];
 
-export const STRIPE_PRICE_ENV_BY_PLAN: Record<BillablePlan, string> = {
+export const STRIPE_PRICE_ENV_BY_PLAN: Readonly<Record<BillablePlan, string>> = Object.freeze({
   starter: "STRIPE_PRICE_ID_STARTER",
   pro: "STRIPE_PRICE_ID_PRO",
   agency: "STRIPE_PRICE_ID_AGENCY",
   agency_partner: "STRIPE_PRICE_ID_AGENCY_PARTNER",
-};
+});
 
 export const PLAN_NAMES: Record<BillablePlan, string> = {
   starter: "Starter",
@@ -19,13 +19,24 @@ export const PLAN_NAMES: Record<BillablePlan, string> = {
   agency_partner: "Agency Partner",
 };
 
-/** Precios públicos (EUR/mes). agency_partner = wholesale que paga el partner a Nelvyon. */
-export const PLAN_PRICES: Record<BillablePlan, number> = {
+/**
+ * Precios públicos (EUR/mes). agency_partner = wholesale que paga el partner a
+ * Nelvyon.
+ *
+ * CONGELADO a proposito. Era un objeto exportado y mutable: cualquier modulo
+ * -o una dependencia comprometida- podia reescribir un precio en caliente y el
+ * cambio duraba lo que durase el proceso, sin dejar rastro en ningun sitio.
+ *
+ * No es un ataque probable, pero congelarlo cuesta una llamada y convierte un
+ * "no deberia pasar" en un "no puede pasar". En una tabla de precios eso vale
+ * la pena.
+ */
+export const PLAN_PRICES: Readonly<Record<BillablePlan, number>> = Object.freeze({
   starter: 97,
   pro: 297,
   agency: 797,
   agency_partner: 297,
-};
+});
 
 export const PLAN_LIMITS: Record<
   BillablePlan,

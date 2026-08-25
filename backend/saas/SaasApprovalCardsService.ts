@@ -3,6 +3,7 @@
  */
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { DbClient } from "../db/DbClient";
+import { esDestinoInterno } from "../private-ai/privateMode";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 
 export type ApprovalChannel = "slack" | "teams";
@@ -178,11 +179,25 @@ export class SaasApprovalCardsService {
     }
   }
 
-  /** Only allow https outgoing webhooks (SSRF guard). */
+  /**
+   * Guarda de SSRF para webhooks salientes que configura el INQUILINO.
+   *
+   * Antes solo comprobaba que fuera `https:` y que hubiera host. Eso deja pasar
+   * `https://169.254.169.254/...` -el endpoint de metadatos de la nube-,
+   * `https://127.0.0.1/...` y cualquier direccion de la red interna. NELVYON
+   * haria el POST desde DENTRO de su propia infraestructura, con lo que un
+   * inquilino podia usarlo para alcanzar servicios que no estan expuestos.
+   *
+   * `esDestinoInterno` reutiliza los rangos que ya existian para el modo
+   * privado: no hacia falta inventar una lista nueva y mantener dos.
+   */
   static isSafeWebhookUrl(url: string): boolean {
     try {
       const u = new URL(url.trim());
-      return u.protocol === "https:" && u.hostname.length > 0 && !u.username;
+      if (u.protocol !== "https:") return false;
+      if (!u.hostname || u.username) return false;
+      if (esDestinoInterno(u.hostname)) return false;
+      return true;
     } catch {
       return false;
     }
