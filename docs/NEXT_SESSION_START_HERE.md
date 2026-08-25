@@ -10,7 +10,7 @@ Estado a **2026-08-25**. Rama `bloque4-webhooks`, worktree `C:\Users\Daniel\nelv
 | 2 · Web + SaaS + OS completos | **CERRADO** en `2b2c3d8e` → `docs/BLOQUE_2_CIERRE.md` |
 | 3 · Empresa IA autónoma | **CERRADO** en `3feaaf24` → `docs/BLOQUE_3_CIERRE.md` |
 | 4 · Operación real | **CERRADO** en `cf43aeda` → `docs/BLOQUE_4_CIERRE.md` |
-| 5 · Producto medido y comparativa | **CERRADO** → `docs/BLOQUE_5_CIERRE.md` |
+| 5 · Producto medido y comparativa | **CERRADO** en `9a3841bc` → `docs/BLOQUE_5_CIERRE.md` |
 
 El estado por capacidad se **genera**, no se escribe:
 
@@ -84,7 +84,7 @@ Está escrito, con las cuatro tandas y sus variables, en
 
 ## Bloque 5 — CERRADO
 
-`BLOQUE_5_EXECUTABLE = CLOSED`.
+`BLOQUE_5_EXECUTABLE = CLOSED`. **SHA certificado `9a3841bc`.**
 
 **25/25 categorías de producto · 24 `FIXED_CERTIFIED` + 1 `PASS_CERTIFIED` ·
 0 bloqueadas · 0 pendientes.** Contador: **25 + 0 + 0 = 25**.

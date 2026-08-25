@@ -1,6 +1,6 @@
 # BLOQUE 5 — cierre
 
-**Producto medido.** Rama `bloque4-webhooks`.
+**Producto medido.** SHA certificado: `9a3841bc`, rama `bloque4-webhooks`.
 
 Los cuatro bloques anteriores midieron lo que el sistema hace por dentro:
 esquema, aislamiento, agentes, operación bajo carga. Este mide **lo que el
@@ -287,3 +287,5 @@ eso se dice aquí en vez de dejarlo enterrado en un diff.
 
 **217 áreas · 0 huérfanas · 888 rutas · 0 enlaces rotos · 993 → 0 violaciones
 graves de accesibilidad · 0 desbordamiento en móvil.**
+
+SHA certificado: **`9a3841bc`**.
