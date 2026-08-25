@@ -53,10 +53,10 @@
       "motivo": ""
     },
     "correo_saliente": {
-      "estado": "PENDING",
+      "estado": "FIXED_CERTIFIED",
       "familia": "SALIDA",
       "modulos": 14,
-      "evidencia": "",
+      "evidencia": "backend/email/__tests__/interruptorDeCorreo.test.ts - 10 pruebas, mas 2 anadidas en os-agents/__tests__/email.test.ts. DEFECTO ENCONTRADO Y CORREGIDO: NELVYON tenia interruptor para la IA (NELVYON_AI_ENABLED) y NO lo tenia para el correo. Con credenciales de SES en el entorno, cualquier ejecucion -una suite, un script, una certificacion- podia mandar correos REALES a las direcciones de las fixtures. Un correo enviado no se devuelve. DECISION DE DISENO: apagado, `sendEmail` LANZA en vez de devolver en silencio. Un envio que se da por hecho sin salir es la peor de las dos opciones, porque el cliente cree que ha avisado a alguien. Y el error lleva TIPO propio (`CorreoDesactivadoError`, code CORREO_DESACTIVADO) para que quien llame distinga tres cosas que no son la misma: desactivado, fallo del proveedor y enviado - mezclarlas lleva a informar mal al cliente. Apagado por defecto fuera de produccion, encendible y APAGABLE explicitamente -poder parar el correo sin desplegar vale mas que la elegancia-. Un valor mal escrito no lo enciende. La comprobacion va ANTES de construir el cliente del proveedor: si fuera despues, construirlo ya podria resolver DNS o leer credenciales. REGRESION LOCALIZADA Y TRATADA: de las 14 suites que tocan `sendEmail`, cayo UNA, la que comprueba el contrato con el transporte. Se condiciono explicitamente en vez de debilitar el interruptor -antes pasaba sin decir nada porque el correo salia siempre; con credenciales en el entorno esa misma prueba habria mandado un correo real-. Mutacion comprobada: quitado el interruptor, caen 3 pruebas.",
       "motivo": ""
     },
     "cobros_y_suscripciones": {
