@@ -32,10 +32,10 @@
       "motivo": ""
     },
     "colas_y_reintentos": {
-      "estado": "PENDING",
+      "estado": "FIXED_CERTIFIED",
       "familia": "EJECUCION",
       "modulos": 4,
-      "evidencia": "",
+      "evidencia": "backend/queue/__tests__/colasYRecuperacion.test.ts - 8 pruebas. RECLAMACION: la cola usa `lmove` atomico de Redis (cola -> lista de procesamiento), asi que dos workers no pueden coger el mismo elemento. DEFECTO ENCONTRADO Y CORREGIDO - misma clase que la idempotencia: una suposicion de INSTANCIA UNICA en un mundo de varias. `recoverStaleJobs` fallaba TODOS los trabajos en curso al arrancar. Con una instancia es correcto -si esta arrancando, nadie estaba trabajando-; con dos, desplegar la instancia B mataba el trabajo en vuelo de la instancia A y el cliente veia 'interrumpido por reinicio' en un trabajo que iba perfectamente. Acotado por ultimo latido, SIN columna nueva ni migracion: `os_jobs.updated_at` ya avanza en cada paso del agente, asi que un trabajo vivo nunca lleva minutos sin moverse. La senal ya estaba ahi. El umbral es configurable por entorno a proposito, para que un despliegue de pasos largos no lleve a nadie a 'arreglarlo' quitando la guarda. Ademas: los estados terminales no se resucitan, y una marca de tiempo ilegible se trata como MUERTO y no como vivo -fallo cerrado en la direccion correcta, porque un trabajo eternamente en curso es peor que uno fallido: nadie lo reintenta y nadie sabe que hay que mirarlo-. Mutacion comprobada: quitada la guarda del ultimo latido, caen 2 pruebas.",
       "motivo": ""
     },
     "tareas_programadas": {

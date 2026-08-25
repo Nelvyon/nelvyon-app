@@ -59,6 +59,18 @@ export type OsQueueWorkerDeps = {
 /**
  * Background processor for `OsQueue`: bounded concurrency, resilient loop, startup recovery.
  */
+/**
+ * Cuanto tiene que llevar un trabajo sin dar senales para considerarlo muerto.
+ *
+ * Cinco minutos es holgado a proposito: un paso de agente puede tardar. El
+ * riesgo de esperar de mas es que un trabajo realmente muerto tarde un poco en
+ * liberarse; el de esperar de menos es matar trabajo vivo de otra instancia, que
+ * es peor y ademas invisible para quien lo sufre.
+ */
+const SILENCIO_PARA_DARLO_POR_MUERTO_MS = Number(
+  process.env.OS_WORKER_SILENCIO_MS ?? 5 * 60_000,
+);
+
 export class OsQueueWorker {
   private static instance: OsQueueWorker | undefined;
 
@@ -142,6 +154,23 @@ export class OsQueueWorker {
         };
         await this.queue.enqueue(item);
       } else if (j.status === "running") {
+        // Solo se dan por interrumpidos los que llevan CALLADOS un rato.
+        //
+        // Antes se fallaban TODOS los `running` al arrancar. Con una sola
+        // instancia eso es correcto: si esta arrancando, nadie estaba
+        // trabajando. Con dos, no: desplegar la instancia B mataba el trabajo
+        // en vuelo de la instancia A, y el cliente veia «interrumpido por
+        // reinicio» en un trabajo que iba perfectamente.
+        //
+        // `updated_at` avanza en cada paso del agente -`updateJobProgress` lo
+        // toca-, asi que un trabajo vivo nunca lleva minutos sin moverse. No
+        // hizo falta ni columna nueva ni migracion: la senal ya estaba ahi.
+        const ultimoLatido = Date.parse(j.updatedAt ?? j.createdAt);
+        const callado = Number.isFinite(ultimoLatido)
+          ? Date.now() - ultimoLatido
+          : Number.POSITIVE_INFINITY;
+        if (callado < SILENCIO_PARA_DARLO_POR_MUERTO_MS) continue;
+
         await this.jobStore.failJob(j.jobId, "Server restart — job interrupted", undefined);
         this.eventBus.emit("job:failed", {
           jobId: j.jobId,
