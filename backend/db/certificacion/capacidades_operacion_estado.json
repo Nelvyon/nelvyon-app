@@ -39,10 +39,10 @@
       "motivo": ""
     },
     "tareas_programadas": {
-      "estado": "PENDING",
+      "estado": "PASS_CERTIFIED",
       "familia": "EJECUCION",
       "modulos": 16,
-      "evidencia": "",
+      "evidencia": "backend/saas/__tests__/tareasProgramadas.pg.test.ts - 9 pruebas contra PostgreSQL real. Un cron no se dispara una vez: se dispara cuando la plataforma decide, y las plataformas reintentan -dos regiones, un despliegue a mitad, un timeout que se reintenta-. Si dos disparos reclaman el mismo post programado, el cliente publica dos veces en su propio perfil, y eso no se deshace con un ROLLBACK. La reclamacion empuja `scheduled_at` diez minutos con FOR UPDATE SKIP LOCKED, que es lo que convierte 'seleccionar y publicar' en 'reclamar y publicar'. Certificado: dos y seis planificadores concurrentes reclaman UNA vez; con cinco posts vencidos y cuatro planificadores, cada post se reclama exactamente una vez -la invariante que no depende de como el planificador reparta el trabajo-; un post no vencido no se reclama (publicar antes de tiempo es tan malo como no publicar); la reclamacion aplaza, asi que un fallo se reintenta mas tarde en vez de entrar en bucle; un post ya publicado no se vuelve a reclamar; y el planificador de A no toca los posts de B. Contra PostgreSQL real a proposito: SKIP LOCKED no existe en un doble, que acepta el SQL y no bloquea nada. Ademas una prueba vigila que la sentencia replicada siga siendo la del servicio. Mutacion comprobada: quitado SKIP LOCKED, caen 2 pruebas.",
       "motivo": ""
     },
     "integraciones_salientes": {
