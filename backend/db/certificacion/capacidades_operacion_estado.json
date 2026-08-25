@@ -1,0 +1,98 @@
+{
+  "bloque": 4,
+  "total": 13,
+  "nota": "Derivado de backend/db/certificacion/capacidades_operacion.py. El conjunto de claves lo fija el arbol, no se edita a mano.",
+  "capacidades": {
+    "webhooks_de_pago": {
+      "estado": "PENDING",
+      "familia": "ENTRADA",
+      "modulos": 7,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "webhooks_de_canal": {
+      "estado": "PENDING",
+      "familia": "ENTRADA",
+      "modulos": 3,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "webhooks_de_inquilino": {
+      "estado": "PENDING",
+      "familia": "ENTRADA",
+      "modulos": 3,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "idempotencia_y_fallidos": {
+      "estado": "PENDING",
+      "familia": "ENTRADA",
+      "modulos": 3,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "colas_y_reintentos": {
+      "estado": "PENDING",
+      "familia": "EJECUCION",
+      "modulos": 4,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "tareas_programadas": {
+      "estado": "PENDING",
+      "familia": "EJECUCION",
+      "modulos": 16,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "integraciones_salientes": {
+      "estado": "PENDING",
+      "familia": "SALIDA",
+      "modulos": 16,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "correo_saliente": {
+      "estado": "PENDING",
+      "familia": "SALIDA",
+      "modulos": 14,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "cobros_y_suscripciones": {
+      "estado": "PENDING",
+      "familia": "DINERO",
+      "modulos": 16,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "oauth_de_proveedores": {
+      "estado": "PENDING",
+      "familia": "IDENTIDAD",
+      "modulos": 7,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "observabilidad": {
+      "estado": "PENDING",
+      "familia": "OPERACION",
+      "modulos": 8,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "salud_y_disponibilidad": {
+      "estado": "PENDING",
+      "familia": "OPERACION",
+      "modulos": 5,
+      "evidencia": "",
+      "motivo": ""
+    },
+    "derechos_del_titular": {
+      "estado": "PENDING",
+      "familia": "OPERACION",
+      "modulos": 2,
+      "evidencia": "",
+      "motivo": ""
+    }
+  }
+}
