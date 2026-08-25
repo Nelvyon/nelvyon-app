@@ -67,10 +67,10 @@
       "motivo": ""
     },
     "oauth_de_proveedores": {
-      "estado": "PENDING",
+      "estado": "PASS_CERTIFIED",
       "familia": "IDENTIDAD",
       "modulos": 7,
-      "evidencia": "",
+      "evidencia": "backend/oauth/__tests__/estadoDeOauthYSalida.test.ts - 11 pruebas, sin llamar a ningun proveedor (la firma es criptografia local). El flujo sale del navegador, va al proveedor y vuelve; entre medias NELVYON no controla nada, y el `state` es lo unico que ata la autorizacion a quien la pidio. Certificado: A NO puede terminar una autorizacion iniciada por B -si no llevara el usuario, quien interceptara la vuelta de B conectaria la cuenta de B a su propio inquilino-; cambiar el usuario dentro del state invalida la firma; un state fabricado con otro secreto se rechaza; uno de hace 20 minutos caduca; sin usuario, con marca de tiempo no numerica o malformado se rechaza sin reventar; y sin secreto configurado no se acepta ninguno. HALLAZGO DE METODO: la primera version usaba `NELVYON_HMAC_SECRET` y el modulo lee `JWT_SECRET`. Efecto: TODOS los negativos pasaban por el motivo equivocado -firma incorrecta en vez de la propiedad que decian medir- y habrian pasado callados para siempre. Lo destapo la unica prueba que esperaba EXITO. Es el argumento mas limpio de todo el proyecto para exigir control positivo en toda suite de seguridad: los negativos solos no distinguen 'tu defensa funciona' de 'mi prueba esta mal montada'. Mutacion comprobada: quitada la verificacion de firma, caen 2 pruebas.",
       "motivo": ""
     },
     "observabilidad": {
