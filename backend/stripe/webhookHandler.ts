@@ -174,16 +174,34 @@ export async function processStripeEvent(event: Stripe.Event, db: DbClient): Pro
 
       // Misma garantia de recencia que el upsert: un `deleted` antiguo no puede
       // cancelar una suscripcion reactivada despues.
-      await db.query(
+      // El `RETURNING` no es cosmetico: es lo que permite saber si el UPDATE
+      // llego a aplicar. Sin el, los efectos de abajo corrian SIEMPRE.
+      //
+      // La guarda de recencia protegia la fila -un evento repetido tiene el
+      // mismo `created`, asi que `< $2` es falso y no reescribe- pero
+      // `downgradeSaasTenantPlan` y el correo de cancelacion se ejecutaban
+      // igual. Stripe reintenta ante cualquier respuesta que no sea 2xx y
+      // ademas puede entregar duplicados, asi que el cliente recibia un segundo
+      // correo diciendole que su suscripcion se ha cancelado.
+      //
+      // Que la fila quede bien no basta cuando el efecto sale hacia fuera.
+      const aplicado = await db.query<{ user_id: string }>(
         `UPDATE subscriptions
             SET status='canceled',
                 last_stripe_event_at=$2,
                 last_stripe_event_id=$3,
                 updated_at=now()
           WHERE user_id::text=$1
-            AND (last_stripe_event_at IS NULL OR last_stripe_event_at < $2)`,
+            AND (last_stripe_event_at IS NULL OR last_stripe_event_at < $2)
+        RETURNING user_id`,
         [userId, new Date(event.created * 1000), event.id],
       );
+      if (aplicado.length === 0) {
+        // Entrega repetida o evento mas antiguo que el estado actual: no hay
+        // nada que cancelar y no se avisa dos veces.
+        logStripeEvent(event, { userId, action: "canceled", skipped: "duplicado_o_antiguo" });
+        break;
+      }
       await downgradeSaasTenantPlan(db, userId);
       const email = await getUserEmail(db, userId);
       const periodEnd = periodEndFromSubscription(sub);

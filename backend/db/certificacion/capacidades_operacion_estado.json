@@ -4,10 +4,10 @@
   "nota": "Derivado de backend/db/certificacion/capacidades_operacion.py. El conjunto de claves lo fija el arbol, no se edita a mano.",
   "capacidades": {
     "webhooks_de_pago": {
-      "estado": "PENDING",
+      "estado": "FIXED_CERTIFIED",
       "familia": "ENTRADA",
       "modulos": 7,
-      "evidencia": "",
+      "evidencia": "backend/stripe/__tests__/webhookDePagoNoDuplicaEfectos.test.ts - 11 pruebas. DEFECTO ENCONTRADO Y CORREGIDO: LA BASE CAMBIABA UNA VEZ PERO EL EFECTO EXTERNO OCURRIA DOS. La guarda de recencia `last_stripe_event_at < $2` protegia la fila -un evento repetido tiene el mismo `created`, asi que no reescribe- pero el resultado del UPDATE se descartaba y `downgradeSaasTenantPlan` y `sendEmail` corrian igual: el cliente recibia un SEGUNDO correo diciendole que su suscripcion se ha cancelado. Stripe reintenta ante cualquier respuesta que no sea 2xx y ademas puede entregar duplicados, asi que 'llega dos veces' es el funcionamiento normal del proveedor, no un caso raro. Arreglado con `RETURNING user_id` y los efectos condicionados a que el UPDATE aplicara. AUTENTICIDAD con verificacion criptografica REAL de la libreria -es HMAC local, no sale a la red y no cuesta nada; un doble habria medido el doble-: firma inventada, cuerpo manipulado con la firma de otro cuerpo, firma caducada (repeticion) y fallo cerrado sin secreto, con control positivo para que un verificador que rechazara todo no pasara por bueno. Mutacion comprobada: quitada la condicion, caen 4 pruebas.",
       "motivo": ""
     },
     "webhooks_de_canal": {
@@ -25,10 +25,10 @@
       "motivo": ""
     },
     "idempotencia_y_fallidos": {
-      "estado": "PENDING",
+      "estado": "FIXED_CERTIFIED",
       "familia": "ENTRADA",
       "modulos": 3,
-      "evidencia": "",
+      "evidencia": "backend/saas/__tests__/idempotenciaDistribuida.pg.test.ts - 12 pruebas contra PostgreSQL real. DEFECTO: la idempotencia de webhooks era un `Map` DENTRO DEL PROCESO. Deduplica mientras el proceso siga en pie y solo haya uno; con dos instancias -o una que se reinicia entre dos entregas- deja de deduplicar y `dispatchWebhookIn` vuelve a lanzar los workflows del inquilino con sus correos y llamadas a integraciones. 'Idempotente dentro de un proceso' no es idempotente: el proveedor reintenta contra el balanceador, no contra un proceso concreto. CERRADO SIN MIGRACION: `erp_idempotency_keys` ya existia con clave unica (tenant_id, domain, idem_key) y NADIE la usaba desde TypeScript. Su nombre dice `erp` por su origen pero su forma es generica y `domain` es texto libre, asi que reutilizarla es mejor que crear otra igual -una migracion nueva seria tocar produccion para duplicar algo que ya esta-. Certificado: misma instancia, instancias distintas, reinicio entre entregas, 12 concurrentes, aislamiento A/B, misma clave desde otra fuente, y soltar la reclamacion ante fallo -sin eso la entrega quedaria marcada para siempre y el evento se perderia en silencio, peor que procesarlo dos veces-. LA PRIMERA MUTACION NO CAYO: sustituido el INSERT..ON CONFLICT por un comprobar-y-despues-insertar, las 11 pruebas siguieron verdes porque la carrera no se daba segun como el pool repartiera conexiones. Una mutacion que no cae no certifica nada, asi que se afilo con la invariante que no depende del planificador: la funcion debe devolver true EXACTAMENTE tantas veces como filas creo. Con la mutacion, 12 procesos creian que les tocaba y solo habia 1 fila. Ahora cae.",
       "motivo": ""
     },
     "colas_y_reintentos": {
