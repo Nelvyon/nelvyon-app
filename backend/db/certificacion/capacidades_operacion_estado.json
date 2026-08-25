@@ -88,10 +88,10 @@
       "motivo": ""
     },
     "derechos_del_titular": {
-      "estado": "PENDING",
+      "estado": "PASS_CERTIFIED",
       "familia": "OPERACION",
       "modulos": 2,
-      "evidencia": "",
+      "evidencia": "backend/gdpr/__tests__/derechosDelTitular.pg.test.ts - 10 pruebas contra PostgreSQL real. Dos afirmaciones con consecuencias legales si son falsas: 'aqui estan todos tus datos' y 'tus datos se han borrado'. Certificado: la exportacion devuelve datos reales y la de A NO contiene datos de B -entregar a una persona los datos de otra en respuesta a una solicitud legal es lo contrario de cumplir-; un usuario inexistente no obtiene exportacion inventada; la ventana de espera existe -sin ella la exportacion es un canal de extraccion masiva para cualquiera con sesion- y la de A no bloquea la de B; el borrado de A no toca a B. ERRORES QUE NO SE CONVIERTEN EN EXITO: `tryExec` silencia solo 'objeto ausente' -tablas que no existen en este entorno- y relanza todo lo demas. Si un DELETE fallara y el error se tragara, NELVYON informaria 'borrado' sobre datos que siguen ahi, y un regulador puede comprobarlo. ORDEN DE LO IRREVERSIBLE: la cancelacion en Stripe va DESPUES del borrado. El propio codigo cuenta que antes iba primero, que la linea siguiente lanzaba en produccion porque `user_provider_api_keys` no existe alli, y que el resultado era el peor posible: suscripcion cancelada irreversiblemente en un tercero y datos del interesado intactos. LA MUTACION NO CAYO A LA PRIMERA: la prueba lanzaba el error en una sentencia que pasa por `tryQuery`, no por `tryExec`, asi que rechazaba por un camino distinto del que decia medir - el MISMO fallo que aparecio en OAuth. Afilada a la sentencia concreta, la mutacion ya cae.",
       "motivo": ""
     }
   }
