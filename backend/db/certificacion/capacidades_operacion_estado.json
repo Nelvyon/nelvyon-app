@@ -18,10 +18,10 @@
       "motivo": ""
     },
     "webhooks_de_inquilino": {
-      "estado": "PENDING",
+      "estado": "FIXED_CERTIFIED",
       "familia": "ENTRADA",
       "modulos": 3,
-      "evidencia": "",
+      "evidencia": "backend/saas/__tests__/webhooksDeInquilinoYSalida.test.ts - 21 pruebas. Un inquilino da una URL y NELVYON hace el POST DESDE DENTRO de su propia infraestructura: eso convierte una casilla de configuracion en una peticion privilegiada, y es la definicion de SSRF. Rechazados: metadatos de nube por IP y por nombre -el peor, porque devuelve credenciales-, bucle local, localhost y .localhost, .local, los tres rangos RFC1918, CGNAT, ruta cero, IPv6 de bucle, de uso local y link-local, octetos imposibles, esquemas que no son HTTPS -http viaja en claro con el secreto del webhook dentro-, credenciales embebidas y URLs ilegibles. Con control positivo, porque una guarda que rechazara todo dejaria a los clientes sin poder configurar un webhook. CONSOLIDACION: habia TRES copias del mismo control en el arbol -esta, la del servicio de tarjetas de aprobacion y los rangos del modo privado-. Tres copias de un control es garantia de que dos se queden atras, y la de aprobacion era justo la debil: solo miraba el esquema, asi que dejaba pasar 169.254.169.254. Ahora todas delegan en `assertSafeEgressUrl`, y una prueba comprueba que las dos rutas dan el MISMO resultado sobre los mismos casos - si alguien reimplementara una, dejarian de coincidir. El mensaje de rechazo dice que falla sin confirmar que IPs internas existen. Mutacion comprobada: quitado el bloqueo de rangos, caen 18 pruebas entre las dos suites.",
       "motivo": ""
     },
     "idempotencia_y_fallidos": {
@@ -46,10 +46,10 @@
       "motivo": ""
     },
     "integraciones_salientes": {
-      "estado": "PENDING",
+      "estado": "FIXED_CERTIFIED",
       "familia": "SALIDA",
       "modulos": 16,
-      "evidencia": "",
+      "evidencia": "backend/saas/__tests__/webhooksDeInquilinoYSalida.test.ts - 21 pruebas. Un inquilino da una URL y NELVYON hace el POST DESDE DENTRO de su propia infraestructura: eso convierte una casilla de configuracion en una peticion privilegiada, y es la definicion de SSRF. Rechazados: metadatos de nube por IP y por nombre -el peor, porque devuelve credenciales-, bucle local, localhost y .localhost, .local, los tres rangos RFC1918, CGNAT, ruta cero, IPv6 de bucle, de uso local y link-local, octetos imposibles, esquemas que no son HTTPS -http viaja en claro con el secreto del webhook dentro-, credenciales embebidas y URLs ilegibles. Con control positivo, porque una guarda que rechazara todo dejaria a los clientes sin poder configurar un webhook. CONSOLIDACION: habia TRES copias del mismo control en el arbol -esta, la del servicio de tarjetas de aprobacion y los rangos del modo privado-. Tres copias de un control es garantia de que dos se queden atras, y la de aprobacion era justo la debil: solo miraba el esquema, asi que dejaba pasar 169.254.169.254. Ahora todas delegan en `assertSafeEgressUrl`, y una prueba comprueba que las dos rutas dan el MISMO resultado sobre los mismos casos - si alguien reimplementara una, dejarian de coincidir. El mensaje de rechazo dice que falla sin confirmar que IPs internas existen. Mutacion comprobada: quitado el bloqueo de rangos, caen 18 pruebas entre las dos suites.",
       "motivo": ""
     },
     "correo_saliente": {

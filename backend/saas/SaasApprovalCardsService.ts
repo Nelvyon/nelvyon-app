@@ -3,7 +3,7 @@
  */
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { DbClient } from "../db/DbClient";
-import { esDestinoInterno } from "../private-ai/privateMode";
+import { assertSafeEgressUrl } from "./safeEgressUrl";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 
 export type ApprovalChannel = "slack" | "teams";
@@ -192,11 +192,17 @@ export class SaasApprovalCardsService {
    * privado: no hacia falta inventar una lista nueva y mantener dos.
    */
   static isSafeWebhookUrl(url: string): boolean {
+    // Se DELEGA en la guarda canonica en vez de reimplementarla.
+    //
+    // Habia TRES copias de este control en el arbol: esta, `assertSafeEgressUrl`
+    // -la buena, con bloqueo IPv4/IPv6, metadatos de nube y CGNAT- y los rangos
+    // del modo privado. Tres copias del mismo control es garantia de que dos se
+    // quedaran atras: esta era justamente la debil, la que solo miraba el
+    // esquema.
+    //
+    // Una sola guarda, y las demas apuntando a ella.
     try {
-      const u = new URL(url.trim());
-      if (u.protocol !== "https:") return false;
-      if (!u.hostname || u.username) return false;
-      if (esDestinoInterno(u.hostname)) return false;
+      assertSafeEgressUrl(url.trim());
       return true;
     } catch {
       return false;
