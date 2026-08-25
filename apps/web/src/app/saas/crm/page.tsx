@@ -650,50 +650,52 @@ export default function SaasCrmPage() {
                         </div>
                       ) : (
                         <>
-                          <table id="crm-tbl" className="table shorting">
-                            <thead>
-                              <tr>
-                                <th>Contacto</th>
-                                <th>Email</th>
-                                <th>Teléfono</th>
-                                <th>Empresa</th>
-                                <th>Etapa</th>
-                                <th>Valor</th>
-                                <th>Estado</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {records.map((item) => (
-                                <tr key={item.id} onClick={() => setSelected(item)} style={{ cursor: "pointer" }}>
-                                  <td>
-                                    <div className="products">
-                                      <Avatar name={item.name} />
-                                      <div>
-                                        <h6>{item.name}</h6>
-                                        <span>{item.position ?? "—"}</span>
-                                      </div>
-                                    </div>
-                                  </td>
-                                  <td>
-                                    {item.email ? (
-                                      <span className="text-primary">{item.email}</span>
-                                    ) : (
-                                      <span>—</span>
-                                    )}
-                                  </td>
-                                  <td><span>{item.phone ?? "—"}</span></td>
-                                  <td><span>{item.company ?? "—"}</span></td>
-                                  <td><span>{STAGE_LABELS[item.pipelineStage]}</span></td>
-                                  <td><span>{item.value > 0 ? eur(item.value) : "—"}</span></td>
-                                  <td>
-                                    <span className={`badge light border-0 badge-${STATUS_TONE[item.status]}`}>
-                                      {STATUS_LABELS[item.status]}
-                                    </span>
-                                  </td>
+                          <div className="table-responsive">
+                            <table id="crm-tbl" className="table shorting">
+                              <thead>
+                                <tr>
+                                  <th>Contacto</th>
+                                  <th>Email</th>
+                                  <th>Teléfono</th>
+                                  <th>Empresa</th>
+                                  <th>Etapa</th>
+                                  <th>Valor</th>
+                                  <th>Estado</th>
                                 </tr>
-                              ))}
-                            </tbody>
-                          </table>
+                              </thead>
+                              <tbody>
+                                {records.map((item) => (
+                                  <tr key={item.id} onClick={() => setSelected(item)} style={{ cursor: "pointer" }}>
+                                    <td>
+                                      <div className="products">
+                                        <Avatar name={item.name} />
+                                        <div>
+                                          <h6>{item.name}</h6>
+                                          <span>{item.position ?? "—"}</span>
+                                        </div>
+                                      </div>
+                                    </td>
+                                    <td>
+                                      {item.email ? (
+                                        <span className="text-primary">{item.email}</span>
+                                      ) : (
+                                        <span>—</span>
+                                      )}
+                                    </td>
+                                    <td><span>{item.phone ?? "—"}</span></td>
+                                    <td><span>{item.company ?? "—"}</span></td>
+                                    <td><span>{STAGE_LABELS[item.pipelineStage]}</span></td>
+                                    <td><span>{item.value > 0 ? eur(item.value) : "—"}</span></td>
+                                    <td>
+                                      <span className={`badge light border-0 badge-${STATUS_TONE[item.status]}`}>
+                                        {STATUS_LABELS[item.status]}
+                                      </span>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
                           <div className="d-sm-flex text-center justify-content-between align-items-center">
                             <div className="dataTables_info">
                               Mostrando {firstIndex + 1} a {Math.min(lastIndex, contacts.length)} de {contacts.length} contactos
@@ -703,6 +705,7 @@ export default function SaasCrmPage() {
                               id="crm-tbl_paginate"
                             >
                               <Link
+                                aria-label="Pagina anterior"
                                 className={`paginate_button previous ${currentPage === 1 ? "disabled" : ""}`}
                                 href="#"
                                 scroll={false}
@@ -724,6 +727,7 @@ export default function SaasCrmPage() {
                                 ))}
                               </span>
                               <Link
+                                aria-label="Pagina siguiente"
                                 className={`paginate_button next ${currentPage === npage ? "disabled" : ""}`}
                                 href="#"
                                 scroll={false}

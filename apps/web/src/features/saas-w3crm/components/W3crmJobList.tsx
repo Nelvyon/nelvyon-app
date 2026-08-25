@@ -80,51 +80,54 @@ export function W3crmJobList({
                 <div className="text-center py-5">{vacio}</div>
               ) : (
                 <>
-                  <table id="projects-tbl" className="table ItemsCheckboxSec dataTable no-footer mb-0">
-                    <thead>
-                      <tr>
-                        {columnas.map((c) => (
-                          <th key={c}>{c}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {records.map((item) => (
-                        <tr key={item.clave}>
-                          <td>
-                            <div className="d-flex align-items-center">
-                              <span
-                                className="avatar avatar-md rounded-circle d-inline-flex align-items-center justify-content-center bg-primary text-white"
-                                style={{ width: 40, height: 40 }}
-                              >
-                                {item.iniciales}
-                              </span>
-                              <div className="ms-2">
-                                <p className="mb-0 text-start font-w500">{item.nombre}</p>
-                                <span>{item.subtitulo}</span>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <p className="mb-0 font-w500">{item.fecha}</p>
-                          </td>
-                          <td>
-                            <p className="mb-0 font-w500">{item.ultimaActividad}</p>
-                          </td>
-                          <td>
-                            <div className="action-button">{item.acciones}</div>
-                          </td>
+                  <div className="table-responsive">
+                    <table id="projects-tbl" className="table ItemsCheckboxSec dataTable no-footer mb-0">
+                      <thead>
+                        <tr>
+                          {columnas.map((c) => (
+                            <th key={c}>{c}</th>
+                          ))}
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {records.map((item) => (
+                          <tr key={item.clave}>
+                            <td>
+                              <div className="d-flex align-items-center">
+                                <span
+                                  className="avatar avatar-md rounded-circle d-inline-flex align-items-center justify-content-center bg-primary text-white"
+                                  style={{ width: 40, height: 40 }}
+                                >
+                                  {item.iniciales}
+                                </span>
+                                <div className="ms-2">
+                                  <p className="mb-0 text-start font-w500">{item.nombre}</p>
+                                  <span>{item.subtitulo}</span>
+                                </div>
+                              </div>
+                            </td>
+                            <td>
+                              <p className="mb-0 font-w500">{item.fecha}</p>
+                            </td>
+                            <td>
+                              <p className="mb-0 font-w500">{item.ultimaActividad}</p>
+                            </td>
+                            <td>
+                              <div className="action-button">{item.acciones}</div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                   <div className="d-sm-flex text-center justify-content-between align-items-center">
                     <div className="dataTables_info">
                       Mostrando {filas.length === 0 ? 0 : firstIndex + 1} a {Math.min(lastIndex, filas.length)} de {filas.length}
                     </div>
                     <div className="dataTables_paginate paging_simple_numbers justify-content-center" id="job-tbl_paginate">
                       <Link
-                        className={`paginate_button previous ${currentPage === 1 ? "disabled" : ""}`}
+                        aria-label="Pagina anterior"
+                                className={`paginate_button previous ${currentPage === 1 ? "disabled" : ""}`}
                         href="#" scroll={false}
                         onClick={(e) => { e.preventDefault(); prePage(); }}
                       >
@@ -142,7 +145,8 @@ export function W3crmJobList({
                         ))}
                       </span>
                       <Link
-                        className={`paginate_button next ${currentPage === npage ? "disabled" : ""}`}
+                        aria-label="Pagina siguiente"
+                                className={`paginate_button next ${currentPage === npage ? "disabled" : ""}`}
                         href="#" scroll={false}
                         onClick={(e) => { e.preventDefault(); nextPage(); }}
                       >

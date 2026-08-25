@@ -693,14 +693,16 @@ export default function SaasStorePage() {
                     </tbody>
                   </table>
                 </div>
-                <table className="table table-clear">
-                  <tbody>
-                    <tr><td className="left"><strong>Subtotal</strong></td><td className="right">{num(selectedOrder.subtotal).toFixed(2)}€</td></tr>
-                    <tr><td className="left"><strong>IVA</strong></td><td className="right">{num(selectedOrder.vatAmount).toFixed(2)}€</td></tr>
-                    <tr><td className="left"><strong>Envío</strong></td><td className="right">{num(selectedOrder.shippingFee).toFixed(2)}€</td></tr>
-                    <tr><td className="left"><strong>Total</strong></td><td className="right"><strong>{num(selectedOrder.total).toFixed(2)}€</strong></td></tr>
-                  </tbody>
-                </table>
+                <div className="table-responsive">
+                  <table className="table table-clear">
+                    <tbody>
+                      <tr><td className="left"><strong>Subtotal</strong></td><td className="right">{num(selectedOrder.subtotal).toFixed(2)}€</td></tr>
+                      <tr><td className="left"><strong>IVA</strong></td><td className="right">{num(selectedOrder.vatAmount).toFixed(2)}€</td></tr>
+                      <tr><td className="left"><strong>Envío</strong></td><td className="right">{num(selectedOrder.shippingFee).toFixed(2)}€</td></tr>
+                      <tr><td className="left"><strong>Total</strong></td><td className="right"><strong>{num(selectedOrder.total).toFixed(2)}€</strong></td></tr>
+                    </tbody>
+                  </table>
+                </div>
                 <div className="d-flex flex-wrap gap-2">
                   {STATUS_ACTIONS.filter((a) => a.from === selectedOrder.status).map((a) => (
                     <button

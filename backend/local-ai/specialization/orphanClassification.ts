@@ -233,6 +233,26 @@ export const ORPHAN_CLASSIFICATION: readonly OrphanClassEntry[] = [
   { path: "docs/PHASE_2F_READY_FOR_SAAS.md", disposition: "archive", reason: "Phase 2F historical" },
   { path: "docs/PHASE_3A_SAAS_DEALS_PIPELINE.md", disposition: "archive", reason: "Phase 3A historical" },
   { path: "docs/PHASE_3B_PIPELINE_STAGE_SYNC.md", disposition: "archive", reason: "Phase 3B historical" },
+  // —— Cierres de bloque (2026-08) ——
+  //
+  // El Bloque 4 anadio sus dos documentos de cierre y NO los registro aqui, asi
+  // que el detector de huecos paso de 5 a 7 orfanos y la puerta se puso roja en
+  // el bloque siguiente. Es exactamente lo que advierte el comentario de arriba:
+  // documentacion propia que el cerebro de NELVYON no sabe que existe.
+  //
+  // Los del Bloque 5 se registran ANTES de escribirlos, para no repetirlo.
+  { path: "docs/BLOQUE_4_CIERRE.md", disposition: "index", domain: "nelvyon", priority: 1, title: "Bloque 4 — cierre", sourceType: "official_doc", reason: "Certificacion de operacion real: webhooks, colas, integraciones y sus 8 defectos corregidos" },
+  { path: "docs/BLOQUE_4_ESTADO.md", disposition: "index", domain: "nelvyon", priority: 2, title: "Bloque 4 — estado", reason: "Estado por capacidad del bloque 4" },
+  { path: "docs/BLOQUE_5_CIERRE.md", disposition: "index", domain: "nelvyon", priority: 1, title: "Bloque 5 — cierre", sourceType: "official_doc", reason: "Certificacion de producto: 217 areas, 25 categorias, medicion en navegador y comparativa de mercado" },
+  { path: "docs/BLOQUE_5_ESTADO.md", disposition: "index", domain: "nelvyon", priority: 2, title: "Bloque 5 — estado", reason: "Estado por categoria de producto del bloque 5" },
+
+  // —— Documentos vivos que estaban sin clasificar ——
+  { path: "docs/DEVELOPER_ONBOARDING.md", disposition: "index", domain: "development_tech", priority: 2, title: "Developer Onboarding", sourceType: "runbook", reason: "Puesta en marcha del entorno para alguien que llega nuevo" },
+  { path: "docs/HANDOFF_AISLAMIENTO.md", disposition: "index", domain: "development_tech", priority: 1, title: "Handoff de aislamiento", reason: "Estado y siguiente paso del aislamiento multi-inquilino" },
+  { path: "docs/LAUNCH_CHECKLIST_DEFINITIVE.md", disposition: "index", domain: "development_tech", priority: 1, title: "Launch Checklist definitivo", sourceType: "runbook", reason: "Checklist de lanzamiento consolidado" },
+  { path: "docs/NELVYON_CLOSURE_STATE.md", disposition: "index", domain: "nelvyon", priority: 1, title: "Estado de cierre de NELVYON", reason: "Estado agregado de los cierres por bloque" },
+  { path: "docs/NELVYON_RELEASE_CANDIDATE_REPORT.md", disposition: "index", domain: "nelvyon", priority: 2, title: "Informe de candidata a version", reason: "Informe de la candidata a release" },
+
   { path: "docs/PHASE_3B_SAAS_DEALS_UI.md", disposition: "archive", reason: "Phase 3B historical" },
   { path: "docs/PHASE_3B_SAAS_LEGACY_CLEANUP.md", disposition: "archive", reason: "Phase 3B historical" },
   { path: "docs/PHASE_3C_SAAS_RBAC_BILLING.md", disposition: "archive", reason: "Phase 3C historical" },

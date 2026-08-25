@@ -594,7 +594,8 @@ export default function SaasInboxPage() {
                                   id="inbox_paginate"
                                 >
                                   <Link
-                                    className={`paginate_button previous ${currentPage === 1 ? "disabled" : ""}`}
+                                    aria-label="Pagina anterior"
+                                className={`paginate_button previous ${currentPage === 1 ? "disabled" : ""}`}
                                     href="#" scroll={false}
                                     onClick={(e) => { e.preventDefault(); prePage(); }}
                                   >
@@ -612,7 +613,8 @@ export default function SaasInboxPage() {
                                     ))}
                                   </span>
                                   <Link
-                                    className={`paginate_button next ${currentPage === npage ? "disabled" : ""}`}
+                                    aria-label="Pagina siguiente"
+                                className={`paginate_button next ${currentPage === npage ? "disabled" : ""}`}
                                     href="#" scroll={false}
                                     onClick={(e) => { e.preventDefault(); nextPage(); }}
                                   >

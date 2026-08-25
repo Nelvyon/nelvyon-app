@@ -69,7 +69,7 @@ export default function LaunchPage() {
           )}
           <p className="mt-3 mb-0 text-center" style={{ fontSize: 13, color: "#6b7c93" }}>
             También puede{" "}
-            <Link href="/contacto" style={{ color: "#0084FF" }}>
+            <Link href="/contacto" className="underline" style={{ color: "var(--primary)" }}>
               solicitar una demo
             </Link>
             .

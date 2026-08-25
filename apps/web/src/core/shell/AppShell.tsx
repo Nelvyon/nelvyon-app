@@ -325,7 +325,7 @@ function SidebarChrome({
         <div className={cn("flex items-center", collapsed ? "flex-col gap-2" : "justify-between gap-2")}>
           <Link
             className={cn("font-semibold text-foreground tracking-tight", collapsed ? "text-center text-xs" : "text-base")}
-            href="/dashboard"
+            href="/saas/dashboard"
           >
             {logoUrl && !collapsed ? (
                

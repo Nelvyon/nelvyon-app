@@ -24,13 +24,13 @@ export function LegalPage({ title, lastUpdated, children }: LegalPageProps) {
             <nav aria-label="Miga de pan" style={{ fontSize: 14, color: "#6b7c93" }}>
               <ol className="d-flex flex-wrap gap-1 mb-3" style={{ listStyle: "none", padding: 0 }}>
                 <li>
-                  <Link href="/" style={{ color: "#0084FF" }}>
+                  <Link href="/" className="underline" style={{ color: "var(--primary)" }}>
                     Inicio
                   </Link>
                 </li>
                 <li aria-hidden>/</li>
                 <li>
-                  <Link href="/legal" style={{ color: "#0084FF" }}>
+                  <Link href="/legal" className="underline" style={{ color: "var(--primary)" }}>
                     Legal
                   </Link>
                 </li>
@@ -57,7 +57,7 @@ export function LegalPage({ title, lastUpdated, children }: LegalPageProps) {
         </section>
       </PublicShell>
       <style>{`
-        .nv-brand-legal-prose a { color: #0084FF; }
+        .nv-brand-legal-prose a { color: #0063c2; text-decoration: underline; }
         .nv-brand-legal-prose h2 { margin-top: 2rem; font-size: 1.25rem; color: #06050B; font-weight: 700; }
         .nv-brand-legal-prose h3 { margin-top: 1.25rem; font-size: 1.05rem; color: #06050B; font-weight: 600; }
         .nv-brand-legal-prose ul, .nv-brand-legal-prose ol { padding-left: 1.25rem; }

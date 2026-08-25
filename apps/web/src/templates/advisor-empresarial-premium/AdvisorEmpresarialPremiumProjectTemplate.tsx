@@ -79,7 +79,7 @@ export function AdvisorEmpresarialPremiumProjectTemplate({ config, accentHex = "
               <Link href="/app/advisor">Business advisor (Advisor v1)</Link>
             </NelvyonDsButton>
             <NelvyonDsButton asChild className="text-link hover:text-link-hover" size="sm" variant="ghost">
-              <Link href="/app/projects">Projects</Link>
+              <Link href="/app/projects/new">Nuevo proyecto</Link>
             </NelvyonDsButton>
             <NelvyonDsButton asChild className="text-link hover:text-link-hover" size="sm" variant="ghost">
               <Link href="/campaigns">Campaigns</Link>

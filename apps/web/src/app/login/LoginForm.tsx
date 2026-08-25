@@ -120,7 +120,7 @@ export function LoginForm() {
             <label className="block text-sm font-medium text-zinc-300" htmlFor="password">
               Contraseña
             </label>
-            <Link className="text-sm text-[#93c5fd] underline-offset-2 hover:text-white hover:underline" href="/forgot-password">
+            <Link className="text-sm text-[#93c5fd] underline-offset-2 hover:text-white hover:underline" href="/auth/forgot-password">
               ¿Olvidaste tu contraseña?
             </Link>
           </div>

@@ -192,47 +192,49 @@ function PlaybookBox({
                 ) : steps.length === 0 ? (
                   <W3crmEmptyState title="Sin pasos" description="Este playbook todavía no tiene pasos." />
                 ) : (
-                  <table className="table table-responsive-lg table-striped table-condensed flip-content">
-                    <thead>
-                      <tr>
-                        <th className="text-black">Paso</th>
-                        <th className="text-black">Detalle</th>
-                        <th className="text-black text-end">Acciones</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {steps.map((s) => {
-                        const cta = stepCta(s, pb.packId);
-                        return (
-                          <tr key={s.id}>
-                            <td>
-                              <span className={s.completed ? "text-muted text-decoration-line-through" : "fw-bold"}>
-                                {iconoPaso(s.stepType)} {s.title}
-                              </span>
-                            </td>
-                            <td><span className="fs-12 text-muted">{s.body}</span></td>
-                            <td className="text-end">
-                              {cta && (
-                                <Link href={cta.href} className="btn btn-primary light btn-sm me-1">
-                                  {cta.label}
-                                </Link>
-                              )}
-                              {!s.completed && (
-                                <button
-                                  type="button"
-                                  className="btn btn-primary btn-sm content-icon"
-                                  aria-label={`Marcar completado: ${s.title}`}
-                                  onClick={() => onCompleteStep(pb.id, s.id)}
-                                >
-                                  <i className="fa-solid fa-check" />
-                                </button>
-                              )}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                  <div className="table-responsive">
+                    <table className="table table-responsive-lg table-striped table-condensed flip-content">
+                      <thead>
+                        <tr>
+                          <th className="text-black">Paso</th>
+                          <th className="text-black">Detalle</th>
+                          <th className="text-black text-end">Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {steps.map((s) => {
+                          const cta = stepCta(s, pb.packId);
+                          return (
+                            <tr key={s.id}>
+                              <td>
+                                <span className={s.completed ? "text-muted text-decoration-line-through" : "fw-bold"}>
+                                  {iconoPaso(s.stepType)} {s.title}
+                                </span>
+                              </td>
+                              <td><span className="fs-12 text-muted">{s.body}</span></td>
+                              <td className="text-end">
+                                {cta && (
+                                  <Link href={cta.href} className="btn btn-primary light btn-sm me-1">
+                                    {cta.label}
+                                  </Link>
+                                )}
+                                {!s.completed && (
+                                  <button
+                                    type="button"
+                                    className="btn btn-primary btn-sm content-icon"
+                                    aria-label={`Marcar completado: ${s.title}`}
+                                    onClick={() => onCompleteStep(pb.id, s.id)}
+                                  >
+                                    <i className="fa-solid fa-check" />
+                                  </button>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
                 )}
               </div>
             </div>

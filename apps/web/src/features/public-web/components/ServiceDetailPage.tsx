@@ -91,7 +91,7 @@ export function ServiceDetailPage({ slugOrHref }: { slugOrHref: string }) {
             <ul className="mt-3" style={{ fontSize: 14, color: "#484848", paddingLeft: 0, listStyle: "none" }}>
               {saasModules.slice(0, 5).map((m) => (
                 <li key={m.id} className="mb-2">
-                  <Link href={`/producto/${m.slug}`} style={{ color: "#0084FF" }}>
+                  <Link href={`/producto/${m.slug}`} className="underline" style={{ color: "var(--primary)" }}>
                     {m.name}
                   </Link>
                   {" — "}

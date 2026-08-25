@@ -19,7 +19,7 @@ export default function OfflinePage() {
       </div>
       <h1 className="text-2xl font-bold">NELVYON</h1>
       <p className="mt-4 max-w-sm text-zinc-400">Sin conexión — reconectando…</p>
-      <p className="mt-2 text-xs text-zinc-500">Comprobando cada 10 segundos</p>
+      <p className="mt-2 text-xs text-zinc-400">Comprobando cada 10 segundos</p>
     </div>
   );
 }

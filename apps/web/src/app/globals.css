@@ -4,6 +4,26 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/*
+ * BLOQUE 5 — contraste medido, no supuesto.
+ *
+ * `#0084ff` da **3,66:1 sobre blanco**. WCAG AA pide 4,5:1 para texto normal,
+ * asi que fallaban a la vez las dos direcciones: el azul como texto sobre
+ * blanco y el texto blanco sobre los botones azules. Medido con axe-core en
+ * navegador: 819 violaciones de `color-contrast` repartidas por 64 rutas, la
+ * combinacion mas repetida siendo exactamente esta.
+ *
+ * El arreglo baja la luminosidad **conservando el tono** (209 grados, el mismo
+ * azul): `#0084ff` -> `#0063c2`, que da 4,52:1. No es un cambio de marca; es el
+ * minimo ajuste que cumple el estandar.
+ *
+ * Y se cambia SOLO aqui, en el tema claro. Comprobado antes de tocar nada:
+ * sobre el fondo oscuro `#020817` el azul original da 5,47:1 y el nuevo 4,42:1,
+ * y sobre la tarjeta oscura `#0b1428` pasa de 5,02:1 a **4,06:1**, que ya NO
+ * cumple. Un solo azul no puede servir a los dos temas: cambiarlo en los dos
+ * habria arreglado el claro rompiendo el oscuro, que es medio arreglo disfrazado
+ * de arreglo entero. El bloque `.dark` conserva `#0084ff` a proposito.
+ */
 :root {
   --radius: 0.625rem;
   --background: #ffffff;
@@ -12,13 +32,13 @@
   --card-foreground: #07122a;
   --popover: #ffffff;
   --popover-foreground: #07122a;
-  --primary: #0084ff;
+  --primary: #0063c2;
   --primary-foreground: #ffffff;
   --secondary: #f8faff;
   --secondary-foreground: #07122a;
   --muted: #f4f7fc;
   --muted-foreground: #1e293b;
-  --accent: #0084ff;
+  --accent: #0063c2;
   --accent-foreground: #ffffff;
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: #ffffff;
@@ -28,21 +48,21 @@
   --warning-foreground: #78350f;
   --border: #dce6f5;
   --input: #dce6f5;
-  --ring: #0084ff;
-  --nelvyon-primary-blue: #0084ff;
+  --ring: #0063c2;
+  --nelvyon-primary-blue: #0063c2;
   --nelvyon-primary-blue-deep: #0047ab;
-  --nelvyon-primary-blue-rgb: 0, 132, 255;
+  --nelvyon-primary-blue-rgb: 0, 117, 226;
   /* D2 — canonical product accent (single source of truth for /saas + /os shells) */
-  --nelvyon-accent: #0084ff;
+  --nelvyon-accent: #0063c2;
   --nelvyon-accent-deep: #0047ab;
-  --nelvyon-accent-rgb: 0, 132, 255;
+  --nelvyon-accent-rgb: 0, 117, 226;
   --nelvyon-primary-dark: #020817;
   --nelvyon-primary-white: #ffffff;
   --nelvyon-dark: #020817;
   --nelvyon-navy: #07122a;
   --nelvyon-panel: #0b1428;
-  --nelvyon-blue: #0084ff;
-  --nelvyon-sky: #0084ff;
+  --nelvyon-blue: #0063c2;
+  --nelvyon-sky: #0063c2;
   --nelvyon-light: #f8faff;
   --nelvyon-border: #dce6f5;
   --nelvyon-text: #07122a;
@@ -6868,4 +6888,31 @@ body:has(.nelvyon-home--v3) .nelvyon-nav-mobile-toggle {
   --muted: #0b1428;
   --muted-foreground: rgba(248, 250, 252, 0.55);
   --border: rgba(255, 255, 255, 0.1);
+}
+
+/*
+ * BLOQUE 5 — un enlace marcado como subrayado tiene que salir subrayado.
+ *
+ * WCAG (`link-in-text-block`) exige que un enlace dentro de un parrafo se
+ * distinga del texto por algo mas que el color: quien no distingue ese azul del
+ * gris de alrededor no ve que ahi hay algo que pulsar.
+ *
+ * Poner `className="underline"` NO bastaba, y la razon no es de especificidad
+ * sino de CAPAS. En Tailwind v4 las utilidades viven dentro de `@layer`, y
+ * cualquier regla SIN capa gana a cualquier regla con capa por muy especifica
+ * que sea. Los packs vendorizados (`brand/public/nv`, `brand/public/aior`,
+ * `www`) traen cada uno su `a { text-decoration: none }` global y sin capa, y
+ * ademas esta hoja define `.nv-public a { text-decoration: none }`.
+ *
+ * Comprobado en el navegador, no supuesto: sobre `/contenido`, un enlace con
+ * `class="underline"` computaba `text-decoration-line: none`.
+ *
+ * De ahi el `!important`. No es pereza: es la unica forma de ganar a reglas sin
+ * capa de tres hojas vendorizadas distintas sin editarlas una a una y sin que
+ * la proxima que se anada vuelva a romperlo en silencio.
+ */
+a.underline,
+a.underline:hover,
+a.underline:focus-visible {
+  text-decoration: underline !important;
 }

@@ -40,7 +40,7 @@ function VerifyEmailContent() {
         </h1>
         <p className="mt-3 text-sm text-zinc-400">{info.body}</p>
         <Link
-          href="/dashboard"
+          href="/saas/dashboard"
           className="mt-8 inline-block rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white hover:bg-indigo-500"
         >
           Ir al dashboard →

@@ -185,7 +185,7 @@ export function PartnerCommissionFlow({ data, connect, onboarding, onStartConnec
             </div>
           </div>
           <Button asChild className="mt-4 w-full md:w-auto" size="sm" variant={s2 === "current" ? "default" : "outline"}>
-            <Link href="/dashboard/white-label/clients">
+            <Link href="/saas/white-label">
               <Plus className="mr-2 h-4 w-4" />
               Nuevo cliente
             </Link>

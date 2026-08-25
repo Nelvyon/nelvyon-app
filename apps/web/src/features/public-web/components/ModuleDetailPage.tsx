@@ -121,7 +121,7 @@ export function ModuleDetailPage({ slug }: { slug: string }) {
             {mod.productPath ? (
               <p className="mt-3" style={{ fontSize: 14, color: "#484848" }}>
                 Acceso autenticado:{" "}
-                <Link href={mod.productPath} style={{ color: "#0084FF" }}>
+                <Link href={mod.productPath} className="underline" style={{ color: "var(--primary)" }}>
                   {mod.productPath}
                 </Link>
               </p>

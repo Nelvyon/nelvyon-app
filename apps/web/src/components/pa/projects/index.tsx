@@ -7,12 +7,48 @@ import { motion, type Variants } from "motion/react";
 import { cn } from "@/lib/pa/utils";
 
 const MotionLink = motion.create(Link);
+const MotionDiv = motion.div;
+
+/**
+ * Enlace si hay destino; bloque si no. Un enlace a ninguna parte no es un enlace.
+ *
+ * Las props se declaran una a una en vez de reenviar un saco generico: las de
+ * un `<div>` no son asignables a las de un `<a>` —`onMouseEnter` recibe
+ * `HTMLDivElement` frente a `HTMLAnchorElement`— y taparlo con un `as never`
+ * habria apagado el unico aviso que dice si la tarjeta esta bien montada.
+ */
+type PropsTarjeta = {
+  href?: string;
+  "data-slot"?: string;
+  initial?: string;
+  animate?: string;
+  whileHover?: string;
+  className?: string;
+  children?: React.ReactNode;
+};
+
+function Tarjeta({ href, children, ...resto }: PropsTarjeta) {
+  return href ? (
+    <MotionLink href={href} {...resto}>
+      {children}
+    </MotionLink>
+  ) : (
+    <MotionDiv {...resto}>{children}</MotionDiv>
+  );
+}
 
 import { Container } from "@/components/pa/container";
 import { RightArrow } from "@/components/pa/icons/general";
 import { PageHeader } from "@/components/pa/page-header";
 
 type Project = {
+  /**
+   * Destino real de la ficha. Opcional a proposito: la plantilla ponia
+   * `href="#"` fijo en las nueve tarjetas, de modo que la tarjeta ensenaba
+   * «View Project» con su flecha y al pulsarla no pasaba nada. Sin destino no
+   * se pinta un enlace ni se promete uno.
+   */
+  href?: string;
   src: string;
   alt: string;
   width: number;
@@ -27,7 +63,7 @@ type Project = {
   impact: string;
 };
 
-const projects = [
+const projects: Project[] = [
   {
     src: "/pa/assets/project-1.webp",
     alt: "Arquitectura CRM y funnels",
@@ -183,9 +219,9 @@ export const Projects = ({
           )}
         >
           {projects.map((project) => (
-            <MotionLink
+            <Tarjeta
               key={project.src}
-              href="#"
+              {...(project.href ? { href: project.href } : {})}
               data-slot="card"
               initial="rest"
               animate="rest"
@@ -216,18 +252,22 @@ export const Projects = ({
                   variants={overlayItemVariants}
                   className="flex w-full items-end justify-between gap-4"
                 >
-                  <div className="flex items-center gap-1">
-                    <span className="text-natural-white tracking-xs text-sm leading-3.5 font-medium">
-                      View Project
-                    </span>
-                    <RightArrow />
-                  </div>
+                  {project.href ? (
+                    <div className="flex items-center gap-1">
+                      <span className="text-natural-white tracking-xs text-sm leading-3.5 font-medium">
+                        Ver proyecto
+                      </span>
+                      <RightArrow />
+                    </div>
+                  ) : (
+                    <span />
+                  )}
                   <span className="-tracking-xs text-natural-white/80 text-right text-sm leading-3.5 font-medium">
                     {project.category}
                   </span>
                 </motion.div>
               </motion.div>
-            </MotionLink>
+            </Tarjeta>
           ))}
         </div>
       </Container>

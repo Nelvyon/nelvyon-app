@@ -653,47 +653,49 @@ export default function SaasCampaniasPage() {
                           />
                         ) : (
                           <>
-                            <table className="table table-responsive-lg table-striped table-condensed flip-content">
-                              <thead>
-                                <tr>
-                                  <th className="text-black">Nombre</th>
-                                  <th className="text-black">Canal</th>
-                                  <th className="text-black">Estado</th>
-                                  <th className="text-black">Destinatarios</th>
-                                  <th className="text-black">Enviados</th>
-                                  <th className="text-black">Open rate</th>
-                                  <th className="text-black">Programada</th>
-                                  <th className="text-end text-black">Acciones</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {records.map((c) => {
-                                  const enviados = num(c.sentCount);
-                                  const openRate = enviados > 0 ? Math.round((num(c.openedCount) / enviados) * 100) : 0;
-                                  return (
-                                    <tr key={c.id}>
-                                      <td>{c.name || "—"}</td>
-                                      <td>{etiquetaCanal(c.channel)}</td>
-                                      <td><span className={`badge ${badgeEstado(c.status)}`}>{etiquetaEstado(c.status)}</span></td>
-                                      <td>{num(c.totalRecipients)}</td>
-                                      <td>{enviados}</td>
-                                      <td>{enviados > 0 ? `${openRate}%` : "—"}</td>
-                                      <td>{fecha(c.scheduledAt)}</td>
-                                      <td className="text-end">
-                                        <button
-                                          type="button"
-                                          className="btn btn-primary btn-sm content-icon"
-                                          aria-label={`Ver detalle de ${c.name || "la campaña"}`}
-                                          onClick={() => void openDetail(c)}
-                                        >
-                                          <i className="fa fa-eye" />
-                                        </button>
-                                      </td>
-                                    </tr>
-                                  );
-                                })}
-                              </tbody>
-                            </table>
+                            <div className="table-responsive">
+                              <table className="table table-responsive-lg table-striped table-condensed flip-content">
+                                <thead>
+                                  <tr>
+                                    <th className="text-black">Nombre</th>
+                                    <th className="text-black">Canal</th>
+                                    <th className="text-black">Estado</th>
+                                    <th className="text-black">Destinatarios</th>
+                                    <th className="text-black">Enviados</th>
+                                    <th className="text-black">Open rate</th>
+                                    <th className="text-black">Programada</th>
+                                    <th className="text-end text-black">Acciones</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {records.map((c) => {
+                                    const enviados = num(c.sentCount);
+                                    const openRate = enviados > 0 ? Math.round((num(c.openedCount) / enviados) * 100) : 0;
+                                    return (
+                                      <tr key={c.id}>
+                                        <td>{c.name || "—"}</td>
+                                        <td>{etiquetaCanal(c.channel)}</td>
+                                        <td><span className={`badge ${badgeEstado(c.status)}`}>{etiquetaEstado(c.status)}</span></td>
+                                        <td>{num(c.totalRecipients)}</td>
+                                        <td>{enviados}</td>
+                                        <td>{enviados > 0 ? `${openRate}%` : "—"}</td>
+                                        <td>{fecha(c.scheduledAt)}</td>
+                                        <td className="text-end">
+                                          <button
+                                            type="button"
+                                            className="btn btn-primary btn-sm content-icon"
+                                            aria-label={`Ver detalle de ${c.name || "la campaña"}`}
+                                            onClick={() => void openDetail(c)}
+                                          >
+                                            <i className="fa fa-eye" />
+                                          </button>
+                                        </td>
+                                      </tr>
+                                    );
+                                  })}
+                                </tbody>
+                              </table>
+                            </div>
                             <div className="d-sm-flex text-center justify-content-between align-items-center">
                               <div className="dataTables_info">
                                 Mostrando {firstIndex + 1} a {Math.min(lastIndex, filtered.length)} de {filtered.length} campañas
@@ -701,7 +703,7 @@ export default function SaasCampaniasPage() {
                               <div className="dataTables_paginate paging_simple_numbers justify-content-center" id="campanias_paginate">
                                 <button
                                   type="button"
-                                  className={`paginate_button previous ${currentPage === 1 ? "disabled" : ""}`}
+                                className={`paginate_button previous ${currentPage === 1 ? "disabled" : ""}`}
                                   aria-label="Página anterior"
                                   onClick={prePage}
                                 >
@@ -723,7 +725,7 @@ export default function SaasCampaniasPage() {
                                 </span>
                                 <button
                                   type="button"
-                                  className={`paginate_button next ${currentPage === npage ? "disabled" : ""}`}
+                                className={`paginate_button next ${currentPage === npage ? "disabled" : ""}`}
                                   aria-label="Página siguiente"
                                   onClick={nextPage}
                                 >

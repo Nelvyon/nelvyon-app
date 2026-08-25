@@ -122,6 +122,41 @@ export default function SaasCalendarPage() {
 
   useEffect(() => { void loadEvents(); }, [loadEvents]);
 
+  /**
+   * FullCalendar dibuja sus flechas como `<span class="fc-icon" role="img">`
+   * SIN texto dentro. Un elemento con `role="img"` y sin nombre accesible es
+   * una violacion `serious` de WCAG: un lector de pantalla anuncia «imagen» y
+   * no dice de que.
+   *
+   * El boton que las envuelve SI tiene su etiqueta, asi que el icono es
+   * decorativo y lo correcto es esconderlo del arbol de accesibilidad. No se
+   * puede hacer con CSS —`aria-hidden` es un atributo— ni configurando
+   * FullCalendar, que no expone esa parte del marcado.
+   *
+   * Se usa un `MutationObserver` y no una pasada unica porque la barra se
+   * vuelve a dibujar al cambiar de vista o de mes: una sola pasada arreglaria
+   * el primer render y dejaria el defecto en todos los demas.
+   */
+  useEffect(() => {
+    // Se observa `body` y no `.fc`: cuando este efecto corre, el calendario
+    // todavia no se ha montado —espera a que carguen los eventos— asi que
+    // `querySelector(".fc")` devolvia null y el observador no llegaba a
+    // instalarse nunca. Medido: los iconos seguian con `role="img"`.
+    const raiz = document.body;
+
+    const esconderIconos = () => {
+      raiz.querySelectorAll('.fc-icon[role="img"]').forEach((el) => {
+        el.setAttribute("aria-hidden", "true");
+        el.removeAttribute("role");
+      });
+    };
+
+    esconderIconos();
+    const observador = new MutationObserver(esconderIconos);
+    observador.observe(raiz, { childList: true, subtree: true });
+    return () => observador.disconnect();
+  }, []);
+
   async function createEvent(e: React.FormEvent) {
     e.preventDefault();
     if (!newTitle.trim() || !newDate) return;

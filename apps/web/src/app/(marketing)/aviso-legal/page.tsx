@@ -35,7 +35,7 @@ export default function AvisoLegalPage() {
           </p>
           <p>
             Contacto:{" "}
-            <a href={`mailto:${siteBrand.contactEmail}`} style={{ color: "#0084FF" }}>
+            <a href={`mailto:${siteBrand.contactEmail}`} className="underline" style={{ color: "var(--primary)" }}>
               {siteBrand.contactEmail}
             </a>
           </p>
@@ -80,27 +80,27 @@ export default function AvisoLegalPage() {
           </h2>
           <ul>
             <li>
-              <Link href="/privacidad" style={{ color: "#0084FF" }}>
+              <Link href="/privacidad" className="underline" style={{ color: "var(--primary)" }}>
                 Política de privacidad
               </Link>
             </li>
             <li>
-              <Link href="/cookies" style={{ color: "#0084FF" }}>
+              <Link href="/cookies" className="underline" style={{ color: "var(--primary)" }}>
                 Política de cookies
               </Link>
             </li>
             <li>
-              <Link href="/terminos" style={{ color: "#0084FF" }}>
+              <Link href="/terminos" className="underline" style={{ color: "var(--primary)" }}>
                 Términos y condiciones
               </Link>
             </li>
             <li>
-              <Link href="/legal/dpa" style={{ color: "#0084FF" }}>
+              <Link href="/legal/dpa" className="underline" style={{ color: "var(--primary)" }}>
                 DPA
               </Link>
             </li>
             <li>
-              <Link href="/legal/subprocessors" style={{ color: "#0084FF" }}>
+              <Link href="/legal/subprocessors" className="underline" style={{ color: "var(--primary)" }}>
                 Subprocesadores
               </Link>
             </li>

@@ -124,7 +124,21 @@ function KpiValor({ valor, pista }: { valor: string; pista?: string }) {
   return (
     <>
       <span>{valor}</span>
-      {pista ? <span className="d-block fs-12 fw-normal text-muted">{pista}</span> : null}
+      {/*
+        `text-muted` es un gris pensado para fondo claro, y esta pista se pinta
+        DENTRO de una tarjeta con el color de marca: medido, `#535b62` sobre
+        `#0063c2` da 2,2:1. El gris no es el fallo; usarlo sobre un fondo de
+        color, si.
+
+        `opacity` en vez de un color fijo: hereda el color del contenedor, asi
+        que la pista sigue siendo secundaria tanto en la tarjeta de color como
+        sobre fondo blanco, sin tener que saber cual de los dos es.
+      */}
+      {pista ? (
+        <span className="d-block fs-12 fw-normal" style={{ opacity: 0.85 }}>
+          {pista}
+        </span>
+      ) : null}
     </>
   );
 }

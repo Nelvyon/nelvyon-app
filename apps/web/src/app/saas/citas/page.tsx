@@ -498,91 +498,93 @@ export default function SaasCitasPage() {
                         description={view === "today" ? "No hay citas programadas para hoy" : "No hay citas que mostrar"}
                       />
                     ) : (
-                      <table id="citas-tbl" className="table shorting">
-                        <thead>
-                          <tr>
-                            <th>Cita</th>
-                            <th>Contacto</th>
-                            <th>Inicio</th>
-                            <th>Duración</th>
-                            <th>Estado</th>
-                            <th className="text-end">Acciones</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {filtered.map((a) => (
-                            <tr key={a.id}>
-                              <td>
-                                <span className="fw-bold">{a.title || "—"}</span>
-                                {a.notes ? <div className="text-muted fs-12">{a.notes}</div> : null}
-                              </td>
-                              <td>
-                                <span>{a.contactName || "—"}</span>
-                                <div className="text-muted fs-12">{a.contactEmail || "—"}</div>
-                              </td>
-                              <td><span>{formatDate(a.startAt)}</span></td>
-                              <td><span>{a.durationMinutes ?? 0} min</span></td>
-                              <td>
-                                <span className={`badge badge-${estadoDe(a.status).estilo}`}>
-                                  {etiquetaEstado(a.status)}
-                                </span>
-                              </td>
-                              <td className="text-end">
-                                {a.meetingUrl ? (
-                                  <a href={a.meetingUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary light btn-sm me-2">
-                                    Unirse
-                                  </a>
-                                ) : null}
-                                <W3crmRowDropdown etiqueta={`Acciones de ${a.title || a.contactName || "la cita"}`}>
-                                  <button
-                                    type="button"
-                                    className="dropdown-item"
-                                    disabled={updatingId === a.id || a.status === "confirmed" || a.status === "completed" || a.status === "cancelled"}
-                                    onClick={() => void changeStatus(a.id, "confirmed")}
-                                  >
-                                    Confirmar
-                                  </button>
-                                  <button
-                                    type="button"
-                                    className="dropdown-item"
-                                    disabled={updatingId === a.id || a.status === "completed" || a.status === "cancelled"}
-                                    onClick={() => void changeStatus(a.id, "completed")}
-                                  >
-                                    Completar
-                                  </button>
-                                  <button
-                                    type="button"
-                                    className="dropdown-item"
-                                    disabled={updatingId === a.id || a.status === "completed" || a.status === "cancelled"}
-                                    onClick={() => void changeStatus(a.id, "cancelled")}
-                                  >
-                                    Cancelar
-                                  </button>
-                                  <button
-                                    type="button"
-                                    className="dropdown-item text-danger"
-                                    disabled={updatingId === a.id}
-                                    onClick={() => {
-                                      void Alert.fire({
-                                        title: "¿Eliminar esta cita?",
-                                        text: "Esta acción no se puede deshacer.",
-                                        icon: "warning",
-                                        showCancelButton: true,
-                                        confirmButtonColor: "#d33",
-                                        cancelButtonColor: "#3085d6",
-                                        confirmButtonText: "Eliminar",
-                                        cancelButtonText: "Cancelar",
-                                      }).then((r) => { if (r.value) void removeAppointment(a.id); });
-                                    }}
-                                  >
-                                    Eliminar
-                                  </button>
-                                </W3crmRowDropdown>
-                              </td>
+                      <div className="table-responsive">
+                        <table id="citas-tbl" className="table shorting">
+                          <thead>
+                            <tr>
+                              <th>Cita</th>
+                              <th>Contacto</th>
+                              <th>Inicio</th>
+                              <th>Duración</th>
+                              <th>Estado</th>
+                              <th className="text-end">Acciones</th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                          </thead>
+                          <tbody>
+                            {filtered.map((a) => (
+                              <tr key={a.id}>
+                                <td>
+                                  <span className="fw-bold">{a.title || "—"}</span>
+                                  {a.notes ? <div className="text-muted fs-12">{a.notes}</div> : null}
+                                </td>
+                                <td>
+                                  <span>{a.contactName || "—"}</span>
+                                  <div className="text-muted fs-12">{a.contactEmail || "—"}</div>
+                                </td>
+                                <td><span>{formatDate(a.startAt)}</span></td>
+                                <td><span>{a.durationMinutes ?? 0} min</span></td>
+                                <td>
+                                  <span className={`badge badge-${estadoDe(a.status).estilo}`}>
+                                    {etiquetaEstado(a.status)}
+                                  </span>
+                                </td>
+                                <td className="text-end">
+                                  {a.meetingUrl ? (
+                                    <a href={a.meetingUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary light btn-sm me-2">
+                                      Unirse
+                                    </a>
+                                  ) : null}
+                                  <W3crmRowDropdown etiqueta={`Acciones de ${a.title || a.contactName || "la cita"}`}>
+                                    <button
+                                      type="button"
+                                      className="dropdown-item"
+                                      disabled={updatingId === a.id || a.status === "confirmed" || a.status === "completed" || a.status === "cancelled"}
+                                      onClick={() => void changeStatus(a.id, "confirmed")}
+                                    >
+                                      Confirmar
+                                    </button>
+                                    <button
+                                      type="button"
+                                      className="dropdown-item"
+                                      disabled={updatingId === a.id || a.status === "completed" || a.status === "cancelled"}
+                                      onClick={() => void changeStatus(a.id, "completed")}
+                                    >
+                                      Completar
+                                    </button>
+                                    <button
+                                      type="button"
+                                      className="dropdown-item"
+                                      disabled={updatingId === a.id || a.status === "completed" || a.status === "cancelled"}
+                                      onClick={() => void changeStatus(a.id, "cancelled")}
+                                    >
+                                      Cancelar
+                                    </button>
+                                    <button
+                                      type="button"
+                                      className="dropdown-item text-danger"
+                                      disabled={updatingId === a.id}
+                                      onClick={() => {
+                                        void Alert.fire({
+                                          title: "¿Eliminar esta cita?",
+                                          text: "Esta acción no se puede deshacer.",
+                                          icon: "warning",
+                                          showCancelButton: true,
+                                          confirmButtonColor: "#d33",
+                                          cancelButtonColor: "#3085d6",
+                                          confirmButtonText: "Eliminar",
+                                          cancelButtonText: "Cancelar",
+                                        }).then((r) => { if (r.value) void removeAppointment(a.id); });
+                                      }}
+                                    >
+                                      Eliminar
+                                    </button>
+                                  </W3crmRowDropdown>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
                     )}
                   </div>
                 </div>

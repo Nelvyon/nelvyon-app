@@ -150,7 +150,7 @@ export function W3crmDataTable<T>({
           <div className="dataTables_paginate paging_simple_numbers justify-content-center">
             <button
               type="button"
-              className={`paginate_button previous ${pagina === 1 ? "disabled" : ""}`}
+                                className={`paginate_button previous ${pagina === 1 ? "disabled" : ""}`}
               aria-label="Página anterior"
               onClick={() => { if (pagina !== 1) setPagina(pagina - 1); }}
             >
@@ -172,7 +172,7 @@ export function W3crmDataTable<T>({
             </span>
             <button
               type="button"
-              className={`paginate_button next ${pagina === paginas ? "disabled" : ""}`}
+                                className={`paginate_button next ${pagina === paginas ? "disabled" : ""}`}
               aria-label="Página siguiente"
               onClick={() => { if (pagina !== paginas) setPagina(pagina + 1); }}
             >

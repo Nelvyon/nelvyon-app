@@ -341,22 +341,24 @@ function InvoiceModal({ invoice, onClose }: { invoice?: Invoice; onClose: () => 
           <div className="row">
             <div className="col-lg-4 col-sm-5"> </div>
             <div className="col-lg-4 col-sm-5 ms-auto">
-              <table className="table table-clear">
-                <tbody>
-                  <tr>
-                    <td className="left"><strong>Subtotal</strong></td>
-                    <td className="right">€{subtotal.toFixed(2)}</td>
-                  </tr>
-                  <tr>
-                    <td className="left"><strong>IVA (21%)</strong></td>
-                    <td className="right">€{tax.toFixed(2)}</td>
-                  </tr>
-                  <tr>
-                    <td className="left"><strong>Total</strong></td>
-                    <td className="right"><strong>€{total.toFixed(2)}</strong></td>
-                  </tr>
-                </tbody>
-              </table>
+              <div className="table-responsive">
+                <table className="table table-clear">
+                  <tbody>
+                    <tr>
+                      <td className="left"><strong>Subtotal</strong></td>
+                      <td className="right">€{subtotal.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                      <td className="left"><strong>IVA (21%)</strong></td>
+                      <td className="right">€{tax.toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                      <td className="left"><strong>Total</strong></td>
+                      <td className="right"><strong>€{total.toFixed(2)}</strong></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
 

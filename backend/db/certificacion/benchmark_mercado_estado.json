@@ -1,0 +1,548 @@
+{
+  "categorias": {
+    "acceso": {
+      "clase_nelvyon": "MEASURED",
+      "clase_referente": "DOCUMENTED",
+      "criterio": "registro, acceso, recuperacion de contrasena y cierre de sesion",
+      "limite": "Los proveedores OAuth reales estan prohibidos en este bloque.",
+      "medida_nelvyon": {
+        "areas": 7,
+        "defectos": 0,
+        "enlaces_rotos": 0,
+        "herramientas": [
+          "auditoria_de_pantallas (7 reglas)",
+          "auditoria_de_rutas (888 rutas derivadas)",
+          "medicion-por-categoria.spec.ts (axe-core + 375px, navegador real)"
+        ],
+        "pantallas": 10
+      },
+      "referentes": [
+        "Keycloak (codigo abierto)",
+        "Auth.js (codigo abierto)"
+      ],
+      "veredicto": "PROPIA_MEDIDA"
+    },
+    "agencia_y_partners": {
+      "clase_nelvyon": "MEASURED",
+      "clase_referente": "NOT_COMPARABLE",
+      "criterio": "",
+      "limite": "NO COMPARABLE: la operativa de agencia con subcuentas, marca blanca y reparto de comision no tiene un referente gratuito y documentable con la misma unidad. Inventar uno para poder poner una nota seria peor que decir que no lo hay.",
+      "medida_nelvyon": {
+        "areas": 8,
+        "defectos": 0,
+        "enlaces_rotos": 0,
+        "herramientas": [
+          "auditoria_de_pantallas (7 reglas)",
+          "auditoria_de_rutas (888 rutas derivadas)",
+          "medicion-por-categoria.spec.ts (axe-core + 375px, navegador real)"
+        ],
+        "pantallas": 13
+      },
+      "referentes": [],
+      "veredicto": "SIN_COMPARAR"
+    },
+    "analitica_y_reporting": {
+      "clase_nelvyon": "MEASURED",
+      "clase_referente": "DOCUMENTED",
+      "criterio": "paneles, series temporales y exportacion",
+      "limite": "Sin trafico real no hay datos que comparar.",
+      "medida_nelvyon": {
+        "areas": 4,
+        "defectos": 0,
+        "enlaces_rotos": 0,
+        "herramientas": [
+          "auditoria_de_pantallas (7 reglas)",
+          "auditoria_de_rutas (888 rutas derivadas)",
+          "medicion-por-categoria.spec.ts (axe-core + 375px, navegador real)"
+        ],
+        "pantallas": 44
+      },
+      "referentes": [
+        "Matomo (codigo abierto)",
+        "Metabase (codigo abierto)",
+        "Google Analytics 4 (gratuito)"
+      ],
+      "veredicto": "PROPIA_MEDIDA"
+    },
+    "automatizacion": {
+      "clase_nelvyon": "MEASURED",
+      "clase_referente": "DOCUMENTED",
+      "criterio": "encadenar pasos con disparador, condiciones y reintentos",
+      "limite": "El referente es una plataforma generica de flujos; NELVYON automatiza su propio dominio. Comparables en mecanica, no en alcance.",
+      "medida_nelvyon": {
+        "areas": 5,
+        "defectos": 0,
+        "enlaces_rotos": 0,
+        "herramientas": [
+          "auditoria_de_pantallas (7 reglas)",
+          "auditoria_de_rutas (888 rutas derivadas)",
+          "medicion-por-categoria.spec.ts (axe-core + 375px, navegador real)"
+        ],
+        "pantallas": 17
+      },
+      "referentes": [
+        "n8n (codigo abierto)",
+        "Make (plan gratuito)"
+      ],
+      "veredicto": "PROPIA_MEDIDA"
+    },
+    "campanias_y_email": {
+      "clase_nelvyon": "MEASURED",
+      "clase_referente": "DOCUMENTED",
+      "criterio": "composicion, segmentacion y envio de campanias con seguimiento de aperturas",
+      "limite": "NELVYON tiene el correo APAGADO por diseno en certificacion (`CorreoDesactivadoError`), asi que ni siquiera el lado propio se mide enviando: se mide que el envio no sale sin autorizacion.",
+      "medida_nelvyon": {
+        "areas": 6,
+        "defectos": 0,
+        "enlaces_rotos": 0,
+        "herramientas": [
+          "auditoria_de_pantallas (7 reglas)",
+          "auditoria_de_rutas (888 rutas derivadas)",
+          "medicion-por-categoria.spec.ts (axe-core + 375px, navegador real)"
+        ],
+        "pantallas": 8
+      },
+      "referentes": [
+        "Mailchimp (plan gratuito)",
+        "Brevo (plan gratuito)",
+        "Listmonk (codigo abierto)"
+      ],
+      "veredicto": "PROPIA_MEDIDA"
+    },
+    "cobro_y_facturacion": {
+      "clase_nelvyon": "MEASURED",
+      "clase_referente": "DOCUMENTED",
+      "criterio": "suscripciones, facturas y estados de cobro",
+      "limite": "Cobrar de verdad es coste externo y produccion. Lo que SI se mide aqui es que el importe lo decide el servidor y que la tabla de precios esta congelada.",
+      "medida_nelvyon": {
+        "areas": 4,
+        "defectos": 0,
+        "enlaces_rotos": 0,
+        "herramientas": [
+          "auditoria_de_pantallas (7 reglas)",
+          "auditoria_de_rutas (888 rutas derivadas)",
+          "medicion-por-categoria.spec.ts (axe-core + 375px, navegador real)"
+        ],
+        "pantallas": 10
+      },
+      "referentes": [
+        "Stripe Billing (documentacion publica)",
+        "Invoice Ninja (codigo abierto)"
+      ],
+      "veredicto": "PROPIA_MEDIDA"
+    },
+    "contenido_y_copy": {
+      "clase_nelvyon": "MEASURED",
+      "clase_referente": "DOCUMENTED",
+      "criterio": "creacion y reutilizacion de piezas de contenido con plantillas",
+      "limite": "Comparacion de superficie: el referente es un editor generico y NELVYON un generador orientado a campania.",
+      "medida_nelvyon": {
+        "areas": 6,
+        "defectos": 0,
+        "enlaces_rotos": 0,
+        "herramientas": [
+          "auditoria_de_pantallas (7 reglas)",
+          "auditoria_de_rutas (888 rutas derivadas)",
+          "medicion-por-categoria.spec.ts (axe-core + 375px, navegador real)"
+        ],
+        "pantallas": 6
+      },
+      "referentes": [
+        "Notion (plan gratuito)",
+        "Google Docs"
+      ],
+      "veredicto": "PROPIA_MEDIDA"
+    },
+    "crm_y_ventas": {
+      "clase_nelvyon": "MEASURED",
+      "clase_referente": "DOCUMENTED",
+      "criterio": "gestion de contactos, oportunidades y actividades sobre una misma ficha",
+      "limite": "El comportamiento del referente solo se puede leer en su documentacion: medirlo exigiria una cuenta suya y datos reales.",
+      "medida_nelvyon": {
+        "areas": 7,
+        "defectos": 0,
+        "enlaces_rotos": 0,
+        "herramientas": [
+          "auditoria_de_pantallas (7 reglas)",
+          "auditoria_de_rutas (888 rutas derivadas)",
+          "medicion-por-categoria.spec.ts (axe-core + 375px, navegador real)"
+        ],
+        "pantallas": 16
+      },
+      "referentes": [
+        "HubSpot CRM (plan gratuito)",
+        "Zoho CRM Free",
+        "EspoCRM (codigo abierto)"
+      ],
+      "veredicto": "PROPIA_MEDIDA"
+    },
+    "cuenta_y_configuracion": {
+      "clase_nelvyon": "MEASURED",
+      "clase_referente": "DOCUMENTED",
+      "criterio": "identidad, roles y permisos",
+      "limite": "El referente es un servidor de identidad; NELVYON integra RBAC en el producto. Comparables en propiedades, no en forma.",
+      "medida_nelvyon": {
+        "areas": 8,
+        "defectos": 0,
+        "enlaces_rotos": 0,
+        "herramientas": [
+          "auditoria_de_pantallas (7 reglas)",
+          "auditoria_de_rutas (888 rutas derivadas)",
+          "medicion-por-categoria.spec.ts (axe-core + 375px, navegador real)"
+        ],
+        "pantallas": 31
+      },
+      "referentes": [
+        "Keycloak (codigo abierto)"
+      ],
+      "veredicto": "PROPIA_MEDIDA"
+    },
+    "enlaces_y_utilidades": {
+      "clase_nelvyon": "MEASURED",
+      "clase_referente": "NOT_COMPARABLE",
+      "criterio": "",
+      "limite": "NO COMPARABLE: son rutas de utilidad y previsualizacion internas, sin equivalente comercial.",
+      "medida_nelvyon": {
+        "areas": 8,
+        "defectos": 0,
+        "enlaces_rotos": 0,
+        "herramientas": [
+          "auditoria_de_pantallas (7 reglas)",
+          "auditoria_de_rutas (888 rutas derivadas)",
+          "medicion-por-categoria.spec.ts (axe-core + 375px, navegador real)"
+        ],
+        "pantallas": 9
+      },
+      "referentes": [],
+      "veredicto": "SIN_COMPARAR"
+    },
+    "entregables_y_packs": {
+      "clase_nelvyon": "MEASURED",
+      "clase_referente": "DOCUMENTED",
+      "criterio": "entrega y versionado de material al cliente",
+      "limite": "El referente entrega ficheros; NELVYON entrega paquetes de servicio. La unidad no es la misma.",
+      "medida_nelvyon": {
+        "areas": 6,
+        "defectos": 0,
+        "enlaces_rotos": 0,
+        "herramientas": [
+          "auditoria_de_pantallas (7 reglas)",
+          "auditoria_de_rutas (888 rutas derivadas)",
+          "medicion-por-categoria.spec.ts (axe-core + 375px, navegador real)"
+        ],
+        "pantallas": 7
+      },
+      "referentes": [
+        "Google Drive",
+        "Notion (plan gratuito)"
+      ],
+      "veredicto": "PROPIA_MEDIDA"
+    },
+    "funnels_y_conversion": {
+      "clase_nelvyon": "MEASURED",
+      "clase_referente": "DOCUMENTED",
+      "criterio": "construccion de formulario y medicion de conversion",
+      "limite": "La conversion del referente depende de su trafico; no hay dos poblaciones comparables.",
+      "medida_nelvyon": {
+        "areas": 7,
+        "defectos": 0,
+        "enlaces_rotos": 0,
+        "herramientas": [
+          "auditoria_de_pantallas (7 reglas)",
+          "auditoria_de_rutas (888 rutas derivadas)",
+          "medicion-por-categoria.spec.ts (axe-core + 375px, navegador real)"
+        ],
+        "pantallas": 13
+      },
+      "referentes": [
+        "Google Forms (gratuito)",
+        "Typeform (plan gratuito)"
+      ],
+      "veredicto": "PROPIA_MEDIDA"
+    },
+    "ia_y_agentes": {
+      "clase_nelvyon": "MEASURED",
+      "clase_referente": "DOCUMENTED",
+      "criterio": "agentes con herramientas, memoria y aprobaciones",
+      "limite": "NELVYON se certifica con la IA APAGADA (`NELVYON_AI_ENABLED=0`) y sin proveedores de pago. Lo medido es el contrato de estados y las guardas, no la calidad de un modelo.",
+      "medida_nelvyon": {
+        "areas": 3,
+        "defectos": 0,
+        "enlaces_rotos": 0,
+        "herramientas": [
+          "auditoria_de_pantallas (7 reglas)",
+          "auditoria_de_rutas (888 rutas derivadas)",
+          "medicion-por-categoria.spec.ts (axe-core + 375px, navegador real)"
+        ],
+        "pantallas": 3
+      },
+      "referentes": [
+        "Flowise (codigo abierto)",
+        "LangChain (codigo abierto)"
+      ],
+      "veredicto": "PROPIA_MEDIDA"
+    },
+    "integraciones_y_api": {
+      "clase_nelvyon": "MEASURED",
+      "clase_referente": "DOCUMENTED",
+      "criterio": "webhooks entrantes y salientes, claves de API e idempotencia",
+      "limite": "Los webhooks externos reales estan prohibidos en este bloque.",
+      "medida_nelvyon": {
+        "areas": 8,
+        "defectos": 0,
+        "enlaces_rotos": 0,
+        "herramientas": [
+          "auditoria_de_pantallas (7 reglas)",
+          "auditoria_de_rutas (888 rutas derivadas)",
+          "medicion-por-categoria.spec.ts (axe-core + 375px, navegador real)"
+        ],
+        "pantallas": 8
+      },
+      "referentes": [
+        "n8n (codigo abierto)",
+        "Zapier (documentacion publica)"
+      ],
+      "veredicto": "PROPIA_MEDIDA"
+    },
+    "legales": {
+      "clase_nelvyon": "MEASURED",
+      "clase_referente": "DOCUMENTED",
+      "criterio": "presencia y accesibilidad de aviso legal, privacidad y cookies",
+      "limite": "Comparar la CALIDAD juridica de un texto no es una medida tecnica; afirmarlo seria opinar con cara de dato.",
+      "medida_nelvyon": {
+        "areas": 8,
+        "defectos": 0,
+        "enlaces_rotos": 0,
+        "herramientas": [
+          "auditoria_de_pantallas (7 reglas)",
+          "auditoria_de_rutas (888 rutas derivadas)",
+          "medicion-por-categoria.spec.ts (axe-core + 375px, navegador real)"
+        ],
+        "pantallas": 8
+      },
+      "referentes": [
+        "Textos legales publicos de cualquier SaaS"
+      ],
+      "veredicto": "PROPIA_MEDIDA"
+    },
+    "os_plataforma": {
+      "clase_nelvyon": "MEASURED",
+      "clase_referente": "NOT_COMPARABLE",
+      "criterio": "",
+      "limite": "NO COMPARABLE: es el sistema operativo interno de la agencia. Un referente externo mediria otra cosa.",
+      "medida_nelvyon": {
+        "areas": 40,
+        "defectos": 0,
+        "enlaces_rotos": 0,
+        "herramientas": [
+          "auditoria_de_pantallas (7 reglas)",
+          "auditoria_de_rutas (888 rutas derivadas)",
+          "medicion-por-categoria.spec.ts (axe-core + 375px, navegador real)"
+        ],
+        "pantallas": 69
+      },
+      "referentes": [],
+      "veredicto": "SIN_COMPARAR"
+    },
+    "os_servicios_premium": {
+      "clase_nelvyon": "MEASURED",
+      "clase_referente": "NOT_COMPARABLE",
+      "criterio": "",
+      "limite": "NO COMPARABLE: son 25 servicios de agencia empaquetados. No hay producto gratuito que venda lo mismo con la misma unidad.",
+      "medida_nelvyon": {
+        "areas": 25,
+        "defectos": 0,
+        "enlaces_rotos": 0,
+        "herramientas": [
+          "auditoria_de_pantallas (7 reglas)",
+          "auditoria_de_rutas (888 rutas derivadas)",
+          "medicion-por-categoria.spec.ts (axe-core + 375px, navegador real)"
+        ],
+        "pantallas": 50
+      },
+      "referentes": [],
+      "veredicto": "SIN_COMPARAR"
+    },
+    "portal_del_cliente": {
+      "clase_nelvyon": "MEASURED",
+      "clase_referente": "DOCUMENTED",
+      "criterio": "acceso del cliente a su material y su estado",
+      "limite": "El referente cubre soporte, no entrega de proyecto. Solape parcial.",
+      "medida_nelvyon": {
+        "areas": 3,
+        "defectos": 0,
+        "enlaces_rotos": 0,
+        "herramientas": [
+          "auditoria_de_pantallas (7 reglas)",
+          "auditoria_de_rutas (888 rutas derivadas)",
+          "medicion-por-categoria.spec.ts (axe-core + 375px, navegador real)"
+        ],
+        "pantallas": 10
+      },
+      "referentes": [
+        "Chatwoot (codigo abierto)"
+      ],
+      "veredicto": "PROPIA_MEDIDA"
+    },
+    "publicidad": {
+      "clase_nelvyon": "MEASURED",
+      "clase_referente": "DOCUMENTED",
+      "criterio": "estructura de campania, presupuesto y atribucion",
+      "limite": "Cualquier medida real implicaria gasto publicitario: coste externo > 0 €.",
+      "medida_nelvyon": {
+        "areas": 3,
+        "defectos": 0,
+        "enlaces_rotos": 0,
+        "herramientas": [
+          "auditoria_de_pantallas (7 reglas)",
+          "auditoria_de_rutas (888 rutas derivadas)",
+          "medicion-por-categoria.spec.ts (axe-core + 375px, navegador real)"
+        ],
+        "pantallas": 7
+      },
+      "referentes": [
+        "Google Ads (documentacion publica)",
+        "Meta Ads Manager (documentacion publica)"
+      ],
+      "veredicto": "PROPIA_MEDIDA"
+    },
+    "reputacion": {
+      "clase_nelvyon": "MEASURED",
+      "clase_referente": "DOCUMENTED",
+      "criterio": "recogida de resenas y respuesta",
+      "limite": "Requiere una ficha de negocio real. No se usan clientes reales.",
+      "medida_nelvyon": {
+        "areas": 2,
+        "defectos": 0,
+        "enlaces_rotos": 0,
+        "herramientas": [
+          "auditoria_de_pantallas (7 reglas)",
+          "auditoria_de_rutas (888 rutas derivadas)",
+          "medicion-por-categoria.spec.ts (axe-core + 375px, navegador real)"
+        ],
+        "pantallas": 9
+      },
+      "referentes": [
+        "Google Business Profile (gratuito)"
+      ],
+      "veredicto": "PROPIA_MEDIDA"
+    },
+    "seo_y_visibilidad": {
+      "clase_nelvyon": "MEASURED",
+      "clase_referente": "DOCUMENTED",
+      "criterio": "auditoria tecnica y seguimiento de posiciones",
+      "limite": "Los referentes miden un dominio real conectado; NELVYON se certifica contra entorno de certificacion. No son la misma poblacion.",
+      "medida_nelvyon": {
+        "areas": 3,
+        "defectos": 0,
+        "enlaces_rotos": 0,
+        "herramientas": [
+          "auditoria_de_pantallas (7 reglas)",
+          "auditoria_de_rutas (888 rutas derivadas)",
+          "medicion-por-categoria.spec.ts (axe-core + 375px, navegador real)"
+        ],
+        "pantallas": 3
+      },
+      "referentes": [
+        "Google Search Console (gratuito)",
+        "Ahrefs Webmaster Tools (gratuito)"
+      ],
+      "veredicto": "PROPIA_MEDIDA"
+    },
+    "sitio_publico": {
+      "clase_nelvyon": "MEASURED",
+      "clase_referente": "DOCUMENTED",
+      "criterio": "accesibilidad WCAG, ausencia de desbordamiento en movil y errores de render",
+      "limite": "ESTE es el unico eje donde la misma medida se podria tomar de los dos lados sin cuenta ni pago, porque una pagina publica se puede auditar con axe. No se ha hecho: exigiria lanzar peticiones contra servidores de terceros, y este bloque no sale a la red. Queda registrado como limite, no como resultado.",
+      "medida_nelvyon": {
+        "areas": 31,
+        "defectos": 0,
+        "enlaces_rotos": 0,
+        "herramientas": [
+          "auditoria_de_pantallas (7 reglas)",
+          "auditoria_de_rutas (888 rutas derivadas)",
+          "medicion-por-categoria.spec.ts (axe-core + 375px, navegador real)"
+        ],
+        "pantallas": 47
+      },
+      "referentes": [
+        "Cualquier sitio publico de SaaS (medible sin cuenta)"
+      ],
+      "veredicto": "PROPIA_MEDIDA"
+    },
+    "social_y_comunidad": {
+      "clase_nelvyon": "MEASURED",
+      "clase_referente": "DOCUMENTED",
+      "criterio": "programacion de publicaciones y espacio de comunidad",
+      "limite": "Publicar de verdad exige credenciales de las redes, prohibidas aqui.",
+      "medida_nelvyon": {
+        "areas": 4,
+        "defectos": 0,
+        "enlaces_rotos": 0,
+        "herramientas": [
+          "auditoria_de_pantallas (7 reglas)",
+          "auditoria_de_rutas (888 rutas derivadas)",
+          "medicion-por-categoria.spec.ts (axe-core + 375px, navegador real)"
+        ],
+        "pantallas": 10
+      },
+      "referentes": [
+        "Buffer (plan gratuito)",
+        "Discourse (codigo abierto)"
+      ],
+      "veredicto": "PROPIA_MEDIDA"
+    },
+    "soporte_e_inbox": {
+      "clase_nelvyon": "MEASURED",
+      "clase_referente": "DOCUMENTED",
+      "criterio": "bandeja unificada con asignacion y estados",
+      "limite": "Los canales reales (WhatsApp, correo) estan desconectados en certificacion.",
+      "medida_nelvyon": {
+        "areas": 4,
+        "defectos": 0,
+        "enlaces_rotos": 0,
+        "herramientas": [
+          "auditoria_de_pantallas (7 reglas)",
+          "auditoria_de_rutas (888 rutas derivadas)",
+          "medicion-por-categoria.spec.ts (axe-core + 375px, navegador real)"
+        ],
+        "pantallas": 6
+      },
+      "referentes": [
+        "Chatwoot (codigo abierto)",
+        "FreeScout (codigo abierto)"
+      ],
+      "veredicto": "PROPIA_MEDIDA"
+    },
+    "web_y_tienda": {
+      "clase_nelvyon": "MEASURED",
+      "clase_referente": "DOCUMENTED",
+      "criterio": "catalogo, ficha de producto y proceso de compra",
+      "limite": "El proceso de compra real implica pagos; prohibidos en este bloque.",
+      "medida_nelvyon": {
+        "areas": 7,
+        "defectos": 0,
+        "enlaces_rotos": 0,
+        "herramientas": [
+          "auditoria_de_pantallas (7 reglas)",
+          "auditoria_de_rutas (888 rutas derivadas)",
+          "medicion-por-categoria.spec.ts (axe-core + 375px, navegador real)"
+        ],
+        "pantallas": 19
+      },
+      "referentes": [
+        "WooCommerce (codigo abierto)",
+        "Medusa (codigo abierto)"
+      ],
+      "veredicto": "PROPIA_MEDIDA"
+    }
+  },
+  "clases": [
+    "MEASURED: medido aqui con herramienta reproducible del arbol",
+    "OBSERVED: visto en producto publico gratuito, sin cuenta",
+    "DOCUMENTED: lo que el fabricante afirma en su documentacion publica",
+    "SIMULATED: modelado; no es evidencia de nada real",
+    "NOT_COMPARABLE: no hay base comun para comparar"
+  ],
+  "nota": "Ninguna categoria declara SUPERIOR ni EQUAL. Para sostener cualquiera de las dos haria falta la MISMA medida tomada en el referente, y medir el producto de un tercero exige una cuenta suya, coste y datos reales: las tres cosas estan prohibidas en este bloque. Lo que si se afirma es la calidad PROPIA medida."
+}

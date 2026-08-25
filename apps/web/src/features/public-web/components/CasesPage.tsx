@@ -37,7 +37,7 @@ export function CasesPage({ successStoriesMode = false }: CasesPageProps) {
           <p className="mb-0" style={{ maxWidth: 720 }}>
             Esta página recoge perfiles anonimizados de capacidad. Para casos de uso con narrativa paso a paso,
             visite{" "}
-            <Link href="/casos-de-uso" style={{ color: "#0084FF" }}>
+            <Link href="/casos-de-uso" className="underline" style={{ color: "var(--primary)" }}>
               /casos-de-uso
             </Link>
             .

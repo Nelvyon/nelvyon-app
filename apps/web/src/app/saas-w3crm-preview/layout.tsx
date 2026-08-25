@@ -10,6 +10,12 @@ import type { Metadata } from "next";
 
 import ThemeContextProvider from "@/features/saas-w3crm/context/ThemeContext";
 import Layout from "@/features/saas-w3crm/layouts/Layout";
+
+// Convivencia Tailwind/Bootstrap y correcciones de contraste del ambito.
+// Esta ruta monta `Layout` directamente, sin pasar por `SaasW3crmShell`,
+// que es donde vivia la unica importacion de esta hoja: sin ella el
+// `--primary` del pack (#0D99FF, 2,99:1 sobre blanco) seguia gobernando.
+import "@/features/saas-w3crm/w3crmScope.css";
 import { buildNelvyonMenu } from "@/features/saas-w3crm/layouts/nav/nelvyonMenu";
 
 export const metadata: Metadata = {

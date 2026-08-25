@@ -139,39 +139,43 @@ export default function OsBriefDiffPage() {
                 <Link href={`/os/agent-audit?packRunId=${newRunId}`} className="text-primary hover:underline font-mono">{newRunId}</Link>
               </p>
             )}
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead><tr className="text-left text-muted-foreground"><th className="py-1">Campo</th><th>Antes</th><th>Después</th></tr></thead>
+                <tbody>
+                  {lastDiff.diff.map((c) => (
+                    <tr key={c.field} className="border-t border-border/50">
+                      <td className="py-1 font-mono">{c.field}</td>
+                      <td className="text-muted-foreground truncate max-w-[200px]">{String(c.before ?? "—")}</td>
+                      <td>{String(c.after ?? "—")}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        <div className="rounded-xl border border-border overflow-hidden">
+          <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead><tr className="text-left text-muted-foreground"><th className="py-1">Campo</th><th>Antes</th><th>Después</th></tr></thead>
+              <thead className="bg-muted/30"><tr><th className="text-left p-3">Source run</th><th>Pack</th><th>Cambios</th><th>Status</th><th>New run</th><th>Fecha</th></tr></thead>
               <tbody>
-                {lastDiff.diff.map((c) => (
-                  <tr key={c.field} className="border-t border-border/50">
-                    <td className="py-1 font-mono">{c.field}</td>
-                    <td className="text-muted-foreground truncate max-w-[200px]">{String(c.before ?? "—")}</td>
-                    <td>{String(c.after ?? "—")}</td>
+                {loading && <tr><td colSpan={6} className="p-4 text-muted-foreground">Cargando…</td></tr>}
+                {!loading && diffs.length === 0 && <tr><td colSpan={6} className="p-4 text-muted-foreground">Sin diffs — ejecuta un growth pack y compara un brief aquí.</td></tr>}
+                {diffs.map((d) => (
+                  <tr key={d.id} className="border-t border-border/50">
+                    <td className="p-3 font-mono text-xs">{d.sourcePackRunId.slice(0, 8)}…</td>
+                    <td className="p-3">{d.packId}</td>
+                    <td className="p-3">{d.changeCount}{d.material ? " · mat." : ""}</td>
+                    <td className="p-3"><Badge tone={STATUS_TONE[d.status] ?? "neutral"}>{d.status}</Badge></td>
+                    <td className="p-3 font-mono text-xs">{d.newPackRunId ? `${d.newPackRunId.slice(0, 8)}…` : "—"}</td>
+                    <td className="p-3 text-muted-foreground">{new Date(d.createdAt).toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        )}
-
-        <div className="rounded-xl border border-border overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-muted/30"><tr><th className="text-left p-3">Source run</th><th>Pack</th><th>Cambios</th><th>Status</th><th>New run</th><th>Fecha</th></tr></thead>
-            <tbody>
-              {loading && <tr><td colSpan={6} className="p-4 text-muted-foreground">Cargando…</td></tr>}
-              {!loading && diffs.length === 0 && <tr><td colSpan={6} className="p-4 text-muted-foreground">Sin diffs — ejecuta un growth pack y compara un brief aquí.</td></tr>}
-              {diffs.map((d) => (
-                <tr key={d.id} className="border-t border-border/50">
-                  <td className="p-3 font-mono text-xs">{d.sourcePackRunId.slice(0, 8)}…</td>
-                  <td className="p-3">{d.packId}</td>
-                  <td className="p-3">{d.changeCount}{d.material ? " · mat." : ""}</td>
-                  <td className="p-3"><Badge tone={STATUS_TONE[d.status] ?? "neutral"}>{d.status}</Badge></td>
-                  <td className="p-3 font-mono text-xs">{d.newPackRunId ? `${d.newPackRunId.slice(0, 8)}…` : "—"}</td>
-                  <td className="p-3 text-muted-foreground">{new Date(d.createdAt).toLocaleString()}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
         </div>
       </div>
     </ProtectedLayout>

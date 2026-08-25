@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 
 import { AuthDebugPanel } from "@/core/auth/AuthDebugPanel";
 import { useAuth } from "@/core/auth/AuthContext";
@@ -26,19 +26,58 @@ function AuthLoadingShell() {
 }
 
 export function ProtectedLayout({ module, children }: ProtectedLayoutProps) {
-  const { isAuthenticated, isBootstrapping, user } = useAuth();
+  const { isAuthenticated, isBootstrapping, user, recuperarSesionDesdeCookie } = useAuth();
   const pathname = usePathname() ?? "";
   const router = useRouter();
   const brandMode = getBrandMode();
   const isClientMode = brandMode === "client";
   const appName = getBrandAppName(brandMode);
+  /** Un intento por montaje: sin esto, cada re-render reintentaria la cookie. */
+  const intentado = useRef(false);
 
   useEffect(() => {
     if (isBootstrapping || isAuthenticated) return;
     if (isClientMode) return;
-    const next = encodeURIComponent(pathname || "/dashboard");
-    router.replace(`/login?next=${next}`);
-  }, [isAuthenticated, isBootstrapping, isClientMode, pathname, router]);
+
+    let vigente = true;
+
+    void (async () => {
+      /**
+       * ANTES de rendirse, se intenta recuperar la sesion desde la cookie.
+       *
+       * El JWT vive en `sessionStorage`, que es **por pestana**. El arranque
+       * automatico solo probaba la cookie en una lista de rutas escrita a mano
+       * que no incluia ninguna de las 136 pantallas que envuelve este
+       * componente. Resultado medido en navegador: abrir `/analytics`,
+       * `/account`, `/billing` o `/campaigns` en una pestana nueva echaba al
+       * usuario al login **con la sesion valida en la cookie**, mientras que
+       * `/saas/dashboard` entraba sin problema. Mismo usuario, misma cookie,
+       * dos comportamientos segun la ruta.
+       *
+       * Pedirlo desde aqui elimina la lista como fuente de verdad: quien
+       * necesita sesion es este componente, y es el quien la pide.
+       */
+      if (!intentado.current) {
+        intentado.current = true;
+        const recuperada = await recuperarSesionDesdeCookie();
+        if (!vigente || recuperada) return;
+      }
+      if (!vigente) return;
+      const next = encodeURIComponent(pathname || "/dashboard");
+      router.replace(`/login?next=${next}`);
+    })();
+
+    return () => {
+      vigente = false;
+    };
+  }, [
+    isAuthenticated,
+    isBootstrapping,
+    isClientMode,
+    pathname,
+    recuperarSesionDesdeCookie,
+    router,
+  ]);
 
   if (isBootstrapping) {
     return <AuthLoadingShell />;

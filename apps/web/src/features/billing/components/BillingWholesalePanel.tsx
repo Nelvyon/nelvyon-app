@@ -45,7 +45,7 @@ export function BillingWholesalePanel({ planId }: WholesalePanelProps) {
       </dl>
       <div className="mt-4">
         <Button asChild size="sm" variant="outline">
-          <Link href="/dashboard/partners">Abrir Partner HQ</Link>
+          <Link href="/saas/partner">Abrir Partner HQ</Link>
         </Button>
       </div>
     </section>

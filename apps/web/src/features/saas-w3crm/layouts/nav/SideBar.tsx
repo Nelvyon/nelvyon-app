@@ -6,7 +6,7 @@ import Collapse from 'react-bootstrap/Collapse';
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import {MenuList, type W3crmMenuItem} from './Menu';
+import type { W3crmMenuItem } from './Menu';
 import {useScrollPosition} from "@n8tb1t/use-scroll-position";
 import { ThemeContext } from "@/features/saas-w3crm/context/ThemeContext";
 
@@ -32,7 +32,15 @@ function claveMenu(item: W3crmMenuItem, index: number): string {
   return item.to ?? item.title ?? `item-${index}`;
 }
 
-const SideBar = ({ menuList = MenuList }: { menuList?: W3crmMenuItem[] }) => {
+/**
+ * El valor por defecto era `MenuList`: el menu de DEMOSTRACION de la plantilla
+ * W3CRM, con «Dashboard», «Profile 1», «Add Role» y rutas como `/app-profile`
+ * que no existen en NELVYON. Hoy los dos llamantes pasan siempre su menu, asi
+ * que no se alcanzaba; pero un defecto que solo esta a un `undefined` de
+ * distancia acaba alcanzandose, y el menu de otro producto no es un fallback
+ * aceptable. Ningun menu es mejor que el menu de otro.
+ */
+const SideBar = ({ menuList = [] }: { menuList?: W3crmMenuItem[] }) => {
 	const {
 		iconHover,
 		sidebarposition,

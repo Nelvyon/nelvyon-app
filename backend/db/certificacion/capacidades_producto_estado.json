@@ -1,0 +1,179 @@
+{
+  "capacidades": {
+    "acceso": {
+      "areas": 7,
+      "estado": "FIXED_CERTIFIED",
+      "evidencia": "7 areas · 10 pantallas barridas. Auditoria estatica: 0 defectos (RELLENO, ENLACE_MUERTO, SIN_ALT, ALT_INUTIL, TABLA_SIN_SCROLL, ANCHO_FIJO) y 0 enlaces internos a 404 sobre 888 rutas derivadas. Medicion en navegador sobre 3 rutas de esta categoria (axe-core WCAG 2.1 AA, viewport 375px): 1 violaciones graves ANTES -> 0 DESPUES, 0 desbordamiento horizontal, 0 errores de JavaScript, 0 pantallas que acaben en el login.",
+      "referentes": "",
+      "veredicto": "Defectos medidos y corregidos en la causa; vuelto a medir a cero."
+    },
+    "agencia_y_partners": {
+      "areas": 8,
+      "estado": "FIXED_CERTIFIED",
+      "evidencia": "8 areas · 13 pantallas barridas. Auditoria estatica: 0 defectos (RELLENO, ENLACE_MUERTO, SIN_ALT, ALT_INUTIL, TABLA_SIN_SCROLL, ANCHO_FIJO) y 0 enlaces internos a 404 sobre 888 rutas derivadas. Medicion en navegador sobre 3 rutas de esta categoria (axe-core WCAG 2.1 AA, viewport 375px): 50 violaciones graves ANTES -> 0 DESPUES, 0 desbordamiento horizontal, 0 errores de JavaScript, 0 pantallas que acaben en el login.",
+      "referentes": "",
+      "veredicto": "Defectos medidos y corregidos en la causa; vuelto a medir a cero."
+    },
+    "analitica_y_reporting": {
+      "areas": 4,
+      "estado": "FIXED_CERTIFIED",
+      "evidencia": "4 areas · 44 pantallas barridas. Auditoria estatica: 0 defectos (RELLENO, ENLACE_MUERTO, SIN_ALT, ALT_INUTIL, TABLA_SIN_SCROLL, ANCHO_FIJO) y 0 enlaces internos a 404 sobre 888 rutas derivadas. Medicion en navegador sobre 3 rutas de esta categoria (axe-core WCAG 2.1 AA, viewport 375px): 3 violaciones graves ANTES -> 0 DESPUES, 0 desbordamiento horizontal, 0 errores de JavaScript, 0 pantallas que acaben en el login.",
+      "referentes": "",
+      "veredicto": "Defectos medidos y corregidos en la causa; vuelto a medir a cero."
+    },
+    "automatizacion": {
+      "areas": 5,
+      "estado": "FIXED_CERTIFIED",
+      "evidencia": "5 areas · 17 pantallas barridas. Auditoria estatica: 0 defectos (RELLENO, ENLACE_MUERTO, SIN_ALT, ALT_INUTIL, TABLA_SIN_SCROLL, ANCHO_FIJO) y 0 enlaces internos a 404 sobre 888 rutas derivadas. Medicion en navegador sobre 3 rutas de esta categoria (axe-core WCAG 2.1 AA, viewport 375px): 43 violaciones graves ANTES -> 0 DESPUES, 0 desbordamiento horizontal, 0 errores de JavaScript, 0 pantallas que acaben en el login.",
+      "referentes": "",
+      "veredicto": "Defectos medidos y corregidos en la causa; vuelto a medir a cero."
+    },
+    "campanias_y_email": {
+      "areas": 6,
+      "estado": "FIXED_CERTIFIED",
+      "evidencia": "6 areas · 8 pantallas barridas. Auditoria estatica: 0 defectos (RELLENO, ENLACE_MUERTO, SIN_ALT, ALT_INUTIL, TABLA_SIN_SCROLL, ANCHO_FIJO) y 0 enlaces internos a 404 sobre 888 rutas derivadas. Medicion en navegador sobre 3 rutas de esta categoria (axe-core WCAG 2.1 AA, viewport 375px): 58 violaciones graves ANTES -> 0 DESPUES, 0 desbordamiento horizontal, 0 errores de JavaScript, 0 pantallas que acaben en el login.",
+      "referentes": "",
+      "veredicto": "Defectos medidos y corregidos en la causa; vuelto a medir a cero."
+    },
+    "cobro_y_facturacion": {
+      "areas": 4,
+      "estado": "FIXED_CERTIFIED",
+      "evidencia": "4 areas · 10 pantallas barridas. Auditoria estatica: 0 defectos (RELLENO, ENLACE_MUERTO, SIN_ALT, ALT_INUTIL, TABLA_SIN_SCROLL, ANCHO_FIJO) y 0 enlaces internos a 404 sobre 888 rutas derivadas. Medicion en navegador sobre 3 rutas de esta categoria (axe-core WCAG 2.1 AA, viewport 375px): 16 violaciones graves ANTES -> 0 DESPUES, 0 desbordamiento horizontal, 0 errores de JavaScript, 0 pantallas que acaben en el login.",
+      "referentes": "",
+      "veredicto": "Defectos medidos y corregidos en la causa; vuelto a medir a cero."
+    },
+    "contenido_y_copy": {
+      "areas": 6,
+      "estado": "FIXED_CERTIFIED",
+      "evidencia": "6 areas · 6 pantallas barridas. Auditoria estatica: 0 defectos (RELLENO, ENLACE_MUERTO, SIN_ALT, ALT_INUTIL, TABLA_SIN_SCROLL, ANCHO_FIJO) y 0 enlaces internos a 404 sobre 888 rutas derivadas. Medicion en navegador sobre 3 rutas de esta categoria (axe-core WCAG 2.1 AA, viewport 375px): 74 violaciones graves ANTES -> 0 DESPUES, 0 desbordamiento horizontal, 0 errores de JavaScript, 0 pantallas que acaben en el login.",
+      "referentes": "",
+      "veredicto": "Defectos medidos y corregidos en la causa; vuelto a medir a cero."
+    },
+    "crm_y_ventas": {
+      "areas": 7,
+      "estado": "FIXED_CERTIFIED",
+      "evidencia": "7 areas · 16 pantallas barridas. Auditoria estatica: 0 defectos (RELLENO, ENLACE_MUERTO, SIN_ALT, ALT_INUTIL, TABLA_SIN_SCROLL, ANCHO_FIJO) y 0 enlaces internos a 404 sobre 888 rutas derivadas. Medicion en navegador sobre 3 rutas de esta categoria (axe-core WCAG 2.1 AA, viewport 375px): 23 violaciones graves ANTES -> 0 DESPUES, 0 desbordamiento horizontal, 0 errores de JavaScript, 0 pantallas que acaben en el login.",
+      "referentes": "",
+      "veredicto": "Defectos medidos y corregidos en la causa; vuelto a medir a cero."
+    },
+    "cuenta_y_configuracion": {
+      "areas": 8,
+      "estado": "FIXED_CERTIFIED",
+      "evidencia": "8 areas · 31 pantallas barridas. Auditoria estatica: 0 defectos (RELLENO, ENLACE_MUERTO, SIN_ALT, ALT_INUTIL, TABLA_SIN_SCROLL, ANCHO_FIJO) y 0 enlaces internos a 404 sobre 888 rutas derivadas. Medicion en navegador sobre 3 rutas de esta categoria (axe-core WCAG 2.1 AA, viewport 375px): 4 violaciones graves ANTES -> 0 DESPUES, 0 desbordamiento horizontal, 0 errores de JavaScript, 0 pantallas que acaben en el login.",
+      "referentes": "",
+      "veredicto": "Defectos medidos y corregidos en la causa; vuelto a medir a cero."
+    },
+    "enlaces_y_utilidades": {
+      "areas": 8,
+      "estado": "FIXED_CERTIFIED",
+      "evidencia": "8 areas · 9 pantallas barridas. Auditoria estatica: 0 defectos (RELLENO, ENLACE_MUERTO, SIN_ALT, ALT_INUTIL, TABLA_SIN_SCROLL, ANCHO_FIJO) y 0 enlaces internos a 404 sobre 888 rutas derivadas. Medicion en navegador sobre 3 rutas de esta categoria (axe-core WCAG 2.1 AA, viewport 375px): 23 violaciones graves ANTES -> 0 DESPUES, 0 desbordamiento horizontal, 0 errores de JavaScript, 0 pantallas que acaben en el login.",
+      "referentes": "",
+      "veredicto": "Defectos medidos y corregidos en la causa; vuelto a medir a cero."
+    },
+    "entregables_y_packs": {
+      "areas": 6,
+      "estado": "FIXED_CERTIFIED",
+      "evidencia": "6 areas · 7 pantallas barridas. Auditoria estatica: 0 defectos (RELLENO, ENLACE_MUERTO, SIN_ALT, ALT_INUTIL, TABLA_SIN_SCROLL, ANCHO_FIJO) y 0 enlaces internos a 404 sobre 888 rutas derivadas. Medicion en navegador sobre 3 rutas de esta categoria (axe-core WCAG 2.1 AA, viewport 375px): 42 violaciones graves ANTES -> 0 DESPUES, 0 desbordamiento horizontal, 0 errores de JavaScript, 0 pantallas que acaben en el login.",
+      "referentes": "",
+      "veredicto": "Defectos medidos y corregidos en la causa; vuelto a medir a cero."
+    },
+    "funnels_y_conversion": {
+      "areas": 7,
+      "estado": "FIXED_CERTIFIED",
+      "evidencia": "7 areas · 13 pantallas barridas. Auditoria estatica: 0 defectos (RELLENO, ENLACE_MUERTO, SIN_ALT, ALT_INUTIL, TABLA_SIN_SCROLL, ANCHO_FIJO) y 0 enlaces internos a 404 sobre 888 rutas derivadas. Medicion en navegador sobre 3 rutas de esta categoria (axe-core WCAG 2.1 AA, viewport 375px): 27 violaciones graves ANTES -> 0 DESPUES, 0 desbordamiento horizontal, 0 errores de JavaScript, 0 pantallas que acaben en el login.",
+      "referentes": "",
+      "veredicto": "Defectos medidos y corregidos en la causa; vuelto a medir a cero."
+    },
+    "ia_y_agentes": {
+      "areas": 3,
+      "estado": "FIXED_CERTIFIED",
+      "evidencia": "3 areas · 3 pantallas barridas. Auditoria estatica: 0 defectos (RELLENO, ENLACE_MUERTO, SIN_ALT, ALT_INUTIL, TABLA_SIN_SCROLL, ANCHO_FIJO) y 0 enlaces internos a 404 sobre 888 rutas derivadas. Medicion en navegador sobre 3 rutas de esta categoria (axe-core WCAG 2.1 AA, viewport 375px): 327 violaciones graves ANTES -> 0 DESPUES, 0 desbordamiento horizontal, 0 errores de JavaScript, 0 pantallas que acaben en el login.",
+      "referentes": "",
+      "veredicto": "Defectos medidos y corregidos en la causa; vuelto a medir a cero."
+    },
+    "integraciones_y_api": {
+      "areas": 8,
+      "estado": "FIXED_CERTIFIED",
+      "evidencia": "8 areas · 8 pantallas barridas. Auditoria estatica: 0 defectos (RELLENO, ENLACE_MUERTO, SIN_ALT, ALT_INUTIL, TABLA_SIN_SCROLL, ANCHO_FIJO) y 0 enlaces internos a 404 sobre 888 rutas derivadas. Medicion en navegador sobre 3 rutas de esta categoria (axe-core WCAG 2.1 AA, viewport 375px): 81 violaciones graves ANTES -> 0 DESPUES, 0 desbordamiento horizontal, 0 errores de JavaScript, 0 pantallas que acaben en el login.",
+      "referentes": "",
+      "veredicto": "Defectos medidos y corregidos en la causa; vuelto a medir a cero."
+    },
+    "legales": {
+      "areas": 8,
+      "estado": "FIXED_CERTIFIED",
+      "evidencia": "8 areas · 8 pantallas barridas. Auditoria estatica: 0 defectos (RELLENO, ENLACE_MUERTO, SIN_ALT, ALT_INUTIL, TABLA_SIN_SCROLL, ANCHO_FIJO) y 0 enlaces internos a 404 sobre 888 rutas derivadas. Medicion en navegador sobre 3 rutas de esta categoria (axe-core WCAG 2.1 AA, viewport 375px): 10 violaciones graves ANTES -> 0 DESPUES, 0 desbordamiento horizontal, 0 errores de JavaScript, 0 pantallas que acaben en el login.",
+      "referentes": "",
+      "veredicto": "Defectos medidos y corregidos en la causa; vuelto a medir a cero."
+    },
+    "os_plataforma": {
+      "areas": 40,
+      "estado": "FIXED_CERTIFIED",
+      "evidencia": "40 areas · 69 pantallas barridas. Auditoria estatica: 0 defectos (RELLENO, ENLACE_MUERTO, SIN_ALT, ALT_INUTIL, TABLA_SIN_SCROLL, ANCHO_FIJO) y 0 enlaces internos a 404 sobre 888 rutas derivadas. Medicion en navegador sobre 3 rutas de esta categoria (axe-core WCAG 2.1 AA, viewport 375px): 3 violaciones graves ANTES -> 0 DESPUES, 0 desbordamiento horizontal, 0 errores de JavaScript, 0 pantallas que acaben en el login.",
+      "referentes": "",
+      "veredicto": "Defectos medidos y corregidos en la causa; vuelto a medir a cero."
+    },
+    "os_servicios_premium": {
+      "areas": 25,
+      "estado": "FIXED_CERTIFIED",
+      "evidencia": "25 areas · 50 pantallas barridas. Auditoria estatica: 0 defectos (RELLENO, ENLACE_MUERTO, SIN_ALT, ALT_INUTIL, TABLA_SIN_SCROLL, ANCHO_FIJO) y 0 enlaces internos a 404 sobre 888 rutas derivadas. Medicion en navegador sobre 3 rutas de esta categoria (axe-core WCAG 2.1 AA, viewport 375px): 3 violaciones graves ANTES -> 0 DESPUES, 0 desbordamiento horizontal, 0 errores de JavaScript, 0 pantallas que acaben en el login.",
+      "referentes": "",
+      "veredicto": "Defectos medidos y corregidos en la causa; vuelto a medir a cero."
+    },
+    "portal_del_cliente": {
+      "areas": 3,
+      "estado": "PASS_CERTIFIED",
+      "evidencia": "3 areas · 10 pantallas barridas. Auditoria estatica: 0 defectos (RELLENO, ENLACE_MUERTO, SIN_ALT, ALT_INUTIL, TABLA_SIN_SCROLL, ANCHO_FIJO) y 0 enlaces internos a 404 sobre 888 rutas derivadas. Medicion en navegador sobre 3 rutas de esta categoria (axe-core WCAG 2.1 AA, viewport 375px): 0 violaciones graves ANTES -> 0 DESPUES, 0 desbordamiento horizontal, 0 errores de JavaScript, 0 pantallas que acaben en el login.",
+      "referentes": "",
+      "veredicto": "Medida sin defectos en ninguna de las tres auditorias. No se toco nada."
+    },
+    "publicidad": {
+      "areas": 3,
+      "estado": "FIXED_CERTIFIED",
+      "evidencia": "3 areas · 7 pantallas barridas. Auditoria estatica: 0 defectos (RELLENO, ENLACE_MUERTO, SIN_ALT, ALT_INUTIL, TABLA_SIN_SCROLL, ANCHO_FIJO) y 0 enlaces internos a 404 sobre 888 rutas derivadas. Medicion en navegador sobre 3 rutas de esta categoria (axe-core WCAG 2.1 AA, viewport 375px): 3 violaciones graves ANTES -> 0 DESPUES, 0 desbordamiento horizontal, 0 errores de JavaScript, 0 pantallas que acaben en el login.",
+      "referentes": "",
+      "veredicto": "Defectos medidos y corregidos en la causa; vuelto a medir a cero."
+    },
+    "reputacion": {
+      "areas": 2,
+      "estado": "FIXED_CERTIFIED",
+      "evidencia": "2 areas · 9 pantallas barridas. Auditoria estatica: 0 defectos (RELLENO, ENLACE_MUERTO, SIN_ALT, ALT_INUTIL, TABLA_SIN_SCROLL, ANCHO_FIJO) y 0 enlaces internos a 404 sobre 888 rutas derivadas. Medicion en navegador sobre 3 rutas de esta categoria (axe-core WCAG 2.1 AA, viewport 375px): 3 violaciones graves ANTES -> 0 DESPUES, 0 desbordamiento horizontal, 0 errores de JavaScript, 0 pantallas que acaben en el login.",
+      "referentes": "",
+      "veredicto": "Defectos medidos y corregidos en la causa; vuelto a medir a cero."
+    },
+    "seo_y_visibilidad": {
+      "areas": 3,
+      "estado": "FIXED_CERTIFIED",
+      "evidencia": "3 areas · 3 pantallas barridas. Auditoria estatica: 0 defectos (RELLENO, ENLACE_MUERTO, SIN_ALT, ALT_INUTIL, TABLA_SIN_SCROLL, ANCHO_FIJO) y 0 enlaces internos a 404 sobre 888 rutas derivadas. Medicion en navegador sobre 3 rutas de esta categoria (axe-core WCAG 2.1 AA, viewport 375px): 52 violaciones graves ANTES -> 0 DESPUES, 0 desbordamiento horizontal, 0 errores de JavaScript, 0 pantallas que acaben en el login.",
+      "referentes": "",
+      "veredicto": "Defectos medidos y corregidos en la causa; vuelto a medir a cero."
+    },
+    "sitio_publico": {
+      "areas": 31,
+      "estado": "FIXED_CERTIFIED",
+      "evidencia": "31 areas · 47 pantallas barridas. Auditoria estatica: 0 defectos (RELLENO, ENLACE_MUERTO, SIN_ALT, ALT_INUTIL, TABLA_SIN_SCROLL, ANCHO_FIJO) y 0 enlaces internos a 404 sobre 888 rutas derivadas. Medicion en navegador sobre 3 rutas de esta categoria (axe-core WCAG 2.1 AA, viewport 375px): 34 violaciones graves ANTES -> 0 DESPUES, 0 desbordamiento horizontal, 0 errores de JavaScript, 0 pantallas que acaben en el login.",
+      "referentes": "",
+      "veredicto": "Defectos medidos y corregidos en la causa; vuelto a medir a cero."
+    },
+    "social_y_comunidad": {
+      "areas": 4,
+      "estado": "FIXED_CERTIFIED",
+      "evidencia": "4 areas · 10 pantallas barridas. Auditoria estatica: 0 defectos (RELLENO, ENLACE_MUERTO, SIN_ALT, ALT_INUTIL, TABLA_SIN_SCROLL, ANCHO_FIJO) y 0 enlaces internos a 404 sobre 888 rutas derivadas. Medicion en navegador sobre 3 rutas de esta categoria (axe-core WCAG 2.1 AA, viewport 375px): 49 violaciones graves ANTES -> 0 DESPUES, 0 desbordamiento horizontal, 0 errores de JavaScript, 0 pantallas que acaben en el login.",
+      "referentes": "",
+      "veredicto": "Defectos medidos y corregidos en la causa; vuelto a medir a cero."
+    },
+    "soporte_e_inbox": {
+      "areas": 4,
+      "estado": "FIXED_CERTIFIED",
+      "evidencia": "4 areas · 6 pantallas barridas. Auditoria estatica: 0 defectos (RELLENO, ENLACE_MUERTO, SIN_ALT, ALT_INUTIL, TABLA_SIN_SCROLL, ANCHO_FIJO) y 0 enlaces internos a 404 sobre 888 rutas derivadas. Medicion en navegador sobre 3 rutas de esta categoria (axe-core WCAG 2.1 AA, viewport 375px): 56 violaciones graves ANTES -> 0 DESPUES, 0 desbordamiento horizontal, 0 errores de JavaScript, 0 pantallas que acaben en el login.",
+      "referentes": "",
+      "veredicto": "Defectos medidos y corregidos en la causa; vuelto a medir a cero."
+    },
+    "web_y_tienda": {
+      "areas": 7,
+      "estado": "FIXED_CERTIFIED",
+      "evidencia": "7 areas · 19 pantallas barridas. Auditoria estatica: 0 defectos (RELLENO, ENLACE_MUERTO, SIN_ALT, ALT_INUTIL, TABLA_SIN_SCROLL, ANCHO_FIJO) y 0 enlaces internos a 404 sobre 888 rutas derivadas. Medicion en navegador sobre 3 rutas de esta categoria (axe-core WCAG 2.1 AA, viewport 375px): 8 violaciones graves ANTES -> 0 DESPUES, 0 desbordamiento horizontal, 0 errores de JavaScript, 0 pantallas que acaben en el login.",
+      "referentes": "",
+      "veredicto": "Defectos medidos y corregidos en la causa; vuelto a medir a cero."
+    }
+  }
+}

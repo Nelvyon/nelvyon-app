@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   fetchAuthMe,
@@ -23,6 +23,29 @@ interface AuthContextValue extends SessionState {
   isBootstrapping: boolean;
   /** After workspace list loads, align module gates with membership role. */
   syncRoleFromWorkspaceRole: (workspaceRole: string | null) => void;
+  /**
+   * Recupera la sesion desde la cookie, a peticion de quien sepa que la
+   * necesita. Devuelve si lo consiguio.
+   *
+   * Existe porque el arranque automatico solo intentaba la cookie en una lista
+   * de rutas escrita a mano (`/saas`, `/os`, `/portal`, `/admin`, `/dashboard`,
+   * `/auth`, `/login`), y esa lista se habia quedado corta frente a las **136
+   * pantallas** que envuelve `ProtectedLayout`: `/account`, `/analytics/*`,
+   * `/campaigns`, `/billing`, `/crm/*`, `/funnels`, `/publicidad`,
+   * `/reputacion`, `/social`, `/inbox`, `/ecommerce`, `/settings`,
+   * `/automations/*`, `/app/*`...
+   *
+   * El JWT vive en `sessionStorage`, que es **por pestana**. Consecuencia
+   * medida en navegador: abrir cualquiera de esas pantallas en una pestana
+   * nueva —o volver a ellas tras reiniciar el navegador, o desde un enlace de
+   * un correo— echaba al usuario al login con la sesion perfectamente valida en
+   * la cookie, mientras que `/saas/dashboard` entraba sin problema. Mismo
+   * usuario, misma cookie, dos comportamientos.
+   *
+   * Una lista de rutas mantenida a mano se desincroniza siempre. Que lo pida
+   * quien lo necesita elimina la lista como fuente de verdad.
+   */
+  recuperarSesionDesdeCookie: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -45,6 +68,16 @@ function persistJwt(token: string): void {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  // `cancelled` era del ambito del efecto; al sacar la recuperacion fuera
+  // hace falta una senal que viva con el componente.
+  const vivo = useRef(true);
+  useEffect(() => {
+    vivo.current = true;
+    return () => {
+      vivo.current = false;
+    };
+  }, []);
+
   const [user, setUser] = useState<SessionUser | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isBootstrapping, setIsBootstrapping] = useState(true);
@@ -96,6 +129,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setAccessTokenProvider(() => null);
     })();
   }, []);
+
+  /** Ver `recuperarSesionDesdeCookie` en el contrato: se invoca a demanda. */
+  const recuperarSesionDesdeCookie = useCallback(async (): Promise<boolean> => {
+
+    try {
+      const r = await fetch("/api/auth/me", { credentials: "same-origin", cache: "no-store" });
+      if (!vivo.current || !r.ok) return false;
+      const me: unknown = await r.json();
+      if (!me || typeof me !== "object") return false;
+      const o = me as Record<string, unknown>;
+      if (
+        typeof o.userId !== "string" ||
+        typeof o.email !== "string" ||
+        typeof o.tenantId !== "string" ||
+        typeof o.plan !== "string" ||
+        typeof o.fullName !== "string"
+      ) {
+        return false;
+      }
+
+      const tokenFromCookie = await fetchNelvyonTokenFromCookie();
+      if (!tokenFromCookie) return false;
+
+      applySession(
+        {
+          id: o.userId,
+          email: o.email,
+          role: nelvyonPlanToUiRole(o.plan),
+          tenantId: o.tenantId,
+          fullName: o.fullName,
+        },
+        tokenFromCookie,
+      );
+      await ensureWorkspaceForToken(tokenFromCookie, syncRoleFromWorkspaceRole);
+      return true;
+    } catch {
+      return false;
+    }
+  }, [applySession, syncRoleFromWorkspaceRole]);
 
   useEffect(() => {
     let cancelled = false;
@@ -157,43 +229,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }
 
-    async function bootstrapFromCookie(): Promise<boolean> {
-      try {
-        const r = await fetch("/api/auth/me", { credentials: "same-origin", cache: "no-store" });
-        if (cancelled || !r.ok) return false;
-        const me: unknown = await r.json();
-        if (!me || typeof me !== "object") return false;
-        const o = me as Record<string, unknown>;
-        if (
-          typeof o.userId !== "string" ||
-          typeof o.email !== "string" ||
-          typeof o.tenantId !== "string" ||
-          typeof o.plan !== "string" ||
-          typeof o.fullName !== "string"
-        ) {
-          return false;
-        }
-
-        const tokenFromCookie = await fetchNelvyonTokenFromCookie();
-        if (!tokenFromCookie) return false;
-
-        applySession(
-          {
-            id: o.userId,
-            email: o.email,
-            role: nelvyonPlanToUiRole(o.plan),
-            tenantId: o.tenantId,
-            fullName: o.fullName,
-          },
-          tokenFromCookie,
-        );
-        await ensureWorkspaceForToken(tokenFromCookie, syncRoleFromWorkspaceRole);
-        return true;
-      } catch {
-        return false;
-      }
-    }
-
     async function run() {
       setIsBootstrapping(true);
       const storedJwt = readStoredJwt();
@@ -225,7 +260,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           path.startsWith("/auth");
         // Avoid noisy 401 /api/auth/me on anonymous public marketing pages.
         if (isAppSurface) {
-          ok = await bootstrapFromCookie();
+          ok = await recuperarSesionDesdeCookie();
         }
       }
 
@@ -239,7 +274,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [applySession, syncRoleFromWorkspaceRole]);
+  }, [applySession, recuperarSesionDesdeCookie, syncRoleFromWorkspaceRole]);
 
   const value = useMemo<AuthContextValue>(
     () => ({
@@ -249,9 +284,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isBootstrapping,
       signIn,
       signOut,
+      recuperarSesionDesdeCookie,
       syncRoleFromWorkspaceRole,
     }),
-    [accessToken, isBootstrapping, signIn, signOut, syncRoleFromWorkspaceRole, user],
+    [accessToken, isBootstrapping, recuperarSesionDesdeCookie, signIn, signOut, syncRoleFromWorkspaceRole, user],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

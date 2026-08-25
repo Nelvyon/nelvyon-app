@@ -133,3 +133,179 @@ body:not([data-header-position]) .content-body {
     padding-top: 3.1rem;
   }
 }
+
+/**
+ * ---------------------------------------------------------------------------
+ * Contraste: el pack trae su propio `--primary` y pisa al del producto
+ *
+ * `public/w3crm/css/style.css` define `--primary: #0D99FF` en su propio `:root`,
+ * y esa hoja se carga DENTRO del panel. Resultado: todo lo que en el panel usa
+ * `var(--primary)` —`.btn-primary`, `.menu-title`, los enlaces del sidebar, el
+ * pie— se pintaba con el azul del pack y no con el de NELVYON.
+ *
+ * Ese azul da **2,99:1 sobre blanco**. WCAG AA pide 4,5:1 para texto normal, o
+ * sea que ni de lejos. Medido con axe-core en navegador, era la segunda
+ * combinacion mas repetida del arbol.
+ *
+ * Se reasigna al mismo azul accesible que usa el tema claro del producto
+ * (`#0063c2`, 4,52:1, tono 209 conservado). No se toca `style.css`: es un fichero
+ * del pack, y sobrescribir sus variables desde el ambito es justo para lo que
+ * existe este fichero.
+ */
+.w3crm-scope {
+  --primary: #0063c2;
+  --bs-primary: #0063c2;
+  --bs-link-color: #0063c2;
+  --bs-link-hover-color: #005cb3;
+}
+
+/**
+ * ---------------------------------------------------------------------------
+ * Enlaces dentro de un parrafo: subrayado obligatorio
+ *
+ * El pie del panel lleva tres enlaces (`NELVYON`, `Aviso legal`, `Privacidad`)
+ * dentro de una frase, y solo se distinguian del texto por el color. Es la
+ * violacion `link-in-text-block` de WCAG: quien no distingue ese azul del gris
+ * de alrededor no ve que ahi hay algo que pulsar.
+ *
+ * Se puso `className="underline"` en el componente y NO bastaba: el reseteo de
+ * enlaces del pack gana en cascada y el `text-decoration-line` computado seguia
+ * siendo `none` —comprobado en el navegador, no supuesto—. Por eso la correccion
+ * vive aqui, en el ambito, con especificidad suficiente para ganar.
+ */
+.w3crm-scope .copyright p a,
+.w3crm-scope .footer .copyright a {
+  text-decoration: underline;
+}
+
+/**
+ * ---------------------------------------------------------------------------
+ * Insignias de estado: texto oscuro sobre color saturado
+ *
+ * `<span class="badge badge-warning">` salia texto BLANCO sobre `#ff9f00`:
+ * 2,06:1. Y `badge-success`, blanco sobre `#3ac977`: 2,14:1. Los dos muy por
+ * debajo del 4,5:1 de WCAG AA, y los dos en sitios donde el color ES el dato
+ * («Pro», «ready»).
+ *
+ * No se cambia el color de fondo: se cambia el del texto. Sobre esos mismos
+ * naranja y verde, el negro da 10,21:1 y 9,80:1. Es lo que hace el propio
+ * Bootstrap con `.btn-warning` y `.btn-success` (`--bs-btn-color: #000`), y
+ * conserva el codigo de color, que es justo lo que el usuario reconoce.
+ */
+.w3crm-scope .badge-warning,
+.w3crm-scope .badge-success,
+.w3crm-scope .badge-info {
+  color: #1a1a1a;
+}
+
+/**
+ * `.btn-danger.light` daba `#ee0000` sobre `#ffdede`: 3,61:1. Se oscurece solo
+ * el texto —el fondo rosa palido se queda— hasta 8,05:1.
+ */
+.w3crm-scope .btn-danger.light,
+.w3crm-scope .badge-danger.light {
+  color: #8a0000;
+}
+
+/**
+ * Variantes «light» de las insignias.
+ *
+ * `.light.badge-success` pinta `#41cb7c` sobre `#dbf5e7`: **1,81:1**. Es el peor
+ * contraste medido en todo el arbol —color saturado sobre su propio tono
+ * palido— y aparece en la leyenda del calendario, donde el chip ES la
+ * informacion.
+ *
+ * Igual que arriba: se conserva el fondo, que es lo que codifica el estado, y
+ * se oscurece solo el texto.
+ */
+.w3crm-scope .light.badge-success,
+.w3crm-scope .light.badge-warning,
+.w3crm-scope .light.badge-info,
+.w3crm-scope .light.badge-primary,
+.w3crm-scope .badge-success.light,
+.w3crm-scope .badge-warning.light,
+.w3crm-scope .badge-info.light,
+.w3crm-scope .badge-primary.light {
+  color: #1a1a1a;
+}
+
+/** `badge-danger` completaba la familia: mismo caso que warning y success. */
+.w3crm-scope .badge-danger,
+.w3crm-scope .light.badge-danger,
+.w3crm-scope .badge-danger.light {
+  color: #1a1a1a;
+}
+
+/**
+ * ---------------------------------------------------------------------------
+ * Familia `.light.btn-*` y el calendario
+ *
+ * La leyenda del calendario no usa `badge-*` sino `light btn-success`, asi que
+ * la regla de arriba no la alcanzaba: `#3ac977` sobre `#daf5e6` da **1,85:1**,
+ * el peor contraste medido en todo el arbol. Y ese chip ES la leyenda: si no se
+ * lee, no se sabe que color corresponde a que tipo de evento.
+ */
+.w3crm-scope .light.btn-success,
+.w3crm-scope .light.btn-warning,
+.w3crm-scope .light.btn-info,
+.w3crm-scope .light.btn-primary,
+.w3crm-scope .light.btn-danger,
+.w3crm-scope .light.btn-secondary {
+  color: #1a1a1a;
+}
+
+/**
+ * FullCalendar pinta su barra de herramientas con `#b5b5c3` sobre blanco:
+ * 2,02:1. Son los botones de vista («Mes», «Semana», «Dia»), o sea controles,
+ * no decoracion.
+ *
+ * Y el numero del dia de HOY va sobre el amarillo de resalte `#fffadf`, donde
+ * el gris de cuerpo se queda en 4,32:1.
+ */
+/*
+ * `.fc .fc-button-group > .fc-button { color: #b5b5c3 }` del pack tiene la
+ * MISMA especificidad (0,3,0) que un `.w3crm-scope .fc .fc-button`, asi que
+ * ganaba por orden de carga: su hoja entra por `<link>` despues del bundle.
+ * Hay que igualar el selector y anadirle el ambito.
+ */
+.w3crm-scope .fc .fc-button,
+.w3crm-scope .fc .fc-button-primary,
+.w3crm-scope .fc .fc-button-group > .fc-button,
+.w3crm-scope .fc .fc-toolbar-title {
+  color: #1a1a1a;
+}
+.w3crm-scope .fc .fc-day-today .fc-daygrid-day-number,
+.w3crm-scope .fc .fc-daygrid-day-number {
+  color: #4a4a4a;
+}
+
+/**
+ * ---------------------------------------------------------------------------
+ * Utilidades semanticas de texto (`.text-success`, `.text-warning`...)
+ *
+ * Son los colores de estado del pack usados como TEXTO sobre fondo claro, que
+ * es donde peor funcionan: `.text-success` da `#3ac977` sobre blanco, 2,14:1.
+ * El mismo verde como FONDO con texto oscuro esta perfectamente bien —y asi se
+ * deja arriba—; el problema es usarlo como tinta.
+ *
+ * Cada valor es el mismo tono con la luminosidad minima que alcanza 4,5:1.
+ */
+.w3crm-scope .text-success { color: #25874f !important; }
+.w3crm-scope .text-warning { color: #a76800 !important; }
+.w3crm-scope .text-danger { color: #ee0000 !important; }
+.w3crm-scope .text-info { color: #0079d2 !important; }
+
+/**
+ * Cabeceras de tabla.
+ *
+ * `<th>` hereda el gris de cuerpo (`#767676`) pero la fila de cabecera lleva su
+ * propia banda `#f0f4f9`, no blanco. Sobre ese fondo el mismo gris se queda en
+ * **4,32:1**: cumple sobre blanco y no cumple aqui.
+ *
+ * Es el recordatorio de que el contraste no es propiedad de un color sino de un
+ * PAR. Se oscurece solo la cabecera, que ademas es donde mas se agradece.
+ */
+.w3crm-scope .table th,
+.w3crm-scope table th {
+  color: #5f5f5f;
+}

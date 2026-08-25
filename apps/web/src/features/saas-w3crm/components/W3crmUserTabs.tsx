@@ -180,67 +180,70 @@ export function W3crmUserList({
             </div>
           </div>
           <div id="user-tbl_wrapper" className="dataTables_wrapper no-footer">
-            <table id="projects-tbl" className="table ItemsCheckboxSec dataTable no-footer mb-0">
-              <thead>
-                <tr>
-                  <th className="sorting_asc_11">
-                    <div className="form-check custom-checkbox ms-0">
-                      <input
-                        type="checkbox"
-                        className="form-check-input checkAllInput"
-                        aria-label="Seleccionar todo"
-                        onClick={() => checkboxFun("all")}
-                      />
-                      <label className="form-check-label" htmlFor="checkAll"></label>
-                    </div>
-                  </th>
-                  <th>Usuario</th>
-                  <th>Email</th>
-                  <th>Rol</th>
-                  <th>Última actividad</th>
-                  <th>Estado</th>
-                  <th>Acción</th>
-                </tr>
-              </thead>
-              <tbody>
-                {records.map((item, index) => (
-                  <tr key={item.clave}>
-                    <td className="sorting_20">
-                      <div className="form-check11custom-checkbox">
+            <div className="table-responsive">
+              <table id="projects-tbl" className="table ItemsCheckboxSec dataTable no-footer mb-0">
+                <thead>
+                  <tr>
+                    <th className="sorting_asc_11">
+                      <div className="form-check custom-checkbox ms-0">
                         <input
                           type="checkbox"
-                          className="form-check-input"
-                          id={`user${index + 211}`}
-                          aria-label={`Seleccionar ${item.titulo}`}
-                          onClick={() => checkboxFun()}
+                          className="form-check-input checkAllInput"
+                          aria-label="Seleccionar todo"
+                          onClick={() => checkboxFun("all")}
                         />
-                        <label className="form-check-label" htmlFor={`user${index + 211}`}></label>
+                        <label className="form-check-label" htmlFor="checkAll"></label>
                       </div>
-                    </td>
-                    <td>
-                      <div className="d-flex align-items-center">
-                        <span className="avatar rounded-circle d-inline-flex align-items-center justify-content-center bg-primary text-white" style={{ width: 35, height: 35 }}>
-                          {item.iniciales}
-                        </span>
-                        <p className="mb-0 ms-2">{item.titulo}</p>
-                      </div>
-                    </td>
-                    <td>{item.email}</td>
-                    <td>{item.posicion}</td>
-                    <td>{item.fecha}</td>
-                    <td>{item.estado}</td>
-                    <td>{item.acciones}</td>
+                    </th>
+                    <th>Usuario</th>
+                    <th>Email</th>
+                    <th>Rol</th>
+                    <th>Última actividad</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {records.map((item, index) => (
+                    <tr key={item.clave}>
+                      <td className="sorting_20">
+                        <div className="form-check11custom-checkbox">
+                          <input
+                            type="checkbox"
+                            className="form-check-input"
+                            id={`user${index + 211}`}
+                            aria-label={`Seleccionar ${item.titulo}`}
+                            onClick={() => checkboxFun()}
+                          />
+                          <label className="form-check-label" htmlFor={`user${index + 211}`}></label>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="d-flex align-items-center">
+                          <span className="avatar rounded-circle d-inline-flex align-items-center justify-content-center bg-primary text-white" style={{ width: 35, height: 35 }}>
+                            {item.iniciales}
+                          </span>
+                          <p className="mb-0 ms-2">{item.titulo}</p>
+                        </div>
+                      </td>
+                      <td>{item.email}</td>
+                      <td>{item.posicion}</td>
+                      <td>{item.fecha}</td>
+                      <td>{item.estado}</td>
+                      <td>{item.acciones}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
             <div className="d-sm-flex text-center justify-content-between align-items-center">
               <div className="dataTables_info">
                 Mostrando {items.length === 0 ? 0 : firstIndex + 1} a {Math.min(lastIndex, items.length)} de {items.length}
               </div>
               <div className="dataTables_paginate paging_simple_numbers justify-content-center" id="example2_paginate">
                 <Link
-                  className={`paginate_button previous ${currentPage === 1 ? "disabled" : ""}`}
+                  aria-label="Pagina anterior"
+                                className={`paginate_button previous ${currentPage === 1 ? "disabled" : ""}`}
                   href="#" scroll={false}
                   onClick={(e) => { e.preventDefault(); prePage(); }}
                 >
@@ -258,7 +261,8 @@ export function W3crmUserList({
                   ))}
                 </span>
                 <Link
-                  className={`paginate_button next ${currentPage === npage ? "disabled" : ""}`}
+                  aria-label="Pagina siguiente"
+                                className={`paginate_button next ${currentPage === npage ? "disabled" : ""}`}
                   href="#" scroll={false}
                   onClick={(e) => { e.preventDefault(); nextPage(); }}
                 >

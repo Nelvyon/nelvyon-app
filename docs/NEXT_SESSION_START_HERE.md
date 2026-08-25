@@ -1,6 +1,6 @@
 # EMPIEZA AQUÍ
 
-Estado a **2026-08-23**. Rama `bloque4-webhooks`, worktree `C:\Users\Daniel\nelvyon-w3`.
+Estado a **2026-08-25**. Rama `bloque4-webhooks`, worktree `C:\Users\Daniel\nelvyon-w3`.
 
 ## Dónde estamos
 
@@ -10,7 +10,7 @@ Estado a **2026-08-23**. Rama `bloque4-webhooks`, worktree `C:\Users\Daniel\nelv
 | 2 · Web + SaaS + OS completos | **CERRADO** en `2b2c3d8e` → `docs/BLOQUE_2_CIERRE.md` |
 | 3 · Empresa IA autónoma | **CERRADO** en `3feaaf24` → `docs/BLOQUE_3_CIERRE.md` |
 | 4 · Operación real | **CERRADO** en `cf43aeda` → `docs/BLOQUE_4_CIERRE.md` |
-| 5 · Auditoría comparativa | **por arrancar** |
+| 5 · Producto medido y comparativa | **CERRADO** → `docs/BLOQUE_5_CIERRE.md` |
 
 El estado por capacidad se **genera**, no se escribe:
 
@@ -81,6 +81,77 @@ Está escrito, con las cuatro tandas y sus variables, en
 - **No confundas código muerto con producto.**
 - **No mates una suite por lenta si sigue progresando.** `test_rls_saas_cross_tenant.py`
   tarda ~14 minutos y no está colgada.
+
+## Bloque 5 — CERRADO
+
+`BLOQUE_5_EXECUTABLE = CLOSED`.
+
+**25/25 categorías de producto · 24 `FIXED_CERTIFIED` + 1 `PASS_CERTIFIED` ·
+0 bloqueadas · 0 pendientes.** Contador: **25 + 0 + 0 = 25**.
+
+Denominador: `backend/db/certificacion/capacidades_producto.py` deriva
+**217 áreas de producto en 25 categorías con 0 huérfanas**. Estado en
+`capacidades_producto_estado.json`; comparativa en
+`benchmark_mercado_estado.json`, que **se regenera**, no se edita:
+
+    python -m backend.db.certificacion.benchmark_mercado --escribir
+
+### Las tres auditorías, y cómo se ejecutan
+
+    python -m backend.db.certificacion.auditoria_de_pantallas    # 7 reglas, 1069 ficheros
+    python -m backend.db.certificacion.auditoria_de_rutas        # 888 rutas, 0 enlaces a 404
+    python -m backend.db.certificacion.informe_por_categoria     # cruza las dos por categoría
+
+La cuarta necesita servidor construido y va aparte:
+
+    cd apps/web && npx next build && npx next start -p 3000
+    PLAYWRIGHT_BASE_URL=http://localhost:3000       npx playwright test e2e/bloque5/medicion-por-categoria.spec.ts --workers=2
+
+Abre un navegador de verdad sobre 75 rutas —las 25 categorías— y mide con
+axe-core (WCAG 2.1 AA, `serious` y `critical`), desbordamiento a 375 px y errores
+de JavaScript. **75/75.** De **993 violaciones graves a 0**.
+
+`rutas_por_categoria.json` es un fichero **generado**; hay un guardián que falla
+si se desincroniza del inventario. Regenerar con la orden que el propio mensaje
+de error imprime.
+
+### Lo que este bloque enseñó y conviene no olvidar
+
+- **Los defectos de producto no se encuentran leyendo el código.** Los dos peores
+  —una identidad falsa («Thomas Fleming») en 75 pantallas, y una sesión que echaba
+  al login en 136— llevaban meses delante de todo el mundo y ninguna suite los
+  veía. Aparecieron al abrir un navegador.
+- **Afilar una regla es el mismo gesto que cegarla.** Por eso cada regla del
+  auditor tiene control positivo *y* negativo en
+  `test_el_auditor_de_pantallas_ve_los_defectos.py`. Ese guardián encontró un
+  punto ciego que ocultaba 425 casos en su primera ejecución.
+- **Un arreglo que sirve a la mitad del producto no es un arreglo.** Oscurecer el
+  azul arreglaba el tema claro y rompía el oscuro. El guardián de contraste mira
+  **los dos temas** a propósito.
+- **Un cronómetro no es una señal.** Esperar «1500 ms» fallaba con la máquina
+  cargada; esperar a que las hojas de estilo estén aplicadas, no.
+- **Clasifica un documento AL CREARLO** en `orphanClassification.ts`. El cierre
+  del Bloque 4 no lo hizo y puso roja la puerta de este bloque.
+
+### Fase B: por qué no hay ninguna superioridad declarada
+
+**0 `SUPERIOR` · 0 `EQUAL` · 21 `PROPIA_MEDIDA` · 4 `SIN_COMPARAR`.**
+
+No es modestia ni falta de trabajo: afirmar superioridad exige **la misma medida
+tomada en el referente**, y eso requiere una cuenta suya, coste externo y datos
+reales — las tres prohibidas aquí. El veredicto lo **deriva** `_veredicto()` de
+las clases de evidencia, y no hay ninguna rama que devuelva `SUPERIOR` sin
+`MEASURED` en los dos lados. Escribirlo a mano en el JSON pone la puerta roja.
+
+Si algún día se autoriza medir a un competidor, `test_hoy_no_hay_ni_una_
+superioridad_declarada` se pondrá rojo y habrá que cambiarlo **a propósito**, con
+la evidencia delante.
+
+### Cambio visible
+
+El azul de marca es `#0063c2` en el **tema claro** (antes `#0084ff`): mismo tono,
+un escalón más oscuro, por exigencia de contraste WCAG. El tema oscuro conserva
+`#0084ff` porque allí el nuevo no cumple. Reversible en una línea.
 
 ## Bloque 3 — CERRADO
 

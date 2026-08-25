@@ -121,28 +121,30 @@ function SaasPanelMock() {
         })}
       </div>
       <div className="mt-4 overflow-hidden rounded-lg border border-white/10">
-        <table className="w-full text-left text-sm">
-          <thead>
-            <tr className="border-b border-white/10 text-white/50">
-              <th className="px-3 py-2 font-medium">Campaña</th>
-              <th className="px-3 py-2 font-medium">Estado</th>
-              <th className="px-3 py-2 font-medium">ROAS</th>
-              <th className="px-3 py-2 font-medium">Presupuesto</th>
-            </tr>
-          </thead>
-          <tbody>
-            {PANEL_ROWS.map((row) => (
-              <tr className="border-b border-white/5 last:border-0" key={row.name}>
-                <td className="px-3 py-2.5 text-white">{row.name}</td>
-                <td className="px-3 py-2.5 font-medium" style={{ color: "#4ade80" }}>
-                  Activa
-                </td>
-                <td className="px-3 py-2.5 text-white">{row.roas}</td>
-                <td className="px-3 py-2.5 text-white/80">{row.budget}</td>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead>
+              <tr className="border-b border-white/10 text-white/50">
+                <th className="px-3 py-2 font-medium">Campaña</th>
+                <th className="px-3 py-2 font-medium">Estado</th>
+                <th className="px-3 py-2 font-medium">ROAS</th>
+                <th className="px-3 py-2 font-medium">Presupuesto</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {PANEL_ROWS.map((row) => (
+                <tr className="border-b border-white/5 last:border-0" key={row.name}>
+                  <td className="px-3 py-2.5 text-white">{row.name}</td>
+                  <td className="px-3 py-2.5 font-medium" style={{ color: "#4ade80" }}>
+                    Activa
+                  </td>
+                  <td className="px-3 py-2.5 text-white">{row.roas}</td>
+                  <td className="px-3 py-2.5 text-white/80">{row.budget}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

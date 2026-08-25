@@ -436,74 +436,77 @@ export default function SaasKnowledgeBasePage() {
                           />
                         ) : (
                           <>
-                            <table className="table table-responsive-lg table-striped table-condensed flip-content">
-                              <thead>
-                                <tr>
-                                  <th className="text-black">Título</th>
-                                  <th className="text-black">Categoría</th>
-                                  <th className="text-black">Estado</th>
-                                  <th className="text-black">Lecturas</th>
-                                  <th className="text-black">% útil</th>
-                                  <th className="text-black">Modificado</th>
-                                  <th className="text-black text-end">Acciones</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {records.map((a) => {
-                                  const votos = num(a.helpful) + num(a.notHelpful);
-                                  const helpfulPct = votos > 0 ? Math.round((num(a.helpful) / votos) * 100) : null;
-                                  return (
-                                    <tr key={a.id}>
-                                      <td>
-                                        <span className="fw-bold">{a.title || "—"}</span>
-                                        {a.excerpt ? <div className="text-muted fs-12">{a.excerpt}</div> : null}
-                                      </td>
-                                      <td>{a.categoryName ?? "—"}</td>
-                                      <td>
-                                        <span className={`badge ${a.published ? "badge-success" : "badge-primary"}`}>
-                                          {a.published ? "Publicado" : "Borrador"}
-                                        </span>
-                                      </td>
-                                      <td>{num(a.views).toLocaleString("es-ES")}</td>
-                                      <td>{helpfulPct !== null ? `${helpfulPct}%` : "—"}</td>
-                                      <td>{fecha(a.updatedAt)}</td>
-                                      <td className="text-end">
-                                        <button
-                                          type="button"
-                                          className="btn btn-warning btn-sm content-icon me-1"
-                                          aria-label={`Editar ${a.title || "artículo"}`}
-                                          onClick={() => { setEditing(a); setShowEditor(true); }}
-                                        >
-                                          <i className="fa fa-edit" />
-                                        </button>
-                                        <button
-                                          type="button"
-                                          className="btn btn-primary btn-sm content-icon me-1"
-                                          aria-label={a.published ? `Despublicar ${a.title || "artículo"}` : `Publicar ${a.title || "artículo"}`}
-                                          onClick={() => void togglePublish(a)}
-                                        >
-                                          <i className={`fa-solid ${a.published ? "fa-eye-slash" : "fa-check"}`} />
-                                        </button>
-                                        <button
-                                          type="button"
-                                          className="btn btn-danger btn-sm content-icon"
-                                          aria-label={`Eliminar ${a.title || "artículo"}`}
-                                          onClick={() => void deleteArticle(a.id)}
-                                        >
-                                          <i className="fa-solid fa-trash" />
-                                        </button>
-                                      </td>
-                                    </tr>
-                                  );
-                                })}
-                              </tbody>
-                            </table>
+                            <div className="table-responsive">
+                              <table className="table table-responsive-lg table-striped table-condensed flip-content">
+                                <thead>
+                                  <tr>
+                                    <th className="text-black">Título</th>
+                                    <th className="text-black">Categoría</th>
+                                    <th className="text-black">Estado</th>
+                                    <th className="text-black">Lecturas</th>
+                                    <th className="text-black">% útil</th>
+                                    <th className="text-black">Modificado</th>
+                                    <th className="text-black text-end">Acciones</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {records.map((a) => {
+                                    const votos = num(a.helpful) + num(a.notHelpful);
+                                    const helpfulPct = votos > 0 ? Math.round((num(a.helpful) / votos) * 100) : null;
+                                    return (
+                                      <tr key={a.id}>
+                                        <td>
+                                          <span className="fw-bold">{a.title || "—"}</span>
+                                          {a.excerpt ? <div className="text-muted fs-12">{a.excerpt}</div> : null}
+                                        </td>
+                                        <td>{a.categoryName ?? "—"}</td>
+                                        <td>
+                                          <span className={`badge ${a.published ? "badge-success" : "badge-primary"}`}>
+                                            {a.published ? "Publicado" : "Borrador"}
+                                          </span>
+                                        </td>
+                                        <td>{num(a.views).toLocaleString("es-ES")}</td>
+                                        <td>{helpfulPct !== null ? `${helpfulPct}%` : "—"}</td>
+                                        <td>{fecha(a.updatedAt)}</td>
+                                        <td className="text-end">
+                                          <button
+                                            type="button"
+                                            className="btn btn-warning btn-sm content-icon me-1"
+                                            aria-label={`Editar ${a.title || "artículo"}`}
+                                            onClick={() => { setEditing(a); setShowEditor(true); }}
+                                          >
+                                            <i className="fa fa-edit" />
+                                          </button>
+                                          <button
+                                            type="button"
+                                            className="btn btn-primary btn-sm content-icon me-1"
+                                            aria-label={a.published ? `Despublicar ${a.title || "artículo"}` : `Publicar ${a.title || "artículo"}`}
+                                            onClick={() => void togglePublish(a)}
+                                          >
+                                            <i className={`fa-solid ${a.published ? "fa-eye-slash" : "fa-check"}`} />
+                                          </button>
+                                          <button
+                                            type="button"
+                                            className="btn btn-danger btn-sm content-icon"
+                                            aria-label={`Eliminar ${a.title || "artículo"}`}
+                                            onClick={() => void deleteArticle(a.id)}
+                                          >
+                                            <i className="fa-solid fa-trash" />
+                                          </button>
+                                        </td>
+                                      </tr>
+                                    );
+                                  })}
+                                </tbody>
+                              </table>
+                            </div>
                             <div className="d-sm-flex text-center justify-content-between align-items-center">
                               <div className="dataTables_info">
                                 Mostrando {firstIndex + 1} a {Math.min(lastIndex, filtered.length)} de {filtered.length} artículos
                               </div>
                               <div className="dataTables_paginate paging_simple_numbers justify-content-center" id="kb_paginate">
-                                <button type="button" className={`paginate_button previous ${currentPage === 1 ? "disabled" : ""}`} aria-label="Página anterior" onClick={prePage}>
+                                <button type="button"
+                                className={`paginate_button previous ${currentPage === 1 ? "disabled" : ""}`} aria-label="Página anterior" onClick={prePage}>
                                   <i className="fa-solid fa-angle-left" />
                                 </button>
                                 <span>
@@ -520,7 +523,8 @@ export default function SaasKnowledgeBasePage() {
                                     </button>
                                   ))}
                                 </span>
-                                <button type="button" className={`paginate_button next ${currentPage === npage ? "disabled" : ""}`} aria-label="Página siguiente" onClick={nextPage}>
+                                <button type="button"
+                                className={`paginate_button next ${currentPage === npage ? "disabled" : ""}`} aria-label="Página siguiente" onClick={nextPage}>
                                   <i className="fa-solid fa-angle-right" />
                                 </button>
                               </div>

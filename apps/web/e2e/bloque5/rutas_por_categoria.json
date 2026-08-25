@@ -1,0 +1,127 @@
+{
+  "acceso": [
+    "/account",
+    "/login",
+    "/register"
+  ],
+  "agencia_y_partners": [
+    "/agencia",
+    "/servicios",
+    "/agencia/contenido"
+  ],
+  "analitica_y_reporting": [
+    "/analytics",
+    "/analytics/automatizacion",
+    "/analytics/campaigns"
+  ],
+  "automatizacion": [
+    "/automatizacion",
+    "/automations/jobs",
+    "/automations/webhooks"
+  ],
+  "campanias_y_email": [
+    "/campaigns",
+    "/campaigns/new",
+    "/saas/campanias"
+  ],
+  "cobro_y_facturacion": [
+    "/billing",
+    "/billing/upgrade",
+    "/saas/billing"
+  ],
+  "contenido_y_copy": [
+    "/contenido",
+    "/saas/copywriter",
+    "/saas/knowledge-base"
+  ],
+  "crm_y_ventas": [
+    "/crm",
+    "/crm/clients",
+    "/crm/deals"
+  ],
+  "cuenta_y_configuracion": [
+    "/admin",
+    "/settings",
+    "/admin/jobs"
+  ],
+  "enlaces_y_utilidades": [
+    "/example",
+    "/offline",
+    "/saas-w3crm-preview"
+  ],
+  "entregables_y_packs": [
+    "/packs",
+    "/saas/certificados",
+    "/saas/documentos"
+  ],
+  "funnels_y_conversion": [
+    "/funnels",
+    "/funnels/builder",
+    "/saas/countdown"
+  ],
+  "ia_y_agentes": [
+    "/saas/agentes",
+    "/saas/ai",
+    "/saas/voice"
+  ],
+  "integraciones_y_api": [
+    "/integraciones",
+    "/saas/api-keys",
+    "/saas/calendar"
+  ],
+  "legales": [
+    "/aviso-legal",
+    "/cookies",
+    "/goodbye"
+  ],
+  "os_plataforma": [
+    "/os",
+    "/os/agent-audit",
+    "/os/agent-data"
+  ],
+  "os_servicios_premium": [
+    "/os/3d-inmersivo-premium/preview",
+    "/os/ads-premium/preview",
+    "/os/advisor-empresarial-premium/preview"
+  ],
+  "portal_del_cliente": [
+    "/portal",
+    "/portal/deliverables",
+    "/portal/projects"
+  ],
+  "publicidad": [
+    "/publicidad",
+    "/publicidad/briefing",
+    "/publicidad/google"
+  ],
+  "reputacion": [
+    "/reputacion",
+    "/reputacion/alertas",
+    "/reputacion/resenas"
+  ],
+  "seo_y_visibilidad": [
+    "/seo",
+    "/saas/benchmark",
+    "/saas/seo"
+  ],
+  "sitio_publico": [
+    "/",
+    "/ads",
+    "/agencia-ia"
+  ],
+  "social_y_comunidad": [
+    "/social",
+    "/saas/comunidades",
+    "/saas/loyalty"
+  ],
+  "soporte_e_inbox": [
+    "/inbox/tickets",
+    "/saas/chat",
+    "/saas/helpdesk"
+  ],
+  "web_y_tienda": [
+    "/ecommerce",
+    "/producto",
+    "/ecommerce/editor"
+  ]
+}
