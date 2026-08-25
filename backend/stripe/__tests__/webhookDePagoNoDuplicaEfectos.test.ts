@@ -15,6 +15,19 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+// Importacion ESTATICA a proposito.
+//
+// Con `await import(...)` dentro de cada prueba, la PRIMERA pagaba la carga del
+// SDK de Stripe -2,7 s medidos- dentro de su presupuesto de 5 s. Aislada pasaba;
+// en la suite completa, con la maquina cargada, se pasaba del limite y fallaba
+// por tiempo. No era un defecto del producto ni un timeout que subir: era el
+// coste del import contabilizado en el sitio equivocado.
+//
+// Estatico, vitest lo cuenta en la fase de import del fichero y las pruebas
+// arrancan con el modulo ya cargado. `getStripe()` lee el entorno EN CADA
+// LLAMADA, asi que las pruebas de autenticidad siguen pudiendo cambiarlo.
+import { processStripeEvent, verifyStripeWebhook } from "../webhookHandler";
+
 const correosEnviados: Array<{ plantilla: string; a: unknown }> = [];
 
 vi.mock("../../email", () => ({
@@ -115,7 +128,6 @@ describe("BLOQUE 4 · webhook de pago: efecto exactamente una vez", () => {
   it("EL CONTROL: la primera entrega SÍ cancela y SÍ avisa", async () => {
     // Sin este control, una implementación que no hiciera nunca nada pasaría
     // todas las pruebas de duplicado y dejaría las cancelaciones sin procesar.
-    const { processStripeEvent } = await import("../webhookHandler");
     const { db, estado } = baseFalsa();
 
     await processStripeEvent(eventoDeCancelacion(1_700_000_000), db as never);
@@ -127,7 +139,6 @@ describe("BLOQUE 4 · webhook de pago: efecto exactamente una vez", () => {
   it("una SEGUNDA entrega del mismo evento no envía un segundo correo", async () => {
     // El defecto. Stripe reintenta ante cualquier no-2xx: recibir el mismo
     // evento dos veces es lo normal, no la excepción.
-    const { processStripeEvent } = await import("../webhookHandler");
     const { db } = baseFalsa();
     const evento = eventoDeCancelacion(1_700_000_000);
 
@@ -139,7 +150,6 @@ describe("BLOQUE 4 · webhook de pago: efecto exactamente una vez", () => {
 
   it("diez entregas del mismo evento siguen produciendo un solo efecto", async () => {
     // Un proveedor con problemas puede reintentar muchas veces seguidas.
-    const { processStripeEvent } = await import("../webhookHandler");
     const { db } = baseFalsa();
     const evento = eventoDeCancelacion(1_700_000_000);
 
@@ -151,7 +161,6 @@ describe("BLOQUE 4 · webhook de pago: efecto exactamente una vez", () => {
   it("un evento MÁS ANTIGUO no revierte un estado más nuevo", async () => {
     // Los webhooks llegan fuera de orden. Un `deleted` viejo que llega después
     // de una reactivación no puede volver a cancelar.
-    const { processStripeEvent } = await import("../webhookHandler");
     const { db } = baseFalsa();
 
     await processStripeEvent(eventoDeCancelacion(1_700_000_500), db as never);
@@ -164,7 +173,6 @@ describe("BLOQUE 4 · webhook de pago: efecto exactamente una vez", () => {
   it("dos entregas CONCURRENTES del mismo evento producen un solo efecto", async () => {
     // El caso que no se ve probando en serie: dos instancias procesando la misma
     // entrega a la vez. La guarda vive en la base, así que la segunda no aplica.
-    const { processStripeEvent } = await import("../webhookHandler");
     const { db } = baseFalsa();
     const evento = eventoDeCancelacion(1_700_000_000);
 
@@ -179,7 +187,6 @@ describe("BLOQUE 4 · webhook de pago: efecto exactamente una vez", () => {
   it("un evento NUEVO sí produce su efecto después de uno antiguo", async () => {
     // La otra mitad del control: si la guarda bloqueara todo lo posterior, una
     // cancelacion real después de otra quedaría sin procesar.
-    const { processStripeEvent } = await import("../webhookHandler");
     const { db, estado } = baseFalsa();
 
     await processStripeEvent(eventoDeCancelacion(1_700_000_000), db as never);
@@ -210,7 +217,6 @@ describe("BLOQUE 4 · webhook de pago: autenticidad", () => {
     // a la red y no cuesta nada. Sustituirla por un doble mediria el doble.
     process.env.STRIPE_SECRET_KEY = "sk_test_de_prueba_sin_uso";
     process.env.STRIPE_WEBHOOK_SECRET = "whsec_de_prueba";
-    const { verifyStripeWebhook } = await import("../webhookHandler");
 
     expect(() => verifyStripeWebhook('{"id":"evt_1"}', "t=1,v1=firmainventada")).toThrow();
   });
@@ -220,7 +226,6 @@ describe("BLOQUE 4 · webhook de pago: autenticidad", () => {
     // usuario, y reenviarla con su firma original.
     process.env.STRIPE_SECRET_KEY = "sk_test_de_prueba_sin_uso";
     process.env.STRIPE_WEBHOOK_SECRET = "whsec_de_prueba";
-    const { verifyStripeWebhook } = await import("../webhookHandler");
 
     const cuerpo = '{"id":"evt_1","type":"customer.subscription.deleted"}';
     const manipulado = cuerpo.replace("evt_1", "evt_manipulado");
@@ -240,7 +245,6 @@ describe("BLOQUE 4 · webhook de pago: autenticidad", () => {
     // pruebas de arriba y dejaria el producto sin poder cobrar.
     process.env.STRIPE_SECRET_KEY = "sk_test_de_prueba_sin_uso";
     process.env.STRIPE_WEBHOOK_SECRET = "whsec_de_prueba";
-    const { verifyStripeWebhook } = await import("../webhookHandler");
 
     const cuerpo = '{"id":"evt_1","type":"ping","created":1700000000,"data":{"object":{}}}';
     const crypto = await import("node:crypto");
@@ -259,7 +263,6 @@ describe("BLOQUE 4 · webhook de pago: autenticidad", () => {
     // convierte la firma en una prueba de frescura y no solo de origen.
     process.env.STRIPE_SECRET_KEY = "sk_test_de_prueba_sin_uso";
     process.env.STRIPE_WEBHOOK_SECRET = "whsec_de_prueba";
-    const { verifyStripeWebhook } = await import("../webhookHandler");
 
     const cuerpo = '{"id":"evt_1","type":"ping","created":1,"data":{"object":{}}}';
     const crypto = await import("node:crypto");
@@ -277,7 +280,6 @@ describe("BLOQUE 4 · webhook de pago: autenticidad", () => {
     // cualquier cosa. Se comprueba que se niega, no COMO se niega.
     process.env.STRIPE_SECRET_KEY = "sk_test_de_prueba_sin_uso";
     delete process.env.STRIPE_WEBHOOK_SECRET;
-    const { verifyStripeWebhook } = await import("../webhookHandler");
 
     expect(() => verifyStripeWebhook("{}", "t=1,v1=abc")).toThrow();
   });
