@@ -9,7 +9,8 @@ Estado a **2026-08-23**. Rama `bloque4-webhooks`, worktree `C:\Users\Daniel\nelv
 | 1 · Seguridad + base técnica | **CERRADO** → `docs/BLOQUE_1_CIERRE.md` |
 | 2 · Web + SaaS + OS completos | **CERRADO** en `2b2c3d8e` → `docs/BLOQUE_2_CIERRE.md` |
 | 3 · Empresa IA autónoma | **CERRADO** en `3feaaf24` → `docs/BLOQUE_3_CIERRE.md` |
-| 4 · Certificación final | pendiente |
+| 4 · Operación real | **CERRADO** en `cf43aeda` → `docs/BLOQUE_4_CIERRE.md` |
+| 5 · Auditoría comparativa | **por arrancar** |
 
 El estado por capacidad se **genera**, no se escribe:
 
@@ -120,3 +121,55 @@ de revisión de permisos de red.
 ### Bloque 4
 
 Arranca **después** de `3feaaf24`, en commits posteriores, sin tocar ese árbol.
+
+## Bloque 4 — CERRADO
+
+`BLOQUE_4_EXECUTABLE = CLOSED`. **SHA certificado `cf43aeda`.**
+
+**13/13 · 8 `FIXED_CERTIFIED` + 5 `PASS_CERTIFIED` · 0 bloqueadas · 0 pendientes.**
+
+| Puerta | Resultado |
+|---|---|
+| Web (830 ficheros) | 7663 pasadas · 0 fallos · 178 saltadas |
+| Python, PostgreSQL real | 3616 pasadas · 0 fallos · 10 saltadas |
+| Aislamiento y RLS, en serie | 95/95 |
+| Guardianes (inventario + web) | 38 + 46 |
+
+Estado vivo generado:
+
+    python -m backend.db.certificacion.estado_bloque4
+
+### Cómo repetir la puerta del Bloque 4
+
+    # Web, sola
+    NELVYON_B4_DSN=...nelvyon_b2_cert NELVYON_B3_DSN=... NELVYON_B2_DSN=...     npx vitest run                                     # desde apps/web
+
+    # Python, sola
+    NELVYON_AI_ENABLED=0 NELVYON_PG_CERT_DSN=...nelvyon_cert545     NELVYON_WEB_CERT_DSN=...nelvyon_web_cert NELVYON_VIRGEN_DSN=...nelvyon_rec_final     python -m pytest backend/tests -q -p no:randomly
+
+    # Aislamiento, EN SERIE (ver BLOQUE_3 handoff para la lista)
+
+### Interruptores que ahora existen
+
+- `NELVYON_AI_ENABLED=0` — ningún proveedor de IA, ni siquiera para sondear.
+- `NELVYON_EMAIL_ENABLED` — **apagado por defecto fuera de producción**. Apagado,
+  `sendEmail` lanza `CorreoDesactivadoError`; nunca finge que envió.
+- `OS_WORKER_SILENCIO_MS` — cuánto silencio hace falta para dar un trabajo por
+  muerto. No lo bajes para «arreglar» un despliegue de pasos largos.
+
+### Dos reglas que este bloque confirmó dos veces cada una
+
+1. **Un negativo verde no certifica una defensa si la ejecución nunca la
+   alcanzó.** Pasó en OAuth (secreto con otro nombre) y en GDPR (error lanzado en
+   una sentencia que va por otra función). Solo la mutación lo destapa.
+2. **Un timeout no se arregla subiendo el timeout.** Mide primero la causa.
+
+### Bloque 5 — punto de arranque
+
+Auditoría comparativa contra referentes mundiales: SaaS líderes y agencias de
+marketing digital de máximo nivel. Arranca **después** de `cf43aeda`, en commits
+posteriores.
+
+La regla que ya está fijada para ese bloque: **no afirmar superioridad sin
+evidencia comparativa**. Paridad o superioridad solo donde sea objetivamente
+verificable; en lo demás, decir qué falta.
