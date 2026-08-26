@@ -22,10 +22,41 @@ import { aplicarContexto, inquilinoActual, sentenciasDeContexto } from "./contex
 
 let dbClientSingleton: DbClient | undefined;
 
+/** Lee un plazo de entorno; si no esta o no vale, devuelve el de por defecto. */
+function plazo(variable: string, porDefecto: number): number {
+  const n = Number.parseInt(process.env[variable] ?? "", 10);
+  return Number.isInteger(n) && n > 0 ? n : porDefecto;
+}
+
 function poolOptions(connectionString: string): pg.PoolConfig {
   const config: pg.PoolConfig = {
     connectionString,
-    connectionTimeoutMillis: 10_000,
+    // TRES plazos, y los tres hacen falta porque acotan cosas distintas.
+    //
+    // 1. `connectionTimeoutMillis` acota cuanto ESPERA una peticion por una
+    //    conexion libre. Ya estaba.
+    //
+    // 2. `statement_timeout` acota cuanto RETIENE una conexion la consulta que
+    //    ya la tiene. No estaba, y es el que importa: medido en
+    //    `elPoolBajoPresion.pg.test.ts`, con el pool a dos y dos consultas de dos
+    //    segundos, una consulta trivial espero 1803 ms. Sin este plazo, una
+    //    consulta desbocada retiene su conexion todo lo que tarde, y con el pool
+    //    agotado eso es una caida general. No hace falta un ataque para
+    //    provocarlo: basta un informe grande o un indice que falta.
+    //
+    // 3. `idle_in_transaction_session_timeout` acota una transaccion abierta que
+    //    nadie cierra. Es el plazo silencioso: `query` con contexto de inquilino
+    //    hace BEGIN/COMMIT, y si el proceso muere entremedias la conexion se
+    //    queda reteniendo sus bloqueos. No consume CPU ni sale en las graficas de
+    //    consultas lentas, pero deja colgado el ALTER TABLE de la migracion
+    //    siguiente.
+    //
+    // Los valores por defecto son GENEROSOS a proposito. Un plazo corto de mas
+    // es peor que no tener plazo: rompe informes legitimos de forma
+    // intermitente, que es la averia mas cara de diagnosticar.
+    connectionTimeoutMillis: plazo("NELVYON_DB_CONNECTION_TIMEOUT_MS", 10_000),
+    statement_timeout: plazo("NELVYON_DB_STATEMENT_TIMEOUT_MS", 30_000),
+    idle_in_transaction_session_timeout: plazo("NELVYON_DB_IDLE_TX_TIMEOUT_MS", 60_000),
   };
   // Tamano del pool, ajustable. Es un parametro de operacion legitimo —Railway
   // impone un maximo de conexiones y conviene poder bajarlo— y ademas hace
@@ -45,6 +76,11 @@ function poolOptions(connectionString: string): pg.PoolConfig {
     /* keep default pool config */
   }
   return config;
+}
+
+/** Solo para las pruebas de carga: permite mirar los plazos sin abrir un pool. */
+export function opcionesDePoolParaPruebas(connectionString: string): pg.PoolConfig {
+  return poolOptions(connectionString);
 }
 
 export class DbClient {
