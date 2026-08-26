@@ -15,7 +15,7 @@ Estado a **2026-08-26**. Rama `bloque4-webhooks`, worktree `C:\Users\Daniel\nelv
 | 7 · Seguridad ofensiva y abuso end-to-end | **CERRADO** en `c33b9939` → `docs/BLOQUE_7_CIERRE.md` |
 | 8 · Rendimiento, carga y concurrencia | **CERRADO** en `efb27997` → `docs/BLOQUE_8_CIERRE.md` |
 | 9 · Operación, observabilidad y recuperación | **CERRADO** en `87304e68` → `docs/BLOQUE_9_CIERRE.md` |
-| 10 · Certificación integral final | **CERRADO** en `SHA_B10` → `docs/BLOQUE_10_CIERRE.md` |
+| 10 · Certificación integral final | **CERRADO** en `c233e23b` → `docs/BLOQUE_10_CIERRE.md` |
 
 **Bloque 7 · cerrado**: 12/12 categorías de superficie atacable, **925
 superficies** derivadas del árbol con 0 huérfanas. **Ocho defectos reales

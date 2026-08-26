@@ -15,7 +15,7 @@ Los tres bloques se cerraron encadenados, sin parar entre ellos.
 | 7 | `c33b9939` | seguridad ofensiva *(heredado)* |
 | **8** | **`efb27997`** | rendimiento, carga y concurrencia |
 | **9** | **`87304e68`** | operación, observabilidad y recuperación |
-| **10** | **`53763685`** | certificación integral final |
+| **10** | **`c233e23b`** | certificación integral final |
 
 ---
 

@@ -100,7 +100,7 @@ puerta de este bloque corre el árbol completo, y por eso este bloque existe.
 
 ---
 
-## 5. Los saltos: de 96 a 10
+## 5. Los saltos: de 96 a 7
 
 Un salto **no es un aprobado**. Al empezar la noche había 96 pruebas saltándose en
 silencio por variables de entorno que nadie había escrito en ningún sitio.
@@ -122,10 +122,24 @@ Todo está en `docs/COMO_EJECUTAR_LAS_PUERTAS.md`, con los comandos exactos.
 
 Lo que **sigue** saltándose está clasificado, no ignorado:
 
-- `rls.test.ts` (2) — **EXTERNAL_VERIFICATION_REQUIRED**: exigen Supabase en vivo.
-- `perderPostgresYVolver` (3) — corre **a solas**, con permiso explícito, porque
-  reinicia el contenedor.
-- 5 sueltas de suites «live» que apuntan a entornos externos.
+Son **siete**, contadas del informe JSON de la suite y no a ojo:
+
+| Suite | Saltos | Clase |
+|---|---:|---|
+| `perderPostgresYVolver.pg.test.ts` | 3 | corre **a solas**, con permiso explícito, porque reinicia el contenedor |
+| `rls.test.ts` | 2 | **EXTERNAL_VERIFICATION_REQUIRED**: exigen Supabase en vivo |
+| `phase2EliteLive.test.ts` | 1 | necesita un modelo de *embeddings* real |
+| `workforceLive.test.ts` | 1 | necesita un modelo de *embeddings* real |
+
+Los dos ficheros que la suite cuenta como «saltados» son los dos primeros: todas
+sus pruebas se saltan, así que el fichero entero cuenta como salto. De ahí que el
+resumen diga **866 ficheros / 2 saltados** y **8 196 pruebas / 7 saltadas** — son
+las mismas siete, contadas de dos formas.
+
+> Esta cifra decía **10** en una versión anterior de este documento, con «5
+> sueltas de suites live». Al contar el informe JSON en vez de la memoria, son
+> **2**. Corregido a lo medido: un documento de certificación que redondea al
+> alza sus propios saltos no vale más que un salto sin clasificar.
 
 ---
 
