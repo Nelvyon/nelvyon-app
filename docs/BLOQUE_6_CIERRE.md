@@ -1,6 +1,6 @@
 # BLOQUE 6 — cierre
 
-**Autonomía bajo adversidad.** Rama `bloque4-webhooks`.
+**Autonomía bajo adversidad.** SHA certificado: `5352db46`, rama `bloque4-webhooks`.
 
 Los cinco bloques anteriores midieron el sistema **funcionando**: esquema,
 aislamiento, agentes, operación real, producto. Este mide qué pasa cuando algo
@@ -239,6 +239,45 @@ podía haber repetido exactamente eso, así que hay una prueba que comprueba que
 
 ---
 
+## Evidencia de la puerta
+
+Ejecutada **en serie**, nunca solapando cargas.
+
+| Tanda | Resultado |
+|---|---|
+| Web completa (840 ficheros) | **7436 pasadas · 0 fallos · 480 saltadas** · 137 s |
+| Python completa, PostgreSQL real (`nelvyon_cert545`) | **3678 pasadas · 0 fallos · 25 saltadas** · 9:50 |
+| Aislamiento y RLS, en serie | **27 pasadas · 0 fallos · 68 saltadas** (bloqueadas) |
+| Guardianes de inventario, bloques 1–6 | **116 pasadas · 0 fallos · 2 saltadas** |
+| Autonomía / concurrencia / fault injection | **59 / 59** (8 ficheros) |
+| Árbol antes y después | **limpio** |
+
+### Un transitorio que conviene contar
+
+Una corrida de la suite web dio **3 ficheros en rojo**. Fue la única que se lanzó
+**a la vez que el typechecker** en el mismo comando, violando la regla del propio
+proyecto: la puerta se ejecuta sola. No se reprodujo en cinco corridas
+posteriores —tres aisladas, una con saturación forzada a propósito y tres
+repeticiones de las suites nuevas—, y los nombres no se capturaron.
+
+Se registra tal cual: la explicación que encaja es la saturación de máquina que
+este proyecto ya documentó dos veces, pero **no se pudo confirmar sobre los
+ficheros concretos**. Los skips y los conteos de las corridas limpias son los de
+la tabla.
+
+### Los 25 skips de Python
+
+Los mismos auditados uno a uno en el Bloque 5, sin cambios: 12 exigen
+`NELVYON_WEB_CERT_DSN` (base que no existe aquí, parte de
+`WEB_DB_ROLE_CUTOVER`), 5 son conectores sin ruta declarada, 3 dependen de una
+base reconstruida solo con migraciones —las `575` y `576` están bloqueadas por
+ADR-064—, 2 son de la migración `571` apartada, 2 son listas de deuda **vacías**
+con control positivo, y 1 declara en voz alta que `workspace_members_invites` no
+existe en este entorno en vez de dar un verde silencioso.
+
+Las **68** de aislamiento son las de `WEB_DB_ROLE_CUTOVER`: la suite se niega
+ante un superusuario, y hace bien — RLS no se aplica a superusuarios.
+
 ## Producción y coste
 
 - **Producción: NO TOCADA.** Todo contra `nelvyon_cert545` local.
@@ -265,3 +304,5 @@ aislaron y el resto se certificó.
 
 **83 módulos · 0 huérfanos · 12 defectos corregidos en la causa · 21 mutaciones,
 todas caen.**
+
+SHA certificado: **`5352db46`**.

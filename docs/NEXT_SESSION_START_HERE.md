@@ -1,6 +1,6 @@
 # EMPIEZA AQUÍ
 
-Estado a **2026-08-25**. Rama `bloque4-webhooks`, worktree `C:\Users\Daniel\nelvyon-w3`.
+Estado a **2026-08-26**. Rama `bloque4-webhooks`, worktree `C:\Users\Daniel\nelvyon-w3`.
 
 ## Dónde estamos
 
@@ -11,6 +11,7 @@ Estado a **2026-08-25**. Rama `bloque4-webhooks`, worktree `C:\Users\Daniel\nelv
 | 3 · Empresa IA autónoma | **CERRADO** en `3feaaf24` → `docs/BLOQUE_3_CIERRE.md` |
 | 4 · Operación real | **CERRADO** en `cf43aeda` → `docs/BLOQUE_4_CIERRE.md` |
 | 5 · Producto medido y comparativa | **CERRADO** en `9a3841bc` → `docs/BLOQUE_5_CIERRE.md` |
+| 6 · Autonomía, resiliencia y recuperación | **CERRADO** en `5352db46` → `docs/BLOQUE_6_CIERRE.md` |
 
 El estado por capacidad se **genera**, no se escribe:
 
@@ -81,6 +82,56 @@ Está escrito, con las cuatro tandas y sus variables, en
 - **No confundas código muerto con producto.**
 - **No mates una suite por lenta si sigue progresando.** `test_rls_saas_cross_tenant.py`
   tarda ~14 minutos y no está colgada.
+
+## Bloque 6 — CERRADO
+
+`BLOQUE_6_EXECUTABLE = CLOSED`. **SHA certificado `5352db46`.**
+
+**8/8 capacidades operacionales · 6 `FIXED_CERTIFIED` + 2 `PASS_CERTIFIED` ·
+0 bloqueadas · 0 pendientes.** Contador: **8 + 0 + 0 = 8**.
+
+Denominador: `backend/db/certificacion/capacidades_operacionales.py` deriva
+**83 módulos de maquinaria autónoma en 8 categorías con 0 huérfanos**. Estado en
+`capacidades_operacionales_estado.json`.
+
+El guardián de este bloque exige algo que los anteriores no: **una capacidad
+certificada tiene que declarar qué fallo se le indujo**. Un verde que nunca se
+ha puesto rojo a propósito no certifica ninguna defensa.
+
+### Cómo se ejecutan sus pruebas
+
+    cd apps/web
+    NELVYON_PG_CERT_DSN=postgresql://...@127.0.0.1:5434/nelvyon_cert545       npx vitest run ../../backend/orchestrator/__tests__         ../../backend/queue/__tests__/elTrabajoVaradoVuelveALaCola.test.ts         ../../backend/mcp ../../backend/autonomous/llm ../../backend/autonomous/qa
+
+La de idempotencia va contra **PostgreSQL real** a propósito: la propiedad la
+sostiene la restricción de unicidad, y un doble en memoria probaría el doble.
+
+### Lo que este bloque enseñó
+
+- **Una mutación infiel no prueba nada, y es fácil escribirla.** Pasó tres
+  veces. Al reintroducir el reclamo no atómico lo serialicé sin querer y
+  «arreglé» el defecto al intentar reproducirlo. Si una mutación no cae, una de
+  las dos cosas está mal: la prueba o la mutación.
+- **Un negativo verde no certifica nada si la ejecución no alcanza la defensa.**
+  «Sin opt-in no se llama a OpenAI» pasaba porque el interruptor maestro y el
+  modo privado bloqueaban antes. Hubo que abrir las otras tres puertas para
+  aislar la que se estaba midiendo.
+- **Una aserción puede ser cierta y no discriminar.** Con un solo trabajo, la de
+  intentos salía verde con el defecto puesto; con cuatro devuelve `k1:2, k2:3`.
+- **Maquinaria sin llamante es maquinaria que no existe.** El `leaseUntil` del
+  orquestador se escribía y no lo leía nadie. Hay una prueba que comprueba que
+  arrancar el worker **barre** la lista, y cae si alguien borra la llamada.
+- **La puerta se ejecuta SOLA.** Lanzarla junto al typechecker produjo 3 rojos
+  que no se reprodujeron en cinco corridas posteriores.
+
+### Cambios de contrato que conviene conocer
+
+- `McpToolDef` tiene ahora `requiredScopes` **obligatorio en la práctica**: una
+  herramienta que no lo declare se deniega. Las 22 productivas lo declaran.
+- Los ámbitos amplios `mcp.read`, `mcp.write` y `workflows.execute` **siguen
+  valiendo**: son reales en las claves de API y sustituirlos habría roto en
+  silencio a quien ya tuviera una emitida.
+- `recoverJobsAfterRestart` ya **no** reencola `waiting_approval`.
 
 ## Bloque 5 — CERRADO
 
