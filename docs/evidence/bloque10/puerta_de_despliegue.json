@@ -2,8 +2,8 @@
   "resumen": {
     "automaticos_ok": 15,
     "automaticos_fallidos": 0,
-    "configuracion_puesta": 6,
-    "configuracion_faltante": 0,
+    "configuracion_puesta": 0,
+    "configuracion_faltante": 4,
     "decisiones_humanas": 8,
     "verificaciones_externas": 6
   },
@@ -101,38 +101,26 @@
     {
       "clase": "REQUIRED_CONFIGURATION",
       "id": "DATABASE_URL",
-      "estado": "PUESTA",
-      "detalle": "1 caracteres"
+      "estado": "FALTA",
+      "detalle": "sin base no hay producto"
     },
     {
       "clase": "REQUIRED_CONFIGURATION",
       "id": "JWT_SECRET",
-      "estado": "PUESTA",
-      "detalle": "56 caracteres"
+      "estado": "FALTA",
+      "detalle": "es la clave de las sesiones y de los enlaces de capacidad"
     },
     {
       "clase": "REQUIRED_CONFIGURATION",
       "id": "CRON_SECRET",
-      "estado": "PUESTA",
-      "detalle": "32 caracteres"
+      "estado": "FALTA",
+      "detalle": "sin ella las 16 rutas de cron cierran en falso y no corre nada"
     },
     {
       "clase": "REQUIRED_CONFIGURATION",
       "id": "SES_SNS_TOPIC_ARN",
-      "estado": "PUESTA",
-      "detalle": "25 caracteres"
-    },
-    {
-      "clase": "REQUIRED_CONFIGURATION",
-      "id": "JWT_SECRET_longitud",
-      "estado": "PUESTA",
-      "detalle": ">= 32"
-    },
-    {
-      "clase": "REQUIRED_CONFIGURATION",
-      "id": "CRON_SECRET_longitud",
-      "estado": "PUESTA",
-      "detalle": ">= 16"
+      "estado": "FALTA",
+      "detalle": "sin ella /api/webhooks/ses responde 503 en produccion"
     },
     {
       "clase": "BLOCKED_HUMAN_DECISION",

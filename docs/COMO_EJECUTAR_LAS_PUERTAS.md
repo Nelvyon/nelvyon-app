@@ -56,3 +56,51 @@ Aquellos 84 rojos no eran del producto — eran de haber lanzado a la vez dos co
 que compiten por el mismo PostgreSQL.
 
 Sin la variable, la suite se salta entera. Esa es la salvaguarda.
+
+## Las dos bases que hay que preparar (y que antes se saltaban 34 pruebas)
+
+### `migration523.pg.test.ts` — 18 pruebas
+
+Necesita una base **desechable con las migraciones aplicadas**:
+
+```
+docker exec nelvyon-local-ai-postgres psql -U nelvyon_local -d postgres \
+  -c "CREATE DATABASE nelvyon_recon_b9"
+DATABASE_URL=postgresql://nelvyon_local:nelvyon_local_dev@localhost:5434/nelvyon_recon_b9 \
+  node scripts/migrate-pg.mjs
+MIG523_TEST_DATABASE_URL=postgresql://nelvyon_local:nelvyon_local_dev@localhost:5434/nelvyon_recon_b9 \
+  npx vitest run ../../backend/db/__tests__/migration523.pg.test.ts
+```
+
+### `rlsIsolation.pg.test.ts` — 16 pruebas
+
+Necesita una base de local-ai **con rol NO superusuario**, y ahí hay un detalle
+que costó encontrar y conviene no volver a descubrir:
+
+> El esquema de local-ai se aprovisiona con `apply-local-ai-schema.mjs`, **fuera
+> de la cadena de migraciones**. Con solo ese script, `local_ai_audit`,
+> `local_ai_config` y `local_ai_ingest_jobs` se quedan **sin RLS** — porque quien
+> se la activa es la migración 567, que nunca corre contra esa base.
+>
+> Hay que aplicar **las dos cosas**: el script de esquema y después las
+> migraciones.
+
+```
+docker exec ... -c "CREATE DATABASE nelvyon_localai_cert"
+PGSSL=0 NELVYON_LOCAL_AI_USE_MAIN_DB=1 NELVYON_LOCAL_AI_SCHEMA_APPLY=1 \
+  DATABASE_URL=postgresql://nelvyon_local:nelvyon_local_dev@localhost:5434/nelvyon_localai_cert \
+  node scripts/apply-local-ai-schema.mjs
+PGSSL=0 NELVYON_LOCAL_AI_USE_MAIN_DB=1 NELVYON_LOCAL_AI_RLS_ROLE_APPLY=1 \
+  NELVYON_LOCAL_AI_APP_ROLE=nelvyon_local_app DATABASE_URL=...nelvyon_localai_cert \
+  node scripts/apply-local-ai-rls-role.mjs
+DATABASE_URL=...nelvyon_localai_cert node scripts/migrate-pg.mjs   # ← el paso que faltaba
+docker exec ... -d nelvyon_localai_cert -c "GRANT USAGE ON SCHEMA public TO nelvyon_local_app; GRANT ALL ON ALL TABLES IN SCHEMA public TO nelvyon_local_app;"
+LOCAL_AI_TEST_DATABASE_URL=postgresql://nelvyon_local_app:cert_local_b10@localhost:5434/nelvyon_localai_cert \
+  npx vitest run ../../backend/local-ai/__tests__/rlsIsolation.pg.test.ts
+```
+
+**Importante:** el rol tiene que ser **no superusuario y sin BYPASSRLS**. Con un
+superusuario, RLS no se aplica y la prueba certificaría el vacío. La propia suite
+lo comprueba antes de nada, que es exactamente lo que debe hacer.
+
+Con las dos bases preparadas, los saltos bajan de **44 a 10**.

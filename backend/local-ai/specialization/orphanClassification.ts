@@ -254,6 +254,8 @@ export const ORPHAN_CLASSIFICATION: readonly OrphanClassEntry[] = [
   { path: "docs/COMO_EJECUTAR_LAS_PUERTAS.md", disposition: "index", domain: "nelvyon", priority: 1, title: "Como ejecutar las puertas", sourceType: "official_doc", reason: "DSN y variables sin las cuales las suites se saltan en silencio" },
   { path: "docs/BLOQUE_9_CIERRE.md", disposition: "index", domain: "nelvyon", priority: 1, title: "Bloque 9 — cierre", sourceType: "official_doc", reason: "Operacion, observabilidad, restauracion certificada y deriva de esquema" },
   { path: "docs/BLOQUE_9_ESTADO.md", disposition: "index", domain: "nelvyon", priority: 2, title: "Bloque 9 — estado", reason: "Estado por familia de capacidad de operacion del bloque 9" },
+  { path: "docs/BLOQUE_10_CIERRE.md", disposition: "index", domain: "nelvyon", priority: 1, title: "Bloque 10 — certificacion integral final", sourceType: "official_doc", reason: "Certificacion transversal de todo NELVYON, recorrido E2E, puerta de despliegue ejecutable y estado real de lanzamiento" },
+  { path: "docs/ESTADO_DE_LANZAMIENTO.md", disposition: "index", domain: "nelvyon", priority: 1, title: "Estado de lanzamiento", sourceType: "official_doc", reason: "Lo certificado, lo que hace falta configurar, lo bloqueado y lo que exige verificacion externa" },
   { path: "docs/DECISION_WORKSPACE_ID.md", disposition: "index", domain: "nelvyon", priority: 1, title: "Decision pendiente — workspace derivado", sourceType: "official_doc", reason: "Estudio medido de la colision del workspace derivado y estrategia de migracion; decision humana bloqueada" },
 
   // —— Documentos vivos que estaban sin clasificar ——
