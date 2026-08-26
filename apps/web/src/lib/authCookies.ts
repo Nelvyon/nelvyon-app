@@ -8,7 +8,14 @@ export const NELVYON_AUTH_COOKIE = "nelvyon_token";
  */
 const MAX_AGE_SEC = 60 * 60 * 8;
 
-function isSecureContext(): boolean {
+/**
+ * Criterio UNICO de si la cookie va marcada `Secure`.
+ *
+ * Se exporta para que la cookie del nonce de OAuth use este y no una copia:
+ * dos criterios distintos acaban divergiendo, y el que diverge es siempre el
+ * de la ruta menos transitada.
+ */
+export function isSecureContext(): boolean {
   if (process.env.NODE_ENV === "production") return true;
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
   return appUrl.startsWith("https://");

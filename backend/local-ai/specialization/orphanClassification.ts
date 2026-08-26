@@ -247,6 +247,8 @@ export const ORPHAN_CLASSIFICATION: readonly OrphanClassEntry[] = [
   { path: "docs/BLOQUE_5_ESTADO.md", disposition: "index", domain: "nelvyon", priority: 2, title: "Bloque 5 — estado", reason: "Estado por categoria de producto del bloque 5" },
   { path: "docs/BLOQUE_6_CIERRE.md", disposition: "index", domain: "nelvyon", priority: 1, title: "Bloque 6 — cierre", sourceType: "official_doc", reason: "Certificacion de autonomia operacional: 83 modulos, 12 defectos de concurrencia/recuperacion/permisos y sus mutaciones" },
   { path: "docs/BLOQUE_6_ESTADO.md", disposition: "index", domain: "nelvyon", priority: 2, title: "Bloque 6 — estado", reason: "Estado por categoria operacional del bloque 6" },
+  { path: "docs/BLOQUE_7_CIERRE.md", disposition: "index", domain: "nelvyon", priority: 1, title: "Bloque 7 — cierre", sourceType: "official_doc", reason: "Auditoria ofensiva de extremo a extremo: 925 superficies atacables, ocho defectos reales corregidos, dos hallazgos que requieren decision humana, y la correccion del denominador que se dejaba fuera 396 rutas" },
+  { path: "docs/BLOQUE_7_ESTADO.md", disposition: "index", domain: "nelvyon", priority: 2, title: "Bloque 7 — estado", reason: "Estado por categoria de superficie atacable del bloque 7" },
 
   // —— Documentos vivos que estaban sin clasificar ——
   { path: "docs/DEVELOPER_ONBOARDING.md", disposition: "index", domain: "development_tech", priority: 2, title: "Developer Onboarding", sourceType: "runbook", reason: "Puesta en marcha del entorno para alguien que llega nuevo" },

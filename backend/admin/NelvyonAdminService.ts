@@ -138,22 +138,56 @@ function rowToTenant(r: TenantRow): AdminTenant {
 export class NelvyonAdminService {
   constructor(private readonly db: AdminDbPort) {}
 
+  /**
+   * ¿Es este usuario administrador de PLATAFORMA?
+   *
+   * Va a la base y NO mira el `role` del token, y eso es lo correcto: el token
+   * va firmado pero lo firmó NELVYON hace hasta ocho horas, así que degradar a
+   * alguien no surtiría efecto hasta que caducara.
+   *
+   * AVISO SOBRE EL ESTADO ACTUAL (Bloque 7): ninguna migración del árbol crea
+   * `os_users` ni añade `role` a `nelvyon_users`. Las dos consultas lanzan, los
+   * dos `catch` devuelven `false`, y hoy **nadie puede ser administrador de
+   * plataforma**. Cierra en falso, que es la dirección buena, pero deja muerta
+   * toda la superficie `admin/*`. Quién es administrador es una decisión de
+   * producto y no se toma desde aquí.
+   *
+   * Lo que sí se corrige es el diagnóstico: un esquema que falta se tragaba en
+   * silencio y se informaba como «no es administrador», indistinguible de una
+   * denegación legítima. Ahora se registra una vez, alto y claro. Se sigue
+   * denegando: hacer que un error de configuración conceda acceso sería
+   * exactamente el defecto contrario y mucho peor.
+   */
   async isUserAdmin(userId: string): Promise<boolean> {
+    let faltaEsquema = 0;
     try {
       const rows = await this.db.query<RoleRow>(`SELECT role FROM os_users WHERE id = $1 LIMIT 1`, [userId]);
       const role = rows[0]?.role;
       if (typeof role === "string" && role.toLowerCase() === "admin") return true;
     } catch {
-      // fallback below for installs without os_users
+      faltaEsquema++;
     }
     try {
       const rows = await this.db.query<RoleRow>(`SELECT role FROM nelvyon_users WHERE user_id = $1 LIMIT 1`, [userId]);
       const role = rows[0]?.role;
       return typeof role === "string" && role.toLowerCase() === "admin";
     } catch {
+      faltaEsquema++;
+      if (faltaEsquema === 2 && !NelvyonAdminService._avisoDeEsquemaDado) {
+        NelvyonAdminService._avisoDeEsquemaDado = true;
+        console.error(
+          "[NelvyonAdminService] ni `os_users.role` ni `nelvyon_users.role` existen: " +
+            "NADIE puede ser administrador de plataforma y toda la superficie admin/* " +
+            "responde 403. Se deniega (cierre en falso), pero esto es un problema de " +
+            "esquema, no una denegacion legitima.",
+        );
+      }
       return false;
     }
   }
+
+  /** Para que el aviso salga una vez y no por peticion. */
+  private static _avisoDeEsquemaDado = false;
 
   async getSystemStats(): Promise<SystemStats> {
     const [totalTenants, activeTenants, totalJobs, runningJobs, completedJobs, failedJobs, totalContacts, totalCampanias, totalWorkflows] =

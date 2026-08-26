@@ -38,7 +38,9 @@ export function hasScope(scopes: string[], required: string): boolean {
   return scopes.includes("*") || scopes.includes(required);
 }
 
-export async function resolvePublicApiKey(rawKey: string): Promise<{ tenantId: string; scopes: string[] } | null> {
+export async function resolvePublicApiKey(
+  rawKey: string,
+): Promise<{ tenantId: string; scopes: string[]; keyId: string; keyPrefix: string } | null> {
   try {
     // DbClient may throw if DATABASE_URL is unset — treat as invalid key (401), never 500.
     return await getSaasApiKeysService().verifyKey(rawKey);

@@ -81,10 +81,24 @@ export async function POST(req: Request) {
       kind: (body.kind as "fact") ?? "fact",
       layer: body.layer as "stm" | "ltm" | undefined,
       agentId: (body.agentId as string) ?? null,
-      userId: (body.userId as string) ?? ctx.claims.userId,
-      workspaceId: (body.workspaceId as string) ?? null,
+      // De la sesión y del inquilino verificado, nunca del cuerpo.
+      //
+      // `tenantId` ya salía de aquí, pero sus dos campos hermanos —los que
+      // dicen de quién es la entrada DENTRO del inquilino— salían del cliente.
+      // `userId` es filtro de búsqueda, así que aceptarlo dejaba escribir
+      // memoria que aparece en la búsqueda por usuario de otro; y el workspace
+      // es una unidad de aislamiento real cuya pertenencia aquí no se
+      // comprobaba. `agentId` sí es del cuerpo a propósito: acotar una entrada
+      // a un agente es para lo que existe el campo, y `authorizeRead` lo cierra.
+      userId: ctx.claims.userId,
+      workspaceId: ctx.tenant.workspaceId === null ? null : String(ctx.tenant.workspaceId),
       sessionId: (body.sessionId as string) ?? null,
-      key: String(body.key ?? "default"),
+      // Con tope. `key` llega del cuerpo y acaba dentro del contexto de un
+      // agente; sin limite, una sola entrada empuja el resto fuera de la
+      // ventana del modelo. La neutralizacion estructural vive en
+      // `AgentContextEngine.comoDato`, pero un campo sin tope tampoco tiene
+      // por que llegar hasta alli para que alguien se acuerde de acotarlo.
+      key: String(body.key ?? "default").slice(0, 200),
       title: typeof body.title === "string" ? body.title : "",
       content: String(body.content ?? ""),
       tags: Array.isArray(body.tags) ? (body.tags as string[]) : [],

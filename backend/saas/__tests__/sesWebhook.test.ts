@@ -171,6 +171,16 @@ describe("Delivery", () => {
 // â”€â”€â”€ SubscriptionConfirmation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 describe("SubscriptionConfirmation", () => {
+  /**
+   * BLOQUE 7 — el `SubscribeURL` de esta fixture era `https://sns.amazonaws.com/...`,
+   * sin region: nunca fue una URL que SNS emita de verdad. Lo era porque nadie
+   * la comprobaba, mientras su hermana `SigningCertURL` en esta misma fixture SI
+   * lleva region — porque a esa si se le aplicaba el patron.
+   *
+   * Ahora las dos pasan por el mismo patron anclado, asi que la fixture pasa a
+   * usar la forma real. Lo que se afirma —que se visita y responde
+   * `confirmed:true`— no se ha tocado.
+   */
   it("llama a SubscribeURL y responde confirmed:true", async () => {
     const fetchMock = vi.fn().mockResolvedValue({ ok: true });
     vi.stubGlobal("fetch", fetchMock);
@@ -186,7 +196,7 @@ describe("SubscriptionConfirmation", () => {
         SignatureVersion: "1",
         Signature: "test",
         SigningCertURL: "https://sns.us-east-1.amazonaws.com/cert.pem",
-        SubscribeURL: "https://sns.amazonaws.com/confirm?token=abc",
+        SubscribeURL: "https://sns.us-east-1.amazonaws.com/?Action=ConfirmSubscription&Token=abc",
         Token: "abc",
       }),
     });
@@ -195,7 +205,7 @@ describe("SubscriptionConfirmation", () => {
     const body = await res.json() as { ok: boolean; confirmed: boolean };
     expect(body.confirmed).toBe(true);
     expect(fetchMock).toHaveBeenCalledWith(
-      "https://sns.amazonaws.com/confirm?token=abc",
+      "https://sns.us-east-1.amazonaws.com/?Action=ConfirmSubscription&Token=abc",
       expect.any(Object),
     );
     vi.unstubAllGlobals();

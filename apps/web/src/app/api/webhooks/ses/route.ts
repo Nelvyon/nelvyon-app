@@ -45,10 +45,35 @@ type SesNotification = {
 // Cache fetched certificates in-process to avoid hammering AWS on every request
 const certCache = new Map<string, string>();
 
+/**
+ * URLs que de verdad sirve SNS. Anclada al principio y exigiendo la barra tras
+ * el dominio: sin la barra, `https://sns.eu-west-1.amazonaws.com.atacante.test/`
+ * y `...amazonaws.com@atacante.test/` pasarian.
+ *
+ * Se saca a constante porque el sobre trae DOS URLs —`SigningCertURL` y
+ * `SubscribeURL`— y solo se comprobaba una. Son la misma clase de dato.
+ */
+const URL_DE_SNS = /^https:\/\/sns\.[a-z0-9-]+\.amazonaws\.com\//;
+
+/**
+ * Topics cuyas notificaciones se aceptan (lista separada por comas).
+ *
+ * Sin esto, verificar la firma no sirve para identificar al remitente: AWS firma
+ * para todo el mundo, asi que cualquiera puede crear un topic en SU cuenta,
+ * apuntarlo aqui, y sus mensajes traeran una firma autentica y un certificado
+ * servido por AWS de verdad. Lo unico que separa el topic de NELVYON del de un
+ * desconocido es el `TopicArn`, que va dentro de la cadena firmada.
+ */
+function topicsPermitidos(): string[] {
+  return (process.env.SES_SNS_TOPIC_ARN ?? "")
+    .split(",")
+    .map((t) => t.trim())
+    .filter(Boolean);
+}
+
 async function fetchCert(url: string): Promise<string> {
   if (certCache.has(url)) return certCache.get(url)!;
-  // Only trust AWS SNS cert URLs
-  if (!/^https:\/\/sns\.[a-z0-9-]+\.amazonaws\.com\//.test(url)) {
+  if (!URL_DE_SNS.test(url)) {
     throw new Error(`Untrusted SigningCertURL: ${url}`);
   }
   const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
@@ -207,8 +232,28 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  // In production, always verify SNS signature. Skip only if SKIP_SNS_VERIFY=true (test env).
-  if (process.env.SKIP_SNS_VERIFY !== "true") {
+  const enProduccion = process.env.NODE_ENV === "production";
+
+  // La firma dice que el mensaje viene de AWS. NO dice de quien: eso lo dice el
+  // topic, y hay que compararlo con el nuestro.
+  const permitidos = topicsPermitidos();
+  if (permitidos.length === 0) {
+    if (enProduccion) {
+      // Cierre en falso y visible, como en la ruta hermana de WhatsApp. Callar
+      // aqui seria aceptar notificaciones de cualquier cuenta de AWS del mundo.
+      return NextResponse.json(
+        { error: "SES_SNS_TOPIC_ARN required in production" },
+        { status: 503 },
+      );
+    }
+  } else if (!permitidos.includes(envelope.TopicArn)) {
+    return NextResponse.json({ error: "Untrusted TopicArn" }, { status: 403 });
+  }
+
+  // El interruptor de pruebas no puede alcanzar produccion. Antes no miraba el
+  // entorno: una variable heredada de un fichero de pruebas dejaba el webhook
+  // abierto de par en par sin que nada lo delatara.
+  if (enProduccion || process.env.SKIP_SNS_VERIFY !== "true") {
     const valid = await verifySnsSignature(envelope).catch(() => false);
     if (!valid) {
       return NextResponse.json({ error: "Invalid SNS signature" }, { status: 403 });
@@ -217,6 +262,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
   // Auto-confirm SNS subscription
   if (envelope.Type === "SubscriptionConfirmation" && envelope.SubscribeURL) {
+    if (!URL_DE_SNS.test(envelope.SubscribeURL)) {
+      return NextResponse.json({ error: "Untrusted SubscribeURL" }, { status: 403 });
+    }
     await fetch(envelope.SubscribeURL, { signal: AbortSignal.timeout(5000) });
     return NextResponse.json({ ok: true, confirmed: true });
   }

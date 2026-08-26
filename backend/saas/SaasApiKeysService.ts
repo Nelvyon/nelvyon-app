@@ -111,11 +111,29 @@ export class SaasApiKeysService {
     if (!rows[0]) throw new SaasApiKeysError("API key not found", "NOT_FOUND");
   }
 
-  async verifyKey(rawKey: string): Promise<{ tenantId: string; scopes: string[] } | null> {
+  /**
+   * Verifica una clave y devuelve su identidad ESTABLE.
+   *
+   * `keyId` es el `id` de la fila, no un trozo de la clave. La version anterior
+   * no lo devolvia y quien llamaba se lo fabricaba cortando `rawKey.slice(0,20)`
+   * —`nlv_` mas dieciseis caracteres hexadecimales de la clave viva— que acababa
+   * persistido en `logUsage` y en el rastro de auditoria de MCP. Este mismo
+   * servicio ya guarda un `key_prefix` de DOCE caracteres para enseñarlo en la
+   * interfaz: la casa ya habia decidido cuanta clave es enseñable.
+   */
+  async verifyKey(
+    rawKey: string,
+  ): Promise<{ tenantId: string; scopes: string[]; keyId: string; keyPrefix: string } | null> {
     try {
       const keyHash = crypto.createHash("sha256").update(rawKey).digest("hex");
-      const rows = await this.db.query<{ tenant_id: string; scopes: string[]; expires_at: Date | string | null }>(
-        `SELECT tenant_id, scopes, expires_at FROM api_keys
+      const rows = await this.db.query<{
+        id: string;
+        tenant_id: string;
+        scopes: string[];
+        expires_at: Date | string | null;
+        key_prefix: string;
+      }>(
+        `SELECT id, tenant_id, scopes, expires_at, key_prefix FROM api_keys
        WHERE key_hash=$1 AND active=TRUE AND revoked_at IS NULL LIMIT 1`,
         [keyHash],
       );
@@ -125,7 +143,12 @@ export class SaasApiKeysService {
         `UPDATE api_keys SET last_used_at=NOW(), requests_total=requests_total+1 WHERE key_hash=$1`,
         [keyHash],
       );
-      return { tenantId: rows[0].tenant_id, scopes: rows[0].scopes };
+      return {
+        tenantId: rows[0].tenant_id,
+        scopes: rows[0].scopes,
+        keyId: String(rows[0].id),
+        keyPrefix: rows[0].key_prefix,
+      };
     } catch {
       return null;
     }

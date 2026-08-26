@@ -12,6 +12,37 @@ Estado a **2026-08-26**. Rama `bloque4-webhooks`, worktree `C:\Users\Daniel\nelv
 | 4 · Operación real | **CERRADO** en `cf43aeda` → `docs/BLOQUE_4_CIERRE.md` |
 | 5 · Producto medido y comparativa | **CERRADO** en `9a3841bc` → `docs/BLOQUE_5_CIERRE.md` |
 | 6 · Autonomía, resiliencia y recuperación | **CERRADO** en `5352db46` → `docs/BLOQUE_6_CIERRE.md` |
+| 7 · Seguridad ofensiva y abuso end-to-end | **CERRADO** en `SHA_BLOQUE_7` → `docs/BLOQUE_7_CIERRE.md` |
+
+**Bloque 7 · cerrado**: 12/12 categorías de superficie atacable, **925
+superficies** derivadas del árbol con 0 huérfanas. **Ocho defectos reales
+corregidos** y **dos hallazgos que requieren decisión humana** (§3 del cierre).
+44 mutaciones, 39 caen; las 5 que no, documentadas con su motivo.
+
+Inventario: `backend/db/certificacion/superficies_atacables.py`.
+Estado: `superficies_atacables_estado.json` → `docs/BLOQUE_7_ESTADO.md`.
+
+> **CORRECCIÓN DE DENOMINADOR.** El inventario arrancó en 531 superficies y
+> estaba mal por un 43 %: solo miraba `app/api/**/route.ts` y este árbol tiene
+> **también** el enrutador de páginas, con 396 rutas más bajo `pages/api/`. Si
+> alguien deriva un inventario nuevo, que mire los dos.
+
+> **REQUISITO DE DESPLIEGUE ANTES DEL SIGUIENTE `deploy`:** configurar
+> `SES_SNS_TOPIC_ARN`. Sin ella `/api/webhooks/ses` responde 503 en producción
+> —cierre en falso deliberado—. Antes de esa corrección, cualquiera con una
+> cuenta gratuita de AWS podía marcar como rebotados los destinatarios de las
+> campañas de cualquier inquilino.
+
+> **DOS DECISIONES ABIERTAS, no resueltas unilateralmente:**
+> 1. **Nadie puede ser administrador de plataforma.** `isUserAdmin` consulta
+>    `os_users.role` y `nelvyon_users.role`; ninguna existe en las migraciones.
+>    Toda la superficie `admin/*` responde 403 a cualquiera. Cierra en falso,
+>    pero decidir quién es administrador es una decisión de producto.
+> 2. **El workspace derivado colisiona.** `stableWorkspaceIdFromTenant` es un
+>    hash `% 900_000`: medido, 2.000 inquilinos dan 1,8 colisiones y 5.000 dan
+>    13,1. Cada colisión son dos inquilinos compartiendo la unidad de
+>    aislamiento aguas arriba. Cambiar la derivación deja huérfanos los datos
+>    guardados bajo el identificador viejo: es una migración, no un parche.
 
 El estado por capacidad se **genera**, no se escribe:
 

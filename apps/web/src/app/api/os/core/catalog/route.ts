@@ -26,7 +26,12 @@ export async function GET(req: Request) {
     const auth = getAuthService();
     const token =
       req.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ??
-      req.headers.get("cookie")?.match(/nelvyon_token=([^;]+)/)?.[1];
+      req.headers.get("cookie")?.match(/(?:^|;\s*)nelvyon_token=([^;]+)/)?.[1];
+    // Anclada al principio o a un `;`: sin eso, `xnelvyon_token=` casaba con
+    // la buena. No es explotable —haria falta un token firmado por NELVYON de
+    // todos modos— pero es la misma clase de defecto que si se probo en
+    // `AuthMiddleware`, y dos criterios distintos para la misma cookie acaban
+    // divergiendo.
     if (!token) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401, headers: NO_STORE });
     }

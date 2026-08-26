@@ -4,7 +4,13 @@ import {
   redirectIntegrationsError,
   redirectIntegrationsSuccess,
 } from "@/lib/integrations/oauthRedirect";
-export { createOAuthState, parseOAuthState } from "@/lib/integrations/oauthState";
+export {
+  aplicarCookieDeNonce,
+  crearEstadoOAuth,
+  limpiarCookieDeNonce,
+  parseOAuthState,
+  verificarNonceDelNavegador,
+} from "@/lib/integrations/oauthState";
 
 export async function finishOAuthCallback(
   origin: string,

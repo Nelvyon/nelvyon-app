@@ -32,7 +32,18 @@ export async function requirePublicApiContext(req: Request, requiredScope: strin
   }
 
   const { tenantId, scopes } = verified;
-  const keyId = rawKey.slice(0, 20);
+  // La identidad de la clave, no una rebanada de la clave.
+  //
+  // Esto era `rawKey.slice(0, 20)`: `nlv_` mas DIECISEIS caracteres hexadecimales
+  // del secreto vivo. Y no se quedaba aqui — viaja a `logUsage(...)`, que lo
+  // persiste, y al rastro de auditoria de MCP como identificador de usuario y de
+  // clave. El propio servicio guarda un `key_prefix` de DOCE caracteres para la
+  // interfaz: se estaba registrando mas clave de la que el producto enseña.
+  //
+  // No es explotable —quedan 128 bits— pero un trozo de credencial viva en los
+  // registros es un trozo de credencial viva en los registros, y la identidad
+  // estable de una clave ya existia: su `id`.
+  const keyId = verified.keyId;
 
   const allowed   = checkPublicApiRateLimit(keyId);
   const remaining = getRateLimitRemaining(keyId);

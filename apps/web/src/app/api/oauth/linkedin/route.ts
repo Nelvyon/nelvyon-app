@@ -4,7 +4,7 @@ import { authenticate } from "@/lib/auth";
 import { OsAgentError } from "@nelvyon/os-agents";
 
 import { LinkedInOAuthProvider } from "../../../../../../../backend/oauth/LinkedInOAuthProvider";
-import { createOAuthState } from "@/lib/integrations/oauthState";
+import { aplicarCookieDeNonce, crearEstadoOAuth } from "@/lib/integrations/oauthState";
 
 export const dynamic = 'force-dynamic';
 export const runtime = "nodejs";
@@ -12,9 +12,15 @@ export const runtime = "nodejs";
 export async function GET(req: Request) {
   try {
     const claims = await authenticate(req);
-    const state = createOAuthState(claims.userId);
+    // El `state` firmado dice quien EMPIEZA el flujo. La cookie del nonce
+    // es lo que permite comprobar en el callback que quien lo TERMINA es el
+    // mismo navegador; sin ella, un `state` legitimo enviado a la victima
+    // cuelga la cuenta del proveedor de la victima del atacante.
+    const { state, nonce } = crearEstadoOAuth(claims.userId);
     const url = new LinkedInOAuthProvider().getAuthUrl(state);
-    return NextResponse.redirect(url);
+    const res = NextResponse.redirect(url);
+    aplicarCookieDeNonce(res, nonce);
+    return res;
   } catch (e: unknown) {
     if (e instanceof OsAgentError && e.message === "Unauthorized") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
