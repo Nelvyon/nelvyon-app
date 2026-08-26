@@ -87,11 +87,32 @@ _IMPORTA_BD = ("DbClient", "@nelvyon/saas", "@nelvyon/os-agents",
                "@nelvyon/admin", "@nelvyon/billing")
 
 
+def _es_enrutada(f: pathlib.Path, base: pathlib.Path) -> bool:
+    """Next NO enruta ningun segmento que empiece por `_`.
+
+    Añadido en el Bloque 10 porque este guardian tomo un fichero de pruebas por
+    una ruta: `pages/api/os/__tests__/elCanalEnVivoDeOtroInquilino.test.ts`. Antes
+    no habia ningun `__tests__` bajo `pages/api`, asi que el hueco no se veia.
+
+    No es un ablande: `__tests__` empieza por `_`, asi que Next no lo sirve. Un
+    fichero que nadie puede llamar por HTTP no es una superficie. La misma regla
+    que ya usa `superficies_atacables.py` para su inventario.
+    """
+    rel = f.relative_to(base)
+    if any(parte.startswith("_") for parte in rel.parts):
+        return False
+    return not f.name.endswith((".test.ts", ".test.tsx", ".spec.ts", ".spec.tsx"))
+
+
 def _rutas() -> list[pathlib.Path]:
     fuera = []
     for base, es_app in ((WEB / "app" / "api", True), (WEB / "pages" / "api", False)):
         if base.exists():
-            fuera += [f for f in base.rglob("*.ts*") if not es_app or f.stem == "route"]
+            fuera += [
+                f
+                for f in base.rglob("*.ts*")
+                if (not es_app or f.stem == "route") and _es_enrutada(f, base)
+            ]
     return fuera
 
 

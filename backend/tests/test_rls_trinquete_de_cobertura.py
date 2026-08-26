@@ -92,7 +92,16 @@ pytestmark = [
 #:   (la cuarta varia segun el estado de la base de certificacion)
 #:
 #: Protegerlas hoy no las aseguraria: las volveria invisibles.
-DEUDA_MAXIMA = 4
+#:
+#: BLOQUE 10 · el trinquete se aprieta de 4 a 2.
+#: Al aplicar las migraciones pendientes a la base de certificacion, dos de las
+#: cuatro pasaron a tener RLS. Quedan `client_memory` y `saas_tenants`.
+#:
+#: `saas_tenants` no baja de aqui por si sola, y el motivo esta medido: la
+#: migracion 567 activa RLS SOLO sobre tablas VACIAS, y esa tiene filas. Ver
+#: RLS_SAAS_TENANTS_SOBRE_TABLA_CON_DATOS en decisiones_y_bloqueos.json — es una
+#: decision humana, no una tarea pendiente.
+DEUDA_MAXIMA = 2
 
 #: Margen cero a proposito. Un trinquete con holgura deja de ser un trinquete: la
 #: holgura se consume y nadie se entera.

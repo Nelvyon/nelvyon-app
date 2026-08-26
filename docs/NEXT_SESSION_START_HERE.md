@@ -15,6 +15,7 @@ Estado a **2026-08-26**. Rama `bloque4-webhooks`, worktree `C:\Users\Daniel\nelv
 | 7 · Seguridad ofensiva y abuso end-to-end | **CERRADO** en `c33b9939` → `docs/BLOQUE_7_CIERRE.md` |
 | 8 · Rendimiento, carga y concurrencia | **CERRADO** en `efb27997` → `docs/BLOQUE_8_CIERRE.md` |
 | 9 · Operación, observabilidad y recuperación | **CERRADO** en `87304e68` → `docs/BLOQUE_9_CIERRE.md` |
+| 10 · Certificación integral final | **CERRADO** en `SHA_B10` → `docs/BLOQUE_10_CIERRE.md` |
 
 **Bloque 7 · cerrado**: 12/12 categorías de superficie atacable, **925
 superficies** derivadas del árbol con 0 huérfanas. **Ocho defectos reales
@@ -45,6 +46,19 @@ Estado: `superficies_atacables_estado.json` → `docs/BLOQUE_7_ESTADO.md`.
 >    13,1. Cada colisión son dos inquilinos compartiendo la unidad de
 >    aislamiento aguas arriba. Cambiar la derivación deja huérfanos los datos
 >    guardados bajo el identificador viejo: es una migración, no un parche.
+
+**LEE ESTO PRIMERO: `docs/ESTADO_DE_LANZAMIENTO.md`.** Cuatro listas separadas —
+lo CERTIFICADO, lo que HACE FALTA CONFIGURAR, lo BLOQUEADO por ti, y lo que exige
+VERIFICACIÓN EXTERNA. Se comprueba sola:
+
+    node scripts/puerta-de-despliegue.mjs
+
+Salida 0 = todo lo comprobable en verde · 1 = falta configuración · 2 = una
+defensa ha desaparecido del árbol.
+
+**Antes de ejecutar cualquier puerta, lee `docs/COMO_EJECUTAR_LAS_PUERTAS.md`.**
+Sin las variables que documenta, decenas de pruebas **se saltan en silencio**, y
+un salto no es un aprobado. Con ellas, los saltos bajan de 96 a 10.
 
 El estado por capacidad se **genera**, no se escribe:
 

@@ -212,7 +212,7 @@ def _rhs_seguro(texto: str, rhs: str, profundidad: int = 1) -> bool:
     if not interpoladas:
         return bool(_trozo_seguro(rhs) or _ternario_de_literales(rhs))
     for e in interpoladas:
-        if re.match(r"^[A-Z][A-Z0-9_]*", e):
+        if re.match(r"^[A-Z][A-Z0-9_]*\b", e):
             continue  # cadena de metodos sobre una constante de modulo
         j = re.match(r"^([\w$]+(?:\.[\w$]+)*)\.join\(", e)
         if j:
@@ -345,9 +345,6 @@ IDENTIFICADORES_JUSTIFICADOS: dict[str, str] = {
     'apps/web/src/lib/portal/portalProjectsStore.ts::searchFilter': (
         "misma forma que en portalDeliverablesStore."
     ),
-    'backend/saas/SaasWebBuilderService.ts::SELECT_PAGE.split(",").map(c => "p." + c.trim()).join(",")': (
-        "reescribe la lista de columnas de la constante SELECT_PAGE poniendole el alias `p.`. Todo sale de una constante del modulo; no hay entrada."
-    ),
 }
 
 
@@ -366,7 +363,7 @@ def _pendiente_de_lectura(fichero: str, expr: str) -> bool:
     if _tiene_forma_segura(expr) or _ternario_de_literales(expr):
         return False
     texto = _texto(RAIZ / fichero)
-    if re.match(r"^[A-Z][A-Z0-9_]*", expr):
+    if re.match(r"^[A-Z][A-Z0-9_]*\b", expr):
         return False  # cadena de metodos sobre una constante de modulo
     j = re.match(r"^([\w$]+(?:\.[\w$]+)*)\.join\(", expr)
     if j and _lista_de_fragmentos_segura(texto, j.group(1)):

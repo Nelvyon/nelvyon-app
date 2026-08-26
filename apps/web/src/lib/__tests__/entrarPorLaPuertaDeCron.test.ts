@@ -22,9 +22,19 @@ import { verifyCronBearer, verifyCronFlexible, verifyCronHeader } from "../cronA
 
 const SECRETO = "secreto-de-cron-de-certificacion-bloque-7-largo";
 
-const original = process.env.CRON_SECRET;
+/**
+ * El valor previo se captura DENTRO del hook, no al cargar el fichero.
+ *
+ * Vitest reparte varios ficheros por worker y comparte el proceso. Capturar
+ * `process.env.CRON_SECRET` en la carga congela lo que dejara OTRO fichero del
+ * mismo worker, y al restaurar se le devuelve ese valor ajeno — no el que habia
+ * antes de esta suite. Lo destapo `test_tests_no_capturan_env_al_cargar.py`, un
+ * guardian de un bloque anterior, sobre codigo escrito esta noche.
+ */
+let original: string | undefined;
 
 beforeEach(() => {
+  original = process.env.CRON_SECRET;
   process.env.CRON_SECRET = SECRETO;
 });
 
