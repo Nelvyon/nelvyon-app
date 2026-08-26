@@ -252,6 +252,8 @@ export const ORPHAN_CLASSIFICATION: readonly OrphanClassEntry[] = [
   { path: "docs/BLOQUE_8_CIERRE.md", disposition: "index", domain: "nelvyon", priority: 1, title: "Bloque 8 — cierre", sourceType: "official_doc", reason: "Rendimiento, carga y concurrencia: 1367 puntos de escalado medidos, plazos del pool, cotas de listado e idempotencia bajo concurrencia real" },
   { path: "docs/BLOQUE_8_ESTADO.md", disposition: "index", domain: "nelvyon", priority: 2, title: "Bloque 8 — estado", reason: "Estado por clase de punto de escalado del bloque 8" },
   { path: "docs/COMO_EJECUTAR_LAS_PUERTAS.md", disposition: "index", domain: "nelvyon", priority: 1, title: "Como ejecutar las puertas", sourceType: "official_doc", reason: "DSN y variables sin las cuales las suites se saltan en silencio" },
+  { path: "docs/BLOQUE_9_CIERRE.md", disposition: "index", domain: "nelvyon", priority: 1, title: "Bloque 9 — cierre", sourceType: "official_doc", reason: "Operacion, observabilidad, restauracion certificada y deriva de esquema" },
+  { path: "docs/BLOQUE_9_ESTADO.md", disposition: "index", domain: "nelvyon", priority: 2, title: "Bloque 9 — estado", reason: "Estado por familia de capacidad de operacion del bloque 9" },
   { path: "docs/DECISION_WORKSPACE_ID.md", disposition: "index", domain: "nelvyon", priority: 1, title: "Decision pendiente — workspace derivado", sourceType: "official_doc", reason: "Estudio medido de la colision del workspace derivado y estrategia de migracion; decision humana bloqueada" },
 
   // —— Documentos vivos que estaban sin clasificar ——

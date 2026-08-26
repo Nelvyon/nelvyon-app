@@ -40,3 +40,19 @@ mida la frontera de verdad y no la del superusuario.
 Los dos casos de `rls.test.ts` no se pueden ejecutar en local por definición:
 comprueban la RLS del Supabase gestionado. Quedan clasificados como verificación
 externa, no como cobertura pendiente.
+
+## La suite de recuperación corre A SOLAS
+
+`perderPostgresYVolver.pg.test.ts` **para y arranca el contenedor de PostgreSQL**.
+Se ejecuta solo con:
+
+```
+NELVYON_PERMITIR_REINICIO_PG=1 CERT_PG_CONTAINER=nelvyon-local-ai-postgres   npx vitest run ../../backend/db/__tests__/perderPostgresYVolver.pg.test.ts
+```
+
+**Nunca junto al resto.** Se comprobó: lanzándola con el directorio entero, el
+reinicio tumbó **84 pruebas** de otras suites que estaban a mitad de una consulta.
+Aquellos 84 rojos no eran del producto — eran de haber lanzado a la vez dos cosas
+que compiten por el mismo PostgreSQL.
+
+Sin la variable, la suite se salta entera. Esa es la salvaguarda.

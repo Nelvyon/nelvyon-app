@@ -14,7 +14,7 @@
     {
       "paso": "sembrar_inquilino_real",
       "ok": true,
-      "tenantId": "bd033dfb-7b4d-49c5-b512-8431646fab56",
+      "tenantId": "268b8fee-9002-47a0-bfb2-9641b3a708af",
       "contactos": 250
     },
     {
@@ -26,10 +26,10 @@
     {
       "paso": "estructura_del_origen",
       "ok": true,
-      "tablas": "714",
-      "restricciones": "1334",
-      "indices": "2302",
-      "politicas_rls": "2108"
+      "tablas": "715",
+      "restricciones": "1335",
+      "indices": "2303",
+      "politicas_rls": "2117"
     },
     {
       "paso": "pg_dump",
@@ -39,7 +39,7 @@
     {
       "paso": "el_volcado_no_esta_vacio",
       "ok": true,
-      "bytes": "3541285"
+      "bytes": "3549143"
     },
     {
       "paso": "crear_base_destino",
@@ -61,26 +61,26 @@
     {
       "paso": "vuelven_las_tablas",
       "ok": true,
-      "origen": "714",
-      "destino": "714"
+      "origen": "715",
+      "destino": "715"
     },
     {
       "paso": "vuelven_las_restricciones",
       "ok": true,
-      "origen": "1334",
-      "destino": "1334"
+      "origen": "1335",
+      "destino": "1335"
     },
     {
       "paso": "vuelven_los_indices",
       "ok": true,
-      "origen": "2302",
-      "destino": "2302"
+      "origen": "2303",
+      "destino": "2303"
     },
     {
       "paso": "vuelven_las_politicas_rls",
       "ok": true,
-      "origen": "2108",
-      "destino": "2108"
+      "origen": "2117",
+      "destino": "2117"
     },
     {
       "paso": "la_clave_foranea_sigue_restringiendo",

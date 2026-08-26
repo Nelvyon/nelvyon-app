@@ -27,7 +27,7 @@ pnpm exec cross-env PORT=3010 next dev -p 3010 -H 127.0.0.1
 cd apps/web
 set PLAYWRIGHT_BASE_URL=http://127.0.0.1:3010
 pnpm exec playwright test --config playwright.marketing-shots.config.ts
-node ./scripts/optimize-saas-shots.mjs
+node apps/web/scripts/optimize-saas-shots.mjs
 ```
 
 Fixtures: `e2e/saas/marketingDemoData.ts`  
