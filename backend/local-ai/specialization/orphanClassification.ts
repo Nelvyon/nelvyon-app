@@ -256,6 +256,7 @@ export const ORPHAN_CLASSIFICATION: readonly OrphanClassEntry[] = [
   { path: "docs/BLOQUE_9_ESTADO.md", disposition: "index", domain: "nelvyon", priority: 2, title: "Bloque 9 — estado", reason: "Estado por familia de capacidad de operacion del bloque 9" },
   { path: "docs/BLOQUE_10_CIERRE.md", disposition: "index", domain: "nelvyon", priority: 1, title: "Bloque 10 — certificacion integral final", sourceType: "official_doc", reason: "Certificacion transversal de todo NELVYON, recorrido E2E, puerta de despliegue ejecutable y estado real de lanzamiento" },
   { path: "docs/ESTADO_DE_LANZAMIENTO.md", disposition: "index", domain: "nelvyon", priority: 1, title: "Estado de lanzamiento", sourceType: "official_doc", reason: "Lo certificado, lo que hace falta configurar, lo bloqueado y lo que exige verificacion externa" },
+  { path: "docs/INFORME_NOCTURNO_BLOQUES_8_9_10.md", disposition: "index", domain: "nelvyon", priority: 1, title: "Informe nocturno bloques 8-10", sourceType: "official_doc", reason: "SHAs, defectos, mediciones, mutaciones y puertas de la ejecucion de los bloques 8, 9 y 10" },
   { path: "docs/DECISION_WORKSPACE_ID.md", disposition: "index", domain: "nelvyon", priority: 1, title: "Decision pendiente — workspace derivado", sourceType: "official_doc", reason: "Estudio medido de la colision del workspace derivado y estrategia de migracion; decision humana bloqueada" },
 
   // —— Documentos vivos que estaban sin clasificar ——
