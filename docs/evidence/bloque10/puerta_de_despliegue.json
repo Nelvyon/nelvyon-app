@@ -1,0 +1,222 @@
+{
+  "resumen": {
+    "automaticos_ok": 15,
+    "automaticos_fallidos": 0,
+    "configuracion_puesta": 6,
+    "configuracion_faltante": 0,
+    "decisiones_humanas": 8,
+    "verificaciones_externas": 6
+  },
+  "filas": [
+    {
+      "clase": "AUTOMATIC_PASS",
+      "id": "ses_cierra_en_falso_sin_topic",
+      "estado": "PASA",
+      "detalle": "apps/web/src/app/api/webhooks/ses/route.ts"
+    },
+    {
+      "clase": "AUTOMATIC_PASS",
+      "id": "ses_comprueba_el_topic",
+      "estado": "PASA",
+      "detalle": "apps/web/src/app/api/webhooks/ses/route.ts"
+    },
+    {
+      "clase": "AUTOMATIC_PASS",
+      "id": "oauth_ata_el_flujo_al_navegador",
+      "estado": "PASA",
+      "detalle": "apps/web/src/lib/integrations/oauthState.ts"
+    },
+    {
+      "clase": "AUTOMATIC_PASS",
+      "id": "el_websocket_exige_sesion",
+      "estado": "PASA",
+      "detalle": "apps/web/src/pages/api/os/ws.ts"
+    },
+    {
+      "clase": "AUTOMATIC_PASS",
+      "id": "el_contexto_de_agente_va_delimitado",
+      "estado": "PASA",
+      "detalle": "backend/private-ai/context/AgentContextEngine.ts"
+    },
+    {
+      "clase": "AUTOMATIC_PASS",
+      "id": "el_pool_tiene_plazo_de_sentencia",
+      "estado": "PASA",
+      "detalle": "backend/db/DbClient.ts"
+    },
+    {
+      "clase": "AUTOMATIC_PASS",
+      "id": "la_guarda_de_salida_mira_dentro_de_la_ipv6",
+      "estado": "PASA",
+      "detalle": "backend/saas/safeEgressUrl.ts"
+    },
+    {
+      "clase": "AUTOMATIC_PASS",
+      "id": "la_sonda_de_vida_no_toca_la_base",
+      "estado": "PASA",
+      "detalle": "apps/web/src/app/api/health/live/route.ts"
+    },
+    {
+      "clase": "AUTOMATIC_PASS",
+      "id": "existe_la_certificacion_de_restauracion",
+      "estado": "PASA",
+      "detalle": "scripts/certificar-restauracion.mjs"
+    },
+    {
+      "clase": "AUTOMATIC_PASS",
+      "id": "existe_el_detector_de_deriva",
+      "estado": "PASA",
+      "detalle": "scripts/detectar-deriva-de-esquema.mjs"
+    },
+    {
+      "clase": "AUTOMATIC_PASS",
+      "id": "existe_el_runner_de_migraciones",
+      "estado": "PASA",
+      "detalle": "scripts/migrate-pg.mjs"
+    },
+    {
+      "clase": "AUTOMATIC_PASS",
+      "id": "existe_el_registro_de_bloqueos",
+      "estado": "PASA",
+      "detalle": "backend/db/certificacion/decisiones_y_bloqueos.json"
+    },
+    {
+      "clase": "AUTOMATIC_PASS",
+      "id": "existe_la_receta_de_las_puertas",
+      "estado": "PASA",
+      "detalle": "docs/COMO_EJECUTAR_LAS_PUERTAS.md"
+    },
+    {
+      "clase": "AUTOMATIC_PASS",
+      "id": "inventario_superficies_sin_huerfanas",
+      "estado": "PASA",
+      "detalle": "huerfanas: 0"
+    },
+    {
+      "clase": "AUTOMATIC_PASS",
+      "id": "inventario_escalado_sin_huerfanos",
+      "estado": "PASA",
+      "detalle": "huerfanos: 0"
+    },
+    {
+      "clase": "REQUIRED_CONFIGURATION",
+      "id": "DATABASE_URL",
+      "estado": "PUESTA",
+      "detalle": "1 caracteres"
+    },
+    {
+      "clase": "REQUIRED_CONFIGURATION",
+      "id": "JWT_SECRET",
+      "estado": "PUESTA",
+      "detalle": "56 caracteres"
+    },
+    {
+      "clase": "REQUIRED_CONFIGURATION",
+      "id": "CRON_SECRET",
+      "estado": "PUESTA",
+      "detalle": "32 caracteres"
+    },
+    {
+      "clase": "REQUIRED_CONFIGURATION",
+      "id": "SES_SNS_TOPIC_ARN",
+      "estado": "PUESTA",
+      "detalle": "25 caracteres"
+    },
+    {
+      "clase": "REQUIRED_CONFIGURATION",
+      "id": "JWT_SECRET_longitud",
+      "estado": "PUESTA",
+      "detalle": ">= 32"
+    },
+    {
+      "clase": "REQUIRED_CONFIGURATION",
+      "id": "CRON_SECRET_longitud",
+      "estado": "PUESTA",
+      "detalle": ">= 16"
+    },
+    {
+      "clase": "BLOCKED_HUMAN_DECISION",
+      "id": "PLATFORM_ADMIN_MODEL",
+      "estado": "PENDIENTE",
+      "detalle": "Nadie puede ser administrador de plataforma"
+    },
+    {
+      "clase": "BLOCKED_HUMAN_DECISION",
+      "id": "STABLE_WORKSPACE_ID_MIGRATION",
+      "estado": "PENDIENTE",
+      "detalle": "El workspace derivado del inquilino colisiona"
+    },
+    {
+      "clase": "BLOCKED_HUMAN_DECISION",
+      "id": "WEB_DB_ROLE_CUTOVER",
+      "estado": "PENDIENTE",
+      "detalle": "El lado web se conecta con un rol que evita las politicas RLS"
+    },
+    {
+      "clase": "BLOCKED_HUMAN_DECISION",
+      "id": "ADR-064",
+      "estado": "PENDIENTE",
+      "detalle": "Decision de arquitectura pendiente de firma"
+    },
+    {
+      "clase": "BLOCKED_HUMAN_DECISION",
+      "id": "STRIPE_MEMBERSHIP_REACTIVATION",
+      "estado": "PENDIENTE",
+      "detalle": "Reactivacion de membresias en Stripe"
+    },
+    {
+      "clase": "BLOCKED_HUMAN_DECISION",
+      "id": "INVOICING_AB_TESTING_SERVICES",
+      "estado": "PENDIENTE",
+      "detalle": "InvoicingService y ABTestingService"
+    },
+    {
+      "clase": "BLOCKED_HUMAN_DECISION",
+      "id": "CRM_EMAIL_VALIDATION",
+      "estado": "PENDIENTE",
+      "detalle": "Validacion de email invalido en CRM"
+    },
+    {
+      "clase": "BLOCKED_HUMAN_DECISION",
+      "id": "RLS_SAAS_TENANTS_SOBRE_TABLA_CON_DATOS",
+      "estado": "PENDIENTE",
+      "detalle": "Cuatro politicas RLS de saas_tenants no llegan a una base con datos"
+    },
+    {
+      "clase": "EXTERNAL_VERIFICATION_REQUIRED",
+      "id": "rls_del_supabase_gestionado",
+      "estado": "PENDIENTE",
+      "detalle": "los 2 casos de rls.test.ts exigen Supabase en vivo (RUN_SUPABASE_RLS=1)"
+    },
+    {
+      "clase": "EXTERNAL_VERIFICATION_REQUIRED",
+      "id": "deriva_de_esquema_en_produccion",
+      "estado": "PENDIENTE",
+      "detalle": "ejecutar detectar-deriva-de-esquema.mjs contra la base de produccion"
+    },
+    {
+      "clase": "EXTERNAL_VERIFICATION_REQUIRED",
+      "id": "colision_de_workspace_en_produccion",
+      "estado": "PENDIENTE",
+      "detalle": "ejecutar la deteccion de STABLE_WORKSPACE_ID_MIGRATION contra produccion"
+    },
+    {
+      "clase": "EXTERNAL_VERIFICATION_REQUIRED",
+      "id": "restauracion_desde_el_backup_real",
+      "estado": "PENDIENTE",
+      "detalle": "el simulacro corre en local; el backup de produccion hay que restaurarlo una vez"
+    },
+    {
+      "clase": "EXTERNAL_VERIFICATION_REQUIRED",
+      "id": "entrega_de_correo_real",
+      "estado": "PENDIENTE",
+      "detalle": "SES en produccion: solo se comprueba enviando"
+    },
+    {
+      "clase": "EXTERNAL_VERIFICATION_REQUIRED",
+      "id": "webhooks_de_stripe_en_vivo",
+      "estado": "PENDIENTE",
+      "detalle": "la firma se certifica en local; la entrega real no"
+    }
+  ]
+}
