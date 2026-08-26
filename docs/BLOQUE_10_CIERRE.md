@@ -137,3 +137,59 @@ Lo que **sigue** saltándose está clasificado, no ignorado:
   nueva de esta noche.
 - **No declaró nada listo sin condiciones.** El estado real está en
   `docs/ESTADO_DE_LANZAMIENTO.md`, con sus cuatro listas separadas.
+
+---
+
+## 7. Los cuatro fallos que encontró correr Python entero
+
+La suite Python completa tarda **46 minutos** y son 3 735 pruebas. Se corrió
+entera, no por muestreo, y encontró **cuatro fallos**. Los cuatro eran guardianes
+de bloques anteriores reaccionando a trabajo de esta noche — exactamente para lo
+que existen.
+
+### 7.1 · Un retroceso literal que cegaba una regla mía
+
+`test_lo_que_entra_de_fuera_no_construye_codigo.py` tenía un byte **0x08**
+(retroceso) donde debía ir `\b`. Mi patrón de «constante con cadena de métodos»
+terminaba en un carácter de control, así que **no casaba nunca**.
+
+Es exactamente la clase de defecto contra la que llevo tres bloques avisando: una
+regla cegada que sigue en verde. Y lo cometi DOS VECES: al escribir este mismo
+parrafo volvi a poner un retroceso en vez de la secuencia de escape, y tuve que
+corregirlo. Por eso el guardian existe y por eso no basta con tener cuidado. La cazó un guardián del Bloque 5 escrito para
+esto (`test_guardia_de_roles.py`), no yo.
+
+Y al corregirlo, la regla empezó a funcionar — con lo que una de mis
+justificaciones escritas a mano pasó a sobrar, y el guardián de excusas muertas
+también lo dijo. Las dos direcciones.
+
+### 7.2 · Captura de entorno al cargar el fichero
+
+`entrarPorLaPuertaDeCron.test.ts` capturaba `process.env.CRON_SECRET` fuera de un
+hook. Vitest reparte varios ficheros por *worker*: lo que se congela en la carga
+es lo que dejó **otro fichero del mismo worker**, no lo que había antes de esta
+suite. Movido dentro de `beforeEach`.
+
+### 7.3 · Un falso positivo del guardián de rutas
+
+Tomaba mi fichero `pages/api/os/__tests__/…test.ts` por una ruta de API. Next
+**no enruta ningún segmento que empiece por `_`**, así que `__tests__` no es una
+superficie — es la misma regla que `superficies_atacables.py` ya usaba.
+
+No es un ablande: es un fichero que nadie puede llamar por HTTP. Antes de esta
+noche no había ningún `__tests__` bajo `pages/api`, así que el hueco del guardián
+nunca se había visto.
+
+### 7.4 · Un trinquete que exigía apretarse
+
+`test_rls_trinquete_de_cobertura.py` falló con: *«la deuda bajó a 2: actualiza
+`DEUDA_MAXIMA` para que el trinquete siga apretado»*.
+
+Al aplicar las migraciones pendientes a la base de certificación, dos de las
+cuatro tablas sin RLS pasaron a tenerla. El trinquete **exige registrar las
+bajadas** — si no, la holgura se acumula y deja de ser un trinquete. Apretado de
+4 a 2.
+
+Las dos que quedan son `client_memory` y `saas_tenants`. La segunda no baja sola,
+y su motivo está medido: la migración 567 y su guarda de tabla vacía (§2 del
+Bloque 9).
