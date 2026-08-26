@@ -13,7 +13,13 @@ NELVYON_PG_CERT_DSN=postgresql://nelvyon_local:nelvyon_local_dev@localhost:5434/
 NELVYON_WEB_CERT_DSN=postgresql://nelvyon_local:nelvyon_local_dev@localhost:5434/nelvyon_web_cert
 NELVYON_WEB_APP_CERT_DSN=postgresql://nelvyon_web_app:cert_local_b8@localhost:5434/nelvyon_web_cert
 NELVYON_B2_DSN=postgresql://nelvyon_local:nelvyon_local_dev@localhost:5434/nelvyon_b2_cert
+NELVYON_B3_DSN=postgresql://nelvyon_local:nelvyon_local_dev@localhost:5434/nelvyon_b2_cert
+NELVYON_B4_DSN=postgresql://nelvyon_local:nelvyon_local_dev@localhost:5434/nelvyon_b2_cert
 ```
+
+Con `NELVYON_B3_DSN` y `NELVYON_B4_DSN` puestas se ejecutan **54 pruebas más** que
+antes se saltaban: memoria y RAG, idempotencia distribuida, derechos del titular
+(GDPR), tareas programadas y la espina de agentes.
 
 `NELVYON_WEB_APP_CERT_DSN` usa el rol **`nelvyon_web_app`**, que es el que SÍ está
 sujeto a las políticas RLS. Es lo que hace que la suite de aislamiento efectivo

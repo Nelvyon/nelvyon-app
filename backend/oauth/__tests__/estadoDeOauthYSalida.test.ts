@@ -48,28 +48,46 @@ function fabricar(carga: unknown, secreto = SECRETO): string {
 const A = "usuario-a-11111111";
 const B = "usuario-b-22222222";
 
+/**
+ * NOTA DEL BLOQUE 8 · por que cambio la llamada y no las afirmaciones.
+ *
+ * El Bloque 7 encontro que el `state` firmado prueba quien EMPIEZA el flujo pero
+ * no quien lo TERMINA, y ato el flujo al navegador con un nonce. Para que
+ * ninguna ruta pudiera quedarse en la version vulnerable, `createOAuthState`
+ * DESAPARECIO: ahora es `crearEstadoOAuth(userId)`, que devuelve `{ state, nonce }`.
+ *
+ * Esta suite llamaba a la funcion vieja y se rompio. Se ha cambiado LA LLAMADA y
+ * nada mas: todo lo que afirma —que el `state` lleva su usuario, que reescribirlo
+ * invalida la firma, que otro secreto no vale, que caduca— sigue siendo cierto y
+ * sigue comprobandose igual. La propiedad del Bloque 4 no se ha relajado; se ha
+ * conservado a traves de un cambio de API que la reforzo.
+ *
+ * Que este fallo apareciera en la puerta del Bloque 8 y no en la del 7 es un
+ * fallo de aquella puerta: se corrio sobre las zonas tocadas y no sobre el arbol
+ * entero. Queda anotado.
+ */
 describe("BLOQUE 4 · state de OAuth", () => {
   it("EL CONTROL: un state recién creado verifica y trae su usuario", async () => {
     // Sin esto, una verificación que rechazara todo pasaría las pruebas de abajo
     // y dejaría a nadie capaz de conectar una cuenta.
-    const { createOAuthState, parseOAuthState } = await modulo();
-    const s = createOAuthState(A);
+    const { crearEstadoOAuth, parseOAuthState } = await modulo();
+    const s = crearEstadoOAuth(A).state;
     expect(parseOAuthState(s)?.userId).toBe(A);
   });
 
   it("A NO puede terminar una autorización iniciada por B", async () => {
     // La propiedad central. Si el `state` no llevara el usuario, quien
     // interceptara la vuelta de B podría conectar la cuenta de B a su inquilino.
-    const { createOAuthState, parseOAuthState } = await modulo();
-    const deB = createOAuthState(B);
+    const { crearEstadoOAuth, parseOAuthState } = await modulo();
+    const deB = crearEstadoOAuth(B).state;
     expect(parseOAuthState(deB)?.userId).toBe(B);
     expect(parseOAuthState(deB)?.userId).not.toBe(A);
   });
 
   it("cambiar el usuario dentro del state INVALIDA la firma", async () => {
     // El ataque directo: coger el propio state y reescribir a quién pertenece.
-    const { createOAuthState, parseOAuthState } = await modulo();
-    const original = createOAuthState(A);
+    const { crearEstadoOAuth, parseOAuthState } = await modulo();
+    const original = crearEstadoOAuth(A).state;
     const [, firma] = original.split(".");
     const cargaCambiada = Buffer.from(JSON.stringify({ userId: B, ts: Date.now() })).toString(
       "base64url",
@@ -131,12 +149,13 @@ describe("BLOQUE 4 · state de OAuth", () => {
   });
 
   it("dos states del mismo usuario son distintos entre sí", async () => {
-    // Llevan la marca de tiempo dentro, así que no son reutilizables como si
-    // fueran un identificador fijo.
-    const { createOAuthState } = await modulo();
-    const uno = createOAuthState(A);
+    // Llevan la marca de tiempo dentro —y desde el Bloque 7, tambien un nonce
+    // aleatorio de 32 bytes— asi que no son reutilizables como si fueran un
+    // identificador fijo.
+    const { crearEstadoOAuth } = await modulo();
+    const uno = crearEstadoOAuth(A).state;
     await new Promise((r) => setTimeout(r, 5));
-    const dos = createOAuthState(A);
+    const dos = crearEstadoOAuth(A).state;
     expect(uno).not.toBe(dos);
   });
 });
