@@ -249,6 +249,10 @@ export const ORPHAN_CLASSIFICATION: readonly OrphanClassEntry[] = [
   { path: "docs/BLOQUE_6_ESTADO.md", disposition: "index", domain: "nelvyon", priority: 2, title: "Bloque 6 — estado", reason: "Estado por categoria operacional del bloque 6" },
   { path: "docs/BLOQUE_7_CIERRE.md", disposition: "index", domain: "nelvyon", priority: 1, title: "Bloque 7 — cierre", sourceType: "official_doc", reason: "Auditoria ofensiva de extremo a extremo: 925 superficies atacables, ocho defectos reales corregidos, dos hallazgos que requieren decision humana, y la correccion del denominador que se dejaba fuera 396 rutas" },
   { path: "docs/BLOQUE_7_ESTADO.md", disposition: "index", domain: "nelvyon", priority: 2, title: "Bloque 7 — estado", reason: "Estado por categoria de superficie atacable del bloque 7" },
+  { path: "docs/BLOQUE_8_CIERRE.md", disposition: "index", domain: "nelvyon", priority: 1, title: "Bloque 8 — cierre", sourceType: "official_doc", reason: "Rendimiento, carga y concurrencia: 1367 puntos de escalado medidos, plazos del pool, cotas de listado e idempotencia bajo concurrencia real" },
+  { path: "docs/BLOQUE_8_ESTADO.md", disposition: "index", domain: "nelvyon", priority: 2, title: "Bloque 8 — estado", reason: "Estado por clase de punto de escalado del bloque 8" },
+  { path: "docs/COMO_EJECUTAR_LAS_PUERTAS.md", disposition: "index", domain: "nelvyon", priority: 1, title: "Como ejecutar las puertas", sourceType: "official_doc", reason: "DSN y variables sin las cuales las suites se saltan en silencio" },
+  { path: "docs/DECISION_WORKSPACE_ID.md", disposition: "index", domain: "nelvyon", priority: 1, title: "Decision pendiente — workspace derivado", sourceType: "official_doc", reason: "Estudio medido de la colision del workspace derivado y estrategia de migracion; decision humana bloqueada" },
 
   // —— Documentos vivos que estaban sin clasificar ——
   { path: "docs/DEVELOPER_ONBOARDING.md", disposition: "index", domain: "development_tech", priority: 2, title: "Developer Onboarding", sourceType: "runbook", reason: "Puesta en marcha del entorno para alguien que llega nuevo" },
