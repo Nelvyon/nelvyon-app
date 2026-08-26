@@ -191,3 +191,26 @@ tiene las mismas 712 tablas de producto que la referencia.
 
 Las dos únicas tablas de diferencia son restos de las propias pruebas
 (`_nelvyon_restore_drill`, `zz_concurrency_parent`), no producto.
+
+---
+
+## 8. SHA certificado
+
+**`87304e68`** en la rama `bloque4-webhooks`.
+
+| Puerta | Resultado |
+|---|---|
+| Inventario de operación | 655 capacidades · 8 familias · **0 comandos de runbook rotos** |
+| Guardianes acumulados (Python, a solas) | **21/21** |
+| Certificación de restauración | **16/16**, y falla como debe con fallo inyectado |
+| Detección de deriva | ejecutada: 4 diferencias, todas del hallazgo registrado |
+| Reconstrucción desde cero | **475 migraciones, 0 fallos** |
+| Recuperación (contenedor parado y arrancado) | **4/4**, vuelta sola en 536 ms |
+| Regresión amplia (736 ficheros) | **7 602 verdes, 0 fallos** |
+| Tipos | 11 errores, **todos previos** |
+| Árbol | limpio antes y después |
+
+Los saltos bajaron de 96 a **45** al documentar los DSN que faltaban.
+
+Cadena: 4 `cf43aeda`, 5 `9a3841bc`, 6 `5352db46`, 7 `c33b9939`, 8 `efb27997`,
+**9 `87304e68`**.
