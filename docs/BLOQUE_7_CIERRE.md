@@ -368,3 +368,25 @@ Y un residuo aceptado y escrito, no escondido: `assertSafeEgressUrl` mira la
 exige resolver y comprobar la IP al conectar, con reverificación tras cada
 redirección. Es trabajo de la capa de red, y queda anotado en la propia suite
 para que nadie la lea como si cubriera esa parte.
+
+
+---
+
+## 7. SHA certificado
+
+**`c33b9939`** en la rama `bloque4-webhooks`.
+
+La puerta se corrió entera **sobre este árbol**, en serie y cada parte a solas,
+con el árbol de trabajo limpio:
+
+| Puerta | Resultado |
+|---|---|
+| Inventario derivado | 925 superficies · 12 categorías · **0 huérfanas** |
+| Guardianes estructurales (Python) | **24/24** |
+| Suite ofensiva del bloque | **206/206** en 15 ficheros |
+| PostgreSQL REAL | **21/21 ejecutadas, 0 saltadas** |
+| Regresión de las zonas tocadas | **3 144 verdes, 0 fallos** |
+| Tipos | 11 errores, **todos previos**, 0 en ficheros de este bloque |
+
+Cadena certificada anterior, verificada intacta: bloque 4 `cf43aeda`, bloque 5
+`9a3841bc`, bloque 6 `5352db46`.
