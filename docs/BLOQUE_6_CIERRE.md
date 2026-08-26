@@ -10,7 +10,7 @@ reinicio en el peor momento.
 
 La diferencia con los anteriores es el método. Aquí **ninguna propiedad se da
 por buena leyendo el código**: se induce el fallo y se mira qué hace. De los
-diecisiete defectos encontrados, todos salieron al romper algo a propósito.
+trece defectos encontrados, todos salieron al romper algo a propósito.
 
 ---
 
@@ -302,7 +302,7 @@ aislaron y el resto se certificó.
 **8/8 categorías · 6 `FIXED_CERTIFIED` + 2 `PASS_CERTIFIED` · 0 bloqueadas ·
 0 pendientes.** Contador: **8 + 0 + 0 = 8**.
 
-**83 módulos · 0 huérfanos · 12 defectos corregidos en la causa · 21 mutaciones,
+**83 módulos · 0 huérfanos · 13 defectos corregidos en la causa · 27 mutaciones,
 todas caen.**
 
 SHA certificado: **`5352db46`**.
