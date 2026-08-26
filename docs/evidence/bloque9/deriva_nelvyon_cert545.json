@@ -1,0 +1,43 @@
+{
+  "objetivo": "nelvyon_cert545",
+  "referencia": "nelvyon_deriva_1787770321561",
+  "categorias": {
+    "tablas": {
+      "en_objetivo": 712,
+      "en_referencia": 712,
+      "faltan_en_objetivo": [],
+      "sobran_en_objetivo": []
+    },
+    "columnas": {
+      "en_objetivo": 6584,
+      "en_referencia": 6584,
+      "faltan_en_objetivo": [],
+      "sobran_en_objetivo": []
+    },
+    "restricciones": {
+      "en_objetivo": 1332,
+      "en_referencia": 1332,
+      "faltan_en_objetivo": [],
+      "sobran_en_objetivo": []
+    },
+    "indices": {
+      "en_objetivo": 2300,
+      "en_referencia": 2300,
+      "faltan_en_objetivo": [],
+      "sobran_en_objetivo": []
+    },
+    "politicas_rls": {
+      "en_objetivo": 2117,
+      "en_referencia": 2121,
+      "faltan_en_objetivo": [
+        "saas_tenants.saas_tenants_os_delete",
+        "saas_tenants.saas_tenants_os_insert",
+        "saas_tenants.saas_tenants_os_select",
+        "saas_tenants.saas_tenants_os_update"
+      ],
+      "sobran_en_objetivo": []
+    }
+  },
+  "deriva_total": 4,
+  "decision": "HAY_DERIVA"
+}

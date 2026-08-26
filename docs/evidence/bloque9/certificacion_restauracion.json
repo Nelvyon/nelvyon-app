@@ -1,0 +1,100 @@
+{
+  "decision": "PASA",
+  "totales": {
+    "pasos": 16,
+    "ok": 16,
+    "fallos": 0
+  },
+  "pasos": [
+    {
+      "paso": "contenedor_responde",
+      "ok": true,
+      "err": ""
+    },
+    {
+      "paso": "sembrar_inquilino_real",
+      "ok": true,
+      "tenantId": "bd033dfb-7b4d-49c5-b512-8431646fab56",
+      "contactos": 250
+    },
+    {
+      "paso": "suma_del_origen",
+      "ok": true,
+      "suma": "01e47c8fa2dbd555e1a126ba1f0f636f",
+      "filas": "250"
+    },
+    {
+      "paso": "estructura_del_origen",
+      "ok": true,
+      "tablas": "714",
+      "restricciones": "1334",
+      "indices": "2302",
+      "politicas_rls": "2108"
+    },
+    {
+      "paso": "pg_dump",
+      "ok": true,
+      "err": ""
+    },
+    {
+      "paso": "el_volcado_no_esta_vacio",
+      "ok": true,
+      "bytes": "3541285"
+    },
+    {
+      "paso": "crear_base_destino",
+      "ok": true,
+      "err": ""
+    },
+    {
+      "paso": "pg_restore_ejecutado",
+      "ok": true,
+      "estado": 0,
+      "avisos": 1
+    },
+    {
+      "paso": "el_contenido_coincide_byte_a_byte",
+      "ok": true,
+      "origen": "01e47c8fa2dbd555e1a126ba1f0f636f",
+      "destino": "01e47c8fa2dbd555e1a126ba1f0f636f"
+    },
+    {
+      "paso": "vuelven_las_tablas",
+      "ok": true,
+      "origen": "714",
+      "destino": "714"
+    },
+    {
+      "paso": "vuelven_las_restricciones",
+      "ok": true,
+      "origen": "1334",
+      "destino": "1334"
+    },
+    {
+      "paso": "vuelven_los_indices",
+      "ok": true,
+      "origen": "2302",
+      "destino": "2302"
+    },
+    {
+      "paso": "vuelven_las_politicas_rls",
+      "ok": true,
+      "origen": "2108",
+      "destino": "2108"
+    },
+    {
+      "paso": "la_clave_foranea_sigue_restringiendo",
+      "ok": true,
+      "mensaje": "ERROR:  insert or update on table \"saas_contacts\" violates foreign key constraint \"saas_contacts_tenant_id_fkey\""
+    },
+    {
+      "paso": "la_aplicacion_puede_consultarla",
+      "ok": true,
+      "filas": 250
+    },
+    {
+      "paso": "limpieza",
+      "ok": true
+    }
+  ]
+}
