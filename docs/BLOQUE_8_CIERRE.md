@@ -206,3 +206,51 @@ compatibilidad durante la transición y cómo impedir que vuelva a pasar: todo e
 
 Lo único que hace falta de ti para desbloquearlo es ejecutar la detección y decir
 si el resultado es cero. Con eso, el resto es trabajo mecánico.
+
+---
+
+## 7. Una regresión que la puerta del Bloque 7 no vio
+
+`estadoDeOauthYSalida.test.ts` —una suite del **Bloque 4**— llamaba a
+`createOAuthState`, que **desapareció** en el Bloque 7 al atar el flujo OAuth al
+navegador con un nonce. Se eliminó a propósito, para que ninguna ruta pudiera
+quedarse en la versión vulnerable. Y rompió la suite anterior.
+
+Se cambió **la llamada** y nada más. Todo lo que la suite afirma —que el `state`
+lleva su usuario, que reescribirlo invalida la firma, que otro secreto no vale,
+que caduca— sigue comprobándose igual. La propiedad del Bloque 4 no se relajó:
+sobrevivió a un cambio de API que la reforzó.
+
+**Que esto apareciera aquí y no en la puerta del Bloque 7 es un fallo de aquella
+puerta:** se corrió sobre las zonas tocadas, no sobre el árbol entero. Queda
+anotado en la propia suite y corregido en el método: la puerta del Bloque 10 corre
+el árbol completo.
+
+---
+
+## 8. SHA certificado
+
+**`efb27997`** en la rama `bloque4-webhooks`.
+
+| Puerta | Resultado |
+|---|---|
+| Inventario derivado | 1 367 puntos · 7 clases · **0 huérfanos** |
+| Guardianes acumulados (Python, a solas) | **36/36** |
+| Carga + PostgreSQL real + RLS efectiva | **166/166**, 20 saltadas y clasificadas |
+| Regresión amplia (733 ficheros) | **7 538 verdes, 0 fallos** |
+| Con `NELVYON_B3/B4_DSN` | **+54** que antes se saltaban en silencio |
+| Tipos | 11 errores, **todos previos**, 0 en ficheros de este bloque |
+| Árbol | limpio antes y después |
+
+Saltadas y **clasificadas, no ignoradas**:
+
+- `migration523.pg.test.ts` (18) — necesita una base desechable con las
+  migraciones aplicadas. Se resuelve en el Bloque 9.
+- `rls.test.ts` (2) — **EXTERNAL_VERIFICATION_REQUIRED**: comprueban la RLS del
+  Supabase gestionado y no se pueden ejecutar en local por definición.
+- `rlsIsolation.pg.test.ts` (16) — necesita una base **desechable**, no la de
+  desarrollo. Ejecutarla contra `nelvyon_local_ai`, que tiene la base de
+  conocimiento sembrada, daría un rojo falso. Se resuelve en el Bloque 9.
+
+Cadena certificada: bloque 4 `cf43aeda`, 5 `9a3841bc`, 6 `5352db46`,
+7 `c33b9939`, **8 `efb27997`**.

@@ -13,6 +13,7 @@ Estado a **2026-08-26**. Rama `bloque4-webhooks`, worktree `C:\Users\Daniel\nelv
 | 5 · Producto medido y comparativa | **CERRADO** en `9a3841bc` → `docs/BLOQUE_5_CIERRE.md` |
 | 6 · Autonomía, resiliencia y recuperación | **CERRADO** en `5352db46` → `docs/BLOQUE_6_CIERRE.md` |
 | 7 · Seguridad ofensiva y abuso end-to-end | **CERRADO** en `c33b9939` → `docs/BLOQUE_7_CIERRE.md` |
+| 8 · Rendimiento, carga y concurrencia | **CERRADO** en `efb27997` → `docs/BLOQUE_8_CIERRE.md` |
 
 **Bloque 7 · cerrado**: 12/12 categorías de superficie atacable, **925
 superficies** derivadas del árbol con 0 huérfanas. **Ocho defectos reales
