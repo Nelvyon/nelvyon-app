@@ -51,6 +51,19 @@ export type McpToolDef = {
   readOnly: boolean;
   requiresApproval: boolean;
   inputSchema: Record<string, unknown>;
+  /**
+   * Ambitos que hacen falta para usar la herramienta.
+   *
+   * Antes no existia este campo, y por eso el motor de politica no tenia nada
+   * que comprobar: su unico control de ambito estaba dentro de
+   * `if (!tool.readOnly)`, asi que cualquier contexto autenticado podia llamar
+   * a `postgres_query`, `memory_read` o `logs_tail` sin declarar nada.
+   *
+   * Es obligatorio en la practica: una herramienta que lo deje sin declarar se
+   * DENIEGA. En autorizacion, lo que no esta permitido esta prohibido — al
+   * reves, un olvido abre la puerta en silencio.
+   */
+  requiredScopes: string[];
   tags?: string[];
 };
 

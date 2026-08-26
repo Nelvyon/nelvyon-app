@@ -39,6 +39,21 @@ class SlotPool {
 }
 
 let pollTimer: ReturnType<typeof setInterval> | undefined;
+let barridoTimer: ReturnType<typeof setInterval> | undefined;
+
+/** Cada cuanto late un trabajo en curso. */
+const LATIDO_MS = 15_000;
+
+/**
+ * Cuanto silencio hace falta para dar un trabajo por muerto, y cada cuanto se
+ * barre la lista de procesamiento.
+ *
+ * Diez minutos es holgado a proposito: el coste de esperar de mas es que un
+ * trabajo tarde en reintentarse; el de esperar de menos es ejecutarlo dos
+ * veces mientras el original sigue vivo. No son comparables.
+ */
+const SILENCIO_PARA_DARLO_POR_MUERTO_MS = readIntEnv("WORKER_SILENCIO_MS", 10 * 60_000);
+const BARRIDO_MS = 60_000;
 let running = false;
 let slots: SlotPool | undefined;
 let inflight = 0;
@@ -72,6 +87,19 @@ async function processItem(item: OsQueueWorkItem): Promise<void> {
   const startedAt = Date.now();
   workerLog.info("job_processing_start", { jobId: item.jobId, sector, userId: item.userId });
 
+  /**
+   * Latido mientras el trabajo corre.
+   *
+   * Es lo que permite al rescate distinguir «tarda» de «murio». Sin el, un
+   * trabajo largo y sano acaba reencolado y ejecutado dos veces — el defecto
+   * que el Bloque 4 corrigio en `OsQueueWorker` — o, si se sube el umbral para
+   * evitarlo, la basura se queda varada horas.
+   */
+  const latido = setInterval(() => {
+    void client.latido(item.jobId).catch(() => undefined);
+  }, LATIDO_MS);
+  if (typeof latido.unref === "function") latido.unref();
+
   try {
     const result = await osOrchestrator.processQueuedJob(queueItem);
     if (result.skipped) return;
@@ -91,6 +119,7 @@ async function processItem(item: OsQueueWorkItem): Promise<void> {
       err instanceof Error ? err : undefined,
     );
   } finally {
+    clearInterval(latido);
     await client.acknowledgeDequeued(item).catch(() => undefined);
   }
 }
@@ -130,6 +159,29 @@ export function startOsWorker(): void {
   pollTimer = setInterval(() => {
     void pollOnce();
   }, pollMs);
+
+  /**
+   * Barrido de rescate.
+   *
+   * `os:async:processing` solo se escribia con `lmove` y se vaciaba con `lrem`:
+   * nadie miraba nunca esa lista. Un worker que muriera entre las dos
+   * operaciones dejaba el trabajo varado ahi para siempre, con su estado
+   * congelado en `processing` y el cliente esperando un resultado que no iba a
+   * llegar.
+   *
+   * Un rescate sin llamante seria el mismo defecto con otro nombre — que es lo
+   * que le pasaba al `leaseUntil` del orquestador, escrito en cada trabajo y
+   * leido por nadie.
+   */
+  void QueueClient.getInstance()
+    .recuperarTrabajosVarados(SILENCIO_PARA_DARLO_POR_MUERTO_MS)
+    .catch(() => undefined);
+  barridoTimer = setInterval(() => {
+    void QueueClient.getInstance()
+      .recuperarTrabajosVarados(SILENCIO_PARA_DARLO_POR_MUERTO_MS)
+      .catch(() => undefined);
+  }, BARRIDO_MS);
+  if (typeof barridoTimer.unref === "function") barridoTimer.unref();
 }
 
 export async function stopOsWorker(): Promise<void> {
@@ -137,6 +189,10 @@ export async function stopOsWorker(): Promise<void> {
   if (pollTimer) {
     clearInterval(pollTimer);
     pollTimer = undefined;
+  }
+  if (barridoTimer) {
+    clearInterval(barridoTimer);
+    barridoTimer = undefined;
   }
   while (inflight > 0) {
     await sleep(25);

@@ -46,6 +46,8 @@ export class OrchestratorDaemon {
   private jobsProcessed = 0;
   private lastTickAt: string | null = null;
   private lastError: string | null = null;
+  /** Un tick en curso bloquea al siguiente. Ver `start()`. */
+  private tickEnCurso = false;
   private readonly pollIntervalMs: number;
   private readonly leaseMs: number;
   private readonly maxJobsPerTick: number;
@@ -70,6 +72,12 @@ export class OrchestratorDaemon {
     this.startedAt = Date.now();
     this.writeHealth();
     this.timer = setInterval(() => {
+      // `setInterval` NO espera al tick anterior: si un tick tarda mas que el
+      // intervalo —cuatro trabajos con un ejecutor detras, nada raro— hay dos
+      // vivos a la vez en el mismo proceso. El reclamo atomico ya impide que
+      // se repartan mal, pero solaparlos no aporta nada y multiplica la carga
+      // sobre el ejecutor justo cuando ya va lento.
+      if (this.tickEnCurso) return;
       void this.tick();
     }, this.pollIntervalMs);
     if (typeof this.timer.unref === "function") this.timer.unref();
@@ -94,7 +102,22 @@ export class OrchestratorDaemon {
   }
 
   health(): DaemonHealth {
-    const live = this.running && this.lastTickAt !== null;
+    /**
+     * `live` era `running && lastTickAt !== null`, y `lastTickAt` no se borra
+     * jamas: en cuanto habia UN tick, `live` se quedaba en verdadero para
+     * siempre — aunque el bucle estuviera parado o el proceso congelado.
+     *
+     * Una senal de vida que no puede ser falsa no es una senal de vida: es una
+     * constante. Y esta se publica en `/api/saas/ai-agents`, o sea que quien la
+     * mirase creeria que hay un demonio trabajando llevara el rato que llevara
+     * sin moverse.
+     *
+     * Ahora mide lo que dice medir: hubo un tick hace poco. El margen es de
+     * tres intervalos de sondeo, para que un tick que tarde un poco mas de la
+     * cuenta no lo declare muerto.
+     */
+    const desdeElUltimoTick = this.lastTickAt ? Date.now() - Date.parse(this.lastTickAt) : Infinity;
+    const live = this.running && desdeElUltimoTick <= this.pollIntervalMs * 3;
     const ready = this.running && !this.paused && !isEmergencyStopped();
     const base = {
       running: this.running,
@@ -114,6 +137,15 @@ export class OrchestratorDaemon {
   }
 
   async tick(): Promise<{ processed: number }> {
+    this.tickEnCurso = true;
+    try {
+      return await this.tickInterno();
+    } finally {
+      this.tickEnCurso = false;
+    }
+  }
+
+  private async tickInterno(): Promise<{ processed: number }> {
     this.ticks += 1;
     this.lastTickAt = new Date().toISOString();
     if (!this.running || this.paused) {
@@ -127,20 +159,17 @@ export class OrchestratorDaemon {
 
     let processed = 0;
     try {
-      const jobs = this.orch.drainQueuedJobs(this.maxJobsPerTick);
-      for (const job of jobs) {
-        const leaseUntil = new Date(Date.now() + this.leaseMs).toISOString();
-        job.state = "running";
-        job.startedAt = new Date().toISOString();
-        job.attempts += 1;
-        job.payload = {
-          ...job.payload,
-          leaseOwner: this.workerId,
-          leaseUntil,
-          heartbeatAt: new Date().toISOString(),
-        };
-        this.orch.upsertJob(job);
+      // Antes de coger nada: devolver a la cola lo que otra instancia dejo
+      // colgado. Si no, un trabajo cuyo dueno murio se queda en `running` para
+      // siempre y nadie vuelve a mirarlo.
+      this.orch.recuperarLeasesVencidos();
 
+      // Reclamo ATOMICO: seleccionar y marcar `running` en el mismo paso. Con
+      // `drainQueuedJobs` + marcar despues quedaba un hueco por el que dos
+      // ticks solapados cogian el mismo trabajo. Medido: 7 ejecuciones para 4
+      // trabajos.
+      const jobs = this.orch.reclamarTrabajos(this.maxJobsPerTick, this.workerId, this.leaseMs);
+      for (const job of jobs) {
         try {
           const input = String(job.payload.input ?? "");
           const result = await sandboxJobExecutor({

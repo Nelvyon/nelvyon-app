@@ -256,6 +256,89 @@ export class InMemoryAgentOrchestrator implements IAgentOrchestrator {
       .slice(0, limit);
   }
 
+  /**
+   * Reclama trabajos: los pasa a `running` con lease **en el mismo paso**.
+   *
+   * `drainQueuedJobs` solo CONSULTA: devuelve trabajos que siguen en `queued` y
+   * deja que el llamante los marque despues. Entre lo uno y lo otro hay un
+   * hueco, y por ese hueco se colaba el mismo trabajo dos veces.
+   *
+   * No hacia falta un caso raro: `setInterval` dispara cada 2 s sin esperar al
+   * tick anterior, asi que basta con que un tick tarde mas que eso para tener
+   * dos vivos a la vez en el MISMO proceso. Medido con dos ticks concurrentes
+   * sobre cuatro trabajos: se procesaron **siete**.
+   *
+   * Aqui la transicion es sincrona y completa —seleccionar, marcar `running`,
+   * poner lease y persistir, sin un solo `await` por medio— asi que otro tick
+   * que entre despues ya no los ve en `queued`. En JavaScript eso basta dentro
+   * de un proceso; entre procesos manda el lease, que es lo que comprueba
+   * `recuperarLeasesVencidos`.
+   */
+  reclamarTrabajos(limit: number, workerId: string, leaseMs: number): OrchestratorJob[] {
+    const candidatos = this.drainQueuedJobs(limit);
+    const ahora = Date.now();
+    const reclamados: OrchestratorJob[] = [];
+
+    for (const j of candidatos) {
+      // Relectura desde el mapa: `drainQueuedJobs` devuelve la referencia viva,
+      // pero comprobar el estado otra vez aqui deja explicito que nadie se lo
+      // ha llevado por delante.
+      const actual = this.jobs.get(j.jobId);
+      if (!actual || actual.state !== "queued") continue;
+
+      actual.state = "running";
+      actual.startedAt = new Date(ahora).toISOString();
+      actual.attempts += 1;
+      actual.payload = {
+        ...actual.payload,
+        leaseOwner: workerId,
+        leaseUntil: new Date(ahora + leaseMs).toISOString(),
+        heartbeatAt: new Date(ahora).toISOString(),
+      };
+      this.jobs.set(actual.jobId, actual);
+      reclamados.push(actual);
+    }
+    if (reclamados.length) this.persist();
+    return reclamados;
+  }
+
+  /**
+   * Devuelve a la cola los trabajos cuyo lease ha vencido.
+   *
+   * El demonio escribia `leaseUntil` y `heartbeatAt` en cada trabajo y **nadie
+   * los leia nunca**. Si el proceso moria a mitad, el trabajo se quedaba en
+   * `running` para siempre: ninguna otra instancia lo recogia y solo lo
+   * desbloqueaba un reinicio completo del que tuviera el fichero de estado.
+   *
+   * Un lease que nadie comprueba no es un lease, es un comentario.
+   *
+   * Se mira el lease y **no** si el trabajo lleva mucho en `running`: un
+   * trabajo largo de otra instancia esta vivo y renueva su lease. Confundir
+   * «tarda» con «esta muerto» es el defecto que el Bloque 4 corrigio en
+   * `OsQueueWorker`, donde arrancar una instancia mataba el trabajo en vuelo de
+   * la otra.
+   */
+  recuperarLeasesVencidos(ahora = Date.now()): number {
+    let recuperados = 0;
+    for (const j of this.jobs.values()) {
+      if (j.state !== "running") continue;
+      const hasta = j.payload.leaseUntil;
+      // Sin lease no se toca: no se puede afirmar que este abandonado.
+      if (typeof hasta !== "string") continue;
+      const vence = Date.parse(hasta);
+      if (Number.isNaN(vence) || vence > ahora) continue;
+
+      j.state = "queued";
+      j.startedAt = null;
+      j.lastError = `lease_vencido:${String(j.payload.leaseOwner ?? "desconocido")}`;
+      j.payload = { ...j.payload, leaseOwner: null, leaseUntil: null };
+      this.jobs.set(j.jobId, j);
+      recuperados += 1;
+    }
+    if (recuperados) this.persist();
+    return recuperados;
+  }
+
   upsertJob(job: OrchestratorJob): void {
     this.jobs.set(job.jobId, job);
     this.persist();

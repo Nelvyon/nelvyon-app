@@ -15,6 +15,31 @@ function assertUnderRoots(relPath: string): string {
   return abs;
 }
 
+/**
+ * Traduce los ambitos de MCP a los de la memoria compartida.
+ *
+ * Los dos sistemas nombran distinto: MCP usa dos puntos (`memory:read`) y la
+ * memoria compartida usa punto (`memory.read`). Hacia falta traducir, y hasta
+ * ahi bien. El problema era COMO:
+ *
+ *     scopes: ctx.scopes.includes("memory.read") ? ctx.scopes : [...ctx.scopes, "memory.read"]
+ *
+ * Eso no traduce: **anade**. Si al llamante le faltaba el ambito, la propia
+ * herramienta se lo concedia, de modo que cualquier control que el servicio de
+ * memoria hiciera sobre ese campo quedaba anulado desde arriba — siempre
+ * recibia lo que necesitaba para decir que si.
+ *
+ * Un permiso que el consumidor se autoconcede no es un permiso: es una variable
+ * con nombre de permiso. Y lo que hay detras es la memoria del inquilino, que
+ * es justo donde se mezcla informacion entre clientes cuando algo falla.
+ *
+ * Traducir es convertir lo que hay, no rellenar lo que falta.
+ */
+function ambitosParaMemoriaCompartida(scopes: string[]): string[] {
+  const traducidos = scopes.map((s) => s.replace(/^memory:/, "memory."));
+  return [...new Set([...scopes, ...traducidos])];
+}
+
 export const productiveTools: McpRegisteredTool[] = [
   {
     name: "health_check",
@@ -23,6 +48,7 @@ export const productiveTools: McpRegisteredTool[] = [
     category: "health",
     risk: "low",
     readOnly: true,
+    requiredScopes: ["health:read"],
     requiresApproval: false,
     inputSchema: { type: "object", properties: {} },
     handler: async () => ({
@@ -38,6 +64,7 @@ export const productiveTools: McpRegisteredTool[] = [
     category: "metrics",
     risk: "low",
     readOnly: true,
+    requiredScopes: ["metrics:read"],
     requiresApproval: false,
     inputSchema: { type: "object", properties: {} },
     handler: async () => {
@@ -56,6 +83,7 @@ export const productiveTools: McpRegisteredTool[] = [
     category: "logs",
     risk: "low",
     readOnly: true,
+    requiredScopes: ["logs:read"],
     requiresApproval: false,
     inputSchema: {
       type: "object",
@@ -74,6 +102,7 @@ export const productiveTools: McpRegisteredTool[] = [
     category: "docs",
     risk: "low",
     readOnly: true,
+    requiredScopes: ["docs:read"],
     requiresApproval: false,
     inputSchema: {
       type: "object",
@@ -98,6 +127,7 @@ export const productiveTools: McpRegisteredTool[] = [
     category: "postgres",
     risk: "medium",
     readOnly: true,
+    requiredScopes: ["postgres:read"],
     requiresApproval: false,
     inputSchema: {
       type: "object",
@@ -124,6 +154,7 @@ export const productiveTools: McpRegisteredTool[] = [
     category: "rag",
     risk: "low",
     readOnly: true,
+    requiredScopes: ["rag:read"],
     requiresApproval: false,
     inputSchema: {
       type: "object",
@@ -165,6 +196,7 @@ export const productiveTools: McpRegisteredTool[] = [
     category: "memory",
     risk: "low",
     readOnly: true,
+    requiredScopes: ["memory:read"],
     requiresApproval: false,
     inputSchema: {
       type: "object",
@@ -188,8 +220,8 @@ export const productiveTools: McpRegisteredTool[] = [
           tenantId: ctx.tenantId,
           userId: ctx.userId,
           agentId: ctx.agentId,
-          roles: ctx.roles.length ? ctx.roles : ["member"],
-          scopes: ctx.scopes.includes("memory.read") ? ctx.scopes : [...ctx.scopes, "memory.read"],
+          roles: ctx.roles,
+          scopes: ambitosParaMemoriaCompartida(ctx.scopes),
         },
         {
           query: typeof args.query === "string" ? args.query : undefined,
@@ -220,6 +252,7 @@ export const productiveTools: McpRegisteredTool[] = [
     category: "memory",
     risk: "medium",
     readOnly: false,
+    requiredScopes: ["memory:write"],
     requiresApproval: false,
     inputSchema: {
       type: "object",
@@ -246,10 +279,11 @@ export const productiveTools: McpRegisteredTool[] = [
           tenantId: ctx.tenantId,
           userId: ctx.userId,
           agentId: ctx.agentId,
-          roles: ctx.roles.length ? ctx.roles : ["owner"],
-          scopes: ctx.scopes.includes("memory.write")
-            ? ctx.scopes
-            : [...ctx.scopes, "memory.write"],
+          // Un contexto sin roles NO es el dueno del inquilino. Ascenderlo a
+          // `owner` por defecto convertia la ausencia de informacion en el
+          // permiso mas alto que existe.
+          roles: ctx.roles,
+          scopes: ambitosParaMemoriaCompartida(ctx.scopes),
         },
         {
           tenantId: ctx.tenantId,
@@ -280,6 +314,7 @@ export const productiveTools: McpRegisteredTool[] = [
     category: "filesystem",
     risk: "low",
     readOnly: true,
+    requiredScopes: ["filesystem:read"],
     requiresApproval: false,
     inputSchema: {
       type: "object",
@@ -302,6 +337,7 @@ export const productiveTools: McpRegisteredTool[] = [
     category: "filesystem",
     risk: "low",
     readOnly: true,
+    requiredScopes: ["filesystem:read"],
     requiresApproval: false,
     inputSchema: {
       type: "object",
@@ -322,6 +358,7 @@ export const productiveTools: McpRegisteredTool[] = [
     category: "git",
     risk: "low",
     readOnly: true,
+    requiredScopes: ["git:read"],
     requiresApproval: false,
     inputSchema: { type: "object", properties: {} },
     handler: async () => ({
@@ -337,6 +374,7 @@ export const productiveTools: McpRegisteredTool[] = [
     category: "github",
     risk: "low",
     readOnly: true,
+    requiredScopes: ["github:read"],
     requiresApproval: false,
     inputSchema: {
       type: "object",
@@ -356,6 +394,7 @@ export const productiveTools: McpRegisteredTool[] = [
     category: "scraping",
     risk: "medium",
     readOnly: true,
+    requiredScopes: ["scraping:read"],
     requiresApproval: false,
     inputSchema: {
       type: "object",
@@ -384,6 +423,7 @@ export const productiveTools: McpRegisteredTool[] = [
     category: "browser",
     risk: "medium",
     readOnly: true,
+    requiredScopes: ["browser:read"],
     requiresApproval: false,
     inputSchema: {
       type: "object",
@@ -402,6 +442,7 @@ export const productiveTools: McpRegisteredTool[] = [
     category: "email",
     risk: "medium",
     readOnly: false,
+    requiredScopes: ["email:write"],
     requiresApproval: false,
     inputSchema: {
       type: "object",
@@ -427,6 +468,7 @@ export const productiveTools: McpRegisteredTool[] = [
     category: "crm",
     risk: "low",
     readOnly: true,
+    requiredScopes: ["crm:read"],
     requiresApproval: false,
     inputSchema: {
       type: "object",
@@ -446,6 +488,7 @@ export const productiveTools: McpRegisteredTool[] = [
     category: "crm",
     risk: "medium",
     readOnly: false,
+    requiredScopes: ["crm:write"],
     requiresApproval: false,
     inputSchema: {
       type: "object",
@@ -469,6 +512,7 @@ export const productiveTools: McpRegisteredTool[] = [
     category: "reporting",
     risk: "low",
     readOnly: true,
+    requiredScopes: ["reporting:read"],
     requiresApproval: false,
     inputSchema: {
       type: "object",
@@ -487,6 +531,7 @@ export const productiveTools: McpRegisteredTool[] = [
     category: "crm",
     risk: "high",
     readOnly: false,
+    requiredScopes: ["crm:write"],
     requiresApproval: true,
     inputSchema: {
       type: "object",
@@ -504,6 +549,7 @@ export const productiveTools: McpRegisteredTool[] = [
     category: "email",
     risk: "critical",
     readOnly: false,
+    requiredScopes: ["email:write"],
     requiresApproval: true,
     inputSchema: {
       type: "object",
@@ -520,6 +566,7 @@ export const productiveTools: McpRegisteredTool[] = [
     category: "security",
     risk: "critical",
     readOnly: false,
+    requiredScopes: ["security:write"],
     requiresApproval: true,
     inputSchema: { type: "object", properties: { target: { type: "string" } } },
     handler: async () => {
@@ -533,6 +580,7 @@ export const productiveTools: McpRegisteredTool[] = [
     category: "security",
     risk: "critical",
     readOnly: false,
+    requiredScopes: ["security:write"],
     requiresApproval: true,
     inputSchema: { type: "object", properties: {} },
     handler: async () => {

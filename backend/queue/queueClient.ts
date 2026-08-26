@@ -180,6 +180,89 @@ export class QueueClient {
     await this.redis.lrem(PROCESSING_LIST_KEY, 1, raw);
   }
 
+  /**
+   * Señal de vida de un trabajo en curso.
+   *
+   * Sin esto no hay forma de distinguir «tarda» de «murio», y cualquier umbral
+   * de recuperacion acaba haciendo una de las dos cosas malas: matar trabajo
+   * bueno que va lento, o dejar basura varada para siempre.
+   *
+   * Es la misma pieza que el Bloque 4 añadio a `OsQueueWorker` cuando arrancar
+   * una instancia mataba el trabajo en vuelo de la otra.
+   */
+  async latido(jobId: string): Promise<void> {
+    const existing = await this.getJobStatus(jobId);
+    if (!existing || existing.status !== "processing") return;
+    await this.saveJobStatus(jobId, { ...existing, updatedAt: nowIso() });
+  }
+
+  /**
+   * Devuelve a la cola lo que quedo varado en la lista de procesamiento.
+   *
+   * `lmove` deja el trabajo en `os:async:processing` de forma atomica y `lrem`
+   * lo saca al terminar: el patron fiable de Redis, bien resuelto. Pero **nadie
+   * miraba nunca esa lista**. Si el worker moria entre las dos operaciones —un
+   * despliegue, un OOM, un contenedor reciclado— el trabajo se quedaba ahi para
+   * siempre, su estado congelado en `processing`, y el cliente que lo pidio no
+   * recibia nada nunca: sin error, sin alerta y sin rastro.
+   *
+   * Media pieza del patron fiable no es un patron fiable: es una lista que crece.
+   *
+   * Tres decisiones que evitan que la cura sea peor:
+   *
+   *   - Se mide el **silencio**, no la duracion. Un trabajo largo que late sigue
+   *     vivo. Confundir lento con muerto duplica ejecuciones.
+   *   - Lo que ya esta `completed` o `failed` se **limpia sin reencolar**. Si el
+   *     worker murio despues de escribir el resultado y antes del `lrem`, el
+   *     trabajo esta hecho: repetirlo seria producir el efecto dos veces, que es
+   *     justo lo que este bloque persigue.
+   *   - Sin registro de estado no se toca. No se puede afirmar que este
+   *     abandonado algo de lo que no se sabe nada.
+   */
+  async recuperarTrabajosVarados(maxSilencioMs = 10 * 60_000): Promise<number> {
+    if (!this.redis) return 0;
+    const crudos = await this.redis.lrange<string>(PROCESSING_LIST_KEY, 0, -1);
+    if (!crudos?.length) return 0;
+
+    const limite = Date.now() - maxSilencioMs;
+    let rescatados = 0;
+
+    for (const raw of crudos) {
+      const item = parseWorkItem(raw);
+      if (!item) {
+        // Entrada ilegible: sacarla es lo unico que se puede hacer con ella, y
+        // dejarla ahi solo garantiza que la lista crezca sin fin.
+        await this.redis.lrem(PROCESSING_LIST_KEY, 1, raw);
+        continue;
+      }
+
+      const estado = await this.getJobStatus(item.jobId);
+      if (!estado) continue;
+
+      if (estado.status === "completed" || estado.status === "failed") {
+        await this.redis.lrem(PROCESSING_LIST_KEY, 1, raw);
+        continue;
+      }
+      if (estado.status !== "processing") continue;
+
+      const ultimaSenal = Date.parse(estado.updatedAt || estado.createdAt);
+      if (Number.isFinite(ultimaSenal) && ultimaSenal > limite) continue;
+
+      await this.redis.lrem(PROCESSING_LIST_KEY, 1, raw);
+      await this.redis.rpush(QUEUE_LIST_KEY, raw);
+      await this.saveJobStatus(item.jobId, {
+        ...estado,
+        // `pending` es el nombre que usa esta cola para «esperando a que un
+        // worker lo coja». No hay `queued` en `QueueJobStatus`.
+        status: "pending",
+        error: "recuperado_de_worker_sin_senal",
+        updatedAt: nowIso(),
+      });
+      rescatados += 1;
+    }
+    return rescatados;
+  }
+
   async jobBelongsToUser(jobId: string, userId: string): Promise<boolean> {
     const status = await this.getJobStatus(jobId);
     if (status?.userId === userId) return true;

@@ -179,18 +179,56 @@ export function evaluatePolicy(
     };
   }
 
-  // Scope check: write tools need mcp.write or workflows.execute
-  if (!tool.readOnly) {
-    const canWrite =
-      ctx.scopes.includes("mcp.write") ||
-      ctx.scopes.includes("workflows.execute") ||
-      ctx.roles.includes("owner") ||
-      ctx.roles.includes("admin");
-    if (!canWrite) {
+  /**
+   * Minimo privilegio.
+   *
+   * Antes el unico control de ambito vivia dentro de `if (!tool.readOnly)`, de
+   * modo que TODA herramienta de solo lectura quedaba fuera: cualquier contexto
+   * autenticado podia consultar la base, leer la memoria del inquilino o sacar
+   * los registros sin declarar un solo ambito. Un agente que solo necesita leer
+   * documentacion tenia acceso a todo lo que se lee.
+   *
+   * Los roles de administracion siguen valiendo sin enumerar cada ambito —seria
+   * inmanejable— pero un rol cualquiera ya no sirve de comodin.
+   */
+  const esAdministracion = ctx.roles.includes("owner") || ctx.roles.includes("admin");
+
+  if (!esAdministracion) {
+    const exigidos = (tool as { requiredScopes?: string[] }).requiredScopes;
+    if (!Array.isArray(exigidos)) {
+      // Cierre por defecto: sin declaracion no se puede comprobar nada, y no
+      // poder comprobar no es lo mismo que estar permitido.
+      return {
+        decision: "denied",
+        risk: "critical",
+        reason: "tool_sin_ambitos_declarados",
+        sanitizedArgs: sanitizeArgs(args),
+        blockedCategory: "authorization",
+      };
+    }
+    /**
+     * Los ambitos AMPLIOS que ya existian siguen valiendo.
+     *
+     * `mcp.read`, `mcp.write` y `workflows.execute` son ambitos reales de las
+     * claves de API (`SaasApiKeysService`). Sustituirlos por los finos habria
+     * roto en silencio a todo el que ya tuviera una clave emitida — un cambio
+     * de contrato de permisos disfrazado de mejora tecnica.
+     *
+     * Lo que se arregla es lo que NO estaba: las herramientas de solo lectura
+     * no exigian absolutamente nada. Ahora exigen su ambito fino o el amplio
+     * que corresponda.
+     */
+    const amplios = tool.readOnly
+      ? ["mcp.read", "mcp.write"]
+      : ["mcp.write", "workflows.execute"];
+    const tieneAlguno =
+      exigidos.some((s) => ctx.scopes.includes(s)) ||
+      amplios.some((s) => ctx.scopes.includes(s));
+    if (exigidos.length > 0 && !tieneAlguno) {
       return {
         decision: "denied",
         risk: "high",
-        reason: "insufficient_scope_write",
+        reason: tool.readOnly ? "insufficient_scope_read" : "insufficient_scope_write",
         sanitizedArgs: sanitizeArgs(args),
         blockedCategory: "authorization",
       };

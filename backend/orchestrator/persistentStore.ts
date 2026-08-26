@@ -47,11 +47,29 @@ export function checkpointJobs(dir: string, jobs: Iterable<OrchestratorJob>): vo
   renameSync(tmp, path);
 }
 
-/** On restart: queued/running → queued for recovery; terminal states kept. */
+/**
+ * Al reiniciar: lo interrumpido vuelve a la cola. Lo que esperaba a un humano, NO.
+ *
+ * `waiting_approval` estaba en esta lista junto a `running` y `waiting_tool`, y
+ * eso convertia cualquier reinicio —un despliegue, un contenedor que se
+ * recicla— en un salto de la aprobacion: el trabajo volvia a `queued`, el
+ * demonio lo cogia en el siguiente tick y ejecutaba la accion que un humano
+ * todavia no habia autorizado. Sin rastro de que se hubiera saltado nada.
+ *
+ * La diferencia entre los tres estados no es de matiz:
+ *
+ *   - `running`      — se estaba ejecutando y el proceso murio. Reencolar es lo
+ *                      correcto: nadie decidio nada, solo se corto.
+ *   - `waiting_tool` — una llamada a una herramienta quedo a medias. Igual.
+ *   - `waiting_approval` — hay una PERSONA que todavia no ha dicho que si.
+ *                      Reencolarlo no es recuperar: es decidir en su nombre.
+ *
+ * Una recuperacion nunca puede completar una decision que no ha tomado nadie.
+ */
 export function recoverJobsAfterRestart(jobs: Map<string, OrchestratorJob>): number {
   let recovered = 0;
   for (const j of jobs.values()) {
-    if (j.state === "running" || j.state === "waiting_tool" || j.state === "waiting_approval") {
+    if (j.state === "running" || j.state === "waiting_tool") {
       j.state = "queued";
       j.startedAt = null;
       j.lastError = j.lastError ?? "recovered_after_restart";

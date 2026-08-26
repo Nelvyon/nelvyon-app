@@ -21,7 +21,9 @@ import { getTenantCircuit, resetAllCircuitsForTests } from "../resilience/Circui
 import {
   getIdempotentResult,
   putIdempotentResult,
+  reclamarEjecucionMcp,
   resetIdempotencyForTests,
+  soltarEjecucionMcp,
 } from "../resilience/IdempotencyStore";
 import { checkRateLimit, resetRateLimitsForTests } from "../resilience/RateLimiter";
 import { productiveTools } from "../tools/productiveTools";
@@ -136,6 +138,28 @@ export class McpProductiveServer {
       sanitizedArgs: partial.sanitizedArgs ?? {},
     });
 
+    /**
+     * Suelta la reclamacion cuando la llamada se deniega ANTES de ejecutar.
+     *
+     * Limite alcanzado, circuito abierto, herramienta desconocida o politica:
+     * en los cuatro casos no se toco nada, asi que el cliente tiene que poder
+     * reintentar con la misma clave. Sin esto, un `unknown_tool` por un nombre
+     * mal escrito dejaba la clave quemada para siempre.
+     *
+     * Los fallos DURANTE la ejecucion NO se sueltan: el efecto pudo producirse
+     * y es preferible responder «duplicado» a cobrar dos veces. Ante la duda,
+     * no soltar.
+     */
+    const soltarSiNoSeEjecuto = async (): Promise<void> => {
+      if (!this.db || !req.ctx.idempotencyKey) return;
+      await soltarEjecucionMcp(
+        this.db,
+        req.ctx.tenantId,
+        req.toolName,
+        req.ctx.idempotencyKey,
+      ).catch(() => undefined);
+    };
+
     if (!cfg.enabled) {
       return base({
         toolName: req.toolName,
@@ -149,12 +173,53 @@ export class McpProductiveServer {
     }
 
     if (req.ctx.idempotencyKey) {
+      // El cache de resultado, que es una comodidad: devuelve la respuesta
+      // EXACTA de la primera vez. Se pierde al reiniciar, y perderlo no rompe
+      // nada porque la garantia no vive aqui.
       const replay = getIdempotentResult(req.ctx.tenantId, req.ctx.idempotencyKey);
       if (replay) return { ...replay, toolCallId, durationMs: Date.now() - start };
+
+      /**
+       * La GARANTIA, que vive en PostgreSQL.
+       *
+       * El cache de arriba es un `Map` por proceso: con dos instancias cada una
+       * tiene el suyo, asi que la misma clave llega a la que no la ha visto y la
+       * herramienta se ejecuta por segunda vez. Y un reinicio lo deja vacio, de
+       * modo que el reintento del cliente ante un timeout vuelve a ejecutar.
+       *
+       * `reclamarEjecucionMcp` resuelve la carrera en la base con la
+       * restriccion de unicidad, que es donde se puede resolver entre procesos.
+       *
+       * Si el duplicado llega a una instancia que no tiene el resultado
+       * cacheado, se responde «duplicado» y **no se ejecuta**. Es menos comodo
+       * que repetir la respuesta original, pero lo que no puede pasar es
+       * producir el efecto dos veces.
+       */
+      if (this.db) {
+        const primeraVez = await reclamarEjecucionMcp(
+          this.db,
+          req.ctx.tenantId,
+          req.toolName,
+          req.ctx.idempotencyKey,
+        );
+        if (!primeraVez) {
+          return base({
+            toolName: req.toolName,
+            decision: "denied",
+            ok: false,
+            risk: "low",
+            error: "duplicado: esta clave de idempotencia ya se ejecuto",
+            errorCode: "idempotent_duplicate",
+            idempotentReplay: true,
+            sanitizedArgs: {},
+          });
+        }
+      }
     }
 
     const rate = checkRateLimit(req.ctx.tenantId, cfg.rateLimitPerMin);
     if (!rate.allowed) {
+      await soltarSiNoSeEjecuto();
       return base({
         toolName: req.toolName,
         decision: "denied",
@@ -173,6 +238,7 @@ export class McpProductiveServer {
       getMcpCircuitResetMs(),
     );
     if (circuit.isOpen()) {
+      await soltarSiNoSeEjecuto();
       return base({
         toolName: req.toolName,
         decision: "denied",
@@ -187,6 +253,7 @@ export class McpProductiveServer {
 
     const tool = this.registry.get(req.toolName);
     if (!tool) {
+      await soltarSiNoSeEjecuto();
       return base({
         toolName: req.toolName,
         decision: "denied",
@@ -200,6 +267,7 @@ export class McpProductiveServer {
 
     const policy = evaluatePolicy(tool, req.args ?? {}, req.ctx);
     if (policy.decision === "denied") {
+      await soltarSiNoSeEjecuto();
       const result = base({
         toolName: req.toolName,
         decision: "denied",
