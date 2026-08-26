@@ -104,3 +104,30 @@ superusuario, RLS no se aplica y la prueba certificaría el vacío. La propia su
 lo comprueba antes de nada, que es exactamente lo que debe hacer.
 
 Con las dos bases preparadas, los saltos bajan de **44 a 10**.
+
+## Las últimas cuatro variables (y por qué el ROL importa más que el DSN)
+
+```
+DATABASE_URL=postgresql://nelvyon_local:nelvyon_local_dev@localhost:5434/nelvyon_cert545
+LOCAL_AI_DATABASE_URL=postgresql://nelvyon_local_app:cert_local_b10@localhost:5434/nelvyon_localai_cert
+MIG523_TEST_DATABASE_URL=postgresql://nelvyon_local:nelvyon_local_dev@localhost:5434/nelvyon_recon_b9
+LOCAL_AI_TEST_DATABASE_URL=postgresql://nelvyon_local_app:cert_local_b10@localhost:5434/nelvyon_localai_cert
+```
+
+> **`LOCAL_AI_DATABASE_URL` usa `nelvyon_local_app`, no `nelvyon_local`.**
+> Con el superusuario, `localAiPhase2.test.ts` **falla** — y falla con razón: RLS
+> no se aplica a un superusuario, así que el inquilino A sí ve la memoria del B.
+> No es un fallo del producto: es la prueba diciendo que la estás ejecutando con
+> el rol equivocado.
+>
+> Es el mismo error, cometido dos veces esta noche, en dos suites distintas. **El
+> DSN correcto no basta: tiene que ser el ROL correcto.**
+
+Con todo puesto, los saltos bajan a **9**, y los nueve están clasificados:
+
+| Suite | Saltos | Clase |
+|---|---:|---|
+| `perderPostgresYVolver` | 3 | corre **a solas**, con `NELVYON_PERMITIR_REINICIO_PG=1` |
+| `rls.test.ts` | 2 | **EXTERNAL_VERIFICATION_REQUIRED** — Supabase en vivo |
+| `phase2EliteLive`, `workforceLive` | 2 | exigen modelo de *embeddings* real |
+| resto | 2 | entornos externos |

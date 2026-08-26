@@ -58,8 +58,15 @@ beforeEach(async () => {
   process.env.NELVYON_AI_ENABLED = "0";
   process.env.DATABASE_URL =
     process.env.DATABASE_URL ?? "postgresql://noop:noop@127.0.0.1:5432/noop";
-  // El servicio cachea el secreto al construirse.
-  const { resetAuthServiceForTests } = await import("../../../../../../../backend/auth/AuthService");
+  // El servicio cachea el secreto al construirse, y hay que reiniciarlo POR EL
+  // MISMO ESPECIFICADOR que usa el codigo bajo prueba.
+  //
+  // `ws.ts` hace `await import("@nelvyon/auth")`. Reiniciar por la ruta relativa
+  // `backend/auth/AuthService` puede tocar OTRA instancia del modulo, con lo que
+  // el singleton que de verdad se usa conserva el secreto que cacheo primero — y
+  // el control positivo pasa o falla segun que fichero del worker cargara antes.
+  // Aparecio como un fallo intermitente en una de cuatro ejecuciones completas.
+  const { resetAuthServiceForTests } = await import("@nelvyon/auth");
   resetAuthServiceForTests();
 });
 

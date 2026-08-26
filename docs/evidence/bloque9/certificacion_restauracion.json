@@ -14,7 +14,7 @@
     {
       "paso": "sembrar_inquilino_real",
       "ok": true,
-      "tenantId": "268b8fee-9002-47a0-bfb2-9641b3a708af",
+      "tenantId": "b3e2d5d0-abf1-4d0d-a369-0cf05234401b",
       "contactos": 250
     },
     {
@@ -39,7 +39,7 @@
     {
       "paso": "el_volcado_no_esta_vacio",
       "ok": true,
-      "bytes": "3549143"
+      "bytes": "3574349"
     },
     {
       "paso": "crear_base_destino",
