@@ -1,5 +1,6 @@
 import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
+import { examinarEmailDeContacto, exigirEmailDeContacto } from "./emailDeContacto";
 import { assertSaasPlanCanCreate, assertSaasPlanCanCreateMany } from "./saasPlanQuota";
 import { dispatchContactCreated, dispatchContactStageChanged } from "./saasWorkflowDispatch";
 
@@ -211,6 +212,13 @@ export class SaasCrmService {
     if (name.length === 0) {
       throw new SaasCrmError("name is required", "VALIDATION");
     }
+    // Estricto AQUI: hay una persona delante que puede corregirlo, y el email es
+    // a donde salen las campanias. Un email invalido no falla al guardarse; falla
+    // semanas despues, en un envio, sobre una lista entera.
+    const correo = exigirEmailDeContacto(data.email);
+    if (!correo.ok) {
+      throw new SaasCrmError(correo.mensaje, "VALIDATION");
+    }
     const status = data.status ?? "lead";
     const stage = data.pipeline_stage ?? "new";
     assertStatus(status);
@@ -225,7 +233,7 @@ export class SaasCrmService {
         [
           tenantId,
           name,
-          normalizeOptional(data.email),
+          correo.valor,
           normalizeOptional(data.phone),
           normalizeOptional(data.company),
           normalizeOptional(data.position),
@@ -294,7 +302,20 @@ export class SaasCrmService {
     tenantId: string,
     inputs: CreateContactInput[],
     opts?: { chunkSize?: number },
-  ): Promise<{ created: SaasContact[]; errors: Array<{ index: number; error: string }> }> {
+  ): Promise<{
+    created: SaasContact[];
+    errors: Array<{ index: number; error: string }>;
+    /**
+     * Filas que se importaron CON un email que no se va a poder enviar.
+     *
+     * No son errores y por eso no van en `errors`: la fila entra, el valor se
+     * conserva tal cual y aqui se dice cual es. Rechazar una importacion de
+     * 5.000 contactos por tres emails malos —o descartar esos tres en silencio—
+     * es perder trabajo de quien la hace; devolverle el indice y el motivo le
+     * permite arreglarlos sabiendo cuales son.
+     */
+    avisos: Array<{ index: number; aviso: string }>;
+  }> {
     const prepared: Array<{ index: number; data: Required<Pick<CreateContactInput, "name">> & CreateContactInput & {
       status: ContactStatus;
       pipeline_stage: PipelineStage;
@@ -302,6 +323,7 @@ export class SaasCrmService {
       tags: string[];
     } }> = [];
     const errors: Array<{ index: number; error: string }> = [];
+    const avisos: Array<{ index: number; aviso: string }> = [];
 
     for (let i = 0; i < inputs.length; i++) {
       const data = inputs[i]!;
@@ -315,10 +337,16 @@ export class SaasCrmService {
         const stage = data.pipeline_stage ?? "new";
         assertStatus(status);
         assertStage(stage);
+        // Se normaliza siempre; NO se rechaza. Ver `avisos` en la firma.
+        const correo = examinarEmailDeContacto(data.email);
+        if (!correo.valido) {
+          avisos.push({ index: i, aviso: `email no enviable (${correo.motivo}): ${JSON.stringify(correo.valor)}` });
+        }
         prepared.push({
           index: i,
           data: {
             ...data,
+            email: correo.valor,
             name,
             status,
             pipeline_stage: stage,
@@ -331,7 +359,7 @@ export class SaasCrmService {
       }
     }
 
-    if (prepared.length === 0) return { created: [], errors };
+    if (prepared.length === 0) return { created: [], errors, avisos };
 
     await assertSaasPlanCanCreateMany(this.db, tenantId, "contacts", prepared.length);
 
@@ -351,7 +379,7 @@ export class SaasCrmService {
         params.push(
           tenantId,
           d.name,
-          normalizeOptional(d.email),
+          d.email ?? null,
           normalizeOptional(d.phone),
           normalizeOptional(d.company),
           normalizeOptional(d.position),
@@ -395,7 +423,7 @@ export class SaasCrmService {
       }
     }
 
-    return { created, errors };
+    return { created, errors, avisos };
   }
 
   async getContact(tenantId: string, contactId: string): Promise<SaasContact | null> {
@@ -421,6 +449,17 @@ export class SaasCrmService {
     if (name !== undefined && name.length === 0) {
       throw new SaasCrmError("name cannot be empty", "VALIDATION");
     }
+    // Solo se exige validez si se ESTA CAMBIANDO el email.
+    //
+    // Un contacto ya guardado con un email raro tiene que poder editarse — aunque
+    // sea para arreglarle el telefono. Validar siempre lo dejaria bloqueado por
+    // un dato que ya estaba ahi, que es perder informacion por otra via.
+    let correo: string | null = null;
+    if (data.email !== undefined) {
+      const r = exigirEmailDeContacto(data.email);
+      if (!r.ok) throw new SaasCrmError(r.mensaje, "VALIDATION");
+      correo = r.valor;
+    }
     const rows = await this.db.query<ContactRow>(
       `UPDATE saas_contacts SET
          name = COALESCE($3, name),
@@ -440,7 +479,7 @@ export class SaasCrmService {
         tenantId,
         contactId,
         name ?? null,
-        data.email === undefined ? null : normalizeOptional(data.email),
+        correo,
         data.phone === undefined ? null : normalizeOptional(data.phone),
         data.company === undefined ? null : normalizeOptional(data.company),
         data.position === undefined ? null : normalizeOptional(data.position),

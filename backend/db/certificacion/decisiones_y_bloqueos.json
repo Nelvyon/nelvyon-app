@@ -74,14 +74,6 @@
    "verificable_automaticamente": false
   },
   {
-   "bloque_origen": 5,
-   "clase": "BLOCKED_HUMAN_DECISION",
-   "id": "CRM_EMAIL_VALIDATION",
-   "lo_que_NO_se_debe_hacer": "Decidir la politica de validacion.",
-   "titulo": "Validacion de email invalido en CRM",
-   "verificable_automaticamente": false
-  },
-  {
    "bloque_origen": 9,
    "clase": "BLOCKED_HUMAN_DECISION",
    "comportamiento_actual": "Sin cambios. saas_tenants tiene 10 filas en la base de certificacion y 0 politicas de la familia _os_.",
@@ -106,6 +98,22 @@
    "id": "INVOICING_AB_TESTING_SERVICES",
    "resuelto_en": "cierre de pendientes post-certificacion",
    "resultado": "ELIMINADOS. No eran una decision entre conectar o borrar: eran duplicados muertos Y rotos contra el esquema real."
+  },
+  {
+   "clase_anterior": "BLOCKED_HUMAN_DECISION",
+   "evidencia_medida": {
+    "certificacion": "backend/saas/__tests__/elEmailDelContactoNoSeInventa.pg.test.ts 16/16",
+    "crear_de_uno_en_uno": "ESTRICTO. SaasCrmError VALIDATION con el valor en el mensaje.",
+    "editar": "Estricto SOLO si se cambia el email. Un contacto ya guardado con un email raro se puede editar en cualquier otro campo, y se puede arreglar.",
+    "estado_previo": "Ninguna validacion. `normalizeOptional` solo recortaba espacios: \"no soy un email\", \"pepe@\" y \"<script>\" entraban tal cual. La tabla saas_contacts tampoco tiene restriccion de formato (comprobado en pg_constraint).",
+    "importacion_en_lote": "NO rechaza. Importa la fila, CONSERVA el valor normalizado y lo devuelve en `avisos` con su indice y motivo.",
+    "mutaciones": "M9 patron permisivo -> 5 rojas; M10 create sin validar -> 2; M12 el import rechaza -> 3; M13 el import descarta el valor -> 1; M11b valida el email almacenado -> 1. M11 (validar siempre en update) quedo INFIEL por construccion: ausencia de email es valida, asi que la sustitucion no cambia la conducta. Se sustituyo por M11b, que si cae.",
+    "normalizacion": "trim + minusculas, la misma que usa normalizeEmail en la deduplicacion.",
+    "patron": "el mismo que AuthService.EMAIL_RE, para que no haya dos definiciones de email valido."
+   },
+   "id": "CRM_EMAIL_VALIDATION",
+   "resuelto_en": "cierre de pendientes post-certificacion",
+   "resultado": "IMPLEMENTADA una politica POR PUERTA que no destruye ni rechaza datos existentes."
   }
  ]
 }
