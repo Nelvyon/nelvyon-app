@@ -399,12 +399,34 @@ for (const e of registro) {
 // 4 · Lo que solo se comprueba fuera de aquí
 // ═════════════════════════════════════════════════════════════════════════════
 
+// RETIRADA: `rls_del_supabase_gestionado`.
+//
+// Figuraba como verificacion externa pendiente «los 2 casos de rls.test.ts
+// exigen Supabase en vivo». Al mirarlos, los dos eran cascarones: su cuerpo
+// entero afirmaba que la variable que los activaba valia "1". Habrian pasado el
+// dia que alguien montara Supabase sin comprobar ni una fila.
+//
+// Y Supabase ya no esta en produccion: ni NEXT_PUBLIC_SUPABASE_URL, ni la clave
+// anonima, ni la de servicio estan definidas en el servicio web. La base es
+// PostgreSQL de Railway.
+//
+// La propiedad SI esta certificada, contra la base que se usa de verdad: 79
+// pruebas con el rol `nelvyon_web_app`, que si esta sujeto a las politicas.
+//
+// Esto no reduce el denominador: retira una entrada que contaba como pendiente
+// una cobertura que no existia. Un pendiente falso es peor que uno de mas,
+// porque hace parecer que queda trabajo donde no lo hay y esconde el que si.
 const EXTERNAS = [
-  ["rls_del_supabase_gestionado", "los 2 casos de rls.test.ts exigen Supabase en vivo (RUN_SUPABASE_RLS=1)"],
   ["deriva_de_esquema_en_produccion", "ejecutar detectar-deriva-de-esquema.mjs contra la base de produccion"],
-  ["colision_de_workspace_en_produccion", "ejecutar la deteccion de STABLE_WORKSPACE_ID_MIGRATION contra produccion"],
-  ["restauracion_desde_el_backup_real", "el simulacro corre en local; el backup de produccion hay que restaurarlo una vez"],
-  ["entrega_de_correo_real", "SES en produccion: solo se comprueba enviando"],
+  ["colision_de_workspace_en_produccion",
+   "EJECUTADA el 2026-08-27 contra produccion: SIN COLISIONES (22 inquilinos). "
+   + "Se repite al crecer: la probabilidad sube con cada alta"],
+  ["restauracion_desde_el_backup_real",
+   "restaurar la copia en un entorno AISLADO y compararlo con detectar-deriva y "
+   + "diagnostico-de-produccion. NO usar certificar-restauracion: siembra datos en el origen"],
+  ["entrega_de_correo_real",
+   "configuracion VERIFICADA el 2026-08-27 (envio habilitado, nelvyon.com verificado, "
+   + "cuota 50.000/dia). Falta solo la entrega, que exige enviar de verdad"],
   ["webhooks_de_stripe_en_vivo", "la firma se certifica en local; la entrega real no"],
 ];
 for (const [id, detalle] of EXTERNAS) {

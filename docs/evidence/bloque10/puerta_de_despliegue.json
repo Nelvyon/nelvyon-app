@@ -5,7 +5,7 @@
     "configuracion_puesta": 2,
     "configuracion_faltante": 6,
     "decisiones_humanas": 2,
-    "verificaciones_externas": 6
+    "verificaciones_externas": 5
   },
   "filas": [
     {
@@ -160,12 +160,6 @@
     },
     {
       "clase": "EXTERNAL_VERIFICATION_REQUIRED",
-      "id": "rls_del_supabase_gestionado",
-      "estado": "PENDIENTE",
-      "detalle": "los 2 casos de rls.test.ts exigen Supabase en vivo (RUN_SUPABASE_RLS=1)"
-    },
-    {
-      "clase": "EXTERNAL_VERIFICATION_REQUIRED",
       "id": "deriva_de_esquema_en_produccion",
       "estado": "PENDIENTE",
       "detalle": "ejecutar detectar-deriva-de-esquema.mjs contra la base de produccion"
@@ -174,19 +168,19 @@
       "clase": "EXTERNAL_VERIFICATION_REQUIRED",
       "id": "colision_de_workspace_en_produccion",
       "estado": "PENDIENTE",
-      "detalle": "ejecutar la deteccion de STABLE_WORKSPACE_ID_MIGRATION contra produccion"
+      "detalle": "EJECUTADA el 2026-08-27 contra produccion: SIN COLISIONES (22 inquilinos). Se repite al crecer: la probabilidad sube con cada alta"
     },
     {
       "clase": "EXTERNAL_VERIFICATION_REQUIRED",
       "id": "restauracion_desde_el_backup_real",
       "estado": "PENDIENTE",
-      "detalle": "el simulacro corre en local; el backup de produccion hay que restaurarlo una vez"
+      "detalle": "restaurar la copia en un entorno AISLADO y compararlo con detectar-deriva y diagnostico-de-produccion. NO usar certificar-restauracion: siembra datos en el origen"
     },
     {
       "clase": "EXTERNAL_VERIFICATION_REQUIRED",
       "id": "entrega_de_correo_real",
       "estado": "PENDIENTE",
-      "detalle": "SES en produccion: solo se comprueba enviando"
+      "detalle": "configuracion VERIFICADA el 2026-08-27 (envio habilitado, nelvyon.com verificado, cuota 50.000/dia). Falta solo la entrega, que exige enviar de verdad"
     },
     {
       "clase": "EXTERNAL_VERIFICATION_REQUIRED",

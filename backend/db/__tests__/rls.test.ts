@@ -6,7 +6,6 @@ import { describe, expect, it, vi } from "vitest";
 import { getSupabaseAnonKey, assertNoServiceRoleKeyExposedInBrowser } from "../../../apps/web/src/lib/supabaseClient";
 
 const dbRoot = join(__dirname, "..");
-const RUN_SUPABASE_RLS_LIVE = process.env.RUN_SUPABASE_RLS === "1";
 
 describe("RLS audit (MIG 279)", () => {
   // Esta prueba EXIGIA que `DbClient.ts` contuviera la palabra `service_role` y
@@ -100,19 +99,49 @@ describe("RLS audit (MIG 279)", () => {
     vi.unstubAllEnvs();
   });
 
-  it.skipIf(!RUN_SUPABASE_RLS_LIVE)(
-    "RLS en vivo: usuario A no lee filas de usuario B",
-    async () => {
-      // Requiere RUN_SUPABASE_RLS=1 + Supabase project + JWT de dos tenants
-      expect(process.env.RUN_SUPABASE_RLS).toBe("1");
-    },
-  );
-
-  it.skipIf(!RUN_SUPABASE_RLS_LIVE)(
-    "RLS en vivo: authenticated no inserta con user_id ajeno",
-    async () => {
-      // Requiere RUN_SUPABASE_RLS=1 + rol authenticated
-      expect(process.env.RUN_SUPABASE_RLS).toBe("1");
-    },
-  );
+  /**
+   * LAS DOS PRUEBAS «EN VIVO» QUE HABIA AQUI ERAN CASCARONES VACIOS.
+   *
+   * Decian certificar «usuario A no lee filas de usuario B» y «authenticated no
+   * inserta con user_id ajeno», y su cuerpo entero era:
+   *
+   *     expect(process.env.RUN_SUPABASE_RLS).toBe("1");
+   *
+   * Es decir, afirmaban que la variable que las habia activado valia "1".
+   * Habrian pasado el dia que alguien montara Supabase, sin haber comprobado ni
+   * una fila. Y mientras tanto figuraban como EXTERNAL_VERIFICATION_REQUIRED, lo
+   * que hacia creer que habia cobertura esperando infraestructura. No la habia:
+   * habia un hueco con nombre de pendiente.
+   *
+   * Ademas Supabase ya NO esta en produccion — medido: ni
+   * NEXT_PUBLIC_SUPABASE_URL, ni la clave anonima, ni la de servicio estan
+   * definidas en el servicio web. La base es PostgreSQL de Railway.
+   *
+   * LA PROPIEDAD SI ESTA CERTIFICADA, y contra la base que se usa de verdad:
+   * `rlsEfectivaWebApp.pg.test.ts` (21 pruebas) y `rlsFamiliasSaas.pg.test.ts`
+   * (14) lo miden con el rol `nelvyon_web_app`, que SI esta sujeto a las
+   * politicas — no con superusuario, que las evitaria.
+   *
+   * Lo que queda aqui es lo unico que este fichero puede garantizar sin
+   * infraestructura: que esa cobertura sigue existiendo. Si alguien borra esas
+   * suites, esto se pone rojo y el hueco vuelve a verse.
+   */
+  it("la RLS entre inquilinos se certifica contra PostgreSQL real, no aqui", () => {
+    const suites = [
+      "rlsEfectivaWebApp.pg.test.ts",
+      "rlsFamiliasSaas.pg.test.ts",
+      "elCutoverDelRolDelLadoWeb.pg.test.ts",
+    ];
+    for (const s of suites) {
+      const ruta = join(dbRoot, "__tests__", s);
+      expect(
+        () => readFileSync(ruta, "utf8"),
+        `falta ${s}: la RLS entre inquilinos se queda sin quien la certifique`,
+      ).not.toThrow();
+    }
+    // Y que de verdad usan el rol acotado, no el superusuario.
+    const efectiva = readFileSync(join(dbRoot, "__tests__", "rlsEfectivaWebApp.pg.test.ts"), "utf8");
+    expect(efectiva, "no usa el rol sujeto a las politicas").toContain("NELVYON_WEB_APP_CERT_DSN");
+    expect(efectiva, "no comprueba que el rol no salte RLS").toContain("rolbypassrls");
+  });
 });
