@@ -27,6 +27,7 @@
  *   1  si falta configuración obligatoria
  *   2  si algo que debería estar comprobado automáticamente ha FALLADO
  */
+import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -188,6 +189,37 @@ for (const [v, porque] of OBLIGATORIAS) {
   );
 }
 
+/**
+ * NUNCA se imprime el valor de un secreto.
+ *
+ * Esta salida acaba en registros de despliegue, en capturas y en tickets. Todo
+ * lo que se dice de una clave es su longitud y si pasa las comprobaciones; si
+ * hiciera falta señalar CUÁL de varias es, se dan ocho caracteres de su hash y
+ * nunca del valor.
+ */
+function huella(valor) {
+  return createHash("sha256").update(valor).digest("hex").slice(0, 8);
+}
+
+/**
+ * Valores de relleno. Una variable «puesta» con uno de éstos es peor que vacía:
+ * la puerta da verde y el secreto es público.
+ *
+ * No es una lista teórica — `roles_web.sql` lleva literalmente
+ * `cambiar_en_el_cutover` porque es un fichero de certificación local, y el día
+ * que alguien lo copie a un `.env` esto tiene que gritar.
+ */
+const RELLENOS = [
+  "changeme", "change_me", "cambiar", "cambiame", "cambiar_en_el_cutover",
+  "placeholder", "your-secret", "your_secret", "password", "xxxx",
+  "todo", "tbd", "example", "ejemplo",
+];
+
+function pareceRelleno(valor) {
+  const v = valor.toLowerCase();
+  return RELLENOS.some((r) => v.includes(r));
+}
+
 /** Longitudes mínimas: una clave corta es peor que ninguna, porque tranquiliza. */
 for (const [v, minimo] of [["JWT_SECRET", 32], ["CRON_SECRET", 16]]) {
   const valor = (ENV[v] ?? "").trim();
@@ -198,6 +230,132 @@ for (const [v, minimo] of [["JWT_SECRET", 32], ["CRON_SECRET", 16]]) {
     valor.length >= minimo ? "PUESTA" : "FALTA",
     valor.length >= minimo ? `>= ${minimo}` : `tiene ${valor.length}, hacen falta ${minimo}`,
   );
+}
+
+/** Ningún secreto puede ser un valor de relleno ni tener una sola variedad. */
+for (const v of ["JWT_SECRET", "CRON_SECRET", "STRIPE_WEBHOOK_SECRET"]) {
+  const valor = (ENV[v] ?? "").trim();
+  if (!valor) continue;
+  const relleno = pareceRelleno(valor);
+  // Un secreto de un solo carácter repetido pasa cualquier longitud mínima.
+  const variedad = new Set(valor).size;
+  const ok = !relleno && variedad >= 8;
+  fila(
+    "REQUIRED_CONFIGURATION",
+    `${v}_no_es_de_relleno`,
+    ok ? "PUESTA" : "FALTA",
+    ok
+      ? `${variedad} caracteres distintos · huella ${huella(valor)}`
+      : relleno
+        ? "parece un valor de relleno: seria publico"
+        : `solo ${variedad} caracteres distintos: no es un secreto`,
+  );
+}
+
+/**
+ * Los dos secretos no pueden ser el mismo.
+ *
+ * Si `CRON_SECRET` fuera igual que `JWT_SECRET`, quien viera pasar una cabecera
+ * de cron —que va en claro en la configuración de cualquier programador de
+ * tareas— tendría la clave con la que se firman TODAS las sesiones.
+ */
+{
+  const j = (ENV.JWT_SECRET ?? "").trim();
+  const c = (ENV.CRON_SECRET ?? "").trim();
+  if (j && c) {
+    fila(
+      "REQUIRED_CONFIGURATION",
+      "los_secretos_son_distintos",
+      j === c ? "FALTA" : "PUESTA",
+      j === c
+        ? "JWT_SECRET y CRON_SECRET son el MISMO valor: la clave de las sesiones "
+          + "viaja en una cabecera de cron"
+        : "distintos",
+    );
+  }
+}
+
+/**
+ * `SES_SNS_TOPIC_ARN`, sintácticamente.
+ *
+ * No se comprueba que el topic exista —eso exige AWS y es verificación externa—
+ * sino que tenga forma de ARN de SNS. Un valor con una errata cierra el webhook
+ * igual que si faltara, pero con la puerta en verde, que es peor.
+ *
+ *     arn:aws:sns:<region>:<cuenta de 12 digitos>:<nombre>
+ *
+ * Admite varios separados por coma, que es como se declara una lista de topics.
+ */
+{
+  const bruto = (ENV.SES_SNS_TOPIC_ARN ?? "").trim();
+  if (bruto) {
+    const ARN_SNS = /^arn:aws[a-z-]*:sns:[a-z0-9-]+:\d{12}:[A-Za-z0-9_-]+$/;
+    const partes = bruto.split(",").map((s) => s.trim()).filter(Boolean);
+    const malos = partes.filter((a) => !ARN_SNS.test(a));
+    const ok = partes.length > 0 && malos.length === 0;
+    fila(
+      "REQUIRED_CONFIGURATION",
+      "SES_SNS_TOPIC_ARN_tiene_forma_de_arn",
+      ok ? "PUESTA" : "FALTA",
+      ok ? `${partes.length} topic(s), forma valida`
+         : `${malos.length} de ${partes.length} no son un ARN de SNS`,
+    );
+  }
+}
+
+/**
+ * `DATABASE_URL`: que sea una cadena de PostgreSQL y no la clave anónima.
+ *
+ * Lo segundo lo comprueba `DbClient` al arrancar y lanza, pero llegar ahí
+ * significa haber desplegado ya. Aquí se ve antes, y sin imprimir la cadena —
+ * que lleva la contraseña dentro.
+ */
+{
+  const bruto = (ENV.DATABASE_URL ?? "").trim();
+  if (bruto) {
+    let motivo = null;
+    let host = "";
+    try {
+      const u = new URL(bruto.replace(/^postgresql\+asyncpg:/, "postgresql:"));
+      host = u.hostname;
+      if (!/^postgres(ql)?:$/.test(u.protocol)) motivo = `no es postgres: (${u.protocol})`;
+      else if (!u.hostname) motivo = "sin host";
+      else if (!u.pathname.replace(/^\//, "")) motivo = "sin nombre de base";
+      else if (bruto.includes("NEXT_PUBLIC_SUPABASE_ANON_KEY")) motivo = "referencia la clave anonima";
+    } catch {
+      motivo = "no se puede leer como URL";
+    }
+    fila(
+      "REQUIRED_CONFIGURATION",
+      "DATABASE_URL_tiene_forma_valida",
+      motivo ? "FALTA" : "PUESTA",
+      motivo ?? `host ${host}`,   // el host, nunca la contrasena
+    );
+  }
+}
+
+/**
+ * Coherencia con el cutover del rol web.
+ *
+ * Mover `DATABASE_URL` a `nelvyon_web_app` SIN poner
+ * `NELVYON_WEB_JOBS_DATABASE_URL` es el error caro de ese cambio: los 14 crons,
+ * los 6 webhooks y los planos platform/admin no darían error — devolverían CERO
+ * FILAS, en silencio. Medido en `elCutoverDelRolDelLadoWeb.pg.test.ts`.
+ */
+{
+  const principal = (ENV.DATABASE_URL ?? "").trim();
+  const trabajos = (ENV.NELVYON_WEB_JOBS_DATABASE_URL ?? "").trim();
+  if (/(^|[:/@])nelvyon_web_app([:@]|$)/.test(principal)) {
+    fila(
+      "REQUIRED_CONFIGURATION",
+      "NELVYON_WEB_JOBS_DATABASE_URL",
+      trabajos ? "PUESTA" : "FALTA",
+      trabajos
+        ? "puesta, como exige el cutover"
+        : "DATABASE_URL ya apunta a nelvyon_web_app pero falta la conexion "
+          + "cross-tenant: los crons y los webhooks devolverian cero filas EN SILENCIO",
+    );
+  }
 }
 
 // ═════════════════════════════════════════════════════════════════════════════

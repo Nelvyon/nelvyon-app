@@ -143,4 +143,26 @@ function main() {
   process.exit(derivaTotal === 0 ? 0 : 1);
 }
 
-main();
+/**
+ * «No he podido comprobarlo» sale con 2, nunca con 1.
+ *
+ * Antes, un fallo de conexión —base inexistente, contraseña mala, contenedor
+ * parado— se iba por una excepción sin capturar y Node terminaba con **1**, que
+ * es exactamente el código que este script usa para decir «HAY DERIVA».
+ *
+ * Quien lo llame desde un despliegue no podría distinguir «tu esquema ha
+ * cambiado» de «no llegué a mirarlo», y las dos cosas exigen reacciones
+ * opuestas: la primera es un hallazgo, la segunda es que la comprobación no ha
+ * ocurrido y hay que repetirla.
+ *
+ * Es la misma regla que ya aplica `detectar-colision-de-workspace.mjs`, y la
+ * misma que se le exige a una señal de salud: un verde tiene que significar lo
+ * que dice, y un rojo también.
+ */
+try {
+  main();
+} catch (e) {
+  console.error(`NO SE PUEDE COMPROBAR: ${e instanceof Error ? e.message : String(e)}`);
+  console.error("No se ha examinado nada. Esto NO significa que no haya deriva.");
+  process.exit(2);
+}

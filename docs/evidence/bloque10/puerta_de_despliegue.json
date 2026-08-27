@@ -2,9 +2,9 @@
   "resumen": {
     "automaticos_ok": 15,
     "automaticos_fallidos": 0,
-    "configuracion_puesta": 0,
-    "configuracion_faltante": 7,
-    "decisiones_humanas": 3,
+    "configuracion_puesta": 12,
+    "configuracion_faltante": 3,
+    "decisiones_humanas": 2,
     "verificaciones_externas": 6
   },
   "filas": [
@@ -101,26 +101,74 @@
     {
       "clase": "REQUIRED_CONFIGURATION",
       "id": "DATABASE_URL",
-      "estado": "FALTA",
-      "detalle": "sin base no hay producto"
+      "estado": "PUESTA",
+      "detalle": "40 caracteres"
     },
     {
       "clase": "REQUIRED_CONFIGURATION",
       "id": "JWT_SECRET",
-      "estado": "FALTA",
-      "detalle": "es la clave de las sesiones y de los enlaces de capacidad"
+      "estado": "PUESTA",
+      "detalle": "33 caracteres"
     },
     {
       "clase": "REQUIRED_CONFIGURATION",
       "id": "CRON_SECRET",
-      "estado": "FALTA",
-      "detalle": "sin ella las 16 rutas de cron cierran en falso y no corre nada"
+      "estado": "PUESTA",
+      "detalle": "16 caracteres"
     },
     {
       "clase": "REQUIRED_CONFIGURATION",
       "id": "SES_SNS_TOPIC_ARN",
-      "estado": "FALTA",
-      "detalle": "sin ella /api/webhooks/ses responde 503 en produccion"
+      "estado": "PUESTA",
+      "detalle": "54 caracteres"
+    },
+    {
+      "clase": "REQUIRED_CONFIGURATION",
+      "id": "JWT_SECRET_longitud",
+      "estado": "PUESTA",
+      "detalle": ">= 32"
+    },
+    {
+      "clase": "REQUIRED_CONFIGURATION",
+      "id": "CRON_SECRET_longitud",
+      "estado": "PUESTA",
+      "detalle": ">= 16"
+    },
+    {
+      "clase": "REQUIRED_CONFIGURATION",
+      "id": "JWT_SECRET_no_es_de_relleno",
+      "estado": "PUESTA",
+      "detalle": "33 caracteres distintos · huella 3f0d9b60"
+    },
+    {
+      "clase": "REQUIRED_CONFIGURATION",
+      "id": "CRON_SECRET_no_es_de_relleno",
+      "estado": "PUESTA",
+      "detalle": "16 caracteres distintos · huella ee6a84e8"
+    },
+    {
+      "clase": "REQUIRED_CONFIGURATION",
+      "id": "los_secretos_son_distintos",
+      "estado": "PUESTA",
+      "detalle": "distintos"
+    },
+    {
+      "clase": "REQUIRED_CONFIGURATION",
+      "id": "SES_SNS_TOPIC_ARN_tiene_forma_de_arn",
+      "estado": "PUESTA",
+      "detalle": "1 topic(s), forma valida"
+    },
+    {
+      "clase": "REQUIRED_CONFIGURATION",
+      "id": "DATABASE_URL_tiene_forma_valida",
+      "estado": "PUESTA",
+      "detalle": "host db"
+    },
+    {
+      "clase": "REQUIRED_CONFIGURATION",
+      "id": "NELVYON_WEB_JOBS_DATABASE_URL",
+      "estado": "PUESTA",
+      "detalle": "puesta, como exige el cutover"
     },
     {
       "clase": "REQUIRED_CONFIGURATION",
@@ -145,12 +193,6 @@
       "id": "ADR-064",
       "estado": "FALTA",
       "detalle": "Falta aprobar las 8 migraciones pendientes, ya clasificadas una a una"
-    },
-    {
-      "clase": "BLOCKED_HUMAN_DECISION",
-      "id": "STRIPE_MEMBERSHIP_REACTIVATION",
-      "estado": "PENDIENTE",
-      "detalle": "Reactivacion de membresias en Stripe"
     },
     {
       "clase": "BLOCKED_HUMAN_DECISION",
