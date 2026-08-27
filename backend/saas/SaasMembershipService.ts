@@ -335,6 +335,84 @@ export class SaasMembershipService {
     );
   }
 
+  /**
+   * Devuelve el acceso a quien caducó por impago y ha vuelto a pagar.
+   *
+   * EL AGUJERO QUE CIERRA
+   * =====================
+   * `updateMemberStatus` impide, con razón, que un `active` fuera de orden pise
+   * un estado terminal. Pero el único evento que llevaba a `active` era
+   * `customer.subscription.created`, y ése no se repite: se emite una vez, al
+   * crear la suscripción.
+   *
+   * Consecuencia: quien caducaba por un impago **no volvía nunca**, aunque
+   * pagara al día siguiente. Stripe cobraba y NELVYON seguía cerrado. Es el peor
+   * de los dos errores posibles en un cobro recurrente, porque el cliente ya ha
+   * pagado.
+   *
+   * POR QUÉ ESTO NO ES «QUITAR LA PROTECCIÓN»
+   * ==========================================
+   * La protección de `updateMemberStatus` existe porque un `created` que llega
+   * tarde **no significa nada**: no es noticia de un pago, es la reentrega de un
+   * evento viejo. Usarlo como reactivación era el agujero del Bloque 1, y no se
+   * recupera.
+   *
+   * `invoice.payment_succeeded` es otra cosa: es la noticia de que **acaba de
+   * entrar dinero**. Reactivar con eso no es fiarse del orden de entrega, es
+   * fiarse del cobro — que es exactamente lo que decide si alguien tiene derecho
+   * a entrar.
+   *
+   * Y la reactivación se acota a un solo salto:
+   *
+   *     expired   ──(pago)──>  active
+   *     cancelled ──────────>  cancelled   (no se mueve)
+   *
+   * `expired` significa «se le cayó el cobro». `cancelled` significa «se dio de
+   * baja», y una baja no la deshace un cobro rezagado: la deshace volver a
+   * suscribirse, que emite un `created` nuevo con su propia suscripción.
+   *
+   * LA ÚNICA DECISIÓN QUE SIGUE SIENDO DE PRODUCTO
+   * ===============================================
+   * Si una baja explícita debería poder revivir con un pago posterior. Aquí se
+   * responde que NO, que es la dirección que cierra: si se equivoca, alguien que
+   * pagó llama y se le reactiva a mano. Al revés —abrir el material de pago a
+   * quien se dio de baja— no lo llama nadie a decírtelo.
+   */
+  async reactivarPorPago(tenantId: string, stripeSubscriptionId: string): Promise<boolean> {
+    const filas = await this.db.query<{ id: string }>(
+      `UPDATE saas_membership_members SET status='active', updated_at=NOW()
+       WHERE tenant_id=$1 AND stripe_subscription_id=$2
+         AND status = 'expired'
+       RETURNING id::text`,
+      [tenantId, stripeSubscriptionId]
+    );
+    return filas.length > 0;
+  }
+
+  /**
+   * El inquilino dueño de una suscripción de Stripe.
+   *
+   * Hace falta porque los eventos de FACTURA no traen `metadata.tenant_id`: la
+   * metadata vive en la suscripción, no en la factura que genera. La ruta leía
+   * `event.data.object.metadata.tenant_id` para todos los eventos por igual, y
+   * en los de factura salía vacío — con lo que la petición se descartaba entera.
+   *
+   * Es una consulta ENTRE INQUILINOS a propósito, y es legítima: un webhook de
+   * Stripe no tiene sesión detrás, así que no puede saber de quién es hasta que
+   * lo pregunta. Lo que la acota es que sólo busca por un identificador que
+   * emite Stripe (`sub_…`) y sólo devuelve el inquilino, nada más.
+   */
+  async inquilinoDeLaSuscripcion(stripeSubscriptionId: string): Promise<string | null> {
+    if (!stripeSubscriptionId) return null;
+    const filas = await this.db.query<{ tenant_id: string }>(
+      `SELECT tenant_id::text FROM saas_membership_members
+        WHERE stripe_subscription_id = $1
+        ORDER BY updated_at DESC LIMIT 1`,
+      [stripeSubscriptionId]
+    );
+    return filas[0]?.tenant_id ?? null;
+  }
+
   // ── Access gating ─────────────────────────────────────────────────────────
 
   async checkAccess(

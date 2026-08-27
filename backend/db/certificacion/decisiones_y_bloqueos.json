@@ -66,14 +66,6 @@
    "verificable_automaticamente": true
   },
   {
-   "bloque_origen": 4,
-   "clase": "BLOCKED_HUMAN_DECISION",
-   "id": "STRIPE_MEMBERSHIP_REACTIVATION",
-   "lo_que_NO_se_debe_hacer": "Tocar Stripe real ni decidir la politica de reactivacion.",
-   "titulo": "Reactivacion de membresias en Stripe",
-   "verificable_automaticamente": false
-  },
-  {
    "bloque_origen": 9,
    "clase": "BLOCKED_HUMAN_DECISION",
    "comportamiento_actual": "Sin cambios. saas_tenants tiene 10 filas en la base de certificacion y 0 politicas de la familia _os_.",
@@ -114,6 +106,20 @@
    "id": "CRM_EMAIL_VALIDATION",
    "resuelto_en": "cierre de pendientes post-certificacion",
    "resultado": "IMPLEMENTADA una politica POR PUERTA que no destruye ni rechaza datos existentes."
+  },
+  {
+   "clase_anterior": "BLOCKED_HUMAN_DECISION",
+   "decision_de_producto_que_queda": "Si una baja EXPLICITA (cancelled) deberia poder revivir con un pago posterior. Escrito que NO, que es la direccion que cierra: si alguien pago y no entra, llama; si alguien que se dio de baja entra, no llama nadie. Cambiarlo es una linea en reactivarPorPago y esta certificado que hoy no ocurre.",
+   "evidencia_medida": {
+    "certificacion": "backend/saas/__tests__/laMembresiaQueVuelveAPagar.pg.test.ts 14/14, contra PostgreSQL real y sin una sola llamada a Stripe.",
+    "defecto_1_reactivacion": "El unico evento que llevaba a `active` era customer.subscription.created, que se emite UNA vez. Quien caducaba por impago no volvia nunca aunque pagara. Se cierra con invoice.payment_succeeded, que significa que acaba de entrar dinero -- no con un `created` reentregado, que era el agujero del Bloque 1 y NO se recupera.",
+    "defecto_2_identificador": "event.data.object es una Suscripcion en customer.subscription.* y una FACTURA en invoice.*. La ruta leia obj.id para todos por igual, asi que invoice.payment_failed buscaba un miembro con stripe_subscription_id = in_... y no coincidia NUNCA: la caducidad por impago no caducaba a nadie, el UPDATE tocaba cero filas y la ruta devolvia 200 OK. Los dos defectos se tapaban entre si: como nadie caducaba, nadie notaba que los caducados no volvian.",
+    "defecto_3_inquilino": "Las facturas no llevan metadata.tenant_id --la metadata vive en la suscripcion--, asi que el evento se descartaba antes de llegar al servicio. Ahora el inquilino se resuelve por la suscripcion si la metadata no lo trae.",
+    "mutaciones": "M14 la factura usa su propio id -> 3 rojas; M15 reactivar tambien desde cancelled -> 1; M16 reactivar sin filtrar estado -> 2; M17 reactivar ignora el inquilino -> 5; M18 el inquilino no se resuelve por la base -> 1."
+   },
+   "id": "STRIPE_MEMBERSHIP_REACTIVATION",
+   "resuelto_en": "cierre de pendientes post-certificacion",
+   "resultado": "CONTRATO RECONSTRUIDO. La reactivacion la hace invoice.payment_succeeded, y solo desde `expired`. Ademas se corrigio un defecto que nadie buscaba y que tapaba a este."
   }
  ]
 }

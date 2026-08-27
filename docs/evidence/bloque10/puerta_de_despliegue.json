@@ -4,7 +4,7 @@
     "automaticos_fallidos": 0,
     "configuracion_puesta": 0,
     "configuracion_faltante": 7,
-    "decisiones_humanas": 4,
+    "decisiones_humanas": 3,
     "verificaciones_externas": 6
   },
   "filas": [
@@ -151,12 +151,6 @@
       "id": "STRIPE_MEMBERSHIP_REACTIVATION",
       "estado": "PENDIENTE",
       "detalle": "Reactivacion de membresias en Stripe"
-    },
-    {
-      "clase": "BLOCKED_HUMAN_DECISION",
-      "id": "CRM_EMAIL_VALIDATION",
-      "estado": "PENDIENTE",
-      "detalle": "Validacion de email invalido en CRM"
     },
     {
       "clase": "BLOCKED_HUMAN_DECISION",

@@ -50,11 +50,25 @@ def _texto(rel: str) -> str:
 
 
 def test_el_registro_existe_y_no_esta_vacio() -> None:
-    """Suelo minimo: cero bloqueos sobre cero entradas es el verde mas vacio."""
-    e = registro()
-    assert len(e) >= 8, (
-        f"solo {len(e)} entradas en el registro de bloqueos. Los bloques 1 a 7 "
-        "dejaron ocho como minimo: si el numero baja, alguien ha borrado uno."
+    """Suelo minimo: cero bloqueos sobre cero entradas es el verde mas vacio.
+
+    El suelo se cuenta sobre ABIERTOS + RESUELTOS, no sobre abiertos a secas.
+
+    Contarlo solo sobre los abiertos protegia contra borrar una entrada, que es
+    el riesgo de verdad, pero castigaba resolver: cerrar un bloqueo legitimamente
+    —con su evidencia, en `resueltas`— bajaba el numero y ponia esto rojo. Un
+    suelo que se dispara al hacer bien las cosas se acaba subiendo a mano, y
+    entonces ya no es un suelo.
+
+    Lo que sigue estando prohibido es que el TOTAL baje: eso solo puede pasar
+    borrando.
+    """
+    abiertos, cerrados = registro(), _resueltas()
+    total = len(abiertos) + len(cerrados)
+    assert total >= 9, (
+        f"solo {total} entradas en el registro ({len(abiertos)} abiertas + "
+        f"{len(cerrados)} resueltas). Los bloques 1 a 9 dejaron nueve: si el "
+        "total baja, alguien ha borrado una en vez de resolverla."
     )
 
 
