@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { getSaasMembershipService } from "@nelvyon/saas";
 import { verifyStripeWebhook } from "../../../../../../../backend/stripe/webhookHandler";
+import { suscripcionDelEvento } from "./suscripcionDelEvento";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -64,30 +65,6 @@ const EVENTOS = new Set([
   "invoice.payment_failed",
   "invoice.payment_succeeded",
 ]);
-
-/**
- * El `sub_…` del evento, sea cual sea el objeto que traiga.
- *
- * Para una factura, la suscripción está en `subscription` (API clásica) o
- * colgando de `parent.subscription_details.subscription` (API nueva). Se miran
- * las dos: cuál llega depende de la versión de API con la que esté configurado
- * el endpoint en Stripe, y eso no se decide desde aquí.
- */
-export function suscripcionDelEvento(
-  tipo: string,
-  obj: Record<string, unknown>,
-): string {
-  if (tipo.startsWith("invoice.")) {
-    const directa = obj.subscription;
-    if (typeof directa === "string" && directa.length > 0) return directa;
-    const padre = obj.parent as Record<string, unknown> | undefined;
-    const detalles = padre?.subscription_details as Record<string, unknown> | undefined;
-    const anidada = detalles?.subscription;
-    if (typeof anidada === "string" && anidada.length > 0) return anidada;
-    return "";
-  }
-  return typeof obj.id === "string" ? obj.id : "";
-}
 
 export async function POST(req: Request) {
   try {

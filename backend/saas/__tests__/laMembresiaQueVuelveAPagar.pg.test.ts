@@ -42,7 +42,7 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { SaasMembershipService } from "../SaasMembershipService";
-import { suscripcionDelEvento } from "../../../apps/web/src/app/api/webhooks/stripe-membership/route";
+import { suscripcionDelEvento } from "../../../apps/web/src/app/api/webhooks/stripe-membership/suscripcionDelEvento";
 
 const DSN = process.env.NELVYON_B2_DSN ?? process.env.NELVYON_PG_CERT_DSN ?? "";
 const conBase = DSN ? describe : describe.skip;
