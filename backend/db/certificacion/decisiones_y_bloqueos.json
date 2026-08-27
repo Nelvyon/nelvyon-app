@@ -76,14 +76,6 @@
   {
    "bloque_origen": 5,
    "clase": "BLOCKED_HUMAN_DECISION",
-   "id": "INVOICING_AB_TESTING_SERVICES",
-   "lo_que_NO_se_debe_hacer": "Resolverlos unilateralmente.",
-   "titulo": "InvoicingService y ABTestingService",
-   "verificable_automaticamente": false
-  },
-  {
-   "bloque_origen": 5,
-   "clase": "BLOCKED_HUMAN_DECISION",
    "id": "CRM_EMAIL_VALIDATION",
    "lo_que_NO_se_debe_hacer": "Decidir la politica de validacion.",
    "titulo": "Validacion de email invalido en CRM",
@@ -100,6 +92,20 @@
    "por_que": "La migracion 567 activa RLS SOLO sobre tablas vacias, y la cautela esta bien razonada en su cabecera: activar RLS sobre una tabla con datos puede ocultarselos a quien ya los estaba leyendo. Pero la consecuencia no la decidio nadie: una tabla se queda sin RLS PARA SIEMPRE por lo que hubiera dentro el dia que se aplico la migracion. MEDIDO: una reconstruccion desde cero tiene 2121 politicas; la base de certificacion, tras aplicarle las 475 migraciones sin un solo error, tiene 2117. Las cuatro que faltan son las de saas_tenants — la tabla de inquilinos. Las dos bases creen estar al dia.",
    "titulo": "Cuatro politicas RLS de saas_tenants no llegan a una base con datos",
    "verificable_automaticamente": true
+  }
+ ],
+ "resueltas": [
+  {
+   "clase_anterior": "BLOCKED_HUMAN_DECISION",
+   "evidencia_medida": {
+    "ABTestingService": "0 consumidores. Usa 4 tablas y TRES no existen: ab_test_variants, ab_test_results, ab_test_history.",
+    "InvoicingService": "0 consumidores (solo el barril). Ninguna de las columnas que escribe existe en `invoices`: user_id, client_name, client_email, client_address, items, sent_at. La tabla usa tenant_id, contact_id y line_items. Sus 9 pruebas pasaban con un doble que fabricaba a mano una fila con las columnas inventadas, y llevaban @ts-nocheck.",
+    "canonico_que_queda": "SaasFacturasService (cableado a las 4 rutas /api/saas/facturas*, misma tabla `invoices` con la forma correcta, y generatePdfHtml con etiquetas por idioma) y SaasAbTestingService (cableado a /api/saas/ab-testing). Para el OS, os-agents/ab-testing/AbTestingService sobre ab_experiments.",
+    "capacidades_perdidas": "ninguna: las que declaraban no podian ejecutarse."
+   },
+   "id": "INVOICING_AB_TESTING_SERVICES",
+   "resuelto_en": "cierre de pendientes post-certificacion",
+   "resultado": "ELIMINADOS. No eran una decision entre conectar o borrar: eran duplicados muertos Y rotos contra el esquema real."
   }
  ]
 }

@@ -34,8 +34,12 @@ CLASES = {
 }
 
 
+def _registro_completo() -> dict:
+    return json.load(io.open(REGISTRO, encoding="utf-8"))
+
+
 def registro() -> list[dict]:
-    return json.load(io.open(REGISTRO, encoding="utf-8"))["entradas"]
+    return _registro_completo()["entradas"]
 
 
 def _texto(rel: str) -> str:
@@ -66,23 +70,72 @@ def test_toda_entrada_dice_QUE_es_y_POR_QUE() -> None:
         )
 
 
-def test_los_bloqueos_heredados_siguen_todos_presentes() -> None:
-    """Ninguno de los siete que el fundador aisló puede desaparecer."""
-    obligatorios = {
-        "WEB_DB_ROLE_CUTOVER",
-        "ADR-064",
-        "STRIPE_MEMBERSHIP_REACTIVATION",
-        "INVOICING_AB_TESTING_SERVICES",
-        "CRM_EMAIL_VALIDATION",
-        "PLATFORM_ADMIN_MODEL",
-        "STABLE_WORKSPACE_ID_MIGRATION",
-    }
-    presentes = {e["id"] for e in registro()}
-    faltan = sorted(obligatorios - presentes)
-    assert not faltan, (
-        f"han desaparecido del registro: {faltan}. Un bloqueo que se borra es una "
-        "decision tomada por omision."
+#: Los siete que el fundador aisló. Ninguno puede desaparecer sin dejar rastro.
+BLOQUEOS_HEREDADOS = {
+    "WEB_DB_ROLE_CUTOVER",
+    "ADR-064",
+    "STRIPE_MEMBERSHIP_REACTIVATION",
+    "INVOICING_AB_TESTING_SERVICES",
+    "CRM_EMAIL_VALIDATION",
+    "PLATFORM_ADMIN_MODEL",
+    "STABLE_WORKSPACE_ID_MIGRATION",
+}
+
+
+def _resueltas() -> list[dict]:
+    return _registro_completo().get("resueltas", [])
+
+
+def test_los_bloqueos_heredados_siguen_todos_localizables() -> None:
+    """Ninguno de los siete puede desaparecer: o sigue abierto, o esta resuelto
+    CON evidencia.
+
+    POR QUE NO BASTA CON "sigue en `entradas`"
+    -------------------------------------------
+    Esta prueba exigia antes que los siete siguieran en la lista de bloqueos
+    abiertos. Eso protegia contra borrarlos, que era el riesgo real —un bloqueo
+    que se borra es una decision tomada por omision—, pero convertia en
+    imposible cerrar uno legitimamente: para quitarlo habia que tocar esta
+    prueba, y tocarla es exactamente lo que se queria impedir.
+
+    Ahora hay dos sitios validos y ninguno es la papelera: `entradas` si sigue
+    abierto, `resueltas` si se cerro. Y para estar en `resueltas` hay que decir
+    QUE se hizo y CON QUE evidencia medida — no basta con moverlo de lista.
+    """
+    abiertos = {e["id"] for e in registro()}
+    cerrados = {e["id"] for e in _resueltas()}
+    perdidos = sorted(BLOQUEOS_HEREDADOS - abiertos - cerrados)
+    assert not perdidos, (
+        f"han desaparecido del registro: {perdidos}. Un bloqueo que se borra es "
+        "una decision tomada por omision. Si se resolvio, va a `resueltas` con su "
+        "evidencia."
     )
+
+
+def test_lo_resuelto_trae_su_evidencia() -> None:
+    """Mover una entrada a `resueltas` no puede ser mas barato que dejarla abierta.
+
+    Si lo fuera, `resueltas` seria la papelera con otro nombre.
+    """
+    for e in _resueltas():
+        assert e.get("id"), f"entrada resuelta sin id: {e}"
+        assert e.get("resultado"), (
+            f"{e['id']}: esta en `resueltas` y no dice QUE se hizo."
+        )
+        assert e.get("evidencia_medida"), (
+            f"{e['id']}: esta en `resueltas` y no trae evidencia medida. Un bloqueo "
+            "no se cierra con una opinion."
+        )
+        assert e.get("clase_anterior"), (
+            f"{e['id']}: no dice de que clase venia, asi que no se puede saber que "
+            "se ha dejado de exigir."
+        )
+
+
+def test_ningun_bloqueo_esta_en_las_dos_listas() -> None:
+    """Abierto y resuelto a la vez no significa nada, y lee como resuelto."""
+    dos_veces = sorted({e["id"] for e in registro()} & {e["id"] for e in _resueltas()})
+    assert not dos_veces, f"estan abiertos y resueltos a la vez: {dos_veces}"
 
 
 def test_el_cierre_en_falso_de_SES_sigue_en_pie() -> None:

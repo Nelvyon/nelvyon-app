@@ -3,8 +3,8 @@
     "automaticos_ok": 15,
     "automaticos_fallidos": 0,
     "configuracion_puesta": 0,
-    "configuracion_faltante": 6,
-    "decisiones_humanas": 6,
+    "configuracion_faltante": 7,
+    "decisiones_humanas": 5,
     "verificaciones_externas": 6
   },
   "filas": [
@@ -141,10 +141,10 @@
       "detalle": "Falta dar acceso a los dos roles del lado web y apuntar las variables"
     },
     {
-      "clase": "BLOCKED_HUMAN_DECISION",
+      "clase": "REQUIRED_CONFIGURATION",
       "id": "ADR-064",
-      "estado": "PENDIENTE",
-      "detalle": "Decision de arquitectura pendiente de firma"
+      "estado": "FALTA",
+      "detalle": "Falta aprobar las 8 migraciones pendientes, ya clasificadas una a una"
     },
     {
       "clase": "BLOCKED_HUMAN_DECISION",

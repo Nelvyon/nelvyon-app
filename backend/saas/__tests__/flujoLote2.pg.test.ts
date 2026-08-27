@@ -13,15 +13,23 @@
  *                          (forma de INQUILINO: tenant_id, line_items)
  *   /api/saas/invoices*  → SaasInvoiceService   → tabla `saas_invoices`
  *
- * `InvoicingService` escribe la forma de USUARIO (user_id, items, client_name) y
- * **nadie lo llama**: solo lo referencian el barril y su prueba unitaria, que
- * pasa porque usa un doble de base. Es código muerto, no una decisión abierta.
- * Aquí se certifica el contrato VIVO.
+ `InvoicingService` escribía la forma de USUARIO (user_id, items, client_name) y
+ * no lo llamaba nadie: sólo lo referenciaban el barril y su prueba unitaria, que
+ * pasaba porque usaba un doble de base.
  *
- * A/B: LO MISMO
- * -------------
- * El vivo es `SaasAbTestingService`, que sí casa con `ab_tests`. El otro
- * (`ABTestingService`) tampoco lo llama nadie.
+ * YA NO ESTÁ. Al reevaluarlo apareció lo que faltaba para poder retirarlo sin
+ * dudar: no era sólo código muerto, era código **roto**. Ninguna de las columnas
+ * que escribe existe en `invoices` —`user_id`, `client_name`, `client_email`,
+ * `client_address`, `items`, `sent_at`—, así que cada uno de sus métodos habría
+ * lanzado contra el esquema real. Sus nueve pruebas estaban verdes porque
+ * fabricaban a mano una fila con esas columnas inventadas, y llevaban
+ * `@ts-nocheck`. Aquí se certifica el contrato VIVO, que es lo que quedó.
+ *
+ * A/B: LO MISMO, Y MÁS CLARO
+ * --------------------------
+ * El vivo es `SaasAbTestingService`, que sí casa con `ab_tests`. `ABTestingService`
+ * usaba CUATRO tablas y **tres no existen** (`ab_test_variants`,
+ * `ab_test_results`, `ab_test_history`). Retirado también.
  *
  * Se salta sin `NELVYON_B2_DSN`.
  */

@@ -571,17 +571,6 @@ export {
   type SupportedLanguageItem,
 } from "./AgentLanguageService";
 export {
-  ABTestingService,
-  getABTestingService,
-  resetABTestingServiceForTests,
-  type ABMetric,
-  type ABTestStatus,
-  type ABVariantInput,
-  type CreateABTestConfig,
-  type ABVariantMetrics,
-  type ABTest,
-} from "./ABTestingService";
-export {
   SentimentMonitorService,
   getSentimentMonitorService,
   resetSentimentMonitorServiceForTests,
@@ -683,19 +672,6 @@ export {
   type TranscriptionListItem,
   type TranscriptionServiceDeps,
 } from "./TranscriptionService";
-export {
-  InvoicingService,
-  getInvoicingService,
-  resetInvoicingServiceForTests,
-  type InvoiceStatus,
-  type InvoiceItemInput,
-  type CreateInvoiceInput,
-  type InvoiceItem,
-  type InvoiceRecord,
-  type InvoiceFilters,
-  type InvoiceStats,
-  type InvoicingServiceDeps,
-} from "./InvoicingService";
 export {
   canSaasPerform,
   assertSaasPermission,
