@@ -22,8 +22,29 @@ decisiones — eran trabajo sin hacer con nombre de decisión.
 | `STRIPE_MEMBERSHIP_REACTIVATION` | «política de reactivación» | El contrato se podía reconstruir de los eventos. Y ocultaba un defecto peor |
 | `INVOICING_AB_TESTING_SERVICES` | «¿conectar o borrar?» | Duplicados muertos **y rotos** contra el esquema |
 | `CRM_EMAIL_VALIDATION` | «política de validación» | Una política por puerta que no rechaza ni destruye datos |
-| `STABLE_WORKSPACE_ID_MIGRATION` | migración de identidad | **Sigue siendo suya.** Pero se dejó de depender del hash |
-| `RLS_SAAS_TENANTS_SOBRE_TABLA_CON_DATOS` | cambio de visibilidad de datos | **Sigue siendo suya** |
+| `STABLE_WORKSPACE_ID_MIGRATION` | migración de identidad | **Sigue siendo suya.** Pero se dejó de depender del hash, y ahora se decide mirando el mapa |
+| `RLS_SAAS_TENANTS_SOBRE_TABLA_CON_DATOS` | cambio de visibilidad de datos | **La misma decisión que la anterior**, medido: ver abajo |
+
+### Los dos que quedan son uno
+
+`saas_tenants` **sí está** en la lista de la migración 569, incluida a propósito
+para que las guardas la nombren al omitirla. De sus seis guardas, la única que no
+pasa es la quinta: *ninguna fila con `workspace_id` nulo*. En producción son 20
+de 22. El tipo es `integer`, la tabla existe, no tiene otra familia de políticas
+— todo lo demás pasa.
+
+Así que en cuanto el puente deje de tener NULLs, reaplicar la 569 protege
+`saas_tenants` sola, sin una línea nueva. Y ese mismo relleno es lo que elimina
+la colisión del hash.
+
+**Una decisión, dos consecuencias.** Lo que la mantiene fuera de mi alcance:
+rellenar el puente cambia el `X-Workspace-Id` que sale hacia FastAPI, y lo
+guardado bajo el derivado deja de encontrarse. Eso es identidad sobre datos
+reales.
+
+Lo que sí se ha hecho es que se decida **con la lista delante**:
+`scripts/simular-poblado-del-puente.mjs` enseña, inquilino a inquilino, el mapa
+viejo→nuevo. Sólo lee.
 
 ---
 
@@ -105,16 +126,36 @@ con `rejects` que fallaba justo cuando la conexión iba bien.
 | `elEmailDelContactoNoSeInventa` | 16/16 | 5/5 caen |
 | `laMembresiaQueVuelveAPagar` | 14/14 | 5/5 caen |
 
-**18 mutaciones aplicadas, 18 caen.** Una —M11, «validar siempre al editar»—
-quedó **infiel por construcción**: la ausencia de email es válida, así que la
-sustitución no cambiaba la conducta. No se escondió; se sustituyó por M11b, que
-sí cae.
+**19 mutaciones aplicadas, 19 caen** (M19 cubre que los avisos de importación
+lleguen a la respuesta). Una —M11, «validar siempre al editar»— quedó **infiel
+por construcción**: la ausencia de email es válida, así que la sustitución no
+cambiaba la conducta. No se escondió; se sustituyó por M11b, que sí cae.
+
+### Los dos fallos que encontró la suite Python completa
+
+Los dos eran míos, y los dos tenían causa raíz — no se taparon.
+
+**Una lista blanca de roles que quitaba una capacidad.** Al cerrar la escalada
+del router CRUD genérico añadí, además de la jerarquía, la lista cerrada de
+cinco nombres de `/rbac/assign`. Rompió `test_user_roles_create_admin_ok`, que
+crea un rol `analyst` — y el test tenía razón: guardar etiquetas propias con su
+`permissions_json` es una capacidad que ese CRUD ya daba. La jerarquía sola basta
+para lo que había que cerrar, porque un rol desconocido vale 0 y nunca supera al
+actor. Retirada la lista, conservada la guarda.
+
+**Mi propia prueba capturaba `process.env` para restaurarlo.** Lo cazó
+`test_tests_no_capturan_env_al_cargar.py`. La objeción es real aunque la captura
+estuviera dentro del `it`: vitest comparte el proceso entre ficheros, así que «lo
+que había antes» puede ser de otro fichero, y restaurarlo es propagar su estado
+en vez de deshacer el propio. Reescrita con `vi.stubEnv` / `unstubAllEnvs`, que
+deshace exactamente lo que esta prueba hizo.
 
 ### Herramientas nuevas
 
 | Qué | Para qué |
 |---|---|
 | `scripts/detectar-colision-de-workspace.mjs` | ¿hay ya dos clientes compartiendo espacio? Sólo lee, en transacción de sólo lectura |
+| `scripts/simular-poblado-del-puente.mjs` | el mapa viejo→nuevo antes de decidir la migración de identidad. Sólo lee |
 | `scripts/clasificar-migraciones-bloqueadas.mjs` | clasifica las ocho pendientes sobre copias desechables |
 | `backend/db/DbJobsClient.ts` | la conexión cross-tenant del cutover, que se niega a trabajar si hay un inquilino en el contexto |
 | `backend/db/migrations/577_roles_del_lado_web.sql` | crea los dos roles **sin login** y concede 964 privilegios medidos del uso real |

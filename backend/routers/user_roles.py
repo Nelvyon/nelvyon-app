@@ -40,30 +40,61 @@ router = APIRouter(prefix="/api/v1/entities/user_roles", tags=["user_roles"])
 # propia fila. El control deliberado de `/rbac/assign` quedaba en un rodeo de
 # una peticion.
 #
-# Tampoco se validaba el valor de `role`: se podia guardar cualquier cadena.
-# Como `isUserAdmin` compara contra un conjunto cerrado, una cadena rara no da
-# acceso — pero deja filas que no significan nada en la tabla que decide quien
-# manda, y eso hace ilegible lo unico que hay que poder leer de un vistazo.
+# LO QUE NO SE TOCA, AUNQUE APETEZCA
+# ----------------------------------
+# Aqui se puede guardar cualquier cadena como `role`, y se sigue pudiendo. El
+# primer intento anadio una lista blanca de cinco nombres y rompio un test que
+# crea un rol `analyst` — un test que tenia razon: guardar etiquetas propias con
+# su `permissions_json` es una capacidad que este CRUD generico ya daba.
 #
-# Se reutilizan las constantes de `rbac_management` a proposito. Copiarlas seria
-# crear una segunda definicion de la jerarquia que puede divergir en silencio.
-VALID_ROLES = {"super_admin", "admin", "manager", "user", "viewer"}
+# No hacia falta para cerrar el agujero, y quitarla habria sido cambiar el
+# producto por una preferencia de legibilidad. `isUserAdmin` compara contra un
+# conjunto CERRADO de dos nombres, asi que una etiqueta desconocida no concede
+# nada.
+#
+# La jerarquia es la misma que la de `rbac_management`, y a proposito: si aqui
+# fuera otra, «superior a ti» significaria dos cosas distintas segun por que
+# puerta se entre, que es la forma normal de que una de las dos acabe siendo mas
+# permisiva sin que nadie lo decida.
+#
+# La lista cerrada de nombres NO se replica: ver `_exigir_rol_asignable`.
 ROLE_HIERARCHY = {"super_admin": 5, "admin": 4, "manager": 3, "user": 2, "viewer": 1}
 
 
 def _exigir_rol_asignable(actor: UserResponse, role: Optional[str]) -> None:
-    """Valida el rol pedido y prohibe ascender por encima del propio.
+    """Prohibe ascender por encima del propio nivel. Nada mas.
 
     `role=None` en un update parcial significa «no lo toques», y entonces no hay
     nada que comprobar.
+
+    POR QUE NO SE VALIDA EL NOMBRE DEL ROL AQUI, Y SI EN /rbac/assign
+    -----------------------------------------------------------------
+    La primera version rechazaba todo rol fuera de VALID_ROLES, copiando la
+    regla de `/rbac/assign`. Rompio `test_user_roles_create_admin_ok`, que crea
+    un rol `analyst` y espera 201 — y el test tenia razon.
+
+    Los dos endpoints no son lo mismo. `/rbac/assign` presenta al usuario los
+    cinco roles con sus permisos por defecto: alli el conjunto cerrado ES el
+    contrato, y aceptar uno fuera de la lista seria ofrecer algo que la interfaz
+    no sabe explicar. Este router es CRUD generico sobre la entidad, y guardar
+    una etiqueta propia con su `permissions_json` es una capacidad que YA
+    EXISTIA. Quitarla para ganar legibilidad habria sido cambiar el producto por
+    una preferencia mia.
+
+    Y no abre ningun agujero: quien decide el acceso al plano de administracion
+    es `NelvyonAdminService.isUserAdmin`, que compara contra un conjunto CERRADO
+    de dos nombres. Una etiqueta desconocida no concede nada.
+
+    LO QUE SI HABIA QUE CERRAR, Y SE CIERRA
+    ---------------------------------------
+    Que un `admin` de nivel 4 pudiera crearse un `super_admin` de nivel 5 por
+    aqui, saltandose la comprobacion que `/rbac/assign` si hace con un mensaje
+    explicito. Un rol desconocido vale 0 con `ROLE_HIERARCHY.get(role, 0)`, asi
+    que nunca supera al actor: la guarda deja pasar `analyst` y sigue parando
+    `super_admin`.
     """
     if role is None:
         return
-    if role not in VALID_ROLES:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Rol invalido. Validos: {', '.join(sorted(VALID_ROLES))}",
-        )
     nivel_actor = ROLE_HIERARCHY.get(getattr(actor, "role", None) or "", 0)
     nivel_pedido = ROLE_HIERARCHY.get(role, 0)
     if nivel_pedido > nivel_actor:

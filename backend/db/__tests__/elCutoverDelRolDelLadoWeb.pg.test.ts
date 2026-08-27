@@ -35,7 +35,7 @@
  * RLS que nadie ha demostrado que haga falta es exactamente lo que no se debe
  * añadir.
  */
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 const DSN_APP = process.env.NELVYON_WEB_APP_CERT_DSN ?? "";
 const DSN_JOBS = process.env.NELVYON_WEB_JOBS_CERT_DSN ?? "";
@@ -294,24 +294,37 @@ describe("`DbJobsClient` se niega a trabajar dentro de una petición con inquili
      * dos movimientos simultáneos es un cambio que no se puede revertir a
      * medias.
      */
+    /**
+     * Con `vi.stubEnv` y NO capturando el valor previo a mano.
+     *
+     * Guardar `const previo = process.env.X` y devolverlo en un `finally` es el
+     * patrón que `test_tests_no_capturan_env_al_cargar.py` vigila, y lo cazó
+     * sobre este mismo fichero. La objeción es real aunque aquí la captura
+     * estuviera dentro del `it`: vitest reparte varios ficheros por *worker* y
+     * comparte el proceso, así que «lo que había antes» puede ser lo que dejó
+     * otro fichero, y restaurarlo es propagar su estado en vez de deshacer el
+     * propio.
+     *
+     * `unstubAllEnvs` no restaura un valor leído: deshace exactamente los
+     * `stubEnv` de esta prueba. Es la diferencia entre revertir lo que hice y
+     * reponer lo que creía que había.
+     */
     const { cadenaDeTrabajos } = await import("../DbJobsClient");
-    const previo = process.env.NELVYON_WEB_JOBS_DATABASE_URL;
-    delete process.env.NELVYON_WEB_JOBS_DATABASE_URL;
-    process.env.DATABASE_URL = "postgresql://a:b@127.0.0.1:5432/normal";
     try {
+      vi.stubEnv("NELVYON_WEB_JOBS_DATABASE_URL", "");
+      vi.stubEnv("DATABASE_URL", "postgresql://a:b@127.0.0.1:5432/normal");
       expect(cadenaDeTrabajos()).toEqual({
         url: "postgresql://a:b@127.0.0.1:5432/normal",
         separada: false,
       });
 
-      process.env.NELVYON_WEB_JOBS_DATABASE_URL = "postgresql://c:d@127.0.0.1:5432/trabajos";
+      vi.stubEnv("NELVYON_WEB_JOBS_DATABASE_URL", "postgresql://c:d@127.0.0.1:5432/trabajos");
       expect(cadenaDeTrabajos()).toEqual({
         url: "postgresql://c:d@127.0.0.1:5432/trabajos",
         separada: true,
       });
     } finally {
-      if (previo === undefined) delete process.env.NELVYON_WEB_JOBS_DATABASE_URL;
-      else process.env.NELVYON_WEB_JOBS_DATABASE_URL = previo;
+      vi.unstubAllEnvs();
     }
   });
 });

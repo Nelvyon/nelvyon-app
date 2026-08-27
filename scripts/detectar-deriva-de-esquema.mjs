@@ -69,6 +69,35 @@ const CONSULTAS = {
   indices: "SELECT tablename||'.'||indexname FROM pg_indexes WHERE schemaname='public' ORDER BY 1",
   politicas_rls:
     "SELECT tablename||'.'||policyname FROM pg_policies WHERE schemaname='public' ORDER BY 1",
+
+  /**
+   * Que EXISTA una política y que esté HACIENDO algo son cosas distintas.
+   *
+   * Una política sobre una tabla que no tiene la seguridad por filas activada no
+   * se evalúa nunca: está ahí, se ve en el catálogo, y no protege nada.
+   *
+   * Hasta aquí se comparaba sólo `pg_policies`, así que una tabla con políticas
+   * inertes parecía IDÉNTICA a una protegida. Es decir: las cuatro diferencias
+   * que arrastra `saas_tenants` se podían cerrar creando sus políticas sin
+   * activar nada, y esto habría dado verde sobre una tabla igual de expuesta.
+   *
+   * Un detector que se puede satisfacer sin cambiar lo que mide no es un
+   * detector. Por eso se compara también el interruptor.
+   */
+  rls_activada:
+    "SELECT tablename FROM pg_tables WHERE schemaname='public' AND rowsecurity ORDER BY 1",
+
+  /**
+   * Y si además está FORZADA.
+   *
+   * `FORCE` es lo que somete al DUEÑO de la tabla a sus propias políticas. Sin
+   * él, el dueño las evita — y el dueño de estas tablas es el rol con el que
+   * corren las migraciones. Una tabla activada pero no forzada protege menos de
+   * lo que aparenta, y esa diferencia también hay que verla.
+   */
+  rls_forzada:
+    "SELECT c.relname FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace "
+    + "WHERE n.nspname='public' AND c.relforcerowsecurity ORDER BY 1",
 };
 
 function main() {

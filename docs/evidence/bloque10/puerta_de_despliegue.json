@@ -2,7 +2,7 @@
   "resumen": {
     "automaticos_ok": 15,
     "automaticos_fallidos": 0,
-    "configuracion_puesta": 12,
+    "configuracion_puesta": 11,
     "configuracion_faltante": 3,
     "decisiones_humanas": 2,
     "verificaciones_externas": 6
@@ -162,13 +162,7 @@
       "clase": "REQUIRED_CONFIGURATION",
       "id": "DATABASE_URL_tiene_forma_valida",
       "estado": "PUESTA",
-      "detalle": "host db"
-    },
-    {
-      "clase": "REQUIRED_CONFIGURATION",
-      "id": "NELVYON_WEB_JOBS_DATABASE_URL",
-      "estado": "PUESTA",
-      "detalle": "puesta, como exige el cutover"
+      "detalle": "host db.interno"
     },
     {
       "clase": "REQUIRED_CONFIGURATION",
