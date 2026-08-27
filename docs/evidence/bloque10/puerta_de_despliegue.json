@@ -3,8 +3,8 @@
     "automaticos_ok": 15,
     "automaticos_fallidos": 0,
     "configuracion_puesta": 0,
-    "configuracion_faltante": 4,
-    "decisiones_humanas": 8,
+    "configuracion_faltante": 6,
+    "decisiones_humanas": 6,
     "verificaciones_externas": 6
   },
   "filas": [
@@ -123,10 +123,10 @@
       "detalle": "sin ella /api/webhooks/ses responde 503 en produccion"
     },
     {
-      "clase": "BLOCKED_HUMAN_DECISION",
+      "clase": "REQUIRED_CONFIGURATION",
       "id": "PLATFORM_ADMIN_MODEL",
-      "estado": "PENDIENTE",
-      "detalle": "Nadie puede ser administrador de plataforma"
+      "estado": "FALTA",
+      "detalle": "Falta designar al primer administrador de plataforma"
     },
     {
       "clase": "BLOCKED_HUMAN_DECISION",
@@ -135,10 +135,10 @@
       "detalle": "El workspace derivado del inquilino colisiona"
     },
     {
-      "clase": "BLOCKED_HUMAN_DECISION",
+      "clase": "REQUIRED_CONFIGURATION",
       "id": "WEB_DB_ROLE_CUTOVER",
-      "estado": "PENDIENTE",
-      "detalle": "El lado web se conecta con un rol que evita las politicas RLS"
+      "estado": "FALTA",
+      "detalle": "Falta dar acceso a los dos roles del lado web y apuntar las variables"
     },
     {
       "clase": "BLOCKED_HUMAN_DECISION",

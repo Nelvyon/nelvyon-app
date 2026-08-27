@@ -4,7 +4,7 @@ import { extractToken } from "@nelvyon/auth";
 import { requireSaasContext, saasErrorBody, saasErrorStatus } from "@nelvyon/saas";
 
 import { subrutaDeProxy } from "@/lib/security/subrutaDeProxy";
-import { platformApiBase, stableWorkspaceIdFromTenant } from "@/lib/platformFastApiProxy";
+import { platformApiBase, workspaceParaAguasArriba } from "@/lib/platformFastApiProxy";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -34,7 +34,7 @@ async function proxyDialerAdvanced(req: Request, pathSegments: string[] | undefi
     const headers = new Headers();
     headers.set("Authorization", `Bearer ${token}`);
     headers.set("Accept", "application/json");
-    headers.set("X-Workspace-Id", String(stableWorkspaceIdFromTenant(ctx.tenant.id)));
+    headers.set("X-Workspace-Id", String(workspaceParaAguasArriba(ctx.tenant)));
     const contentType = req.headers.get("content-type");
     if (contentType) headers.set("Content-Type", contentType);
 

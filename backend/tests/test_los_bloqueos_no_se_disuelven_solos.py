@@ -104,18 +104,54 @@ def test_el_cierre_en_falso_de_SES_sigue_en_pie() -> None:
     )
 
 
-def test_el_administrador_de_plataforma_sigue_cerrado_en_falso() -> None:
-    """PLATFORM_ADMIN_MODEL sigue bloqueado, y eso significa: sigue denegando."""
+def test_el_administrador_de_plataforma_lee_la_fuente_canonica() -> None:
+    """PLATFORM_ADMIN_MODEL: RESUELTO el mecanismo, pendiente el dato.
+
+    Esta prueba exigia antes que `isUserAdmin` siguiera cerrado en falso por
+    falta de esquema. Se puso ROJA al conectarlo a `user_roles`, que es
+    exactamente lo que tenia que pasar: una deuda no se cierra en silencio, se
+    cierra viniendo aqui y sustituyendo la vigilancia vieja por la nueva.
+
+    Lo que cambio, medido contra el arbol:
+
+        os_users        NO existe: ninguna migracion la crea
+        nelvyon_users   SI existe (003_auth.sql) pero NO tiene columna `role`
+        user_roles      SI existe (migracion 545) y es la fuente canonica: tiene
+                        su modelo, su API de gestion con jerarquia y auditoria,
+                        y SEIS sitios del lado Python deciden con ella
+
+    Asi que no habia una decision de producto que tomar: habia un lado sin
+    conectar al sistema que ya existia. Lo que SIGUE siendo del fundador es
+    QUIEN: la primera fila con rol `admin` es un dato sobre una persona real.
+
+    Lo que se vigila ahora es que no se afloje en ninguna de las dos direcciones.
+    """
     svc = _texto("backend/admin/NelvyonAdminService.ts")
     assert svc, "no se encuentra NelvyonAdminService"
     assert "isUserAdmin" in svc
-    # El aviso de esquema ausente tiene que seguir ahi: sin el, un fallo de
-    # configuracion vuelve a ser indistinguible de una denegacion legitima.
-    assert "NADIE puede ser administrador de plataforma" in svc, (
-        "el aviso de esquema ausente ha desaparecido: un esquema que falta "
-        "volveria a informarse como 'no es administrador'."
+
+    assert "user_roles" in svc, (
+        "`isUserAdmin` ya no consulta `user_roles`, la fuente canonica de roles "
+        "de plataforma. Si se ha movido a otra, actualiza esta prueba con la "
+        "evidencia de por que la nueva es canonica."
     )
+    # El predicado, exacto y el mismo que gobierna el lado Python.
+    assert '"admin", "super_admin"' in svc, (
+        "el conjunto de roles de plataforma ha cambiado. Ampliarlo da acceso al "
+        "plano de administracion a quien antes no lo tenia."
+    )
+    # Revocar tiene que surtir efecto: por eso se va a la base y no al token.
+    assert "is_active" in svc, (
+        "`isUserAdmin` ya no mira `is_active`: revocar un rol dejaria de tener "
+        "efecto y habria que esperar a que caducara la sesion."
+    )
+    # Y sigue cerrando en falso cuando no puede preguntar.
     assert "return false" in svc, "isUserAdmin ya no cierra en falso"
+    assert "NADIE puede ser administrador" in svc, (
+        "el aviso ha desaparecido: un esquema o un privilegio que falta volveria "
+        "a informarse como 'no es administrador', indistinguible de una "
+        "denegacion legitima."
+    )
 
 
 def test_el_workspace_derivado_no_se_ha_cambiado_a_escondidas() -> None:

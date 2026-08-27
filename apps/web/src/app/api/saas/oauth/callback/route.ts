@@ -8,7 +8,7 @@ import {
 import {
   platformApiBase,
   readSessionToken,
-  stableWorkspaceIdFromTenant,
+  workspaceParaAguasArriba,
 } from "@/lib/platformFastApiProxy";
 import {
   redirectIntegrationsError,
@@ -52,7 +52,10 @@ export async function GET(req: Request) {
     const claims = await authenticate(req);
     userId = claims.userId;
     const tenant = await getSaasOnboardingService().getTenant(claims.userId);
-    workspaceId = tenant?.workspaceId ?? stableWorkspaceIdFromTenant(tenant?.id ?? claims.userId);
+    // El mismo resolvedor que `connect`, para que las dos mitades del flujo no
+    // puedan volver a discrepar. El respaldo sigue siendo el `userId` cuando no
+    // hay inquilino, que es lo que hacía antes.
+    workspaceId = workspaceParaAguasArriba(tenant, claims.userId);
   } catch {
     return redirectIntegrationsError(origin, "unauthorized");
   }

@@ -1,94 +1,100 @@
 {
-  "_leeme": "SSOT de lo que NO se puede resolver desde una sesion de certificacion. Se lee desde test_los_bloqueos_no_se_disuelven_solos.py y desde la checklist de pre-despliegue. Nadie borra una entrada sin sustituirla por evidencia de que se ha resuelto.",
-  "entradas": [
-    {
-      "bloque_origen": 7,
-      "clase": "REQUIRED_CONFIGURATION",
-      "comportamiento_actual": "FAIL_CLOSED: sin SES_SNS_TOPIC_ARN la ruta responde 503 en produccion. Fuera de produccion no se exige, para no romper el entorno de pruebas.",
-      "comprobacion": "process.env.SES_SNS_TOPIC_ARN no vacio en el entorno de despliegue",
-      "evidencia": "apps/web/src/app/api/webhooks/ses/__tests__/unaFirmaValidaNoDiceDeQuien.test.ts",
-      "id": "SES_SNS_TOPIC_ARN",
-      "lo_que_NO_se_debe_hacer": "Inventar o configurar un ARN de produccion desde una sesion de certificacion.",
-      "por_que": "Verificar la firma SNS no identifica al remitente: AWS firma para todo el mundo. Sin lista de topics, cualquiera con una cuenta gratuita de AWS creaba un topic, lo apuntaba al endpoint —que ademas auto-confirmaba la suscripcion— y marcaba como rebotados los destinatarios de las campanias de cualquier inquilino.",
-      "titulo": "El webhook de SES necesita la lista de topics permitidos antes del despliegue",
-      "verificable_automaticamente": true
-    },
-    {
-      "bloque_origen": 7,
-      "clase": "BLOCKED_HUMAN_DECISION",
-      "comportamiento_actual": "FAIL_CLOSED, y se mantiene. El diagnostico SI se corrigio: un esquema ausente se registra alto y claro en vez de confundirse con una denegacion legitima.",
-      "evidencia": "backend/admin/__tests__/serAdministradorLoDiceLaBase.pg.test.ts",
-      "id": "PLATFORM_ADMIN_MODEL",
-      "lo_que_NO_se_debe_hacer": "Inventar el modelo de administradores ni anadir el esquema. Decidir quien es administrador de plataforma es una decision de producto con consecuencias de acceso.",
-      "por_que": "isUserAdmin consulta os_users.role y nelvyon_users.role. Ninguna de las dos existe: no hay migracion en el arbol que cree la tabla ni que anada la columna. Las dos consultas lanzan, los dos catch devuelven false, y toda la superficie admin/* responde 403 a cualquiera.",
-      "titulo": "Nadie puede ser administrador de plataforma",
-      "verificable_automaticamente": false
-    },
-    {
-      "bloque_origen": 7,
-      "clase": "BLOCKED_HUMAN_DECISION",
-      "comportamiento_actual": "Sin cambios. Los identificadores existentes se conservan.",
-      "estudio_requerido": "Bloques 8-10 deben documentar impacto, volumen, estrategia de migracion segura, deteccion previa de colisiones, rollback, compatibilidad y como impedir nuevas colisiones despues.",
-      "evidencia": "apps/web/src/lib/__tests__/elWorkspaceQueVaAguasArriba.test.ts",
-      "id": "STABLE_WORKSPACE_ID_MIGRATION",
-      "lo_que_NO_se_debe_hacer": "Cambiar la derivacion. Cambiaria el identificador de todos los inquilinos que ya lo usan y dejaria huerfanos los datos guardados bajo el viejo.",
-      "por_que": "stableWorkspaceIdFromTenant es un hash multiplicativo por 31 reducido a % 900_000. Medido con UUID reales, media de veinte repeticiones: 1.000 inquilinos -> 0,5 colisiones; 2.000 -> 1,8; 5.000 -> 13,1. Cada colision son dos inquilinos mandando el mismo X-Workspace-Id aguas arriba.",
-      "titulo": "El workspace derivado del inquilino colisiona",
-      "verificable_automaticamente": false
-    },
-    {
-      "bloque_origen": 1,
-      "clase": "BLOCKED_HUMAN_DECISION",
-      "evidencia": "backend/tests/test_el_lado_web_no_esta_cubierto_por_rls.py",
-      "id": "WEB_DB_ROLE_CUTOVER",
-      "lo_que_NO_se_debe_hacer": "Cambiar el rol de conexion de produccion.",
-      "por_que": "Las politicas RLS estan declaradas y verificadas, pero HOY no forman parte de la frontera efectiva del lado web porque la aplicacion se conecta con un rol que las evita. El aislamiento efectivo lo da el filtrado por inquilino en la aplicacion, certificado aparte.",
-      "titulo": "El lado web se conecta con un rol que evita las politicas RLS",
-      "verificable_automaticamente": false
-    },
-    {
-      "bloque_origen": 1,
-      "clase": "BLOCKED_HUMAN_DECISION",
-      "id": "ADR-064",
-      "lo_que_NO_se_debe_hacer": "Resolverla unilateralmente.",
-      "titulo": "Decision de arquitectura pendiente de firma",
-      "verificable_automaticamente": false
-    },
-    {
-      "bloque_origen": 4,
-      "clase": "BLOCKED_HUMAN_DECISION",
-      "id": "STRIPE_MEMBERSHIP_REACTIVATION",
-      "lo_que_NO_se_debe_hacer": "Tocar Stripe real ni decidir la politica de reactivacion.",
-      "titulo": "Reactivacion de membresias en Stripe",
-      "verificable_automaticamente": false
-    },
-    {
-      "bloque_origen": 5,
-      "clase": "BLOCKED_HUMAN_DECISION",
-      "id": "INVOICING_AB_TESTING_SERVICES",
-      "lo_que_NO_se_debe_hacer": "Resolverlos unilateralmente.",
-      "titulo": "InvoicingService y ABTestingService",
-      "verificable_automaticamente": false
-    },
-    {
-      "bloque_origen": 5,
-      "clase": "BLOCKED_HUMAN_DECISION",
-      "id": "CRM_EMAIL_VALIDATION",
-      "lo_que_NO_se_debe_hacer": "Decidir la politica de validacion.",
-      "titulo": "Validacion de email invalido en CRM",
-      "verificable_automaticamente": false
-    },
-    {
-      "bloque_origen": 9,
-      "clase": "BLOCKED_HUMAN_DECISION",
-      "comportamiento_actual": "Sin cambios. saas_tenants tiene 10 filas en la base de certificacion y 0 politicas de la familia _os_.",
-      "comprobacion": "node scripts/detectar-deriva-de-esquema.mjs contra la base objetivo",
-      "evidencia": "backend/db/__tests__/laMigracionQueDependeDelDiaEnQueCorrio.pg.test.ts y docs/evidence/bloque9/deriva_nelvyon_cert545.json",
-      "id": "RLS_SAAS_TENANTS_SOBRE_TABLA_CON_DATOS",
-      "lo_que_NO_se_debe_hacer": "Activar RLS sobre una saas_tenants con datos desde una sesion de certificacion. Es un cambio de visibilidad de datos, y ademas se cruza con WEB_DB_ROLE_CUTOVER: hoy la aplicacion se conecta con un rol que EVITA las politicas, asi que estas no son la frontera efectiva de todas formas. Decidir esto exige decidir aquello primero.",
-      "por_que": "La migracion 567 activa RLS SOLO sobre tablas vacias, y la cautela esta bien razonada en su cabecera: activar RLS sobre una tabla con datos puede ocultarselos a quien ya los estaba leyendo. Pero la consecuencia no la decidio nadie: una tabla se queda sin RLS PARA SIEMPRE por lo que hubiera dentro el dia que se aplico la migracion. MEDIDO: una reconstruccion desde cero tiene 2121 politicas; la base de certificacion, tras aplicarle las 475 migraciones sin un solo error, tiene 2117. Las cuatro que faltan son las de saas_tenants — la tabla de inquilinos. Las dos bases creen estar al dia.",
-      "titulo": "Cuatro politicas RLS de saas_tenants no llegan a una base con datos",
-      "verificable_automaticamente": true
-    }
-  ]
+ "_leeme": "SSOT de lo que NO se puede resolver desde una sesion de certificacion. Se lee desde test_los_bloqueos_no_se_disuelven_solos.py y desde la checklist de pre-despliegue. Nadie borra una entrada sin sustituirla por evidencia de que se ha resuelto.",
+ "entradas": [
+  {
+   "bloque_origen": 7,
+   "clase": "REQUIRED_CONFIGURATION",
+   "comportamiento_actual": "FAIL_CLOSED: sin SES_SNS_TOPIC_ARN la ruta responde 503 en produccion. Fuera de produccion no se exige, para no romper el entorno de pruebas.",
+   "comprobacion": "process.env.SES_SNS_TOPIC_ARN no vacio en el entorno de despliegue",
+   "evidencia": "apps/web/src/app/api/webhooks/ses/__tests__/unaFirmaValidaNoDiceDeQuien.test.ts",
+   "id": "SES_SNS_TOPIC_ARN",
+   "lo_que_NO_se_debe_hacer": "Inventar o configurar un ARN de produccion desde una sesion de certificacion.",
+   "por_que": "Verificar la firma SNS no identifica al remitente: AWS firma para todo el mundo. Sin lista de topics, cualquiera con una cuenta gratuita de AWS creaba un topic, lo apuntaba al endpoint —que ademas auto-confirmaba la suscripcion— y marcaba como rebotados los destinatarios de las campanias de cualquier inquilino.",
+   "titulo": "El webhook de SES necesita la lista de topics permitidos antes del despliegue",
+   "verificable_automaticamente": true
+  },
+  {
+   "bloque_origen": 7,
+   "clase": "REQUIRED_CONFIGURATION",
+   "comportamiento_actual": "FAIL_CLOSED mientras no exista la fila. Sin ninguna fila `admin`/`super_admin` activa en `user_roles`, isUserAdmin devuelve false para todo el mundo y admin/* responde 403.",
+   "comprobacion": "INSERT INTO user_roles (user_id, email, role, is_active, created_at, updated_at) VALUES ('<uuid del usuario>', '<su email>', 'super_admin', true, now(), now());",
+   "evidencia": "backend/admin/__tests__/serAdministradorLoDiceLaBase.pg.test.ts (15/15) y backend/admin/__tests__/nadieSeHaceAdministradorSolo.pg.test.ts (9/9)",
+   "id": "PLATFORM_ADMIN_MODEL",
+   "lo_que_NO_se_debe_hacer": "Sembrar una fila de administrador desde una sesion de certificacion. Designar a una persona real es del fundador. Tampoco ampliar el conjunto de roles ni dejar de mirar is_active.",
+   "por_que": "RESUELTO EL MECANISMO. El bloqueo decia que decidir el modelo de administradores era una decision de producto. Medido contra el arbol, no lo era: `os_users` NO existe, `nelvyon_users` existe pero NO tiene columna `role`, y `user_roles` (migracion 545) SI es la fuente canonica —con su modelo, su API de gestion con jerarquia y auditoria en rbac_management.py, y SEIS sitios del lado Python decidiendo con `role in (admin, super_admin)`. `isUserAdmin` usa ahora ese mismo predicado: no se invento politica, se unifico la que ya gobernaba el otro lado. Lo que queda NO es una decision entre disenos: es un dato sobre una persona real.",
+   "resuelto_en": "cierre de pendientes post-certificacion",
+   "titulo": "Falta designar al primer administrador de plataforma",
+   "verificable_automaticamente": true
+  },
+  {
+   "bloque_origen": 7,
+   "clase": "BLOCKED_HUMAN_DECISION",
+   "comportamiento_actual": "La derivacion NO se ha tocado y los identificadores existentes se conservan. Lo que SI cambio: las tres rutas que mandaban X-Workspace-Id usan ahora `workspaceParaAguasArriba`, que prefiere el puente unico `saas_tenants.workspace_id` y solo deriva si esta a NULL. Para un inquilino sin puente el valor es identico al de antes.",
+   "defecto_encontrado_al_reevaluar": "Los tres sitios no resolvian igual: `saas/oauth/connect` derivaba siempre mientras `saas/oauth/callback` —la otra mitad del MISMO flujo— ya prefería el puente. Con la columna poblada, la autorizacion salia hacia un workspace y la conexion se guardaba en otro. Corregido con un resolvedor unico.",
+   "estudio_requerido": "Bloques 8-10 deben documentar impacto, volumen, estrategia de migracion segura, deteccion previa de colisiones, rollback, compatibilidad y como impedir nuevas colisiones despues.",
+   "evidencia": "apps/web/src/lib/__tests__/elPuenteManda.test.ts (8/8), backend/tests/test_el_workspace_sale_del_puente.py y apps/web/src/lib/__tests__/elWorkspaceQueVaAguasArriba.test.ts",
+   "id": "STABLE_WORKSPACE_ID_MIGRATION",
+   "lo_que_NO_se_debe_hacer": "Cambiar la derivacion. Cambiaria el identificador de todos los inquilinos que ya lo usan y dejaria huerfanos los datos guardados bajo el viejo.",
+   "por_que": "stableWorkspaceIdFromTenant es un hash multiplicativo por 31 reducido a % 900_000. Medido con UUID reales, media de veinte repeticiones: 1.000 inquilinos -> 0,5 colisiones; 2.000 -> 1,8; 5.000 -> 13,1. Cada colision son dos inquilinos mandando el mismo X-Workspace-Id aguas arriba.",
+   "titulo": "El workspace derivado del inquilino colisiona",
+   "verificable_automaticamente": false
+  },
+  {
+   "bloque_origen": 1,
+   "clase": "REQUIRED_CONFIGURATION",
+   "comportamiento_actual": "Sin cambios. `DbJobsClient` cae a DATABASE_URL mientras NELVYON_WEB_JOBS_DATABASE_URL no exista, asi que hoy da exactamente el comportamiento actual.",
+   "comprobacion": "ALTER ROLE nelvyon_web_app WITH LOGIN PASSWORD '<secreto>'; ALTER ROLE nelvyon_web_jobs WITH LOGIN PASSWORD '<otro>'; DATABASE_URL -> nelvyon_web_app ; NELVYON_WEB_JOBS_DATABASE_URL -> nelvyon_web_jobs",
+   "evidencia": "backend/db/__tests__/elCutoverDelRolDelLadoWeb.pg.test.ts (11/11)",
+   "id": "WEB_DB_ROLE_CUTOVER",
+   "lo_que_NO_se_debe_hacer": "Cambiar la credencial de produccion desde una sesion de certificacion. Y no mover DATABASE_URL sin poner tambien NELVYON_WEB_JOBS_DATABASE_URL: los crons, los webhooks y los planos platform/admin devolverian cero filas EN SILENCIO.",
+   "por_que": "PREPARADO Y CERTIFICADO. Lo que faltaba no era decidir: era que las 60 rutas que trabajan entre inquilinos no tenian por donde conectarse despues del cutover. Medido: con el rol acotado y sin contexto, el SQL de un cron devuelve CERO filas y NINGUN error. Se anadio `backend/db/DbJobsClient.ts` (conexion cross-tenant que se niega a trabajar si hay un inquilino en el contexto) y la migracion 577 (los dos roles NOLOGIN con 964 privilegios medidos del uso real). Nada de eso cambia el comportamiento de hoy.",
+   "resuelto_en": "cierre de pendientes post-certificacion (preparacion completa)",
+   "titulo": "Falta dar acceso a los dos roles del lado web y apuntar las variables",
+   "verificable_automaticamente": true
+  },
+  {
+   "bloque_origen": 1,
+   "clase": "BLOCKED_HUMAN_DECISION",
+   "id": "ADR-064",
+   "lo_que_NO_se_debe_hacer": "Resolverla unilateralmente.",
+   "titulo": "Decision de arquitectura pendiente de firma",
+   "verificable_automaticamente": false
+  },
+  {
+   "bloque_origen": 4,
+   "clase": "BLOCKED_HUMAN_DECISION",
+   "id": "STRIPE_MEMBERSHIP_REACTIVATION",
+   "lo_que_NO_se_debe_hacer": "Tocar Stripe real ni decidir la politica de reactivacion.",
+   "titulo": "Reactivacion de membresias en Stripe",
+   "verificable_automaticamente": false
+  },
+  {
+   "bloque_origen": 5,
+   "clase": "BLOCKED_HUMAN_DECISION",
+   "id": "INVOICING_AB_TESTING_SERVICES",
+   "lo_que_NO_se_debe_hacer": "Resolverlos unilateralmente.",
+   "titulo": "InvoicingService y ABTestingService",
+   "verificable_automaticamente": false
+  },
+  {
+   "bloque_origen": 5,
+   "clase": "BLOCKED_HUMAN_DECISION",
+   "id": "CRM_EMAIL_VALIDATION",
+   "lo_que_NO_se_debe_hacer": "Decidir la politica de validacion.",
+   "titulo": "Validacion de email invalido en CRM",
+   "verificable_automaticamente": false
+  },
+  {
+   "bloque_origen": 9,
+   "clase": "BLOCKED_HUMAN_DECISION",
+   "comportamiento_actual": "Sin cambios. saas_tenants tiene 10 filas en la base de certificacion y 0 politicas de la familia _os_.",
+   "comprobacion": "node scripts/detectar-deriva-de-esquema.mjs contra la base objetivo",
+   "evidencia": "backend/db/__tests__/laMigracionQueDependeDelDiaEnQueCorrio.pg.test.ts y docs/evidence/bloque9/deriva_nelvyon_cert545.json",
+   "id": "RLS_SAAS_TENANTS_SOBRE_TABLA_CON_DATOS",
+   "lo_que_NO_se_debe_hacer": "Activar RLS sobre una saas_tenants con datos desde una sesion de certificacion. Es un cambio de visibilidad de datos, y ademas se cruza con WEB_DB_ROLE_CUTOVER: hoy la aplicacion se conecta con un rol que EVITA las politicas, asi que estas no son la frontera efectiva de todas formas. Decidir esto exige decidir aquello primero.",
+   "por_que": "La migracion 567 activa RLS SOLO sobre tablas vacias, y la cautela esta bien razonada en su cabecera: activar RLS sobre una tabla con datos puede ocultarselos a quien ya los estaba leyendo. Pero la consecuencia no la decidio nadie: una tabla se queda sin RLS PARA SIEMPRE por lo que hubiera dentro el dia que se aplico la migracion. MEDIDO: una reconstruccion desde cero tiene 2121 politicas; la base de certificacion, tras aplicarle las 475 migraciones sin un solo error, tiene 2117. Las cuatro que faltan son las de saas_tenants — la tabla de inquilinos. Las dos bases creen estar al dia.",
+   "titulo": "Cuatro politicas RLS de saas_tenants no llegan a una base con datos",
+   "verificable_automaticamente": true
+  }
+ ]
 }

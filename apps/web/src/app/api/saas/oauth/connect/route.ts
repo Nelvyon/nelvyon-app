@@ -7,7 +7,7 @@ import {
 import {
   platformApiBase,
   readSessionToken,
-  stableWorkspaceIdFromTenant,
+  workspaceParaAguasArriba,
 } from "@/lib/platformFastApiProxy";
 import { isAllowedOAuthAuthorizeUrl } from "@/lib/integrations/oauthAuthorizeAllowlist";
 
@@ -34,7 +34,11 @@ export async function GET(req: Request) {
 
     const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? url.origin).replace(/\/$/, "");
     const redirectUri = `${appUrl}/api/saas/oauth/callback`;
-    const workspaceId = stableWorkspaceIdFromTenant(ctx.tenant.id);
+    // El puente primero. Antes esto derivaba SIEMPRE, mientras el `callback`
+    // —la otra mitad de ESTE MISMO flujo— ya prefería el puente: con la
+    // columna poblada, `authorize` salía hacia un workspace y la conexión se
+    // guardaba en otro.
+    const workspaceId = workspaceParaAguasArriba(ctx.tenant);
 
     const authRes = await fetch(
       `${platformApiBase()}/api/v1/oauth/authorize/${encodeURIComponent(provider)}?redirect_uri=${encodeURIComponent(redirectUri)}`,
