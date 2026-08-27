@@ -61,14 +61,28 @@ Lo que la hace viable: **la derivación es pura y determinista**. No consulta
 nada, así que durante la transición se puede calcular el identificador viejo *y*
 el nuevo para el mismo inquilino. Sin eso, la migración tendría que ser un corte.
 
-1. **Detectar.** Ejecutar la detección de arriba. Si hay colisiones activas,
-   resolverlas primero: son un problema distinto y más urgente.
-2. **Elegir la fuente correcta.** No es «un hash mejor»: es **dejar de derivar**.
-   `saas_tenants.workspace_id` ya existe, ya es único por índice, y ya es el
-   workspace de verdad del inquilino. El árbol incluso lo usa a medias —
-   `saas/oauth/callback` hace `tenant?.workspaceId ?? derivado`— mientras
-   `saas/oauth/connect` y `dialer-advanced` derivan siempre teniendo
-   `ctx.tenant.workspaceId` a mano. Tres sitios, dos criterios.
+1. **Detectar.** ~~Ejecutar la detección de arriba.~~ **HECHO**: ahora es un
+   comando, `node scripts/detectar-colision-de-workspace.mjs`. Sólo lee, en
+   transacción de sólo lectura, y distingue tres respuestas —sin colisiones (0),
+   con colisiones (1) y **no se ha podido comprobar** (2)—, porque «no lo sé» no
+   puede parecerse a «no hay problema». Falta ejecutarlo contra producción.
+2. ~~**Elegir la fuente correcta.**~~ **HECHO.** No era «un hash mejor»: era
+   **dejar de derivar**. `saas_tenants.workspace_id` ya existía, ya era único por
+   índice parcial y ya era el workspace de verdad del inquilino.
+
+   Y al mirarlo apareció algo peor que la colisión futura: los tres sitios que
+   mandaban `X-Workspace-Id` **no resolvían igual**. `saas/oauth/callback` hacía
+   `tenant?.workspaceId ?? derivado` mientras `saas/oauth/connect` —la otra mitad
+   del **mismo flujo**— derivaba siempre. Con la columna poblada, la autorización
+   salía hacia un workspace y la conexión resultante se guardaba en otro. No es
+   un riesgo futuro: pasa en cuanto la 310 rellena la columna.
+
+   Los tres usan ahora `workspaceParaAguasArriba`, que prefiere el puente y sólo
+   deriva si está a `NULL`. Para un inquilino sin puente el valor es **idéntico**
+   al de antes, así que esto no migra ninguna identidad — sólo deja de depender
+   del hash cuando hay algo mejor. Vigilado por
+   `test_el_workspace_sale_del_puente.py`, que prohíbe volver a derivar desde una
+   ruta y comprueba que la derivación **no ha cambiado de forma**.
 3. **Doble lectura.** Durante la transición, leer del identificador nuevo y, si
    no hay nada, del viejo. Escribir siempre en el nuevo.
 4. **Copiar.** Mover los datos de FastAPI del identificador viejo al nuevo,
@@ -100,7 +114,26 @@ derivación **no ha cambiado**. Si alguien la toca sin migrar, se pone rojo.
 
 ## Lo que hace falta de ti
 
-1. Ejecutar la detección y decirme si el resultado es cero o no.
-2. Decidir si se migra ahora o se espera — el dato para decidir está en la tabla.
+Menos que antes. Los pasos 1 y 2 están hechos, y con el 2 hecho la urgencia baja:
+un inquilino con `workspace_id` poblado ya no se deriva, así que **no puede
+colisionar**.
 
-Con la respuesta a la primera, el resto es trabajo mecánico que sí puedo hacer.
+1. **Ejecutar la detección contra producción.** Un comando, sólo lectura:
+
+   ```bash
+   DATABASE_URL="<produccion>" node scripts/detectar-colision-de-workspace.mjs
+   ```
+
+   Si sale **0**, no ha pasado todavía y hay tiempo. Si sale **1**, hay clientes
+   compartiendo espacio y deja de ser una decisión de arquitectura para ser un
+   incidente. Si sale **2**, no se ha comprobado nada — hay que repetirlo.
+
+2. **Decidir si se migran los identificadores ya emitidos.** Eso sigue siendo
+   tuyo: es una operación de identidad sobre datos reales, y todo lo que FastAPI
+   tenga guardado bajo el viejo dejaría de encontrarse.
+
+Y hay una tercera vía que no exige decidir nada y que corta el problema de raíz
+para los nuevos: **poblar `saas_tenants.workspace_id`** en los inquilinos que lo
+tengan a `NULL`. En cuanto lo tienen, dejan de derivarse, y el índice único
+parcial impide que dos reciban el mismo. Está demostrado con un control negativo
+en la propia detección.
