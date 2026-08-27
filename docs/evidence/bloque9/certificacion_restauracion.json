@@ -1,9 +1,9 @@
 {
-  "decision": "FALLA",
+  "decision": "PASA",
   "totales": {
-    "pasos": 2,
-    "ok": 1,
-    "fallos": 1
+    "pasos": 16,
+    "ok": 16,
+    "fallos": 0
   },
   "pasos": [
     {
@@ -12,9 +12,89 @@
       "err": ""
     },
     {
-      "paso": "error_inesperado",
-      "ok": false,
-      "error": "AggregateError"
+      "paso": "sembrar_inquilino_real",
+      "ok": true,
+      "tenantId": "19a5d058-7a45-4585-acc5-4db1ef545a25",
+      "contactos": 250
+    },
+    {
+      "paso": "suma_del_origen",
+      "ok": true,
+      "suma": "01e47c8fa2dbd555e1a126ba1f0f636f",
+      "filas": "250"
+    },
+    {
+      "paso": "estructura_del_origen",
+      "ok": true,
+      "tablas": "715",
+      "restricciones": "1335",
+      "indices": "2303",
+      "politicas_rls": "2117"
+    },
+    {
+      "paso": "pg_dump",
+      "ok": true,
+      "err": ""
+    },
+    {
+      "paso": "el_volcado_no_esta_vacio",
+      "ok": true,
+      "bytes": "3697590"
+    },
+    {
+      "paso": "crear_base_destino",
+      "ok": true,
+      "err": ""
+    },
+    {
+      "paso": "pg_restore_ejecutado",
+      "ok": true,
+      "estado": 0,
+      "avisos": 1
+    },
+    {
+      "paso": "el_contenido_coincide_byte_a_byte",
+      "ok": true,
+      "origen": "01e47c8fa2dbd555e1a126ba1f0f636f",
+      "destino": "01e47c8fa2dbd555e1a126ba1f0f636f"
+    },
+    {
+      "paso": "vuelven_las_tablas",
+      "ok": true,
+      "origen": "715",
+      "destino": "715"
+    },
+    {
+      "paso": "vuelven_las_restricciones",
+      "ok": true,
+      "origen": "1335",
+      "destino": "1335"
+    },
+    {
+      "paso": "vuelven_los_indices",
+      "ok": true,
+      "origen": "2303",
+      "destino": "2303"
+    },
+    {
+      "paso": "vuelven_las_politicas_rls",
+      "ok": true,
+      "origen": "2117",
+      "destino": "2117"
+    },
+    {
+      "paso": "la_clave_foranea_sigue_restringiendo",
+      "ok": true,
+      "mensaje": "ERROR:  insert or update on table \"saas_contacts\" violates foreign key constraint \"saas_contacts_tenant_id_fkey\""
+    },
+    {
+      "paso": "la_aplicacion_puede_consultarla",
+      "ok": true,
+      "filas": 250
+    },
+    {
+      "paso": "limpieza",
+      "ok": true
     }
   ]
 }

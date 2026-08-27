@@ -2,8 +2,8 @@
   "resumen": {
     "automaticos_ok": 15,
     "automaticos_fallidos": 0,
-    "configuracion_puesta": 11,
-    "configuracion_faltante": 3,
+    "configuracion_puesta": 0,
+    "configuracion_faltante": 7,
     "decisiones_humanas": 2,
     "verificaciones_externas": 6
   },
@@ -101,68 +101,26 @@
     {
       "clase": "REQUIRED_CONFIGURATION",
       "id": "DATABASE_URL",
-      "estado": "PUESTA",
-      "detalle": "40 caracteres"
+      "estado": "FALTA",
+      "detalle": "sin base no hay producto"
     },
     {
       "clase": "REQUIRED_CONFIGURATION",
       "id": "JWT_SECRET",
-      "estado": "PUESTA",
-      "detalle": "33 caracteres"
+      "estado": "FALTA",
+      "detalle": "es la clave de las sesiones y de los enlaces de capacidad"
     },
     {
       "clase": "REQUIRED_CONFIGURATION",
       "id": "CRON_SECRET",
-      "estado": "PUESTA",
-      "detalle": "16 caracteres"
+      "estado": "FALTA",
+      "detalle": "sin ella las 16 rutas de cron cierran en falso y no corre nada"
     },
     {
       "clase": "REQUIRED_CONFIGURATION",
       "id": "SES_SNS_TOPIC_ARN",
-      "estado": "PUESTA",
-      "detalle": "54 caracteres"
-    },
-    {
-      "clase": "REQUIRED_CONFIGURATION",
-      "id": "JWT_SECRET_longitud",
-      "estado": "PUESTA",
-      "detalle": ">= 32"
-    },
-    {
-      "clase": "REQUIRED_CONFIGURATION",
-      "id": "CRON_SECRET_longitud",
-      "estado": "PUESTA",
-      "detalle": ">= 16"
-    },
-    {
-      "clase": "REQUIRED_CONFIGURATION",
-      "id": "JWT_SECRET_no_es_de_relleno",
-      "estado": "PUESTA",
-      "detalle": "33 caracteres distintos · huella 3f0d9b60"
-    },
-    {
-      "clase": "REQUIRED_CONFIGURATION",
-      "id": "CRON_SECRET_no_es_de_relleno",
-      "estado": "PUESTA",
-      "detalle": "16 caracteres distintos · huella ee6a84e8"
-    },
-    {
-      "clase": "REQUIRED_CONFIGURATION",
-      "id": "los_secretos_son_distintos",
-      "estado": "PUESTA",
-      "detalle": "distintos"
-    },
-    {
-      "clase": "REQUIRED_CONFIGURATION",
-      "id": "SES_SNS_TOPIC_ARN_tiene_forma_de_arn",
-      "estado": "PUESTA",
-      "detalle": "1 topic(s), forma valida"
-    },
-    {
-      "clase": "REQUIRED_CONFIGURATION",
-      "id": "DATABASE_URL_tiene_forma_valida",
-      "estado": "PUESTA",
-      "detalle": "host db.interno"
+      "estado": "FALTA",
+      "detalle": "sin ella /api/webhooks/ses responde 503 en produccion"
     },
     {
       "clase": "REQUIRED_CONFIGURATION",
@@ -174,7 +132,7 @@
       "clase": "BLOCKED_HUMAN_DECISION",
       "id": "STABLE_WORKSPACE_ID_MIGRATION",
       "estado": "PENDIENTE",
-      "detalle": "El workspace derivado del inquilino colisiona"
+      "detalle": "Rellenar saas_tenants.workspace_id: una decision, dos consecuencias"
     },
     {
       "clase": "REQUIRED_CONFIGURATION",
@@ -192,7 +150,7 @@
       "clase": "BLOCKED_HUMAN_DECISION",
       "id": "RLS_SAAS_TENANTS_SOBRE_TABLA_CON_DATOS",
       "estado": "PENDIENTE",
-      "detalle": "Cuatro politicas RLS de saas_tenants no llegan a una base con datos"
+      "detalle": "RLS de saas_tenants: depende de que el puente no tenga NULLs"
     },
     {
       "clase": "EXTERNAL_VERIFICATION_REQUIRED",

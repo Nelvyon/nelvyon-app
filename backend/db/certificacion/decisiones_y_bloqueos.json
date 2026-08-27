@@ -70,7 +70,7 @@
   {
    "bloque_origen": 9,
    "clase": "BLOCKED_HUMAN_DECISION",
-   "comportamiento_actual": "Sin cambios. saas_tenants tiene 10 filas en la base de certificacion y 0 politicas de la familia _os_.",
+   "comportamiento_actual": "Sin cambios. saas_tenants tiene filas y 0 politicas de la familia _os_. El detector de deriva la senala ahora en TRES listas -politicas_rls, rls_activada y rls_forzada-, que son 6 diferencias en total: la misma carencia contada con precision desde que el detector compara tambien el interruptor y no solo la existencia de las politicas.",
    "comprobacion": "DATABASE_URL=\"<produccion>\" node scripts/simular-poblado-del-puente.mjs",
    "evidencia": "scripts/simular-poblado-del-puente.mjs (mapa viejo->nuevo, solo lectura, con control positivo verificado en local), backend/db/migrations/569_rls_os_tablas_con_datos.sql (quinta guarda) y backend/db/__tests__/laMigracionQueDependeDelDiaEnQueCorrio.pg.test.ts",
    "id": "RLS_SAAS_TENANTS_SOBRE_TABLA_CON_DATOS",

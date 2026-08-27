@@ -140,7 +140,7 @@ para las sondas.
 | Carga y concurrencia (Bloque 8) | dentro de la web |
 | Recuperación **a solas** | 4/4, vuelta sola en 536 ms |
 | Restauración certificada | 16/16, y **falla** con fallo inyectado |
-| Deriva de esquema | 4 diferencias, todas del hallazgo registrado |
+| Deriva de esquema | 4 diferencias, todas del hallazgo registrado *(hoy 6: el detector también compara si la seguridad por filas está activada y forzada)* |
 | E2E con dos inquilinos | 14/14 |
 | UX / WCAG | 362 pantallas, reglas medibles |
 | Auditoría de saltos | **de 96 a 7**, los siete clasificados |

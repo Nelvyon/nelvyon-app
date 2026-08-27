@@ -1,6 +1,6 @@
 {
   "objetivo": "nelvyon_cert545",
-  "referencia": "nelvyon_deriva_1787838645920",
+  "referencia": "nelvyon_deriva_1787842942512",
   "categorias": {
     "tablas": {
       "en_objetivo": 712,
@@ -36,8 +36,24 @@
         "saas_tenants.saas_tenants_os_update"
       ],
       "sobran_en_objetivo": []
+    },
+    "rls_activada": {
+      "en_objetivo": 585,
+      "en_referencia": 586,
+      "faltan_en_objetivo": [
+        "saas_tenants"
+      ],
+      "sobran_en_objetivo": []
+    },
+    "rls_forzada": {
+      "en_objetivo": 534,
+      "en_referencia": 535,
+      "faltan_en_objetivo": [
+        "saas_tenants"
+      ],
+      "sobran_en_objetivo": []
     }
   },
-  "deriva_total": 4,
+  "deriva_total": 6,
   "decision": "HAY_DERIVA"
 }

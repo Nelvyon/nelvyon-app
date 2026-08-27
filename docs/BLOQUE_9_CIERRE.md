@@ -203,7 +203,7 @@ Las dos únicas tablas de diferencia son restos de las propias pruebas
 | Inventario de operación | 655 capacidades · 8 familias · **0 comandos de runbook rotos** |
 | Guardianes acumulados (Python, a solas) | **21/21** |
 | Certificación de restauración | **16/16**, y falla como debe con fallo inyectado |
-| Detección de deriva | ejecutada: 4 diferencias, todas del hallazgo registrado |
+| Detección de deriva | ejecutada: 4 diferencias, todas del hallazgo registrado. **Hoy son 6**: el detector pasó a comparar también si la seguridad por filas está activada y forzada, y `saas_tenants` aparece ahora en las tres listas en vez de sólo en la de políticas. Es la misma carencia, contada con precisión |
 | Reconstrucción desde cero | **475 migraciones, 0 fallos** |
 | Recuperación (contenedor parado y arrancado) | **4/4**, vuelta sola en 536 ms |
 | Regresión amplia (736 ficheros) | **7 602 verdes, 0 fallos** |
