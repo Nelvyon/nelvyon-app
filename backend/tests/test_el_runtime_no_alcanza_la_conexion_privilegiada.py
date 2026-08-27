@@ -27,10 +27,15 @@ con un `new Pool()` en cualquier fichero.
 
 ESTADO
 ------
-El rol privilegiado todavia no existe en produccion y la variable tampoco. Estas
-pruebas se escriben AHORA, antes del cutover, para que el dia que la variable
-aparezca ya haya algo vigilando quien la lee. Escribirlas despues seria escribirlas
-cuando ya no se sabe si alguien la leyo.
+El rol privilegiado no existe en produccion y la variable tampoco. Estas pruebas
+se escribieron ANTES del cutover, para que el dia que la variable aparezca ya
+hubiera algo vigilando quien la lee. Escribirlas despues seria escribirlas cuando
+ya no se sabe si alguien la leyo.
+
+El cliente dedicado que reservaban —`backend/db/DbJobsClient.ts`— YA EXISTE. Se
+escribio al preparar el cutover, y anade una tercera defensa que este fichero no
+preveia: no basta con que una ruta normal no pueda ALCANZARLO; si lo alcanza, se
+niega a trabajar mientras haya un inquilino en el contexto de la peticion.
 """
 from __future__ import annotations
 
@@ -54,6 +59,9 @@ POOLS_PERMITIDOS = {
     "backend/agency/erp/ErpDomainSnapshotStore.ts": "espejo ERP; fija `app.tenant_id` "
                                                     "en cada transaccion",
     "backend/agency/erp/ErpRelationalMirror.ts": "igual que el anterior",
+    "backend/db/DbJobsClient.ts": "el cliente cross-tenant del cutover; lee solo "
+                                  "NELVYON_WEB_JOBS_DATABASE_URL y se niega a "
+                                  "trabajar si hay un inquilino en el contexto",
 }
 
 

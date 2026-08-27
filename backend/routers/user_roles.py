@@ -19,6 +19,60 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/entities/user_roles", tags=["user_roles"])
 
 
+# ═══════════════════════════════════════════════════════════════════════════
+# La jerarquia, tambien aqui
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# EL DEFECTO QUE CIERRA ESTO
+# --------------------------
+# Este router es CRUD generico sobre `user_roles`, y `user_roles` no es una
+# entidad de negocio cualquiera: es la fuente canonica de quien administra la
+# plataforma. El lado web la consulta para decidir el acceso a `admin/*`
+# (`NelvyonAdminService.isUserAdmin`).
+#
+# Las escrituras exigian `get_admin_user`, asi que un anonimo no llegaba. Pero
+# NO comprobaban la jerarquia, y `/rbac/assign` —el endpoint escrito a mano para
+# esto mismo— si la comprueba con una razon explicita: «un admin no puede
+# asignar un rol superior al suyo».
+#
+# Es decir: la regla existia y este camino se la saltaba. Un `admin` (nivel 4)
+# podia hacer POST aqui con role='super_admin' y ascender, o hacer PUT sobre su
+# propia fila. El control deliberado de `/rbac/assign` quedaba en un rodeo de
+# una peticion.
+#
+# Tampoco se validaba el valor de `role`: se podia guardar cualquier cadena.
+# Como `isUserAdmin` compara contra un conjunto cerrado, una cadena rara no da
+# acceso — pero deja filas que no significan nada en la tabla que decide quien
+# manda, y eso hace ilegible lo unico que hay que poder leer de un vistazo.
+#
+# Se reutilizan las constantes de `rbac_management` a proposito. Copiarlas seria
+# crear una segunda definicion de la jerarquia que puede divergir en silencio.
+VALID_ROLES = {"super_admin", "admin", "manager", "user", "viewer"}
+ROLE_HIERARCHY = {"super_admin": 5, "admin": 4, "manager": 3, "user": 2, "viewer": 1}
+
+
+def _exigir_rol_asignable(actor: UserResponse, role: Optional[str]) -> None:
+    """Valida el rol pedido y prohibe ascender por encima del propio.
+
+    `role=None` en un update parcial significa «no lo toques», y entonces no hay
+    nada que comprobar.
+    """
+    if role is None:
+        return
+    if role not in VALID_ROLES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Rol invalido. Validos: {', '.join(sorted(VALID_ROLES))}",
+        )
+    nivel_actor = ROLE_HIERARCHY.get(getattr(actor, "role", None) or "", 0)
+    nivel_pedido = ROLE_HIERARCHY.get(role, 0)
+    if nivel_pedido > nivel_actor:
+        raise HTTPException(
+            status_code=403,
+            detail=f"No puedes asignar un rol superior al tuyo ({getattr(actor, 'role', None)})",
+        )
+
+
 # ---------- Pydantic Schemas ----------
 class User_rolesData(BaseModel):
     """Entity data schema (for create/update)"""
@@ -198,6 +252,8 @@ async def create_user_roles(
 ):
     """Create a new user_roles"""
     logger.debug(f"Creating new user_roles with data: {data}")
+
+    _exigir_rol_asignable(_admin, data.role)
     
     service = User_rolesService(db)
     try:
@@ -223,6 +279,11 @@ async def create_user_roless_batch(
 ):
     """Create multiple user_roless in a single request"""
     logger.debug(f"Batch creating {len(request.items)} user_roless")
+
+    # Se validan TODOS antes de escribir ninguno: un lote que asciende en el
+    # tercer elemento no debe dejar los dos primeros creados.
+    for item_data in request.items:
+        _exigir_rol_asignable(_admin, item_data.role)
     
     service = User_rolesService(db)
     results = []
@@ -249,6 +310,9 @@ async def update_user_roless_batch(
 ):
     """Update multiple user_roless in a single request"""
     logger.debug(f"Batch updating {len(request.items)} user_roless")
+
+    for item in request.items:
+        _exigir_rol_asignable(_admin, item.updates.role)
     
     service = User_rolesService(db)
     results = []
@@ -278,6 +342,8 @@ async def update_user_roles(
 ):
     """Update an existing user_roles"""
     logger.debug(f"Updating user_roles {id} with data: {data}")
+
+    _exigir_rol_asignable(_admin, data.role)
 
     service = User_rolesService(db)
     try:

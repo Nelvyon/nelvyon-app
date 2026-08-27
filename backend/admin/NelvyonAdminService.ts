@@ -93,6 +93,29 @@ type ActivityRow = {
 };
 type RoleRow = { role: string };
 
+/**
+ * Los roles de `user_roles` que dan acceso al plano de administración.
+ *
+ * El mismo conjunto que `get_admin_user` en el lado Python
+ * (`backend/dependencies/auth.py`), que es quien gobierna el plano equivalente
+ * allí. Está aquí como constante con nombre, y no repartido por seis
+ * comparaciones, para que restringirlo a `super_admin` sea un cambio de una
+ * línea en un sitio y no una cacería.
+ */
+const ROLES_DE_PLATAFORMA: ReadonlySet<string> = new Set(["admin", "super_admin"]);
+
+/**
+ * Se compara en minúsculas pero SIN recortar espacios, y la diferencia importa.
+ *
+ * Minúsculas: `/rbac/assign` valida contra un conjunto ya en minúsculas, así que
+ * un `Admin` guardado a mano es el mismo rol escrito de otra forma.
+ *
+ * Espacios NO: `" admin"` y `"admin "` no son ese rol escrito de otra forma, son
+ * un valor que nadie escribió a propósito. Recortarlos convertiría un carácter
+ * invisible en acceso al plano de administración. Ya estaba certificado que no
+ * cuelan, y se conserva.
+ */
+
 function toIso(v: Date | string): string {
   return typeof v === "string" ? v : v.toISOString();
 }
@@ -141,45 +164,95 @@ export class NelvyonAdminService {
   /**
    * ¿Es este usuario administrador de PLATAFORMA?
    *
-   * Va a la base y NO mira el `role` del token, y eso es lo correcto: el token
-   * va firmado pero lo firmó NELVYON hace hasta ocho horas, así que degradar a
-   * alguien no surtiría efecto hasta que caducara.
+   * Va a la base y NO mira el `role` del token. Eso es deliberado y es lo
+   * importante de esta función: el token va firmado, pero lo firmó NELVYON hace
+   * hasta ocho horas. Si el rol viajara en el token, degradar a alguien no
+   * surtiría efecto hasta que caducara, y —peor— cualquier camino que rellene
+   * claims (SSO, refresco, una invitación) pasaría a ser un camino para
+   * fabricar administradores.
    *
-   * AVISO SOBRE EL ESTADO ACTUAL (Bloque 7): ninguna migración del árbol crea
-   * `os_users` ni añade `role` a `nelvyon_users`. Las dos consultas lanzan, los
-   * dos `catch` devuelven `false`, y hoy **nadie puede ser administrador de
-   * plataforma**. Cierra en falso, que es la dirección buena, pero deja muerta
-   * toda la superficie `admin/*`. Quién es administrador es una decisión de
-   * producto y no se toma desde aquí.
+   * DE DÓNDE SALE LA RESPUESTA, Y POR QUÉ NO ES UNA DECISIÓN INVENTADA
+   * ==================================================================
+   * De `user_roles`, que es la fuente canónica de roles de plataforma de
+   * NELVYON y ya existía. No se ha creado un segundo sistema de autorización:
+   * se ha conectado este lado al que ya había.
    *
-   * Lo que sí se corrige es el diagnóstico: un esquema que falta se tragaba en
-   * silencio y se informaba como «no es administrador», indistinguible de una
-   * denegación legítima. Ahora se registra una vez, alto y claro. Se sigue
-   * denegando: hacer que un error de configuración conceda acceso sería
-   * exactamente el defecto contrario y mucho peor.
+   * La evidencia de que es la canónica, y no una tabla cualquiera con un campo
+   * `role`:
+   *
+   *   - La CREA una migración del árbol (`545_esquema_de_modelos_sin_migracion`),
+   *     con `role`, `permissions_json`, `is_active`, `assigned_by` y fechas.
+   *   - Tiene su modelo (`backend/models/user_roles.py`) y su API de gestión
+   *     completa (`backend/routers/rbac_management.py`), con jerarquía
+   *     declarada —super_admin > admin > manager > user > viewer— y auditoría
+   *     de cada cambio en `security_events`.
+   *   - El lado Python decide con ella en seis sitios independientes
+   *     (`dependencies/auth.py`, `routers/audit_log.py`, `routers/gdpr.py`…),
+   *     siempre con el mismo predicado: `role in ("admin", "super_admin")`.
+   *
+   * Este método usa EXACTAMENTE ese predicado. Si el lado web usara uno distinto
+   * del que ya gobierna el lado Python, «administrador» significaría dos cosas
+   * en el mismo producto, que es la forma normal de que un plano de
+   * administración acabe siendo más permisivo que el otro sin que nadie lo
+   * decida.
+   *
+   * QUÉ ERA ESTO ANTES
+   * ------------------
+   * Consultaba `os_users.role` y `nelvyon_users.role`. Medido contra el árbol:
+   * `os_users` NO EXISTE —ninguna migración la crea— y `nelvyon_users` sí existe
+   * (`003_auth.sql`) pero NO TIENE columna `role`; tiene `plan`, que es otra
+   * cosa. Las dos consultas lanzaban, los dos `catch` devolvían `false`, y por
+   * eso nadie podía ser administrador y toda la superficie `admin/*` respondía
+   * 403.
+   *
+   * El diagnóstico del Bloque 7 decía «ninguna migración crea la tabla ni añade
+   * la columna». Era cierto para `os_users` y para la columna, y por eso el
+   * cierre en falso era correcto. Lo que no se había buscado entonces es si
+   * existía otra fuente ya canónica. Existía.
+   *
+   * LO QUE SIGUE SIN PODER DECIDIRSE DESDE AQUÍ
+   * -------------------------------------------
+   * QUIÉN es administrador. Esto resuelve el mecanismo —de dónde se lee y con
+   * qué predicado—; la primera fila de `user_roles` con rol `admin` es un dato
+   * sobre una persona real y la pone el fundador. Mientras no exista, esto
+   * sigue devolviendo `false` para todo el mundo, que es la dirección correcta.
+   *
+   * POR QUÉ NO HAY CAMINO PARA AUTOCONCEDERSE ESTO
+   * ----------------------------------------------
+   * En todo el árbol hay UN solo `INSERT INTO user_roles`: el endpoint
+   * `/rbac/assign`, que exige ser administrador, comprueba la jerarquía —un
+   * `admin` no puede crear un `super_admin`— y deja rastro auditado. Registrarse,
+   * ser propietario de un workspace, entrar por SSO o aceptar una invitación no
+   * escriben ahí. Certificado en `nadieSeHaceAdministradorSolo.pg.test.ts`.
    */
   async isUserAdmin(userId: string): Promise<boolean> {
-    let faltaEsquema = 0;
+    // `is_active IS NULL` cuenta como activa: la columna es opcional en el
+    // esquema y las filas antiguas la traen vacía. Es el mismo criterio que usa
+    // `/rbac/my-role` en Python; si aquí fuera más estricto, un administrador
+    // legítimo dejaría de serlo solo en el lado web.
     try {
-      const rows = await this.db.query<RoleRow>(`SELECT role FROM os_users WHERE id = $1 LIMIT 1`, [userId]);
-      const role = rows[0]?.role;
-      if (typeof role === "string" && role.toLowerCase() === "admin") return true;
-    } catch {
-      faltaEsquema++;
-    }
-    try {
-      const rows = await this.db.query<RoleRow>(`SELECT role FROM nelvyon_users WHERE user_id = $1 LIMIT 1`, [userId]);
-      const role = rows[0]?.role;
-      return typeof role === "string" && role.toLowerCase() === "admin";
-    } catch {
-      faltaEsquema++;
-      if (faltaEsquema === 2 && !NelvyonAdminService._avisoDeEsquemaDado) {
+      const rows = await this.db.query<RoleRow>(
+        `SELECT role FROM user_roles
+          WHERE user_id = $1 AND (is_active = TRUE OR is_active IS NULL)`,
+        [userId],
+      );
+      return rows.some(
+        (r) => typeof r.role === "string"
+          && ROLES_DE_PLATAFORMA.has(r.role.toLowerCase()),
+      );
+    } catch (err) {
+      // Un esquema que falta no puede parecerse a una denegación legítima: se
+      // registra una vez, alto y claro. Y se sigue denegando — hacer que un
+      // error de configuración CONCEDA acceso sería el defecto contrario y
+      // mucho peor.
+      if (!NelvyonAdminService._avisoDeEsquemaDado) {
         NelvyonAdminService._avisoDeEsquemaDado = true;
         console.error(
-          "[NelvyonAdminService] ni `os_users.role` ni `nelvyon_users.role` existen: " +
-            "NADIE puede ser administrador de plataforma y toda la superficie admin/* " +
-            "responde 403. Se deniega (cierre en falso), pero esto es un problema de " +
-            "esquema, no una denegacion legitima.",
+          "[NelvyonAdminService] no se pudo consultar `user_roles`, la fuente "
+            + "canonica de roles de plataforma: NADIE puede ser administrador y "
+            + "toda la superficie admin/* respondera 403. Es un problema de "
+            + "esquema o de privilegios, no una denegacion legitima. Detalle: "
+            + (err instanceof Error ? err.message : String(err)),
         );
       }
       return false;
