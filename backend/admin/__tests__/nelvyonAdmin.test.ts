@@ -96,10 +96,14 @@ function makeDb() {
       return [...activity].sort((a, b) => b.created_at.getTime() - a.created_at.getTime()).slice(0, limit) as unknown as T[];
     }
 
-    if (s.startsWith("SELECT role FROM os_users WHERE id = $1 LIMIT 1")) {
-      return [] as T[];
-    }
-    if (s.startsWith("SELECT role FROM nelvyon_users WHERE user_id = $1 LIMIT 1")) {
+    // El rol de plataforma sale de `user_roles`, que es la fuente canónica.
+    //
+    // Este doble consultaba `os_users` y `nelvyon_users`, que es lo que hacía
+    // `isUserAdmin` antes. Medido contra el árbol: `os_users` NO existe y
+    // `nelvyon_users` no tiene columna `role`. Es decir, el doble simulaba un
+    // esquema que no está en ninguna base, y estas tres pruebas pasaban por un
+    // camino que en producción lanzaba siempre.
+    if (s.includes("FROM user_roles")) {
       const row = users.find((u) => u.user_id === String(p[0]));
       return (row ? [{ role: row.role }] : []) as T[];
     }

@@ -223,7 +223,17 @@ describe("`DbJobsClient` se niega a trabajar dentro de una petición con inquili
    * Que lance antes es justo lo que se quiere — si primero consultara y luego
    * comprobara, ya habría leído datos de otros inquilinos.
    */
-  it("EL CONTROL · sin inquilino en el contexto, no lanza por este motivo", async () => {
+  it("EL CONTROL · sin inquilino en el contexto, NO se niega por ese motivo", async () => {
+    /**
+     * Sin este control, un cliente que se negara SIEMPRE pasaría las tres
+     * pruebas de abajo y dejaría sin funcionar los 14 crons y los 6 webhooks.
+     *
+     * Se afirma sobre el MOTIVO y no sobre si hay error: con una base real
+     * detrás la consulta funciona, y con una inventada falla por conexión. Las
+     * dos cosas son aceptables; lo que no lo es es que se niegue por contexto.
+     * Escrito con `rejects`, este control fallaba justo cuando la conexión iba
+     * bien — un rojo por acertar.
+     */
     const { conInquilino } = await import("../contextoDeInquilino");
     const { DbJobsClient, reiniciarClienteDeTrabajosParaPruebas } = await import("../DbJobsClient");
     reiniciarClienteDeTrabajosParaPruebas();
@@ -231,8 +241,13 @@ describe("`DbJobsClient` se niega a trabajar dentro de una petición con inquili
       process.env.DATABASE_URL ?? "postgresql://noop:noop@127.0.0.1:1/noop";
 
     await conInquilino({}, async () => {
-      // Sin inquilino: el error, si lo hay, será de conexión y no de contexto.
-      await expect(DbJobsClient.getInstance().query("SELECT 1")).rejects.not.toThrow(
+      let motivo = "";
+      try {
+        await DbJobsClient.getInstance().query("SELECT 1");
+      } catch (e) {
+        motivo = e instanceof Error ? e.message : String(e);
+      }
+      expect(motivo, "se negó a trabajar sin haber ningún inquilino").not.toMatch(
         /hay un inquilino en el contexto/,
       );
     });

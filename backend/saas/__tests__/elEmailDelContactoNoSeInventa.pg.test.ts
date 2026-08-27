@@ -59,6 +59,26 @@ const VALIDOS = [
   "guion-bajo_1@dominio-con-guion.io",
 ];
 
+/**
+ * Un puerto atado al pool DE ESTE FICHERO, no al singleton `DbClient`.
+ *
+ * Vitest reparte varios ficheros por *worker* y comparte el proceso. Si aquí se
+ * usara `DbClient.getInstance()`, se cogería el singleton que otro fichero del
+ * mismo worker ya hubiera construido —apuntando a OTRA base—, y este fichero
+ * sembraría en una y consultaría en la otra.
+ *
+ * Aislado pasaba y en la suite completa fallaba: el peor tipo de rojo, porque
+ * parece intermitente cuando en realidad es determinista y depende del reparto.
+ */
+function puerto() {
+  return {
+    query: async <T>(sql: string, params?: unknown[]): Promise<T[]> => {
+      const r = await pool.query(sql, params as never[]);
+      return r.rows as T[];
+    },
+  };
+}
+
 beforeAll(async () => {
   if (!DSN) return;
   const { Pool } = await import("pg");
@@ -76,9 +96,7 @@ beforeAll(async () => {
      VALUES ($1,$2,'Cert Email','tech','pro')`,
     [TENANT, USUARIO],
   );
-  const { DbClient } = await import("../../db/DbClient");
-  process.env.DATABASE_URL = DSN;
-  crm = new SaasCrmService(DbClient.getInstance());
+  crm = new SaasCrmService(puerto() as never);
 });
 
 beforeEach(async () => {

@@ -226,22 +226,29 @@ describeSiHayPg("BLOQUE 2 · CRM — flujo completo", () => {
 
   // ── Entradas que no valen ─────────────────────────────────────────────────
 
-  it("HALLAZGO: el correo NO se valida en ninguna capa", async () => {
-    // Esto NO es una prueba de que esté bien: documenta lo que hay.
-    //
-    // Ni `SaasCrmService.createContact` ni la ruta `/api/saas/crm/contacts`
-    // comprueban la forma del correo. `no-soy-un-correo` entra y se guarda. La
-    // consecuencia llega después: una campaña a ese contacto rebota, y la
-    // deduplicación por correo trata la basura como si fuera una dirección.
-    //
-    // No lo arreglo yo. Añadir validación RECHAZARÍA lo que hoy se acepta, y eso
-    // rompe importaciones que ahora funcionan: es una decisión de producto sobre
-    // qué hacer con los contactos que ya están guardados así. Queda anotado en el
-    // registro de capacidades como riesgo residual.
-    //
-    // Cuando se decida, esta prueba se invierte y pasa a exigir el rechazo.
-    const c = await crm.createContact(A, { ...contacto(), email: "no-soy-un-correo" } as never);
-    expect((await crm.getContact(A, c.id))?.email).toBe("no-soy-un-correo");
+  it("RESUELTO: el correo se valida al crear, y se rechaza el que no sirve", async () => {
+    /**
+     * Esta prueba estaba INVERTIDA y documentaba el hallazgo: ni el servicio ni
+     * la ruta comprobaban la forma del correo, así que `no-soy-un-correo` se
+     * guardaba tal cual. Decía literalmente: «cuando se decida, esta prueba se
+     * invierte y pasa a exigir el rechazo». Es lo que ha pasado.
+     *
+     * La cautela de entonces también era correcta, y se ha respetado: validar en
+     * todas las puertas a la vez rompería las importaciones que hoy funcionan y
+     * dejaría congelados los contactos ya guardados con un correo raro. Por eso
+     * la política es POR PUERTA — estricta al crear, tolerante con lo histórico,
+     * y en lote informa sin rechazar.
+     *
+     * El detalle completo, con los tres caminos y sus mutaciones, está en
+     * `elEmailDelContactoNoSeInventa.pg.test.ts`.
+     */
+    await expect(
+      crm.createContact(A, { ...contacto(), email: "no-soy-un-correo" } as never),
+    ).rejects.toThrow(/email invalido/i);
+
+    // Y el control: uno válido sigue entrando, y normalizado.
+    const c = await crm.createContact(A, { ...contacto(), email: "Valido@Ejemplo.COM" } as never);
+    expect((await crm.getContact(A, c.id))?.email).toBe("valido@ejemplo.com");
   });
 
   it("editar un contacto que no existe no crea nada por sorpresa", async () => {

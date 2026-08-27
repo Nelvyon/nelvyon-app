@@ -56,6 +56,26 @@ let pool: import("pg").Pool;
 let svc: SaasMembershipService;
 let planId = "";
 
+/**
+ * Un puerto atado al pool DE ESTE FICHERO, no al singleton `DbClient`.
+ *
+ * Vitest reparte varios ficheros por *worker* y comparte el proceso. Si aquí se
+ * usara `DbClient.getInstance()`, se cogería el singleton que otro fichero del
+ * mismo worker ya hubiera construido —apuntando a OTRA base—, y este fichero
+ * sembraría en una y consultaría en la otra.
+ *
+ * Aislado pasaba y en la suite completa fallaba: el peor tipo de rojo, porque
+ * parece intermitente cuando en realidad es determinista y depende del reparto.
+ */
+function puerto() {
+  return {
+    query: async <T>(sql: string, params?: unknown[]): Promise<T[]> => {
+      const r = await pool.query(sql, params as never[]);
+      return r.rows as T[];
+    },
+  };
+}
+
 async function estado(): Promise<string | null> {
   const r = await pool.query<{ status: string }>(
     `SELECT status FROM saas_membership_members
@@ -99,9 +119,7 @@ beforeAll(async () => {
   );
   planId = p.rows[0]!.id;
 
-  process.env.DATABASE_URL = DSN;
-  const { DbClient } = await import("../../db/DbClient");
-  svc = new SaasMembershipService(DbClient.getInstance());
+  svc = new SaasMembershipService(puerto() as never);
 });
 
 beforeEach(async () => {
