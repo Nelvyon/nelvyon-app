@@ -52,8 +52,63 @@ let app: import("pg").Pool;
 let jobs: import("pg").Pool;
 let dueno: import("pg").Pool;
 
+/**
+ * La tabla de esta suite, y SOLO de esta suite.
+ *
+ * La primera versión usaba `cert_os_rls`, que ya usaba
+ * `rlsEfectivaWebApp.pg.test.ts`. Las dos hacían `TRUNCATE` en su `beforeEach` y
+ * vitest corre los ficheros EN PARALELO contra la misma base: por separado
+ * pasaban las dos, y juntas fallaban cuatro. Es el mismo defecto que
+ * `flujoLote2` documentó con los inquilinos compartidos, y da igual acotar por
+ * `workspace_id` — el `TRUNCATE` ajeno se lleva las filas propias de todas
+ * formas.
+ *
+ * Y había algo peor de fondo: `cert_os_rls` no existía en ningún fichero del
+ * árbol. Se creó a mano en la base local durante el Bloque 8, así que la
+ * certificación de RLS efectiva dependía de un objeto que nadie podía
+ * reconstruir leyendo el repositorio. Ésta se crea aquí, es idempotente, y
+ * cualquiera que clone puede reproducirla.
+ */
+const TABLA = "cert_cutover_rls";
+
 /** El SQL que escribiría un cron: sin `WHERE` de inquilino, a propósito. */
-const SQL_DE_CRON = `SELECT workspace_id, status FROM cert_os_rls ORDER BY workspace_id, status`;
+const SQL_DE_CRON = `SELECT workspace_id, status FROM ${TABLA} ORDER BY workspace_id, status`;
+
+/**
+ * El fixture, con la MISMA familia de políticas que usa el producto.
+ *
+ * Se copia de `cert_os_rls` a propósito: si aquí se inventara una política más
+ * simple, la suite mediría una política de juguete y no la que protege de
+ * verdad. Las cuatro salen de `nelvyon_os_workspace_select` y
+ * `nelvyon_os_workspace_mutate`, que son las que crean las migraciones 322 y
+ * 566-569.
+ */
+const FIXTURE = `
+CREATE TABLE IF NOT EXISTS ${TABLA} (
+  id              serial PRIMARY KEY,
+  channel         text,
+  workspace_id    integer,
+  status          text,
+  content_preview text
+);
+ALTER TABLE ${TABLA} ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ${TABLA} FORCE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS ${TABLA}_os_select ON ${TABLA};
+DROP POLICY IF EXISTS ${TABLA}_os_insert ON ${TABLA};
+DROP POLICY IF EXISTS ${TABLA}_os_update ON ${TABLA};
+DROP POLICY IF EXISTS ${TABLA}_os_delete ON ${TABLA};
+CREATE POLICY ${TABLA}_os_select ON ${TABLA} FOR SELECT
+  USING (nelvyon_os_workspace_select(workspace_id));
+CREATE POLICY ${TABLA}_os_insert ON ${TABLA} FOR INSERT
+  WITH CHECK (nelvyon_os_workspace_mutate(workspace_id));
+CREATE POLICY ${TABLA}_os_update ON ${TABLA} FOR UPDATE
+  USING (nelvyon_os_workspace_mutate(workspace_id))
+  WITH CHECK (nelvyon_os_workspace_mutate(workspace_id));
+CREATE POLICY ${TABLA}_os_delete ON ${TABLA} FOR DELETE
+  USING (nelvyon_os_workspace_mutate(workspace_id));
+GRANT SELECT, INSERT, UPDATE, DELETE ON ${TABLA} TO nelvyon_web_app, nelvyon_web_jobs;
+GRANT USAGE ON SEQUENCE ${TABLA}_id_seq TO nelvyon_web_app, nelvyon_web_jobs;
+`;
 
 conRoles("el cutover del rol del lado web (PostgreSQL real)", () => {
   beforeAll(async () => {
@@ -61,6 +116,7 @@ conRoles("el cutover del rol del lado web (PostgreSQL real)", () => {
     app = new Pool({ connectionString: DSN_APP, max: 2 });
     jobs = new Pool({ connectionString: DSN_JOBS, max: 2 });
     dueno = new Pool({ connectionString: DSN_DUENO, max: 2 });
+    await dueno.query(FIXTURE);
   });
 
   afterAll(async () => {
@@ -82,10 +138,10 @@ conRoles("el cutover del rol del lado web (PostgreSQL real)", () => {
         [ws, duenoDeWs, `cert-cutover-${ws}`],
       );
     }
-    await dueno.query("TRUNCATE cert_os_rls");
+    await dueno.query(`DELETE FROM ${TABLA}`);
     for (const ws of [WS_A, WS_B]) {
       await dueno.query(
-        `INSERT INTO cert_os_rls (channel, workspace_id, status, content_preview)
+        `INSERT INTO ${TABLA} (channel, workspace_id, status, content_preview)
          VALUES ('landing',$1,'blocked',$2), ('email',$1,'passed',$2)`,
         [ws, `fila-del-workspace-${ws}`],
       );
@@ -125,10 +181,10 @@ conRoles("el cutover del rol del lado web (PostgreSQL real)", () => {
     // estaría midiendo una tabla desprotegida.
     const r = await dueno.query<{ rls: boolean; n: string }>(
       `SELECT (SELECT rowsecurity FROM pg_tables
-                WHERE schemaname='public' AND tablename='cert_os_rls') AS rls,
-              (SELECT count(*)::text FROM cert_os_rls) AS n`,
+                WHERE schemaname='public' AND tablename='${TABLA}') AS rls,
+              (SELECT count(*)::text FROM ${TABLA}) AS n`,
     );
-    expect(r.rows[0]?.rls, "cert_os_rls no tiene RLS: la suite no probaría nada").toBe(true);
+    expect(r.rows[0]?.rls, `${TABLA} no tiene RLS: la suite no probaría nada`).toBe(true);
     expect(Number(r.rows[0]?.n)).toBe(4);
   });
 
@@ -185,9 +241,9 @@ conRoles("el cutover del rol del lado web (PostgreSQL real)", () => {
      * superusuario de sitio y hacerlo más difícil de ver.
      */
     await expect(jobs.query("CREATE TABLE cert_intruso (id int)")).rejects.toThrow();
-    await expect(jobs.query("TRUNCATE cert_os_rls")).rejects.toThrow();
+    await expect(jobs.query(`TRUNCATE ${TABLA}`)).rejects.toThrow();
     // Y las filas siguen ahí después de los dos intentos.
-    const r = await dueno.query<{ n: string }>(`SELECT count(*)::text AS n FROM cert_os_rls`);
+    const r = await dueno.query<{ n: string }>(`SELECT count(*)::text AS n FROM ${TABLA}`);
     expect(Number(r.rows[0]?.n)).toBe(4);
   });
 
