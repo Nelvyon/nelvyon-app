@@ -174,9 +174,26 @@ real cuando existe, y solo se calcula cuando no. La decisión que queda es si
 migrar los identificadores antiguos, que es una operación de identidad sobre
 datos reales. El estudio completo está en `docs/DECISION_WORKSPACE_ID.md`.
 
-*Mientras tanto*: el paso 5 te dice si ya ha pasado.
+*Mientras tanto*, dos comandos que sólo leen te dan el dato para decidir:
+
+```bash
+# ¿ha pasado ya?
+DATABASE_URL="<produccion>" node scripts/detectar-colision-de-workspace.mjs
+
+# ¿a quién le cambiaría el identificador, y de qué a qué?
+DATABASE_URL="<produccion>" node scripts/simular-poblado-del-puente.mjs
+```
+
+El segundo enseña la tabla completa: cliente por cliente, el número viejo y el
+nuevo. Nadie tiene que decidir esto a ciegas.
+
+**Y cierra las dos cosas a la vez.** La segunda decisión de abajo depende de
+ésta: la regla de aislamiento de `saas_tenants` no se puede activar mientras haya
+clientes sin espacio de trabajo asignado, porque sus datos quedarían invisibles.
+En cuanto dejen de faltar, esa regla se aplica sola.
 
 **2. Si alguien que se dio de baja debería recuperar el acceso al volver a pagar.**
+*(Ésta es de verdad independiente; la de arriba y la del aislamiento son la misma.)*
 Hoy: **no**. Quien caduca por un impago y paga, vuelve a entrar
 —eso ya funciona y está certificado—, pero quien se dio de baja explícitamente
 no revive con un cobro rezagado. Está escrito así porque es la dirección segura:
