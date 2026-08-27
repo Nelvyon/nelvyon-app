@@ -24,6 +24,8 @@
  * la política es POR PUERTA, y esta suite certifica las tres.
  */
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import fs from "node:fs";
+import path from "node:path";
 
 import { SaasCrmError, SaasCrmService } from "../SaasCrmService";
 import { examinarEmailDeContacto } from "../emailDeContacto";
@@ -282,5 +284,38 @@ conBase("3 · importación en lote: informa, no rechaza", () => {
     ]);
     const lista = await crm.getContacts(TENANT, {});
     expect(lista).toHaveLength(2);
+  });
+
+  it("los avisos LLEGAN a quien importa, no se quedan en el servicio", () => {
+    /**
+     * Un aviso que no sale de la capa de servicio no sirve de nada: la mitad
+     * tolerante de la política existe precisamente para que quien sube un
+     * fichero sepa QUÉ filas hay que arreglar.
+     *
+     * Se comprueba sobre el código de la ruta y no ejecutándola, y conviene
+     * decir por qué: la ruta exige un contexto SaaS autenticado completo, y
+     * montarlo aquí probaría sobre todo el montaje. Lo que queda por cubrir es
+     * sólo el cableado —que la ruta lea `avisos` y los devuelva—, porque que los
+     * avisos se produzcan bien ya está medido en las cuatro pruebas de arriba.
+     *
+     * El `+2` de la fila también se fija: la fila 1 del fichero es la cabecera y
+     * el índice empieza en 0, así que sin él el número que ve el cliente no
+     * coincidiría con el de su hoja de cálculo — y un aviso que señala la fila
+     * equivocada es peor que ninguno.
+     */
+    const fuente = fs.readFileSync(
+      path.resolve(
+        __dirname, "..", "..", "..",
+        "apps", "web", "src", "app", "api", "saas", "crm", "contacts", "import", "route.ts",
+      ),
+      "utf8",
+    );
+    expect(fuente, "la ruta no recoge `avisos` del servicio").toMatch(
+      /const\s*\{[^}]*\bavisos\b[^}]*\}\s*=\s*await\s+crm\.createContactsBatch/,
+    );
+    expect(fuente, "los avisos no llegan a la respuesta").toContain("warningDetails");
+    expect(fuente, "la fila del aviso no se traduce a la del fichero").toMatch(
+      /a\.index\s*\+\s*2/,
+    );
   });
 });

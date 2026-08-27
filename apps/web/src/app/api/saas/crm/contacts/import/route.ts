@@ -124,16 +124,33 @@ export async function POST(req: Request) {
     }
 
     // Chunked multi-row INSERT — avoids up to 5k sequential round-trips.
-    const { created, errors: batchErrors } = await crm.createContactsBatch(ctx.tenant.id, inputs);
+    const { created, errors: batchErrors, avisos } = await crm.createContactsBatch(
+      ctx.tenant.id,
+      inputs,
+    );
     const errors = [
       ...preErrors,
       ...batchErrors.map((e) => ({ row: e.index + 2, error: e.error })),
     ];
 
+    // Los AVISOS no son errores, y por eso van aparte.
+    //
+    // Una fila con un correo que no se va a poder enviar SE IMPORTA igual y
+    // conserva el valor: rechazar el lote entero por unos cuantos, o descartar
+    // esos en silencio, son las dos formas de perder el trabajo de quien
+    // importa. Lo que hace falta es que sepa CUALES son para poder arreglarlos,
+    // y para eso tienen que llegar hasta aqui.
+    //
+    // `+2` porque la fila 1 del fichero es la cabecera y el indice empieza en 0:
+    // asi el numero que se ve coincide con el que muestra la hoja de calculo.
+    const avisosPorFila = avisos.map((a) => ({ row: a.index + 2, aviso: a.aviso }));
+
     return NextResponse.json({
       imported: created.length,
       errors: errors.length,
       errorDetails: errors.slice(0, 50),
+      warnings: avisosPorFila.length,
+      warningDetails: avisosPorFila.slice(0, 50),
     }, { status: 200 });
   } catch (e: unknown) {
     if (e instanceof SaasCrmError) return NextResponse.json({ error: e.message }, { status: 400 });
