@@ -24,37 +24,6 @@
    "en_produccion": false,
    "clase": "ROTO_HOY",
    "nota": "`saas_tenants` ya tiene `user_id`. Si `owner_user_id` es un nombre distinto para lo mismo, la correccion es en el servicio, no una columna nueva: duplicar el dueno en dos columnas crea dos verdades."
-  },
-  {
-   "tabla": "invoices",
-   "columnas": [
-    "client_address",
-    "client_email",
-    "client_name",
-    "items",
-    "logo_url",
-    "tax_total",
-    "user_id"
-   ],
-   "origen": "backend/saas/InvoicingService.ts",
-   "vivo": false,
-   "en_produccion": false,
-   "clase": "CODIGO_MUERTO",
-   "nota": "RESUELTO EL DIAGNOSTICO. La tabla `invoices` tiene DOS escritores y solo uno esta vivo: `SaasFacturasService`, al que llaman las rutas /api/saas/facturas*, y que usa la forma de inquilino (tenant_id, line_items) — la que la tabla tiene de verdad. `InvoicingService` escribe la forma de USUARIO (user_id, items, client_name...) y NADIE lo llama: solo lo referencian el barril backend/saas/index.ts y su propia prueba unitaria, que pasa porque usa un doble de base. Asi que el contrato de facturas ya esta definido y funciona: /api/saas/facturas -> SaasFacturasService -> invoices, y /api/saas/invoices -> SaasInvoiceService -> saas_invoices. Decision minima pendiente, y es UNA: borrar `InvoicingService` con su export del barril y su prueba, o conectarlo a algo. No lo borro yo."
-  },
-  {
-   "tabla": "ab_tests",
-   "columnas": [
-    "duration_days",
-    "metric",
-    "updated_at",
-    "user_id"
-   ],
-   "origen": "backend/saas/ABTestingService.ts",
-   "vivo": false,
-   "en_produccion": false,
-   "clase": "CODIGO_MUERTO",
-   "nota": "RESUELTO EL DIAGNOSTICO. El A/B vivo es /api/saas/ab-testing -> SaasAbTestingService -> ab_tests, y ESE si casa con la tabla (id, tenant_id, name, type, status, variants, winner_variant_id, confidence). `ABTestingService` escribe otra forma y NADIE lo llama: solo el barril y su prueba unitaria con doble de base. Decision minima pendiente, y es UNA: borrarlo con su export y su prueba, o conectarlo. No lo borro yo."
   }
  ],
  "_cerrados_por_la_576": [
@@ -64,5 +33,27 @@
   "saas_conversations",
   "security_events"
  ],
- "_nota_produccion": "La 576 esta escrita y certificada pero NO aplicada (ADR-064 = BLOCKED_ON_FOUNDER). Mientras no se aplique, esos cinco INSERT siguen fallando en produccion."
+ "_nota_produccion": "La 576 esta escrita y certificada pero NO aplicada (ADR-064 = BLOCKED_ON_FOUNDER). Mientras no se aplique, esos cinco INSERT siguen fallando en produccion.",
+ "_cerrados_al_eliminar_codigo_muerto": {
+  "cuando": "cierre de pendientes post-certificacion",
+  "por_que": "Al retirar InvoicingService y ABTestingService --duplicados muertos y ademas ROTOS contra el esquema real-- desaparecieron las citas de columnas que la cadena de migraciones no crea. No se \"arreglaron\" anadiendo columnas: se fueron con el codigo que las escribia, que es la forma buena de cerrar un hueco de recuperacion. Lo destapo test_el_inventario_no_se_queda_obsoleto al ejecutarse por primera vez con NELVYON_VIRGEN_DSN puesto: hasta entonces se saltaba en silencio. La clase CODIGO_MUERTO archivaba estos dos huecos diciendo \"esto no cuenta, el fichero no lo usa nadie\". Era cierto, y ahora es mejor: el fichero ya no existe. Un hueco cuyo escritor se ha borrado no necesita una etiqueta que lo excuse.",
+  "columnas": [
+   "ab_tests.duration_days",
+   "ab_tests.metric",
+   "ab_tests.updated_at",
+   "ab_tests.user_id",
+   "invoices.client_address",
+   "invoices.client_email",
+   "invoices.client_name",
+   "invoices.items",
+   "invoices.logo_url",
+   "invoices.tax_total",
+   "invoices.user_id"
+  ],
+  "modulos_eliminados": [
+   "backend/saas/InvoicingService.ts",
+   "backend/saas/ABTestingService.ts"
+  ],
+  "clase_anterior": "CODIGO_MUERTO"
+ }
 }

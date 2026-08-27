@@ -109,7 +109,28 @@ def test_codigo_muerto_es_una_medicion_y_no_una_excusa():
     import huecos_de_recuperacion as hr  # noqa: E402
 
     muertos = [h for h in datos["huecos"] if h["clase"] == "CODIGO_MUERTO"]
-    assert muertos, "no hay entradas CODIGO_MUERTO: esta prueba se quedo sin objeto"
+    cerrados = datos.get("_cerrados_al_eliminar_codigo_muerto", {})
+    eliminados = cerrados.get("modulos_eliminados", [])
+
+    # HAY UNA SEGUNDA FORMA VALIDA DE NO TENER ENTRADAS `CODIGO_MUERTO`, Y ES
+    # MEJOR QUE LA PRIMERA: que el codigo muerto se haya BORRADO.
+    #
+    # Esta prueba exigia que hubiera al menos una entrada, para que reetiquetar
+    # un hueco incomodo como "muerto" no fuera una escotilla silenciosa. La
+    # exigencia sigue en pie, pero se cumplia de una sola manera y eso castigaba
+    # hacer lo correcto: al retirar InvoicingService y ABTestingService la lista
+    # se quedo vacia y esto fallo.
+    #
+    # Asi que ahora se admiten las dos, y la segunda se comprueba MAS fuerte: no
+    # basta con anotar que se borro, hay que demostrar que el fichero no esta.
+    assert muertos or eliminados, (
+        "no hay entradas CODIGO_MUERTO ni constancia de que se eliminara ninguna: "
+        "esta prueba se quedo sin objeto")
+
+    for rel in eliminados:
+        assert not (RAIZ / rel).exists(), (
+            f"`{rel}` figura como eliminado y sigue en el arbol. O vuelve al "
+            "inventario con su clase, o se borra de verdad.")
 
     for h in muertos:
         assert h.get("vivo") is False, h["tabla"]

@@ -15,7 +15,38 @@ NELVYON_WEB_APP_CERT_DSN=postgresql://nelvyon_web_app:cert_local_b8@localhost:54
 NELVYON_B2_DSN=postgresql://nelvyon_local:nelvyon_local_dev@localhost:5434/nelvyon_b2_cert
 NELVYON_B3_DSN=postgresql://nelvyon_local:nelvyon_local_dev@localhost:5434/nelvyon_b2_cert
 NELVYON_B4_DSN=postgresql://nelvyon_local:nelvyon_local_dev@localhost:5434/nelvyon_b2_cert
+NELVYON_WEB_JOBS_CERT_DSN=postgresql://nelvyon_web_jobs:cert_local_b8@localhost:5434/nelvyon_web_cert
+MIG523_TEST_DATABASE_URL=postgresql://nelvyon_local:nelvyon_local_dev@localhost:5434/nelvyon_recon_b9
+LOCAL_AI_TEST_DATABASE_URL=postgresql://nelvyon_local_app:cert_local_b10@localhost:5434/nelvyon_localai_cert
+LOCAL_AI_DATABASE_URL=postgresql://nelvyon_local_app:cert_local_b10@localhost:5434/nelvyon_localai_cert
+NELVYON_VIRGEN_DSN=postgresql://nelvyon_local:nelvyon_local_dev@localhost:5434/nelvyon_rec_final
+NELVYON_PG_VIRGEN_DSN=postgresql://nelvyon_local:nelvyon_local_dev@localhost:5434/nelvyon_recon_b9
 ```
+
+### Las tres últimas son de la suite **Python**, y se olvidaron
+
+La suite de Python se venía ejecutando sólo con `DATABASE_URL`, y eso dejaba
+**16 pruebas saltándose en silencio**. Se vio al pedirle el desglose con `-rs`,
+que es lo que hay que hacer siempre: un total de saltos sin desglosar no dice si
+son de diseño o son cobertura perdida.
+
+| Variable | Desbloquea | Qué certifica |
+|---|---:|---|
+| `NELVYON_WEB_CERT_DSN` | 13 | los webhooks salientes reintentan de verdad |
+| `NELVYON_VIRGEN_DSN` | 2 | que el código no cita columnas que la cadena de migraciones no crea |
+| `NELVYON_PG_VIRGEN_DSN` | 1 | que la cadena entera aplica sobre PostgreSQL virgen, sin *shims* |
+
+Y desbloquear la segunda **encontró algo**: al retirar los dos servicios muertos
+habían quedado cerrados varios huecos de recuperación que seguían inventariados.
+El trinquete exige que un hueco arreglado salga de la lista, y hasta entonces se
+saltaba sin decir nada.
+
+> `NELVYON_VIRGEN_DSN` y `NELVYON_PG_VIRGEN_DSN` **no son la misma base**. La
+> primera quiere un esquema reconstruido sólo con migraciones (`nelvyon_rec_final`);
+> la segunda, además, que el registro `_migrations` esté completo
+> (`nelvyon_recon_b9`, 475 filas). Apuntar las dos a la misma falla, y falla
+> diciendo `relation "_migrations" does not exist`, que no se parece a lo que
+> pasa.
 
 Con `NELVYON_B3_DSN` y `NELVYON_B4_DSN` puestas se ejecutan **54 pruebas más** que
 antes se saltaban: memoria y RAG, idempotencia distribuida, derechos del titular
