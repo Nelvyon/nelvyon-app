@@ -54,23 +54,28 @@ falso — es decir, **el webhook deja de funcionar** hasta que se configure.
 
 ## 3 · BLOQUEADO POR EL FUNDADOR
 
-No son fallos. Son decisiones con consecuencias que una sesión de certificación
-no puede tomar.
+Eran **ocho**. Al reevaluar cada uno contra el árbol —en vez de fiarse de la
+etiqueta— quedaron **dos**. Una etiqueta antigua no demuestra que siga haciendo
+falta el fundador.
 
 | Id | Qué hay que decidir |
 |---|---|
-| `PLATFORM_ADMIN_MODEL` | **Nadie puede ser administrador de plataforma.** `isUserAdmin` consulta un esquema que ninguna migración crea. Cierra en falso; toda la superficie `admin/*` responde 403 |
-| `STABLE_WORKSPACE_ID_MIGRATION` | El workspace derivado colisiona. Con 1 000 inquilinos, **42,6 %** de probabilidad de tener ya una colisión. Estudio y plan en `DECISION_WORKSPACE_ID.md` |
-| `RLS_SAAS_TENANTS_SOBRE_TABLA_CON_DATOS` | Cuatro políticas RLS de `saas_tenants` no llegan a una base con filas. Es un cambio de visibilidad de datos |
-| `WEB_DB_ROLE_CUTOVER` | El lado web se conecta con un rol que **evita** las políticas RLS |
-| `ADR-064` | Decisión de arquitectura pendiente de firma |
-| `STRIPE_MEMBERSHIP_REACTIVATION` | Política de reactivación de membresías |
-| `INVOICING_AB_TESTING_SERVICES` | `InvoicingService` y `ABTestingService` |
-| `CRM_EMAIL_VALIDATION` | Política de validación de email inválido |
+| `STABLE_WORKSPACE_ID_MIGRATION` | Si se migran los identificadores de espacio de trabajo ya emitidos. Es una operación de identidad sobre datos reales. Estudio en `DECISION_WORKSPACE_ID.md` |
+| `RLS_SAAS_TENANTS_SOBRE_TABLA_CON_DATOS` | Cuatro políticas RLS de `saas_tenants` no llegan a una base con filas. Es un cambio de visibilidad de datos, y se cruza con el paso 4 de abajo |
 
-Las tres primeras se cruzan entre sí: decidir la de `saas_tenants` exige decidir
-antes `WEB_DB_ROLE_CUTOVER`, porque hoy las políticas no son la frontera efectiva
-de todas formas.
+### Los seis que dejaron de serlo, y por qué
+
+| Id | Qué era en realidad |
+|---|---|
+| `PLATFORM_ADMIN_MODEL` | No era una decisión de producto: era este lado sin conectar a `user_roles`, la fuente canónica que **ya existía** (migración 545, con su API, su jerarquía y su auditoría, y seis sitios del lado Python decidiendo con ella). Conectado. Queda designar a la primera persona → **paso 2** |
+| `WEB_DB_ROLE_CUTOVER` | No faltaba decidir: faltaba que las 60 rutas cross-tenant tuvieran por dónde conectarse después. Hecho y certificado. Queda dar contraseña a dos roles → **paso 4** |
+| `ADR-064` | No era una decisión sin escribir: es un mecanismo de gobierno **ya implementado**. Faltaba clasificar las ocho migraciones una a una. Hecho: 2 inocuas, 6 que solo necesitan firma, 0 peligrosas → **paso 3** |
+| `STRIPE_MEMBERSHIP_REACTIVATION` | Contrato reconstruido. Y apareció un defecto que nadie buscaba: los eventos de factura usaban el id equivocado, así que **la caducidad por impago no caducaba a nadie** |
+| `INVOICING_AB_TESTING_SERVICES` | No era «conectar o borrar»: eran duplicados muertos **y rotos** contra el esquema. Eliminados; lo canónico se queda |
+| `CRM_EMAIL_VALIDATION` | Se implementó una política **por puerta** que no rechaza ni destruye datos existentes |
+
+Todo con su evidencia en `backend/db/certificacion/decisiones_y_bloqueos.json`,
+sección `resueltas`: nadie cierra un bloqueo sin decir qué hizo y con qué medida.
 
 ---
 
@@ -95,3 +100,7 @@ Cosas que **esta máquina no puede comprobar**, no cosas que estén mal.
 
 Lo que sí se puede decir: *todo lo certificable sin decisiones humanas, sin tocar
 producción y sin coste externo está cerrado con evidencia reproducible.*
+
+Y una cosa más, que antes no se podía decir: **cada rojo que queda es una acción
+concreta con nombre**, no una zona sin explorar. Están los seis pasos, en orden y
+con los comandos exactos, en `docs/LO_QUE_TIENE_QUE_HACER_EL_FUNDADOR.md`.
