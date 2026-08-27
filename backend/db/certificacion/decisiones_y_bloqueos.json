@@ -54,11 +54,16 @@
   },
   {
    "bloque_origen": 1,
-   "clase": "BLOCKED_HUMAN_DECISION",
+   "clase": "REQUIRED_CONFIGURATION",
+   "comportamiento_actual": "Ninguna aplicada en produccion. La puerta de gobierno sigue negando sin aprobacion explicita, que es lo correcto.",
+   "comprobacion": "node scripts/clasificar-migraciones-bloqueadas.mjs",
+   "evidencia": "docs/evidence/adr064/clasificacion.json",
    "id": "ADR-064",
-   "lo_que_NO_se_debe_hacer": "Resolverla unilateralmente.",
-   "titulo": "Decision de arquitectura pendiente de firma",
-   "verificable_automaticamente": false
+   "lo_que_NO_se_debe_hacer": "Aplicarlas a produccion desde una sesion de certificacion. Y no aplicar el lote de RLS sin decidir antes WEB_DB_ROLE_CUTOVER: hoy el lado web se conecta con un rol que EVITA las politicas, asi que activarlas no cambia su frontera efectiva.",
+   "por_que": "ADR-064 NO era una decision de arquitectura sin escribir: es un mecanismo de gobierno YA implementado (backend/db/prodMigrateGate.ts) que en produccion exige variables de aprobacion auditables y niega el despliegue sin ellas. Funciona. Lo que faltaba era la evidencia POR MIGRACION: \"568-576 = BLOCKED_ON_FOUNDER\" mete a las ocho en el mismo saco y no son lo mismo. Medido sobre una base reconstruida con la cadena hasta la 567: las OCHO aplican limpias y son idempotentes, ninguna es MUST_NOT_APPLY. 573 y 576 son SAFE_TO_APPLY (2 indices y 8 columnas que el codigo ya escribe). 568/569/570/572/575 cambian visibilidad via RLS y 574 escribe datos pero trae su propia copia (os_sector_shield_audits_backfill_574) y su ROLLBACK escrito: son REQUIRES_APPROVAL_ONLY.",
+   "resuelto_en": "cierre de pendientes post-certificacion (clasificacion completa)",
+   "titulo": "Falta aprobar las 8 migraciones pendientes, ya clasificadas una a una",
+   "verificable_automaticamente": true
   },
   {
    "bloque_origen": 4,

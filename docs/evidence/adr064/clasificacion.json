@@ -1,0 +1,275 @@
+{
+ "base": {
+  "aplicadas": 467,
+  "fallosTolerados": 0,
+  "tablas": 711
+ },
+ "migraciones": [
+  {
+   "migracion": "568",
+   "fichero": "568_rls_os_tablas_vacias_restantes.sql",
+   "clase": "REQUIRES_APPROVAL_ONLY",
+   "aplica_limpia": true,
+   "idempotente": true,
+   "anade": {
+    "tablas": 0,
+    "columnas": 0,
+    "restricciones": 0,
+    "indices": 0,
+    "politicas_rls": 204,
+    "tablas_que_pasan_a_tener_rls": 51
+   },
+   "escribe_datos": false,
+   "se_deja_deshacer": {
+    "creaCompanera": false,
+    "traeRollback": true,
+    "ok": false
+   },
+   "sin_efecto_sobre_esta_base": false,
+   "detalle": {
+    "tablas": [],
+    "indices": [],
+    "tablas_que_pasan_a_tener_rls": [
+     "affiliates",
+     "agency_profiles",
+     "blog_posts",
+     "connector_configs",
+     "consent_records",
+     "cpq_quotes",
+     "data_deletion_requests",
+     "dialer_advanced_sessions",
+     "email_warmup_accounts",
+     "email_warmup_logs",
+     "executive_reports",
+     "form_items"
+    ]
+   }
+  },
+  {
+   "migracion": "569",
+   "fichero": "569_rls_os_tablas_con_datos.sql",
+   "clase": "REQUIRES_APPROVAL_ONLY",
+   "aplica_limpia": true,
+   "idempotente": true,
+   "anade": {
+    "tablas": 0,
+    "columnas": 0,
+    "restricciones": 0,
+    "indices": 0,
+    "politicas_rls": 16,
+    "tablas_que_pasan_a_tener_rls": 4
+   },
+   "escribe_datos": false,
+   "se_deja_deshacer": {
+    "creaCompanera": false,
+    "traeRollback": true,
+    "ok": false
+   },
+   "sin_efecto_sobre_esta_base": false,
+   "detalle": {
+    "tablas": [],
+    "indices": [],
+    "tablas_que_pasan_a_tener_rls": [
+     "contacts",
+     "nelvyon_campaigns",
+     "nelvyon_clients",
+     "saas_tenants"
+    ]
+   }
+  },
+  {
+   "migracion": "570",
+   "fichero": "570_rls_saas_tenant_id_no_uuid.sql",
+   "clase": "REQUIRES_APPROVAL_ONLY",
+   "aplica_limpia": true,
+   "idempotente": true,
+   "anade": {
+    "tablas": 0,
+    "columnas": 0,
+    "restricciones": 0,
+    "indices": 0,
+    "politicas_rls": 60,
+    "tablas_que_pasan_a_tener_rls": 15
+   },
+   "escribe_datos": false,
+   "se_deja_deshacer": {
+    "creaCompanera": false,
+    "traeRollback": true,
+    "ok": false
+   },
+   "sin_efecto_sobre_esta_base": false,
+   "detalle": {
+    "tablas": [],
+    "indices": [],
+    "tablas_que_pasan_a_tener_rls": [
+     "chat_widget_config",
+     "data_processing_agreements",
+     "os_agent_data_cache",
+     "os_assets",
+     "os_health_reports",
+     "saas_activation_checklist",
+     "saas_appointments",
+     "saas_chat_messages",
+     "saas_client_profiles",
+     "saas_gdpr_requests",
+     "saas_invoices",
+     "saas_notifications"
+    ]
+   }
+  },
+  {
+   "migracion": "572",
+   "fichero": "572_rls_saas_tablas_con_datos.sql",
+   "clase": "REQUIRES_APPROVAL_ONLY",
+   "aplica_limpia": true,
+   "idempotente": true,
+   "anade": {
+    "tablas": 0,
+    "columnas": 0,
+    "restricciones": 0,
+    "indices": 0,
+    "politicas_rls": 44,
+    "tablas_que_pasan_a_tener_rls": 11
+   },
+   "escribe_datos": false,
+   "se_deja_deshacer": {
+    "creaCompanera": false,
+    "traeRollback": true,
+    "ok": false
+   },
+   "sin_efecto_sobre_esta_base": false,
+   "detalle": {
+    "tablas": [],
+    "indices": [],
+    "tablas_que_pasan_a_tener_rls": [
+     "saas_affiliate_programs",
+     "saas_autopilot_settings",
+     "saas_ceo_brief_runs",
+     "saas_deliverability_snapshots",
+     "saas_loyalty_programs",
+     "saas_pack_entitlements",
+     "saas_private_ai_audit",
+     "saas_private_ai_settings",
+     "saas_sequences",
+     "saas_tenant_memory_settings",
+     "saas_workflow_versions"
+    ]
+   }
+  },
+  {
+   "migracion": "573",
+   "fichero": "573_indices_de_inquilino_en_tablas_sociales.sql",
+   "clase": "SAFE_TO_APPLY",
+   "aplica_limpia": true,
+   "idempotente": true,
+   "anade": {
+    "tablas": 0,
+    "columnas": 0,
+    "restricciones": 0,
+    "indices": 2,
+    "politicas_rls": 0,
+    "tablas_que_pasan_a_tener_rls": 0
+   },
+   "escribe_datos": false,
+   "se_deja_deshacer": {
+    "creaCompanera": false,
+    "traeRollback": true,
+    "ok": false
+   },
+   "sin_efecto_sobre_esta_base": false,
+   "detalle": {
+    "tablas": [],
+    "indices": [
+     "social_auto_posts.ix_social_auto_posts_workspace",
+     "social_auto_settings.ix_social_auto_settings_workspace"
+    ],
+    "tablas_que_pasan_a_tener_rls": []
+   }
+  },
+  {
+   "migracion": "574",
+   "fichero": "574_atribuir_las_auditorias_de_shield_sin_dueno.sql",
+   "clase": "REQUIRES_APPROVAL_ONLY",
+   "aplica_limpia": true,
+   "idempotente": true,
+   "anade": {
+    "tablas": 0,
+    "columnas": 0,
+    "restricciones": 0,
+    "indices": 0,
+    "politicas_rls": 0,
+    "tablas_que_pasan_a_tener_rls": 0
+   },
+   "escribe_datos": true,
+   "se_deja_deshacer": {
+    "creaCompanera": true,
+    "traeRollback": true,
+    "ok": true
+   },
+   "sin_efecto_sobre_esta_base": true,
+   "detalle": {
+    "tablas": [],
+    "indices": [],
+    "tablas_que_pasan_a_tener_rls": []
+   }
+  },
+  {
+   "migracion": "575",
+   "fichero": "575_reparar_lo_que_la_507_y_la_406_no_llegaron_a_crear.sql",
+   "clase": "REQUIRES_APPROVAL_ONLY",
+   "aplica_limpia": true,
+   "idempotente": true,
+   "anade": {
+    "tablas": 0,
+    "columnas": 0,
+    "restricciones": 0,
+    "indices": 0,
+    "politicas_rls": 9,
+    "tablas_que_pasan_a_tener_rls": 3
+   },
+   "escribe_datos": false,
+   "se_deja_deshacer": {
+    "creaCompanera": false,
+    "traeRollback": true,
+    "ok": false
+   },
+   "sin_efecto_sobre_esta_base": false,
+   "detalle": {
+    "tablas": [],
+    "indices": [],
+    "tablas_que_pasan_a_tener_rls": [
+     "visual_workflow_executions",
+     "workflow_nodes",
+     "workflow_trigger_registry"
+    ]
+   }
+  },
+  {
+   "migracion": "576",
+   "fichero": "576_columnas_que_el_codigo_escribe_y_no_existian.sql",
+   "clase": "SAFE_TO_APPLY",
+   "aplica_limpia": true,
+   "idempotente": true,
+   "anade": {
+    "tablas": 0,
+    "columnas": 8,
+    "restricciones": 0,
+    "indices": 0,
+    "politicas_rls": 0,
+    "tablas_que_pasan_a_tener_rls": 0
+   },
+   "escribe_datos": false,
+   "se_deja_deshacer": {
+    "creaCompanera": false,
+    "traeRollback": false,
+    "ok": false
+   },
+   "sin_efecto_sobre_esta_base": false,
+   "detalle": {
+    "tablas": [],
+    "indices": [],
+    "tablas_que_pasan_a_tener_rls": []
+   }
+  }
+ ]
+}
