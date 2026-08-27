@@ -43,13 +43,74 @@ const REFERENCIA = `nelvyon_deriva_${Date.now()}`;
  */
 const NO_SON_PRODUCTO = /^(_nelvyon_|zz_|tmp_|pg_temp)/;
 
-function enContenedor(args) {
-  const r = spawnSync("docker", ["exec", CONTENEDOR, ...args], { encoding: "utf8" });
+function enContenedor(args, env) {
+  const r = spawnSync("docker", ["exec", ...(env ? ["-e", `OBJETIVO_DSN=${env}`] : []),
+                                 CONTENEDOR, ...args],
+                      { encoding: "utf8" });
   return { status: r.status ?? 1, out: (r.stdout || "").trim(), err: (r.stderr || "").trim() };
 }
 
 function psql(db, sql) {
   return enContenedor(["psql", "-U", USUARIO_PG, "-d", db, "-tAc", sql.replace(/\s+/g, " ")]);
+}
+
+/**
+ * Consulta el OBJETIVO por su cadena de conexión, no por su nombre.
+ *
+ * EL DEFECTO QUE CIERRA ESTO
+ * ==========================
+ * La referencia se reconstruye en el PostgreSQL local del contenedor, y eso está
+ * bien. Pero el objetivo se consultaba igual: `psql -d <nombre>` dentro del
+ * mismo contenedor, sacando el nombre de la ruta de `DATABASE_URL` y tirando el
+ * host.
+ *
+ * Contra una base local daba lo mismo. Contra **producción** —que es justo para
+ * lo que la documentación manda usarlo— no comparaba producción: comparaba una
+ * base local que se llamara igual, o fallaba con un mensaje que no se parece a
+ * lo que pasa. Un veredicto de deriva que no ha mirado la base que dice.
+ *
+ * Ahora el objetivo se consulta por su DSN completo, y en una transacción de
+ * **sólo lectura** declarada: este detector examina, no arregla, y contra una
+ * base real esa distinción no puede depender de que el SQL esté bien escrito.
+ *
+ * El DSN va por variable de entorno y nunca como argumento, para que no aparezca
+ * en la lista de procesos ni en ningún registro.
+ */
+/** ¿El objetivo vive en esta máquina o está fuera? */
+function esLocal(dsn) {
+  try {
+    const h = new URL(dsn.replace(/^postgresql\+asyncpg:/, "postgresql:")).hostname;
+    return h === "localhost" || h === "127.0.0.1" || h === "::1" || h === "host.docker.internal";
+  } catch {
+    return false;
+  }
+}
+
+function listaObjetivo(dsn, sql) {
+  // OBJETIVO LOCAL: por nombre, dentro del contenedor.
+  //
+  // Desde dentro, `localhost:5434` es el propio contenedor —donde PostgreSQL
+  // escucha en 5432, no en el puerto que el host publica—, así que pasarle el
+  // DSN tal cual falla con «connection refused». Para una base local el camino
+  // correcto sigue siendo el de siempre.
+  if (esLocal(dsn)) {
+    const db = new URL(dsn.replace(/^postgresql\+asyncpg:/, "postgresql:"))
+      .pathname.replace(/^\//, "");
+    return lista(db, sql);
+  }
+
+  // OBJETIVO REMOTO: por su DSN, y en una transacción de SÓLO LECTURA declarada.
+  //
+  // El DSN va por variable de entorno y nunca como argumento, para que no
+  // aparezca en la lista de procesos ni en ningún registro.
+  const r = enContenedor(
+    ["sh", "-c",
+     `psql "$OBJETIVO_DSN" -v ON_ERROR_STOP=1 -tAc ` +
+     `"BEGIN READ ONLY; ${sql.replace(/\s+/g, " ").replace(/"/g, '\\"')}; COMMIT;"`],
+    dsn,
+  );
+  if (r.status !== 0) throw new Error(`consulta fallida en el objetivo: ${r.err.slice(0, 200)}`);
+  return r.out ? r.out.split("\n").map((s) => s.trim()).filter(Boolean) : [];
 }
 
 function lista(db, sql) {
@@ -100,6 +161,16 @@ const CONSULTAS = {
     + "WHERE n.nspname='public' AND c.relforcerowsecurity ORDER BY 1",
 };
 
+/**
+ * Donde vive la base de REFERENCIA. Siempre local, nunca la del objetivo.
+ *
+ * Se puede sobrescribir por si el contenedor escucha en otro puerto, pero por
+ * defecto no hay forma de que la reconstruccion salga de esta maquina.
+ */
+const DSN_REFERENCIA_LOCAL =
+  process.env.CERT_REFERENCIA_DSN
+  ?? `postgresql://${USUARIO_PG}:nelvyon_local_dev@localhost:5434/postgres`;
+
 function main() {
   const objetivo = process.env.DATABASE_URL;
   if (!objetivo) {
@@ -120,7 +191,14 @@ function main() {
     process.exit(1);
   }
 
-  const url = new URL(objetivo);
+  // La referencia se levanta SIEMPRE en el PostgreSQL local del contenedor.
+  //
+  // Antes se construia clonando la URL del objetivo y cambiandole la ruta. Contra
+  // una base local daba lo mismo; contra produccion apuntaba el runner de
+  // migraciones al HOST DE PRODUCCION con un nombre de base inventado. Aunque no
+  // llegara a escribir nada, es un runner de migraciones apuntando a produccion:
+  // eso no puede depender de que la base no exista.
+  const url = new URL(DSN_REFERENCIA_LOCAL);
   url.pathname = `/${REFERENCIA}`;
   const mig = spawnSync("node", [path.join(ROOT, "scripts", "migrate-pg.mjs")], {
     encoding: "utf8",
@@ -139,7 +217,7 @@ function main() {
   let derivaTotal = 0;
 
   for (const [nombre, sql] of Object.entries(CONSULTAS)) {
-    const enObjetivo = new Set(lista(nombreObjetivo, sql).filter((x) => !NO_SON_PRODUCTO.test(x)));
+    const enObjetivo = new Set(listaObjetivo(objetivo, sql).filter((x) => !NO_SON_PRODUCTO.test(x)));
     const enReferencia = new Set(lista(REFERENCIA, sql).filter((x) => !NO_SON_PRODUCTO.test(x)));
     const faltan = [...enReferencia].filter((x) => !enObjetivo.has(x)).sort();
     const sobran = [...enObjetivo].filter((x) => !enReferencia.has(x)).sort();
