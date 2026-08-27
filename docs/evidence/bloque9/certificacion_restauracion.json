@@ -1,9 +1,9 @@
 {
-  "decision": "FALLA",
+  "decision": "PASA",
   "totales": {
     "pasos": 16,
-    "ok": 14,
-    "fallos": 2
+    "ok": 16,
+    "fallos": 0
   },
   "pasos": [
     {
@@ -14,7 +14,7 @@
     {
       "paso": "sembrar_inquilino_real",
       "ok": true,
-      "tenantId": "ecb8de22-ca80-4492-8e9c-fbf0badd25b4",
+      "tenantId": "16b761c9-8da1-44db-94f2-c63ec05c9ef2",
       "contactos": 250
     },
     {
@@ -39,7 +39,7 @@
     {
       "paso": "el_volcado_no_esta_vacio",
       "ok": true,
-      "bytes": "3730829"
+      "bytes": "3730830"
     },
     {
       "paso": "crear_base_destino",
@@ -54,9 +54,9 @@
     },
     {
       "paso": "el_contenido_coincide_byte_a_byte",
-      "ok": false,
+      "ok": true,
       "origen": "01e47c8fa2dbd555e1a126ba1f0f636f",
-      "destino": ""
+      "destino": "01e47c8fa2dbd555e1a126ba1f0f636f"
     },
     {
       "paso": "vuelven_las_tablas",
@@ -89,8 +89,8 @@
     },
     {
       "paso": "la_aplicacion_puede_consultarla",
-      "ok": false,
-      "filas": 0
+      "ok": true,
+      "filas": 250
     },
     {
       "paso": "limpieza",

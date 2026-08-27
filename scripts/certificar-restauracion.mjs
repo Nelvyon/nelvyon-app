@@ -48,6 +48,39 @@ const USUARIO_PG = process.env.CERT_PG_USER || "nelvyon_local";
 const ORIGEN = process.env.CERT_SOURCE_DB || "nelvyon_cert545";
 const DESTINO = `nelvyon_restaurada_${Date.now()}`;
 
+/**
+ * ESTE SIMULACRO ESCRIBE EN EL ORIGEN. Por eso el origen sólo puede ser local.
+ *
+ * El paso 1 siembra un inquilino con 250 contactos ANTES de volcar, y eso es
+ * deliberado: sin sembrar algo conocido no se puede comprobar que la
+ * restauración devuelve el CONTENIDO, sólo que devuelve *algo*. Un simulacro que
+ * cuenta filas certifica el recuento, no los datos.
+ *
+ * Pero convierte esto en una herramienta que ESCRIBE, y la documentación llegó a
+ * sugerir apuntarla a producción con `CERT_SOURCE_DB=<base real>`. No habría
+ * llegado —`pg_dump` corre dentro del contenedor y sólo ve bases locales—, pero
+ * la instrucción era peligrosa: bastaba con que alguien «arreglara» esa
+ * limitación para sembrar 250 contactos falsos en la base de los clientes.
+ *
+ * Así que la limitación pasa a ser una guarda con nombre. Un límite accidental
+ * no protege; uno declarado sí.
+ *
+ * PARA CERTIFICAR UN BACKUP REAL no se usa esto: se restaura la copia en un
+ * entorno aislado —nunca encima de producción— y se compara ese entorno con
+ * `detectar-deriva-de-esquema.mjs` y `diagnostico-de-produccion.mjs`, que sólo
+ * leen. El procedimiento está en `docs/LO_QUE_TIENE_QUE_HACER_EL_FUNDADOR.md`.
+ */
+if (!/^[a-z_][a-z0-9_]*$/.test(ORIGEN)) {
+  console.error(
+    `CERT_SOURCE_DB="${ORIGEN}" no es el nombre de una base local.\n` +
+    "Este simulacro SIEMBRA datos en el origen antes de volcarlo, asi que solo\n" +
+    "puede apuntar a una base desechable del contenedor de certificacion.\n" +
+    "Para certificar un backup REAL: restauralo en un entorno aislado y compara\n" +
+    "ese entorno con detectar-deriva-de-esquema.mjs, que solo lee.",
+  );
+  process.exit(2);
+}
+
 const require = createRequire(path.join(ROOT, "backend", "db", "package.json"));
 const pg = require("pg");
 

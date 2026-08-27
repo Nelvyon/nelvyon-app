@@ -1,117 +1,130 @@
 # Lo que solo puedes hacer tú
 
-Todo lo demás está hecho y certificado. Esto es lo que queda, y queda porque
-necesita **una credencial que no tengo**, **acceso a producción**, o **una
-decisión de negocio**. Ninguna de las tres se puede resolver desde una sesión de
-certificación.
+Todo lo demás está hecho y certificado. Esta versión ya no supone nada: se ha
+**medido contra tu producción real**, en solo lectura, el 27 de agosto de 2026.
 
-Está en orden: cada paso deja el siguiente listo.
+Lo que se comprobó y ya no hace falta que compruebes:
 
----
-
-## Paso 1 · Poner cuatro variables
-
-Sin ellas NELVYON no arranca, o arranca con puertas cerradas a propósito.
-
-| Variable | Qué es | Sin ella |
-|---|---|---|
-| `DATABASE_URL` | la cadena de conexión a PostgreSQL | no hay producto |
-| `JWT_SECRET` | la clave con la que se firman las sesiones. **Mínimo 32 caracteres** | nadie puede entrar |
-| `CRON_SECRET` | la clave de las 16 tareas programadas. **Mínimo 16** | no corre ninguna tarea automática |
-| `SES_SNS_TOPIC_ARN` | la lista de *topics* de AWS autorizados a avisar de rebotes | el aviso de correos rebotados responde 503 |
-
-La cuarta es la que menos suena y la que más importa. Antes, cualquiera con una
-cuenta gratuita de AWS podía marcar como rebotados a los destinatarios de las
-campañas de cualquier cliente tuyo. Ahora esa puerta está cerrada, y se abre
-poniendo la lista de topics.
-
-**Genera los secretos así** (uno distinto para cada uno):
-
-```bash
-node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
-```
-
-**Comprueba que están bien puestas antes de desplegar:**
-
-```bash
-node scripts/puerta-de-despliegue.mjs
-```
-
-No hace falta que entiendas la salida: si dice `FALTA` en algo, ahí está el
-problema, con el motivo escrito al lado. **Nunca imprime tus secretos** — solo su
-longitud.
+| | Estado real medido |
+|---|---|
+| `DATABASE_URL` | **ya está** en los dos servicios |
+| `JWT_SECRET` | **ya está**, 53 caracteres, no es de relleno |
+| `CRON_SECRET` | **ya está** en el servicio web, 64 caracteres |
+| `SES_SNS_TOPIC_ARN` | **falta** — es lo único que falta de las cuatro |
+| `user_roles` | existe y está **vacía**: nadie es administrador |
+| Migraciones 568–577 | las **nueve** pendientes en producción |
+| Roles del cutover | **ninguno de los dos existe** todavía |
+| Colisión de workspace | **no hay ninguna** |
+| Rol de conexión actual | `postgres` (superusuario), como se sospechaba |
 
 ---
 
-## Paso 2 · Nombrar al primer administrador
+## Paso 1 · Una sola variable
 
-Hoy **nadie** puede entrar al panel de administración de la plataforma. No es un
-fallo: es que nunca se dijo quién debía poder.
+De las cuatro, tres ya están puestas y **pasan todas las comprobaciones de
+calidad** (longitud, variedad, no son valores de relleno, son distintas entre
+sí). Falta una:
 
-El mecanismo ya está hecho y certificado. Falta el dato: **quién eres tú en la
-base**.
+**`SES_SNS_TOPIC_ARN`**
+
+Y no hay que inventarla ni buscarla: el tema existe en tu cuenta de AWS y está
+verificado desde tres sitios independientes — es el `BounceTopic` de
+`nelvyon.com`, es su `ComplaintTopic`, y está suscrito a
+`https://nelvyon.com/api/webhooks/ses`. Es éste:
+
+```
+arn:aws:sns:eu-west-1:354780327276:nelvyon-ses-events
+```
+
+**Ponlo así** (Railway → proyecto `truthful-respect` → servicio `@nelvyon/web` →
+Variables), o por línea de comandos:
+
+```bash
+railway variables --service "@nelvyon/web" --environment production \
+  --set SES_SNS_TOPIC_ARN=arn:aws:sns:eu-west-1:354780327276:nelvyon-ses-events
+```
+
+> **Esto no es preparación, es una avería activa.** AWS ya está enviando los
+> avisos de rebote a `https://nelvyon.com/api/webhooks/ses`, y esa ruta responde
+> **503** porque la variable no está. Es decir: **los rebotes y las quejas de
+> spam se están perdiendo ahora mismo**. Poner la variable los recupera.
+
+---
+
+## Paso 2 · Necesito un dato tuyo, y sólo uno
+
+Busqué tu usuario para prepararte el alta de administrador y **no lo encontré**.
+Probé `danicaste2004@gmail.com`, `d00820188@gmail.com`, `admin@nelvyon.com`,
+`daniel@nelvyon.com` y `hola@nelvyon.com`: ninguno tiene cuenta en
+`nelvyon_users`, que tiene 25 usuarios.
+
+No voy a elegir por ti cuál de esos 25 eres.
+
+**Dime con qué correo entras a NELVYON** y te dejo la orden exacta lista. O, si
+prefieres hacerlo tú, es esto:
 
 ```sql
 -- 1. Busca tu usuario
-SELECT user_id, email FROM nelvyon_users WHERE email = 'tu-email@tu-dominio.com';
+SELECT user_id, email FROM nelvyon_users WHERE lower(email) = 'tu-correo-real';
 
 -- 2. Conviértelo en administrador (pega el user_id del paso 1)
 INSERT INTO user_roles (user_id, email, role, is_active, created_at, updated_at)
-VALUES ('<el user_id del paso 1>', 'tu-email@tu-dominio.com',
+VALUES ('<el user_id del paso 1>', 'tu-correo-real',
         'super_admin', true, now(), now());
 ```
 
-A partir de ahí, los demás administradores se dan de alta desde el producto, sin
-tocar la base. Y está certificado que **nadie se convierte en administrador
-solo**: ni registrándose, ni siendo dueño de su espacio, ni manipulando su
-sesión, ni por SSO, ni por invitación.
+**Por qué `super_admin` y no `admin`**, que parecería lo prudente: porque un
+`admin` (nivel 4) **no puede crear un `super_admin`** (nivel 5) — la jerarquía lo
+impide, y está certificado que lo impide. Si el primero fuera `admin`, nunca
+podrías crear el otro. Además **24 endpoints** exigen `super_admin` y quedarían
+inalcanzables para siempre. No es ampliar privilegios: es que el primero tiene
+que serlo o el sistema queda a medias.
+
+A partir de ahí los demás se dan de alta desde el producto, sin tocar la base.
 
 ---
 
-## Paso 3 · Aprobar las ocho migraciones pendientes
+## Paso 3 · Aprobar las migraciones
 
-Hay ocho cambios de base de datos escritos, probados y esperando tu visto bueno.
-**Las ocho aplican limpias y se pueden aplicar dos veces sin efecto distinto**,
-medido sobre una copia. Ninguna es peligrosa; dos son completamente inocuas.
+Las **nueve** están pendientes en producción (`_migrations` tiene 467 filas). Las
+ocho de ADR-064 más la `577`, que es la del paso 4.
 
 | Migración | Qué hace | Riesgo |
 |---|---|---|
 | **573** | añade 2 índices | ninguno |
 | **576** | añade 8 columnas que el código ya escribe | ninguno |
-| 568 · 569 · 570 · 572 · 575 | activan reglas de aislamiento en la base | cambian **qué filas se ven**; conviene hacerlo después del paso 4 |
-| 574 | atribuye 2.761 registros antiguos que quedaron sin dueño | escribe datos, pero **se guarda una copia de qué tocó** y trae escrito cómo deshacerlo |
+| **577** | crea los dos roles del cutover, **sin poder conectarse** | ninguno: no cambia el comportamiento de nada |
+| 568 · 569 · 570 · 572 · 575 | activan reglas de aislamiento | cambian **qué filas se ven**; después del paso 4 |
+| 574 | atribuye 2.761 registros sin dueño | escribe datos, pero **guarda copia de qué tocó** y trae escrito cómo deshacerlo |
 
-Para revisar la clasificación tú mismo, con la evidencia recalculada:
+Las nueve aplican limpias y son idempotentes, medido sobre copias desechables.
+Ninguna es peligrosa.
 
-```bash
-node scripts/clasificar-migraciones-bloqueadas.mjs
-```
+**Empieza por 573, 576 y 577.** Las tres son inocuas y las dos primeras cierran
+errores que el código ya está cometiendo hoy.
 
-Aplicar en producción exige que declares la aprobación, que es como está montado
-el gobierno de migraciones desde hace tiempo:
+Aplicar exige que declares la aprobación — es el mecanismo ADR-064, y **yo no
+puedo declararla por ti**: firmar la aprobación en tu nombre vaciaría de sentido
+la puerta que existe justo para eso.
 
 ```bash
 NELVYON_PROD_MIGRATE_APPROVED=1 \
-NELVYON_PROD_MIGRATE_APPROVED_BY="tu nombre" \
+NELVYON_PROD_MIGRATE_APPROVED_BY="Daniel" \
 NELVYON_PROD_MIGRATE_COMMIT_SHA="<el sha que despliegas>" \
   <tu comando de despliegue habitual>
 ```
 
-**Sugerencia**: aplica primero **573 y 576**. Son inocuas y cierran errores que
-el código ya está cometiendo hoy.
-
 ---
 
-## Paso 4 · Cambiar el usuario con el que la web habla con la base
+## Paso 4 · El cutover del rol de base de datos
 
-Hoy la parte web se conecta como **superusuario**. Eso significa que las 1.763
-reglas de aislamiento que protegen los datos de cada cliente **no se le aplican**.
-El aislamiento real lo da que cada consulta filtre bien a mano — y está
-certificado que lo hacen —, pero no hay red debajo.
+Confirmado contra producción: la web se conecta como **`postgres`**, que es
+superusuario, así que las reglas de aislamiento **no se le aplican**. El
+aislamiento real lo da que cada consulta filtre bien a mano — y está certificado
+que lo hacen —, pero no hay red debajo.
 
-Está todo preparado. Los dos usuarios se crean solos al aplicar la migración
-`577`, sin poder conectarse. Lo que falta es darles contraseña y apuntarles las
-variables:
+Los dos roles **no existen todavía**: los crea la migración `577` del paso 3, sin
+poder conectarse. Luego:
 
 ```sql
 ALTER ROLE nelvyon_web_app  WITH LOGIN PASSWORD '<un secreto>';
@@ -123,82 +136,101 @@ DATABASE_URL                  -> ...nelvyon_web_app...
 NELVYON_WEB_JOBS_DATABASE_URL -> ...nelvyon_web_jobs...
 ```
 
-> **Las dos variables, o ninguna.** Si mueves solo la primera, las tareas
+Genera los secretos con:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
+```
+
+> **Las dos variables, o ninguna.** Si mueves sólo la primera, las tareas
 > programadas, los avisos de Stripe y el panel de plataforma **no darán error**:
 > devolverán listas vacías, en silencio. Está medido. La puerta de despliegue lo
-> detecta y te lo dice, pero es mejor saberlo antes.
+> detecta, pero es mejor saberlo antes.
 
-**Para volver atrás** basta con devolver `DATABASE_URL` al usuario de antes. No
-hay nada que deshacer en la base.
+**Vuelta atrás**: devolver `DATABASE_URL` al usuario anterior. No hay nada que
+deshacer en la base.
 
 ---
 
-## Paso 5 · Tres comprobaciones que solo se pueden hacer contra producción
+## Paso 5 · Lo que ya está comprobado contra producción
 
-Ninguna cambia nada. Las tres solo leen.
+**Dos de las tres comprobaciones ya las he ejecutado yo**, en solo lectura:
+
+| Comprobación | Resultado |
+|---|---|
+| Colisión de workspace | **SIN COLISIONES.** 22 inquilinos, ninguno comparte |
+| Simulacro del puente | **Nada cambiaría de identidad** (ver paso 6) |
+
+Queda una, y es un comando:
 
 ```bash
-# ¿El esquema real coincide con lo que dicen las migraciones?
-DATABASE_URL="<produccion>" node scripts/detectar-deriva-de-esquema.mjs
-
-# ¿Hay ya dos clientes compartiendo el mismo espacio de trabajo?
-DATABASE_URL="<produccion>" node scripts/detectar-colision-de-workspace.mjs
+DATABASE_URL="<la cadena publica de tu Postgres>" \
+  node scripts/detectar-deriva-de-esquema.mjs
 ```
 
-Las dos salen con **0** si todo está bien, **1** si encuentran algo, y **2** si no
-han podido comprobarlo — que no es lo mismo que «no hay problema».
+Sale con **0** si el esquema coincide con lo que dicen las migraciones, **1** si
+hay diferencias, y **2** si no ha podido comprobarlo — que no es lo mismo que «no
+hay problema».
 
-Y la tercera, que es la única que de verdad certifica un backup:
+> Este comando **no funcionaba** contra producción hasta hoy: reconstruía la
+> referencia bien, pero luego consultaba una base **local** que se llamara igual.
+> Habría dado un veredicto sin haber mirado producción. Corregido y verificado.
+
+---
+
+## Paso 6 · La decisión del identificador de workspace
+
+**La evidencia cambió la pregunta.** Medido hoy en producción:
+
+- 22 inquilinos.
+- **2** tienen `workspace_id` real.
+- **20** no lo tienen — y **ninguno de esos 20 tiene un workspace al que
+  enlazarse**: la tabla `workspaces` sólo tiene **3 filas**.
+
+Es decir: **hoy no existe la migración que estabas decidiendo.** No hay
+identificador nuevo al que mover a nadie. Rellenar el puente cambiaría **cero**
+identidades.
+
+Mi recomendación está al final de este documento.
+
+---
+
+## Paso 7 · Certificar el backup real
+
+**Corrección importante.** La versión anterior de este documento decía:
 
 ```bash
-# Restaurar UNA VEZ el backup real en una base desechable
 CERT_SOURCE_DB="<la base de produccion>" node scripts/certificar-restauracion.mjs
 ```
 
-> Un backup que nunca se ha restaurado no es un backup: es un fichero. El
-> simulacro pasa 16 de 16 en local, pero eso certifica el procedimiento, no *tu*
-> copia de seguridad.
+**No hagas eso.** Ese simulacro **siembra 250 contactos de prueba en el origen**
+antes de volcarlo — es lo que le permite comprobar que la restauración devuelve
+el contenido y no sólo el recuento. Apuntado a producción habría escrito datos
+falsos en la base de tus clientes. No habría llegado a hacerlo (sólo ve bases
+locales), pero la instrucción era peligrosa y ya lleva una guarda que se niega a
+empezar si el origen no es local.
 
----
+**El procedimiento correcto**, sin escribir en ningún sitio real:
 
-## Paso 6 · Dos decisiones que son tuyas, y pueden esperar
+1. En Railway, restaura la copia de seguridad **en una base nueva** — nunca
+   encima de producción. (Railway → Postgres → Backups → Restore, eligiendo un
+   destino nuevo.)
+2. Compara ese entorno restaurado con lo que las migraciones dicen:
+   ```bash
+   DATABASE_URL="<la cadena de la base RESTAURADA>" \
+     node scripts/detectar-deriva-de-esquema.mjs
+   ```
+3. Y comprueba que el contenido está:
+   ```bash
+   DATABASE_URL="<la cadena de la base RESTAURADA>" \
+     node scripts/diagnostico-de-produccion.mjs
+   ```
+   Debe darte los mismos recuentos que producción: 22 inquilinos, 25 usuarios.
 
-Ninguna bloquea el lanzamiento. Las dos están estudiadas y medidas.
+Los dos comandos **sólo leen** — la conexión se abre en modo de sólo lectura
+impuesto por PostgreSQL, no por buena voluntad del código.
 
-**1. El identificador de espacio de trabajo puede repetirse.**
-Se deriva del cliente con un cálculo que tiene 900.000 resultados posibles. Con
-1.000 clientes, la probabilidad de que dos ya compartan uno es del **42,6 %**.
-
-Ya se ha hecho lo que no requería decidir nada: ahora se usa el identificador
-real cuando existe, y solo se calcula cuando no. La decisión que queda es si
-migrar los identificadores antiguos, que es una operación de identidad sobre
-datos reales. El estudio completo está en `docs/DECISION_WORKSPACE_ID.md`.
-
-*Mientras tanto*, dos comandos que sólo leen te dan el dato para decidir:
-
-```bash
-# ¿ha pasado ya?
-DATABASE_URL="<produccion>" node scripts/detectar-colision-de-workspace.mjs
-
-# ¿a quién le cambiaría el identificador, y de qué a qué?
-DATABASE_URL="<produccion>" node scripts/simular-poblado-del-puente.mjs
-```
-
-El segundo enseña la tabla completa: cliente por cliente, el número viejo y el
-nuevo. Nadie tiene que decidir esto a ciegas.
-
-**Y cierra las dos cosas a la vez.** La segunda decisión de abajo depende de
-ésta: la regla de aislamiento de `saas_tenants` no se puede activar mientras haya
-clientes sin espacio de trabajo asignado, porque sus datos quedarían invisibles.
-En cuanto dejen de faltar, esa regla se aplica sola.
-
-**2. Si alguien que se dio de baja debería recuperar el acceso al volver a pagar.**
-*(Ésta es de verdad independiente; la de arriba y la del aislamiento son la misma.)*
-Hoy: **no**. Quien caduca por un impago y paga, vuelve a entrar
-—eso ya funciona y está certificado—, pero quien se dio de baja explícitamente
-no revive con un cobro rezagado. Está escrito así porque es la dirección segura:
-si alguien pagó y no entra, te llama; si alguien que se dio de baja entra, no te
-llama nadie.
+> Un backup que nunca se ha restaurado no es un backup: es un fichero.
 
 ---
 
@@ -208,4 +240,4 @@ llama nadie.
 node scripts/puerta-de-despliegue.mjs
 ```
 
-Se ejecuta, no se lee. Cada línea en rojo es una acción concreta, y dice cuál.
+Se ejecuta, no se lee. Cada línea en rojo es una acción concreta con nombre.

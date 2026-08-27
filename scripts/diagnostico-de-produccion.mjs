@@ -128,7 +128,38 @@ async function main() {
       }
     }
 
-    // ── 4 · a quien corresponde un correo ──────────────────────────────────
+    // ── 4 · que migraciones faltan, y los roles del cutover ────────────────
+    console.log("\n── migraciones ──");
+    if (!(await existe("_migrations"))) {
+      console.log("  `_migrations` no existe: esta base no la lleva el runner oficial.");
+    } else {
+      const n = (await q("SELECT count(*)::text AS n FROM _migrations"))[0];
+      const pendientes = ["568", "569", "570", "572", "573", "574", "575", "576", "577"];
+      const aplicadas = await q(
+        `SELECT substring(name from '^[0-9]+') AS num FROM _migrations
+          WHERE substring(name from '^[0-9]+') = ANY($1)`, [pendientes]);
+      const puestas = new Set(aplicadas.map((r) => r.num));
+      console.log(`  registradas en total: ${n.n}`);
+      for (const p of pendientes) {
+        console.log(`    ${p}  ${puestas.has(p) ? "APLICADA" : "pendiente"}`);
+      }
+    }
+
+    // Los dos roles del cutover: existen o no, y con que privilegios.
+    console.log("\n── roles del lado web (cutover) ──");
+    const roles = await q(
+      `SELECT rolname, rolsuper, rolbypassrls, rolcanlogin FROM pg_roles
+        WHERE rolname IN ('nelvyon_web_app','nelvyon_web_jobs') ORDER BY rolname`);
+    if (roles.length === 0) {
+      console.log("  ninguno de los dos existe: falta aplicar la migracion 577.");
+    } else {
+      for (const r of roles) {
+        console.log(`  ${r.rolname.padEnd(18)} login=${r.rolcanlogin}  ` +
+                    `super=${r.rolsuper}  saltaRLS=${r.rolbypassrls}`);
+      }
+    }
+
+    // ── 5 · a quien corresponde un correo ──────────────────────────────────
     if (correo) {
       console.log(`\n── busqueda de usuario ──`);
       if (!(await existe("nelvyon_users"))) {
