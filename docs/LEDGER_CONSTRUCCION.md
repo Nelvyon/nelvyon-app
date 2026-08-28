@@ -63,9 +63,10 @@ Nada se marca `DONE`: una fase cuya prueba final exige producción es
 | P5 · equivalencia medida | LOCAL_CERTIFIED | `931775e8` | 648 formas; 545 únicas |
 | **Fase 3 · Business Brain** | LOCAL_CERTIFIED | `338bdd41` | 28 dimensiones, 27 pruebas PG |
 | **Fase 2 · journey cliente** | LOCAL_CERTIFIED | `b041713e` | 4 rutas de portal, 26 pruebas PG |
-| Fase 4 · departamentos | PENDIENTE | — | |
-| Fase 5 · contrato de agente | PENDIENTE | — | |
+| Fase 4 · departamentos | LOCAL_CERTIFIED | pendiente | 24 departamentos, 0 vacíos |
+| Fase 5 · contrato de agente | LOCAL_CERTIFIED | pendiente | 23 contratos, 27 pruebas |
 | Fase 6 · 1 994 sectoriales | PENDIENTE | — | characterization tests primero |
+| Fase 19 · autonomía L0–L5 | LOCAL_CERTIFIED | pendiente | suelo por consecuencia |
 | Fase 11 · puente agente→ejecutor | PENDIENTE | — | sobre la guarda de gasto |
 | Fase 16 · results engine | PENDIENTE | — | |
 | Fase 23 · customer success | LOCAL_CERTIFIED | pendiente | 19 pruebas PG, 6 tipos de señal |
@@ -123,6 +124,6 @@ Se anotan porque son la clase de error que se repite si no se escribe.
 
 ## Siguiente acción
 
-**Fase 5 — contrato de agente**, y después **Fase 4 — jefes de departamento**.
-El cerebro ya existe, así que un agente puede por fin declarar qué contexto
-necesita y leerlo, en vez de recibir un `brief` armado a mano.
+**Fase 11 — el puente agente → ejecutor**, que ya tiene debajo todo lo que
+necesita: la guarda de gasto (P4), los niveles de autonomía (Fase 19) y los
+contratos con sus consecuencias declaradas (Fase 5).
