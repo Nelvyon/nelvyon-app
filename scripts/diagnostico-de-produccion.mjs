@@ -134,12 +134,15 @@ async function main() {
       console.log("  `_migrations` no existe: esta base no la lleva el runner oficial.");
     } else {
       const n = (await q("SELECT count(*)::text AS n FROM _migrations"))[0];
-      const pendientes = ["568", "569", "570", "572", "573", "574", "575", "576", "577"];
+      const pendientes = ["476", "568", "569", "570", "572", "573", "574", "575", "576", "577"];
       const aplicadas = await q(
         `SELECT substring(name from '^[0-9]+') AS num FROM _migrations
           WHERE substring(name from '^[0-9]+') = ANY($1)`, [pendientes]);
       const puestas = new Set(aplicadas.map((r) => r.num));
       console.log(`  registradas en total: ${n.n}`);
+      const ult = await q(
+        `SELECT name FROM _migrations ORDER BY substring(name from '^[0-9]+')::int DESC LIMIT 1`);
+      if (ult[0]) console.log(`  la mas alta aplicada:  ${ult[0].name}`);
       for (const p of pendientes) {
         console.log(`    ${p}  ${puestas.has(p) ? "APLICADA" : "pendiente"}`);
       }
@@ -205,7 +208,34 @@ async function main() {
       }
     }
 
-    // ── 6 · a quien corresponde un correo ──────────────────────────────────
+    // ── 6 · ¿el trabajo entregado lo hizo una IA de verdad? ────────────────
+    //
+    // `resolveLlmMode()` devuelve "real" o "mock", y cuando la llamada al modelo
+    // falla el adaptador cae a `mockFallback()`: contenido generado por reglas,
+    // registrado con `ok: true`. Nada aguas abajo impide publicar un entregable
+    // hecho así. Lo unico que lo distingue es esta columna.
+    console.log("\n── con que se produjo el trabajo ──");
+    if (!(await existe("os_agent_audit_events"))) {
+      console.log("  `os_agent_audit_events` no existe: no se puede saber.");
+    } else {
+      const t = (await q(`SELECT count(*)::text AS n FROM os_agent_audit_events`))[0];
+      console.log(`  entradas de auditoria de agente: ${t.n}`);
+      if (Number(t.n) > 0) {
+        const m = await q(`SELECT coalesce(llm_mode,'(sin dato)') AS modo, count(*)::text AS n
+                             FROM os_agent_audit_events GROUP BY 1 ORDER BY 2 DESC`);
+        for (const x of m) console.log(`    ${String(x.modo).padEnd(12)} ${x.n}`);
+        const f = (await q(`SELECT min(recorded_at)::date::text AS a, max(recorded_at)::date::text AS b
+                              FROM os_agent_audit_events`))[0];
+        console.log(`    rango: ${f.a} → ${f.b}`);
+        const mo = await q(`SELECT coalesce(model,'(sin dato)') AS m, count(*)::text AS n
+                              FROM os_agent_audit_events GROUP BY 1 ORDER BY 2 DESC LIMIT 6`);
+        console.log(`    modelos: ${mo.map((x) => `${x.m}=${x.n}`).join(", ")}`);
+        const tk = (await q(`SELECT sum(tokens)::text AS t FROM os_agent_audit_events`))[0];
+        console.log(`    tokens registrados en total: ${tk.t}`);
+      }
+    }
+
+    // ── 7 · a quien corresponde un correo ──────────────────────────────────
     if (correo) {
       console.log(`\n── busqueda de usuario ──`);
       if (!(await existe("nelvyon_users"))) {
