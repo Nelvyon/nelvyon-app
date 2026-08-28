@@ -83,6 +83,19 @@ export interface OpcionesDeCola {
   esperaBaseMs?: number;
   /** Tope de la espera entre reintentos. */
   esperaMaximaMs?: number;
+  /**
+   * Servicios que ESTE trabajador atiende. Vacío o ausente = todos.
+   *
+   * Sirve para especializar trabajadores: uno dedicado a publicidad, que puede
+   * necesitar más memoria y menos concurrencia, no tiene por qué llevarse los
+   * trabajos de contenido. Sin esto, un solo trabajo pesado bloquea huecos que
+   * otros trabajos ligeros podrían usar.
+   *
+   * Y hace posible aislar pruebas que comparten la misma base: el reclamo es
+   * cruzado entre inquilinos POR DISEÑO, así que dos suites en paralelo se
+   * roban los trabajos la una a la otra. Medido: pasó.
+   */
+  serviciosQueAtiende?: readonly string[];
 }
 
 type Fila = {
@@ -102,6 +115,7 @@ function objeto(v: unknown): Record<string, unknown> {
 
 export class ColaDeTrabajos {
   readonly identidad: string;
+  private readonly servicios: readonly string[] | null;
   private readonly arriendoMs: number;
   private readonly esperaBaseMs: number;
   private readonly esperaMaximaMs: number;
@@ -111,6 +125,10 @@ export class ColaDeTrabajos {
     opciones: OpcionesDeCola = {},
   ) {
     this.identidad = opciones.identidad ?? `worker-${process.pid}-${randomUUID().slice(0, 8)}`;
+    this.servicios =
+      opciones.serviciosQueAtiende && opciones.serviciosQueAtiende.length > 0
+        ? [...opciones.serviciosQueAtiende]
+        : null;
     this.arriendoMs = opciones.arriendoMs ?? 5 * 60_000;
     this.esperaBaseMs = opciones.esperaBaseMs ?? 30_000;
     this.esperaMaximaMs = opciones.esperaMaximaMs ?? 15 * 60_000;
@@ -143,6 +161,7 @@ export class ColaDeTrabajos {
               AND run_after <= NOW()
               AND dead_lettered_at IS NULL
               AND attempts < max_attempts
+              AND ($5::text[] IS NULL OR service_id = ANY($5::text[]))
             ORDER BY run_after ASC, created_at ASC
             LIMIT $2
             FOR UPDATE SKIP LOCKED
@@ -158,7 +177,7 @@ export class ColaDeTrabajos {
           WHERE j.job_id = e.job_id
         RETURNING j.job_id, j.service_id, j.client_id, j.tenant_id,
                   j.payload, j.intake, j.attempts, j.max_attempts`,
-        [[...RECLAMABLES], cuantos, this.identidad, this.arriendoMs],
+        [[...RECLAMABLES], cuantos, this.identidad, this.arriendoMs, this.servicios],
       );
       return rows.map((r) => ({
         jobId: r.job_id,

@@ -123,8 +123,8 @@ conBase("la cola de trabajos, sobre PostgreSQL real", () => {
       await sembrar("j-3");
       await sembrar("j-4");
 
-      const a = new ColaDeTrabajos(almacen(), { identidad: "A" });
-      const b = new ColaDeTrabajos(almacen(), { identidad: "B" });
+      const a = new ColaDeTrabajos(almacen(), { serviciosQueAtiende: [SERVICIO, "servicio_inexistente"], identidad: "A" });
+      const b = new ColaDeTrabajos(almacen(), { serviciosQueAtiende: [SERVICIO, "servicio_inexistente"], identidad: "B" });
 
       // A la vez, a propósito: es la condición de carrera que `SKIP LOCKED`
       // existe para resolver, y la que un doble en memoria no reproduce.
@@ -139,7 +139,7 @@ conBase("la cola de trabajos, sobre PostgreSQL real", () => {
       // Si se contara al terminar, un trabajo capaz de matar al proceso se
       // reintentaría eternamente: nunca llegaría a "terminar".
       await sembrar("j-1");
-      const cola = new ColaDeTrabajos(almacen(), { identidad: "A" });
+      const cola = new ColaDeTrabajos(almacen(), { serviciosQueAtiende: [SERVICIO, "servicio_inexistente"], identidad: "A" });
       const [t] = await cola.reclamar(1);
       expect(t.attempts).toBe(1);
       expect((await estado("j-1")).attempts).toBe(1);
@@ -147,19 +147,19 @@ conBase("la cola de trabajos, sobre PostgreSQL real", () => {
 
     it("no se reclama nada programado para más tarde", async () => {
       await sembrar("j-futuro", { runAfter: new Date(Date.now() + 3_600_000).toISOString() });
-      const cola = new ColaDeTrabajos(almacen(), { identidad: "A" });
+      const cola = new ColaDeTrabajos(almacen(), { serviciosQueAtiende: [SERVICIO, "servicio_inexistente"], identidad: "A" });
       expect(await cola.reclamar(5)).toHaveLength(0);
     });
 
     it("no se reclama nada sin intentos restantes", async () => {
       await sembrar("j-agotado", { attempts: 3, maxAttempts: 3 });
-      const cola = new ColaDeTrabajos(almacen(), { identidad: "A" });
+      const cola = new ColaDeTrabajos(almacen(), { serviciosQueAtiende: [SERVICIO, "servicio_inexistente"], identidad: "A" });
       expect(await cola.reclamar(5)).toHaveLength(0);
     });
 
     it("el arriendo queda puesto y con dueño", async () => {
       await sembrar("j-1");
-      const cola = new ColaDeTrabajos(almacen(), { identidad: "A", arriendoMs: 60_000 });
+      const cola = new ColaDeTrabajos(almacen(), { serviciosQueAtiende: [SERVICIO, "servicio_inexistente"], identidad: "A", arriendoMs: 60_000 });
       await cola.reclamar(1);
       const e = await estado("j-1");
       expect(e.status).toBe("running");
@@ -176,7 +176,7 @@ conBase("la cola de trabajos, sobre PostgreSQL real", () => {
       // que estaba parado esperando a alguien — y ese trabajo es justo el que
       // gasta dinero o publica en nombre del cliente.
       await sembrar("j-espera", { status: "waiting_approval" });
-      const cola = new ColaDeTrabajos(almacen(), { identidad: "A" });
+      const cola = new ColaDeTrabajos(almacen(), { serviciosQueAtiende: [SERVICIO, "servicio_inexistente"], identidad: "A" });
       expect(await cola.reclamar(10)).toHaveLength(0);
       expect((await estado("j-espera")).status).toBe("waiting_approval");
     });
@@ -189,7 +189,7 @@ conBase("la cola de trabajos, sobre PostgreSQL real", () => {
         leaseExpires: new Date(Date.now() - 60_000).toISOString(),
         lockedBy: "muerto",
       });
-      const cola = new ColaDeTrabajos(almacen(), { identidad: "A" });
+      const cola = new ColaDeTrabajos(almacen(), { serviciosQueAtiende: [SERVICIO, "servicio_inexistente"], identidad: "A" });
       await cola.rescatarArriendosVencidos();
       expect((await estado("j-espera")).status).toBe("waiting_approval");
     });
@@ -203,7 +203,7 @@ conBase("la cola de trabajos, sobre PostgreSQL real", () => {
 
     it("dejar esperando NO consume un intento ni programa reintento", async () => {
       await sembrar("j-1");
-      const cola = new ColaDeTrabajos(almacen(), { identidad: "A" });
+      const cola = new ColaDeTrabajos(almacen(), { serviciosQueAtiende: [SERVICIO, "servicio_inexistente"], identidad: "A" });
       await cola.reclamar(1);
       await cola.dejarEsperandoAprobacion("j-1", "hace falta que el cliente apruebe el gasto");
       const e = await estado("j-1");
@@ -218,7 +218,7 @@ conBase("la cola de trabajos, sobre PostgreSQL real", () => {
   describe("fallos, espera creciente y rendición", () => {
     it("un fallo devuelve a la cola con espera", async () => {
       await sembrar("j-1");
-      const cola = new ColaDeTrabajos(almacen(), { identidad: "A", esperaBaseMs: 60_000 });
+      const cola = new ColaDeTrabajos(almacen(), { serviciosQueAtiende: [SERVICIO, "servicio_inexistente"], identidad: "A", esperaBaseMs: 60_000 });
       const [t] = await cola.reclamar(1);
       const destino = await cola.fallar("j-1", new Error("proveedor caido"), t.attempts, t.maxAttempts);
 
@@ -230,7 +230,7 @@ conBase("la cola de trabajos, sobre PostgreSQL real", () => {
     });
 
     it("la espera crece y tiene tope", () => {
-      const cola = new ColaDeTrabajos(almacen(), { esperaBaseMs: 1_000, esperaMaximaMs: 5_000 });
+      const cola = new ColaDeTrabajos(almacen(), { serviciosQueAtiende: [SERVICIO, "servicio_inexistente"], esperaBaseMs: 1_000, esperaMaximaMs: 5_000 });
       expect(cola.esperaDelIntento(1)).toBe(1_000);
       expect(cola.esperaDelIntento(2)).toBe(2_000);
       expect(cola.esperaDelIntento(3)).toBe(4_000);
@@ -239,7 +239,7 @@ conBase("la cola de trabajos, sobre PostgreSQL real", () => {
 
     it("agotados los intentos va a `dead_letter` y NO vuelve", async () => {
       await sembrar("j-1", { attempts: 2, maxAttempts: 3 });
-      const cola = new ColaDeTrabajos(almacen(), { identidad: "A" });
+      const cola = new ColaDeTrabajos(almacen(), { serviciosQueAtiende: [SERVICIO, "servicio_inexistente"], identidad: "A" });
       const [t] = await cola.reclamar(1);
       expect(t.attempts).toBe(3);
 
@@ -265,7 +265,7 @@ conBase("la cola de trabajos, sobre PostgreSQL real", () => {
         leaseExpires: new Date(Date.now() - 60_000).toISOString(),
         lockedBy: "trabajador-muerto",
       });
-      const cola = new ColaDeTrabajos(almacen(), { identidad: "A" });
+      const cola = new ColaDeTrabajos(almacen(), { serviciosQueAtiende: [SERVICIO, "servicio_inexistente"], identidad: "A" });
       const r = await cola.rescatarArriendosVencidos();
 
       expect(r.devueltos).toBe(1);
@@ -285,7 +285,7 @@ conBase("la cola de trabajos, sobre PostgreSQL real", () => {
         leaseExpires: new Date(Date.now() + 300_000).toISOString(),
         lockedBy: "trabajador-vivo",
       });
-      const cola = new ColaDeTrabajos(almacen(), { identidad: "A" });
+      const cola = new ColaDeTrabajos(almacen(), { serviciosQueAtiende: [SERVICIO, "servicio_inexistente"], identidad: "A" });
       const r = await cola.rescatarArriendosVencidos();
 
       expect(r.devueltos).toBe(0);
@@ -302,7 +302,7 @@ conBase("la cola de trabajos, sobre PostgreSQL real", () => {
         leaseExpires: new Date(Date.now() - 60_000).toISOString(),
         lockedBy: "trabajador-muerto",
       });
-      const cola = new ColaDeTrabajos(almacen(), { identidad: "A" });
+      const cola = new ColaDeTrabajos(almacen(), { serviciosQueAtiende: [SERVICIO, "servicio_inexistente"], identidad: "A" });
       const r = await cola.rescatarArriendosVencidos();
 
       expect(r.agotados).toBe(1);
@@ -311,8 +311,8 @@ conBase("la cola de trabajos, sobre PostgreSQL real", () => {
 
     it("el latido de otro trabajador no alarga MI arriendo", async () => {
       await sembrar("j-1");
-      const a = new ColaDeTrabajos(almacen(), { identidad: "A" });
-      const b = new ColaDeTrabajos(almacen(), { identidad: "B" });
+      const a = new ColaDeTrabajos(almacen(), { serviciosQueAtiende: [SERVICIO, "servicio_inexistente"], identidad: "A" });
+      const b = new ColaDeTrabajos(almacen(), { serviciosQueAtiende: [SERVICIO, "servicio_inexistente"], identidad: "B" });
       await a.reclamar(1);
 
       expect(await b.latir("j-1"), "B alargó un arriendo que no es suyo").toBe(false);
@@ -321,8 +321,8 @@ conBase("la cola de trabajos, sobre PostgreSQL real", () => {
 
     it("completar un trabajo que ya no es mío no hace nada", async () => {
       await sembrar("j-1");
-      const a = new ColaDeTrabajos(almacen(), { identidad: "A" });
-      const b = new ColaDeTrabajos(almacen(), { identidad: "B" });
+      const a = new ColaDeTrabajos(almacen(), { serviciosQueAtiende: [SERVICIO, "servicio_inexistente"], identidad: "A" });
+      const b = new ColaDeTrabajos(almacen(), { serviciosQueAtiende: [SERVICIO, "servicio_inexistente"], identidad: "B" });
       await a.reclamar(1);
 
       await b.completar("j-1", { falso: true }, 10);
@@ -358,7 +358,7 @@ conBase("la cola de trabajos, sobre PostgreSQL real", () => {
   describe("el trabajador, de punta a punta", () => {
     it("toma un trabajo, lo ejecuta y lo cierra", async () => {
       await sembrar("j-1");
-      const cola = new ColaDeTrabajos(almacen(), { identidad: "W" });
+      const cola = new ColaDeTrabajos(almacen(), { serviciosQueAtiende: [SERVICIO, "servicio_inexistente"], identidad: "W" });
       const w = new TrabajadorDeCola(cola, { registrar: () => {} });
       w.registrarManejador(SERVICIO, async () => ({ tipo: "completado", resultado: { ok: 1 } }));
 
@@ -370,7 +370,7 @@ conBase("la cola de trabajos, sobre PostgreSQL real", () => {
 
     it("un manejador que pide aprobación deja el trabajo esperando", async () => {
       await sembrar("j-1");
-      const cola = new ColaDeTrabajos(almacen(), { identidad: "W" });
+      const cola = new ColaDeTrabajos(almacen(), { serviciosQueAtiende: [SERVICIO, "servicio_inexistente"], identidad: "W" });
       const w = new TrabajadorDeCola(cola, { registrar: () => {} });
       w.registrarManejador(SERVICIO, async (): Promise<ResultadoDeManejador> => ({
         tipo: "esperandoAprobacion",
@@ -386,7 +386,7 @@ conBase("la cola de trabajos, sobre PostgreSQL real", () => {
       // mientras tanto ocupa un hueco de concurrencia cada vez.
       await sembrar("j-huerfano");
       await pool.query(`UPDATE os_jobs SET service_id = 'servicio_inexistente' WHERE job_id = 'j-huerfano'`);
-      const cola = new ColaDeTrabajos(almacen(), { identidad: "W" });
+      const cola = new ColaDeTrabajos(almacen(), { serviciosQueAtiende: [SERVICIO, "servicio_inexistente"], identidad: "W" });
       const w = new TrabajadorDeCola(cola, { registrar: () => {} });
 
       await w.unaVuelta();
@@ -397,7 +397,7 @@ conBase("la cola de trabajos, sobre PostgreSQL real", () => {
 
     it("un manejador que revienta programa reintento, no pierde el trabajo", async () => {
       await sembrar("j-1");
-      const cola = new ColaDeTrabajos(almacen(), { identidad: "W" });
+      const cola = new ColaDeTrabajos(almacen(), { serviciosQueAtiende: [SERVICIO, "servicio_inexistente"], identidad: "W" });
       const w = new TrabajadorDeCola(cola, { registrar: () => {} });
       w.registrarManejador(SERVICIO, async () => {
         throw new Error("el modelo no respondio");
@@ -411,7 +411,7 @@ conBase("la cola de trabajos, sobre PostgreSQL real", () => {
 
     it("respeta la concurrencia", async () => {
       for (let i = 0; i < 6; i += 1) await sembrar(`j-${i}`);
-      const cola = new ColaDeTrabajos(almacen(), { identidad: "W" });
+      const cola = new ColaDeTrabajos(almacen(), { serviciosQueAtiende: [SERVICIO, "servicio_inexistente"], identidad: "W" });
       const w = new TrabajadorDeCola(cola, { concurrencia: 2, registrar: () => {} });
       w.registrarManejador(SERVICIO, async () => ({ tipo: "completado", resultado: null }));
 
@@ -422,7 +422,7 @@ conBase("la cola de trabajos, sobre PostgreSQL real", () => {
     it("el resumen cuenta lo que hay", async () => {
       await sembrar("j-1");
       await sembrar("j-2", { status: "waiting_approval" });
-      const cola = new ColaDeTrabajos(almacen(), { identidad: "W" });
+      const cola = new ColaDeTrabajos(almacen(), { serviciosQueAtiende: [SERVICIO, "servicio_inexistente"], identidad: "W" });
       const r = await cola.resumen();
       expect(r.queued).toBeGreaterThanOrEqual(1);
       expect(r.waiting_approval).toBeGreaterThanOrEqual(1);

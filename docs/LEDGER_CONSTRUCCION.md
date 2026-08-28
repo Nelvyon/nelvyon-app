@@ -65,7 +65,7 @@ Nada se marca `DONE`: una fase cuya prueba final exige producción es
 | **Fase 2 · journey cliente** | LOCAL_CERTIFIED | `b041713e` | 4 rutas de portal, 26 pruebas PG |
 | Fase 4 · departamentos | LOCAL_CERTIFIED | pendiente | 24 departamentos, 0 vacíos |
 | Fase 5 · contrato de agente | LOCAL_CERTIFIED | pendiente | 23 contratos, 27 pruebas |
-| Fase 6 · 1 994 sectoriales | PENDIENTE | — | characterization tests primero |
+| Fase 6 · caracterización sectorial | LOCAL_CERTIFIED | pendiente | 1.605 al 100 %, 3 familias, 0 rebeldes |
 | Fase 19 · autonomía L0–L5 | LOCAL_CERTIFIED | pendiente | suelo por consecuencia |
 | Fase 11 · puente agente→ejecutor | LOCAL_CERTIFIED | pendiente | 20 pruebas PG, 6 puertas |
 | Fase 16 · results engine | PENDIENTE | — | |
@@ -121,7 +121,12 @@ Se anotan porque son la clase de error que se repite si no se escribe.
    delivered, approved, published, rejected, archived.
 5. Las migraciones 581 y 582 declaraban `client_id TEXT` cuando `os_clients.id`
    es `uuid`. Corregidas en su sitio, no con una migración de parche.
-6. La guarda de gasto comparaba la ventana con `Date.now()` contra fechas
+6. Afirmé que ningún agente sectorial leía el contexto del cliente. **Falso**:
+   253 de 1.605 lo leen con `ClientProfileService`, de `client_profiles` — otra
+   tabla distinta de `os_clients`. Salía de haber buscado sólo `os_clients`.
+   NELVYON tiene TRES almacenes de contexto a la vez, y el cerebro debe
+   absorber los dos viejos, no ser el tercero.
+7. La guarda de gasto comparaba la ventana con `Date.now()` contra fechas
    escritas por `NOW()` de PostgreSQL. Medido: PG va 1 ms por delante, así que
    una autorización aprobada en ese instante se rechazaba. Ahora la ventana la
    evalúa la base. **Y la primera prueba de regresión no lo detectaba**: dependía

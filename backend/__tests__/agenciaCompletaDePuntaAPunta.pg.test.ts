@@ -111,7 +111,7 @@ conBase("la agencia completa", () => {
     pool = new pg.Pool({ connectionString: DSN, max: 10 });
     cerebro = new CerebroDeNegocioService(almacen());
     ciclo = new CicloDelClienteService(almacen(), cerebro);
-    cola = new ColaDeTrabajos(almacen(), { identidad: "e2e" });
+    cola = new ColaDeTrabajos(almacen(), { serviciosQueAtiende: [SERVICIO], identidad: "e2e" });
     guarda = new GuardaDeGasto(almacen());
     senales = new SenalesDeCliente(almacen(), cerebro, ciclo);
 
