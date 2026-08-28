@@ -35,7 +35,10 @@ CREATE TABLE IF NOT EXISTS os_client_brain (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     workspace_id    INTEGER NOT NULL,
-    client_id       TEXT NOT NULL,
+    -- UUID y no TEXT: `os_clients.id` es uuid. Una columna que no comparte
+    -- tipo con su destino obliga a un cast en cada consulta y deja pasar
+    -- identificadores que no existen.
+    client_id       UUID NOT NULL,
 
     -- La dimensión: 'sector', 'icp', 'competidores', 'brand_voice'... El
     -- catálogo vive en el código (`cerebroDeNegocio.ts`) y no en un CHECK,
@@ -108,7 +111,7 @@ CREATE POLICY os_client_brain_tenant ON os_client_brain
 CREATE TABLE IF NOT EXISTS os_client_brain_history (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     workspace_id    INTEGER NOT NULL,
-    client_id       TEXT NOT NULL,
+    client_id       UUID NOT NULL,
     dimension       TEXT NOT NULL,
     valor           JSONB NOT NULL,
     procedencia     TEXT NOT NULL,

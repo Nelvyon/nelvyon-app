@@ -27,8 +27,8 @@ const conBase = DSN ? describe : describe.skip;
 
 const WS_A = 990001;
 const WS_B = 990002;
-const CLI_A = "ciclo-cert-a";
-const CLI_B = "ciclo-cert-b";
+const CLI_A = "aaaaaaaa-c1c0-4001-8001-000000000001";
+const CLI_B = "bbbbbbbb-c1c0-4002-8002-000000000002";
 
 let pool: pg.Pool;
 let ciclo: CicloDelClienteService;

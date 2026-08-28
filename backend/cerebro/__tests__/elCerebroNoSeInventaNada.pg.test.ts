@@ -33,8 +33,8 @@ const conBase = DSN ? describe : describe.skip;
 
 const WS_A = 980001;
 const WS_B = 980002;
-const CLI_A = "cerebro-cert-a";
-const CLI_B = "cerebro-cert-b";
+const CLI_A = "aaaaaaaa-cebe-4001-8001-000000000001";
+const CLI_B = "bbbbbbbb-cebe-4002-8002-000000000002";
 
 let pool: pg.Pool;
 let cerebro: CerebroDeNegocioService;

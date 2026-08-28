@@ -61,14 +61,14 @@ Nada se marca `DONE`: una fase cuya prueba final exige producción es
 | P3 · cola de trabajos | LOCAL_CERTIFIED | `3b3783d2` | 25 pruebas contra PG real |
 | P4 · guarda de gasto | LOCAL_CERTIFIED | `52b2cae0` | 30 pruebas contra PG real |
 | P5 · equivalencia medida | LOCAL_CERTIFIED | `931775e8` | 648 formas; 545 únicas |
-| **Fase 3 · Business Brain** | PENDIENTE | — | fundamento de agentes y contexto |
-| **Fase 2 · journey cliente** | PENDIENTE | — | contratar, intake, conexiones |
+| **Fase 3 · Business Brain** | LOCAL_CERTIFIED | `338bdd41` | 28 dimensiones, 27 pruebas PG |
+| **Fase 2 · journey cliente** | LOCAL_CERTIFIED | `b041713e` | 4 rutas de portal, 26 pruebas PG |
 | Fase 4 · departamentos | PENDIENTE | — | |
 | Fase 5 · contrato de agente | PENDIENTE | — | |
 | Fase 6 · 1 994 sectoriales | PENDIENTE | — | characterization tests primero |
 | Fase 11 · puente agente→ejecutor | PENDIENTE | — | sobre la guarda de gasto |
 | Fase 16 · results engine | PENDIENTE | — | |
-| Fase 23 · customer success | PENDIENTE | — | |
+| Fase 23 · customer success | LOCAL_CERTIFIED | pendiente | 19 pruebas PG, 6 tipos de señal |
 | Fase 24 · portal premium | PENDIENTE | — | |
 | Fase 29 · las 55 sentencias | PENDIENTE | — | |
 | Fase 31 · E2E agencia completa | PENDIENTE | — | prueba de que todo encaja |
@@ -104,8 +104,25 @@ Nada se marca `DONE`: una fase cuya prueba final exige producción es
 
 ---
 
+## Defectos propios encontrados por las pruebas
+
+Se anotan porque son la clase de error que se repite si no se escribe.
+
+1. `conContadorDeEjecucion` era síncrono y restauraba el contexto antes de que
+   terminaran los `await`: el tope de gasto de IA no mordía. → `AsyncLocalStorage`.
+2. La herramienta de equivalencia neutralizaba sólo el nombre de la carpeta y
+   daba «65 % de ficheros únicos». La cifra real es 27,3 %.
+3. `SenalesDeCliente` consultaba `pack_deliverables`, que **no existe**: la
+   tabla es `os_deliverables`. Una consulta contra una tabla inexistente no
+   falla en tiempo de compilación y devolvería cero siempre.
+4. La misma consulta usaba los estados `pending_approval` / `awaiting_client`,
+   que **tampoco existen**: los de `os_deliverables` son draft, in_review,
+   delivered, approved, published, rejected, archived.
+5. Las migraciones 581 y 582 declaraban `client_id TEXT` cuando `os_clients.id`
+   es `uuid`. Corregidas en su sitio, no con una migración de parche.
+
 ## Siguiente acción
 
-**Fase 3 — Business Brain.** Es el fundamento: sin contexto estructurado por
-cliente, los contratos de agente de la Fase 5 no tienen de dónde leer, y los
-prompts gigantes acaban sustituyendo a la arquitectura.
+**Fase 5 — contrato de agente**, y después **Fase 4 — jefes de departamento**.
+El cerebro ya existe, así que un agente puede por fin declarar qué contexto
+necesita y leerlo, en vez de recibir un `brief` armado a mano.

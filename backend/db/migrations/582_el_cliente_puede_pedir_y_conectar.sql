@@ -29,7 +29,10 @@ CREATE TABLE IF NOT EXISTS os_service_requests (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     workspace_id    INTEGER NOT NULL,
-    client_id       TEXT NOT NULL,
+    -- UUID y no TEXT: `os_clients.id` es uuid. Una columna que no comparte
+    -- tipo con su destino obliga a un cast en cada consulta y deja pasar
+    -- identificadores que no existen.
+    client_id       UUID NOT NULL,
     /** Quién la pidió: un usuario del portal, o alguien de NELVYON por él. */
     solicitada_por  TEXT NOT NULL,
 
@@ -91,7 +94,7 @@ CREATE TABLE IF NOT EXISTS os_client_connections (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
     workspace_id    INTEGER NOT NULL,
-    client_id       TEXT NOT NULL,
+    client_id       UUID NOT NULL,
 
     -- 'google_analytics', 'google_ads', 'meta_ads', 'search_console'...
     proveedor       TEXT NOT NULL,
