@@ -68,7 +68,7 @@ Nada se marca `DONE`: una fase cuya prueba final exige producción es
 | Fase 6 · caracterización sectorial | LOCAL_CERTIFIED | pendiente | 1.605 al 100 %, 3 familias, 0 rebeldes |
 | Fase 19 · autonomía L0–L5 | LOCAL_CERTIFIED | pendiente | suelo por consecuencia |
 | Fase 11 · puente agente→ejecutor | LOCAL_CERTIFIED | pendiente | 20 pruebas PG, 6 puertas |
-| Fase 16 · results engine | PENDIENTE | — | |
+| Fase 16 · motor de resultados | LOCAL_CERTIFIED | pendiente | 19 pruebas PG, 4 mutaciones |
 | Fase 23 · customer success | LOCAL_CERTIFIED | pendiente | 19 pruebas PG, 6 tipos de señal |
 | Fase 24 · portal premium | PENDIENTE | — | |
 | Fase 29 · las 55 sentencias | PENDIENTE | — | |
@@ -135,9 +135,10 @@ Se anotan porque son la clase de error que se repite si no se escribe.
 
 ## Siguiente acción
 
-**Fase 6** — los 1.994 sectoriales. El orden que exige el encargo: primero
-characterization tests que fijen QUÉ produce hoy cada familia, y sólo después
-migrar. Sin ese paso, cualquier colapso es un big-bang a ciegas.
+**Fase 24** — portal premium: las cuatro rutas existen y falta la interfaz que
+las use. Después, **Fase 25** (consola interna) y **Fase 17** (inteligencia
+entre departamentos, que ya tiene debajo el cerebro y el motor de resultados).
 
-Después, **Fase 16** (results engine) y **Fase 24** (portal premium: las cuatro
-rutas existen, falta la interfaz que las use).
+El paso que falta de la **Fase 6** está escrito en su propia prueba: caracterizar
+la FUENTE no basta; hay que ejecutar cada familia contra un modelo doble y
+comparar SALIDAS antes de migrar nada.
