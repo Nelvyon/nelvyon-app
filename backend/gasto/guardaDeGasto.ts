@@ -77,6 +77,8 @@ type FilaAutorizacion = {
   estado: string;
   vigente_desde: string;
   vigente_hasta: string;
+  /** Lo calcula PostgreSQL con su propio reloj. Ver la consulta. */
+  vigente: boolean;
 };
 
 type FilaGasto = {
@@ -155,8 +157,20 @@ export class GuardaDeGasto {
       }
 
       const filas = await this.db.query<FilaAutorizacion>(
+        // La ventana se evalua EN LA BASE y no en JavaScript.
+        //
+        // Comparar `Date.now()` con una fecha que puso `NOW()` de PostgreSQL es
+        // comparar dos relojes distintos. Medido en local, PostgreSQL va 1 ms
+        // por delante: una autorizacion aprobada en este mismo instante se
+        // rechazaba por «fuera de ventana» durante esos milisegundos. Con la
+        // base en otra maquina el desfase son segundos, y el sintoma seria una
+        // autorizacion recien aprobada que no funciona y luego si — el peor
+        // tipo de fallo, el que no se reproduce.
+        //
+        // `vigente` viene calculado por el mismo reloj que escribio las fechas.
         `SELECT id, presupuesto_cents, tope_por_operacion_cents, consumido_cents,
-                estado, vigente_desde, vigente_hasta
+                estado, vigente_desde, vigente_hasta,
+                (NOW() >= vigente_desde AND NOW() <= vigente_hasta) AS vigente
            FROM autorizaciones_de_gasto
           WHERE tenant_id = $1::uuid
             AND workspace_id = $2
@@ -180,10 +194,7 @@ export class GuardaDeGasto {
         return deniega("autorizacion_no_aprobada", `la autorizacion esta en '${a.estado}'`);
       }
 
-      const ahora = Date.now();
-      const desde = new Date(a.vigente_desde).getTime();
-      const hasta = new Date(a.vigente_hasta).getTime();
-      if (!(ahora >= desde && ahora <= hasta)) {
+      if (a.vigente !== true) {
         return deniega(
           "fuera_de_ventana",
           `la autorizacion es valida de ${a.vigente_desde} a ${a.vigente_hasta}`,

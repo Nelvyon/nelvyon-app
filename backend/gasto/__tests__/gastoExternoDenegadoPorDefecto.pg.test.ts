@@ -263,6 +263,74 @@ conBase("la guarda de gasto externo", () => {
       if (!v.permitido) expect(v.motivo).toBe("fuera_de_ventana");
     });
 
+    it("LA REGRESIÓN: el desfase de reloj NO puede rechazar una autorización válida", async () => {
+      // Este caso existe por un defecto real, y la primera versión de esta
+      // prueba NO lo detectaba: dependía de una carrera de 1 ms y pasaba con el
+      // defecto dentro. Una prueba que sólo falla a veces es peor que ninguna.
+      //
+      // El defecto: la ventana se comparaba con `Date.now()` contra fechas
+      // escritas por `NOW()` de PostgreSQL — dos relojes distintos. Medido en
+      // local, PostgreSQL va 1 ms por delante. Con la base en otra máquina el
+      // desfase son segundos, y el síntoma sería una autorización recién
+      // aprobada que no funciona y luego sí: el peor tipo de fallo.
+      //
+      // Aquí el desfase se fabrica: la fila dice que empezó DENTRO DE UN
+      // MINUTO según el reloj de quien la lee, y `vigente` —que lo calcula la
+      // base con su propio reloj— dice que sí vale. Una guarda que compare en
+      // JavaScript deniega; una que confíe en la base, no.
+      const conDesfase = new GuardaDeGasto({
+        async query<T>(sql: string): Promise<T[]> {
+          if (sql.includes("gastos_ejecutados")) return [] as T[];
+          return [
+            {
+              id: "11111111-1111-4111-8111-111111111111",
+              presupuesto_cents: "100000",
+              tope_por_operacion_cents: "20000",
+              consumido_cents: "0",
+              estado: "aprobada",
+              vigente_desde: new Date(Date.now() + 60_000).toISOString(),
+              vigente_hasta: new Date(Date.now() + 30 * 86_400_000).toISOString(),
+              vigente: true,
+            },
+          ] as T[];
+        },
+      });
+
+      const v = await conDesfase.autorizar(peticion());
+      expect(
+        v.permitido,
+        "la ventana se está evaluando con el reloj equivocado",
+      ).toBe(true);
+    });
+
+    it("EL CONTROL: si la base dice que NO es vigente, se deniega", async () => {
+      // Sin este caso, una guarda que ignorara la ventana entera pasaría la
+      // prueba anterior.
+      const caducada = new GuardaDeGasto({
+        async query<T>(sql: string): Promise<T[]> {
+          if (sql.includes("gastos_ejecutados")) return [] as T[];
+          return [
+            {
+              id: "11111111-1111-4111-8111-111111111111",
+              presupuesto_cents: "100000",
+              tope_por_operacion_cents: "20000",
+              consumido_cents: "0",
+              estado: "aprobada",
+              // Fechas que en JavaScript parecen perfectamente vigentes...
+              vigente_desde: new Date(Date.now() - 86_400_000).toISOString(),
+              vigente_hasta: new Date(Date.now() + 86_400_000).toISOString(),
+              // ...pero la base dice que no. Manda la base.
+              vigente: false,
+            },
+          ] as T[];
+        },
+      });
+
+      const v = await caducada.autorizar(peticion());
+      expect(v.permitido).toBe(false);
+      if (!v.permitido) expect(v.motivo).toBe("fuera_de_ventana");
+    });
+
     it("una autorización que aún no ha empezado tampoco", async () => {
       await autorizar({
         desde: new Date(Date.now() + 86_400_000).toISOString(),

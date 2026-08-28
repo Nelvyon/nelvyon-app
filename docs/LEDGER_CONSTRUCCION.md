@@ -67,7 +67,7 @@ Nada se marca `DONE`: una fase cuya prueba final exige producción es
 | Fase 5 · contrato de agente | LOCAL_CERTIFIED | pendiente | 23 contratos, 27 pruebas |
 | Fase 6 · 1 994 sectoriales | PENDIENTE | — | characterization tests primero |
 | Fase 19 · autonomía L0–L5 | LOCAL_CERTIFIED | pendiente | suelo por consecuencia |
-| Fase 11 · puente agente→ejecutor | PENDIENTE | — | sobre la guarda de gasto |
+| Fase 11 · puente agente→ejecutor | LOCAL_CERTIFIED | pendiente | 20 pruebas PG, 6 puertas |
 | Fase 16 · results engine | PENDIENTE | — | |
 | Fase 23 · customer success | LOCAL_CERTIFIED | pendiente | 19 pruebas PG, 6 tipos de señal |
 | Fase 24 · portal premium | PENDIENTE | — | |
@@ -121,9 +121,15 @@ Se anotan porque son la clase de error que se repite si no se escribe.
    delivered, approved, published, rejected, archived.
 5. Las migraciones 581 y 582 declaraban `client_id TEXT` cuando `os_clients.id`
    es `uuid`. Corregidas en su sitio, no con una migración de parche.
+6. La guarda de gasto comparaba la ventana con `Date.now()` contra fechas
+   escritas por `NOW()` de PostgreSQL. Medido: PG va 1 ms por delante, así que
+   una autorización aprobada en ese instante se rechazaba. Ahora la ventana la
+   evalúa la base. **Y la primera prueba de regresión no lo detectaba**: dependía
+   de una carrera de 1 ms y pasaba con el defecto dentro. Reescrita con desfase
+   determinista.
 
 ## Siguiente acción
 
-**Fase 11 — el puente agente → ejecutor**, que ya tiene debajo todo lo que
-necesita: la guarda de gasto (P4), los niveles de autonomía (Fase 19) y los
-contratos con sus consecuencias declaradas (Fase 5).
+**Fase 31 — el escenario de agencia completa**, que es la prueba de que todas
+las piezas encajan de punta a punta. Después, **Fase 6** (los 1.994 sectoriales,
+con characterization tests antes de tocar nada) y **Fase 16** (results engine).
