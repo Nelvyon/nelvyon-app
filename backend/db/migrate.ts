@@ -122,15 +122,106 @@ async function runConsolidatedMigration(db: DbClient, file: string, sql: string)
     `[migrate] ${file}: ${ok} sentencias ok, ${omitidas.length} omitidas por deriva idempotente`,
   );
 
-  if (intolerables.length > 0) {
-    console.error(
-      `[migrate] ${file}: ${intolerables.length} sentencia(s) NO se aplicaron y no son deriva:`,
+  // La 507 arrastra una deuda real y medida: concatena el SQL de ~40 servicios
+  // y no es coherente consigo misma. Esa deuda esta ESCRITA en
+  // `omisiones_conocidas_507.json`, con la sentencia y el motivo de cada una.
+  // Lo que ya fallaba el 28-08-2026 no bloquea; cualquier fallo nuevo si. La
+  // diferencia con la lista de tolerancia antigua es que aquella era una
+  // categoria abierta —"todo error 42P01"— y esta es una lista cerrada de
+  // sentencias concretas que no puede crecer sin que alguien la edite.
+  const conocidas = cargarOmisionesConocidas(file);
+  const nuevas = intolerables.filter((d) => !conocidas.has(d.id));
+  const yaSabidas = intolerables.length - nuevas.length;
+
+  // La lista se escribe desde aqui y no se transcribe a mano de un registro:
+  // copiar el texto de un log introduce diferencias de espacios que hacen que
+  // una omision ya anotada parezca nueva. Es explicito y ruidoso a proposito —
+  // el fichero va en git, asi que cualquier crecimiento se ve en la revision.
+  if (process.env.NELVYON_MIGRATE_WRITE_OMISSIONS === "1" && file === CONSOLIDATED_MIGRATION) {
+    escribirOmisionesConocidas(intolerables);
+    console.warn(
+      `[migrate] ATENCION: reescrita la deuda conocida de ${file} con ${intolerables.length} omision(es).`,
     );
-    for (const d of intolerables) console.error(`  [${d.code}] ${d.preview}  ->  ${d.message}`);
-    throw new Error(
-      `${file}: ${intolerables.length} sentencia(s) fallaron. La migracion NO se registra como aplicada.`,
+    return;
+  }
+
+  if (yaSabidas > 0) {
+    console.warn(
+      `[migrate] ${file}: ${yaSabidas} omision(es) YA CONOCIDAS (ver backend/db/omisiones_conocidas_507.json)`,
     );
   }
+
+  if (nuevas.length > 0) {
+    console.error(`[migrate] ${file}: ${nuevas.length} sentencia(s) NUEVAS que no se aplicaron:`);
+    for (const d of nuevas) console.error(`  [${d.code}] ${d.preview}  ->  ${d.message}`);
+    throw new Error(
+      `${file}: ${nuevas.length} sentencia(s) fallaron y no estan en la deuda conocida. ` +
+        `La migracion NO se registra como aplicada. Arreglalas, o si son inevitables ` +
+        `anadelas a backend/db/omisiones_conocidas_507.json explicando por que.`,
+    );
+  }
+}
+
+/** Vuelca la deuda actual al fichero, con la sentencia y el motivo de cada una. */
+function escribirOmisionesConocidas(omisiones: SentenciaOmitida[]): void {
+  // Se deduplica por identidad porque la 507 contiene sentencias repetidas
+  // —`CREATE INDEX api_keys_workspace_idx` aparece dos veces, heredado de dos
+  // ficheros de servicio concatenados—, y la lista es de SENTENCIAS, no de
+  // ocurrencias. Contar ocurrencias haria que el total bailara sin que la deuda
+  // cambiara.
+  const porId = new Map<string, { id: string; code: string; sentencia: string; motivo: string }>();
+  for (const d of omisiones) {
+    if (!porId.has(d.id)) {
+      porId.set(d.id, { id: d.id, code: d.code, sentencia: d.preview, motivo: d.message });
+    }
+  }
+  const unicas = [...porId.values()];
+
+  const doc = {
+    _lee_esto: [
+      "Deuda conocida de la migracion 507 sobre una base LIMPIA.",
+      "",
+      "La 507 concatena el SQL de ~40 servicios FastAPI y no es coherente consigo",
+      "misma: hay indices y politicas que referencian tablas o columnas que nadie",
+      "crea, y una tabla (campaigns) que llega en la migracion 545, posterior.",
+      "Durante meses eso no se vio porque el aplicador toleraba en silencio los",
+      "codigos 42601 y 42P01 y registraba la migracion como aplicada igual. El",
+      "resultado medido: produccion sin cinco tablas que tres servicios consultan.",
+      "",
+      "Ahora un fallo NO listado aqui rompe la migracion. Esta lista es la deuda",
+      "que ya existia: no puede crecer sin que alguien la anada, y cada linea que",
+      "se arregle debe borrarse de aqui.",
+      "",
+      "Solo se consulta al construir un esquema DESDE CERO. En una base donde la",
+      "507 ya consta aplicada, la migracion se salta entera y esto no se mira.",
+      "",
+      "Se regenera con NELVYON_MIGRATE_WRITE_OMISSIONS=1, nunca a mano.",
+    ],
+    total: unicas.length,
+    omisiones: unicas.sort(
+      (a, b) => a.code.localeCompare(b.code) || a.sentencia.localeCompare(b.sentencia),
+    ),
+  };
+  fs.writeFileSync(
+    path.join(__dirname, "omisiones_conocidas_507.json"),
+    `${JSON.stringify(doc, null, 2)}
+`,
+    "utf8",
+  );
+}
+
+/**
+ * Deuda conocida de una migracion consolidada. Si el fichero no esta, no hay
+ * deuda tolerada y cualquier fallo rompe — que es el comportamiento estricto.
+ */
+function cargarOmisionesConocidas(file: string): Set<string> {
+  if (file !== CONSOLIDATED_MIGRATION) return new Set();
+  const ruta = path.join(__dirname, "omisiones_conocidas_507.json");
+  if (!fs.existsSync(ruta)) return new Set();
+  const doc = JSON.parse(fs.readFileSync(ruta, "utf8")) as {
+    omisiones?: Array<{ id: string }>;
+  };
+  return new Set((doc.omisiones ?? []).map((o) => o.id));
 }
 
 runMigrations()

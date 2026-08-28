@@ -1,0 +1,354 @@
+{
+  "_lee_esto": [
+    "Deuda conocida de la migracion 507 sobre una base LIMPIA.",
+    "",
+    "La 507 concatena el SQL de ~40 servicios FastAPI y no es coherente consigo",
+    "misma: hay indices y politicas que referencian tablas o columnas que nadie",
+    "crea, y una tabla (campaigns) que llega en la migracion 545, posterior.",
+    "Durante meses eso no se vio porque el aplicador toleraba en silencio los",
+    "codigos 42601 y 42P01 y registraba la migracion como aplicada igual. El",
+    "resultado medido: produccion sin cinco tablas que tres servicios consultan.",
+    "",
+    "Ahora un fallo NO listado aqui rompe la migracion. Esta lista es la deuda",
+    "que ya existia: no puede crecer sin que alguien la anada, y cada linea que",
+    "se arregle debe borrarse de aqui.",
+    "",
+    "Solo se consulta al construir un esquema DESDE CERO. En una base donde la",
+    "507 ya consta aplicada, la migracion se salta entera y esto no se mira.",
+    "",
+    "Se regenera con NELVYON_MIGRATE_WRITE_OMISSIONS=1, nunca a mano."
+  ],
+  "total": 55,
+  "omisiones": [
+    {
+      "id": "a59e3ace9fa1fa54",
+      "code": "42703",
+      "sentencia": "ALTER TABLE calendar_events ALTER COLUMN start_time DROP NOT NULL",
+      "motivo": "column \"start_time\" of relation \"calendar_events\" does not exist"
+    },
+    {
+      "id": "f470d648cbd2affb",
+      "code": "42703",
+      "sentencia": "ALTER TABLE calendar_events ALTER COLUMN user_id DROP NOT NULL",
+      "motivo": "column \"user_id\" of relation \"calendar_events\" does not exist"
+    },
+    {
+      "id": "770bcc2969ec03c2",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS ab_experiments_workspace_idx ON ab_experiments (workspace_id, status)",
+      "motivo": "column \"workspace_id\" does not exist"
+    },
+    {
+      "id": "8b88091e36142db0",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS affiliate_clicks_affiliate_idx ON affiliate_clicks (affiliate_id, created_at DESC)",
+      "motivo": "column \"affiliate_id\" does not exist"
+    },
+    {
+      "id": "804a3676527d26a0",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS api_keys_workspace_idx ON api_keys (workspace_id)",
+      "motivo": "column \"workspace_id\" does not exist"
+    },
+    {
+      "id": "e56e5ef4bb87df4f",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS bookings_workspace_idx ON bookings (workspace_id)",
+      "motivo": "column \"workspace_id\" does not exist"
+    },
+    {
+      "id": "2d52dd0a9432d076",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS bookings_workspace_start_idx ON bookings (workspace_id, start_at)",
+      "motivo": "column \"workspace_id\" does not exist"
+    },
+    {
+      "id": "89b47d98db088b07",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS bookings_workspace_status_idx ON bookings (workspace_id, status)",
+      "motivo": "column \"workspace_id\" does not exist"
+    },
+    {
+      "id": "0ecb2a896f87159a",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS bookings_zoom_meeting_idx ON bookings (zoom_meeting_id) WHERE zoom_meeting_id IS NOT NULL",
+      "motivo": "column \"zoom_meeting_id\" does not exist"
+    },
+    {
+      "id": "ffa00a6445fd7d22",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS calendar_events_ws_start_at_idx ON calendar_events (workspace_id, start_at)",
+      "motivo": "column \"workspace_id\" does not exist"
+    },
+    {
+      "id": "64fb2a7cdf3fffdb",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS chatbot_conversations_bot_idx ON chatbot_conversations (chatbot_id, last_message_at DESC)",
+      "motivo": "column \"last_message_at\" does not exist"
+    },
+    {
+      "id": "edbb028d2ad16caa",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS chatbot_conversations_workspace_idx ON chatbot_conversations (workspace_id, started_at DESC)",
+      "motivo": "column \"workspace_id\" does not exist"
+    },
+    {
+      "id": "4a2ebd34edb98963",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS crm_activities_deal_idx ON crm_activities (deal_id)",
+      "motivo": "column \"deal_id\" does not exist"
+    },
+    {
+      "id": "3e89a8f638b3d668",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS crm_activities_workspace_idx ON crm_activities (workspace_id)",
+      "motivo": "column \"workspace_id\" does not exist"
+    },
+    {
+      "id": "34ba6b14a002d72d",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS crm_contacts_email_idx ON crm_contacts (workspace_id, lower(email))",
+      "motivo": "column \"workspace_id\" does not exist"
+    },
+    {
+      "id": "c5a0f4073ccab68e",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS crm_contacts_score_idx ON crm_contacts (workspace_id, score DESC)",
+      "motivo": "column \"workspace_id\" does not exist"
+    },
+    {
+      "id": "7773f056f3be837d",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS crm_contacts_workspace_idx ON crm_contacts (workspace_id)",
+      "motivo": "column \"workspace_id\" does not exist"
+    },
+    {
+      "id": "91c24b44fb2a9d11",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS idx_bookings_ws_created ON bookings (workspace_id, created_at DESC)",
+      "motivo": "column \"workspace_id\" does not exist"
+    },
+    {
+      "id": "56f16aba950ed478",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS idx_bookings_ws_status ON bookings (workspace_id, status)",
+      "motivo": "column \"workspace_id\" does not exist"
+    },
+    {
+      "id": "35020fbb3bb48158",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS idx_crm_activities_ws_created ON crm_activities (workspace_id, created_at DESC)",
+      "motivo": "column \"workspace_id\" does not exist"
+    },
+    {
+      "id": "b7b7bc202ef32837",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS idx_crm_contacts_ws_created ON crm_contacts (workspace_id, created_at DESC)",
+      "motivo": "column \"workspace_id\" does not exist"
+    },
+    {
+      "id": "c227bdc01ce5d89e",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS idx_invoices_ws_created ON invoices (workspace_id, created_at DESC)",
+      "motivo": "column \"workspace_id\" does not exist"
+    },
+    {
+      "id": "91daa72bf1955156",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS idx_invoices_ws_status ON invoices (workspace_id, status)",
+      "motivo": "column \"workspace_id\" does not exist"
+    },
+    {
+      "id": "daa1a6c6b3020a37",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS idx_qr_codes_ws_created ON qr_codes (workspace_id, created_at DESC)",
+      "motivo": "column \"workspace_id\" does not exist"
+    },
+    {
+      "id": "54627189cdd86e13",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS idx_webhook_deliveries_endpoint ON webhook_deliveries (endpoint_id, created_at DESC)",
+      "motivo": "column \"endpoint_id\" does not exist"
+    },
+    {
+      "id": "62777f9b12462279",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS invoices_workspace_created_idx ON invoices (workspace_id, created_at DESC)",
+      "motivo": "column \"workspace_id\" does not exist"
+    },
+    {
+      "id": "fd497ad01313d7b1",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS invoices_workspace_status_idx ON invoices (workspace_id, status)",
+      "motivo": "column \"workspace_id\" does not exist"
+    },
+    {
+      "id": "51d68cdfcbb030de",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS qr_codes_workspace_idx ON qr_codes (workspace_id, created_at DESC)",
+      "motivo": "column \"workspace_id\" does not exist"
+    },
+    {
+      "id": "a88b54943c7823b4",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS webhook_deliveries_endpoint_idx ON webhook_deliveries (endpoint_id, created_at DESC)",
+      "motivo": "column \"endpoint_id\" does not exist"
+    },
+    {
+      "id": "945b914c16ede14b",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS webhook_deliveries_retry_idx ON webhook_deliveries (status, next_retry_at) WHERE status IN ('",
+      "motivo": "column \"status\" does not exist"
+    },
+    {
+      "id": "44dae8df39265a76",
+      "code": "42703",
+      "sentencia": "CREATE POLICY ab_experiments_tenant ON ab_experiments FOR ALL USING (workspace_id = current_tenant_id()) WITH CHECK (wor",
+      "motivo": "column \"workspace_id\" does not exist"
+    },
+    {
+      "id": "17034cde3c988c3f",
+      "code": "42703",
+      "sentencia": "CREATE POLICY ab_variants_tenant ON ab_variants FOR ALL USING (workspace_id = current_tenant_id()) WITH CHECK (workspace",
+      "motivo": "column \"workspace_id\" does not exist"
+    },
+    {
+      "id": "e8cb83e66d5530f8",
+      "code": "42703",
+      "sentencia": "CREATE POLICY chatbot_conversations_tenant ON chatbot_conversations FOR ALL USING (workspace_id = current_tenant_id()) W",
+      "motivo": "column \"workspace_id\" does not exist"
+    },
+    {
+      "id": "6c6f06c092c967a7",
+      "code": "42703",
+      "sentencia": "CREATE POLICY qr_codes_public_read ON qr_codes FOR SELECT USING (short_code IS NOT NULL)",
+      "motivo": "column \"short_code\" does not exist"
+    },
+    {
+      "id": "fe8204ced6b7c2ec",
+      "code": "42703",
+      "sentencia": "CREATE POLICY qr_codes_tenant ON qr_codes FOR ALL USING (workspace_id = current_tenant_id()) WITH CHECK (workspace_id = ",
+      "motivo": "column \"workspace_id\" does not exist"
+    },
+    {
+      "id": "52fc8b124694e9d8",
+      "code": "42703",
+      "sentencia": "CREATE UNIQUE INDEX IF NOT EXISTS calendar_events_ws_google_idx ON calendar_events (workspace_id, google_event_id) WHERE",
+      "motivo": "column \"workspace_id\" does not exist"
+    },
+    {
+      "id": "ceb82ca91290b744",
+      "code": "42703",
+      "sentencia": "CREATE UNIQUE INDEX IF NOT EXISTS invoices_workspace_number_idx ON invoices (workspace_id, invoice_number)",
+      "motivo": "column \"workspace_id\" does not exist"
+    },
+    {
+      "id": "76c22c17574c0da1",
+      "code": "42703",
+      "sentencia": "DO $$ DECLARE tbl TEXT; BEGIN FOR tbl IN SELECT unnest(ARRAY[ 'crm_contacts', 'crm_deals', 'crm_activities', 'campaigns'",
+      "motivo": "column \"workspace_id\" does not exist"
+    },
+    {
+      "id": "4d36760187ac8d6b",
+      "code": "42883",
+      "sentencia": "CREATE POLICY audit_logs_tenant_insert ON audit_logs FOR INSERT WITH CHECK (tenant_id = current_tenant_id())",
+      "motivo": "operator does not exist: uuid = integer"
+    },
+    {
+      "id": "d0d46a1eebdbf74f",
+      "code": "42883",
+      "sentencia": "CREATE POLICY audit_logs_tenant_select ON audit_logs FOR SELECT USING (tenant_id = current_tenant_id())",
+      "motivo": "operator does not exist: uuid = integer"
+    },
+    {
+      "id": "0063ac97fa43376d",
+      "code": "42P01",
+      "sentencia": "ALTER TABLE campaigns ADD COLUMN IF NOT EXISTS from_email TEXT",
+      "motivo": "relation \"campaigns\" does not exist"
+    },
+    {
+      "id": "7dbdd870985209af",
+      "code": "42P01",
+      "sentencia": "ALTER TABLE campaigns ADD COLUMN IF NOT EXISTS from_name TEXT",
+      "motivo": "relation \"campaigns\" does not exist"
+    },
+    {
+      "id": "81bfc3ddd6f26d05",
+      "code": "42P01",
+      "sentencia": "ALTER TABLE funnel_steps ENABLE ROW LEVEL SECURITY",
+      "motivo": "relation \"funnel_steps\" does not exist"
+    },
+    {
+      "id": "131f9e4b821f67ff",
+      "code": "42P01",
+      "sentencia": "ALTER TABLE users ADD COLUMN IF NOT EXISTS language VARCHAR(8) NOT NULL DEFAULT 'es'",
+      "motivo": "relation \"users\" does not exist"
+    },
+    {
+      "id": "653adbaeedf15406",
+      "code": "42P01",
+      "sentencia": "CREATE INDEX IF NOT EXISTS campaign_recipients_campaign_idx ON campaign_recipients (campaign_id)",
+      "motivo": "relation \"campaign_recipients\" does not exist"
+    },
+    {
+      "id": "ba27d78cac73d70e",
+      "code": "42P01",
+      "sentencia": "CREATE INDEX IF NOT EXISTS campaign_recipients_status_idx ON campaign_recipients (campaign_id, status)",
+      "motivo": "relation \"campaign_recipients\" does not exist"
+    },
+    {
+      "id": "6748d57a7009b01d",
+      "code": "42P01",
+      "sentencia": "CREATE INDEX IF NOT EXISTS campaigns_scheduled_idx ON campaigns (status, scheduled_at) WHERE status = 'scheduled' AND sc",
+      "motivo": "relation \"campaigns\" does not exist"
+    },
+    {
+      "id": "c759cb2a8e62ae0a",
+      "code": "42P01",
+      "sentencia": "CREATE INDEX IF NOT EXISTS campaigns_workspace_status_idx ON campaigns (workspace_id, status)",
+      "motivo": "relation \"campaigns\" does not exist"
+    },
+    {
+      "id": "e059b7ae34aa308c",
+      "code": "42P01",
+      "sentencia": "CREATE INDEX IF NOT EXISTS funnel_steps_funnel_idx ON funnel_steps (funnel_id, step_order)",
+      "motivo": "relation \"funnel_steps\" does not exist"
+    },
+    {
+      "id": "c752b8c6ec58396d",
+      "code": "42P01",
+      "sentencia": "CREATE INDEX IF NOT EXISTS idx_push_subscriptions_ws ON push_subscriptions (workspace_id, created_at DESC)",
+      "motivo": "relation \"push_subscriptions\" does not exist"
+    },
+    {
+      "id": "8adeacca9960d21e",
+      "code": "42P01",
+      "sentencia": "CREATE INDEX IF NOT EXISTS idx_qr_scans_qr ON qr_scans (qr_id, scanned_at DESC)",
+      "motivo": "relation \"qr_scans\" does not exist"
+    },
+    {
+      "id": "033c5ed35fb29029",
+      "code": "42P01",
+      "sentencia": "CREATE INDEX IF NOT EXISTS idx_webinars_ws_created ON webinars (workspace_id, created_at DESC)",
+      "motivo": "relation \"webinars\" does not exist"
+    },
+    {
+      "id": "c72ed1fd0bf05bfc",
+      "code": "42P01",
+      "sentencia": "CREATE POLICY funnel_steps_tenant ON funnel_steps FOR ALL USING ( funnel_id IN (SELECT id FROM funnels WHERE workspace_i",
+      "motivo": "relation \"funnel_steps\" does not exist"
+    },
+    {
+      "id": "b2a978ca2fbb403e",
+      "code": "42P01",
+      "sentencia": "CREATE TABLE IF NOT EXISTS campaign_recipients ( id SERIAL PRIMARY KEY, campaign_id INTEGER NOT NULL REFERENCES campaign",
+      "motivo": "relation \"campaigns\" does not exist"
+    },
+    {
+      "id": "7a161c1ebdb4c70a",
+      "code": "42P01",
+      "sentencia": "CREATE TABLE IF NOT EXISTS funnel_steps ( id UUID PRIMARY KEY DEFAULT gen_random_uuid(), funnel_id UUID NOT NULL REFEREN",
+      "motivo": "relation \"landing_pages\" does not exist"
+    }
+  ]
+}

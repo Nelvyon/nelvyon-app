@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+
 /** Split SQL into statements, respecting quoted strings and dollar quotes. */
 export function splitSqlStatements(sql: string): string[] {
   const statements: string[] = [];
@@ -172,12 +174,25 @@ export function isTolerableConsolidatedMigrationError(err: unknown, sql: string)
 }
 
 /** Para poder informar de que se salto y por que, en vez de solo contar. */
-export type SentenciaOmitida = { code: string; message: string; preview: string };
+export type SentenciaOmitida = { id: string; code: string; message: string; preview: string };
+
+/**
+ * Identidad estable de una sentencia. Se calcula sobre la sentencia ENTERA
+ * normalizada, no sobre su vista previa: dos indices sobre la misma tabla
+ * pueden coincidir en los primeros 120 caracteres, y con la vista previa como
+ * identidad se solapaban en una sola entrada — asi una de las dos quedaba sin
+ * vigilar. Medido: 56 omisiones producian 55 identidades.
+ */
+export function idDeSentencia(sql: string): string {
+  const normalizada = stripLeadingComments(sql).replace(/\s+/g, " ").trim();
+  return createHash("sha256").update(normalizada).digest("hex").slice(0, 16);
+}
 
 /** Resumen de una sentencia omitida, sin volcar el SQL entero al registro. */
 export function describirOmision(err: unknown, sql: string): SentenciaOmitida {
   const e = err as PgError;
   return {
+    id: idDeSentencia(sql),
     code: e.code ?? "",
     message: (e.message ?? "").slice(0, 200),
     preview: stripLeadingComments(sql).replace(/\s+/g, " ").slice(0, 120),

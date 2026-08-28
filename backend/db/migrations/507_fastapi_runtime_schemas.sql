@@ -2,6 +2,32 @@
 -- Replaces all runtime CREATE TABLE / ensure_schema DDL in FastAPI services.
 
 
+-- ORDEN. Estas dos funciones estaban definidas en la linea ~2259, DESPUES de
+-- las 38 politicas RLS que las usan. Sobre una base limpia esas 38 fallaban
+-- con 42883 'function current_tenant_id() does not exist', el aplicador las
+-- toleraba en silencio y registraba la migracion como aplicada igual. Por eso
+-- el esquema no se podia reconstruir desde cero.
+--
+-- No cambia nada donde ya existan: son CREATE OR REPLACE.
+
+-- Session helper for RLS (Supabase / Postgres)
+CREATE OR REPLACE FUNCTION set_tenant_context(p_tenant_id INTEGER)
+RETURNS VOID AS $$
+BEGIN
+    PERFORM set_config('app.tenant_id', p_tenant_id::TEXT, TRUE);
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION current_tenant_id()
+RETURNS INTEGER AS $$
+BEGIN
+    RETURN NULLIF(current_setting('app.tenant_id', TRUE), '')::INTEGER;
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN NULL;
+END;
+$$ LANGUAGE plpgsql STABLE;
+
 -- === ab_testing.sql ===
 
 -- NELVYON A/B Testing â€” experiments, variants, events
@@ -2248,23 +2274,6 @@ CREATE TABLE IF NOT EXISTS data_processing_agreements (
 CREATE INDEX IF NOT EXISTS dpa_tenant_idx
     ON data_processing_agreements (tenant_id, created_at DESC);
 
--- Session helper for RLS (Supabase / Postgres)
-CREATE OR REPLACE FUNCTION set_tenant_context(p_tenant_id INTEGER)
-RETURNS VOID AS $$
-BEGIN
-    PERFORM set_config('app.tenant_id', p_tenant_id::TEXT, TRUE);
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION current_tenant_id()
-RETURNS INTEGER AS $$
-BEGIN
-    RETURN NULLIF(current_setting('app.tenant_id', TRUE), '')::INTEGER;
-EXCEPTION
-    WHEN OTHERS THEN
-        RETURN NULL;
-END;
-$$ LANGUAGE plpgsql STABLE;
 
 -- RLS: audit_logs â€” tenant isolation, no deletes
 ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
