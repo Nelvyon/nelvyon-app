@@ -72,7 +72,7 @@ Nada se marca `DONE`: una fase cuya prueba final exige producción es
 | Fase 23 · customer success | LOCAL_CERTIFIED | pendiente | 19 pruebas PG, 6 tipos de señal |
 | Fase 24 · portal premium | PENDIENTE | — | |
 | Fase 29 · las 55 sentencias | PENDIENTE | — | |
-| Fase 31 · E2E agencia completa | PENDIENTE | — | prueba de que todo encaja |
+| Fase 31 · E2E agencia completa | LOCAL_CERTIFIED | pendiente | 13 pasos, 3 pruebas PG |
 
 ---
 
@@ -130,6 +130,9 @@ Se anotan porque son la clase de error que se repite si no se escribe.
 
 ## Siguiente acción
 
-**Fase 31 — el escenario de agencia completa**, que es la prueba de que todas
-las piezas encajan de punta a punta. Después, **Fase 6** (los 1.994 sectoriales,
-con characterization tests antes de tocar nada) y **Fase 16** (results engine).
+**Fase 6** — los 1.994 sectoriales. El orden que exige el encargo: primero
+characterization tests que fijen QUÉ produce hoy cada familia, y sólo después
+migrar. Sin ese paso, cualquier colapso es un big-bang a ciegas.
+
+Después, **Fase 16** (results engine) y **Fase 24** (portal premium: las cuatro
+rutas existen, falta la interfaz que las use).
