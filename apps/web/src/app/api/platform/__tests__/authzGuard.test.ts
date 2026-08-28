@@ -98,8 +98,11 @@ const PERMITIDAS: Record<string, { motivo: string; categoria: Categoria }> = {
   ...Object.fromEntries(
     [
       "portal/auth/accept-invite",
+      "portal/conexiones",
       "portal/deliverables/[id]/approve",
       "portal/deliverables/[id]/reject",
+      "portal/intake",
+      "portal/servicios",
     ].map((id) => [
       id,
       {
