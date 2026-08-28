@@ -6,6 +6,7 @@
  * v1 uses deterministic rules — no LLM required. Token interpolation injects
  * the tenant's own numbers into each insight/action so the advice is concrete.
  */
+import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 import { resolveIndustryKey } from "../os-agents/benchmarks/industryBenchmarks";
 
@@ -200,10 +201,6 @@ let _instance: SaasDataPlaybooksService | null = null;
 
 export function getSaasDataPlaybooksService(): SaasDataPlaybooksService {
   if (!_instance) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { DbClient } = require("../db/DbClient") as {
-      DbClient: { getInstance(): SaasPostgresPort };
-    };
     _instance = new SaasDataPlaybooksService(DbClient.getInstance());
   }
   return _instance;

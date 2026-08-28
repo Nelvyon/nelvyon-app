@@ -4,6 +4,7 @@
  * One row per (tenant, service_type, period_key=YYYY-MM); re-running a completed
  * period is a no-op (skipped), so deliverables never duplicate.
  */
+import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 
 export type RecurringRunServiceType = "seo" | "social" | "ads" | "reputation";
@@ -95,8 +96,6 @@ let _instance: OsRecurringRunLogService | null = null;
 
 export function getOsRecurringRunLogService(): OsRecurringRunLogService {
   if (!_instance) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { DbClient } = require("../db/DbClient") as { DbClient: { getInstance(): SaasPostgresPort } };
     _instance = new OsRecurringRunLogService(DbClient.getInstance());
   }
   return _instance;

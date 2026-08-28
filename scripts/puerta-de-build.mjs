@@ -141,7 +141,52 @@ comprueba("ningún require() de estilo CommonJS en src", () => {
 });
 
 /**
- * DEFECTO 3, la causa raíz de que los otros dos llegaran a certificarse.
+ * DEFECTO 3, ocurrido, y el más caro de los tres. Veintinueve servicios de
+ * `backend/` obtenían la conexión así:
+ *
+ *   const { DbClient } = require("../db/DbClient") as { ... };
+ *   _instance = new Servicio(DbClient.getInstance());
+ *
+ * En el bundle de servidor de Next, ese `require` devuelve un objeto sin
+ * `DbClient`, así que la desestructuración da `undefined` y la llamada revienta
+ * con `Cannot read properties of undefined (reading 'getInstance')`. Siete
+ * rutas de `/api/saas` devolvían 500 a cualquier inquilino nuevo por esto, y no
+ * lo veía nadie: Vitest ejecuta sin empaquetar, así que el mismo código pasa
+ * doce mil pruebas y falla al desplegarse.
+ *
+ * Los servicios que SÍ funcionan usan un import estático de nivel superior.
+ * `DbClient` sólo importa `pg` y dos módulos puros: no hay ciclo que romper, así
+ * que el `require` perezoso nunca estuvo justificado.
+ *
+ * La regla se limita a `db/DbClient` a propósito. Otros `require` perezosos del
+ * árbol pueden estar rompiendo ciclos reales entre servicios; prohibirlos todos
+ * aquí sería una regla que no se puede cumplir, y una regla así se acaba
+ * desactivando entera.
+ */
+comprueba("ningún require() perezoso de DbClient en backend", () => {
+  const dirBackend = path.join(ROOT, "backend");
+  const fuentes = ficheros(dirBackend, (n) => n.endsWith(".ts") && !n.includes(".test."));
+  const malos = [];
+  for (const f of fuentes) {
+    if (f.includes(`${path.sep}__tests__${path.sep}`)) continue;
+    const texto = fs.readFileSync(f, "utf8");
+    const limpio = texto
+      .replace(/\/\*[\s\S]*?\*\//g, "")
+      .replace(/(^|[^:])\/\/[^\n]*/g, "$1");
+    if (/require\s*\(\s*["'][^"']*db\/DbClient["']/.test(limpio)) malos.push(f);
+  }
+  if (malos.length === 0) {
+    return { ok: true, detalle: `0 en ${fuentes.length} ficheros de backend` };
+  }
+  return {
+    ok: false,
+    detalle: `${malos.length} servicio(s) piden DbClient con require(): ${malos.slice(0, 5).map(rel).join(", ")}`,
+    arreglo: 'usa `import { DbClient } from "../db/DbClient"` — el require devuelve undefined en el bundle',
+  };
+});
+
+/**
+ * DEFECTO 4, la causa raíz de que los otros llegaran a certificarse.
  * Comprueba que el guion `gate` invoque de verdad a esta puerta. Sin esto, la
  * puerta existe y nadie la llama, que es exactamente donde estábamos.
  */
@@ -159,7 +204,7 @@ comprueba("el guion `gate` invoca esta puerta", () => {
 });
 
 /**
- * DEFECTO 4, latente. El `typecheck` del repo (`tsc --noEmit`) lee
+ * DEFECTO 5, latente. El `typecheck` del repo (`tsc --noEmit`) lee
  * `.next/types/validator.ts`, que sólo existe DESPUÉS de un build. Ejecutado
  * sobre un árbol limpio mide menos de lo que cree medir, y ejecutado sobre un
  * `.next` viejo mide un árbol que ya no existe. Se avisa, no se bloquea: no es

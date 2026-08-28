@@ -2,6 +2,7 @@
  * S49 — SaasBriefToLaunchService
  * Unified "brief → launch OS pack → progress → portal" flow from SaaS context.
  */
+import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -137,8 +138,6 @@ let _instance: SaasBriefToLaunchService | null = null;
 
 export function getSaasBriefToLaunchService(): SaasBriefToLaunchService {
   if (!_instance) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { DbClient } = require("../db/DbClient") as { DbClient: { getInstance(): SaasPostgresPort } };
     // Lazy-load RUNNERS to avoid pulling in Next.js deps at module init
     const runners: PackRunnerPort = {
       getRunner(packId: string) {

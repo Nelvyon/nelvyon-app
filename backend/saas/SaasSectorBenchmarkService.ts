@@ -7,6 +7,7 @@
  * collected automatically from saas_campanias, saas_lead_attribution, crm_deals,
  * saas_ads_metrics_cache and nelvyon_pack_runs — no manual input required.
  */
+import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 import { getBenchmark, resolveIndustryKey } from "../os-agents/benchmarks/industryBenchmarks";
 
@@ -132,10 +133,6 @@ let _instance: SaasSectorBenchmarkService | null = null;
 
 export function getSaasSectorBenchmarkService(): SaasSectorBenchmarkService {
   if (!_instance) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { DbClient } = require("../db/DbClient") as {
-      DbClient: { getInstance(): SaasPostgresPort };
-    };
     _instance = new SaasSectorBenchmarkService(DbClient.getInstance());
   }
   return _instance;

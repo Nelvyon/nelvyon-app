@@ -8,6 +8,8 @@
  * (the real orchestrator needs DATABASE_URL); production lazy-loads RUNNERS.
  */
 
+import { DbClient } from "../../db/DbClient";
+
 export type CertDbPort = {
   query<T = Record<string, unknown>>(sql: string, params?: unknown[]): Promise<T[]>;
 };
@@ -155,8 +157,6 @@ let _instance: OsPackCertificationService | null = null;
 
 export function getOsPackCertificationService(): OsPackCertificationService {
   if (!_instance) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { DbClient } = require("../../db/DbClient") as { DbClient: { getInstance(): CertDbPort } };
     _instance = new OsPackCertificationService(DbClient.getInstance());
   }
   return _instance;

@@ -6,6 +6,7 @@
  * The catalog metadata (backend/data/envato-seeds-metadata.json) is committed and
  * works without ZIPs; the registry mirrors it in Postgres for the OS UI + stats.
  */
+import { DbClient } from "../../db/DbClient";
 import * as fs from "node:fs";
 import * as path from "node:path";
 
@@ -124,8 +125,6 @@ let _instance: OsEnvatoSeedService | null = null;
 
 export function getOsEnvatoSeedService(): OsEnvatoSeedService {
   if (!_instance) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { DbClient } = require("../../db/DbClient") as { DbClient: { getInstance(): SeedDbPort } };
     _instance = new OsEnvatoSeedService(DbClient.getInstance());
   }
   return _instance;

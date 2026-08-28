@@ -2,6 +2,7 @@
  * O18 — OsSectorCertificationService
  * Batch-certifies sector OS agents: registry instantiate + intake schema smoke.
  */
+import { DbClient } from "../db/DbClient";
 import { OS_SECTOR_SERVICE_IDS, instantiateSectorOsAgent, isSectorServiceId } from "./sectorOsRegistry";
 import { getSchemaForService } from "./IntakeFormService";
 
@@ -155,7 +156,6 @@ export class OsSectorCertificationService {
 let _instance: OsSectorCertificationService | null = null;
 export function getOsSectorCertificationService(): OsSectorCertificationService {
   if (!_instance) {
-    const { DbClient } = require("../db/DbClient") as { DbClient: { getInstance(): SectorCertDbPort } };
     _instance = new OsSectorCertificationService(DbClient.getInstance());
   }
   return _instance;

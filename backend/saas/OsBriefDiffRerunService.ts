@@ -5,6 +5,7 @@
  *
  * Standalone + injectable ports so vitest never hits live runners; prod lazy DB.
  */
+import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 
 // ── Constants ───────────────────────────────────────────────────────────────────
@@ -207,8 +208,6 @@ let _instance: OsBriefDiffRerunService | null = null;
 
 export function getOsBriefDiffRerunService(): OsBriefDiffRerunService {
   if (!_instance) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { DbClient } = require("../db/DbClient") as { DbClient: { getInstance(): SaasPostgresPort } };
     _instance = new OsBriefDiffRerunService(DbClient.getInstance());
   }
   return _instance;

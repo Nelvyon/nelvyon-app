@@ -151,7 +151,13 @@ export class DashboardMetricsService {
       `SELECT TO_CHAR(DATE_TRUNC('month', created_at), 'YYYY-MM') as month,
          COALESCE(SUM(amount_eur), 0)::text as mrr
        FROM saas_invoices
-       WHERE user_id = $1::uuid
+       -- SIN ::uuid a proposito. La columna user_id de saas_invoices es
+       -- character varying, mientras el resto de tablas de este servicio la
+       -- tienen uuid. El cast reventaba con: operator does not exist:
+       -- character varying = uuid, y la ruta /api/saas/dashboard-metrics
+       -- devolvia 500 a cualquier inquilino. Sin cast, PostgreSQL resuelve el
+       -- parametro contra el tipo de la columna y el indice se sigue usando.
+       WHERE user_id = $1
          AND created_at >= NOW() - ($2::int || ' months')::interval
        GROUP BY 1
        ORDER BY 1 ASC`,

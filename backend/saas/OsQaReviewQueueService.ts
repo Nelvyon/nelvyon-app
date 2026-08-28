@@ -1,6 +1,7 @@
 /**
  * C35 — Human QA review queue for pack runs below auto-approve threshold.
  */
+import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 
 export type QaReviewStatus = "pending" | "approved" | "rejected";
@@ -136,7 +137,6 @@ let _instance: OsQaReviewQueueService | null = null;
 
 export function getOsQaReviewQueueService(): OsQaReviewQueueService {
   if (!_instance) {
-    const { DbClient } = require("../db/DbClient") as { DbClient: { getInstance(): SaasPostgresPort } };
     _instance = new OsQaReviewQueueService(DbClient.getInstance());
   }
   return _instance;

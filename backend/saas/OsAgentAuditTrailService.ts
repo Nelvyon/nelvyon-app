@@ -6,6 +6,7 @@
  *
  * Standalone + injectable db port so vitest never hits a live DB; prod lazy.
  */
+import { DbClient } from "../db/DbClient";
 import { createHash } from "crypto";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 
@@ -167,8 +168,6 @@ let _instance: OsAgentAuditTrailService | null = null;
 
 export function getOsAgentAuditTrailService(): OsAgentAuditTrailService {
   if (!_instance) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { DbClient } = require("../db/DbClient") as { DbClient: { getInstance(): SaasPostgresPort } };
     _instance = new OsAgentAuditTrailService(DbClient.getInstance());
   }
   return _instance;

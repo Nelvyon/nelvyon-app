@@ -9,7 +9,7 @@ import { isSesEnvConfigured } from "./saasEnv";
 import { SaasCrmService, type PipelineStage, type ContactStatus, type SaasContact, type ActivityType } from "./SaasCrmService";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 import { assertSaasPlanCanCreate } from "./saasPlanQuota";
-import type { SaasDealsService } from "./SaasDealsService";
+import { SaasDealsService } from "./SaasDealsService";
 import type { DealStage } from "./saasDealsDedupe";
 
 const FROM_EMAIL = process.env.SES_FROM_EMAIL ?? "no-reply@nelvyon.com";
@@ -928,7 +928,6 @@ export function getSaasWorkflowService(): SaasWorkflowService {
   if (!cached) {
     const db = DbClient.getInstance();
     const crm = new SaasCrmService(db);
-    const { SaasDealsService } = require("./SaasDealsService") as typeof import("./SaasDealsService");
     const deals = new SaasDealsService(db);
     cached = new SaasWorkflowService(db, crm, deals);
   }

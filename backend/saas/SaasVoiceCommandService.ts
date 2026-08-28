@@ -4,6 +4,7 @@
  * matching — no LLM, no API cost. The browser uses the free Web Speech API and
  * sends only the resulting text here for intent resolution + logging.
  */
+import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 
 // ── Types ───────────────────────────────────────────────────────────────────────
@@ -168,8 +169,6 @@ let _instance: SaasVoiceCommandService | null = null;
 
 export function getSaasVoiceCommandService(): SaasVoiceCommandService {
   if (!_instance) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { DbClient } = require("../db/DbClient") as { DbClient: { getInstance(): SaasPostgresPort } };
     _instance = new SaasVoiceCommandService(DbClient.getInstance());
   }
   return _instance;

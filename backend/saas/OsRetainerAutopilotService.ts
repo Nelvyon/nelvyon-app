@@ -7,6 +7,7 @@
  *
  * Ports injectable so vitest never hits autopilot/recurring/deliverables; prod lazy.
  */
+import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 
 export type RetainerService = "seo" | "social" | "reputation" | "ads";
@@ -209,8 +210,6 @@ let _instance: OsRetainerAutopilotService | null = null;
 
 export function getOsRetainerAutopilotService(): OsRetainerAutopilotService {
   if (!_instance) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { DbClient } = require("../db/DbClient") as { DbClient: { getInstance(): SaasPostgresPort } };
     const db = DbClient.getInstance();
     _instance = new OsRetainerAutopilotService(db, defaultAutopilotPort, defaultRecurringLogPort, defaultDeliverablesPort(db), defaultCertificatePort);
   }

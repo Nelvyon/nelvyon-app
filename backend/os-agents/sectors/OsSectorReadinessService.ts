@@ -1,3 +1,4 @@
+import { DbClient } from "../../db/DbClient";
 /**
  * O16 — OsSectorReadinessService
  * Computes a production-readiness score for each of the 20 sector verticals from
@@ -167,8 +168,6 @@ let _instance: OsSectorReadinessService | null = null;
 
 export function getOsSectorReadinessService(): OsSectorReadinessService {
   if (!_instance) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { DbClient } = require("../../db/DbClient") as { DbClient: { getInstance(): SectorDbPort } };
     _instance = new OsSectorReadinessService(DbClient.getInstance());
   }
   return _instance;

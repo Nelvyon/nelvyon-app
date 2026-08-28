@@ -48,6 +48,8 @@
     "autonomous:learning-refresh": "tsx ../../backend/autonomous/scripts/run-learning-refresh.ts",
     "gate:build": "node ../../scripts/puerta-de-build.mjs",
     "gate:build:rapido": "node ../../scripts/puerta-de-build.mjs --solo-rapido",
+    "upstash:local": "node ../../scripts/upstash-local-para-pruebas.mjs",
+    "humo:produccion": "node ../../scripts/humo-sobre-build-de-produccion.mjs",
     "gate": "pnpm gate:build && pnpm typecheck && pnpm lint && pnpm test:smoke && pnpm test:bot-evals",
     "elite:reinforce": "node ../../scripts/run-local-elite-reinforce.mjs",
     "pwa:icons": "node ./scripts/generate-pwa-icons.mjs",

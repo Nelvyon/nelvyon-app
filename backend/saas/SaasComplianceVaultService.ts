@@ -2,6 +2,7 @@
  * S50 — SaasComplianceVaultService
  * Legal/consent/QA artifacts per deliverable, SaaS tenant-scoped.
  */
+import { DbClient } from "../db/DbClient";
 import { createHash } from "crypto";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 
@@ -126,10 +127,6 @@ let _instance: SaasComplianceVaultService | null = null;
 
 export function getSaasComplianceVaultService(): SaasComplianceVaultService {
   if (!_instance) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { DbClient } = require("../db/DbClient") as {
-      DbClient: { getInstance(): SaasPostgresPort };
-    };
     _instance = new SaasComplianceVaultService(DbClient.getInstance());
   }
   return _instance;

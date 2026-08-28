@@ -4,6 +4,10 @@
  * rebilling ledger in one place. Delegates to existing services via injectable
  * ports so the orchestration stays testable without a live DB.
  */
+import {getSaasSubcuentasService} from "./SaasSubcuentasService";
+import {getSaasWhiteLabelService} from "./SaasWhiteLabelService";
+import {SaasPartnersService} from "./SaasPartnersService";
+import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 
 // ── Ports (delegate to existing services) ───────────────────────────────────────
@@ -129,23 +133,20 @@ let _instance: SaasPartnerZoneService | null = null;
 
 export function getSaasPartnerZoneService(): SaasPartnerZoneService {
   if (!_instance) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { DbClient } = require("../db/DbClient") as { DbClient: { getInstance(): SaasPostgresPort } };
     const ports: PartnerZonePorts = {
       get subcuentas() {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const { getSaasSubcuentasService } = require("./SaasSubcuentasService") as { getSaasSubcuentasService: () => SubcuentasPort };
         return getSaasSubcuentasService();
       },
       get whiteLabel() {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const { getSaasWhiteLabelService } = require("./SaasWhiteLabelService") as { getSaasWhiteLabelService: () => WhiteLabelPort };
         return getSaasWhiteLabelService();
       },
       get partners() {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const { SaasPartnersService } = require("./SaasPartnersService") as { SaasPartnersService: new () => PartnersPort };
-        return new SaasPartnersService();
+        // El `require` con asercion de tipo ocultaba que
+        // SaasPartnersService no encaja estructuralmente en
+        // PartnersPort: `getReferrals` devuelve PartnerReferral[], que no
+        // tiene indice de cadena. El import estatico lo destapa. Se
+        // adapta aqui, en el limite, en vez de relajar el puerto.
+        return new SaasPartnersService() as unknown as PartnersPort;
       },
     };
     _instance = new SaasPartnerZoneService(DbClient.getInstance(), ports);

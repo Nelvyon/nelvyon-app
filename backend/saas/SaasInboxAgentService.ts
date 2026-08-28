@@ -3,6 +3,8 @@
  * Multi-tenant inbox AI: suggest + optional auto-reply using Nelvyon agent skills.
  * Uses gpt-4o-mini when OPENAI_API_KEY is set; rule-based mock otherwise (0€ dev).
  */
+import {getSaasInboxService} from "./SaasInboxService";
+import { DbClient } from "../db/DbClient";
 import type { ILlmClient } from "../os-agents/LlmClient";
 import { LlmClient } from "../os-agents/LlmClient";
 
@@ -124,8 +126,6 @@ let _instance: SaasInboxAgentService | null = null;
 
 export function getSaasInboxAgentService(): SaasInboxAgentService {
   if (!_instance) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { DbClient } = require("../db/DbClient") as { DbClient: { getInstance(): SaasPostgresPort } };
     _instance = new SaasInboxAgentService({ db: DbClient.getInstance() });
   }
   return _instance;
@@ -143,8 +143,6 @@ export class SaasInboxAgentService {
   constructor(deps: SaasInboxAgentDeps = {}) {
     if (deps.db) this.db = deps.db;
     else {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { DbClient } = require("../db/DbClient") as { DbClient: { getInstance(): SaasPostgresPort } };
       this.db = DbClient.getInstance();
     }
     this.inbox = deps.inbox ?? this.lazyInbox();
@@ -152,8 +150,6 @@ export class SaasInboxAgentService {
   }
 
   private lazyInbox(): SaasInboxService {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { getSaasInboxService } = require("./SaasInboxService") as typeof import("./SaasInboxService");
     return getSaasInboxService();
   }
 

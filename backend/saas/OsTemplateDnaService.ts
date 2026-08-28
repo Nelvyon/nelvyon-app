@@ -6,6 +6,8 @@
  *
  * Ports injectable so vitest never hits learning/registry/pack tables; prod lazy.
  */
+import {getOsLearningService} from "./OsLearningService";
+import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 import { SECTOR_IDS } from "../autonomous/sectors/sectorRegistry";
 
@@ -125,8 +127,6 @@ function rowToScore(r: DnaRow): DnaScore {
 
 const defaultWeightsPort: WeightsPort = {
   async getSectorWeights() {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { getOsLearningService } = require("./OsLearningService") as { getOsLearningService: () => { getSectorWeights(): Promise<Record<string, number>> } };
     return getOsLearningService().getSectorWeights();
   },
 };
@@ -184,8 +184,6 @@ let _instance: OsTemplateDnaService | null = null;
 
 export function getOsTemplateDnaService(): OsTemplateDnaService {
   if (!_instance) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { DbClient } = require("../db/DbClient") as { DbClient: { getInstance(): SaasPostgresPort } };
     const db = DbClient.getInstance();
     _instance = new OsTemplateDnaService(db, defaultWeightsPort, defaultRegistryPort(db), defaultPackOutcomesPort(db));
   }

@@ -3,6 +3,7 @@
  * Unified deterministic pre-publish rules for landing, email, and ads copy.
  * Reuses O27 scanClaims + O18 legal slice — no LLM, no legal advice.
  */
+import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 
 /**
@@ -205,8 +206,6 @@ let _instance: OsTruthGuardService | null = null;
 
 export function getOsTruthGuardService(): OsTruthGuardService {
   if (!_instance) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { DbClient } = require("../db/DbClient") as { DbClient: { getInstance(): SaasPostgresPort } };
     _instance = new OsTruthGuardService(DbClient.getInstance(), defaultClaimsPort, defaultLegalPort);
   }
   return _instance;

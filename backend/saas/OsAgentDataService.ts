@@ -6,6 +6,7 @@
  *
  * Never logs api_key. Never throws on the fetch path — agents degrade gracefully.
  */
+import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 
 // ── Ports ───────────────────────────────────────────────────────────────────────
@@ -115,8 +116,6 @@ let _instance: OsAgentDataService | null = null;
 
 export function getOsAgentDataService(): OsAgentDataService {
   if (!_instance) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { DbClient } = require("../db/DbClient") as { DbClient: { getInstance(): SaasPostgresPort } };
     _instance = new OsAgentDataService(DbClient.getInstance(), defaultSemrushPort, defaultDataForSeoPort);
   }
   return _instance;

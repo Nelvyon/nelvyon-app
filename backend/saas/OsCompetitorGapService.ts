@@ -6,6 +6,7 @@
  *
  * Ports injectable so vitest never hits live agent data / launches; prod lazy-loads.
  */
+import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 
 // ── Ports ───────────────────────────────────────────────────────────────────────
@@ -251,8 +252,6 @@ let _instance: OsCompetitorGapService | null = null;
 
 export function getOsCompetitorGapService(): OsCompetitorGapService {
   if (!_instance) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { DbClient } = require("../db/DbClient") as { DbClient: { getInstance(): SaasPostgresPort } };
     _instance = new OsCompetitorGapService(DbClient.getInstance(), defaultAgentDataPort, defaultPackLaunchPort);
   }
   return _instance;

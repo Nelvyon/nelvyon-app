@@ -5,6 +5,7 @@
  * thresholds — no silent bypass. Lighthouse is a structural proxy in v1 (real PSI
  * optional via GOOGLE_PSI_API_KEY).
  */
+import { DbClient } from "../../db/DbClient";
 import { createHash } from "node:crypto";
 import { runVisualQa, type VisualQaInput, type VisualQaResult } from "./visualQaEngine";
 
@@ -65,8 +66,6 @@ let _instance: OsVisualQaGateService | null = null;
 
 export function getOsVisualQaGateService(): OsVisualQaGateService {
   if (!_instance) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { DbClient } = require("../../db/DbClient") as { DbClient: { getInstance(): QaDbPort } };
     _instance = new OsVisualQaGateService(DbClient.getInstance());
   }
   return _instance;

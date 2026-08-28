@@ -6,6 +6,7 @@
  * pure and testable, the catalog is injected via PackCatalogPort; the production
  * singleton lazily imports the real catalog, while tests pass a fixture.
  */
+import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 
 // ── Catalog port ────────────────────────────────────────────────────────────────
@@ -185,10 +186,6 @@ let _instance: SaasPackStoreService | null = null;
 
 export function getSaasPackStoreService(): SaasPackStoreService {
   if (!_instance) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { DbClient } = require("../db/DbClient") as {
-      DbClient: { getInstance(): SaasPostgresPort };
-    };
     _instance = new SaasPackStoreService(DbClient.getInstance(), defaultCatalogPort);
   }
   return _instance;

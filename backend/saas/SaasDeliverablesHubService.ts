@@ -1,3 +1,4 @@
+import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -375,7 +376,6 @@ let _instance: SaasDeliverablesHubService | null = null;
 
 export function getSaasDeliverablesHubService(): SaasDeliverablesHubService {
   if (!_instance) {
-    const { DbClient } = require("../db/DbClient") as { DbClient: { getInstance(): SaasPostgresPort } };
     _instance = new SaasDeliverablesHubService(DbClient.getInstance());
   }
   return _instance;

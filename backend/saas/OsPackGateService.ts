@@ -4,6 +4,7 @@
  * Ports are injectable so vitest never spawns a sub-vitest or hits live runners;
  * the production singleton lazy-loads the cert service + spawns vitest.
  */
+import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 
 // ── Ports ───────────────────────────────────────────────────────────────────────
@@ -149,8 +150,6 @@ let _instance: OsPackGateService | null = null;
 
 export function getOsPackGateService(): OsPackGateService {
   if (!_instance) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { DbClient } = require("../db/DbClient") as { DbClient: { getInstance(): SaasPostgresPort } };
     _instance = new OsPackGateService(DbClient.getInstance(), defaultCertPort, defaultVitestPort);
   }
   return _instance;

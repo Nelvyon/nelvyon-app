@@ -7,6 +7,7 @@
  *
  * Ports injectable so vitest never hits sector registry / QA; prod lazy-loads.
  */
+import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 
 /**
@@ -235,8 +236,6 @@ let _instance: OsRegulatedSectorShieldService | null = null;
 
 export function getOsRegulatedSectorShieldService(): OsRegulatedSectorShieldService {
   if (!_instance) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { DbClient } = require("../db/DbClient") as { DbClient: { getInstance(): SaasPostgresPort } };
     _instance = new OsRegulatedSectorShieldService(DbClient.getInstance(), defaultSectorPort, defaultQaPort);
   }
   return _instance;

@@ -7,6 +7,7 @@
  * Ports are injectable so vitest never touches live pack runs / QA / vault; the
  * production singleton lazy-loads them. v1 emits HTML only (no PDF binary).
  */
+import { DbClient } from "../db/DbClient";
 import { createHash } from "node:crypto";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 
@@ -275,8 +276,6 @@ let _instance: OsDeliveryCertificateService | null = null;
 
 export function getOsDeliveryCertificateService(): OsDeliveryCertificateService {
   if (!_instance) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { DbClient } = require("../db/DbClient") as { DbClient: { getInstance(): SaasPostgresPort } };
     const db = DbClient.getInstance();
     _instance = new OsDeliveryCertificateService(db, defaultPackRunPort(db), defaultQaAuditPort, defaultVaultPort);
   }

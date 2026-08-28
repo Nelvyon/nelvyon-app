@@ -4,6 +4,7 @@
  * re-ranks templates (autonomous M/N/P), persists seed learning ranks, and writes
  * an idempotent audit log. Standalone — does NOT modify OsLearningService.
  */
+import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 
 // ── Injectable ports (keep the loop testable without GA4 / filesystem) ───────────
@@ -168,8 +169,6 @@ let _instance: OsLearningLoopProdService | null = null;
 
 export function getOsLearningLoopProdService(): OsLearningLoopProdService {
   if (!_instance) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { DbClient } = require("../db/DbClient") as { DbClient: { getInstance(): SaasPostgresPort } };
     const db = DbClient.getInstance();
     _instance = new OsLearningLoopProdService(db, defaultGa4Port(db), defaultRefreshPort);
   }
