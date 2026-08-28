@@ -116,6 +116,19 @@ export type SkuRunResult = {
   shield_status?: string;
   truth_status?: string;
   agent_audit_count?: number;
+  /**
+   * Recuento por estado de procedencia de los agentes de este SKU: con que se
+   * produjo el trabajo. Ver `backend/autonomous/llm/llmProvenance.ts`.
+   */
+  provenance_counts?: Record<string, number>;
+  /**
+   * `true` cuando al menos un agente produjo su salida sin modelo real y este
+   * trabajo NO admite esa degradacion. Bloquea la publicacion del SKU y manda
+   * la ejecucion a revision humana.
+   */
+  provenance_block?: boolean;
+  /** Por que se bloqueo, para poder escalar con causa en vez de "fallo". */
+  provenance_reason?: string;
 };
 
 export type PackReport = {

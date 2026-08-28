@@ -112,17 +112,74 @@ function stripLeadingComments(sql: string): string {
 
 type PgError = { code?: string; message?: string };
 
-/** Idempotent DDL drift when legacy tables predate consolidated FastAPI schemas. */
-export function isTolerableConsolidatedMigrationError(err: unknown, _sql: string): boolean {
+/**
+ * QUE PUEDE SALTARSE LA MIGRACION CONSOLIDADA, Y QUE NO.
+ *
+ * La version anterior de esta funcion recibia el SQL y lo IGNORABA (el
+ * parametro se llamaba `_sql`), y toleraba ocho codigos de error entre los que
+ * estaban `42601` (error de sintaxis) y `42P01` (tabla inexistente). El efecto
+ * medido, no supuesto:
+ *
+ *   - En la base local, la 507 declara 123 tablas y creo 14. Consta aplicada.
+ *   - En PRODUCCION, de esas 123 faltan 5: `campaign_recipients`,
+ *     `funnel_steps`, `workflow_nodes`, `visual_workflow_executions` y
+ *     `workflow_trigger_registry`. La 507 tambien consta aplicada.
+ *
+ * Esas cinco no son tablas de adorno: `campaign_service.py`,
+ * `funnel_builder_service.py` y `workflow_service.py` hacen SELECT, INSERT,
+ * UPDATE y DELETE contra ellas. Campañas, constructor de embudos y workflows
+ * visuales llevan rotos en produccion desde entonces, y `_migrations` decia que
+ * todo estaba aplicado.
+ *
+ * La regla correcta distingue dos cosas que la lista plana confundia:
+ *
+ *   TOLERABLE   "esto ya estaba hecho" — deriva de idempotencia sobre un
+ *               esquema heredado. La sentencia no tenia nada que hacer.
+ *   INTOLERABLE "esto no se ha hecho" — la sentencia debia crear algo y no lo
+ *               creo. Saltarselo deja la base incompleta y el registro miente.
+ *
+ * Por eso ahora el tipo de sentencia manda sobre el codigo de error: un
+ * `CREATE TABLE` que falla NUNCA es tolerable, falle por lo que falle.
+ */
+
+/** "Ya existia": la sentencia no tenia trabajo que hacer. */
+const DERIVA_IDEMPOTENTE: ReadonlySet<string> = new Set([
+  "42701", // duplicate_column   — ADD COLUMN de una columna que ya esta
+  "42710", // duplicate_object   — indice o restriccion que ya existe
+  "42P07", // duplicate_table    — la tabla ya existe
+  "42P06", // duplicate_schema
+  "42723", // duplicate_function
+]);
+
+/**
+ * Sentencias cuyo fallo deja la base incompleta. Ninguna es tolerable, con
+ * ningun codigo: si un `CREATE TABLE` no crea la tabla, la migracion no esta
+ * aplicada por mucho que `_migrations` diga lo contrario.
+ */
+const SENTENCIAS_QUE_DEBEN_CUMPLIRSE = /^\s*CREATE\s+(TABLE|SCHEMA|MATERIALIZED\s+VIEW)\b/i;
+
+export function isTolerableConsolidatedMigrationError(err: unknown, sql: string): boolean {
   const code = (err as PgError).code ?? "";
-  return [
-    "42601",
-    "42701",
-    "42703",
-    "42710",
-    "42830",
-    "42883",
-    "42P01",
-    "42P16",
-  ].includes(code);
+
+  // Un error de sintaxis nunca es deriva: es una sentencia rota.
+  if (code === "42601") return false;
+
+  // Sin comentarios delante, para que la regla mida la sentencia y no su
+  // cabecera. Es el mismo motivo por el que existe `stripLeadingComments`.
+  if (SENTENCIAS_QUE_DEBEN_CUMPLIRSE.test(stripLeadingComments(sql))) return false;
+
+  return DERIVA_IDEMPOTENTE.has(code);
+}
+
+/** Para poder informar de que se salto y por que, en vez de solo contar. */
+export type SentenciaOmitida = { code: string; message: string; preview: string };
+
+/** Resumen de una sentencia omitida, sin volcar el SQL entero al registro. */
+export function describirOmision(err: unknown, sql: string): SentenciaOmitida {
+  const e = err as PgError;
+  return {
+    code: e.code ?? "",
+    message: (e.message ?? "").slice(0, 200),
+    preview: stripLeadingComments(sql).replace(/\s+/g, " ").slice(0, 120),
+  };
 }

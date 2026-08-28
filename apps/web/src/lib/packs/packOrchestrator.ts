@@ -1,3 +1,8 @@
+import {
+  degradacionPermitida,
+  recuentoPorEstado,
+  veredictoDeEntregaDelConjunto,
+} from "../../../../../backend/autonomous/llm/llmPolicy";
 import { runAutonomousSimulation } from "../../../../../backend/autonomous/runAutonomousSimulation";
 import type { AutonomousSku } from "../../../../../backend/autonomous/types";
 import { runVisualQa } from "../../../../../backend/autonomous/qa/visualQaEngine";
@@ -245,11 +250,39 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
   const autoPublishThreshold = params.autoPublishQaThreshold ?? 85;
   const meetsThreshold = qaScore >= autoPublishThreshold;
 
+  // ── LA PUERTA DE PROCEDENCIA ─────────────────────────────────────────────
+  //
+  // Antes de esto, un SKU con QA alta se publicaba aunque su contenido lo
+  // hubiera generado un motor de reglas porque el modelo estaba caido. Eso no
+  // es hipotetico: en produccion pasó 14.178 veces entre el 29 de junio y el 22
+  // de julio de 2026, y 3.252 de esos entregables los aprobo un cliente.
+  //
+  // La QA no lo detecta y no puede: un texto de plantilla bien formado pasa las
+  // comprobaciones de forma. Lo unico que distingue el trabajo real del de
+  // plantilla es CON QUE se produjo, y eso viaja en la procedencia de cada
+  // agente.
+  //
+  // El permiso se re-evalua AQUI y no en el adaptador porque es aqui donde se
+  // conoce el pack: el adaptador no sabe si su salida acabara en manos de un
+  // cliente que ha pagado.
+  const permiteDegradacion = degradacionPermitida({ packId: params.packId });
+  const procedencias = (simulation.project.agent_log ?? [])
+    .map((e) => e.provenance)
+    .filter((p): p is NonNullable<typeof p> => Boolean(p))
+    .map((p) => ({ ...p, degradationAllowed: permiteDegradacion }));
+  const veredictoProcedencia = veredictoDeEntregaDelConjunto(procedencias);
+  const conteoProcedencia = recuentoPorEstado(procedencias);
+  const bloqueoProcedencia = !veredictoProcedencia.publicable;
+  const motivoProcedencia = veredictoProcedencia.publicable
+    ? undefined
+    : veredictoProcedencia.motivo;
+
   const shouldPublish =
-    passed ||
-    meetsThreshold ||
-    Boolean(params.mapSkuDeliverable) ||
-    Boolean(params.publishProductionDeliverables);
+    !bloqueoProcedencia &&
+    (passed ||
+      meetsThreshold ||
+      Boolean(params.mapSkuDeliverable) ||
+      Boolean(params.publishProductionDeliverables));
 
   // Personalize content for this sector — never ship raw templates.
   const personalized = personalizeForSector(params.intake.sector, {
@@ -480,6 +513,9 @@ async function runSkuPipeline<T extends GrowthPackIntakeBase & { sector: string 
       shield_status: shieldStatus,
       truth_status: truthStatus,
       agent_audit_count: agentAuditCount,
+      provenance_counts: conteoProcedencia,
+      provenance_block: bloqueoProcedencia,
+      provenance_reason: motivoProcedencia,
     },
     deliverableIds,
   };
@@ -745,7 +781,12 @@ export async function runGrowthPack<T extends GrowthPackIntakeBase & { sector: s
       /* auditor module optional */
     }
 
-    const needsReview = hardReview || softReview || auditorBlock;
+    // Un SKU producido sin modelo real cuando no se permitia degradar NO se
+    // completa: va a revision humana. Sin esto la ejecucion terminaria
+    // "completed", emitiria certificado y auto-aprobaria entregables que nadie
+    // ha escrito.
+    const bloqueoDeProcedencia = skuResults.some((r) => r.provenance_block === true);
+    const needsReview = hardReview || softReview || auditorBlock || bloqueoDeProcedencia;
     const finalStatus = needsReview ? "needs_review" : "completed";
     steps = markStep(steps, "complete", needsReview ? "skipped" : "done");
 

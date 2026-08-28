@@ -8,7 +8,12 @@ import {
   readProdMigrateApproval,
   resolveDeployEnvironment,
 } from "./prodMigrateGate";
-import { isTolerableConsolidatedMigrationError, splitSqlStatements } from "./splitSqlStatements";
+import {
+  describirOmision,
+  isTolerableConsolidatedMigrationError,
+  splitSqlStatements,
+  type SentenciaOmitida,
+} from "./splitSqlStatements";
 
 const CONSOLIDATED_MIGRATION = "507_fastapi_runtime_schemas.sql";
 
@@ -76,25 +81,56 @@ async function runMigrations(): Promise<void> {
   await db.end();
 }
 
+/**
+ * La migracion consolidada se aplica sentencia a sentencia porque un esquema
+ * heredado puede tener ya parte de lo que declara. Lo que NO puede hacer es
+ * saltarse una sentencia que debia crear algo y registrarse igual como
+ * aplicada: eso fue lo que dejo produccion sin `campaign_recipients`,
+ * `funnel_steps`, `workflow_nodes`, `visual_workflow_executions` ni
+ * `workflow_trigger_registry`, con `_migrations` diciendo que la 507 estaba
+ * puesta. Campanas, embudos y workflows visuales llevan rotos desde entonces.
+ *
+ * Ahora las omisiones se enumeran, y si alguna era una sentencia que debia
+ * cumplirse, la migracion FALLA y no se registra. Un fallo ruidoso al migrar
+ * cuesta una tarde; una tabla ausente en produccion no se descubre hasta que
+ * un cliente la pisa.
+ */
 async function runConsolidatedMigration(db: DbClient, file: string, sql: string): Promise<void> {
   const statements = splitSqlStatements(sql);
   let ok = 0;
-  let warned = 0;
+  const omitidas: SentenciaOmitida[] = [];
+  const intolerables: SentenciaOmitida[] = [];
+
   for (const stmt of statements) {
     try {
       await db.query(stmt);
       ok += 1;
     } catch (err: unknown) {
+      const detalle = describirOmision(err, stmt);
       if (isTolerableConsolidatedMigrationError(err, stmt)) {
-        warned += 1;
-        const pg = err as { message?: string };
-        console.warn(`[migrate] warn ${file}: ${pg.message ?? String(err)}`);
+        omitidas.push(detalle);
+        console.warn(`[migrate] warn ${file} [${detalle.code}]: ${detalle.preview}`);
         continue;
       }
-      throw err;
+      intolerables.push(detalle);
+      // No se corta al primero: enumerar TODO lo que falta convierte una
+      // partida de arreglos de uno en uno en un solo diagnostico completo.
     }
   }
-  console.log(`[migrate] ${file}: ${ok} statements ok, ${warned} warnings (legacy schema drift)`);
+
+  console.log(
+    `[migrate] ${file}: ${ok} sentencias ok, ${omitidas.length} omitidas por deriva idempotente`,
+  );
+
+  if (intolerables.length > 0) {
+    console.error(
+      `[migrate] ${file}: ${intolerables.length} sentencia(s) NO se aplicaron y no son deriva:`,
+    );
+    for (const d of intolerables) console.error(`  [${d.code}] ${d.preview}  ->  ${d.message}`);
+    throw new Error(
+      `${file}: ${intolerables.length} sentencia(s) fallaron. La migracion NO se registra como aplicada.`,
+    );
+  }
 }
 
 runMigrations()

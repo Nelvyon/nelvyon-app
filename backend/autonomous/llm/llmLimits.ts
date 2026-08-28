@@ -12,6 +12,8 @@
  * infinito por un error de escritura.
  */
 
+import { AsyncLocalStorage } from "node:async_hooks";
+
 import type { LlmErrorKind } from "./llmProvenance";
 
 export interface LlmLimits {
@@ -115,28 +117,37 @@ export class ContadorDeEjecucion {
 }
 
 /**
- * Contador de la ejecución en curso. `null` fuera de una ejecución, y entonces
- * no hay tope: el adaptador se usa también desde guiones sueltos y pruebas.
+ * Contador de la ejecución en curso. Fuera de una ejecución no hay tope: el
+ * adaptador se usa también desde guiones sueltos y pruebas.
+ *
+ * Va en `AsyncLocalStorage` y no en una variable de módulo por dos razones, la
+ * segunda descubierta por una prueba. La primera: no hay que enhebrar un
+ * parámetro por las ~20 funciones de agente. La segunda: una variable de módulo
+ * con `try/finally` síncrono restaura el valor en cuanto `fn()` devuelve su
+ * promesa, ANTES de que terminen los `await` de dentro — así que el contador
+ * dejaba de estar instalado justo cuando hacían falta las llamadas al modelo, y
+ * el tope no mordía. Es el mismo motivo por el que `llmBudget` ya lo usa, y
+ * además es lo que permite que dos inquilinos ejecuten a la vez sin compartir
+ * cupo.
  */
-let contadorActual: ContadorDeEjecucion | null = null;
+const almacen = new AsyncLocalStorage<ContadorDeEjecucion>();
 
 export function conContadorDeEjecucion<T>(
   contador: ContadorDeEjecucion,
   fn: () => T,
 ): T {
-  const previo = contadorActual;
-  contadorActual = contador;
-  try {
-    return fn();
-  } finally {
-    contadorActual = previo;
-  }
+  return almacen.run(contador, fn);
 }
 
 export function contadorDeEjecucionActual(): ContadorDeEjecucion | null {
-  return contadorActual;
+  return almacen.getStore() ?? null;
 }
 
+/**
+ * No queda nada que limpiar: al salir de `almacen.run` el contexto muere solo.
+ * Se conserva la función para que las pruebas puedan llamarla sin condicionar
+ * su estructura al detalle de implementación.
+ */
 export function limpiarContadorParaPruebas(): void {
-  contadorActual = null;
+  /* el contexto asíncrono no persiste entre pruebas */
 }
