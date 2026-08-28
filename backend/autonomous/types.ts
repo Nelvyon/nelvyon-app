@@ -37,6 +37,13 @@ export interface AgentLogEntry {
   tokens: number;
   llm_mode?: "mock" | "real";
   status: "success" | "failed";
+  /**
+   * Con que se produjo esta salida exactamente. `llm_mode` solo distingue dos
+   * casos y se conserva por compatibilidad con `os_agent_audit_events`; la
+   * procedencia distingue los cinco que importan y es la que decide si el
+   * entregable puede publicarse. Ver `llm/llmProvenance.ts`.
+   */
+  provenance?: import("./llm/llmProvenance").LlmProvenance;
 }
 
 export interface QaCheckResult {

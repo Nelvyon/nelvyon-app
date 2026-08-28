@@ -1,8 +1,15 @@
 /**
- * LLM-backed agents with mock fallback via llmAdapter
+ * Agentes respaldados por modelo, con degradacion a reglas via `llmAdapter`.
+ *
+ * Cada salida arrastra su `provenance`: no basta con saber que salio algo, hay
+ * que saber CON QUE se produjo. `llmChatbotConfig` no llama a ningun modelo
+ * porque no le hace falta, y por eso se marca `RULE_ENGINE` en vez de `mock`:
+ * es una salida correcta, no una degradacion.
  */
 
 import { invokeLlm } from "../llm/llmAdapter";
+import type { ContextoDePolitica } from "../llm/llmPolicy";
+import { procedenciaDeMotorDeReglas } from "../llm/llmProvenance";
 import type { AgentRole } from "../llm/promptTemplates";
 import type { AgentLogEntry } from "../types";
 import {
@@ -38,6 +45,27 @@ function agentLog(agent: string, output: string, version: number, model: string,
   };
 }
 
+/**
+ * Contexto de politica del pack en curso. Lo instala el orquestador antes de
+ * ejecutar los agentes; sin el, `requiereIaReal` queda en falso y nada cambia
+ * respecto al comportamiento anterior.
+ */
+let contextoDePolitica: ContextoDePolitica | null = null;
+
+export function conContextoDePolitica<T>(ctx: ContextoDePolitica | null, fn: () => T): T {
+  const previo = contextoDePolitica;
+  contextoDePolitica = ctx;
+  try {
+    return fn();
+  } finally {
+    contextoDePolitica = previo;
+  }
+}
+
+export function contextoDePoliticaActual(): ContextoDePolitica | null {
+  return contextoDePolitica;
+}
+
 async function runAgent<T>(
   role: AgentRole,
   payload: Record<string, unknown>,
@@ -45,13 +73,22 @@ async function runAgent<T>(
   outputKey: string,
   version = 1,
 ): Promise<{ data: T; log: AgentLogEntry; llm_mode: string }> {
-  const res = await invokeLlm({ agentId: role, payload, mockGenerator: mockFn });
+  const res = await invokeLlm({
+    agentId: role,
+    payload,
+    mockGenerator: mockFn,
+    policy: contextoDePolitica ?? undefined,
+  });
   const data = (res.parsed ?? mockFn()) as T;
   return {
     data,
     log: {
-      ...agentLog(role, outputKey, version, res.mode === "real" ? res.model : "mock-rules-v1", res.tokens),
+      ...agentLog(role, outputKey, version, res.model, res.tokens),
       llm_mode: res.mode,
+      // El estado fino viaja con la entrada: es lo que la puerta de entrega lee
+      // para decidir si esto puede certificarse y publicarse.
+      provenance: res.provenance,
+      status: res.provenance.outcome === "ERROR" ? "failed" : "success",
     },
     llm_mode: res.mode,
   };
@@ -143,10 +180,25 @@ export async function llmCopywriterChatbot(
   );
 }
 
+/**
+ * La configuracion del bot se CALCULA a partir del brief y la base de
+ * conocimiento: no hay nada que redactar, asi que no hay modelo que llamar.
+ * Por eso su procedencia es `RULE_ENGINE` y no `MOCK` — la puerta de entrega
+ * permite la primera y bloquea la segunda, y confundirlas haria imposible
+ * entregar un bot correcto o dejaria pasar copy de plantilla.
+ */
 export async function llmChatbotConfig(brief: Record<string, unknown>, kb: Record<string, unknown>) {
   return {
     data: runChatbotConfig(brief, kb).config,
-    log: agentLog("chatbot_service_mock", "config", 1, "mock-rules-v1", 0),
+    log: {
+      ...agentLog("chatbot_service_rules", "config", 1, "mock-rules-v1", 0),
+      llm_mode: "mock" as const,
+      provenance: procedenciaDeMotorDeReglas(
+        "mock-rules-v1",
+        0,
+        "la configuracion del bot se calcula, no se redacta",
+      ),
+    },
     llm_mode: "mock",
   };
 }

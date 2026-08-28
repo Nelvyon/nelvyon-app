@@ -1,48 +1,84 @@
 /**
- * LLM Adapter — mock | real (Ollama primary).
- * OpenAI is OPTIONAL and OFF by default: requires AUTONOMOUS_ALLOW_OPENAI=1 + key,
- * and is blocked while PRIVATE_MODE is ON without an owner internet window.
- * No sensitive prompt logging — only agent id, mode, token count.
+ * Adaptador de modelo. Ollama primero (local, gratis); OpenAI sólo con permiso
+ * explícito y nunca como salto automático desde un fallo local.
+ *
+ * Qué cambió y por qué. Antes este fichero tenía dos bloques `if` cableados,
+ * uno por proveedor, y devolvía `mode: "mock" | "real"` — dos estados para
+ * cuatro situaciones distintas. Con eso, un generador determinista por diseño y
+ * una degradación por proveedor caído se registraban idénticos, y en producción
+ * eso produjo 14.178 eventos de auditoría indistinguibles: todos `mock`, cero
+ * tokens, y ningún modo de saber cuáles eran correctos.
+ *
+ * Ahora cada llamada devuelve además una `LlmProvenance` con uno de cinco
+ * estados cerrados, el proveedor, los tokens de entrada y salida por separado,
+ * el coste estimado, la latencia, los reintentos y la familia del error.
+ * `mode` se conserva para no romper a quien ya lo lee.
+ *
+ * Lo que NO cambió: las cuatro puertas de OpenAI, el fail-closed cuando Ollama
+ * está configurado y falla, el recorte de timeout contra el presupuesto del SKU
+ * y el enrutado de calidad 3b/8b.
+ *
+ * Sin registro de prompts: sólo id de agente, modo, modelo y conteos.
  */
 
-import { getOllamaClient } from "../../local-ai/OllamaClient";
-import {
-  assertPrivateOutboundAllowed,
-  isInternetTaskAuthorized,
-  isPrivateMode,
-} from "../../private-ai/privateMode";
 import {
   LLM_BUDGET_MIN_CALL_MS,
-  claimLlmCallTimeoutMs,
   markLlmBudgetExhausted,
   remainingLlmBudgetMs,
 } from "./llmBudget";
+import {
+  ContadorDeEjecucion,
+  LlmLimiteExcedidoError,
+  contadorDeEjecucionActual,
+  esperaDeReintento,
+  resolverLimitesLlm,
+} from "./llmLimits";
 import { parseJsonFromLlm } from "./parseJson";
+import type { ContextoDePolitica } from "./llmPolicy";
+import type { LlmErrorKind, LlmProvenance, LlmProviderId } from "./llmProvenance";
+import {
+  aLlmModeHeredado,
+  clasificarErrorDeProveedor,
+  esReintentable,
+  procedenciaDeMotorDeReglas,
+} from "./llmProvenance";
 import type { AgentRole } from "./promptTemplates";
 import { buildUserPrompt, getSystemPrompt } from "./promptTemplates";
-import { isNelvyonAiEnabled } from "../../private-ai/config";
+import {
+  proveedoresDisponibles,
+  registrarProveedor,
+  type ProveedorLlm,
+} from "./providers";
+import { ollamaEstaConfigurado, proveedorOllama } from "./providers/ollamaProvider";
+import { openAiEstaPermitido, proveedorOpenAi } from "./providers/openAiProvider";
 
-/**
- * Timeout por defecto de una llamada a Ollama. Réplica de la regla de
- * `OllamaClient.chat` para poder recortarla contra el presupuesto ANTES de
- * entrar en el cliente: los modelos `8b` son notablemente más lentos.
- */
-function resolveDefaultOllamaTimeoutMs(model: string | undefined): number {
-  const isHeavy = (model ?? "").includes("8b");
-  return Number(
-    isHeavy
-      ? (process.env.OLLAMA_STRATEGY_TIMEOUT_MS ?? 300_000)
-      : (process.env.OLLAMA_FAST_TIMEOUT_MS ?? 120_000),
-  );
-}
+// Registro por defecto. Registrar no habilita: cada proveedor sigue decidiendo
+// si está configurado y si la política le deja actuar.
+registrarProveedor(proveedorOllama);
+registrarProveedor(proveedorOpenAi);
 
 export type LlmMode = "mock" | "real";
 
 export interface LlmRequest {
   agentId: AgentRole;
   payload: Record<string, unknown>;
-  /** Offline mock generator when LLM unavailable or fails */
+  /** Generador offline cuando no hay modelo disponible o la llamada falla. */
   mockGenerator: () => unknown;
+  /**
+   * El generador es determinista POR DISEÑO y no había que llamar a ningún
+   * modelo. Se registra como `RULE_ENGINE`, que sí es publicable: no es una
+   * degradación, es la salida correcta.
+   */
+  ruleEngine?: boolean;
+  /**
+   * Trabajo que exige modelo real. Sin modelo disponible se lanza en vez de
+   * devolver contenido de reglas. Por defecto `false` para no cambiar el
+   * comportamiento de guiones y simulaciones; la protección que no depende de
+   * que nadie se acuerde de ponerlo es la puerta de entrega (`llmPolicy`).
+   */
+  requiereIaReal?: boolean;
+  /** Contexto de servicio/pack, si se conoce. Viaja a la procedencia. */
+  policy?: ContextoDePolitica;
 }
 
 export interface LlmResponse {
@@ -50,12 +86,25 @@ export interface LlmResponse {
   agentId: AgentRole;
   model: string;
   parsed: unknown;
+  /** Total entrada+salida. Se conserva por compatibilidad. */
   tokens: number;
   fallbackReason?: string;
   duration_ms: number;
+  /** Con qué se produjo esto exactamente. */
+  provenance: LlmProvenance;
 }
 
 export type LlmInvokeFn = (req: LlmRequest) => Promise<LlmResponse>;
+
+export class LlmSinModeloRealError extends Error {
+  constructor(
+    readonly provenance: LlmProvenance,
+    mensaje: string,
+  ) {
+    super(mensaje);
+    this.name = "LlmSinModeloRealError";
+  }
+}
 
 let customInvoke: LlmInvokeFn | null = null;
 
@@ -63,41 +112,28 @@ export function setLlmInvokeForTests(fn: LlmInvokeFn | null): void {
   customInvoke = fn;
 }
 
-/** True when autonomous pack pipeline can use local Ollama (primary real path). */
+/** True cuando el pipeline autónomo puede usar Ollama local (camino real). */
 export function isAutonomousOllamaConfigured(): boolean {
-  if (process.env.OLLAMA_CONFIGURED?.trim() === "1") return true;
-  return Boolean(
-    process.env.OLLAMA_HOST?.trim() ||
-      process.env.OLLAMA_BASE_URL?.trim() ||
-      process.env.NELVYON_LOCAL_AI_URL?.trim() ||
-      process.env.LOCAL_AI_BASE_URL?.trim(),
-  );
+  return ollamaEstaConfigurado();
 }
 
 /**
- * Explicit opt-in for remote OpenAI. Never automatic fallback.
- * Defaults OFF; also fail-closed under PRIVATE_MODE without internet window.
+ * Permiso explícito para OpenAI remoto. Nunca es un salto automático.
+ * Apagado por defecto; fail-closed bajo modo privado sin ventana de internet.
  */
 export function isAutonomousOpenAiAllowed(): boolean {
-  if (process.env.AUTONOMOUS_ALLOW_OPENAI?.trim() !== "1") return false;
-  // El interruptor maestro manda por encima de cualquier otra condicion.
-  // Ver `private-ai/config.ts::isNelvyonAiEnabled`: con el apagado no sale
-  // ninguna llamada a un proveedor externo, exista o no una clave.
-  if (!isNelvyonAiEnabled()) return false;
-  if (!process.env.OPENAI_API_KEY?.trim()) return false;
-  if (isPrivateMode() && !isInternetTaskAuthorized()) return false;
-  return true;
+  return openAiEstaPermitido().permitido;
 }
 
 /**
- * Opt-in local quality routing (ADR-036): 3b fast vs 8b critical deliverables.
- * Does NOT change certified Model Router. Default OFF — pack path keeps OLLAMA_MODEL (typically 3b).
+ * Enrutado local de calidad (ADR-036): 3b rápido vs 8b para entregables
+ * críticos. Apagado por defecto — no cambia el Model Router certificado.
  */
 export function isAutonomousQualityRoutingEnabled(): boolean {
   return process.env.AUTONOMOUS_QUALITY_ROUTING?.trim() === "1";
 }
 
-/** Roles whose pack output is QA-critical (hero/copy/SEO deliverables). */
+/** Roles cuyo entregable es crítico para QA (hero/copy/SEO). */
 const QUALITY_CRITICAL_ROLES = new Set<AgentRole>([
   "agent-copywriter-landing",
   "agent-designer-landing",
@@ -115,12 +151,6 @@ const QUALITY_CRITICAL_ROLES = new Set<AgentRole>([
 
 export type AutonomousOllamaSlot = "fast" | "strategy";
 
-/**
- * Resolve Ollama model for an autonomous agent role.
- * - routing OFF → undefined (client default / OLLAMA_MODEL)
- * - routing ON + critical role → OLLAMA_STRATEGY_MODEL (8b) when set; else fast
- * - routing ON + other roles → OLLAMA_MODEL (3b) when set
- */
 export function resolveAutonomousOllamaModel(agentId: AgentRole): {
   slot: AutonomousOllamaSlot;
   model?: string;
@@ -150,277 +180,359 @@ export function resolveAutonomousOllamaModel(agentId: AgentRole): {
 export function resolveLlmMode(): LlmMode {
   if (process.env.AUTONOMOUS_LLM_MODE === "mock") return "mock";
   if (process.env.AUTONOMOUS_LLM_MODE === "real") return "real";
-  if (isAutonomousOllamaConfigured()) return "real";
-  if (isAutonomousOpenAiAllowed()) return "real";
-  return "mock";
+  return proveedoresDisponibles().length > 0 ? "real" : "mock";
 }
 
-function logLlmEvent(event: {
-  agentId: string;
-  mode: LlmMode;
-  model: string;
-  ok: boolean;
-  tokens: number;
-  fallbackReason?: string;
-  duration_ms: number;
-}): void {
+function logLlmEvent(p: LlmProvenance, agentId: string, ok: boolean): void {
   const msg = [
-    `[autonomous-llm] agent=${event.agentId}`,
-    `mode=${event.mode}`,
-    `model=${event.model}`,
-    `ok=${event.ok}`,
-    `tokens=${event.tokens}`,
-    `ms=${event.duration_ms}`,
-    event.fallbackReason ? `fallback=${event.fallbackReason}` : "",
+    `[autonomous-llm] agent=${agentId}`,
+    `outcome=${p.outcome}`,
+    `provider=${p.provider}`,
+    `model=${p.model}`,
+    `ok=${ok}`,
+    `tok_in=${p.tokensIn}`,
+    `tok_out=${p.tokensOut}`,
+    p.costEstimateUsd === null ? "cost=unknown" : `cost_usd=${p.costEstimateUsd}`,
+    `ms=${p.latencyMs}`,
+    `retries=${p.retries}`,
+    p.errorKind ? `err=${p.errorKind}` : "",
+    p.reason ? `reason=${p.reason}` : "",
   ]
     .filter(Boolean)
     .join(" ");
   console.error(msg);
 }
 
-async function callOllama(
-  system: string,
-  user: string,
-  modelOverride?: string,
-  label = "ollama_call",
-): Promise<{ content: string; tokens: number; model: string }> {
-  /**
-   * El presupuesto agregado del SKU recorta el timeout de ESTA llamada, de modo
-   * que ninguna pueda desbordar lo que queda. Si ya no hay margen, lanza
-   * `LlmBudgetExhaustedError` inmediatamente en vez de esperar 120s/300s.
-   * Sin presupuesto instalado devuelve el timeout por defecto y nada cambia.
-   */
-  const budgetTimeoutMs = claimLlmCallTimeoutMs(
-    resolveDefaultOllamaTimeoutMs(modelOverride),
-    label,
-  );
-  const result = await getOllamaClient().chat(
-    [
-      { role: "system", content: system },
-      { role: "user", content: user },
-    ],
-    { format: "json", numPredict: 3072, model: modelOverride, timeoutMs: budgetTimeoutMs },
-  );
-  const content = result.content?.trim() ?? "";
-  if (!content) throw new Error("Ollama empty content");
+function respuestaDesdeProcedencia(
+  req: LlmRequest,
+  parsed: unknown,
+  p: LlmProvenance,
+): LlmResponse {
   return {
-    content,
-    tokens: (result.evalCount ?? 0) + (result.promptEvalCount ?? 0),
-    model: result.model || modelOverride || "ollama",
+    mode: aLlmModeHeredado(p.outcome),
+    agentId: req.agentId,
+    model: p.model,
+    parsed,
+    tokens: p.tokensIn + p.tokensOut,
+    fallbackReason: p.reason ? p.reason : undefined,
+    duration_ms: p.latencyMs,
+    provenance: p,
   };
 }
 
-async function callOpenAi(system: string, user: string): Promise<{ content: string; tokens: number; model: string }> {
-  if (!isAutonomousOpenAiAllowed()) {
-    throw new Error("OpenAI not allowed (set AUTONOMOUS_ALLOW_OPENAI=1; check PRIVATE_MODE)");
-  }
-  assertPrivateOutboundAllowed("remote_llm");
-
-  const apiKey = process.env.OPENAI_API_KEY?.trim();
-  if (!apiKey) throw new Error("OPENAI_API_KEY missing");
-
-  const model = process.env.AUTONOMOUS_OPENAI_MODEL?.trim() || "gpt-4o-mini";
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 60_000);
-
-  try {
-    const res = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model,
-        temperature: 0.3,
-        response_format: { type: "json_object" },
-        messages: [
-          { role: "system", content: system },
-          { role: "user", content: user },
-        ],
-      }),
-      signal: controller.signal,
-    });
-
-    if (!res.ok) {
-      const errText = await res.text().catch(() => "");
-      throw new Error(`OpenAI HTTP ${res.status}: ${errText.slice(0, 200)}`);
-    }
-
-    const data = (await res.json()) as {
-      choices?: Array<{ message?: { content?: string } }>;
-      usage?: { total_tokens?: number };
-      model?: string;
-    };
-
-    const content = data.choices?.[0]?.message?.content ?? "";
-    if (!content) throw new Error("OpenAI empty content");
-
-    return {
-      content,
-      tokens: data.usage?.total_tokens ?? 0,
-      model: data.model ?? model,
-    };
-  } finally {
-    clearTimeout(timeout);
-  }
-}
-
-function mockFallback(
+/** Salida de reglas, con el estado que le corresponda. Nunca finge ser real. */
+function salidaDeReglas(
   req: LlmRequest,
   started: number,
+  outcome: "MOCK" | "FALLBACK" | "RULE_ENGINE",
   reason: string,
+  errorKind: LlmErrorKind | null,
+  fallbackFrom: LlmProviderId | null,
+  retries: number,
+  degradationAllowed: boolean,
 ): LlmResponse {
   const parsed = req.mockGenerator();
-  const response: LlmResponse = {
-    mode: "mock",
-    agentId: req.agentId,
-    model: "mock-rules-v1",
-    parsed,
-    tokens: 0,
-    fallbackReason: reason,
-    duration_ms: Date.now() - started,
+  const p: LlmProvenance =
+    outcome === "RULE_ENGINE"
+      ? procedenciaDeMotorDeReglas("mock-rules-v1", Date.now() - started, reason)
+      : {
+          outcome,
+          provider: "none",
+          model: "mock-rules-v1",
+          tokensIn: 0,
+          tokensOut: 0,
+          costEstimateUsd: 0,
+          latencyMs: Date.now() - started,
+          retries,
+          fallbackFrom,
+          errorKind,
+          degradationAllowed,
+          reason,
+        };
+  // `ok` es falso para toda degradación: antes se registraba `ok: true` y por
+  // eso 14.178 eventos de reglas parecían ejecuciones correctas.
+  logLlmEvent(p, req.agentId, outcome === "RULE_ENGINE");
+  return respuestaDesdeProcedencia(req, parsed, p);
+}
+
+function procedenciaDeError(
+  started: number,
+  provider: LlmProviderId,
+  model: string,
+  errorKind: LlmErrorKind | null,
+  reason: string,
+  fallbackFrom: LlmProviderId | null = null,
+): LlmProvenance {
+  return {
+    outcome: "ERROR",
+    provider,
+    model,
+    tokensIn: 0,
+    tokensOut: 0,
+    costEstimateUsd: null,
+    latencyMs: Date.now() - started,
+    retries: 0,
+    fallbackFrom,
+    errorKind,
+    degradationAllowed: false,
+    reason,
   };
-  logLlmEvent({
-    agentId: req.agentId,
-    mode: "mock",
-    model: response.model,
-    ok: true,
-    tokens: 0,
-    fallbackReason: response.fallbackReason,
-    duration_ms: response.duration_ms,
-  });
-  return response;
+}
+
+async function dormir(ms: number): Promise<void> {
+  if (ms <= 0) return;
+  await new Promise((r) => setTimeout(r, ms));
+}
+
+/**
+ * Un proveedor, con reintentos acotados y espera creciente. Devuelve la salida
+ * ya validada como JSON: un JSON malformado es un fallo reintentable, no una
+ * respuesta.
+ */
+async function intentarProveedor(
+  proveedor: ProveedorLlm,
+  req: LlmRequest,
+  system: string,
+  user: string,
+  modelo: string | undefined,
+): Promise<{
+  parsed: object;
+  model: string;
+  tokensIn: number;
+  tokensOut: number;
+  retries: number;
+}> {
+  const limites = resolverLimitesLlm();
+  const contador = contadorDeEjecucionActual();
+  let ultimoError: unknown = new Error("sin intento");
+  let tokensIn = 0;
+  let tokensOut = 0;
+
+  for (let intento = 0; intento <= limites.maxRetries; intento += 1) {
+    if (intento > 0) {
+      // El pase de reparación duplica el coste del agente. Sólo se intenta si
+      // queda margen de presupuesto; si no, se marca y se deja fallar.
+      const restante = remainingLlmBudgetMs();
+      if (restante !== null && restante < LLM_BUDGET_MIN_CALL_MS) {
+        markLlmBudgetExhausted(`${req.agentId}: reintento omitido por presupuesto`);
+        break;
+      }
+      await dormir(esperaDeReintento(intento, limites));
+    }
+
+    contador?.reservarLlamada();
+
+    const esReparacion = intento > 0 && clasificarErrorDeProveedor(ultimoError) === "bad_json";
+    const userDeEsteIntento = esReparacion
+      ? `${user}\n\nCRITICAL: previous output was not valid JSON. Respond with ONE JSON object only, no markdown.`
+      : user;
+
+    try {
+      const r = await proveedor.generar({
+        system,
+        user: userDeEsteIntento,
+        modelo,
+        etiqueta: `${req.agentId}:${intento === 0 ? "primary" : "repair"}`,
+      });
+      tokensIn += r.tokensEntrada;
+      tokensOut += r.tokensSalida;
+      contador?.anotarConsumo(
+        r.tokensEntrada + r.tokensSalida,
+        proveedor.estimarCoste(r.model, r.tokensEntrada, r.tokensSalida),
+      );
+
+      const parsed = parseJsonFromLlm(r.content);
+      if (!parsed || typeof parsed !== "object") {
+        ultimoError = new Error(`${proveedor.id} response is not valid JSON object`);
+        continue;
+      }
+      return { parsed, model: r.model, tokensIn, tokensOut, retries: intento };
+    } catch (err) {
+      // Un límite excedido no se reintenta: insistir es justo lo que el tope
+      // existe para impedir.
+      if (err instanceof LlmLimiteExcedidoError) throw err;
+      ultimoError = err;
+      if (!esReintentable(clasificarErrorDeProveedor(err))) break;
+    }
+  }
+
+  throw ultimoError;
+}
+
+/**
+ * Completa la procedencia de una respuesta inyectada por una prueba. Sin esto,
+ * cualquier doble de `setLlmInvokeForTests` devolveria `provenance: undefined`
+ * y quien lo lea aguas abajo trataria "no lo se" como "no hubo degradacion".
+ */
+function normalizarRespuesta(req: LlmRequest, res: LlmResponse): LlmResponse {
+  if (res.provenance) return res;
+  const real = res.mode === "real";
+  return {
+    ...res,
+    provenance: {
+      outcome: real ? "REAL_LLM_SUCCESS" : "MOCK",
+      provider: real ? "ollama" : "none",
+      model: res.model,
+      tokensIn: 0,
+      tokensOut: res.tokens ?? 0,
+      costEstimateUsd: real ? null : 0,
+      latencyMs: res.duration_ms ?? 0,
+      retries: 0,
+      fallbackFrom: null,
+      errorKind: null,
+      degradationAllowed: req.requiereIaReal !== true,
+      reason: res.fallbackReason ?? "respuesta inyectada en pruebas",
+    },
+  };
 }
 
 export async function invokeLlm(req: LlmRequest): Promise<LlmResponse> {
-  if (customInvoke) return customInvoke(req);
+  if (customInvoke) return normalizarRespuesta(req, await customInvoke(req));
 
   const started = Date.now();
-  const preferred = resolveLlmMode();
   const system = getSystemPrompt(req.agentId);
   const user = buildUserPrompt(req.agentId, req.payload);
+  // La degradación se marca como permitida sólo cuando quien llama declara que
+  // no exige IA real. La puerta de entrega vuelve a comprobarlo con el contexto
+  // del servicio, que aquí no siempre se conoce.
+  const degradacionOk = req.requiereIaReal !== true;
 
-  if (preferred === "mock") {
-    return mockFallback(
+  if (req.ruleEngine === true) {
+    return salidaDeReglas(
       req,
       started,
-      "AUTONOMOUS_LLM_MODE=mock or no Ollama configured (OpenAI opt-in only)",
+      "RULE_ENGINE",
+      "generador determinista por diseño",
+      null,
+      null,
+      0,
+      true,
     );
   }
 
-  const failures: string[] = [];
-
-  if (isAutonomousOllamaConfigured()) {
-    try {
-      const route = resolveAutonomousOllamaModel(req.agentId);
-      let { content, tokens, model } = await callOllama(
-        system,
-        user,
-        route.model,
-        `${req.agentId}:primary`,
+  if (process.env.AUTONOMOUS_LLM_MODE === "mock") {
+    const motivo = "AUTONOMOUS_LLM_MODE=mock";
+    if (req.requiereIaReal === true) {
+      const p = procedenciaDeError(
+        started,
+        "none",
+        "mock-rules-v1",
+        "forbidden",
+        `${motivo} y este trabajo exige modelo real`,
       );
-      let parsed = parseJsonFromLlm(content);
-      if (!parsed || typeof parsed !== "object") {
-        /**
-         * El pase de reparación duplica el coste del agente y es el multiplicador
-         * que hacía impredecible la duración. Solo se intenta si queda margen:
-         * sin presupuesto útil se marca la degradación y se deja que el fallo de
-         * JSON siga su curso normal (el pipeline ya tiene soft-fail por agente).
-         */
-        const remaining = remainingLlmBudgetMs();
-        if (remaining !== null && remaining < LLM_BUDGET_MIN_CALL_MS) {
-          markLlmBudgetExhausted(`${req.agentId}: pase de reparación omitido por presupuesto`);
-        } else {
-          // One repair pass — still real Ollama, never silent mock.
-          const repairUser =
-            `${user}\n\nCRITICAL: previous output was not valid JSON. Respond with ONE JSON object only, no markdown.`;
-          const repaired = await callOllama(system, repairUser, route.model, `${req.agentId}:repair`);
-          content = repaired.content;
-          tokens += repaired.tokens;
-          model = repaired.model || model;
-          parsed = parseJsonFromLlm(content);
-        }
-      }
-      if (!parsed || typeof parsed !== "object") {
-        throw new Error("Ollama response is not valid JSON object");
-      }
-      const response: LlmResponse = {
-        mode: "real",
-        agentId: req.agentId,
-        model,
-        parsed,
-        tokens,
-        duration_ms: Date.now() - started,
-        fallbackReason: route.reason !== "quality_routing_off" ? `slot=${route.slot};${route.reason}` : undefined,
-      };
-      logLlmEvent({
-        agentId: req.agentId,
-        mode: "real",
-        model,
-        ok: true,
-        tokens,
-        fallbackReason: response.fallbackReason,
-        duration_ms: response.duration_ms,
-      });
-      return response;
-    } catch (err) {
-      failures.push(`ollama: ${err instanceof Error ? err.message : "unknown_error"}`);
+      logLlmEvent(p, req.agentId, false);
+      throw new LlmSinModeloRealError(p, p.reason);
     }
+    return salidaDeReglas(req, started, "MOCK", motivo, null, null, 0, degradacionOk);
   }
 
-  // OpenAI is never an automatic fallback — explicit owner opt-in only.
-  if (isAutonomousOpenAiAllowed()) {
+  const disponibles = proveedoresDisponibles();
+
+  if (disponibles.length === 0) {
+    const motivo = "ningún proveedor de modelo configurado y permitido";
+    if (req.requiereIaReal === true) {
+      const p = procedenciaDeError(started, "none", "mock-rules-v1", "not_configured", motivo);
+      logLlmEvent(p, req.agentId, false);
+      throw new LlmSinModeloRealError(p, motivo);
+    }
+    return salidaDeReglas(
+      req,
+      started,
+      "FALLBACK",
+      motivo,
+      "not_configured",
+      null,
+      0,
+      degradacionOk,
+    );
+  }
+
+  const fallos: string[] = [];
+  let ultimoErrorKind: LlmErrorKind | null = null;
+  let ultimoProveedor: LlmProviderId | null = null;
+
+  for (const proveedor of disponibles) {
+    const ruta = proveedor.id === "ollama" ? resolveAutonomousOllamaModel(req.agentId) : null;
     try {
-      const { content, tokens, model } = await callOpenAi(system, user);
-      const parsed = parseJsonFromLlm(content);
-      if (!parsed || typeof parsed !== "object") {
-        throw new Error("LLM response is not valid JSON object");
-      }
-      const response: LlmResponse = {
-        mode: "real",
-        agentId: req.agentId,
-        model,
-        parsed,
-        tokens,
-        duration_ms: Date.now() - started,
-        fallbackReason: failures.length ? failures.join("; ") : undefined,
+      const r = await intentarProveedor(proveedor, req, system, user, ruta?.model);
+      const p: LlmProvenance = {
+        outcome: "REAL_LLM_SUCCESS",
+        provider: proveedor.id,
+        model: r.model,
+        tokensIn: r.tokensIn,
+        tokensOut: r.tokensOut,
+        costEstimateUsd: proveedor.estimarCoste(r.model, r.tokensIn, r.tokensOut),
+        latencyMs: Date.now() - started,
+        retries: r.retries,
+        fallbackFrom: ultimoProveedor,
+        errorKind: null,
+        degradationAllowed: degradacionOk,
+        reason:
+          ruta && ruta.reason !== "quality_routing_off"
+            ? `slot=${ruta.slot};${ruta.reason}`
+            : fallos.join("; "),
       };
-      logLlmEvent({
-        agentId: req.agentId,
-        mode: "real",
-        model,
-        ok: true,
-        tokens,
-        fallbackReason: response.fallbackReason,
-        duration_ms: response.duration_ms,
-      });
-      return response;
+      logLlmEvent(p, req.agentId, true);
+      return respuestaDesdeProcedencia(req, r.parsed, p);
     } catch (err) {
-      failures.push(`openai: ${err instanceof Error ? err.message : "unknown_error"}`);
+      if (err instanceof LlmLimiteExcedidoError) {
+        const p = procedenciaDeError(
+          started,
+          proveedor.id,
+          ruta?.model ?? proveedor.id,
+          "limit_exceeded",
+          err.message,
+          ultimoProveedor,
+        );
+        logLlmEvent(p, req.agentId, false);
+        throw err;
+      }
+      ultimoErrorKind = clasificarErrorDeProveedor(err);
+      ultimoProveedor = proveedor.id;
+      fallos.push(`${proveedor.id}: ${err instanceof Error ? err.message : "unknown_error"}`);
     }
-  } else if (process.env.OPENAI_API_KEY?.trim() && failures.length > 0) {
-    failures.push("openai: skipped (AUTONOMOUS_ALLOW_OPENAI!=1 or PRIVATE_MODE)");
   }
 
-  // Fail closed when Ollama is configured — never silent-mock critical pack agents.
-  if (isAutonomousOllamaConfigured() && failures.some((f) => f.startsWith("ollama:"))) {
-    const message = failures.join("; ");
-    logLlmEvent({
-      agentId: req.agentId,
-      mode: "real",
-      model: resolveAutonomousOllamaModel(req.agentId).model ?? "ollama-unresolved",
-      ok: false,
-      tokens: 0,
-      fallbackReason: message,
-      duration_ms: Date.now() - started,
-    });
-    throw new Error(`LLM Ollama failed (no silent mock): ${message}`);
+  // Fail-closed histórico: con Ollama configurado NUNCA se cae en silencio a
+  // reglas. Se conserva tal cual porque es lo que impide que un entregable
+  // crítico salga de plantilla cuando el modelo local está caído.
+  if (ollamaEstaConfigurado() && fallos.some((f) => f.startsWith("ollama:"))) {
+    const mensaje = fallos.join("; ");
+    const p = procedenciaDeError(
+      started,
+      "ollama",
+      resolveAutonomousOllamaModel(req.agentId).model ?? "ollama-unresolved",
+      ultimoErrorKind,
+      mensaje,
+    );
+    logLlmEvent(p, req.agentId, false);
+    throw new LlmSinModeloRealError(p, `LLM Ollama failed (no silent mock): ${mensaje}`);
   }
 
-  return mockFallback(
+  const motivo = fallos.length > 0 ? fallos.join("; ") : "no_llm_provider_available";
+  if (req.requiereIaReal === true) {
+    const p = procedenciaDeError(
+      started,
+      ultimoProveedor ?? "none",
+      "mock-rules-v1",
+      ultimoErrorKind,
+      motivo,
+      ultimoProveedor,
+    );
+    logLlmEvent(p, req.agentId, false);
+    throw new LlmSinModeloRealError(p, motivo);
+  }
+  return salidaDeReglas(
     req,
     started,
-    failures.length > 0 ? failures.join("; ") : "no_llm_provider_available",
+    "FALLBACK",
+    motivo,
+    ultimoErrorKind,
+    ultimoProveedor,
+    0,
+    degradacionOk,
   );
 }
+
+export { ContadorDeEjecucion, resolverLimitesLlm };
+export type { LlmProvenance, LlmProviderId };

@@ -1,4 +1,11 @@
 /**
+ * NOTA DE UBICACIÓN. Este test prueba `src/pages/api/os/ws.ts` pero NO puede
+ * vivir a su lado. Next.js trata TODO fichero bajo `pages/api` como una ruta
+ * de API y le exige un `export default` handler, incluidos los de `__tests__`.
+ * Con el test ahí, `next build` fallaba con TS2344 en `.next/types/validator.ts`
+ * y el árbol entero era indesplegable. Lo vigila `puerta-de-build.mjs`.
+ */
+/**
  * BLOQUE 7 · el canal en vivo de otro inquilino.
  *
  * `/api/os/ws` levanta el WebSocket por el que el panel de ejecución recibe los
@@ -36,7 +43,7 @@ vi.mock("@nelvyon/os-agents", () => ({
   OsAgentError: class extends Error {},
 }));
 
-import { resolverClienteDeWs } from "../ws";
+import { resolverClienteDeWs } from "@/pages/api/os/ws";
 
 const TENANT_A = "aaaaaaaa-1111-4111-8111-111111111111";
 const TENANT_B = "bbbbbbbb-2222-4222-8222-222222222222";

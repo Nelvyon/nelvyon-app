@@ -32,6 +32,8 @@
  * en el redirect que llega desde Google. Exigirla ahí rompería los cinco flujos
  * legítimos. Hace falta una cookie propia, `lax`, puesta al arrancar.
  */
+import { createHmac } from "node:crypto";
+
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import {
@@ -173,7 +175,6 @@ describe("BLOQUE 7 · lo que el `state` ya hacía bien y no se puede perder", ()
       JSON.stringify({ userId: "u", ts: Date.now() - 30 * 60 * 1000, nonce: "x" }),
     ).toString("base64url");
     // Firmado DE VERDAD con la clave real: lo único caducado es el tiempo.
-    const { createHmac } = require("node:crypto") as typeof import("node:crypto");
     const sig = createHmac("sha256", SECRETO).update(viejo).digest("base64url");
     expect(parseOAuthState(`${viejo}.${sig}`)).toBeNull();
   });
