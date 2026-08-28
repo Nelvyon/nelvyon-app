@@ -159,7 +159,53 @@ async function main() {
       }
     }
 
-    // ── 5 · a quien corresponde un correo ──────────────────────────────────
+    // ── 5 · ¿ha producido algo esta máquina? ───────────────────────────────
+    //
+    // La pregunta de negocio, no la técnica. Un producto puede estar entero,
+    // desplegado y sin haber entregado nunca nada. Los recuentos lo dicen y las
+    // pantallas no.
+    console.log("\n── actividad real ──");
+    const cuenta = async (tabla, etiqueta, extra = "") => {
+      if (!(await existe(tabla))) { console.log(`  ${etiqueta.padEnd(26)} (tabla ausente)`); return; }
+      const r = (await q(`SELECT count(*)::text AS n${extra} FROM ${tabla}`))[0];
+      const det = Object.entries(r).filter(([k]) => k !== "n")
+        .map(([k, v]) => `${k}=${v}`).join(" ");
+      console.log(`  ${etiqueta.padEnd(26)} ${String(r.n).padStart(8)}${det ? "   " + det : ""}`);
+    };
+    await cuenta("saas_contacts", "contactos");
+    await cuenta("saas_campanias", "campanias");
+    await cuenta("saas_workflows", "workflows");
+    await cuenta("saas_sequences", "secuencias");
+    await cuenta("os_jobs", "trabajos del OS");
+    await cuenta("os_deliverables", "entregables producidos");
+    await cuenta("usage_events", "eventos de uso medidos");
+    if (await existe("os_jobs")) {
+      const e = await q(`SELECT status, count(*)::text AS n FROM os_jobs GROUP BY status ORDER BY 2 DESC`);
+      if (e.length) console.log(`    estados de os_jobs: ${e.map((x) => `${x.status}=${x.n}`).join(", ")}`);
+    }
+    // De donde salen los entregables: si la cola nunca completa un trabajo pero
+    // hay entregables, es que los produce otro camino — o son datos sembrados.
+    if (await existe("os_deliverables")) {
+      const cols = await q(
+        `SELECT column_name FROM information_schema.columns
+          WHERE table_name='os_deliverables' AND column_name IN ('created_at','status','kind','type','source')`);
+      const tiene = new Set(cols.map((c) => c.column_name));
+      if (tiene.has("created_at")) {
+        const f = (await q(`SELECT min(created_at)::date::text AS primero,
+                                   max(created_at)::date::text AS ultimo,
+                                   count(DISTINCT created_at::date)::text AS dias
+                              FROM os_deliverables`))[0];
+        console.log(`    entregables: del ${f.primero} al ${f.ultimo}, en ${f.dias} dia(s) distintos`);
+      }
+      for (const c of ["status", "kind", "type"]) {
+        if (!tiene.has(c)) continue;
+        const g = await q(`SELECT ${c}::text AS v, count(*)::text AS n FROM os_deliverables
+                            GROUP BY 1 ORDER BY 2 DESC LIMIT 5`);
+        console.log(`    por ${c}: ${g.map((x) => `${x.v}=${x.n}`).join(", ")}`);
+      }
+    }
+
+    // ── 6 · a quien corresponde un correo ──────────────────────────────────
     if (correo) {
       console.log(`\n── busqueda de usuario ──`);
       if (!(await existe("nelvyon_users"))) {
