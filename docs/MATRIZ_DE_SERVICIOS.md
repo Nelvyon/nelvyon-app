@@ -22,12 +22,12 @@ del árbol o de una medición ya ejecutada; `BUSINESS_BRAIN` en concreto sale de
 
 | Estado | Servicios |
 |---|---:|
-| LOCAL_CERTIFIED | 25 |
+| LOCAL_CERTIFIED | 29 |
 | PARTIAL | 0 |
 | FAIL | 0 |
-| **Total** | **25** |
+| **Total** | **29** |
 
-Y **los 25** están en `PRODUCTION_UNVERIFIED`: nada se ha desplegado.
+Y **los 29** están en `PRODUCTION_UNVERIFIED`: nada se ha desplegado.
 
 ## La matriz
 
@@ -45,7 +45,7 @@ Y **los 25** están en `PRODUCTION_UNVERIFIED`: nada se ha desplegado.
 | `canales_comunicaciones_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
 | `social_media_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
 | `email_marketing_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
-| `contenido_copywriting_premium` | ✅ | ✅ | ✅ | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
+| `contenido_copywriting_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
 | `video_multimedia_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
 | `3d_contenido_inmersivo_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
 | `fotografia_producto_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
@@ -58,6 +58,10 @@ Y **los 25** están en `PRODUCTION_UNVERIFIED`: nada se ha desplegado.
 | `influencer_marketing_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
 | `landing_premium` | ✅ | ✅ | ✅ | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
 | `funnel_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
+| `crm_captacion_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
+| `analitica_atribucion_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
+| `inteligencia_mercado_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
+| `geo_ai_search_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
 
 ## Qué le falta exactamente a cada uno
 
@@ -165,8 +169,6 @@ Contenido y Copywriting Premium.
 
 Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.41).
 
-**A medias:** INTAKE.
-
 **Sin medir:** PRODUCTION_VERIFIED.
 
 ### `video_multimedia_premium` — LOCAL_CERTIFIED
@@ -264,6 +266,38 @@ Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.342).
 Funnel Multi-paso Premium.
 
 Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.358).
+
+**Sin medir:** PRODUCTION_VERIFIED.
+
+### `crm_captacion_premium` — LOCAL_CERTIFIED
+
+CRM y Captación Premium.
+
+Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.365).
+
+**Sin medir:** PRODUCTION_VERIFIED.
+
+### `analitica_atribucion_premium` — LOCAL_CERTIFIED
+
+Analítica y Atribución Premium.
+
+Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.325).
+
+**Sin medir:** PRODUCTION_VERIFIED.
+
+### `inteligencia_mercado_premium` — LOCAL_CERTIFIED
+
+Inteligencia de Mercado Premium.
+
+Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.37).
+
+**Sin medir:** PRODUCTION_VERIFIED.
+
+### `geo_ai_search_premium` — LOCAL_CERTIFIED
+
+Visibilidad en Buscadores de IA Premium.
+
+Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.321).
 
 **Sin medir:** PRODUCTION_VERIFIED.
 

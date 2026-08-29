@@ -38,6 +38,8 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import { QA_DE } from "./lib/mapaDeServicio.mjs";
+
 const RAIZ = process.cwd();
 const SALIDA = path.join(RAIZ, "docs", "MATRIZ_DE_SERVICIOS.md");
 
@@ -129,34 +131,10 @@ const QA = new Map();
   }
 }
 
-/** Qué disciplina de QA le toca a cada servicio. Explícito: deducirlo del nombre acertaría a veces. */
-const QA_DE = {
-  seo_premium: "seo",
-  ads_premium: "ads",
-  social_media_premium: "social",
-  email_marketing_premium: "email",
-  contenido_copywriting_premium: "contenido",
-  web_premium: "web",
-  landing_premium: "web",
-  mantenimiento_web_premium: "web",
-  ecommerce_premium: "ecommerce",
-  funnel_premium: "cro",
-  branding_premium: "creatividad",
-  diseno_grafico_creatividades_premium: "creatividad",
-  fotografia_producto_premium: "creatividad",
-  video_multimedia_premium: "creatividad",
-  "3d_contenido_inmersivo_premium": "creatividad",
-  reputacion_online_orm_premium: "reputacion",
-  advisor_empresarial_premium: "estrategia",
-  consultoria_automatizacion_premium: "estrategia",
-  influencer_marketing_premium: "social",
-  bots_premium: "contenido",
-  canales_comunicaciones_premium: "contenido",
-  voz_premium: "contenido",
-  personal_digital_premium: "contenido",
-  integraciones_apis_premium: "estrategia",
-  formacion_capacitacion_digital_premium: "contenido",
-};
+// QA_DE vive en `scripts/lib/mapaDeServicio.mjs`: lo comparten esta matriz y el
+// contrato de servicio. Cuando habia una copia por script, se anadio un servicio
+// a una y no a la otra, y los dos documentos decian cosas distintas del mismo
+// servicio sin que nadie lo notara, porque cada uno era coherente consigo mismo.
 
 // ── Herramientas por servicio ──────────────────────────────────────────────
 //

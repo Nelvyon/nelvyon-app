@@ -1066,6 +1066,47 @@ const POR_DOMINIO: Readonly<Record<string, readonly Comprobacion[]>> = {
         return hayControl ? null : `atribuye un resultado sin línea base: «${m[0].trim()}»`;
       },
     },
+    {
+      id: "el-cero-no-se-presenta-como-caida",
+      descripcion: "Un cero repentino se trata como medición rota, no como desplome",
+      clase: "rubrica",
+      gravedad: "bloqueante",
+      evaluar: (p) => {
+        const metricas = p.contenido.metricas;
+        if (!Array.isArray(metricas) || metricas.length === 0) return undefined;
+        // Cuando una etiqueta deja de dispararse, el panel muestra cero. Leerlo
+        // como una caída del negocio es cómo se apagan campañas que estaban
+        // funcionando. Un cero exige decir que se ha comprobado la medición
+        // antes de interpretarlo.
+        const cerosSinRevisar = metricas.filter((m) => {
+          const o = m as { valor?: unknown; medicionComprobada?: unknown };
+          return o?.valor === 0 && o?.medicionComprobada !== true;
+        });
+        return cerosSinRevisar.length > 0
+          ? `${cerosSinRevisar.length} métrica(s) a cero sin comprobar la medición: un cero es antes una etiqueta caída que un desplome`
+          : null;
+      },
+    },
+    {
+      id: "el-porcentaje-lleva-denominador",
+      descripcion: "Ningún porcentaje se presenta sin decir sobre cuántos",
+      clase: "determinista",
+      gravedad: "aviso",
+      evaluar: (p) => {
+        const metricas = p.contenido.metricas;
+        if (!Array.isArray(metricas) || metricas.length === 0) return undefined;
+        // «Conversión del 12 %» sobre diecisiete visitas y sobre diecisiete mil
+        // se escriben igual y no significan lo mismo ni de lejos.
+        const sinBase = metricas.filter((m) => {
+          const o = m as { nombre?: unknown; unidad?: unknown; muestra?: unknown };
+          const esPct = o?.unidad === "%" || /(%|tasa|ratio|porcentaje)/i.test(String(o?.nombre ?? ""));
+          return esPct && typeof o?.muestra !== "number";
+        });
+        return sinBase.length > 0
+          ? `${sinBase.length} porcentaje(s) sin muestra: un 12 % sobre diecisiete visitas no es un 12 %`
+          : null;
+      },
+    },
   ],
   reporting: [
     {
@@ -1166,6 +1207,204 @@ const POR_DOMINIO: Readonly<Record<string, readonly Comprobacion[]>> = {
       },
     },
   ],
+  // ── Investigación de mercado ────────────────────────────────────────────
+  //
+  // Un informe de mercado se equivoca de una forma muy concreta: suena
+  // autorizado. Párrafos bien escritos, cifras redondas, competidores
+  // nombrados — y nada de eso comprobable. Estas comprobaciones existen para
+  // que un hallazgo sin fuente no llegue nunca a una reunión de dirección
+  // disfrazado de dato.
+  investigacion: [
+    {
+      id: "cada-hallazgo-lleva-fuente",
+      descripcion: "Ningún hallazgo se afirma sin decir de dónde sale",
+      clase: "determinista",
+      gravedad: "bloqueante",
+      evaluar: (p) => {
+        const hallazgos = p.contenido.hallazgos;
+        if (!Array.isArray(hallazgos) || hallazgos.length === 0) return undefined;
+        const sinFuente = hallazgos.filter((h) => {
+          const f = (h as { fuente?: unknown })?.fuente;
+          return typeof f !== "string" || f.trim().length === 0;
+        });
+        return sinFuente.length > 0
+          ? `${sinFuente.length} de ${hallazgos.length} hallazgo(s) sin fuente: eso es una opinión, no una investigación`
+          : null;
+      },
+    },
+    {
+      id: "distingue-medido-de-estimado",
+      descripcion: "Una cifra estimada se presenta como estimada",
+      clase: "rubrica",
+      gravedad: "bloqueante",
+      evaluar: (p) => {
+        const hallazgos = p.contenido.hallazgos;
+        if (!Array.isArray(hallazgos) || hallazgos.length === 0) return undefined;
+        // Una cifra sin origen declarado se lee como medida. Es el error que
+        // convierte una suposición razonable en un número que alguien repite
+        // en una junta como si lo hubiera contado.
+        const malas = hallazgos.filter((h) => {
+          const o = h as { cifra?: unknown; origen?: unknown };
+          if (o?.cifra === undefined || o?.cifra === null) return false;
+          return o.origen !== "medido" && o.origen !== "estimado" && o.origen !== "declarado_por_terceros";
+        });
+        return malas.length > 0
+          ? `${malas.length} cifra(s) sin decir si están medidas, estimadas o declaradas por un tercero`
+          : null;
+      },
+    },
+    {
+      id: "el-competidor-se-puede-identificar",
+      descripcion: "Cada competidor citado se puede localizar",
+      clase: "determinista",
+      gravedad: "bloqueante",
+      evaluar: (p) => {
+        const comp = p.contenido.competidores;
+        if (!Array.isArray(comp) || comp.length === 0) return undefined;
+        const vagos = comp.filter((c) => {
+          const o = c as { nombre?: unknown; dominio?: unknown };
+          const n = typeof o?.nombre === "string" ? o.nombre.trim() : "";
+          const d = typeof o?.dominio === "string" ? o.dominio.trim() : "";
+          if (!n && !d) return true;
+          return /^(competidor|empresa|marca)\s*[a-z0-9]?$/i.test(n) && !d;
+        });
+        return vagos.length > 0
+          ? `${vagos.length} competidor(es) sin nombre ni dominio: no se pueden comprobar`
+          : null;
+      },
+    },
+    {
+      id: "responde-a-la-decision-que-se-iba-a-tomar",
+      descripcion: "El informe contesta a la pregunta por la que se encargó",
+      clase: "rubrica",
+      gravedad: "bloqueante",
+      evaluar: (p) => {
+        const decision = texto(p, "decision");
+        const reco = p.contenido.recomendaciones;
+        if (!decision) return undefined;
+        if (!Array.isArray(reco) || reco.length === 0) {
+          return "se encargó para decidir algo y no termina en ninguna recomendación";
+        }
+        return null;
+      },
+    },
+    {
+      id: "no-generaliza-desde-cuatro-casos",
+      descripcion: "No se saca una conclusión de mercado de una muestra minúscula",
+      clase: "rubrica",
+      gravedad: "aviso",
+      evaluar: (p) => {
+        const m = p.contenido.muestra;
+        if (typeof m !== "number") return undefined;
+        return m < 5
+          ? `la conclusión se apoya en ${m} caso(s): eso describe esos casos, no el mercado`
+          : null;
+      },
+    },
+  ],
+
+  // ── Visibilidad en buscadores con IA ────────────────────────────────────
+  //
+  // La disciplina más fácil de vender con humo, porque casi nadie sabe todavía
+  // cómo se mide. Por eso la comprobación más dura de aquí no es de calidad
+  // del contenido: es la que impide prometer una posición que nadie controla.
+  geo: [
+    {
+      id: "no-promete-aparecer-en-la-ia",
+      descripcion: "No se garantiza salir citado en un asistente",
+      clase: "determinista",
+      gravedad: "bloqueante",
+      evaluar: (p) => {
+        const t = [texto(p, "texto"), texto(p, "propuesta"), texto(p, "resumen")]
+          .filter(Boolean)
+          .join("\n");
+        if (!t) return undefined;
+        // Ningún proveedor controla lo que cita un modelo. Prometerlo es
+        // vender un resultado que no depende de quien lo vende.
+        const promesa =
+          /(garantiz\w+|asegur\w+)[^.]{0,60}(chatgpt|gemini|perplexity|copilot|claude|asistente|respuestas? de (la )?ia)/i.exec(t) ??
+          /(saldr[áa]s|aparecer[áa]s)\s+(siempre|seguro)[^.]{0,40}(ia|chatgpt|asistente)/i.exec(t);
+        return promesa
+          ? `promete una cita que nadie puede garantizar: «${promesa[0].slice(0, 80)}»`
+          : null;
+      },
+    },
+    {
+      id: "las-preguntas-son-preguntas",
+      descripcion: "Se trabaja sobre preguntas completas, no sobre palabras clave",
+      clase: "rubrica",
+      gravedad: "aviso",
+      evaluar: (p) => {
+        const qs = p.contenido.preguntas;
+        if (!Array.isArray(qs) || qs.length === 0) return undefined;
+        const textos = qs
+          .map((q) => (typeof q === "string" ? q : (q as { texto?: string })?.texto))
+          .filter((x): x is string => Boolean(x));
+        if (textos.length === 0) return undefined;
+        // A un asistente se le habla; a un buscador se le teclea. Una lista de
+        // dos palabras es investigación de keywords con otro nombre.
+        const sueltas = textos.filter((t) => t.trim().split(/\s+/).length < 4);
+        return sueltas.length > textos.length / 2
+          ? `${sueltas.length} de ${textos.length} son palabras clave, no preguntas: eso ya lo cubre el SEO`
+          : null;
+      },
+    },
+    {
+      id: "responde-antes-de-enrollarse",
+      descripcion: "La respuesta aparece al principio, no al final",
+      clase: "rubrica",
+      gravedad: "aviso",
+      evaluar: (p) => {
+        const t = texto(p, "texto");
+        const pregunta = texto(p, "pregunta");
+        if (!t || !pregunta) return undefined;
+        const primeras = t.split(/\n+/).slice(0, 3).join(" ");
+        if (primeras.trim().length === 0) return undefined;
+        const palabras = pregunta
+          .toLowerCase()
+          .replace(/[¿?¡!.,;:]/g, " ")
+          .split(/\s+/)
+          .filter((w) => w.length > 4);
+        if (palabras.length === 0) return undefined;
+        const cubiertas = palabras.filter((w) => primeras.toLowerCase().includes(w));
+        return cubiertas.length === 0
+          ? "las primeras líneas no tocan la pregunta: un asistente extrae de arriba"
+          : null;
+      },
+    },
+    {
+      id: "aporta-algo-que-no-esta-en-otros-cien-sitios",
+      descripcion: "Hay al menos un dato propio que justifique la cita",
+      clase: "rubrica",
+      gravedad: "bloqueante",
+      evaluar: (p) => {
+        const t = texto(p, "texto");
+        if (!t) return undefined;
+        const propios = p.contenido.datosPropios;
+        if (Array.isArray(propios) && propios.length > 0) return null;
+        // Sin un dato propio no hay motivo para citar a este cliente en vez de
+        // a cualquiera de los otros que dicen lo mismo.
+        return "no hay ningún dato propio: sin eso no hay razón para citar a este cliente y no a otro";
+      },
+    },
+    {
+      id: "el-esquema-declara-lo-que-el-texto-dice",
+      descripcion: "Los datos estructurados no contradicen al contenido",
+      clase: "determinista",
+      gravedad: "bloqueante",
+      evaluar: (p) => {
+        const esquema = p.contenido.esquema as { tipo?: unknown; nombre?: unknown } | undefined;
+        const t = texto(p, "texto");
+        if (!esquema || typeof esquema.nombre !== "string" || !t) return undefined;
+        // Marcar como FAQ algo que no contesta nada, o declarar un nombre que
+        // no aparece, es exactamente lo que se penaliza como marcado engañoso.
+        return t.toLowerCase().includes(esquema.nombre.toLowerCase())
+          ? null
+          : `el esquema declara «${esquema.nombre}» y el texto no lo menciona`;
+      },
+    },
+  ],
+
   compliance: [
     {
       id: "respeta-el-sector-regulado",

@@ -11,13 +11,27 @@
     "Medido con cinco clientes cuyas decisiones correctas se contradicen",
     "entre si. Coste externo 0 EUR: el modelo nunca se llama."
   ],
-  "generado": "2026-08-29T16:28:22.915Z",
-  "total": 26,
-  "medidos": 25,
+  "generado": "2026-08-29T16:57:06.151Z",
+  "total": 30,
+  "medidos": 29,
   "porVeredicto": {
-    "PERSONALIZA": 25
+    "PERSONALIZA": 29
   },
   "servicios": [
+    {
+      "servicio": "geo_ai_search_premium",
+      "veredicto": "PERSONALIZA",
+      "cobertura": 1,
+      "separacion": 0.321,
+      "hechosQueNoLlegan": []
+    },
+    {
+      "servicio": "analitica_atribucion_premium",
+      "veredicto": "PERSONALIZA",
+      "cobertura": 1,
+      "separacion": 0.325,
+      "hechosQueNoLlegan": []
+    },
     {
       "servicio": "landing_premium",
       "veredicto": "PERSONALIZA",
@@ -44,6 +58,20 @@
       "veredicto": "PERSONALIZA",
       "cobertura": 1,
       "separacion": 0.358,
+      "hechosQueNoLlegan": []
+    },
+    {
+      "servicio": "crm_captacion_premium",
+      "veredicto": "PERSONALIZA",
+      "cobertura": 1,
+      "separacion": 0.365,
+      "hechosQueNoLlegan": []
+    },
+    {
+      "servicio": "inteligencia_mercado_premium",
+      "veredicto": "PERSONALIZA",
+      "cobertura": 1,
+      "separacion": 0.37,
       "hechosQueNoLlegan": []
     },
     {

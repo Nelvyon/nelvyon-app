@@ -78,7 +78,14 @@ export const HERRAMIENTAS: readonly Herramienta[] = [
   {
     id: "donde-esta-el-cuello-de-botella",
     que: "Dice en qué paso del embudo se pierde más y qué arreglarlo valdría",
-    servicios: ["advisor_empresarial_premium", "consultoria_automatizacion_premium", "funnel_premium"],
+    servicios: [
+      "advisor_empresarial_premium",
+      "consultoria_automatizacion_premium",
+      "funnel_premium",
+      // El cuello de botella del embudo comercial es el mismo calculo: donde se
+      // cae la gente y cuanto vale recuperarla.
+      "crm_captacion_premium",
+    ],
     consecuencias: [],
     ejecutar(e) {
       // La cuenta que hace un asesor antes de recomendar nada: dónde se cae la
@@ -592,7 +599,13 @@ export const HERRAMIENTAS: readonly Herramienta[] = [
   {
     id: "hueco-de-contenido",
     que: "Dice qué busca la gente que el cliente no responde",
-    servicios: ["seo_premium", "contenido_copywriting_premium"],
+    servicios: [
+      "seo_premium",
+      "contenido_copywriting_premium",
+      // En buscadores de IA el hueco no son palabras clave sino preguntas sin
+      // responder, pero la cuenta es identica.
+      "geo_ai_search_premium",
+    ],
     consecuencias: [],
     ejecutar(e) {
       const buscado = lista(e.loQueSeBusca);
@@ -673,6 +686,123 @@ export const HERRAMIENTAS: readonly Herramienta[] = [
             ? "la lista está sana y se le puede escribir"
             : problemas[0],
         salvedades: ["los umbrales son los que usan los proveedores de correo para bloquear"],
+      };
+    },
+  },
+  {
+    id: "cuadran-las-fuentes",
+    que: "Dice cuánto discrepan dos formas de contar lo mismo y si eso es tolerable",
+    servicios: ["analitica_atribucion_premium"],
+    consecuencias: [],
+    ejecutar(e) {
+      // La primera pregunta de cualquier reunión donde hay dos paneles: «¿por
+      // qué tú dices 412 y yo digo 380?». La respuesta se calcula, no se
+      // opina, y hay un umbral por debajo del cual discrepar es normal:
+      // bloqueo de cookies, atribución distinta, husos horarios. Por encima,
+      // no es ruido, es que una de las dos está mal.
+      const a = num(e.fuenteA);
+      const b = num(e.fuenteB);
+      const faltantes: string[] = [];
+      if (a === null) faltantes.push("cuánto cuenta la primera fuente");
+      if (b === null) faltantes.push("cuánto cuenta la segunda fuente");
+      if (faltantes.length > 0) {
+        return faltan(
+          faltantes,
+          "sin las dos cifras no se puede saber si el panel se puede enseñar a nadie",
+        );
+      }
+      const mayor = Math.max(a as number, b as number);
+      if (mayor === 0) {
+        return faltan(
+          ["al menos una de las dos fuentes con un valor mayor que cero"],
+          "dos ceros no significan que cuadren: significan que probablemente no se está midiendo",
+        );
+      }
+      const diferencia = Math.abs((a as number) - (b as number));
+      const discrepanciaPct = (diferencia / mayor) * 100;
+      // 10 % es lo que se explica solo por consentimiento y ventanas distintas.
+      // 30 % es el punto donde ningún informe construido encima se sostiene.
+      const tolerable = discrepanciaPct <= 10;
+      const grave = discrepanciaPct > 30;
+      return {
+        estado: "CALCULADO",
+        valor: {
+          discrepanciaPct: Math.round(discrepanciaPct * 10) / 10,
+          diferenciaAbsoluta: diferencia,
+          veredicto: grave ? "no_se_puede_informar" : tolerable ? "tolerable" : "hay_que_investigar",
+        },
+        comoSeCalcula: "|A − B| ÷ el mayor de los dos × 100",
+        queSignifica: grave
+          ? `discrepan un ${discrepanciaPct.toFixed(1)} %: con esa diferencia no se puede afirmar nada de lo que hay encima`
+          : tolerable
+            ? `discrepan un ${discrepanciaPct.toFixed(1)} %: entra dentro de lo que explican el consentimiento y las ventanas distintas`
+            : `discrepan un ${discrepanciaPct.toFixed(1)} %: demasiado para ser normal, hay que buscar la causa antes de informar`,
+        salvedades: [
+          "dos herramientas nunca cuadran al 100 %: si cuadran exactamente, sospecha que una copia a la otra",
+        ],
+      };
+    },
+  },
+  {
+    id: "concentracion-del-mercado",
+    que: "Dice si un mercado está repartido o dominado, con la cuenta a la vista",
+    servicios: ["inteligencia_mercado_premium"],
+    consecuencias: [],
+    ejecutar(e) {
+      // Índice de Herfindahl-Hirschman: la suma de los cuadrados de las cuotas.
+      // Se usa porque castiga la concentración — un mercado con un competidor
+      // al 70 % no se ataca como uno con siete al 14 %, y decirlo «a ojo»
+      // produce exactamente el informe que recomienda entrar donde no se puede.
+      const cuotas = lista(e.cuotasDeMercado);
+      if (!cuotas || cuotas.length === 0) {
+        return faltan(
+          ["las cuotas de mercado de los competidores, en porcentaje"],
+          "sin saber cómo está repartido el mercado, recomendar entrar o no entrar es adivinar",
+        );
+      }
+      const valores = cuotas
+        .map((c) => {
+          if (typeof c === "number") return c;
+          const o = c as { cuotaPct?: unknown };
+          return typeof o?.cuotaPct === "number" ? o.cuotaPct : null;
+        })
+        .filter((v): v is number => v !== null && Number.isFinite(v));
+      if (valores.length !== cuotas.length) {
+        return faltan(
+          [`la cuota de ${cuotas.length - valores.length} competidor(es)`],
+          "una cuota que falta no vale cero: descuadra el índice y lo hace parecer más repartido de lo que está",
+        );
+      }
+      const suma = valores.reduce((t, v) => t + v, 0);
+      if (suma > 105) {
+        return faltan(
+          ["cuotas coherentes: las que hay suman más de 100 %"],
+          "si las cuotas suman más del total, alguna está mal medida y el índice no significa nada",
+        );
+      }
+      const hhi = Math.round(valores.reduce((t, v) => t + v * v, 0));
+      // Los tramos son los que usan las autoridades de competencia.
+      const lectura = hhi < 1500 ? "repartido" : hhi < 2500 ? "moderadamente_concentrado" : "concentrado";
+      const restoSinIdentificar = Math.max(0, 100 - suma);
+      return {
+        estado: "CALCULADO",
+        valor: {
+          hhi,
+          lectura,
+          lider: Math.max(...valores),
+          competidoresIdentificados: valores.length,
+          restoSinIdentificarPct: Math.round(restoSinIdentificar * 10) / 10,
+        },
+        comoSeCalcula: "suma de cada cuota elevada al cuadrado (Herfindahl-Hirschman)",
+        queSignifica:
+          lectura === "concentrado"
+            ? `mercado concentrado (HHI ${hhi}): entrar de frente compite contra alguien que puede aguantar más tiempo perdiendo dinero`
+            : lectura === "moderadamente_concentrado"
+              ? `concentración media (HHI ${hhi}): hay hueco, pero no en el centro del mercado`
+              : `mercado repartido (HHI ${hhi}): nadie manda, lo que suele significar que se compite por precio`,
+        salvedades: restoSinIdentificar > 20
+          ? [`un ${restoSinIdentificar.toFixed(0)} % del mercado no está identificado: el índice es un mínimo, la concentración real puede ser mayor`]
+          : [],
       };
     },
   },

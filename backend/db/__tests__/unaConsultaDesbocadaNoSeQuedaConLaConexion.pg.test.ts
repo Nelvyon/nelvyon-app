@@ -103,6 +103,11 @@ soloConBase("BLOQUE 8 · los tres plazos del pool", () => {
     process.env.NELVYON_DB_STATEMENT_TIMEOUT_MS = "400";
     const { Pool } = await import("pg");
     const p = new Pool({ ...(opciones(DSN) as object), max: 1 } as never);
+    // El servidor va a matar esta conexion a proposito. Un `Pool` de `pg` emite
+    // ese corte como evento `error`, y un `error` sin oyente en Node no es un
+    // aviso: tumba el proceso. La prueba pasaba y dejaba dos errores sueltos en
+    // la ejecucion completa, que es justo lo que enseña a ignorar los errores.
+    p.on("error", () => {});
     try {
       await p.query("SELECT pg_sleep(10)").catch(() => null);
       const r = await p.query<{ ok: number }>("SELECT 1::int AS ok");
@@ -126,8 +131,11 @@ soloConBase("BLOQUE 8 · los tres plazos del pool", () => {
     process.env.NELVYON_DB_IDLE_TX_TIMEOUT_MS = "500";
     const { Pool } = await import("pg");
     const p = new Pool(opciones(DSN) as never);
+    p.on("error", () => {});
     try {
       const c = await p.connect();
+      // Y el cliente aparte: el corte llega por su socket, no por el del pool.
+      (c as unknown as { on(e: string, f: () => void): void }).on("error", () => {});
       await c.query("BEGIN");
       await c.query("SELECT 1");
       await new Promise((r) => setTimeout(r, 1_200));
@@ -137,7 +145,10 @@ soloConBase("BLOQUE 8 · los tres plazos del pool", () => {
       } catch (e) {
         mensaje = e instanceof Error ? e.message : String(e);
       }
-      c.release();
+      // `release(true)` DESCARTA la conexion en vez de devolverla al pool. Sin
+      // el `true`, el pool guarda un socket ya muerto y lo entrega al siguiente
+      // que pida conexion.
+      c.release(true);
       console.info(`transaccion abierta y olvidada: ${mensaje || "SIGUE VIVA"}`);
       expect(
         mensaje,

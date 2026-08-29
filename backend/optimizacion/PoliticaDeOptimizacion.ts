@@ -337,6 +337,110 @@ export const POLITICAS: readonly PoliticaDeDisciplina[] = [
     ],
     cuandoEscalar: ["la marca del cliente ha cambiado y las piezas ya no encajan"],
   },
+  {
+    disciplina: "crm_captacion",
+    servicios: ["crm_captacion_premium"],
+    metricaPrincipal: "leads_cualificados",
+    // «Leads» a secas engaña: doscientos contactos que no compran son peores
+    // que veinte que sí, porque además ocupan al equipo de ventas.
+    metricasQueVigilan: ["tasa_de_cualificacion", "tiempo_hasta_primer_contacto", "cierres", "coste_por_lead"],
+    variacionMinimaPct: 15,
+    muestraMinima: { que: "leads en el periodo", minimo: 40 },
+    caidaPreocupantePct: 25,
+    palancas: [
+      { id: "afinar_criterio", que: "afinar qué contacto se considera bueno", consecuencias: [], diasHastaPoderMedir: 30 },
+      { id: "acortar_respuesta", que: "reducir el tiempo hasta el primer contacto", consecuencias: [], diasHastaPoderMedir: 21 },
+      { id: "cambiar_formulario", que: "cambiar qué se pregunta al captar", consecuencias: [], diasHastaPoderMedir: 21 },
+      { id: "reactivar_dormidos", que: "reactivar contactos antiguos", consecuencias: ["contacta_personas"], diasHastaPoderMedir: 30 },
+    ],
+    hipotesis: [
+      "entran muchos contactos pero el criterio de cualificación deja pasar a cualquiera",
+      "se tarda demasiado en llamar y para entonces ya han hablado con otro",
+      "el formulario no pregunta lo que distingue a un buen contacto",
+      "los motivos de pérdida se repiten y nadie ha actuado sobre ellos",
+    ],
+    cuandoEscalar: [
+      "el coste por lead cualificado supera lo que deja un cliente",
+      "ventas dice que los leads no sirven: eso no lo arregla más volumen",
+    ],
+  },
+  {
+    disciplina: "analitica",
+    servicios: ["analitica_atribucion_premium"],
+    // Lo que se optimiza aquí NO es el negocio del cliente: es la calidad de la
+    // medición. Confundirlo llevaría a «mejorar» los números en vez de
+    // mejorar lo que miden.
+    metricaPrincipal: "cobertura_de_medicion",
+    metricasQueVigilan: ["discrepancia_entre_fuentes", "conversiones_sin_origen", "eventos_perdidos"],
+    variacionMinimaPct: 10,
+    muestraMinima: { que: "sesiones medidas", minimo: 500 },
+    caidaPreocupantePct: 15,
+    palancas: [
+      { id: "arreglar_etiquetas", que: "arreglar las etiquetas que no disparan", consecuencias: [], diasHastaPoderMedir: 14 },
+      { id: "unificar_definiciones", que: "unificar qué cuenta como conversión", consecuencias: [], diasHastaPoderMedir: 21 },
+      { id: "ampliar_ventana", que: "ajustar la ventana de atribución al ciclo real", consecuencias: [], diasHastaPoderMedir: 30 },
+      { id: "marcar_campanas", que: "etiquetar bien el origen de las campañas", consecuencias: [], diasHastaPoderMedir: 14 },
+    ],
+    hipotesis: [
+      "hay conversiones sin origen porque las campañas no llevan etiqueta",
+      "dos herramientas cuentan distinto porque miden cosas distintas",
+      "la ventana de atribución es más corta que el ciclo de compra",
+      "el consentimiento bloquea la medición de una parte del tráfico",
+    ],
+    cuandoEscalar: [
+      "las fuentes discrepan más de un 30 %: no se puede informar de nada con eso",
+      "hay conversiones que nadie sabe de dónde vienen y son mayoría",
+    ],
+  },
+  {
+    disciplina: "inteligencia_mercado",
+    servicios: ["inteligencia_mercado_premium"],
+    metricaPrincipal: "decisiones_informadas",
+    // Una investigación se juzga por las decisiones que permite tomar, no por
+    // las páginas que ocupa.
+    metricasQueVigilan: ["hallazgos_accionables", "hallazgos_confirmados", "tiempo_hasta_el_hallazgo"],
+    variacionMinimaPct: 25,
+    muestraMinima: { que: "hallazgos con fuente", minimo: 5 },
+    caidaPreocupantePct: 40,
+    palancas: [
+      { id: "estrechar_la_pregunta", que: "estrechar la pregunta de investigación", consecuencias: [], diasHastaPoderMedir: 30 },
+      { id: "cambiar_fuentes", que: "cambiar de dónde se saca la información", consecuencias: [], diasHastaPoderMedir: 30 },
+      { id: "profundizar_en_un_competidor", que: "profundizar en un solo competidor", consecuencias: [], diasHastaPoderMedir: 21 },
+    ],
+    hipotesis: [
+      "la pregunta era demasiado amplia y el informe no decide nada",
+      "las fuentes son públicas y todos los competidores ya las conocen",
+      "el hallazgo importante estaba en un competidor que no se miró",
+    ],
+    cuandoEscalar: [
+      "la investigación no cambia ninguna decisión: entonces no hacía falta",
+      "los datos que harían falta no son públicos ni comprables",
+    ],
+  },
+  {
+    disciplina: "geo_ai_search",
+    servicios: ["geo_ai_search_premium"],
+    metricaPrincipal: "menciones_en_respuestas_de_ia",
+    metricasQueVigilan: ["senales_de_entidad", "citas_con_enlace", "cobertura_de_preguntas"],
+    variacionMinimaPct: 20,
+    muestraMinima: { que: "preguntas comprobadas", minimo: 20 },
+    caidaPreocupantePct: 35,
+    palancas: [
+      { id: "responder_la_pregunta", que: "responder directamente la pregunta que se hace", consecuencias: [], diasHastaPoderMedir: 30 },
+      { id: "aportar_dato_propio", que: "añadir un dato propio que nadie más tenga", consecuencias: [], diasHastaPoderMedir: 45 },
+      { id: "reforzar_entidad", que: "reforzar las señales de entidad de la empresa", consecuencias: [], diasHastaPoderMedir: 45 },
+      { id: "estructurar_datos", que: "marcar los datos con esquema", consecuencias: [], diasHastaPoderMedir: 30 },
+    ],
+    hipotesis: [
+      "el contenido repite lo que ya está en cien sitios: no hay razón para citarlo",
+      "la empresa no está reconocida como entidad y por eso no se la nombra",
+      "el contenido responde al tema pero no a la pregunta concreta",
+    ],
+    cuandoEscalar: [
+      "no se puede medir: comprobar menciones exige consultar modelos de terceros de forma repetida, y eso genera coste externo",
+      "los asistentes citan a un competidor con peor contenido: hay una señal de entidad que falta",
+    ],
+  },
 ];
 
 const PORSERVICIO = new Map<string, PoliticaDeDisciplina>();

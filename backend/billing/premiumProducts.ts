@@ -29,8 +29,64 @@ export const PREMIUM_PRODUCTS: Record<OsPremiumServiceId, PremiumProduct> = {
   influencer_marketing_premium: { name: "Influencer Marketing Premium", amount: 150_000 },
   landing_premium: { name: "Landing Page Premium", amount: 95_000 },
   funnel_premium: { name: "Funnel Multi-paso Premium", amount: 105_000 },
+
+  // ── Los cuatro nuevos, SIN PRECIO DEFINITIVO ────────────────────────────
+  //
+  // `precioPendiente: true` y NO un numero inventado. Poner una cifra
+  // plausible aqui la convertiria en la cifra real el dia que alguien la
+  // copie a una propuesta, y nadie recordaria que se puso a ojo.
+  //
+  // El importe es el de un servicio comparable, SOLO para que la interfaz
+  // pueda pintar algo. Que sea provisional lo dice el propio campo, y la
+  // prueba `elPrecioProvisionalNoSeCobra` impide que se facture.
+  crm_captacion_premium: {
+    name: "CRM y Captación Premium",
+    amount: 100_000,
+    precioPendiente: true,
+  },
+  analitica_atribucion_premium: {
+    name: "Analítica y Atribución Premium",
+    amount: 90_000,
+    precioPendiente: true,
+  },
+  inteligencia_mercado_premium: {
+    name: "Inteligencia de Mercado Premium",
+    amount: 85_000,
+    precioPendiente: true,
+  },
+  geo_ai_search_premium: {
+    name: "Visibilidad en Buscadores de IA Premium",
+    amount: 95_000,
+    precioPendiente: true,
+  },
 };
 
 export function getPremiumProduct(serviceId: string): PremiumProduct | undefined {
   return PREMIUM_PRODUCTS[serviceId as OsPremiumServiceId];
+}
+
+/**
+ * El precio con el que SE PUEDE COBRAR.
+ *
+ * `null` cuando el precio es provisional. No es una comodidad: es lo que impide
+ * que una cifra puesta a ojo acabe en una factura. Quien quiera cobrar tiene
+ * que pasar por aqui y encontrarse con el `null`, en vez de leer `amount` y no
+ * enterarse de que era provisional.
+ *
+ * Fijar el precio real es una DECISION DE NEGOCIO: depende de lo que cuesta
+ * prestar el servicio y de lo que el mercado paga, y ninguna de las dos cosas
+ * esta en el codigo.
+ */
+export function precioFacturable(serviceId: string): number | null {
+  const p = getPremiumProduct(serviceId);
+  if (!p) return null;
+  return p.precioPendiente ? null : p.amount;
+}
+
+/** Los servicios cuyo precio sigue pendiente de decidir. */
+export function serviciosSinPrecioDefinitivo(): string[] {
+  return Object.entries(PREMIUM_PRODUCTS)
+    .filter(([, p]) => p.precioPendiente)
+    .map(([id]) => id)
+    .sort();
 }

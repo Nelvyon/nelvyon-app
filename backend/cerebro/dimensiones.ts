@@ -908,6 +908,204 @@ export const DIMENSIONES: readonly Dimension[] = [
     serviciosQueLaUsan: ["reputacion_online_orm_premium"],
     laAporta: "cliente",
   },
+  // ══ LOS CUATRO SERVICIOS NUEVOS ══════════════════════════════════════════
+  //
+  // Cada uno con lo que su disciplina necesita saber antes de empezar. Un
+  // servicio nuevo sin intake propio nace con el mismo defecto que tenían los
+  // diecinueve de antes.
+
+  // ── CRM y captación ──────────────────────────────────────────────────────
+  {
+    id: "de_donde_llegan_los_contactos",
+    pregunta: "¿Por dónde te llegan los contactos hoy y cuántos al mes?",
+    forma: "mapa",
+    imprescindible: false,
+    caducaEnDias: 90,
+    serviciosQueLaUsan: ["crm_captacion_premium"],
+    laAporta: "cliente",
+  },
+  {
+    id: "cuando_un_contacto_es_bueno",
+    pregunta: "¿En qué se nota que un contacto merece la pena antes de llamarle?",
+    forma: "lista",
+    imprescindible: false,
+    caducaEnDias: 180,
+    // Sin esto se optimiza por volumen, y el equipo de ventas acaba llamando a
+    // gente que nunca iba a comprar. Es la diferencia entre generar leads y
+    // generar trabajo.
+    serviciosQueLaUsan: ["crm_captacion_premium", "funnel_premium"],
+    laAporta: "cliente",
+  },
+  {
+    id: "quien_llama_y_cuando",
+    pregunta: "¿Quién contacta con un lead nuevo, en cuánto tiempo y por qué canal?",
+    forma: "mapa",
+    imprescindible: false,
+    caducaEnDias: 180,
+    serviciosQueLaUsan: ["crm_captacion_premium"],
+    laAporta: "cliente",
+  },
+  {
+    id: "por_que_se_pierden",
+    pregunta: "De los que no compran, ¿por qué motivos se caen?",
+    forma: "lista",
+    imprescindible: false,
+    caducaEnDias: 120,
+    // Un embudo sin motivos de pérdida repite los mismos errores cada mes
+    // porque nadie apuntó cuáles fueron.
+    serviciosQueLaUsan: ["crm_captacion_premium"],
+    laAporta: "cliente",
+  },
+  {
+    id: "rendimiento_del_embudo_comercial",
+    pregunta: "Cuántos contactos entran, cuántos se cualifican y cuántos cierran",
+    forma: "mapa",
+    imprescindible: false,
+    caducaEnDias: 30,
+    serviciosQueLaUsan: ["crm_captacion_premium"],
+    laAporta: "medicion",
+  },
+
+  // ── Analítica y atribución ───────────────────────────────────────────────
+  {
+    id: "que_cuenta_como_conversion",
+    pregunta: "¿Qué acción cuenta como una conversión para ti? ¿Y cuánto vale una?",
+    forma: "mapa",
+    imprescindible: false,
+    caducaEnDias: 365,
+    // LA pregunta de analítica. Sin una definición acordada, cada informe mide
+    // una cosa distinta y ninguno se puede comparar con el anterior.
+    serviciosQueLaUsan: ["analitica_atribucion_premium"],
+    laAporta: "cliente",
+  },
+  {
+    id: "que_se_esta_midiendo_ya",
+    pregunta: "¿Qué herramientas de medición tenéis puestas y desde cuándo?",
+    forma: "lista",
+    imprescindible: false,
+    caducaEnDias: 180,
+    serviciosQueLaUsan: ["analitica_atribucion_premium"],
+    laAporta: "cliente",
+  },
+  {
+    id: "cuanto_tarda_en_comprar",
+    pregunta: "Desde que alguien os conoce hasta que compra, ¿cuánto suele pasar?",
+    forma: "texto",
+    imprescindible: false,
+    caducaEnDias: 365,
+    // Decide la ventana de atribución. Medir a 30 días un ciclo de nueve meses
+    // dice que nada funciona.
+    serviciosQueLaUsan: ["analitica_atribucion_premium", "crm_captacion_premium"],
+    laAporta: "cliente",
+  },
+  {
+    id: "salud_de_la_medicion",
+    pregunta: "Si las etiquetas miden bien, si hay huecos y si los números cuadran entre herramientas",
+    forma: "mapa",
+    imprescindible: false,
+    caducaEnDias: 30,
+    serviciosQueLaUsan: ["analitica_atribucion_premium"],
+    laAporta: "medicion",
+  },
+
+  // ── Inteligencia de mercado ──────────────────────────────────────────────
+  {
+    id: "contra_quien_compites_de_verdad",
+    pregunta: "Cuando un cliente no te elige a ti, ¿a quién elige?",
+    forma: "competidores",
+    imprescindible: false,
+    caducaEnDias: 180,
+    // No es lo mismo el competidor que el cliente nombra que aquel al que de
+    // verdad se le van los clientes.
+    serviciosQueLaUsan: ["inteligencia_mercado_premium"],
+    laAporta: "cliente",
+  },
+  {
+    id: "que_decision_hay_que_tomar",
+    pregunta: "¿Qué decisión estáis intentando tomar con esta investigación?",
+    forma: "texto",
+    imprescindible: false,
+    caducaEnDias: null,
+    // Una investigación sin decisión detrás produce un informe que nadie lee.
+    serviciosQueLaUsan: ["inteligencia_mercado_premium", "advisor_empresarial_premium"],
+    laAporta: "cliente",
+  },
+  {
+    id: "donde_quieres_mirar",
+    pregunta: "¿Qué mercado, zona o segmento hay que estudiar?",
+    forma: "texto",
+    imprescindible: false,
+    caducaEnDias: 180,
+    serviciosQueLaUsan: ["inteligencia_mercado_premium"],
+    laAporta: "cliente",
+  },
+  {
+    id: "movimientos_del_mercado",
+    pregunta: "Qué hacen los competidores, qué precios mueven y qué está cambiando",
+    forma: "mapa",
+    imprescindible: false,
+    caducaEnDias: 60,
+    serviciosQueLaUsan: ["inteligencia_mercado_premium"],
+    laAporta: "medicion",
+  },
+
+  // ── Visibilidad en buscadores de IA ──────────────────────────────────────
+  {
+    id: "que_te_preguntarian_a_ti",
+    pregunta: "Si alguien le preguntara a una IA por lo que vendes, ¿qué preguntaría?",
+    forma: "lista",
+    imprescindible: false,
+    caducaEnDias: 180,
+    // No son palabras clave: son preguntas completas. La gente le habla a un
+    // asistente de otra forma que a un buscador.
+    serviciosQueLaUsan: ["geo_ai_search_premium"],
+    laAporta: "cliente",
+  },
+  {
+    id: "que_te_hace_citable",
+    pregunta: "¿Qué datos, cifras o hechos propios tenéis que nadie más pueda dar?",
+    forma: "lista",
+    imprescindible: false,
+    caducaEnDias: 365,
+    // Un asistente cita lo que aporta algo. Repetir lo que ya está en cien
+    // sitios no se cita nunca.
+    serviciosQueLaUsan: ["geo_ai_search_premium", "contenido_copywriting_premium"],
+    laAporta: "cliente",
+  },
+  {
+    id: "donde_te_mencionan_ya",
+    pregunta: "¿En qué sitios ajenos a vosotros ya se os nombra? (prensa, directorios, socios, foros)",
+    forma: "lista",
+    imprescindible: false,
+    caducaEnDias: 120,
+    // Un asistente no aprende quién eres leyendo tu propia web. Lo aprende de
+    // lo que otros dicen de ti. Sin este mapa se trabaja sólo sobre el sitio
+    // del cliente, que es la parte que menos pesa.
+    serviciosQueLaUsan: ["geo_ai_search_premium", "reputacion_online_orm_premium"],
+    laAporta: "cliente",
+  },
+  {
+    id: "senales_de_entidad",
+    pregunta: "Dónde aparece la empresa como entidad reconocible y con qué datos",
+    forma: "mapa",
+    imprescindible: false,
+    caducaEnDias: 90,
+    serviciosQueLaUsan: ["geo_ai_search_premium"],
+    laAporta: "nelvyon",
+  },
+  {
+    id: "menciones_en_respuestas_de_ia",
+    pregunta: "Con qué frecuencia se cita al cliente en las respuestas de los asistentes",
+    forma: "mapa",
+    imprescindible: false,
+    caducaEnDias: 30,
+    // ESTA ES LA QUE ESTÁ BLOQUEADA. Medirla exige consultar modelos de
+    // terceros de forma repetida, y eso genera coste externo que hoy no está
+    // autorizado. La dimensión se declara igual: el día que se autorice, el
+    // hueco ya está donde tiene que estar en vez de improvisarse.
+    serviciosQueLaUsan: ["geo_ai_search_premium"],
+    laAporta: "medicion",
+  },
 ] as const;
 
 const PORID = new Map(DIMENSIONES.map((d) => [d.id, d]));

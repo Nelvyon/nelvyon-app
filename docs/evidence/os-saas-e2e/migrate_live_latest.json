@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-08-27T19:01:16.463Z",
-  "database": "postgresql://nelvyon_local:***@localhost:5434/nelvyon_deriva_1787857269240",
-  "ran": 476,
+  "timestamp": "2026-08-29T16:56:50.272Z",
+  "database": "postgres://nelvyon:***@127.0.0.1:5433/nelvyon_desdecero",
+  "ran": 488,
   "skipped": 0,
-  "totalFiles": 476,
+  "totalFiles": 488,
   "failed": null,
   "ok": true,
   "splitter": "scripts/lib/splitSqlStatements.mjs"

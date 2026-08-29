@@ -1,4 +1,9 @@
-export { getPremiumProduct, PREMIUM_PRODUCTS } from "./premiumProducts";
+export {
+  getPremiumProduct,
+  PREMIUM_PRODUCTS,
+  precioFacturable,
+  serviciosSinPrecioDefinitivo,
+} from "./premiumProducts";
 export type { PremiumProduct } from "./types";
 export {
   BILLABLE_PLANS,

@@ -25,6 +25,29 @@ export const OS_PREMIUM_SERVICE_IDS = [
   "influencer_marketing_premium",
   "landing_premium",
   "funnel_premium",
+
+  // ── Cuatro capacidades que faltaban ─────────────────────────────────────
+  //
+  // Se anaden porque NINGUN servicio las cubria y SI existen los departamentos
+  // que las harian. No se anaden porque suenen bien: cada una tiene resultado
+  // propio, se puede ejecutar con lo que ya hay y se puede medir.
+  //
+  // Lo que NO se ha anadido, y por que:
+  //
+  //   Community management .... cabe dentro de social_media_premium. Otro SKU
+  //                             para lo mismo infla el catalogo sin dar mas.
+  //   Social listening ........ cabe dentro de inteligencia de mercado y de
+  //                             reputacion.
+  //   Growth .................. es una forma de trabajar, no un servicio.
+  //   Partnerships ............ no hay evidencia de encaje. Anadirlo seria
+  //                             inventar demanda.
+  //   Programatica ............ cabe dentro de ads_premium.
+  //
+  // Profundidad antes que catalogo inflado.
+  "crm_captacion_premium",
+  "analitica_atribucion_premium",
+  "inteligencia_mercado_premium",
+  "geo_ai_search_premium",
 ] as const;
 
 export type OsPremiumServiceId = (typeof OS_PREMIUM_SERVICE_IDS)[number];

@@ -27,11 +27,15 @@ import { TresDInmersivoPremiumAgent } from "./agents/TresDInmersivoPremiumAgent"
 import { VideoMultimediaPremiumAgent } from "./agents/VideoMultimediaPremiumAgent";
 import { VozPremiumAgent } from "./agents/VozPremiumAgent";
 import { WebPremiumAgent } from "./agents/WebPremiumAgent";
+import { CrmCaptacionPremiumAgent } from "./agents/CrmCaptacionPremiumAgent";
+import { AnaliticaAtribucionPremiumAgent } from "./agents/AnaliticaAtribucionPremiumAgent";
+import { InteligenciaMercadoPremiumAgent } from "./agents/InteligenciaMercadoPremiumAgent";
+import { GeoAiSearchPremiumAgent } from "./agents/GeoAiSearchPremiumAgent";
 
 type AgentFactory = () => BaseOsAgent;
 
 /**
- * Mapa estático serviceId → fábrica de agente (24 servicios OS premium — todos reales).
+ * Mapa estático serviceId → fábrica de agente (29 servicios OS premium — todos reales).
  */
 export const OS_AGENT_REGISTRY: Record<OsPremiumServiceId, AgentFactory> = {
   web_premium: () => new WebPremiumAgent(),
@@ -59,6 +63,15 @@ export const OS_AGENT_REGISTRY: Record<OsPremiumServiceId, AgentFactory> = {
   influencer_marketing_premium: () => new InfluencerMarketingPremiumAgent(),
   landing_premium: () => new LandingPremiumAgent(),
   funnel_premium: () => new FunnelPremiumAgent(),
+
+  // Los cuatro que faltaban. Mismo contrato que el resto: pasan por
+  // BaseOsAgent, luego por herramientas deterministas y luego por el motor
+  // de calidad. Un agente nuevo que no pase por ahi no es un agente nuevo:
+  // es texto.
+  crm_captacion_premium: () => new CrmCaptacionPremiumAgent(),
+  analitica_atribucion_premium: () => new AnaliticaAtribucionPremiumAgent(),
+  inteligencia_mercado_premium: () => new InteligenciaMercadoPremiumAgent(),
+  geo_ai_search_premium: () => new GeoAiSearchPremiumAgent(),
 };
 
 export function instantiateOsAgent(serviceId: string): BaseOsAgent | null {
