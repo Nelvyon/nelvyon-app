@@ -119,28 +119,50 @@ export class ClientProfileService {
     return rows.map(rowToProfile);
   }
 
+  /**
+   * Enriquece la entrada de un agente con el contexto de su cliente.
+   *
+   * LA FIRMA NO CAMBIA, y eso es deliberado: 253 agentes sectoriales llaman a
+   * este metodo. Lo que cambia es de donde sale el contexto.
+   *
+   *   antes:  `client_profiles`, y punto.
+   *   ahora:  el CEREBRO cuando lo tiene, y `client_profiles` como respaldo.
+   *
+   * El cerebro es la fuente canonica porque es la unica que sabe de donde salio
+   * cada dato, cuanto se fia de el y cuando deja de valer. `client_profiles`
+   * sigue leyendose porque hay clientes antiguos que aun no estan migrados, y
+   * retirar esa lectura antes de demostrar que nadie la necesita romperia 253
+   * agentes a la vez.
+   *
+   * NO SE MEZCLAN las dos fuentes. Si el cerebro tiene contexto de ese cliente,
+   * gana el cerebro entero: mezclar produciria un contexto que no existe en
+   * ninguna de las dos, y ante una contradiccion nadie sabria cual mando.
+   *
+   * `_contextoOrigen` viaja en la salida para que se pueda auditar de donde
+   * vino cada ejecucion. Un contexto sin procedencia es el mismo problema que
+   * un entregable sin procedencia.
+   */
   static async enrichInput(userId: string, brandName: string, baseInput: object): Promise<object> {
     const bn = brandName?.trim();
     if (!bn) return baseInput;
     try {
-      const profile = await ClientProfileService.getProfile(userId, bn);
-      if (!profile) return baseInput;
-      const brief = buildProfileBrief(profile);
+      const { contextoCanonico } = await import("../../cerebro/fuenteCanonica");
+      const { CerebroDeNegocioService } = await import("../../cerebro/CerebroDeNegocioService");
+      const db = DbClient.getInstance();
+      const resuelto = await contextoCanonico(db, new CerebroDeNegocioService(db), userId, bn);
+
+      if (resuelto.origen === "ninguno") return baseInput;
+
       return {
         ...baseInput,
-        _clientProfileBrief: brief,
-        clientProfile_brand_name: profile.brand_name,
-        clientProfile_brand_voice: profile.brand_voice ?? undefined,
-        clientProfile_target_audience: profile.target_audience ?? undefined,
-        clientProfile_industry: profile.industry ?? undefined,
-        clientProfile_competitors: profile.competitors ?? undefined,
-        clientProfile_usp: profile.usp ?? undefined,
-        clientProfile_colors: profile.colors ?? undefined,
-        clientProfile_keywords: profile.keywords ?? undefined,
-        clientProfile_past_results: profile.past_results,
-        clientProfile_preferences: profile.preferences,
+        _clientProfileBrief: resuelto.brief ?? undefined,
+        _contextoOrigen: resuelto.origen,
+        ...resuelto.campos,
       };
     } catch {
+      // Fail-open a proposito: un agente que no puede leer contexto produce
+      // trabajo mas generico, pero produce. Fallar cerrado aqui pararia los 253
+      // por un problema de una tabla auxiliar.
       return baseInput;
     }
   }
