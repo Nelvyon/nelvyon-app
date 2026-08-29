@@ -21,6 +21,147 @@ en `LOCAL_CERTIFIED` + `PRODUCTION_UNVERIFIED`, y ya está.
 
 ---
 
+## Cierre integral pre-producción (29-08-2026, tarde)
+
+Esta fase se propuso cerrar lo que quedaba abierto **sin Daniel**. Lo que sigue
+no es un resumen de intenciones: cada línea tiene su prueba, y las que defienden
+algo tienen además su mutación.
+
+### El catálogo pasa de 25 a 29 servicios
+
+Se añadieron cuatro capacidades que **ningún servicio cubría** y cuyo
+departamento ya existía: captación y CRM, analítica y atribución, inteligencia
+de mercado, y visibilidad en buscadores de IA.
+
+Y se dejaron fuera cinco que «sonaban bien»: community management cabe dentro de
+social media, social listening dentro de inteligencia de mercado y reputación,
+growth es una forma de trabajar y no un servicio, partnerships no tiene encaje
+demostrable, y programática cabe dentro de ads. El motivo de cada exclusión está
+escrito en `backend/os-agents/constants.ts`, no aquí: donde se tomó la decisión.
+
+Cada uno de los cuatro entra con **todo lo que exige un servicio**, no con un
+identificador: dimensiones propias de intake, política de optimización con su
+métrica y su muestra mínima, herramientas deterministas, rúbrica de calidad,
+agente de seis pasos, y personalización **medida ejecutándolo con cinco clientes
+sintéticos** —cobertura 1,00 y separación 0,32-0,37—.
+
+**Los cuatro llevan el precio sin decidir**, y eso no es un olvido: un precio
+sale de lo que cuesta prestar el servicio y de lo que el mercado paga, no de la
+arquitectura. Llevan `precioPendiente: true` y `precioFacturable()` devuelve
+`null` para ellos. La prueba no se conforma con comprobar que la puerta cierra:
+recorre el árbol para verificar que **nadie lee el importe por su cuenta**.
+
+### NELVYON AI infiere de verdad, en local
+
+Todos los informes anteriores decían «inferencia `UNAVAILABLE`», y era correcto:
+nadie lo había comprobado. Pero **«nadie lo ha comprobado» y «no se puede» se
+escriben igual y significan cosas distintas**, y esa confusión llevaba meses.
+
+Medido de punta a punta por el adaptador, contra un Ollama local:
+
+| | |
+|---|---|
+| Procedencia | `REAL_LLM_SUCCESS` — no `MOCK`, no `FALLBACK`, no `RULE_ENGINE` |
+| Modelo | `llama3.1:8b-instruct-q4_K_M` |
+| Tokens | 81 entrada / 184 salida |
+| Coste | **0 €** |
+
+Los tokens importan tanto como la procedencia: producción tiene 14.178 eventos
+que dicen `ok: true` con `tok_in: 1`, que es la firma de un doble de pruebas.
+
+**Y lo que esto NO significa.** No significa que NELVYON AI esté servida. El
+estado se declara ahora en dos líneas separadas —`LOCAL_REAL_MEASURED` para el
+camino real, `UNAVAILABLE` para producción— porque juntarlas en una etiqueta
+obligaba a elegir entre exagerar y quedarse corto.
+
+### Lo que sólo se ve cuando escribe un modelo de verdad
+
+Ejecutados servicios completos contra el modelo local y pasado lo que producen
+por su propia rúbrica. Ahí apareció lo que ninguna prueba con doble determinista
+podía enseñar:
+
+**1. El motor de calidad NO es un espejo de su propio doble.** En el primer
+servicio encontró tres bloqueantes en prosa que no había visto nunca, incluida
+la que la rúbrica `geo` se escribió para impedir: *«garantizar que el asistente
+te cite»*. Un hallazgo aquí no es un fallo de la prueba, es información; lo
+sospechoso sería que no encontrara ninguno nunca.
+
+**2. Cien puntos sin haber mirado nada.** Un informe de mercado salió **`PASS`
+con 100 puntos y sus cinco comprobaciones de dominio sin ejecutar**: el texto no
+traía los campos que miran, así que lo único revisado fue la higiene común —la
+misma que se le aplica a una fotografía—. La rama de alto riesgo ya fallaba
+cerrada; el agujero estaba en la de riesgo bajo, que es la que usa todo lo que
+no toca dinero. Ahora, si la disciplina tiene rúbrica y **ninguna** de sus
+comprobaciones pudo ejecutarse, el veredicto es `REVIEW_REQUIRED`.
+
+Con el caso límite protegido, que importa tanto como la regla: una disciplina
+que **todavía no tiene** rúbrica propia no va a revisión por eso. «No hay nada
+que mirar» y «no se pudo mirar» son cosas distintas, y confundirlas llenaría la
+cola de revisión de ruido — una cola con ruido deja de mirarse.
+
+**3. El entregable no sabía leer lo que escribe un modelo.** El compositor exigía
+que la respuesta *empezara* por `{`. Un modelo real casi nunca lo hace: antepone
+una frase de cortesía y envuelve el JSON en un bloque de código. Con eso, el
+documento del cliente le enseñaba las llaves y las comillas en crudo.
+
+**4. La cadena larga agota el plazo del modelo local.** El quinto paso recibía
+íntegros los cuatro anteriores. Cuando revienta lo hace bien —lanza, no cae a un
+proveedor de pago, no finge éxito— pero no terminar tampoco sirve. Ahora QA
+recibe resúmenes, como ya hacía el paso de informe.
+
+### El inventario de conectores dice lo que hay, no lo que declara su ficha
+
+Los cuatro estados del registro mezclan cosas que hay que separar para decidir:
+«live» significa que el adaptador está escrito, no que haya credenciales ni que
+se haya hablado nunca con el proveedor. Quien lee «live» entiende «funciona».
+
+Contrastados los 16 contra el árbol, **sin una sola credencial puesta**:
+
+| Estado real | Cuántos |
+|---|---|
+| `CREDENTIAL_REQUIRED` — lo desbloquea quien tenga las cuentas | 9 |
+| `PROVIDER_REQUIRED` — hace falta un contrato o una aprobación | 7 |
+
+Y **cinco conectores marcados `stub` tienen el adaptador escrito entero y llaman
+a la API real de su proveedor.** Un `stub` que en realidad significa «falta una
+clave» hace concluir «esto no está hecho» de algo que sí lo está.
+
+`verificadoConElProveedor: false` en los dieciséis, declarado **aparte** del
+estado: si fuera un estado más, un conector «disponible» taparía que nadie lo ha
+visto funcionar.
+
+### La cadena de migraciones aplica entera desde cero
+
+Base nueva, 488 migraciones, **488 aplicadas, 0 fallos**, incluidas las 578–589
+que en producción siguen pendientes de autorización. La base de pruebas que
+había estaba a medias desde una aplicación parcial de la 507 y hacía fallar 110
+pruebas por columnas que no existían: no era el repositorio, era esa base.
+
+### Dos defectos que no fallaban, y por eso llevaban meses
+
+**Una dimensión con eñe.** `que_reseñas_son_ciertas` llevaba una eñe en el
+identificador, y los lectores derivados buscan `[a-z0-9_]+`: la matriz contaba 92
+de 93 y la revisión 93. Dos documentos del mismo árbol discrepando en uno, que es
+una diferencia que no llama la atención de nadie.
+
+**Una prueba que medía la tarjeta gráfica.** `routerRagSchemaScope` llevaba en
+verde por el hardware, no por el código: al cargar un modelo en la GPU empezó a
+fallar porque el router se negaba por falta de VRAM antes de llegar al guard que
+la prueba vigila. En una máquina sin `nvidia-smi` pasaba siempre.
+
+### Un índice que dice de qué documento fiarse
+
+`docs/` tiene 179 ficheros y no había forma de saber cuáles describen el sistema
+de hoy. Clasificados por lo que se puede comprobar: **7 generados** (los únicos
+que no pueden quedarse obsoletos), **46 vigentes**, **121 históricos** — y **5
+que declaran ser automáticos sin que se encuentre quién los escribe**, que es
+peor que estar viejo y parecerlo.
+
+No se borra ninguno: un documento viejo guarda el porqué de decisiones que siguen
+en pie.
+
+---
+
 ## Fase de profundidad de servicios (29-08-2026)
 
 Esta fase cambió el foco: de demostrar que la **maquinaria** funciona a
@@ -31,10 +172,10 @@ demostrar que **lo que hace** vale.
 | Qué | Antes | Después |
 |---|---|---|
 | Contexto del cliente que llega al agente | **0,40** | **1,00** |
-| Servicios que personalizan de verdad | 2 de 25 | **25 de 25** |
-| Servicios con intake propio de su disciplina | 6 de 25 | **25 de 25** |
-| Comprobaciones de calidad | 21 | **60 en 16 disciplinas** |
-| Servicios que entregan un fichero al cliente | 8 de 25 | **25 de 25** |
+| Servicios que personalizan de verdad | 2 de 25 | **29 de 29** |
+| Servicios con intake propio de su disciplina | 6 de 25 | **29 de 29** |
+| Comprobaciones de calidad | 21 | **70 en 18 disciplinas** |
+| Servicios que entregan un fichero al cliente | 8 de 25 | **29 de 29** |
 
 El peor hallazgo no fue el presupuesto: fueron **las restricciones legales**. Una
 tienda de suplementos que no puede prometer resultados y una clínica dental
@@ -177,12 +318,13 @@ Claude:
 
 | Qué | Por qué es suyo |
 |---|---|
-| **Dónde vive el modelo de IA** | decisión empresarial con coste recurrente. Sin ella, todo lo que exige IA real sigue en `UNAVAILABLE`, que es lo correcto pero no es lo útil |
+| **Donde vive el modelo de IA en produccion** | decision empresarial con coste recurrente. El camino real esta medido en local (`LOCAL_REAL_MEASURED`, 0 EUR); lo que falta es donde se sirve |
 | **Aplicar las migraciones 578–589** | son migraciones productivas; ADR-064 exige aprobación auditable y la exige con razón |
 | **Desplegar** | acción productiva |
 | **Los 12 trabajos parados en producción** | ejecutarlos gasta dinero de clientes reales |
-| **Los tres servicios sin departamento** | `influencer_marketing_premium`, `canales_comunicaciones_premium` y `bots_premium` se prometen sin nadie que los haga. O se les asigna departamento o se dejan de ofrecer: las dos son decisiones de negocio |
-| **Los cinco defectos de esquema confirmados** | arreglarlos toca tablas de producción |
+| **Los cuatro precios sin decidir** | `crm_captacion_premium`, `analitica_atribucion_premium`, `inteligencia_mercado_premium` y `geo_ai_search_premium` estan construidos y no son facturables. Un precio sale de lo que cuesta prestarlos y de lo que el mercado paga |
+| **Las credenciales de los 9 conectores en `CREDENTIAL_REQUIRED`** | el codigo esta escrito y llama a la API real; lo que falta son cuentas |
+| **Las aprobaciones de los 7 en `PROVIDER_REQUIRED`** | token de desarrollador de Google Ads, salida del sandbox de SES, plantillas de WhatsApp: los aprueba el proveedor, no el codigo |
 
 ---
 
@@ -206,6 +348,14 @@ node scripts/clasificar-las-55-omisiones-de-la-507.mjs
 node scripts/donde-duele-de-verdad.mjs
 node scripts/revision-de-servicios.mjs
 node scripts/lo-que-se-puede-afirmar.mjs
+node scripts/contrato-de-servicio.mjs
+node scripts/matriz-de-servicios.mjs
+node scripts/que-es-nelvyon-ai.mjs
+node scripts/que-documento-me-creo.mjs
+
+# la inferencia local y la calidad de lo que escribe un modelo de verdad
+cd apps/web && ./node_modules/.bin/vitest run   ../../backend/autonomous/llm/__tests__/laInferenciaLocalEsRealOSeDiceQueNo.pg.test.ts
+cd apps/web && NELVYON_MODELO_REAL=1 ./node_modules/.bin/vitest run   ../../backend/os-agents/__tests__/loQueSaleConUnModeloReal.pg.test.ts
 DATABASE_URL=postgres://... node scripts/cuadro-de-mando.mjs
 ```
 

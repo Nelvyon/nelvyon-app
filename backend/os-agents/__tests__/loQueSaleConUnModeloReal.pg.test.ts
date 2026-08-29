@@ -29,6 +29,12 @@
  * tarda media hora deja de ejecutarse, y una prueba que no se ejecuta no
  * protege nada. Se enciende con `NELVYON_MODELO_REAL=1`.
  *
+ * HACE FALTA `DATABASE_URL`. Algunos servicios terminan publicando un ZIP de
+ * verdad —`seo_premium` lo hace en su ultimo paso—, y eso escribe en la base.
+ * Sin ella el agente falla con «falta DATABASE_URL» despues de seis minutos de
+ * modelo, que es una forma cara de descubrir que faltaba una variable. Se
+ * comprueba antes de empezar.
+ *
  * COSTE EXTERNO: 0 €. Todo contra 127.0.0.1.
  */
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -67,7 +73,16 @@ async function hayModelo(): Promise<string | null> {
 }
 
 const MODELO = await hayModelo();
-const conModelo = MODELO ? describe : describe.skip;
+const HAY_BASE = Boolean(process.env.DATABASE_URL?.trim());
+const conModelo = MODELO && HAY_BASE ? describe : describe.skip;
+
+if (MODELO && !HAY_BASE) {
+  // Se dice, no se falla en silencio: saltarse la medicion sin explicar por que
+  // es como se acaba creyendo que algo se comprobo cuando no.
+  console.warn(
+    "[modelo-real] hay modelo pero falta DATABASE_URL: los servicios que publican un fichero no pueden terminar",
+  );
+}
 
 /**
  * Qué servicios se ejecutan.
