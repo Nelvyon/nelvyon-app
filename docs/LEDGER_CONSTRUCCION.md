@@ -63,29 +63,29 @@ Nada se marca `DONE`: una fase cuya prueba final exige producción es
 | P5 · equivalencia medida | LOCAL_CERTIFIED | `931775e8` | 648 formas; 545 únicas |
 | **Fase 3 · Business Brain** | LOCAL_CERTIFIED | `338bdd41` | 28 dimensiones, 27 pruebas PG |
 | **Fase 2 · journey cliente** | LOCAL_CERTIFIED | `b041713e` | 4 rutas de portal, 26 pruebas PG |
-| Fase 4 · departamentos | LOCAL_CERTIFIED | pendiente | 24 departamentos, 0 vacíos |
-| Fase 5 · contrato de agente | LOCAL_CERTIFIED | pendiente | 23 contratos, 27 pruebas |
-| Fase 6 · caracterización sectorial | LOCAL_CERTIFIED | pendiente | 1.605 al 100 %, 3 familias, 0 rebeldes |
-| **Fase 6b · equivalencia por SALIDA** | LOCAL_CERTIFIED | pendiente | 1.521/1.605 medidos · **1.521 instrucciones distintas · 0 redundantes** |
-| Fase 19 · autonomía L0–L5 | LOCAL_CERTIFIED | pendiente | suelo por consecuencia |
-| Fase 11 · puente agente→ejecutor | LOCAL_CERTIFIED | pendiente | 30 pruebas PG, **7 puertas** |
-| Fase 16 · motor de resultados | LOCAL_CERTIFIED | pendiente | 19 pruebas PG, 4 mutaciones |
-| Fase 23 · customer success | LOCAL_CERTIFIED | pendiente | 19 pruebas PG, 6 tipos de señal |
+| Fase 4 · departamentos | LOCAL_CERTIFIED | `b097e865` | 24 departamentos, 0 vacíos |
+| Fase 5 · contrato de agente | LOCAL_CERTIFIED | `d8fb838f` | 23 contratos, 27 pruebas |
+| Fase 6 · caracterización sectorial | LOCAL_CERTIFIED | `35110e19` | 1.605 al 100 %, 3 familias, 0 rebeldes |
+| **Fase 6b · equivalencia por SALIDA** | LOCAL_CERTIFIED | `9eddce4c` | 1.521/1.605 medidos · **1.521 instrucciones distintas · 0 redundantes** |
+| Fase 19 · autonomía L0–L5 | LOCAL_CERTIFIED | `d8fb838f` | suelo por consecuencia |
+| Fase 11 · puente agente→ejecutor | LOCAL_CERTIFIED | `7487229b` | 30 pruebas PG, **7 puertas** |
+| Fase 16 · motor de resultados | LOCAL_CERTIFIED | `bb050ab0` | 19 pruebas PG, 4 mutaciones |
+| Fase 23 · customer success | LOCAL_CERTIFIED | `e339e73f` | 19 pruebas PG, 6 tipos de señal |
 | **Fase 17 · inteligencia entre deptos.** | LOCAL_CERTIFIED | `385fc8cb` | 29 pruebas PG, 6 mutaciones |
 | **contexto de cliente consolidado** | LOCAL_CERTIFIED | `385fc8cb` | 18 pruebas, 3 fuentes → 1 canónica |
-| **Fase 18 · motor de calidad** | LOCAL_CERTIFIED | pendiente | 39 pruebas, 6 mutaciones, puerta 3 del puente |
-| **Fase 29 · las 55 sentencias** | LOCAL_CERTIFIED | pendiente | 55/55 clasificadas · **5 defectos reales confirmados** |
-| **Fase 33 · rendimiento** | LOCAL_CERTIFIED | pendiente | 34 tablas con RLS sin índice por inquilino · **9,88 ms → 0,14 ms (73x)** |
-| **maquinaria comercial de NELVYON** | LOCAL_CERTIFIED | pendiente | 21 pruebas PG, 8 mutaciones · **envío imposible por diseño** |
-| **departamentos: ventas, comunidad, growth** | LOCAL_CERTIFIED | pendiente | 25 operativos, 5 planeados con motivo |
-| **Fase 24 · portal: el ciclo se ve** | LOCAL_CERTIFIED | pendiente | 9 pruebas de interfaz, 6 mutaciones |
-| **Fase 25 · sala de máquinas** | LOCAL_CERTIFIED | pendiente | 13 pruebas PG + 4 de ruta · 9 mutaciones |
-| **E2E multiservicio** | LOCAL_SIMULATED_EXTERNAL | pendiente | **13/13 servicios recorren el cableado entero** |
-| **invariante de negocio** | LOCAL_CERTIFIED | pendiente | 3 contradicciones «sin agencia» corregidas · prueba que impide la deriva |
-| **honestidad de afirmaciones** | LOCAL_CERTIFIED | pendiente | capacidad ≠ resultado · 4 de 5 resultados NO_MEDIDO |
-| **pasada adversarial** | LOCAL_CERTIFIED | pendiente | 7 vías de ataque · **1 agujero real encontrado y cerrado** |
-| **humo sobre build de producción** | LOCAL_CERTIFIED | pendiente | **153 rutas, 0 respuestas 5xx** · el script no podía ejecutarse y ahora sí |
-| Fase 31 · E2E agencia completa | LOCAL_CERTIFIED | pendiente | 13 pasos, 3 pruebas PG |
+| **Fase 18 · motor de calidad** | LOCAL_CERTIFIED | `9eddce4c` | 39 pruebas, 6 mutaciones, puerta 3 del puente |
+| **Fase 29 · las 55 sentencias** | LOCAL_CERTIFIED | `9eddce4c` | 55/55 clasificadas · **5 defectos reales confirmados** |
+| **Fase 33 · rendimiento** | LOCAL_CERTIFIED | `3ffc6dc2` | 34 tablas con RLS sin índice por inquilino · **9,88 ms → 0,14 ms (73x)** |
+| **maquinaria comercial de NELVYON** | LOCAL_CERTIFIED | `b097e865` | 21 pruebas PG, 8 mutaciones · **envío imposible por diseño** |
+| **departamentos: ventas, comunidad, growth** | LOCAL_CERTIFIED | `b097e865` | 25 operativos, 5 planeados con motivo |
+| **Fase 24 · portal: el ciclo se ve** | LOCAL_CERTIFIED | `949f9fa2` | 9 pruebas de interfaz, 6 mutaciones |
+| **Fase 25 · sala de máquinas** | LOCAL_CERTIFIED | `949f9fa2` | 13 pruebas PG + 4 de ruta · 9 mutaciones |
+| **E2E multiservicio** | LOCAL_SIMULATED_EXTERNAL | `949f9fa2` | **13/13 servicios recorren el cableado entero** |
+| **invariante de negocio** | LOCAL_CERTIFIED | `c4e357b7` | 3 contradicciones «sin agencia» corregidas · prueba que impide la deriva |
+| **honestidad de afirmaciones** | LOCAL_CERTIFIED | `c4e357b7` | capacidad ≠ resultado · 4 de 5 resultados NO_MEDIDO |
+| **pasada adversarial** | LOCAL_CERTIFIED | `7487229b` | 7 vías de ataque · **1 agujero real encontrado y cerrado** |
+| **humo sobre build de producción** | LOCAL_CERTIFIED | `7487229b` | **153 rutas, 0 respuestas 5xx** · el script no podía ejecutarse y ahora sí |
+| Fase 31 · E2E agencia completa | LOCAL_CERTIFIED | `9eddce4c` | 13 pasos, 3 pruebas PG |
 
 ---
 
