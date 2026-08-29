@@ -1,4 +1,5 @@
 import { apiClient } from "@/core/api";
+import type { ResumenDelCiclo } from "@/features/client_portal_v1/cicloTypes";
 import type {
   PortalAcceptInviteInput,
   PortalAuthResponse,
@@ -38,6 +39,15 @@ export const portalApi = {
     }),
 
   me: () => apiClient.get<PortalUser>(`${BASE}/me`, portalOpts),
+
+  /**
+   * El ciclo del cliente en una sola llamada.
+   *
+   * Va junto a propósito: un portal donde hay que navegar para descubrir que
+   * falta un dato es un portal donde ese dato no se descubre, y el trabajo se
+   * queda parado sin que nadie sepa por qué.
+   */
+  resumenDelCiclo: () => apiClient.get<ResumenDelCiclo>(`${BASE}/resumen`, portalOpts),
 
   listProjects: (params?: { page?: number; page_size?: number; q?: string }) =>
     apiClient.get<PortalListResponse<PortalProject>>(`${BASE}/projects${qs(params ?? {})}`, portalOpts),

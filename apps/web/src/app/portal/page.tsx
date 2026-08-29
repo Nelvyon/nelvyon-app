@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { Button } from "@/core/ui/button";
 import { PortalDeliverableCard } from "@/features/client_portal_v1/components/PortalCards";
+import { LoQueFaltaParaEmpezar } from "@/features/client_portal_v1/components/LoQueFaltaParaEmpezar";
 import { PortalPageShell } from "@/features/client_portal_v1/components/PortalPageShell";
 import {
   PortalEmptyState,
@@ -12,13 +13,19 @@ import {
 } from "@/features/client_portal_v1/components/PortalUiStates";
 import { portalPackLabel } from "@/features/client_portal_v1/portalPackProgress";
 import { usePortalAuth } from "@/features/client_portal_v1/PortalAuthContext";
-import { usePortalDeliverables, usePortalMe, usePortalProjects } from "@/features/client_portal_v1/hooks";
+import {
+  usePortalCiclo,
+  usePortalDeliverables,
+  usePortalMe,
+  usePortalProjects,
+} from "@/features/client_portal_v1/hooks";
 
 export default function PortalDashboardPage() {
   const { user } = usePortalAuth();
   const me = usePortalMe();
   const projects = usePortalProjects();
   const deliverables = usePortalDeliverables();
+  const ciclo = usePortalCiclo();
 
   const pendingReview =
     deliverables.data?.items.filter((d) => d.status === "published").length ?? 0;
@@ -34,6 +41,27 @@ export default function PortalDashboardPage() {
       {me.isLoading ? <PortalLoadingState message="Cargando perfil…" /> : null}
       {me.isError ? (
         <PortalErrorState message={me.error instanceof Error ? me.error.message : undefined} onRetry={() => void me.refetch()} />
+      ) : null}
+
+      {/*
+        LO PRIMERO, Y ANTES QUE LOS NÚMEROS.
+
+        Un cliente que entra necesita saber si su trabajo puede avanzar, no
+        cuántos entregables acumula. En producción hay doce trabajos encolados
+        desde junio que nunca arrancaron: lo que se atascaba era el principio,
+        y el portal no lo contaba.
+
+        Si el resumen del ciclo falla, NO se enseña un error rojo aquí: el
+        resto del panel sigue siendo útil, y un error en un bloque secundario
+        que tapa la página entera es peor que el bloque ausente. El componente
+        se calla solo cuando no hay nada pendiente.
+      */}
+      {ciclo.data ? (
+        <LoQueFaltaParaEmpezar
+          datos={ciclo.data.loQueFalta.datos}
+          conexiones={ciclo.data.loQueFalta.conexiones}
+          listoParaOperar={ciclo.data.listoParaOperar}
+        />
       ) : null}
 
       {user ? (
@@ -53,6 +81,23 @@ export default function PortalDashboardPage() {
           <div className="rounded-lg border border-border bg-card p-4 shadow-card">
             <p className="text-xs uppercase text-muted-foreground">Growth Packs</p>
             <p className="mt-1 text-2xl font-semibold">{packProjects}</p>
+          </div>
+          {/*
+            El estado del ciclo, con su tercer valor explícito.
+
+            Mientras el resumen no ha llegado NO se dice «todo listo»: se dice
+            que aún no se sabe. Enseñar el estado bueno por defecto y corregirlo
+            al cargar es cómo un cliente se queda con la idea equivocada.
+          */}
+          <div className="rounded-lg border border-border bg-card p-4 shadow-card">
+            <p className="text-xs uppercase text-muted-foreground">Podemos trabajar</p>
+            <p className="mt-1 text-2xl font-semibold">
+              {ciclo.isLoading || !ciclo.data
+                ? "—"
+                : ciclo.data.listoParaOperar
+                  ? "Sí"
+                  : "Falta algo"}
+            </p>
           </div>
         </div>
       ) : null}

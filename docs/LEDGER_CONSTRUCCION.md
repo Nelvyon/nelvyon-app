@@ -78,7 +78,9 @@ Nada se marca `DONE`: una fase cuya prueba final exige producción es
 | **Fase 33 · rendimiento** | LOCAL_CERTIFIED | pendiente | 34 tablas con RLS sin índice por inquilino · **9,88 ms → 0,14 ms (73x)** |
 | **maquinaria comercial de NELVYON** | LOCAL_CERTIFIED | pendiente | 21 pruebas PG, 8 mutaciones · **envío imposible por diseño** |
 | **departamentos: ventas, comunidad, growth** | LOCAL_CERTIFIED | pendiente | 25 operativos, 5 planeados con motivo |
-| Fase 24 · portal premium | PENDIENTE | — | |
+| **Fase 24 · portal: el ciclo se ve** | LOCAL_CERTIFIED | pendiente | 9 pruebas de interfaz, 6 mutaciones |
+| **Fase 25 · sala de máquinas** | LOCAL_CERTIFIED | pendiente | 13 pruebas PG + 4 de ruta · 9 mutaciones |
+| **E2E multiservicio** | LOCAL_SIMULATED_EXTERNAL | pendiente | **13/13 servicios recorren el cableado entero** |
 | Fase 31 · E2E agencia completa | LOCAL_CERTIFIED | pendiente | 13 pasos, 3 pruebas PG |
 
 ---
