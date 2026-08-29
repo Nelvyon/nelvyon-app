@@ -19,6 +19,8 @@
  */
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import pg from "pg";
+import fs from "node:fs";
+import path from "node:path";
 
 import {
   CerebroDeNegocioService,
@@ -293,6 +295,42 @@ conBase("el cerebro de negocio", () => {
           valor: { texto: "   " }, procedencia: "cliente_intake", origen: "p",
         }),
       ).rejects.toThrow(/no vacío/);
+    });
+
+    it("EL IDENTIFICADOR ES UN SLUG, NO UNA FRASE", () => {
+      // LO QUE ESTO ENCONTRO. Una dimension se llamaba `que_reseñas_son_ciertas`,
+      // con ene, y por eso se le escapaba a TODOS los inventarios derivados: los
+      // lectores buscan `[a-z0-9_]+`, asi que la matriz contaba 92 de 93 sin
+      // quejarse. Un fichero y un documento que dice cuantas cosas tiene ese
+      // fichero pueden discrepar en uno durante meses sin que nadie lo note,
+      // porque un uno de diferencia no llama la atencion de nadie.
+      //
+      // El identificador es una CLAVE: viaja a la base de datos, a las URL, a
+      // los informes y a las expresiones regulares que los generan. La pregunta
+      // es la que lleva acentos, y los lleva.
+      const raros = DIMENSIONES.filter((x) => !/^[a-z0-9_]+$/.test(x.id)).map((x) => x.id);
+      expect(raros, "identificadores que no son slugs ASCII").toEqual([]);
+
+      // Y ninguno repetido: dos dimensiones con el mismo id se pisan al leer.
+      const vistos = new Set(DIMENSIONES.map((x) => x.id));
+      expect(vistos.size).toBe(DIMENSIONES.length);
+    });
+
+    it("los inventarios derivados leen TODAS las dimensiones que hay", () => {
+      // El control de lo de arriba, desde el otro lado: se cuenta el fichero con
+      // el mismo patron que usan la matriz y el contrato, y tiene que dar el
+      // mismo numero que el modulo. Si un dia divergen, este documento lo dice
+      // en vez de que dos informes se contradigan en silencio.
+      const fuente = fs
+        .readFileSync(path.join(__dirname, "..", "dimensiones.ts"), "utf8")
+        .replace(/\r\n/g, "\n");
+      const leidas = fuente
+        .split(/\n  \{\n/)
+        .slice(1)
+        .filter((b) => /id:\s*"[a-z0-9_]+"/.test(b)).length;
+      expect(leidas, "el lector derivado ve menos dimensiones de las que hay").toBe(
+        DIMENSIONES.length,
+      );
     });
 
     it("todas las dimensiones del catálogo tienen pregunta y forma", () => {

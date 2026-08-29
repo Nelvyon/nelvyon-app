@@ -58,7 +58,7 @@ scripts/puerta-de-build.mjs ejecuta un `next build` real, no un typecheck
 
 ### Pruebas que pasan
 
-**7926 pruebas pasan** y **1 fallan**, ejecutadas ahora mismo.
+**8035 pruebas pasan** y **1 fallan**, ejecutadas ahora mismo.
 
 El número sale de ejecutar la suite, no de contar ficheros de prueba. Un
 fichero de prueba que nadie ejecuta no prueba nada.

@@ -36,6 +36,51 @@ vi.mock("../OllamaClient", () => ({
   getOllamaClient: () => ({ chat: chatMock, isModelAvailable: async () => true }),
 }));
 
+/**
+ * LA MAQUINA NO DECIDE EL RESULTADO DE ESTA PRUEBA.
+ *
+ * Se descubrio cuando otra cosa empezo a usar la GPU: el router miro la VRAM
+ * libre, no le llego, y devolvio `insufficient_vram` sin haber pasado nunca por
+ * el guard de esquema RAG. La prueba no fallaba por lo que vigila —el alcance
+ * del fail-closed— sino porque en ese momento habia un modelo cargado en la
+ * tarjeta. En una maquina sin `nvidia-smi` pasaba siempre, porque sin dato de
+ * VRAM el router no puede negarse.
+ *
+ * Una prueba cuyo resultado depende del estado del hardware es peor que no
+ * tenerla: pasa con el portatil ocioso, falla en cuanto alguien hace algo, y lo
+ * que ensena es a relanzarla en vez de a mirar.
+ *
+ * Se sustituye `estimateResources` y NO `getSystemSnapshot`: la funcion que
+ * decide llama a la del sistema dentro del mismo modulo, asi que cambiar la
+ * segunda no cambia nada. Mockear una exportacion que el consumidor real no
+ * atraviesa deja la prueba igual de rota y con aspecto de arreglada.
+ *
+ * Que el router se niegue a arrancar un modelo sin VRAM es correcto y tiene su
+ * propia prueba; no es esta.
+ */
+vi.mock("../router/ResourceBudget", async () => {
+  const actual = await vi.importActual<typeof import("../router/ResourceBudget")>(
+    "../router/ResourceBudget",
+  );
+  return {
+    ...actual,
+    estimateResources: (
+      profile: { defaultNumCtx: number },
+      queueDepth: number,
+      loadedModel: string | null,
+    ) => ({
+      ok: true,
+      estimatedCtx: profile.defaultNumCtx,
+      estimatedVramMiB: 0,
+      estimatedRamMiB: 0,
+      vramAvailableMiB: 24_576,
+      ramAvailableMiB: 32_768,
+      modelLoaded: loadedModel,
+      queueDepth,
+    }),
+  };
+});
+
 import { executeTask, resetLocalModelRouterForTests } from "../router/LocalModelRouter";
 import { planRag } from "../router/RoutingPolicy";
 import { classifyTask } from "../router/TaskClassifier";

@@ -898,7 +898,12 @@ export const DIMENSIONES: readonly Dimension[] = [
     laAporta: "cliente",
   },
   {
-    id: "que_reseñas_son_ciertas",
+    // Sin la enye: el identificador es un slug, no una frase. Con ella, este
+    // bloque se le escapaba a TODO inventario derivado —la matriz leia 92 de
+    // 93 dimensiones sin decir nada— porque los lectores buscan `[a-z0-9_]+`.
+    // Un fichero de dimensiones y un documento que dice cuantas hay pueden
+    // discrepar en uno durante meses sin que nadie lo note.
+    id: "que_resenas_son_ciertas",
     pregunta: "De lo que os critican, ¿qué es verdad y estáis arreglando?",
     forma: "lista",
     imprescindible: false,
