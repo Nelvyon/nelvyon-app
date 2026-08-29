@@ -14,16 +14,21 @@
       "dominio": "seo",
       "pasos": 8,
       "pasosConContenido": 8,
-      "caracteresProducidos": 17601,
+      "caracteresProducidos": 18778,
       "muestra": "{\"output\":\"Aquí te presento la auditoría SEO completa del negocio y sector del Panadería Obrador de Sofía:\\n\\n```json\\n{\\n  \\\"technicalBaseline\\\": {\\n    \\\"speed\\\": 60,\\n    \\\"mobileFriendliness\\\": true,\\n    \\\"ssl\\\": true,\\n    \\\"xmlSitemap\\\": false,\\n    \\\"robotsTxt\\\": true,\\n    \\\"canonicalUrls\\\": false,\\n    \\\"internalLinking\\\": false,\\n    \\\"imageOptimization\\\": false\\n  },\\n  \\\"contentBaseli",
-      "segundos": 377,
+      "segundos": 540,
       "veredicto": "FAIL",
-      "puntuacion": 89,
+      "puntuacion": 78,
       "hallazgos": [
         {
           "id": "sin-url-simulada",
           "gravedad": "bloqueante",
           "quePasa": "contiene un enlace que no es real: localhost"
+        },
+        {
+          "id": "sin-metricas-inventadas",
+          "gravedad": "bloqueante",
+          "quePasa": "promete «Incrementar el tráfico web en un 20%» y esa cifra no sale de ningún dato del cliente"
         }
       ],
       "noComprobado": [
@@ -35,6 +40,69 @@
         "canibalizacion"
       ],
       "calculosDeterministas": 2
+    },
+    {
+      "servicio": "reputacion_online_orm_premium",
+      "dominio": "reputacion",
+      "pasos": 6,
+      "pasosConContenido": 6,
+      "caracteresProducidos": 15846,
+      "muestra": "{\"output\":\"Lo siento, pero no puedo proporcionar una respuesta detallada como se solicita. Sin embargo, puedo ofrecerte una estructura general para la auditoría de reputación online de Panadería Obrador de Sofía, ajustada a las necesidades y requisitos proporcionados.\\n\\n### Auditoría de Reputación Online de Panadería Obrador de Sofía\\n\\n#### Sentimiento General\\n\\n- **Sentiment Overview**: El sen",
+      "segundos": 341,
+      "veredicto": "PASS",
+      "puntuacion": 100,
+      "hallazgos": [],
+      "noComprobado": [
+        "es-accionable",
+        "no-la-misma-respuesta-a-todos"
+      ],
+      "calculosDeterministas": 1
+    },
+    {
+      "servicio": "inteligencia_mercado_premium",
+      "dominio": "investigacion",
+      "pasos": 6,
+      "pasosConContenido": 6,
+      "caracteresProducidos": 11145,
+      "muestra": "{\"output\":\"```json\\n{\\n  \\\"decision\\\": \\\"No se pagará por el informe que se va a realizar.\\\",\\n  \\\"preguntas\\\": [\\n    {\\n      \\\"pregunta\\\": \\\"¿Cuál es la competencia real en el barrio de Zaragoza para la panadería artesanal?\\\",\\n      \\\"queDatoLaResponde\\\": \\\"Dato sobre la competencia\\\",\\n      \\\"accesibilidad\\\": \\\"Público\\\"\\n    },\\n    {\\n      \\\"pregunta\\\": \\\"¿Cuál es el público objetivo de l",
+      "segundos": 242,
+      "veredicto": "REVIEW_REQUIRED",
+      "puntuacion": 100,
+      "hallazgos": [],
+      "noComprobado": [
+        "es-accionable",
+        "cada-hallazgo-lleva-fuente",
+        "distingue-medido-de-estimado",
+        "el-competidor-se-puede-identificar",
+        "responde-a-la-decision-que-se-iba-a-tomar",
+        "no-generaliza-desde-cuatro-casos"
+      ],
+      "calculosDeterministas": 1
+    },
+    {
+      "servicio": "geo_ai_search_premium",
+      "dominio": "geo",
+      "pasos": 6,
+      "pasosConContenido": 6,
+      "caracteresProducidos": 18915,
+      "muestra": "{\"output\":\"Aquí te presento el inventario de preguntas para el cliente Panadería Obrador de Sofía:\\n\\n```json\\n{\\n  \\\"preguntas\\\": [\\n    {\\n      \\\"texto\\\": \\\"¿Dónde puedo encontrar panaderías artesanales en Zaragoza?\\\",\\n      \\\"momento\\\": \\\"Quien todavía no sabe que tiene el problema\\\",\\n      \\\"queTendriaQueResponder\\\": \\\"Información sobre ubicación y horarios de la panadería\\\",\\n      \\\"porQu",
+      "segundos": 464,
+      "veredicto": "FAIL",
+      "puntuacion": 90,
+      "hallazgos": [
+        {
+          "id": "aporta-algo-que-no-esta-en-otros-cien-sitios",
+          "gravedad": "bloqueante",
+          "quePasa": "no hay ningún dato propio: sin eso no hay razón para citar a este cliente y no a otro"
+        }
+      ],
+      "noComprobado": [
+        "es-accionable",
+        "las-preguntas-son-preguntas",
+        "responde-antes-de-enrollarse",
+        "el-esquema-declara-lo-que-el-texto-dice"
+      ],
+      "calculosDeterministas": 1
     }
   ]
 }

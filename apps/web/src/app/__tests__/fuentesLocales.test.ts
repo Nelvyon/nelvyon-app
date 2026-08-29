@@ -64,6 +64,9 @@ import path from "node:path";
  * obligue a reabrirla.
  */
 
+// Plazo explicito en las que recorren el arbol: ver el porque en
+// `backend/billing/__tests__/elPrecioProvisionalNoSeCobra.test.ts`.
+
 const SRC = path.resolve(__dirname, "../..");
 const DIR_FUENTES = path.join(SRC, "fonts");
 const PUBLICO = path.resolve(SRC, "../public");
@@ -209,7 +212,7 @@ describe("fuentes — el build no sale a Internet a por ellas", () => {
       `${culpables.length} ficheros descargan la fuente de Google durante el build ` +
         `en vez de usar next/font/local con un woff2 de src/fonts:\n  ${culpables.join("\n  ")}`,
     ).toEqual([]);
-  });
+  }, 60_000);
 
   it("hay consumidores de localFont — el cambio no se deshizo por la via facil", () => {
     // Si alguien quitase los imports remotos borrando las fuentes en vez de
@@ -312,7 +315,7 @@ describe("fuentes — el navegador tampoco sale a Internet a por ellas", () => {
         `o con un @font-face contra /fonts si es del pack estatico de public:\n  ` +
         `${culpables.join("\n  ")}`,
     ).toEqual([]);
-  });
+  }, 60_000);
 
   it("la CSP no autoriza ya esos origenes", () => {
     // El barrido de arriba ya cubre `headers.ts` —dejo de estar excepcionado al

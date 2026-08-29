@@ -277,8 +277,33 @@ conBase("todos los servicios, por el mismo cableado", () => {
     // `reclamar` devuelve una LISTA: la cola está pensada para que un
     // trabajador se lleve varios de una vez. Pedir uno y esperar un objeto es
     // el tipo de suposición sobre una API ajena que compila y luego falla.
-    const reclamados = await cola.reclamar(1);
-    if (reclamados.length === 0 || reclamados[0].jobId !== jobId) {
+// SE RECLAMA HASTA ENCONTRAR EL PROPIO, no una vez y a ver qué sale.
+    //
+    // Esta prueba daba «nadie pudo reclamar el trabajo» para `seo_premium` y
+    // `web_premium` con el cableado intacto: la base tenía trabajos en cola de
+    // OTRO inquilino, dejados por una medición anterior, y `reclamar(1)` se
+    // llevaba el más antiguo — que es exactamente lo que debe hacer una cola.
+    //
+    // La suposición rota era de la prueba: «lo que acabo de encolar es lo
+    // siguiente». Eso sólo es cierto sobre una base vacía, y una base vacía es
+    // la situación menos parecida a producción que existe. Un trabajador real
+    // tira de la cola hasta encontrar lo suyo; esto hace lo mismo, con tope.
+    let mio: { jobId: string } | undefined;
+    const ajenos: Array<{ jobId: string }> = [];
+    for (let intento = 0; intento < 25 && !mio; intento += 1) {
+      const lote = await cola.reclamar(1);
+      if (lote.length === 0) break;
+      if (lote[0].jobId === jobId) mio = lote[0];
+      else ajenos.push(lote[0]);
+    }
+    // Lo ajeno se devuelve a la cola: llevárselo y no soltarlo dejaría trabajo
+    // de otro bloqueado, que es peor que fallar la prueba.
+    for (const a of ajenos) {
+      await pool
+        .query(`UPDATE os_jobs SET status = 'queued', locked_at = NULL WHERE job_id = $1`, [a.jobId])
+        .catch(() => undefined);
+    }
+    if (!mio) {
       return paso("reclamar de la cola", "nadie pudo reclamar el trabajo recién encolado");
     }
 

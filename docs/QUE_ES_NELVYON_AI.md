@@ -123,7 +123,7 @@ contra un modelo local y volvio asi:
 | Modelo | `llama3.1:8b-instruct-q4_K_M` |
 | Tokens | 81 entrada / 184 salida |
 | Coste | 0 USD |
-| Latencia | 48 s |
+| Latencia | 14 s |
 
 Los tokens importan tanto como la procedencia. La ultima medicion de
 produccion tiene 14.178 eventos de agente que dicen `ok: true` con

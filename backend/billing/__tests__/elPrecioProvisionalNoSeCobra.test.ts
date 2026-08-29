@@ -19,6 +19,21 @@
  * marca como BUSINESS_DECISION_REQUIRED.
  *
  * COSTE EXTERNO: 0 €.
+ *
+ * POR QUE LA ULTIMA LLEVA UN PLAZO EXPLICITO.
+ *
+ * Recorren el arbol entero leyendo ficheros. Eso tarda segundos de verdad, no
+ * milisegundos, y el plazo por defecto de vitest —cinco segundos— esta pensado
+ * para una prueba unitaria, no para una auditoria del codigo fuente.
+ *
+ * Con la suite entera en paralelo, siete comprobaciones de esta familia
+ * empezaron a fallar por plazo agotado mientras pasaban una a una. Eso es lo
+ * peor que le puede pasar a una prueba: enseña a relanzarla en vez de a mirar,
+ * y a partir de ahi un fallo de verdad se confunde con «hoy iba lento».
+ *
+ * El plazo no oculta nada: el trabajo se sigue haciendo entero y la
+ * comprobacion sigue siendo la misma. Lo unico que cambia es que se le da el
+ * tiempo que necesita.
  */
 import { describe, expect, it } from "vitest";
 import fs from "node:fs";
@@ -119,5 +134,5 @@ describe("el precio provisional no se cobra", () => {
       infractores,
       `leen el importe sin pasar por precioFacturable(): ${infractores.join(", ")}`,
     ).toEqual([]);
-  });
+  }, 60_000);
 });

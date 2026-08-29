@@ -206,9 +206,17 @@ Cinco intentos pasan y quedan escritos como límites, no como cobertura.
 
 | Comprobación | Resultado |
 |---|---|
-| Suite completa contra PostgreSQL real | **8.305 pruebas pasan, 0 fallan** |
+| Suite completa contra PostgreSQL real | **8.533 pruebas pasan, 0 fallan** (480 saltadas) |
+| Cadena de migraciones sobre una base recién creada | **488 de 488, 0 fallos** |
 | `next build` de producción | **OK** |
 | 153 rutas sobre el build real, con un inquilino nuevo | **0 respuestas 5xx** |
+| Inferencia real por el adaptador, contra modelo local | **`REAL_LLM_SUCCESS`, 81/184 tokens, 0 €** |
+
+Las **480 saltadas** no son un aprobado silencioso: son las que exigen una
+variable de entorno que aquí no está puesta, y cada una lo dice al saltarse. La
+más importante es la de calidad con modelo real, que se enciende a mano porque
+tarda veinticinco minutos — una suite que tarda media hora deja de ejecutarse, y
+una prueba que no se ejecuta no protege nada.
 
 La tercera llevaba **sin poder ejecutarse**: arrancaba un servidor de producción
 sin `JWT_SECRET`, el alta devolvía 500 y el script abortaba con «falta algo para

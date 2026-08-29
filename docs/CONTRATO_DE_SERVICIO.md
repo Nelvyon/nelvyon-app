@@ -1639,6 +1639,7 @@ caso. Este apartado dice cuáles ni siquiera llegan a pedirlo.
 - `donde_te_resenan` — ¿Dónde te dejan reseñas y quién responde ahora mismo?
 - `quejas_que_se_repiten` — ¿De qué se queja la gente una y otra vez? ¿Hay algo que prefieras que no se conteste en público?
 - `quien_puede_responder_en_publico` — ¿Quién puede responder en vuestro nombre y qué tiene que aprobar alguien antes?
+- `que_resenas_son_ciertas` — De lo que os critican, ¿qué es verdad y estáis arreglando?
 - `donde_te_mencionan_ya` — ¿En qué sitios ajenos a vosotros ya se os nombra? (prensa, directorios, socios, foros)
 
 **Qué se mide y quién lo aporta.**

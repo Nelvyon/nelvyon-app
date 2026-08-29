@@ -20,6 +20,9 @@
  * es metadatos del catalogo de conectores, no una lectura. El detector distingue
  * ambas cosas: busca `process.env.X`, no la aparicion del nombre.
  */
+
+// Plazo explicito en las que recorren el arbol: ver el porque en
+// `backend/billing/__tests__/elPrecioProvisionalNoSeCobra.test.ts`.
 import { describe, it, expect } from "vitest";
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
@@ -87,12 +90,12 @@ describe("aislamiento de proveedor de Ads (lado Node)", () => {
     // cuentas corporativas" no probaria nada; aqui SI debe encontrar algo.
     const encontradas = lecturasDeEntorno(CREDENCIALES_DE_APLICACION);
     expect(encontradas.length).toBeGreaterThan(0);
-  });
+  }, 60_000);
 
   it("ninguna superficie Node lee una cuenta publicitaria corporativa", () => {
     const hallazgos = lecturasDeEntorno(CUENTAS_CORPORATIVAS);
     expect(hallazgos).toEqual([]);
-  });
+  }, 60_000);
 
   it("GoogleAdsExecutor resuelve la credencial del propio usuario y falla cerrado", () => {
     const src = readFileSync(

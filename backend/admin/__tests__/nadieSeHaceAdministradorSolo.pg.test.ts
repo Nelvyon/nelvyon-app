@@ -32,6 +32,9 @@
  * otra, esta suite se pone roja aunque los seis intentos de arriba sigan
  * fallando — porque el camino nuevo todavía no estaría en la lista.
  */
+
+// Plazo explicito en la que recorre el arbol: ver el porque en
+// `backend/billing/__tests__/elPrecioProvisionalNoSeCobra.test.ts`.
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
@@ -301,5 +304,5 @@ describe("el camino de escritura es UNO, y está guardado", () => {
     expect(generico, "la jerarquía no está definida en el router genérico").toContain(
       "No puedes asignar un rol superior al tuyo",
     );
-  });
+  }, 60_000);
 });
