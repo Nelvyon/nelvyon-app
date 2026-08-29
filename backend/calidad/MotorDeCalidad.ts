@@ -243,7 +243,14 @@ const COMUNES: readonly Comprobacion[] = [
       // El relleno es lo que separa un entregable de un documento. Estas
       // fórmulas concretas aparecen cuando no hay nada que decir.
       const todo = JSON.stringify(p.contenido).toLowerCase();
-      if (todo.length < 200) return undefined;
+      // 80 y no 200. El umbral existe para no marcar un titular o una etiqueta,
+      // no para dar barra libre a los textos medianos: la pasada adversarial
+      // colo relleno en 177 caracteres, que es media pagina.
+      //
+      // Y las formulas de abajo SON la senal: un texto de ochenta caracteres que
+      // dice «en un mercado cada vez mas competitivo» es relleno, mida lo que
+      // mida.
+      if (todo.length < 80) return undefined;
       const formulas = [
         "en el mundo actual",
         "en la era digital",
@@ -288,8 +295,16 @@ const COMUNES: readonly Comprobacion[] = [
       // CONTAMINACIÓN ENTRE CLIENTES. Es el fallo que destruye la confianza de
       // golpe: ver el nombre de otra empresa en tu informe significa que tus
       // datos están en el suyo.
+      // `null`, no `undefined`. NO ES LO MISMO «no he podido comprobarlo» que
+      // «no aplica»: sin otros clientes con los que confundirse, no hay
+      // contaminacion posible y la comprobacion PASA.
+      //
+      // La diferencia importa porque una bloqueante sin comprobar manda una
+      // accion de alto riesgo a revision humana. Marcar como «sin comprobar» lo
+      // que simplemente no aplica llenaria la bandeja de revisiones que no
+      // hacen falta, y una bandeja llena de ruido se deja de mirar.
       const otros = p.contexto?.otrosClientes;
-      if (!Array.isArray(otros) || otros.length === 0) return undefined;
+      if (!Array.isArray(otros) || otros.length === 0) return null;
       const todo = JSON.stringify(p.contenido).toLowerCase();
       const colados = otros.filter(
         (o) => typeof o === "string" && o.trim().length > 3 && todo.includes(o.toLowerCase()),
@@ -1048,8 +1063,10 @@ const POR_DOMINIO: Readonly<Record<string, readonly Comprobacion[]>> = {
       gravedad: "bloqueante",
       evaluar: (p) => {
         // La comprobación que evita una sanción con el nombre de NELVYON.
+        // `null`: sin restricciones declaradas no hay ninguna que incumplir.
+        // Que un cliente no tenga limites legales no es una laguna de medicion.
         const restricciones = p.contexto?.restricciones;
-        if (!Array.isArray(restricciones) || restricciones.length === 0) return undefined;
+        if (!Array.isArray(restricciones) || restricciones.length === 0) return null;
         const todo = JSON.stringify(p.contenido).toLowerCase();
 
         // Prohibiciones frecuentes en sectores regulados, con lo que las
@@ -1079,8 +1096,9 @@ const POR_DOMINIO: Readonly<Record<string, readonly Comprobacion[]>> = {
       clase: "determinista",
       gravedad: "bloqueante",
       evaluar: (p) => {
+        // `null`: una pieza que no contacta con nadie no necesita base legal.
         const contacta = p.contenido.contactaPersonas;
-        if (contacta !== true) return undefined;
+        if (contacta !== true) return null;
         const base = p.contexto?.baseLegal;
         return typeof base === "string" && base.trim().length > 3
           ? null
@@ -1140,6 +1158,8 @@ export class MotorDeCalidad {
     const comprobaciones = comprobacionesDe(pieza.dominio);
     const hallazgos: Hallazgo[] = [];
     const noComprobado: Array<{ id: string; porQue: string }> = [];
+    /** Las bloqueantes que no se pudieron ejecutar. Deciden en alto riesgo. */
+    const bloqueantesNoEvaluadas: string[] = [];
     let usadas = 0;
 
     for (const c of comprobaciones) {
@@ -1159,6 +1179,9 @@ export class MotorDeCalidad {
       const r = c.evaluar(pieza);
       if (r === undefined) {
         noComprobado.push({ id: c.id, porQue: "la pieza no trae lo que hace falta para comprobarlo" });
+        // Se anota APARTE si era bloqueante: no es lo mismo no poder mirar un
+        // aviso que no poder mirar algo que decide si se pierde dinero.
+        if (c.gravedad === "bloqueante") bloqueantesNoEvaluadas.push(c.id);
         continue;
       }
       usadas += 1;
@@ -1185,7 +1208,7 @@ export class MotorDeCalidad {
             : "RULE_BASED";
 
     return {
-      veredicto: this.decidir(hallazgos, modo, pieza),
+      veredicto: this.decidir(hallazgos, modo, pieza, bloqueantesNoEvaluadas),
       modo,
       hallazgos,
       puntuacion: usadas === 0 ? null : Math.round(((usadas - hallazgos.length) / usadas) * 100),
@@ -1201,7 +1224,12 @@ export class MotorDeCalidad {
    * gastar dinero o publicar en nombre del cliente es exactamente donde no se
    * puede ser optimista.
    */
-  private decidir(hallazgos: Hallazgo[], modo: ModoDeEvaluacion, pieza: Pieza): Veredicto {
+  private decidir(
+    hallazgos: Hallazgo[],
+    modo: ModoDeEvaluacion,
+    pieza: Pieza,
+    bloqueantesNoEvaluadas: readonly string[] = [],
+  ): Veredicto {
     if (hallazgos.some((h) => h.gravedad === "bloqueante")) return "FAIL";
 
     if (modo === "MOCK") {
@@ -1214,6 +1242,21 @@ export class MotorDeCalidad {
     if (pieza.riesgo === "alto") {
       if (modo === "UNAVAILABLE") return "REVIEW_REQUIRED";
       if (avisos > 0) return "REVIEW_REQUIRED";
+
+      // EL AGUJERO QUE ENCONTRO LA PASADA ADVERSARIAL.
+      //
+      // Una comprobacion BLOQUEANTE que no se pudo hacer —porque la pieza no
+      // trae el dato que necesita— salia como PASS en una accion de alto
+      // riesgo. Es decir: la forma de aprobar un plan que no cabe en el
+      // presupuesto era NO DECIR cuanto cuesta.
+      //
+      // Aqui no se puede ser optimista. Una comprobacion que decide si algo
+      // pierde dinero, incumple una norma o publica algo que no se puede
+      // retirar, y que no ha podido ejecutarse, es exactamente el caso en el
+      // que hace falta una persona.
+      const bloqueantesSinComprobar = bloqueantesNoEvaluadas.length;
+      if (bloqueantesSinComprobar > 0) return "REVIEW_REQUIRED";
+
       return "PASS";
     }
 
