@@ -165,6 +165,36 @@ const CAPAS = [
 
 // ── La capa de inferencia, con su estado REAL ──────────────────────────────
 
+/**
+ * El estado de la inferencia NO se escribe a mano: se lee de la medicion.
+ *
+ * Estaba fijado a `UNAVAILABLE`, y era cierto mientras nadie lo hubiera
+ * comprobado. Pero «nadie lo ha comprobado» y «no se puede» se escriben igual y
+ * significan cosas distintas, y esa confusion llevaba meses en este documento.
+ *
+ * Se separan dos preguntas que se responden distinto: si el camino real
+ * funciona (medible, y medido) y si hay un modelo servido para produccion (no,
+ * y eso no lo decide el codigo). Juntarlas en una sola etiqueta obliga a elegir
+ * entre exagerar y quedarse corto.
+ */
+const medicion = (() => {
+  const p = path.join(RAIZ, "docs", "evidence", "inferencia_local.json");
+  if (!fs.existsSync(p)) return null;
+  try {
+    const j = JSON.parse(fs.readFileSync(p, "utf8"));
+    // Se exige la medida COMPLETA: procedencia real y tokens que no parezcan de
+    // un doble. Un fichero de evidencia a medias no acredita nada.
+    const c = j?.llamadaReal;
+    if (!c || c.procedencia !== "REAL_LLM_SUCCESS") return null;
+    if (!(Number(c.tokensEntrada) > 10 && Number(c.tokensSalida) > 3)) return null;
+    return j;
+  } catch {
+    return null;
+  }
+})();
+
+const estadoLocal = medicion ? "LOCAL_REAL_MEASURED" : "UNAVAILABLE";
+
 const modosDeclarados = adaptador ? /resolveLlmMode/.test(adaptador) : false;
 const proveedores = contarFicheros("backend/autonomous/llm/providers", (f) =>
   f.endsWith("Provider.ts"),
@@ -232,7 +262,10 @@ const md = [
   "## La capa de inferencia",
   "",
   "Aqui es donde se puede mentir con mas facilidad, asi que aqui se es mas",
-  "explicito.",
+  "explicito. Y hay que separar DOS preguntas que se responden distinto:",
+  "",
+  "  1. ¿Funciona el camino real de inferencia? — se puede medir, y se ha medido.",
+  "  2. ¿Hay un modelo servido para produccion? — no, y eso no lo decide el codigo.",
   "",
   "| | |",
   "|---|---|",
@@ -241,11 +274,41 @@ const md = [
   "| Declaracion de modo | " +
     (modosDeclarados ? cod("REAL") + " / " + cod("MOCK") + " resuelto en ejecucion" : "NO_MEDIDO") +
     " |",
-  "| **Inferencia real hoy** | **UNAVAILABLE** |",
+  "| **Inferencia real EN LOCAL** | **" + cod(estadoLocal) + "** |",
+  "| **Inferencia servida para produccion** | **" + cod("UNAVAILABLE") + "** |",
   "",
-  "**" + cod("UNAVAILABLE") + " no es un fallo: es la verdad.** No hay un modelo",
-  "conectado porque donde vive el modelo es una decision empresarial con coste",
-  "recurrente, y esa decision no la toma el codigo.",
+  medicion
+    ? [
+        "**Que significa " + cod("LOCAL_REAL_MEASURED") + ".** El " +
+          medicion.medidoEn + " se ejecuto una peticion completa por el adaptador",
+        "contra un modelo local y volvio asi:",
+        "",
+        "| | |",
+        "|---|---|",
+        "| Procedencia | " + cod(String(medicion.llamadaReal?.procedencia)) + " |",
+        "| Proveedor | " + medicion.llamadaReal?.proveedor + " |",
+        "| Modelo | " + cod(String(medicion.llamadaReal?.modelo)) + " |",
+        "| Tokens | " + medicion.llamadaReal?.tokensEntrada + " entrada / " +
+          medicion.llamadaReal?.tokensSalida + " salida |",
+        "| Coste | " + medicion.llamadaReal?.costeUsd + " USD |",
+        "| Latencia | " + Math.round((medicion.llamadaReal?.milisegundos ?? 0) / 1000) + " s |",
+        "",
+        "Los tokens importan tanto como la procedencia. La ultima medicion de",
+        "produccion tiene 14.178 eventos de agente que dicen " + cod("ok: true") + " con",
+        "**cero** modelo y **cero** tokens; un " + cod("tok_in: 1") + " es la firma de",
+        "un doble de pruebas, no la de un modelo leyendo un prompt. Por eso lo que",
+        "se comprueba no es que la llamada no reviente, sino que haya leido algo.",
+        "",
+        "**Y lo que esto NO significa.** No significa que NELVYON AI este servida.",
+        "Significa que el camino funciona y que, el dia que haya un modelo servido,",
+        "no hay nada que construir. Donde vive ese modelo sigue siendo una decision",
+        "empresarial con coste recurrente, y esa decision no la toma el codigo.",
+      ].join("\n")
+    : [
+        "**" + cod("UNAVAILABLE") + " no es un fallo: es la verdad.** En la maquina",
+        "donde se genero este documento no habia ningun modelo local con el que",
+        "medir el camino real. No se da por bueno lo que no se ha recorrido.",
+      ].join("\n"),
   "",
   "Lo que si esta construido y comprobado:",
   "",
@@ -257,9 +320,8 @@ const md = [
   "- El motor de calidad exige **proveedor configurado** para sellar " +
     cod("REAL") + ". Poner una variable de entorno no basta: eso sellaria",
   "  aprobaciones que nadie ha dado.",
-  "- El dia que se conecte un modelo, la ultima medicion de produccion —14.178",
-  "  eventos con **cero** modelo real y **cero** tokens— pasara a tener numeros",
-  "  distintos de cero, y se vera.",
+  "- El dia que se sirva un modelo, esos 14.178 eventos con cero tokens pasaran",
+  "  a tener numeros distintos de cero, y se vera.",
   "",
   "---",
   "",
@@ -279,7 +341,7 @@ const md = [
   "",
   "| Que | Estado | Quien lo desbloquea |",
   "|---|---|---|",
-  "| Modelo de inferencia conectado | " + cod("UNAVAILABLE") +
+  "| Modelo de inferencia SERVIDO para produccion | " + cod("UNAVAILABLE") +
     " | decision empresarial (coste recurrente) |",
   "| Resultado real para un cliente | " + cod("NOT_MEASURED") +
     " | hacen falta clientes y meses |",
@@ -296,5 +358,9 @@ fs.writeFileSync(SALIDA, md, "utf8");
 
 console.log("\nQUÉ ES NELVYON AI");
 for (const c of CAPAS) console.log(`  ${c.titulo.padEnd(34)} ${c.medida}`);
-console.log(`  ${"Inferencia real".padEnd(34)} UNAVAILABLE (${proveedores} adaptadores declarados)`);
+console.log(
+  `  ${"Inferencia real en local".padEnd(34)} ${estadoLocal}` +
+    (medicion ? ` (${medicion.llamadaReal.modelo}, ${medicion.llamadaReal.tokensEntrada}/${medicion.llamadaReal.tokensSalida} tokens, 0 EUR)` : ""),
+);
+console.log(`  ${"Inferencia servida en produccion".padEnd(34)} UNAVAILABLE (${proveedores} adaptadores declarados)`);
 console.log(`\n  escrito en ${path.relative(RAIZ, SALIDA)}\n`);

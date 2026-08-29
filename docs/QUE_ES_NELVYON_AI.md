@@ -28,7 +28,7 @@ Eso es lo que hay debajo, y es lo que se cuenta aqui.
 
 ## Lo que sabe de cada cliente
 
-**54 dimensiones**
+**93 dimensiones**
 
 Un almacén de contexto con procedencia, confianza y caducidad por dato. No es un campo de texto libre: cada dimensión sabe de dónde salió —lo dijo el cliente, lo dedujo un agente, lo midió una herramienta— y cuándo deja de valer.
 
@@ -48,7 +48,7 @@ Departamentos con responsabilidad, con lo que NO deciden y con los indicadores q
 
 ## Quién hace el trabajo
 
-**26 contratos · 26 agentes de servicio · 1605 sectoriales**
+**26 contratos · 30 agentes de servicio · 1605 sectoriales**
 
 Contratos que declaran qué necesita saber cada agente, qué produce, qué NUNCA hace y cuándo escala. Más los agentes de servicio premium, con sus pasos encadenados, y los sectoriales.
 
@@ -78,7 +78,7 @@ Un puente entre el agente y el ejecutor con siete puertas: contrato, aprobación
 
 ## Quién revisa lo que sale
 
-**51 comprobaciones en 16 disciplinas**
+**70 comprobaciones en 18 disciplinas**
 
 Un evaluador independiente por disciplina. El agente que produce algo NO puede ser su juez: el motor lanza si el evaluador coincide con el autor.
 
@@ -101,17 +101,40 @@ Objetivos con línea base, acciones, medidas y atribución. Y la inteligencia en
 ## La capa de inferencia
 
 Aqui es donde se puede mentir con mas facilidad, asi que aqui se es mas
-explicito.
+explicito. Y hay que separar DOS preguntas que se responden distinto:
+
+  1. ¿Funciona el camino real de inferencia? — se puede medir, y se ha medido.
+  2. ¿Hay un modelo servido para produccion? — no, y eso no lo decide el codigo.
 
 | | |
 |---|---|
 | Registro de proveedores | 2 adaptadores declarados |
 | Declaracion de modo | `REAL` / `MOCK` resuelto en ejecucion |
-| **Inferencia real hoy** | **UNAVAILABLE** |
+| **Inferencia real EN LOCAL** | **`LOCAL_REAL_MEASURED`** |
+| **Inferencia servida para produccion** | **`UNAVAILABLE`** |
 
-**`UNAVAILABLE` no es un fallo: es la verdad.** No hay un modelo
-conectado porque donde vive el modelo es una decision empresarial con coste
-recurrente, y esa decision no la toma el codigo.
+**Que significa `LOCAL_REAL_MEASURED`.** El 2026-08-29 se ejecuto una peticion completa por el adaptador
+contra un modelo local y volvio asi:
+
+| | |
+|---|---|
+| Procedencia | `REAL_LLM_SUCCESS` |
+| Proveedor | ollama |
+| Modelo | `llama3.1:8b-instruct-q4_K_M` |
+| Tokens | 81 entrada / 184 salida |
+| Coste | 0 USD |
+| Latencia | 48 s |
+
+Los tokens importan tanto como la procedencia. La ultima medicion de
+produccion tiene 14.178 eventos de agente que dicen `ok: true` con
+**cero** modelo y **cero** tokens; un `tok_in: 1` es la firma de
+un doble de pruebas, no la de un modelo leyendo un prompt. Por eso lo que
+se comprueba no es que la llamada no reviente, sino que haya leido algo.
+
+**Y lo que esto NO significa.** No significa que NELVYON AI este servida.
+Significa que el camino funciona y que, el dia que haya un modelo servido,
+no hay nada que construir. Donde vive ese modelo sigue siendo una decision
+empresarial con coste recurrente, y esa decision no la toma el codigo.
 
 Lo que si esta construido y comprobado:
 
@@ -121,9 +144,8 @@ Lo que si esta construido y comprobado:
   degradacion; una simulacion si.
 - El motor de calidad exige **proveedor configurado** para sellar `REAL`. Poner una variable de entorno no basta: eso sellaria
   aprobaciones que nadie ha dado.
-- El dia que se conecte un modelo, la ultima medicion de produccion —14.178
-  eventos con **cero** modelo real y **cero** tokens— pasara a tener numeros
-  distintos de cero, y se vera.
+- El dia que se sirva un modelo, esos 14.178 eventos con cero tokens pasaran
+  a tener numeros distintos de cero, y se vera.
 
 ---
 
@@ -143,7 +165,7 @@ Lo que si esta construido y comprobado:
 
 | Que | Estado | Quien lo desbloquea |
 |---|---|---|
-| Modelo de inferencia conectado | `UNAVAILABLE` | decision empresarial (coste recurrente) |
+| Modelo de inferencia SERVIDO para produccion | `UNAVAILABLE` | decision empresarial (coste recurrente) |
 | Resultado real para un cliente | `NOT_MEASURED` | hacen falta clientes y meses |
 | Comparacion con otras herramientas | `NOT_MEASURED` | no se ha medido, y estimarlo seria inventar |
 
