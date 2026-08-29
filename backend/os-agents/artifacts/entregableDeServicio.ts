@@ -49,6 +49,14 @@ export interface DatosDelEntregable {
    * tiene derecho a saber si esto lo revisó un modelo o unas reglas.
    */
   modoDeProduccion?: "REAL" | "RULE_BASED" | "MOCK" | "UNAVAILABLE";
+  /**
+   * Las cuentas que se hicieron, con su resultado.
+   *
+   * Van en el documento y con la fórmula al lado. Un especialista que suelta
+   * una cifra sin enseñar la cuenta no se puede rebatir, y lo que no se puede
+   * rebatir tampoco se puede corregir.
+   */
+  calculos?: ReadonlyArray<{ herramienta: string; que: string; resultado: unknown }>;
 }
 
 /** Nombres de paso legibles. Los internos son para el registro, no para el cliente. */
@@ -149,6 +157,26 @@ export function construirEntregable(d: DatosDelEntregable): ArtifactFileMap {
 
   const vacios = d.pasos.length - conContenido.length;
 
+  // Las cuentas, con su fórmula. Sólo las que llegaron a calcularse: una que
+  // no pudo se dice aparte, con lo que le faltó, porque saber qué dato falta
+  // es la mitad del valor.
+  const calculados: Array<{ que: string; significa: string; formula: string }> = [];
+  const sinCalcular: Array<{ que: string; falta: string }> = [];
+  for (const c of d.calculos ?? []) {
+    const r = c.resultado as {
+      estado?: string; queSignifica?: string; comoSeCalcula?: string; falta?: string[];
+    };
+    if (r?.estado === "CALCULADO") {
+      calculados.push({
+        que: c.que,
+        significa: r.queSignifica ?? "",
+        formula: r.comoSeCalcula ?? "",
+      });
+    } else if (r?.estado === "NO_SE_PUEDE_CALCULAR") {
+      sinCalcular.push({ que: c.que, falta: (r.falta ?? []).join(", ") });
+    }
+  }
+
   const md = [
     `# ${titulo}`,
     ``,
@@ -159,6 +187,23 @@ export function construirEntregable(d: DatosDelEntregable): ArtifactFileMap {
     `---`,
     ``,
     ...conContenido.flatMap((p) => [`## ${p.nombre}`, ``, p.cuerpo, ``]),
+    ...(calculados.length > 0
+      ? [
+          `## Las cuentas`,
+          ``,
+          ...calculados.flatMap((c) => [`**${c.que}**`, ``, c.significa, ``, `_${c.formula}_`, ``]),
+        ]
+      : []),
+    ...(sinCalcular.length > 0
+      ? [
+          `## Lo que no se ha podido calcular`,
+          ``,
+          `Falta el dato, y sin él una cifra sería inventada.`,
+          ``,
+          ...sinCalcular.map((c) => `- **${c.que}** — falta: ${c.falta}`),
+          ``,
+        ]
+      : []),
     // LOS PASOS SIN CONTENIDO SE DICEN. Omitirlos en silencio haría que un
     // documento incompleto pareciera completo.
     vacios > 0
@@ -189,6 +234,21 @@ export function construirEntregable(d: DatosDelEntregable): ArtifactFileMap {
     ...conContenido.map(
       (p) => `<h2>${escapar(p.nombre)}</h2><pre>${escapar(p.cuerpo)}</pre>`,
     ),
+    calculados.length > 0
+      ? `<h2>Las cuentas</h2>${calculados
+          .map(
+            (c) =>
+              `<p><strong>${escapar(c.que)}</strong><br>${escapar(c.significa)}<br>` +
+              `<span class="meta">${escapar(c.formula)}</span></p>`,
+          )
+          .join("")}`
+      : "",
+    sinCalcular.length > 0
+      ? `<h2>Lo que no se ha podido calcular</h2>` +
+        `<p class="meta">Falta el dato, y sin él una cifra sería inventada.</p><ul>${sinCalcular
+          .map((c) => `<li><strong>${escapar(c.que)}</strong> — falta: ${escapar(c.falta)}</li>`)
+          .join("")}</ul>`
+      : "",
     vacios > 0
       ? `<p class="meta">${vacios} apartado(s) no produjeron contenido y no aparecen aquí.</p>`
       : "",

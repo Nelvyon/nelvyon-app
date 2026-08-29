@@ -647,6 +647,267 @@ export const DIMENSIONES: readonly Dimension[] = [
     serviciosQueLaUsan: ["3d_contenido_inmersivo_premium"],
     laAporta: "cliente",
   },
+  // ══ LO QUE SE MIDE ═══════════════════════════════════════════════════════
+  //
+  // POR QUÉ SE AÑADEN. Dieciséis de los veinticinco servicios no declaraban
+  // NINGUNA dimensión de medición. Un servicio que no dice con qué cifra se le
+  // juzga no se puede optimizar: el ciclo se para en «hicimos cosas» y nunca
+  // llega a «y esto es lo que pasó».
+  //
+  // Y sin medición no hay línea base, sin línea base cualquier mejora se puede
+  // atribuir a la temporada, y sin eso el informe se convierte en una lista de
+  // tareas realizadas — que es exactamente el entregable que este proyecto no
+  // quiere.
+  //
+  // `laAporta: "medicion"` A PROPÓSITO. Estas dimensiones NO se le preguntan al
+  // cliente: las rellena NELVYON leyendo las cuentas conectadas. Pedirle al
+  // cliente que teclee sus propias métricas es pedirle que haga el trabajo, y
+  // además el dato llegaría sin procedencia.
+  //
+  // NINGUNA es imprescindible: un cliente puede empezar sin analítica conectada
+  // y el trabajo arranca igual. Lo que no puede es TERMINAR sin ella, y eso lo
+  // dice el motor de optimización devolviendo `esperar_datos` en vez de
+  // inventarse un cero.
+
+  {
+    id: "rendimiento_de_busqueda",
+    pregunta: "Qué tráfico y qué posiciones trae la búsqueda orgánica",
+    forma: "mapa",
+    imprescindible: false,
+    caducaEnDias: 30,
+    serviciosQueLaUsan: ["seo_premium"],
+    laAporta: "medicion",
+  },
+  {
+    id: "rendimiento_de_campanas",
+    pregunta: "Qué cuesta una adquisición y qué devuelve la inversión",
+    forma: "mapa",
+    imprescindible: false,
+    caducaEnDias: 14,
+    // Catorce días y no treinta: en publicidad de pago un dato de hace un mes
+    // describe una subasta que ya no existe.
+    serviciosQueLaUsan: ["ads_premium", "influencer_marketing_premium"],
+    laAporta: "medicion",
+  },
+  {
+    id: "rendimiento_social",
+    pregunta: "Qué alcance útil y qué interacción tienen las publicaciones",
+    forma: "mapa",
+    imprescindible: false,
+    caducaEnDias: 30,
+    serviciosQueLaUsan: ["social_media_premium", "influencer_marketing_premium"],
+    laAporta: "medicion",
+  },
+  {
+    id: "rendimiento_de_correo",
+    pregunta: "Qué conversión, bajas y quejas generan los envíos",
+    forma: "mapa",
+    imprescindible: false,
+    caducaEnDias: 30,
+    serviciosQueLaUsan: ["email_marketing_premium", "funnel_premium"],
+    laAporta: "medicion",
+  },
+  {
+    id: "rendimiento_del_sitio",
+    pregunta: "Cuánta gente entra, cuánta convierte y a qué velocidad carga",
+    forma: "mapa",
+    imprescindible: false,
+    caducaEnDias: 30,
+    serviciosQueLaUsan: [
+      "web_premium",
+      "landing_premium",
+      "funnel_premium",
+      "ecommerce_premium",
+      "mantenimiento_web_premium",
+    ],
+    laAporta: "medicion",
+  },
+  {
+    id: "rendimiento_de_la_tienda",
+    pregunta: "Qué pedidos, qué ticket medio y qué margen deja la tienda",
+    forma: "mapa",
+    imprescindible: false,
+    caducaEnDias: 30,
+    serviciosQueLaUsan: ["ecommerce_premium"],
+    laAporta: "medicion",
+  },
+  {
+    id: "rendimiento_de_reputacion",
+    pregunta: "Qué valoración media y qué reseñas nuevas hay",
+    forma: "mapa",
+    imprescindible: false,
+    caducaEnDias: 30,
+    serviciosQueLaUsan: ["reputacion_online_orm_premium"],
+    laAporta: "medicion",
+  },
+  {
+    id: "rendimiento_del_contenido",
+    pregunta: "Qué piezas se leen, cuáles convierten y cuáles no las ve nadie",
+    forma: "mapa",
+    imprescindible: false,
+    caducaEnDias: 45,
+    // Cuarenta y cinco días porque el contenido tarda en posicionar: medirlo a
+    // dos semanas diría que nada funciona.
+    serviciosQueLaUsan: [
+      "contenido_copywriting_premium",
+      "personal_digital_premium",
+      "formacion_capacitacion_digital_premium",
+    ],
+    laAporta: "medicion",
+  },
+  {
+    id: "rendimiento_de_las_piezas",
+    pregunta: "Qué piezas se usan de verdad y cuáles rinden mejor donde se usan",
+    forma: "mapa",
+    imprescindible: false,
+    caducaEnDias: 60,
+    // Las piezas de marca no se miden solas: se miden por cómo rinden en el
+    // canal donde acaban. Por eso el periodo es más largo.
+    serviciosQueLaUsan: [
+      "branding_premium",
+      "diseno_grafico_creatividades_premium",
+      "fotografia_producto_premium",
+      "video_multimedia_premium",
+      "3d_contenido_inmersivo_premium",
+    ],
+    laAporta: "medicion",
+  },
+  {
+    id: "rendimiento_de_conversaciones",
+    pregunta: "Cuántas conversaciones se resuelven solas y cuántas acaban en una persona",
+    forma: "mapa",
+    imprescindible: false,
+    caducaEnDias: 30,
+    serviciosQueLaUsan: ["bots_premium", "voz_premium", "canales_comunicaciones_premium"],
+    laAporta: "medicion",
+  },
+  {
+    id: "rendimiento_de_la_operacion",
+    pregunta: "Cuánto tiempo se ahorra y qué procesos siguen atascados",
+    forma: "mapa",
+    imprescindible: false,
+    caducaEnDias: 60,
+    serviciosQueLaUsan: [
+      "consultoria_automatizacion_premium",
+      "integraciones_apis_premium",
+      "advisor_empresarial_premium",
+    ],
+    laAporta: "medicion",
+  },
+  // ══ LOS CINCO QUE FALTABAN ═══════════════════════════════════════════════
+  //
+  // Cinco servicios se quedaban sin intake propio suficiente. Estas preguntas
+  // son las que un especialista de cada disciplina hace ANTES de empezar —no
+  // las que se le ocurren a medias, cuando ya hay trabajo hecho que tirar.
+
+  // ── Marca ────────────────────────────────────────────────────────────────
+  {
+    id: "de_donde_viene_la_marca",
+    pregunta: "¿De dónde sale el nombre y qué queréis que la gente sienta al verlo?",
+    forma: "texto",
+    imprescindible: false,
+    caducaEnDias: null,
+    serviciosQueLaUsan: ["branding_premium"],
+    laAporta: "cliente",
+  },
+  {
+    id: "que_hay_que_conservar",
+    pregunta: "¿Hay algo de la imagen actual que NO se pueda tocar? Logo, color, nombre…",
+    forma: "lista",
+    imprescindible: false,
+    caducaEnDias: null,
+    // Rehacer una marca y descubrir al final que el color estaba en la fachada
+    // de catorce locales es rehacerla dos veces.
+    serviciosQueLaUsan: ["branding_premium", "diseno_grafico_creatividades_premium"],
+    laAporta: "cliente",
+  },
+
+  // ── Voz ──────────────────────────────────────────────────────────────────
+  {
+    id: "quien_llama_y_para_que",
+    pregunta: "¿Quién os llama, a qué horas y para qué? Pedir cita, dudas, quejas…",
+    forma: "mapa",
+    imprescindible: false,
+    caducaEnDias: 180,
+    serviciosQueLaUsan: ["voz_premium", "canales_comunicaciones_premium"],
+    laAporta: "cliente",
+  },
+  {
+    id: "que_nunca_debe_decir",
+    pregunta: "¿Qué NO debe decir nunca quien conteste, aunque se lo pregunten?",
+    forma: "lista",
+    imprescindible: false,
+    caducaEnDias: null,
+    // En un sector regulado es la diferencia entre atender y meter en un lío.
+    serviciosQueLaUsan: ["voz_premium", "bots_premium", "canales_comunicaciones_premium"],
+    laAporta: "cliente",
+  },
+
+  // ── Vídeo ────────────────────────────────────────────────────────────────
+  {
+    id: "que_material_hay_grabado",
+    pregunta: "¿Tenéis material grabado, fotos o accesos que se puedan reutilizar?",
+    forma: "lista",
+    imprescindible: false,
+    caducaEnDias: 180,
+    serviciosQueLaUsan: ["video_multimedia_premium", "fotografia_producto_premium"],
+    laAporta: "cliente",
+  },
+  {
+    id: "quien_sale_y_quien_no",
+    pregunta: "¿Quién puede aparecer en cámara y quién prefiere no salir?",
+    forma: "lista",
+    imprescindible: false,
+    caducaEnDias: null,
+    // Grabar a alguien que no quería salir obliga a repetir el rodaje entero, y
+    // además es un problema de consentimiento.
+    serviciosQueLaUsan: ["video_multimedia_premium"],
+    laAporta: "cliente",
+  },
+
+  // ── Integraciones ────────────────────────────────────────────────────────
+  {
+    id: "que_datos_tienen_que_viajar",
+    pregunta: "¿Qué información tiene que pasar de un sitio a otro, y en qué dirección?",
+    forma: "mapa",
+    imprescindible: false,
+    caducaEnDias: 180,
+    serviciosQueLaUsan: ["integraciones_apis_premium", "consultoria_automatizacion_premium"],
+    laAporta: "cliente",
+  },
+  {
+    id: "que_pasa_si_falla_la_conexion",
+    pregunta: "Si una conexión se cae media hora, ¿qué no puede perderse?",
+    forma: "texto",
+    imprescindible: false,
+    caducaEnDias: null,
+    // Es la pregunta que decide si hace falta cola, reintento o nada. Hacerla
+    // al final significa rehacer la integración.
+    serviciosQueLaUsan: ["integraciones_apis_premium"],
+    laAporta: "cliente",
+  },
+
+  // ── Reputación ───────────────────────────────────────────────────────────
+  {
+    id: "quien_puede_responder_en_publico",
+    pregunta: "¿Quién puede responder en vuestro nombre y qué tiene que aprobar alguien antes?",
+    forma: "mapa",
+    imprescindible: false,
+    caducaEnDias: null,
+    serviciosQueLaUsan: ["reputacion_online_orm_premium"],
+    laAporta: "cliente",
+  },
+  {
+    id: "que_reseñas_son_ciertas",
+    pregunta: "De lo que os critican, ¿qué es verdad y estáis arreglando?",
+    forma: "lista",
+    imprescindible: false,
+    caducaEnDias: 90,
+    // Responder a una crítica cierta como si fuera falsa es la forma más rápida
+    // de convertir una reseña mala en un incendio.
+    serviciosQueLaUsan: ["reputacion_online_orm_premium"],
+    laAporta: "cliente",
+  },
 ] as const;
 
 const PORID = new Map(DIMENSIONES.map((d) => [d.id, d]));

@@ -22,8 +22,8 @@ del árbol o de una medición ya ejecutada; `BUSINESS_BRAIN` en concreto sale de
 
 | Estado | Servicios |
 |---|---:|
-| LOCAL_CERTIFIED | 6 |
-| PARTIAL | 19 |
+| LOCAL_CERTIFIED | 25 |
+| PARTIAL | 0 |
 | FAIL | 0 |
 | **Total** | **25** |
 
@@ -33,51 +33,49 @@ Y **los 25** están en `PRODUCTION_UNVERIFIED`: nada se ha desplegado.
 
 | Servicio | business outcome | icp | domain depth | intake | business brain | specialist agents | tools | execution | qa | approval | measurement | optimization | recovery | e2e | production verified | Estado |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `web_premium` | ✅ | ✅ | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 🟡 | ✅ | ✅ | — | PARTIAL |
-| `ecommerce_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 🟡 | ✅ | 🟡 | ✅ | ✅ | 🟡 | ✅ | ✅ | — | PARTIAL |
-| `seo_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 🟡 | ✅ | ✅ | — | LOCAL_CERTIFIED |
-| `ads_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 🟡 | ✅ | ✅ | — | LOCAL_CERTIFIED |
-| `branding_premium` | 🟡 | ✅ | 🟡 | 🟡 | ✅ | ✅ | 🟡 | ✅ | 🟡 | ✅ | 🟡 | 🟡 | ✅ | ✅ | — | PARTIAL |
-| `voz_premium` | 🟡 | ✅ | 🟡 | 🟡 | ✅ | ✅ | 🟡 | ✅ | 🟡 | ✅ | 🟡 | 🟡 | ✅ | ✅ | — | PARTIAL |
-| `bots_premium` | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | 🟡 | ✅ | 🟡 | ✅ | 🟡 | 🟡 | ✅ | ✅ | — | PARTIAL |
-| `personal_digital_premium` | 🟡 | ✅ | 🟡 | ✅ | ✅ | ✅ | 🟡 | ✅ | 🟡 | ✅ | 🟡 | 🟡 | ✅ | ✅ | — | PARTIAL |
-| `advisor_empresarial_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 🟡 | ✅ | ✅ | ✅ | ✅ | 🟡 | ✅ | ✅ | — | LOCAL_CERTIFIED |
-| `canales_comunicaciones_premium` | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | 🟡 | ✅ | 🟡 | ✅ | 🟡 | 🟡 | ✅ | ✅ | — | PARTIAL |
-| `social_media_premium` | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 🟡 | 🟡 | ✅ | ✅ | — | LOCAL_CERTIFIED |
-| `email_marketing_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 🟡 | ✅ | ✅ | — | LOCAL_CERTIFIED |
-| `contenido_copywriting_premium` | 🟡 | ✅ | ✅ | 🟡 | ✅ | ✅ | ✅ | ✅ | 🟡 | ✅ | 🟡 | 🟡 | ✅ | ✅ | — | PARTIAL |
-| `video_multimedia_premium` | 🟡 | ✅ | 🟡 | 🟡 | ✅ | ✅ | 🟡 | ✅ | 🟡 | ✅ | 🟡 | 🟡 | ✅ | ✅ | — | PARTIAL |
-| `3d_contenido_inmersivo_premium` | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | 🟡 | ✅ | 🟡 | ✅ | 🟡 | 🟡 | ✅ | ✅ | — | PARTIAL |
-| `fotografia_producto_premium` | 🟡 | ✅ | 🟡 | ✅ | ✅ | ✅ | 🟡 | ✅ | 🟡 | ✅ | 🟡 | 🟡 | ✅ | ✅ | — | PARTIAL |
-| `diseno_grafico_creatividades_premium` | 🟡 | ✅ | 🟡 | 🟡 | ✅ | ✅ | 🟡 | ✅ | 🟡 | ✅ | 🟡 | 🟡 | ✅ | ✅ | — | PARTIAL |
-| `consultoria_automatizacion_premium` | 🟡 | ✅ | 🟡 | ✅ | ✅ | ✅ | 🟡 | ✅ | ✅ | ✅ | 🟡 | 🟡 | ✅ | ✅ | — | PARTIAL |
-| `integraciones_apis_premium` | 🟡 | ✅ | 🟡 | 🟡 | ✅ | ✅ | 🟡 | ✅ | ✅ | ✅ | 🟡 | 🟡 | ✅ | ✅ | — | PARTIAL |
-| `mantenimiento_web_premium` | 🟡 | ✅ | 🟡 | ✅ | ✅ | ✅ | 🟡 | ✅ | ✅ | ✅ | 🟡 | 🟡 | ✅ | ✅ | — | PARTIAL |
-| `reputacion_online_orm_premium` | 🟡 | ✅ | 🟡 | 🟡 | ✅ | ✅ | 🟡 | ✅ | ✅ | ✅ | 🟡 | 🟡 | ✅ | ✅ | — | PARTIAL |
-| `formacion_capacitacion_digital_premium` | 🟡 | ✅ | 🟡 | ✅ | ✅ | ✅ | 🟡 | ✅ | 🟡 | ✅ | 🟡 | 🟡 | ✅ | ✅ | — | PARTIAL |
-| `influencer_marketing_premium` | 🟡 | ✅ | 🟡 | ✅ | ✅ | ✅ | 🟡 | ✅ | ✅ | ✅ | 🟡 | 🟡 | ✅ | ✅ | — | PARTIAL |
-| `landing_premium` | ✅ | ✅ | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 🟡 | ✅ | ✅ | — | PARTIAL |
-| `funnel_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 🟡 | ✅ | ✅ | — | LOCAL_CERTIFIED |
+| `web_premium` | ✅ | ✅ | ✅ | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
+| `ecommerce_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
+| `seo_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
+| `ads_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
+| `branding_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
+| `voz_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
+| `bots_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
+| `personal_digital_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
+| `advisor_empresarial_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
+| `canales_comunicaciones_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
+| `social_media_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
+| `email_marketing_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
+| `contenido_copywriting_premium` | ✅ | ✅ | ✅ | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
+| `video_multimedia_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
+| `3d_contenido_inmersivo_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
+| `fotografia_producto_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
+| `diseno_grafico_creatividades_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
+| `consultoria_automatizacion_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
+| `integraciones_apis_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
+| `mantenimiento_web_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
+| `reputacion_online_orm_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
+| `formacion_capacitacion_digital_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
+| `influencer_marketing_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
+| `landing_premium` | ✅ | ✅ | ✅ | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
+| `funnel_premium` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | LOCAL_CERTIFIED |
 
 ## Qué le falta exactamente a cada uno
 
-### `web_premium` — PARTIAL
+### `web_premium` — LOCAL_CERTIFIED
 
 Web Premium.
 
 Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.342).
 
-**A medias:** DOMAIN_DEPTH, INTAKE, OPTIMIZATION.
+**A medias:** INTAKE.
 
 **Sin medir:** PRODUCTION_VERIFIED.
 
-### `ecommerce_premium` — PARTIAL
+### `ecommerce_premium` — LOCAL_CERTIFIED
 
 Ecommerce Premium.
 
 Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.358).
-
-**A medias:** TOOLS, QA, OPTIMIZATION.
 
 **Sin medir:** PRODUCTION_VERIFIED.
 
@@ -87,8 +85,6 @@ SEO Premium.
 
 Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.389).
 
-**A medias:** OPTIMIZATION.
-
 **Sin medir:** PRODUCTION_VERIFIED.
 
 ### `ads_premium` — LOCAL_CERTIFIED
@@ -97,47 +93,37 @@ Ads Premium.
 
 Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.394).
 
-**A medias:** OPTIMIZATION.
-
 **Sin medir:** PRODUCTION_VERIFIED.
 
-### `branding_premium` — PARTIAL
+### `branding_premium` — LOCAL_CERTIFIED
 
 Branding Premium.
 
 Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.397).
 
-**A medias:** BUSINESS_OUTCOME, DOMAIN_DEPTH, INTAKE, TOOLS, QA, MEASUREMENT, OPTIMIZATION.
-
 **Sin medir:** PRODUCTION_VERIFIED.
 
-### `voz_premium` — PARTIAL
+### `voz_premium` — LOCAL_CERTIFIED
 
 Voz Premium.
 
 Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.431).
 
-**A medias:** BUSINESS_OUTCOME, DOMAIN_DEPTH, INTAKE, TOOLS, QA, MEASUREMENT, OPTIMIZATION.
-
 **Sin medir:** PRODUCTION_VERIFIED.
 
-### `bots_premium` — PARTIAL
+### `bots_premium` — LOCAL_CERTIFIED
 
 Bots Premium.
 
 Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.443).
 
-**A medias:** BUSINESS_OUTCOME, TOOLS, QA, MEASUREMENT, OPTIMIZATION.
-
 **Sin medir:** PRODUCTION_VERIFIED.
 
-### `personal_digital_premium` — PARTIAL
+### `personal_digital_premium` — LOCAL_CERTIFIED
 
 Personal Digital Premium.
 
 Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.445).
-
-**A medias:** BUSINESS_OUTCOME, DOMAIN_DEPTH, TOOLS, QA, MEASUREMENT, OPTIMIZATION.
 
 **Sin medir:** PRODUCTION_VERIFIED.
 
@@ -147,17 +133,13 @@ Advisor Empresarial Premium.
 
 Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.436).
 
-**A medias:** TOOLS, OPTIMIZATION.
-
 **Sin medir:** PRODUCTION_VERIFIED.
 
-### `canales_comunicaciones_premium` — PARTIAL
+### `canales_comunicaciones_premium` — LOCAL_CERTIFIED
 
 Canales y Comunicaciones Premium.
 
 Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.443).
-
-**A medias:** BUSINESS_OUTCOME, TOOLS, QA, MEASUREMENT, OPTIMIZATION.
 
 **Sin medir:** PRODUCTION_VERIFIED.
 
@@ -167,8 +149,6 @@ Social Media Premium.
 
 Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.38).
 
-**A medias:** BUSINESS_OUTCOME, MEASUREMENT, OPTIMIZATION.
-
 **Sin medir:** PRODUCTION_VERIFIED.
 
 ### `email_marketing_premium` — LOCAL_CERTIFIED
@@ -177,127 +157,105 @@ Email Marketing Premium.
 
 Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.412).
 
-**A medias:** OPTIMIZATION.
-
 **Sin medir:** PRODUCTION_VERIFIED.
 
-### `contenido_copywriting_premium` — PARTIAL
+### `contenido_copywriting_premium` — LOCAL_CERTIFIED
 
 Contenido y Copywriting Premium.
 
 Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.41).
 
-**A medias:** BUSINESS_OUTCOME, INTAKE, QA, MEASUREMENT, OPTIMIZATION.
+**A medias:** INTAKE.
 
 **Sin medir:** PRODUCTION_VERIFIED.
 
-### `video_multimedia_premium` — PARTIAL
+### `video_multimedia_premium` — LOCAL_CERTIFIED
 
 Video y Multimedia Premium.
 
 Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.429).
 
-**A medias:** BUSINESS_OUTCOME, DOMAIN_DEPTH, INTAKE, TOOLS, QA, MEASUREMENT, OPTIMIZATION.
-
 **Sin medir:** PRODUCTION_VERIFIED.
 
-### `3d_contenido_inmersivo_premium` — PARTIAL
+### `3d_contenido_inmersivo_premium` — LOCAL_CERTIFIED
 
 3D e Inmersivo Premium.
 
 Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.436).
 
-**A medias:** BUSINESS_OUTCOME, TOOLS, QA, MEASUREMENT, OPTIMIZATION.
-
 **Sin medir:** PRODUCTION_VERIFIED.
 
-### `fotografia_producto_premium` — PARTIAL
+### `fotografia_producto_premium` — LOCAL_CERTIFIED
 
 Fotografía de Producto Premium.
 
 Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.409).
 
-**A medias:** BUSINESS_OUTCOME, DOMAIN_DEPTH, TOOLS, QA, MEASUREMENT, OPTIMIZATION.
-
 **Sin medir:** PRODUCTION_VERIFIED.
 
-### `diseno_grafico_creatividades_premium` — PARTIAL
+### `diseno_grafico_creatividades_premium` — LOCAL_CERTIFIED
 
 Diseño Gráfico Premium.
 
 Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.411).
 
-**A medias:** BUSINESS_OUTCOME, DOMAIN_DEPTH, INTAKE, TOOLS, QA, MEASUREMENT, OPTIMIZATION.
-
 **Sin medir:** PRODUCTION_VERIFIED.
 
-### `consultoria_automatizacion_premium` — PARTIAL
+### `consultoria_automatizacion_premium` — LOCAL_CERTIFIED
 
 Consultoría y Automatización Premium.
 
 Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.481).
 
-**A medias:** BUSINESS_OUTCOME, DOMAIN_DEPTH, TOOLS, MEASUREMENT, OPTIMIZATION.
-
 **Sin medir:** PRODUCTION_VERIFIED.
 
-### `integraciones_apis_premium` — PARTIAL
+### `integraciones_apis_premium` — LOCAL_CERTIFIED
 
 Integraciones y APIs Premium.
 
 Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.436).
 
-**A medias:** BUSINESS_OUTCOME, DOMAIN_DEPTH, INTAKE, TOOLS, MEASUREMENT, OPTIMIZATION.
-
 **Sin medir:** PRODUCTION_VERIFIED.
 
-### `mantenimiento_web_premium` — PARTIAL
+### `mantenimiento_web_premium` — LOCAL_CERTIFIED
 
 Mantenimiento Web Premium.
 
 Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.425).
 
-**A medias:** BUSINESS_OUTCOME, DOMAIN_DEPTH, TOOLS, MEASUREMENT, OPTIMIZATION.
-
 **Sin medir:** PRODUCTION_VERIFIED.
 
-### `reputacion_online_orm_premium` — PARTIAL
+### `reputacion_online_orm_premium` — LOCAL_CERTIFIED
 
 Reputación y ORM Premium.
 
 Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.431).
 
-**A medias:** BUSINESS_OUTCOME, DOMAIN_DEPTH, INTAKE, TOOLS, MEASUREMENT, OPTIMIZATION.
-
 **Sin medir:** PRODUCTION_VERIFIED.
 
-### `formacion_capacitacion_digital_premium` — PARTIAL
+### `formacion_capacitacion_digital_premium` — LOCAL_CERTIFIED
 
 Formación Digital Premium.
 
 Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.431).
 
-**A medias:** BUSINESS_OUTCOME, DOMAIN_DEPTH, TOOLS, QA, MEASUREMENT, OPTIMIZATION.
-
 **Sin medir:** PRODUCTION_VERIFIED.
 
-### `influencer_marketing_premium` — PARTIAL
+### `influencer_marketing_premium` — LOCAL_CERTIFIED
 
 Influencer Marketing Premium.
 
 Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.437).
 
-**A medias:** BUSINESS_OUTCOME, DOMAIN_DEPTH, TOOLS, MEASUREMENT, OPTIMIZATION.
-
 **Sin medir:** PRODUCTION_VERIFIED.
 
-### `landing_premium` — PARTIAL
+### `landing_premium` — LOCAL_CERTIFIED
 
 Landing Page Premium.
 
 Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.342).
 
-**A medias:** DOMAIN_DEPTH, INTAKE, OPTIMIZATION.
+**A medias:** INTAKE.
 
 **Sin medir:** PRODUCTION_VERIFIED.
 
@@ -306,8 +264,6 @@ Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.342).
 Funnel Multi-paso Premium.
 
 Personalización medida: **PERSONALIZA** (cobertura 1, separación 0.358).
-
-**A medias:** OPTIMIZATION.
 
 **Sin medir:** PRODUCTION_VERIFIED.
 

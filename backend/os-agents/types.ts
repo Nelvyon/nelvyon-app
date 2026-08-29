@@ -23,6 +23,13 @@ export interface OsJobResult {
   serviceId: string;
   steps: OsStepResultRecord[];
   /**
+   * Las cuentas que hizo el agente, con su resultado y su explicacion.
+   *
+   * Se guardan en el resultado del trabajo para que se puedan auditar: una
+   * cifra que el cliente usa para decidir tiene que poder rastrearse.
+   */
+  calculos?: Array<{ herramienta: string; que: string; resultado: unknown }>;
+  /**
    * El fichero que el cliente se descarga.
    *
    * Opcional porque los servicios con constructor propio publican el suyo

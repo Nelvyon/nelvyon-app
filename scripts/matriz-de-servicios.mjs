@@ -158,6 +158,33 @@ const QA_DE = {
   formacion_capacitacion_digital_premium: "contenido",
 };
 
+// ── Herramientas por servicio ──────────────────────────────────────────────
+//
+// TOOLS deja de significar «el agente publica un zip» y pasa a significar lo
+// que debía significar: que el servicio hace CUENTAS además de escribir. Un
+// especialista calcula si una campaña deja dinero o si un experimento podrá
+// concluir; pedirle esa división a un modelo de lenguaje es lo peor de los dos
+// mundos.
+const HERRAMIENTAS = new Set();
+{
+  const t = leer("backend/herramientas/Herramientas.ts");
+  for (const m of t.matchAll(/servicios:\s*\[([^\]]*)\]/g)) {
+    for (const s of m[1].matchAll(/"([a-z0-9_]+)"/g)) HERRAMIENTAS.add(s[1]);
+  }
+}
+
+// ── Política de optimización, derivada del árbol ───────────────────────────
+//
+// Antes esta columna estaba fijada a PARTIAL para todos, porque no había motor
+// de optimización: era honesto entonces y sería mentira ahora.
+const OPTIMIZACION = new Set();
+{
+  const t = leer("backend/optimizacion/PoliticaDeOptimizacion.ts");
+  for (const m of t.matchAll(/servicios:\s*\[([^\]]*)\]/g)) {
+    for (const s of m[1].matchAll(/"([a-z0-9_]+)"/g)) OPTIMIZACION.add(s[1]);
+  }
+}
+
 // ── Personalización medida ─────────────────────────────────────────────────
 const personalizacion = new Map();
 for (const s of leerJson("backend/calidad/personalizacion_por_servicio.json")?.servicios ?? []) {
@@ -226,7 +253,11 @@ function evaluar(s) {
           ? "FAIL"
           : "PARTIAL",
     SPECIALIST_AGENTS: !a ? "FAIL" : a.pasos >= 4 ? "PASS" : "PARTIAL",
-    TOOLS: !a ? "FAIL" : a.herramientas ? "PASS" : "PARTIAL",
+    TOOLS: !a
+      ? "FAIL"
+      : HERRAMIENTAS.has(s.id) || a.herramientas
+        ? "PASS"
+        : "PARTIAL",
     // TODOS producen un entregable descargable: los ocho con constructor propio
     // el suyo, y el resto el documento genérico que `BaseOsAgent` compone al
     // terminar. Antes diecisiete terminaban en texto dentro de un JSON, que es
@@ -237,8 +268,10 @@ function evaluar(s) {
     // cruzar sus siete puertas.
     APPROVAL: "PASS",
     MEASUREMENT: d.medicion > 0 ? "PASS" : "PARTIAL",
-    // El motor de resultados existe y es común; lo que falta es dato real.
-    OPTIMIZATION: d.medicion > 0 ? "PARTIAL" : "PARTIAL",
+    // PASS cuando el servicio declara qué mirar, con qué umbral y qué palancas
+    // se pueden mover — y además tiene de dónde sacar la medida. Lo que falta
+    // para que el bucle gire de verdad es DATO REAL, que no es código.
+    OPTIMIZATION: !OPTIMIZACION.has(s.id) ? "FAIL" : d.medicion > 0 ? "PASS" : "PARTIAL",
     // La cola reintenta y rescata para cualquier servicio.
     RECOVERY: "PASS",
     E2E: E2E.has(s.id) ? "PASS" : "NOT_MEASURED",
@@ -260,7 +293,10 @@ const filas = SERVICIOS.map((s) => ({ ...s, celdas: evaluar(s) }));
 function estadoDe(celdas) {
   const c = Object.values(celdas);
   if (c.includes("FAIL")) return "FAIL";
-  const decisivas = ["DOMAIN_DEPTH", "BUSINESS_BRAIN", "QA", "EXECUTION", "E2E"];
+  // TOOLS entra en la lista: la definicion de servicio terminado exige
+  // CONNECTED, y un agente que solo le pide texto a un modelo no esta
+  // conectado a nada. Dejarlo fuera era ponerme el liston mas bajo.
+  const decisivas = ["DOMAIN_DEPTH", "BUSINESS_BRAIN", "QA", "TOOLS", "EXECUTION", "E2E"];
   return decisivas.every((k) => celdas[k] === "PASS") ? "LOCAL_CERTIFIED" : "PARTIAL";
 }
 

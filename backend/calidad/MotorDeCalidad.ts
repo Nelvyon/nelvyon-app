@@ -791,6 +791,35 @@ const POR_DOMINIO: Readonly<Record<string, readonly Comprobacion[]>> = {
   ],
   ecommerce: [
     {
+      id: "el-precio-no-aparece-tarde",
+      descripcion: "El precio se ve antes de invertir tiempo",
+      clase: "rubrica",
+      gravedad: "aviso",
+      evaluar: (p) => {
+        // Descubrir el precio en el último paso es la causa clásica de
+        // abandono: el cliente siente que le han hecho perder el rato.
+        const paso = p.contenido.pasoDondeApareceElPrecio;
+        const total = p.contenido.pasosDelProceso;
+        if (typeof paso !== "number" || typeof total !== "number" || total === 0) return undefined;
+        return paso / total > 0.6
+          ? `el precio aparece en el paso ${paso} de ${total}: demasiado tarde`
+          : null;
+      },
+    },
+    {
+      id: "gastos-de-envio-sin-sorpresas",
+      descripcion: "Los gastos de envío se dicen antes del pago",
+      clase: "determinista",
+      gravedad: "bloqueante",
+      evaluar: (p) => {
+        const cuando = p.contenido.cuandoSeMuestranGastosDeEnvio;
+        if (typeof cuando !== "string") return undefined;
+        return /\b(pago|checkout|ultimo|último)\b/i.test(cuando)
+          ? `los gastos de envío se enseñan en «${cuando}»: es la primera causa de abandono`
+          : null;
+      },
+    },
+    {
       id: "el-pedido-deja-margen",
       descripcion: "Lo que cuesta traer un pedido cabe en su margen",
       clase: "determinista",
@@ -870,6 +899,40 @@ const POR_DOMINIO: Readonly<Record<string, readonly Comprobacion[]>> = {
   ],
   contenido: [
     {
+      id: "cabe-en-el-tiempo-del-cliente",
+      descripcion: "El calendario se puede cumplir",
+      clase: "rubrica",
+      gravedad: "aviso",
+      evaluar: (p) => {
+        // Un plan de cinco piezas semanales para quien tiene media hora no
+        // fracasa por el cliente: fracasa al diseñarlo.
+        const piezas = p.contenido.piezasPorSemana;
+        const horas = p.contexto?.horasSemanalesDelCliente;
+        if (typeof piezas !== "number" || typeof horas !== "number") return undefined;
+        return piezas * 1.5 > horas
+          ? `${piezas} piezas semanales para quien tiene ${horas} h: el plan no se va a cumplir`
+          : null;
+      },
+    },
+    {
+      id: "no-todo-el-contenido-vende",
+      descripcion: "No todas las piezas son para vender",
+      clase: "rubrica",
+      gravedad: "aviso",
+      evaluar: (p) => {
+        // Un calendario donde todo empuja a comprar cansa a la audiencia y deja
+        // de leerse. La proporción exacta se discute; que sea el 100 %, no.
+        const piezas = p.contenido.piezas;
+        if (!Array.isArray(piezas) || piezas.length < 4) return undefined;
+        const comerciales = piezas.filter(
+          (x) => (x as { intencion?: string })?.intencion === "venta",
+        ).length;
+        return comerciales === piezas.length
+          ? "todas las piezas empujan a comprar: la audiencia deja de leer"
+          : null;
+      },
+    },
+    {
       id: "responde-a-alguien-concreto",
       descripcion: "El contenido sabe a quién le habla",
       clase: "rubrica",
@@ -895,6 +958,54 @@ const POR_DOMINIO: Readonly<Record<string, readonly Comprobacion[]>> = {
     },
   ],
   creatividad: [
+    {
+      id: "una-pieza-por-canal",
+      descripcion: "La pieza está hecha para el sitio donde se va a ver",
+      clase: "determinista",
+      gravedad: "aviso",
+      evaluar: (p) => {
+        // Un diseño de escaparate y uno de móvil no se parecen. Entregar el
+        // mismo archivo para los dos es entregar uno que no sirve para ninguno.
+        const formatos = p.contenido.formatos;
+        const canales = p.contenido.canales;
+        if (!Array.isArray(formatos) || !Array.isArray(canales)) return undefined;
+        return formatos.length < canales.length
+          ? `${canales.length} canales y sólo ${formatos.length} formato(s): alguno va a quedar mal`
+          : null;
+      },
+    },
+    {
+      id: "hay-fuente-de-los-materiales",
+      descripcion: "Se sabe de dónde salen las imágenes y las tipografías",
+      clase: "determinista",
+      gravedad: "bloqueante",
+      evaluar: (p) => {
+        // Una imagen sin licencia en una campaña del cliente es una reclamación
+        // con su nombre, no con el nuestro.
+        const activos = p.contenido.activos;
+        if (!Array.isArray(activos)) return undefined;
+        const sinLicencia = activos.filter(
+          (a) => !(a as { licencia?: string })?.licencia,
+        ).length;
+        return sinLicencia > 0
+          ? `${sinLicencia} material(es) sin licencia declarada: eso es una reclamación esperando`
+          : null;
+      },
+    },
+    {
+      id: "se-puede-leer-lo-que-pone",
+      descripcion: "El texto sobre la imagen se lee",
+      clase: "rubrica",
+      gravedad: "aviso",
+      evaluar: (p) => {
+        const contraste = p.contenido.contrasteTextoFondo;
+        if (typeof contraste !== "number") return undefined;
+        // 4,5 es el mínimo con el que un texto normal se lee sin esfuerzo.
+        return contraste < 4.5
+          ? `contraste ${contraste}: por debajo de 4,5 el texto cuesta de leer`
+          : null;
+      },
+    },
     {
       id: "respeta-lo-que-la-marca-no-hace",
       descripcion: "No propone lo que la marca tiene prohibido",

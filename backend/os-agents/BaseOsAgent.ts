@@ -3,6 +3,7 @@ import { NelvyonMonitor } from "../monitoring";
 import { watermarkOsJobResult } from "./watermark";
 import { construirEntregable, yaTieneEntregable } from "./artifacts/entregableDeServicio";
 import { publishArtifactZip } from "./artifacts/artifactPublisher";
+import { ejecutarLasDe } from "../herramientas/Herramientas";
 
 export abstract class BaseOsAgent {
   abstract readonly serviceId: string;
@@ -48,6 +49,28 @@ export abstract class BaseOsAgent {
       }
     }
 
+    // ── LAS HERRAMIENTAS ─────────────────────────────────────────────────
+    //
+    // Un especialista de verdad no solo escribe: hace cuentas. Calcula si una
+    // campana deja dinero, si un experimento va a poder concluir, si el
+    // calendario cabe en las horas que el cliente tiene.
+    //
+    // Diecisiete de los veinticinco servicios tenian agentes que SOLO le pedian
+    // texto a un modelo. Esto es lo que les faltaba, y va aqui —y no en cada
+    // agente— porque son diecisiete ficheros y este es el unico punto por el
+    // que pasan todos.
+    //
+    // Son DETERMINISTAS y no cuestan nada: misma entrada, misma salida. Pedirle
+    // una division a un modelo de lenguaje es lo peor de los dos mundos.
+    let calculos: Array<{ herramienta: string; que: string; resultado: unknown }> = [];
+    try {
+      calculos = ejecutarLasDe(this.serviceId, payload as Record<string, unknown>);
+    } catch (err) {
+      // Una herramienta que revienta NO tumba el trabajo: los pasos ya se
+      // hicieron. Se anota y se sigue.
+      NelvyonMonitor.trackAgentError(this.constructor.name, "herramientas", err);
+    }
+
     // ── EL ENTREGABLE ────────────────────────────────────────────────────
     //
     // De los veinticinco servicios que NELVYON vende, ocho terminan produciendo
@@ -69,6 +92,7 @@ export abstract class BaseOsAgent {
           cliente: typeof payload.clientName === "string" ? payload.clientName : undefined,
           jobId: ctx.jobId,
           pasos: stepResults,
+          calculos,
         });
         const publicado = await publishArtifactZip({
           kind: "sector-report",
@@ -92,6 +116,7 @@ export abstract class BaseOsAgent {
       serviceId: this.serviceId,
       steps: stepResults,
       ...(entregable ? { entregable } : {}),
+      ...(calculos.length > 0 ? { calculos } : {}),
     });
     await ctx.jobStore.completeJob(ctx.jobId, result);
     ctx.eventBus.emit("job:completed", { jobId: ctx.jobId, result });
