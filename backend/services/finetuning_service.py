@@ -229,7 +229,7 @@ class FineTuningService:
             rows = await self.session.execute(
                 text(
                     """
-                    SELECT messages FROM chatbot_conversations
+                    SELECT messages FROM workspace_chatbot_conversations
                     WHERE workspace_id = :ws AND satisfaction >= 4
                     ORDER BY last_message_at DESC
                     LIMIT 60

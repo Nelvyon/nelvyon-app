@@ -44,8 +44,10 @@ const DSN = process.env.NELVYON_COLA_CERT_DSN ?? "";
 const conBase = DSN ? describe : describe.skip;
 
 const TENANT = "dddddddd-000b-400b-800b-00000000000b";
-const WS = 990001;
-const OTRO_WS = 990002;
+// Inquilino propio: 990001 lo usaba ya `elClientePuedeEmpezarSolo`, y dos ficheros que se
+// borran los datos entre si producen una prueba que falla a veces.
+const WS = 994001;
+const OTRO_WS = 994002;
 const CLI = "aaaaaaaa-e51d-4001-8001-00000000000b";
 const SERVICIO = "adversario";
 

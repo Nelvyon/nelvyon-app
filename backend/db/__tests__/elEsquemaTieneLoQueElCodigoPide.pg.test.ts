@@ -21,11 +21,21 @@
  * una lista larga de falsos avisos, dejaría de mirarse, y entonces no
  * protegería nada — que es cómo mueren las comprobaciones automáticas.
  *
- * MIENTRAS UN DEFECTO SIGA ABIERTO, su caso está en `PENDIENTES` y la prueba
- * lo AFIRMA como ausente. Suena al revés, y es a propósito: así el día que
- * alguien lo arregle, esta prueba se pone roja y obliga a mover la línea de
- * `PENDIENTES` a `EXIGIDAS`. Una lista de deuda que no avisa cuando la deuda se
- * paga acaba mintiendo en la otra dirección.
+ * LOS CINCO YA ESTÁN ARREGLADOS. Esta prueba dejó de ser una lista de deuda y
+ * pasó a ser lo que protege el arreglo, con DOS listas:
+ *
+ *   EXIGIDAS ................. columnas que el código usa y deben seguir ahí.
+ *   AUSENTES_A_PROPÓSITO ..... columnas que NO deben aparecer, con el sitio
+ *                              donde vive el dato de verdad.
+ *
+ * La segunda es la menos obvia y la más útil. Dos de los cinco defectos se
+ * arreglaron SIN tocar el esquema: el dato ya existía con otro nombre. Si
+ * alguien añade luego la columna «para que funcione», habrá dos fuentes para lo
+ * mismo y nadie sabrá cuál mirar — así que esta prueba se pone roja y le cuenta
+ * dónde está el dato.
+ *
+ * Cuando la lista de deuda se vació, esta prueba se puso roja avisando de que
+ * la deuda se había pagado. Funcionó como debía.
  */
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import pg from "pg";
@@ -39,31 +49,63 @@ let pool: pg.Pool;
 const EXIGIDAS: ReadonlyArray<[tabla: string, columna: string, quienLaPide: string]> = [
   ["bookings", "workspace_id", "booking_service.py filtra por inquilino"],
   ["bookings", "booking_date", "booking_service.py ordena y filtra por fecha"],
+  ["bookings", "booking_time", "la hora de la cita; con la fecha forman el instante"],
+  ["bookings", "zoom_meeting_id", "el webhook de Zoom cierra la reserva por aquí (migración 588)"],
   ["calendar_events", "tenant_id", "SaasCalendarService y calendar_service.py"],
   ["calendar_events", "event_date", "SaasCalendarService.list ordena por aquí"],
   ["calendar_events", "start_at", "calendar_service.py:464 ordena por aquí"],
-  ["crm_activities", "metadata", "crm_service.py guarda aquí deal_id y outcome"],
+  ["crm_activities", "metadata", "crm_service.py guarda aquí deal_id y outcome, y los lee de aquí"],
   ["crm_activities", "workspace_id", "crm_service.py filtra por inquilino"],
   ["webhook_deliveries", "webhook_id", "webhook_service.py:378 registra la entrega"],
   ["webhook_deliveries", "workspace_id", "webhook_service.py filtra por inquilino"],
-  ["chatbot_conversations", "chatbot_id", "chatbot_service.py une con chatbots"],
-  ["affiliate_clicks", "landed_at", "affiliate_service.py ordena por aquí"],
+  ["chatbot_conversations", "chatbot_id", "el subsistema LEGADO une con chatbot_configs"],
+  ["chatbot_conversations", "captured_lead", "el legado guarda aquí los datos del contacto"],
+  ["affiliate_clicks", "landed_at", "la fecha real del clic; el índice va sobre ésta"],
+
+  // El subsistema por inquilino, en su propia tabla (migración 587).
+  ["workspace_chatbot_conversations", "workspace_id", "chatbot_service.py filtra por inquilino"],
+  ["workspace_chatbot_conversations", "visitor_info", "chatbot_service.py y cdp_service.py"],
+  ["workspace_chatbot_conversations", "lead_captured", "el panel lo usa en un FILTER; es BOOLEANA"],
+  ["workspace_chatbot_conversations", "started_at", "chatbot_service.py cuenta las de hoy"],
+  ["workspace_chatbot_conversations", "last_message_at", "ordena la bandeja por actividad"],
+  ["workspace_chatbot_conversations", "satisfaction", "valoración de la conversación"],
 ];
 
 /**
- * Los cinco defectos confirmados a mano. La prueba afirma que SIGUEN ausentes.
- * Ver `backend/db/verificacion_manual_507.json` para la consulta exacta.
+ * Columnas que NO deben existir, y el motivo.
+ *
+ * Ésta es la lista que sustituye a la antigua de «deuda pendiente», y no es lo
+ * mismo: aquellas faltaban por descuido, éstas faltan POR DECISIÓN. El dato ya
+ * vive en otro sitio, y añadir la columna dejaría dos fuentes para lo mismo —
+ * momento a partir del cual nadie sabe cuál mirar.
+ *
+ * Si alguien las añade «para que funcione», esta prueba se pone roja y le
+ * cuenta dónde está el dato de verdad.
  */
-const PENDIENTES: ReadonlyArray<[tabla: string, columna: string, donde: string]> = [
-  ["bookings", "start_at", "booking_service.py:293 ORDER BY start_at"],
-  ["bookings", "zoom_meeting_id", "booking_service.py:331 WHERE zoom_meeting_id"],
-  ["crm_activities", "deal_id", "crm_service.py:750 AND deal_id ="],
-  ["chatbot_conversations", "workspace_id", "chatbot_service.py:541 y cdp_service.py:303"],
-  ["chatbot_conversations", "started_at", "chatbot_service.py:541 SELECT started_at"],
-  ["chatbot_conversations", "last_message_at", "chatbot_service.py:541 ORDER BY"],
-  ["chatbot_conversations", "visitor_info", "chatbot_service.py:541 y cdp_service.py:303"],
-  ["chatbot_conversations", "lead_captured", "chatbot_service.py:541 (la tabla tiene captured_lead)"],
-  ["chatbot_conversations", "satisfaction", "chatbot_service.py:541 SELECT satisfaction"],
+const AUSENTES_A_PROPOSITO: ReadonlyArray<[tabla: string, columna: string, dondeVive: string]> = [
+  [
+    "bookings", "start_at",
+    "la cita vive en `booking_date + booking_time`. Los lectores usan esa suma.",
+  ],
+  [
+    "crm_activities", "deal_id",
+    "el writer lo guarda en `metadata->>'deal_id'`, y el reader lo lee de ahí.",
+  ],
+  [
+    "chatbot_conversations", "workspace_id",
+    "el legado no tiene inquilino. El subsistema por inquilino usa " +
+    "`workspace_chatbot_conversations`, que sí lo tiene.",
+  ],
+  [
+    "chatbot_conversations", "lead_captured",
+    "en el legado el campo es `captured_lead` y es JSONB con los datos del " +
+    "contacto. El booleano vive en la tabla por inquilino.",
+  ],
+  [
+    "affiliate_clicks", "created_at",
+    "la fecha del clic se llama `landed_at`. Era un índice mal escrito en la 507, " +
+    "no una columna que faltara.",
+  ],
 ];
 
 async function existe(tabla: string, columna: string): Promise<boolean> {
@@ -95,39 +137,42 @@ conBase("el esquema tiene lo que el código pide", () => {
     }
   });
 
-  describe("la deuda medida sigue medida", () => {
-    for (const [tabla, columna, donde] of PENDIENTES) {
-      it(`${tabla}.${columna} sigue ausente — la pide ${donde}`, async () => {
+  describe("lo que falta, falta A PROPÓSITO", () => {
+    for (const [tabla, columna, dondeVive] of AUSENTES_A_PROPOSITO) {
+      it(`${tabla}.${columna} no existe — ${dondeVive.slice(0, 50)}…`, async () => {
         expect(
           await existe(tabla, columna),
-          `${tabla}.${columna} YA EXISTE. Si alguien lo ha arreglado, muy bien: ` +
-          `mueve esta línea de PENDIENTES a EXIGIDAS y quítala de ` +
-          `verificacion_manual_507.json. Esta prueba está roja a propósito para ` +
-          `que la deuda no se pague en silencio.`,
+          `${tabla}.${columna} EXISTE ahora. Si se ha añadido «para que funcione», ` +
+          `hay dos fuentes para el mismo dato y nadie sabrá cuál mirar. ` +
+          `El dato vive aquí: ${dondeVive}`,
         ).toBe(false);
       });
     }
   });
 
-  it("chatbot_conversations sigue siendo el caso más grave", async () => {
-    // Se afirma la FORMA, no una lista de nombres: si alguien reconstruye la
-    // tabla, esta prueba lo nota aunque acierte con algún nombre suelto.
-    const { rows } = await pool.query<{ column_name: string }>(
-      `SELECT column_name FROM information_schema.columns
-        WHERE table_schema='public' AND table_name='chatbot_conversations'`,
-    );
-    const tiene = new Set(rows.map((r) => r.column_name));
-    const pideLaConsulta = [
-      "visitor_info", "lead_captured", "satisfaction",
-      "started_at", "last_message_at", "workspace_id",
-    ];
-    const ausentes = pideLaConsulta.filter((c) => !tiene.has(c));
+  it("los dos subsistemas de chatbot NO comparten forma", async () => {
+    // El defecto era que dos productos distintos compartían una tabla. La
+    // comprobación de que está resuelto no es que existan las columnas: es que
+    // cada tabla tiene SU forma y ninguna tiene la de la otra.
+    const columnas = async (t: string): Promise<Set<string>> => {
+      const { rows } = await pool.query<{ column_name: string }>(
+        `SELECT column_name FROM information_schema.columns
+          WHERE table_schema='public' AND table_name=$1`,
+        [t],
+      );
+      return new Set(rows.map((r) => r.column_name));
+    };
 
-    expect(rows.length).toBeGreaterThan(0);
-    expect(
-      ausentes.length,
-      `chatbot_service.py:541 pide ${pideLaConsulta.length} columnas y faltan ${ausentes.length}. ` +
-      `Si este número ha bajado, alguien está arreglándolo: actualiza la lista.`,
-    ).toBe(6);
+    const legado = await columnas("chatbot_conversations");
+    const porInquilino = await columnas("workspace_chatbot_conversations");
+
+    expect(legado.size, "el legado ha desaparecido").toBeGreaterThan(0);
+    expect(porInquilino.size, "falta la migración 587").toBeGreaterThan(0);
+
+    // Cada uno lo suyo, y nada de lo del otro.
+    expect(legado.has("captured_lead")).toBe(true);
+    expect(legado.has("lead_captured"), "se han mezclado las dos formas").toBe(false);
+    expect(porInquilino.has("lead_captured")).toBe(true);
+    expect(porInquilino.has("captured_lead"), "se han mezclado las dos formas").toBe(false);
   });
 });

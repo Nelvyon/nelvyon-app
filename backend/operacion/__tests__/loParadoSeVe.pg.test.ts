@@ -22,7 +22,9 @@ const DSN = process.env.NELVYON_COLA_CERT_DSN ?? "";
 const conBase = DSN ? describe : describe.skip;
 
 const TENANT = "dddddddd-0009-4009-8009-000000000009";
-const WS = 970001;
+// Inquilino propio: 970001 lo usaban ya `gastoExternoDenegadoPorDefecto` y `cruzarDeInquilinoNoCuela`, y dos ficheros que se
+// borran los datos entre si producen una prueba que falla a veces.
+const WS = 996001;
 const CLI = "aaaaaaaa-c31d-4001-8001-000000000009";
 const SERVICIO = "prueba_sala_de_maquinas";
 

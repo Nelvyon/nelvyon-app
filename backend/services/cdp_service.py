@@ -300,7 +300,7 @@ class CdpService:
             chat = await self.session.execute(
                 text(
                     """
-                    SELECT COUNT(*) FROM chatbot_conversations
+                    SELECT COUNT(*) FROM workspace_chatbot_conversations
                     WHERE workspace_id = :ws AND lower(COALESCE(visitor_info->>'email', '')) = :uid
                     """
                 ),

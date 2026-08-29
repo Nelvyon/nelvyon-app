@@ -29,7 +29,11 @@ const DSN = process.env.NELVYON_COLA_CERT_DSN ?? "";
 const conBase = DSN ? describe : describe.skip;
 
 const TENANT = "cccccccc-0003-4003-8003-000000000003";
-const WS = 970001;
+// Inquilino propio: 970001 lo usa tambien `cruzarDeInquilinoNoCuela`, que
+// borra por workspace en su limpieza. Dos ficheros que se borran los datos
+// entre si producen una prueba que falla a veces — y una prueba que falla a
+// veces ensena a reintentar en vez de a mirar.
+const WS = 997001;
 const SERVICIO = "ads_premium";
 const PROVEEDOR = "meta_ads";
 

@@ -211,9 +211,9 @@ class ChatbotService:
                     c.*,
                     COUNT(conv.id) FILTER (WHERE conv.started_at >= :day_start) AS conversations_today,
                     COUNT(conv.id) AS conversations_total,
-                    COUNT(conv.id) FILTER (WHERE conv.captured_lead) AS leads_captured
+                    COUNT(conv.id) FILTER (WHERE conv.lead_captured) AS leads_captured
                 FROM chatbots c
-                LEFT JOIN chatbot_conversations conv ON conv.chatbot_id = c.id
+                LEFT JOIN workspace_chatbot_conversations conv ON conv.chatbot_id = c.id
                 WHERE c.workspace_id = :ws
                 GROUP BY c.id
                 ORDER BY c.created_at DESC
@@ -360,14 +360,16 @@ class ChatbotService:
         await self.session.execute(
             text(
                 """
-                UPDATE chatbot_conversations
+                UPDATE workspace_chatbot_conversations
                 SET messages = CAST(:messages AS jsonb),
                     visitor_info = CAST(:visitor AS jsonb),
-                    -- La columna real es `captured_lead`: estan invertidas
-                    -- las dos palabras. Con el nombre equivocado este UPDATE
-                    -- lanzaba, asi que una conversacion nunca podia marcarse
-                    -- como lead capturado.
-                    captured_lead = :lead,
+                    -- `lead_captured`, booleana. El parche anterior escribia
+                    -- `captured_lead` creyendo que estaban invertidas las
+                    -- palabras: y lo estaban, pero porque eran DOS TABLAS
+                    -- distintas, no dos nombres del mismo campo. En el legado
+                    -- `captured_lead` es JSONB con los datos del contacto; aqui
+                    -- solo interesa si se capturo.
+                    lead_captured = :lead,
                     escalated = :escalated,
                     last_message_at = NOW()
                 WHERE id = CAST(:id AS uuid)
@@ -444,7 +446,7 @@ class ChatbotService:
         result = await self.session.execute(
             text(
                 """
-                SELECT * FROM chatbot_conversations
+                SELECT * FROM workspace_chatbot_conversations
                 WHERE chatbot_id = CAST(:bot AS uuid) AND session_id = :sid
                 LIMIT 1
                 """
@@ -463,7 +465,7 @@ class ChatbotService:
         ins = await self.session.execute(
             text(
                 """
-                INSERT INTO chatbot_conversations (
+                INSERT INTO workspace_chatbot_conversations (
                     chatbot_id, workspace_id, session_id, visitor_info, messages
                 )
                 VALUES (
@@ -538,7 +540,7 @@ class ChatbotService:
                 SELECT id, session_id, visitor_info, lead_captured, escalated,
                        satisfaction, started_at, last_message_at,
                        jsonb_array_length(messages) AS message_count
-                FROM chatbot_conversations
+                FROM workspace_chatbot_conversations
                 WHERE chatbot_id = CAST(:bot AS uuid) AND workspace_id = :ws
                 ORDER BY last_message_at DESC
                 LIMIT 200
@@ -566,7 +568,7 @@ class ChatbotService:
             where += " AND chatbot_id = CAST(:bot AS uuid)"
             params["bot"] = chatbot_id
         result = await self.session.execute(
-            text(f"SELECT * FROM chatbot_conversations WHERE {where} LIMIT 1"),
+            text(f"SELECT * FROM workspace_chatbot_conversations WHERE {where} LIMIT 1"),
             params,
         )
         row = result.mappings().first()
@@ -593,7 +595,7 @@ class ChatbotService:
                     COUNT(*) FILTER (WHERE lead_captured) AS leads_captured,
                     COUNT(*) FILTER (WHERE escalated) AS escalated,
                     COALESCE(AVG(satisfaction) FILTER (WHERE satisfaction IS NOT NULL), 0) AS avg_satisfaction
-                FROM chatbot_conversations
+                FROM workspace_chatbot_conversations
                 WHERE chatbot_id = CAST(:bot AS uuid) AND workspace_id = :ws
                 """
             ),
@@ -604,7 +606,7 @@ class ChatbotService:
             text(
                 """
                 SELECT DATE(started_at AT TIME ZONE 'UTC') AS day, COUNT(*) AS total
-                FROM chatbot_conversations
+                FROM workspace_chatbot_conversations
                 WHERE chatbot_id = CAST(:bot AS uuid) AND workspace_id = :ws
                   AND started_at >= :week_ago
                 GROUP BY DATE(started_at AT TIME ZONE 'UTC')
@@ -633,7 +635,7 @@ class ChatbotService:
                     COUNT(*) AS total_conversations,
                     COUNT(*) FILTER (WHERE lead_captured) AS leads_captured,
                     COUNT(*) FILTER (WHERE escalated) AS escalated
-                FROM chatbot_conversations
+                FROM workspace_chatbot_conversations
                 WHERE workspace_id = :ws
                 """
             ),

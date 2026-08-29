@@ -136,13 +136,14 @@ class BookingService:
                 INSERT INTO bookings (
                     id, user_id, client_name, client_email, client_phone,
                     booking_date, booking_time, duration, status,
-                    confirmation_token, notes, created_at, updated_at
+                    confirmation_token, notes, zoom_meeting_id, created_at, updated_at
                 )
                 VALUES (
                     gen_random_uuid(), CAST(:propietario AS uuid), :client_name,
                     :client_email, :client_phone,
                     CAST(:start_at AS date), CAST(:start_at AS time), :duration_minutes,
-                    :status, :token_confirmacion, :notes, :created_at, :created_at
+                    :status, :token_confirmacion, :notes,
+                    NULLIF(:zoom_meeting_id, ''), :created_at, :created_at
                 )
                 RETURNING *
                 """
@@ -282,11 +283,18 @@ class BookingService:
         if status:
             where += " AND status = :status"
             params["status"] = status.strip().lower()
+        # LA CITA ES `booking_date + booking_time`, no `start_at`.
+        #
+        # El writer ya se corrigio en su dia y descompone la cita en las dos
+        # columnas reales. Los lectores se quedaron atras: seguian filtrando y
+        # ordenando por `start_at`, que no existe. Es decir, se podia crear una
+        # reserva pero no listarla — un parche a medias es peor que ninguno,
+        # porque el defecto se mueve en vez de arreglarse.
         if start_date:
-            where += " AND start_at >= :start_date"
+            where += " AND (booking_date + booking_time) >= :start_date"
             params["start_date"] = _parse_dt(start_date)
         if end_date:
-            where += " AND start_at <= :end_date"
+            where += " AND (booking_date + booking_time) <= :end_date"
             params["end_date"] = _parse_dt(end_date)
 
         count_r = await self.session.execute(
@@ -298,8 +306,9 @@ class BookingService:
         result = await self.session.execute(
             text(
                 f"""
-                SELECT * FROM bookings WHERE {where}
-                ORDER BY start_at ASC
+                SELECT *, (booking_date + booking_time) AS start_at
+                  FROM bookings WHERE {where}
+                 ORDER BY (booking_date + booking_time) ASC
                 OFFSET :skip LIMIT :limit
                 """
             ),

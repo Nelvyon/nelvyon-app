@@ -26,7 +26,9 @@ import {
 const DSN = process.env.NELVYON_COLA_CERT_DSN ?? "";
 const conBase = DSN ? describe : describe.skip;
 
-const WS = 960001;
+// Inquilino propio: 960001 lo usaba ya `lasSenalesSalenDeHechos`, y dos ficheros que se
+// borran los datos entre si producen una prueba que falla a veces.
+const WS = 995001;
 let pool: pg.Pool;
 let prospeccion: ProspeccionResponsable;
 

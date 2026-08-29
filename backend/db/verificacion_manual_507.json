@@ -1,62 +1,76 @@
 {
   "_lee_esto": [
-    "CONFIRMACION A MANO de los candidatos que el clasificador automatico marca",
-    "como REAL_DEFECT.",
+    "CONFIRMACION A MANO de los candidatos que el clasificador marca REAL_DEFECT.",
     "",
-    "POR QUE EXISTE ESTE FICHERO. El clasificador decide con una aproximacion:",
-    "busca la columna que falta cerca de donde se nombra la tabla. Esa",
-    "aproximacion se equivoco de cuatro formas distintas antes de estabilizarse",
-    "-fichero entero, ventana con comentarios, ventana sin comentarios,",
-    "variables locales del lenguaje anfitrion-, y no hay razon para creer que",
-    "ya no se equivoca. Lo que hace es SEÑALAR DONDE MIRAR.",
+    "LOS CINCO ESTAN ARREGLADOS. Este fichero conserva el diagnostico porque el",
+    "diagnostico es lo que impide repetirlos: dos de los cinco se arreglaron SIN",
+    "tocar el esquema, y saber por que es lo que evita que alguien 'arregle' el",
+    "sexto anadiendo una columna que ya existe con otro nombre.",
     "",
-    "Lo de aqui esta mirado: se ha abierto el fichero, se ha leido la consulta",
-    "y se ha comparado con las columnas reales de la base construida desde",
-    "cero. Un candidato sin linea en este fichero es un candidato SIN",
-    "CONFIRMAR, y no cuenta como defecto.",
-    "",
-    "Se edita a mano. No lo regenera ningun script."
+    "Lo protege `backend/db/__tests__/losCincoDefectosDeEsquema.pg.test.ts`, que",
+    "no consulta el catalogo: EJECUTA las consultas reales de los servicios."
   ],
   "verificado_el": "2026-08-29",
   "esquema_contrastado": "nelvyon_desdecero (477 migraciones desde cero, 723 tablas)",
   "confirmados": [
     {
       "tabla": "bookings",
-      "columnas_ausentes": ["start_at"],
-      "columnas_reales_equivalentes": ["booking_date", "booking_time"],
+      "columnas_ausentes": [
+        "start_at"
+      ],
+      "columnas_reales_equivalentes": [
+        "booking_date",
+        "booking_time"
+      ],
       "donde": "backend/services/booking_service.py:293",
       "consulta": "SELECT * FROM bookings WHERE {where} ORDER BY start_at ASC",
       "veredicto": "REAL_DEFECT",
       "que_pasa": "el listado de reservas falla siempre: ordena por una columna que la tabla no tiene",
-      "arreglo_probable": "ordenar por booking_date, booking_time"
+      "arreglo_probable": "ordenar por booking_date, booking_time",
+      "arreglado": "EN EL CODIGO: los lectores usan `(booking_date + booking_time)`. No se anade columna: habria dos fuentes para la misma cita."
     },
     {
       "tabla": "bookings",
-      "columnas_ausentes": ["zoom_meeting_id"],
+      "columnas_ausentes": [
+        "zoom_meeting_id"
+      ],
       "donde": "backend/services/booking_service.py:331",
       "consulta": "UPDATE bookings SET status='completed' WHERE workspace_id=:ws AND zoom_meeting_id=:id",
       "veredicto": "REAL_DEFECT",
       "que_pasa": "el webhook de Zoom no puede cerrar ninguna reserva: filtra por una columna inexistente",
-      "arreglo_probable": "añadir la columna, o guardar la referencia de Zoom donde ya haya sitio"
+      "arreglo_probable": "añadir la columna, o guardar la referencia de Zoom donde ya haya sitio",
+      "arreglado": "migracion 588: columna nueva con indice parcial. Un identificador externo por el que se busca no puede vivir dentro de `notes`."
     },
     {
       "tabla": "crm_activities",
-      "columnas_ausentes": ["deal_id"],
+      "columnas_ausentes": [
+        "deal_id"
+      ],
       "donde": "backend/services/crm_service.py:750-754",
       "consulta": "SELECT COUNT(*) FROM crm_activities WHERE ... AND deal_id = CAST(:deal_id AS uuid)",
       "veredicto": "REAL_DEFECT",
       "que_pasa": "filtrar actividades por oportunidad falla; el writer del mismo fichero ya guarda deal_id dentro de metadata",
-      "arreglo_probable": "leer de metadata->>'deal_id', igual que se escribe"
+      "arreglo_probable": "leer de metadata->>'deal_id', igual que se escribe",
+      "arreglado": "EN EL CODIGO: el reader lee `metadata->>'deal_id'`, que es donde el writer ya lo guardaba."
     },
     {
       "tabla": "chatbot_conversations",
       "columnas_ausentes": [
-        "workspace_id", "started_at", "last_message_at",
-        "visitor_info", "lead_captured", "satisfaction"
+        "workspace_id",
+        "started_at",
+        "last_message_at",
+        "visitor_info",
+        "lead_captured",
+        "satisfaction"
       ],
       "columnas_reales": [
-        "id", "chatbot_id", "session_id", "messages",
-        "captured_lead", "escalated", "created_at"
+        "id",
+        "chatbot_id",
+        "session_id",
+        "messages",
+        "captured_lead",
+        "escalated",
+        "created_at"
       ],
       "donde": "backend/services/chatbot_service.py:537-543",
       "consulta": "SELECT id, session_id, visitor_info, lead_captured, escalated, satisfaction, started_at, last_message_at ... FROM chatbot_conversations WHERE chatbot_id=... AND workspace_id=:ws ORDER BY last_message_at DESC",
@@ -72,16 +86,21 @@
         "las migraciones construyeron otra, y nadie se entero porque el aplicador",
         "callaba y la pantalla que lo usa se visita poco."
       ],
-      "arreglo_probable": "decidir cual es la definicion buena y migrar la consulta o la tabla; no las dos a medias"
+      "arreglo_probable": "decidir cual es la definicion buena y migrar la consulta o la tabla; no las dos a medias",
+      "arreglado": "migracion 587: tabla propia `workspace_chatbot_conversations` con clave ajena a `chatbots` y RLS. No se podia arreglar anadiendo columnas: la clave ajena apuntaba a `chatbot_configs` y los bots viven en `chatbots`."
     },
     {
       "tabla": "chatbot_conversations",
-      "columnas_ausentes": ["workspace_id", "visitor_info"],
+      "columnas_ausentes": [
+        "workspace_id",
+        "visitor_info"
+      ],
       "donde": "backend/services/cdp_service.py:303",
       "consulta": "SELECT COUNT(*) FROM chatbot_conversations WHERE workspace_id=:ws AND lower(COALESCE(visitor_info->>'email','')) = :uid",
       "veredicto": "REAL_DEFECT",
       "que_pasa": "el perfil unificado de cliente cuenta conversaciones con una consulta que no puede ejecutarse",
-      "arreglo_probable": "el mismo que el anterior; los dos dependen de la misma decision"
+      "arreglo_probable": "el mismo que el anterior; los dos dependen de la misma decision",
+      "arreglado": "migracion 587: tabla propia `workspace_chatbot_conversations` con clave ajena a `chatbots` y RLS. No se podia arreglar anadiendo columnas: la clave ajena apuntaba a `chatbot_configs` y los bots viven en `chatbots`."
     }
   ],
   "descartados": [
@@ -102,13 +121,35 @@
     },
     {
       "tabla": "calendar_events",
-      "columnas": ["workspace_id", "start_time", "user_id"],
+      "columnas": [
+        "workspace_id",
+        "start_time",
+        "user_id"
+      ],
       "veredicto": "LEGACY_COMPATIBILITY",
       "por_que": [
         "Medio arbol consulta `calendar_events`, pero por `tenant_id`,",
         "`event_date` y `start_at`, que existen todas. Las columnas de la 507",
         "son de una forma anterior del esquema que ya no usa nadie."
       ]
+    },
+    {
+      "tabla": "affiliate_clicks",
+      "columna": "created_at",
+      "veredicto": "NO ERA UN DEFECTO VIVO",
+      "por_que": [
+        "Se reviso una a una toda consulta a `affiliate_clicks` en codigo vivo:",
+        "solo hay DOS, y las dos son INSERT. Nadie lee esa tabla por fecha.",
+        "",
+        "Lo que estaba mal era el indice de la 507, escrito sobre `created_at`",
+        "cuando la columna se llama `landed_at`. Corregido en la 588 con el nombre",
+        "real, en vez de anadir una segunda fecha que significara lo mismo.",
+        "",
+        "Corregir mi propia clasificacion importa tanto como el arreglo: un",
+        "informe que infla el numero de defectos deja de leerse igual que uno que",
+        "los esconde."
+      ]
     }
-  ]
+  ],
+  "estado": "TODOS ARREGLADOS · migraciones 587 y 588 + tres correcciones de codigo"
 }

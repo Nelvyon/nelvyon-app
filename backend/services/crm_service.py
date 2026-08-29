@@ -747,8 +747,13 @@ class CRMService:
             where += " AND contact_id = CAST(:contact_id AS uuid)"
             params["contact_id"] = contact_id
         if deal_id:
-            where += " AND deal_id = CAST(:deal_id AS uuid)"
-            params["deal_id"] = deal_id
+            # SE LEE DE DONDE SE ESCRIBE. `crm_activities` no tiene columna
+            # `deal_id`: el writer de este mismo fichero lo guarda dentro de
+            # `metadata`, que es jsonb y esta para eso. Filtrar por una columna
+            # inexistente hacia que buscar actividades de una oportunidad
+            # fallara siempre.
+            where += " AND metadata->>'deal_id' = :deal_id"
+            params["deal_id"] = str(deal_id)
 
         count = await self.session.execute(
             text(f"SELECT COUNT(*) FROM crm_activities WHERE {where}"),

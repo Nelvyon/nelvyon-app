@@ -48,7 +48,11 @@ const DSN = process.env.NELVYON_COLA_CERT_DSN ?? "";
 const conBase = DSN ? describe : describe.skip;
 
 const TENANT = "dddddddd-000a-400a-800a-00000000000a";
-const WS = 980001;
+// 993001, y no 980001: ese ya lo usa `elCerebroNoSeInventaNada.pg.test.ts`.
+// Dos ficheros borrando `os_client_brain` del mismo inquilino en paralelo
+// hacian que este recorrido fallara sólo en la suite completa — y un fallo
+// intermitente es peor que ninguno: se aprende a reintentar en vez de mirar.
+const WS = 993001;
 const CLI = "aaaaaaaa-d41d-4001-8001-00000000000a";
 
 let pool: pg.Pool;
