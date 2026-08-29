@@ -1,0 +1,308 @@
+{
+  "_lee_esto": [
+    "Medicion de rendimiento sobre el esquema construido desde cero.",
+    "",
+    "LO QUE ESTE FICHERO NO ES: una lista de cosas que optimizar. Es una lista",
+    "de cosas MEDIDAS. Optimizar por intuicion produce codigo mas complicado y",
+    "exactamente igual de lento.",
+    "",
+    "LIMITE IMPORTANTE, y hay que leerlo antes de sacar conclusiones: esta base",
+    "esta practicamente VACIA. Con tablas vacias, PostgreSQL elige escaneo",
+    "secuencial y hace bien; forzar un indice ahi seria mas lento. Por eso los",
+    "tiempos de aqui NO dicen que sea rapido en produccion: dicen que el PLAN es",
+    "razonable y que no falta ninguna estructura.",
+    "",
+    "Lo que SI vale sin datos: los indices que faltan. Una clave ajena sin",
+    "indice o una tabla multiinquilino sin indice por workspace son defectos",
+    "estructurales que no dependen del volumen — solo se NOTAN con volumen.",
+    "",
+    "NO_MEDIDO nunca cuenta como sano."
+  ],
+  "generado": "2026-08-29T10:35:38.464Z",
+  "base": "nelvyon_desdecero",
+  "advertencia": "base sin volumen: los tiempos no extrapolan a produccion",
+  "clavesAjenasSinIndice": {
+    "estado": "MEDIDO",
+    "cuantas": 69,
+    "ejemplos": [
+      {
+        "tabla": "affiliate_conversions",
+        "columna": "converted_user_id",
+        "apuntaA": "nelvyon_users"
+      },
+      {
+        "tabla": "agent_feedback",
+        "columna": "result_id",
+        "apuntaA": "saas_service_results"
+      },
+      {
+        "tabla": "agent_feedback",
+        "columna": "user_id",
+        "apuntaA": "nelvyon_users"
+      },
+      {
+        "tabla": "attribution_touchpoints",
+        "columna": "contact_id",
+        "apuntaA": "crm_contacts"
+      },
+      {
+        "tabla": "autopilot_jobs",
+        "columna": "capacidad",
+        "apuntaA": "autopilot_capabilities"
+      },
+      {
+        "tabla": "autopilot_jobs",
+        "columna": "depende_de",
+        "apuntaA": "autopilot_jobs"
+      },
+      {
+        "tabla": "calendar_events",
+        "columna": "contact_id",
+        "apuntaA": "saas_contacts"
+      },
+      {
+        "tabla": "certificates",
+        "columna": "contact_id",
+        "apuntaA": "saas_contacts"
+      },
+      {
+        "tabla": "certificates",
+        "columna": "template_id",
+        "apuntaA": "certificate_templates"
+      },
+      {
+        "tabla": "certificate_templates",
+        "columna": "tenant_id",
+        "apuntaA": "saas_tenants"
+      },
+      {
+        "tabla": "communities",
+        "columna": "required_plan_id",
+        "apuntaA": "saas_membership_plans"
+      },
+      {
+        "tabla": "community_posts",
+        "columna": "tenant_id",
+        "apuntaA": "saas_tenants"
+      },
+      {
+        "tabla": "custom_object_records",
+        "columna": "tenant_id",
+        "apuntaA": "saas_tenants"
+      },
+      {
+        "tabla": "documents",
+        "columna": "contact_id",
+        "apuntaA": "saas_contacts"
+      },
+      {
+        "tabla": "feedback_items",
+        "columna": "user_id",
+        "apuntaA": "nelvyon_users"
+      },
+      {
+        "tabla": "funnel_steps",
+        "columna": "funnel_id",
+        "apuntaA": "funnels"
+      },
+      {
+        "tabla": "funnel_steps",
+        "columna": "landing_page_id",
+        "apuntaA": "landing_pages"
+      },
+      {
+        "tabla": "funnel_steps",
+        "columna": "next_step_id",
+        "apuntaA": "funnel_steps"
+      },
+      {
+        "tabla": "invoices",
+        "columna": "contact_id",
+        "apuntaA": "saas_contacts"
+      },
+      {
+        "tabla": "invoices",
+        "columna": "tenant_id",
+        "apuntaA": "saas_tenants"
+      },
+      {
+        "tabla": "lms_progress",
+        "columna": "lesson_id",
+        "apuntaA": "lms_lessons"
+      },
+      {
+        "tabla": "marketplace_purchases",
+        "columna": "item_id",
+        "apuntaA": "marketplace_items"
+      },
+      {
+        "tabla": "os_deliverables",
+        "columna": "approved_by_portal_user_id",
+        "apuntaA": "os_portal_users"
+      },
+      {
+        "tabla": "os_insights",
+        "columna": "derivado_de",
+        "apuntaA": "os_insights"
+      },
+      {
+        "tabla": "os_portal_invites",
+        "columna": "client_id",
+        "apuntaA": "os_clients"
+      },
+      {
+        "tabla": "os_portal_users",
+        "columna": "invite_id",
+        "apuntaA": "os_portal_invites"
+      },
+      {
+        "tabla": "os_store_pages",
+        "columna": "landing_page_id",
+        "apuntaA": "landing_pages"
+      },
+      {
+        "tabla": "os_website_pages",
+        "columna": "landing_page_id",
+        "apuntaA": "landing_pages"
+      },
+      {
+        "tabla": "pipelines",
+        "columna": "tenant_id",
+        "apuntaA": "saas_tenants"
+      },
+      {
+        "tabla": "saas_ads_optimizer_rules",
+        "columna": "tenant_id",
+        "apuntaA": "saas_tenants"
+      }
+    ]
+  },
+  "tablasMultiinquilinoSinIndice": {
+    "estado": "MEDIDO",
+    "cuantas": 0,
+    "tablas": []
+  },
+  "tablasConDatos": [
+    {
+      "tabla": "os_clients",
+      "filas": 1
+    },
+    {
+      "tabla": "_migrations",
+      "filas": 1
+    },
+    {
+      "tabla": "os_projects",
+      "filas": 1
+    }
+  ],
+  "experimentoConVolumen": {
+    "estado": "MEDIDO",
+    "forma": "200000 filas, 500 inquilinos, consulta por un inquilino",
+    "sinIndice": {
+      "estado": "MEDIDO",
+      "ms": 8.599,
+      "filasLeidas": 20,
+      "nodos": [
+        "Limit",
+        "Gather Merge",
+        "Sort",
+        "Seq Scan"
+      ],
+      "escaneoCompleto": true
+    },
+    "conIndice": {
+      "estado": "MEDIDO",
+      "ms": 0.128,
+      "filasLeidas": 20,
+      "nodos": [
+        "Limit",
+        "Index Scan"
+      ],
+      "escaneoCompleto": false
+    },
+    "cuantasVecesMasRapido": 67.2,
+    "queSignifica": "con este volumen el indice por inquilino hace la consulta 67.2x mas rapida, y las 34 tablas de la lista NO lo tienen"
+  },
+  "caminoCaliente": [
+    {
+      "id": "cola-reclamar-trabajo",
+      "dedonde": "backend/queue/colaDeTrabajos.ts",
+      "porque": "cada vuelta del trabajador la ejecuta; si escanea, la cola no escala",
+      "medicion": {
+        "estado": "MEDIDO",
+        "ms": 0.021,
+        "filasLeidas": 0,
+        "nodos": [
+          "Limit",
+          "LockRows",
+          "Sort",
+          "Seq Scan"
+        ],
+        "escaneoCompleto": true
+      }
+    },
+    {
+      "id": "portal-resumen-servicios",
+      "dedonde": "backend/portal/CicloDelClienteService.ts",
+      "porque": "es la primera pantalla que ve un cliente al entrar",
+      "medicion": {
+        "estado": "MEDIDO",
+        "ms": 0.016,
+        "filasLeidas": 0,
+        "nodos": [
+          "Sort",
+          "Seq Scan"
+        ],
+        "escaneoCompleto": true
+      }
+    },
+    {
+      "id": "gasto-autorizacion-vigente",
+      "dedonde": "backend/gasto/guardaDeGasto.ts",
+      "porque": "se consulta antes de CADA operación que gasta dinero",
+      "medicion": {
+        "estado": "MEDIDO",
+        "ms": 0.003,
+        "filasLeidas": 0,
+        "nodos": [
+          "Limit",
+          "Seq Scan"
+        ],
+        "escaneoCompleto": true
+      }
+    },
+    {
+      "id": "insights-bandeja",
+      "dedonde": "backend/inteligencia/InteligenciaEntreDepartamentos.ts",
+      "porque": "la lee cada departamento al empezar a trabajar",
+      "medicion": {
+        "estado": "MEDIDO",
+        "ms": 0.029,
+        "filasLeidas": 0,
+        "nodos": [
+          "Limit",
+          "Sort",
+          "Seq Scan"
+        ],
+        "escaneoCompleto": true
+      }
+    },
+    {
+      "id": "entregables-del-cliente",
+      "dedonde": "backend/exito/SenalesDeCliente.ts",
+      "porque": "customer success la ejecuta por cada cliente, en bucle",
+      "medicion": {
+        "estado": "MEDIDO",
+        "ms": 0.029,
+        "filasLeidas": 0,
+        "nodos": [
+          "Limit",
+          "Sort",
+          "Seq Scan"
+        ],
+        "escaneoCompleto": true
+      }
+    }
+  ]
+}

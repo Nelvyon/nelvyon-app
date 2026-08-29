@@ -75,6 +75,7 @@ Nada se marca `DONE`: una fase cuya prueba final exige producción es
 | **contexto de cliente consolidado** | LOCAL_CERTIFIED | `385fc8cb` | 18 pruebas, 3 fuentes → 1 canónica |
 | **Fase 18 · motor de calidad** | LOCAL_CERTIFIED | pendiente | 39 pruebas, 6 mutaciones, puerta 3 del puente |
 | **Fase 29 · las 55 sentencias** | LOCAL_CERTIFIED | pendiente | 55/55 clasificadas · **5 defectos reales confirmados** |
+| **Fase 33 · rendimiento** | LOCAL_CERTIFIED | pendiente | 34 tablas con RLS sin índice por inquilino · **9,88 ms → 0,14 ms (73x)** |
 | Fase 24 · portal premium | PENDIENTE | — | |
 | Fase 31 · E2E agencia completa | LOCAL_CERTIFIED | pendiente | 13 pasos, 3 pruebas PG |
 
@@ -101,6 +102,11 @@ Nada se marca `DONE`: una fase cuya prueba final exige producción es
    esquiva no adjuntando nada no es un revisor.
 8. **Una evaluación de reglas nunca se presenta como de modelo.** `REAL` exige
    proveedor configurado, no una variable de entorno.
+10. **RLS por inquilino ⟹ índice por inquilino.** No es rendimiento, es
+    estructura: si la política obliga a filtrar por `workspace_id` en toda
+    consulta, sin ese índice cada lectura recorre las filas de todos los
+    clientes. Lo vigila una prueba cuyo inventario sale del catálogo de
+    PostgreSQL, para que la tabla número 35 entre sola.
 9. **NO se consolidan los agentes sectoriales.** Medido por salida: 1.521 agentes
    producen 1.521 instrucciones distintas y no hay ni una pareja equivalente. La
    sospecha de «un agente copiado 1.605 veces» es falsa, y fusionarlos perdería
