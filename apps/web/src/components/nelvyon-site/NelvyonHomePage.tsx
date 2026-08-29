@@ -153,8 +153,8 @@ export function NelvyonHomePage({ embedded = false }: { embedded?: boolean }) {
 
       <section className="border-t border-white/10 px-4 py-20 md:px-6 md:py-28" id="servicios">
         <FadeUp className="mx-auto max-w-3xl text-center">
-          <h2 className="text-3xl font-bold text-white md:text-4xl">Servicios que ejecuta la IA por ti</h2>
-          <p className="mt-4 text-zinc-500">Nueve disciplinas clave en un grid 3×3 — sin agencias ni esperas.</p>
+          <h2 className="text-3xl font-bold text-white md:text-4xl">Servicios que ejecutamos para ti</h2>
+          <p className="mt-4 text-zinc-500">Nueve disciplinas, un solo equipo. Tú cuentas qué necesitas; lo hacemos nosotros.</p>
         </FadeUp>
         <div className="mx-auto mt-14 grid max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {HOME_SERVICES.map((s, i) => {

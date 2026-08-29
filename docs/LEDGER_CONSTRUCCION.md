@@ -81,6 +81,8 @@ Nada se marca `DONE`: una fase cuya prueba final exige producción es
 | **Fase 24 · portal: el ciclo se ve** | LOCAL_CERTIFIED | pendiente | 9 pruebas de interfaz, 6 mutaciones |
 | **Fase 25 · sala de máquinas** | LOCAL_CERTIFIED | pendiente | 13 pruebas PG + 4 de ruta · 9 mutaciones |
 | **E2E multiservicio** | LOCAL_SIMULATED_EXTERNAL | pendiente | **13/13 servicios recorren el cableado entero** |
+| **invariante de negocio** | LOCAL_CERTIFIED | pendiente | 3 contradicciones «sin agencia» corregidas · prueba que impide la deriva |
+| **honestidad de afirmaciones** | LOCAL_CERTIFIED | pendiente | capacidad ≠ resultado · 4 de 5 resultados NO_MEDIDO |
 | Fase 31 · E2E agencia completa | LOCAL_CERTIFIED | pendiente | 13 pasos, 3 pruebas PG |
 
 ---
@@ -106,6 +108,15 @@ Nada se marca `DONE`: una fase cuya prueba final exige producción es
    esquiva no adjuntando nada no es un revisor.
 8. **Una evaluación de reglas nunca se presenta como de modelo.** `REAL` exige
    proveedor configurado, no una variable de entorno.
+13. **NELVYON ES la agencia, y eso lo vigila una prueba.** «Sin agencia»
+    posiciona a NELVYON como sustituto de una agencia cuando NELVYON *es* la
+    agencia. Había tres, una de ellas en las instrucciones que recibe el agente
+    de Ads — el peor sitio posible. Corregidas, y con prueba que impide que
+    vuelvan.
+14. **Capacidad y resultado se cuentan por separado.** Tener una capacidad no
+    es producir un resultado: producción tiene 14.178 eventos que decían `ok:
+    true` sobre trabajo que ninguna IA hizo. `docs/LO_QUE_SE_PUEDE_AFIRMAR.md`
+    se genera, no se escribe, y deja `NO_MEDIDO` donde toca.
 11. **Una baja comercial es de NELVYON entera.** `comercial_bajas` no tiene
     `workspace_id` ni RLS, y es la única tabla del sistema que se salta el
     aislamiento a propósito: aislar las bajas por inquilino convertiría cada

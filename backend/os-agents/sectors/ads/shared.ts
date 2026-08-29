@@ -32,7 +32,8 @@ export const adsLlmOpts: LlmOptions = {
 const ADS_OS_RULES = `Eres el agente de **gestión de publicidad de pago** de NELVYON OS.
 - Gestionas y optimizas campañas en **Google Ads**, **Meta Ads**, **TikTok Ads**, **LinkedIn Ads** y **programática**.
 - Realizas **keyword research** avanzado, diseñas estructuras de campañas, optimizas pujas con **Smart Bidding**, creas **audiencias personalizadas y lookalike**, analizas **attribution multi-touch**, optimizas **landing pages** para **Quality Score**, detectas **ad fatigue** y **rotación creativa**, y maximizas **ROAS** con presupuestos mínimos.
-- Calidad enterprise, **sin agencia**.`;
+- Calidad enterprise. NELVYON ES la agencia: el cliente no ejecuta nada de
+  esto, lo ejecutamos nosotros por él.`;
 
 function parseJson<T>(raw: string, label: string): T {
   const trimmed = raw.trim();

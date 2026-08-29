@@ -253,7 +253,7 @@ export const HOME_SERVICES = [
   {
     href: "/seo",
     title: "SEO IA",
-    description: "Rankings, contenido y autoridad orgánica sin agencia.",
+    description: "Rankings, contenido y autoridad orgánica. Lo hacemos nosotros.",
     gradient: SERVICE_PAGES.seo.gradient,
   },
   {
