@@ -54,8 +54,37 @@ const SALIDA = path.join(RAIZ, "docs", "REVISION_DE_SERVICIOS.md");
  * Depender del final de linea es fragil por definicion; normalizar cuesta una
  * linea.
  */
+const leerJson = (rel) => {
+  const p = path.join(RAIZ, rel);
+  if (!fs.existsSync(p)) return null;
+  try { return JSON.parse(fs.readFileSync(p, "utf8")); } catch { return null; }
+};
+
 const leer = (rel) =>
   fs.readFileSync(path.join(RAIZ, rel), "utf8").replace(/\r\n/g, "\n");
+
+// ── LA LISTA CANÓNICA: los servicios que NELVYON VENDE ──────────────────────
+//
+// Sale de `premiumProducts.ts`, que es donde cada servicio tiene su PRECIO. Un
+// servicio con precio es un servicio que se vende; uno sin precio es una idea.
+//
+// La primera versión de este script la derivaba de `dimensiones.ts`, y eso
+// estaba mal: allí sólo aparecen los servicios que alguna dimensión menciona.
+// Salían TRECE de VEINTICINCO. Doce servicios —vendidos, con agente propio y
+// con precio— no se revisaron nunca, y el informe decía «todos».
+//
+// Elegir mal la fuente canónica produce un informe completo sobre media
+// realidad, que es peor que uno incompleto que lo diga.
+const productos = leer("backend/billing/premiumProducts.ts");
+const CANONICOS = [...productos.matchAll(/^\s*"?([a-z0-9_]+)"?:\s*\{\s*name:/gm)].map((m) => m[1]);
+
+if (CANONICOS.length < 15) {
+  console.error(
+    "[servicios] sólo se han leído " + CANONICOS.length + " servicios de premiumProducts.ts. " +
+    "Son demasiado pocos: el fichero ha cambiado de forma y el informe cubriría media realidad.",
+  );
+  process.exit(2);
+}
 
 // ── Lo que declara cada servicio, sacado del catálogo de dimensiones ────────
 
@@ -157,54 +186,109 @@ const DEPARTAMENTO_DE = {
   advisor_empresarial_premium: ["estrategia"],
 };
 
+// ── Quién lo ejecuta: el agente premium de cada servicio ───────────────────
+//
+// Derivado del árbol, no de un mapa a mano: cada agente declara su `serviceId`.
+const AGENTES = new Map();
+{
+  const dirAgentes = path.join(RAIZ, "backend", "os-agents", "agents");
+  for (const f of fs.readdirSync(dirAgentes)) {
+    if (!f.endsWith("Agent.ts")) continue;
+    const t = fs.readFileSync(path.join(dirAgentes, f), "utf8");
+    const m = /readonly serviceId = "([a-z0-9_]+)"/.exec(t);
+    if (m) AGENTES.set(m[1], f.replace(/\.ts$/, ""));
+  }
+}
+
+// ── Cuánta personalización tiene medida, si se ha medido ───────────────────
+const personalizacion = new Map();
+{
+  const p = leerJson("backend/calidad/personalizacion_por_servicio.json");
+  for (const s of p?.servicios ?? []) personalizacion.set(s.servicio, s);
+}
+
 // ── Veredicto ───────────────────────────────────────────────────────────────
 
-function veredictoDe(servicio, datos) {
+function veredictoDe(servicio) {
+  const datos = porServicio.get(servicio) ?? { propias: [], delCliente: 0 };
   const propias = datos.propias.length;
-  const cubre = (DEPARTAMENTO_DE[servicio] ?? []).filter((d) => operativos.has(d));
+  const agente = AGENTES.get(servicio) ?? null;
+  const cubre = (DEPARTAMENTO_DE[servicio] ?? []).filter((dep) => operativos.has(dep));
+  const p = personalizacion.get(servicio) ?? null;
 
-  if (cubre.length === 0) {
+  // ── 1 · ¿hay quien lo haga? ──────────────────────────────────────────────
+  //
+  // DOS FORMAS DE TENER DUEÑO, y confundirlas fue el error de la primera
+  // versión: un departamento (personas con una responsabilidad) o un agente
+  // premium (el que ejecuta el servicio). Aquella sólo miraba lo primero, con
+  // un mapa escrito a mano, y declaró «sin dueño» a tres servicios que TIENEN
+  // precio, agente propio y manifiesto de conocimiento.
+  if (!agente && cubre.length === 0) {
     return {
       veredicto: "REVISAR",
+      porQue: "no tiene ni agente premium ni departamento operativo. Si un cliente lo contrata hoy, no hay quien lo haga.",
+    };
+  }
+
+  // ── 2 · ¿personaliza? ────────────────────────────────────────────────────
+  //
+  // Es lo que separa un servicio de una plantilla, y es lo único de esta lista
+  // que está MEDIDO ejecutando el agente con cinco clientes distintos.
+  if (p && p.veredicto === "GENERICO") {
+    return {
+      veredicto: "REVISAR",
+      porQue: `medido: le dice lo mismo a los cinco clientes de prueba (separación ${p.separacion}). Es una plantilla con el nombre puesto arriba.`,
+    };
+  }
+
+  // ── 3 · ¿sabe lo que necesita saber? ─────────────────────────────────────
+  if (propias === 0) {
+    return {
+      veredicto: "COMPLETAR",
       porQue:
-        "ningún departamento operativo lo cubre. Es una promesa sin dueño: si un " +
-        "cliente lo contrata hoy, no hay a quién asignárselo.",
+        "ninguna dimensión del cerebro lo menciona. Recibe el contexto común del " +
+        "cliente y las imprescindibles, pero nada específico de esta disciplina: " +
+        "no hay intake propio que le pregunte al cliente lo que este servicio necesita.",
     };
   }
   if (propias <= 1) {
     return {
       veredicto: "COMPLETAR",
-      porQue:
-        `declara ${propias} dimensión(es) propias. Recibirá las imprescindibles ` +
-        "comunes y prácticamente nada específico suyo: trabajaría a ciegas sobre " +
-        "lo que hace distinto a este servicio.",
+      porQue: `declara ${propias} dimensión propia. Está definido casi al mínimo.`,
     };
   }
   if (propias <= 3 || datos.delCliente === 0) {
     return {
       veredicto: "MEJORAR",
-      porQue:
-        `declara ${propias} dimensiones propias y ${datos.delCliente} que aporta el ` +
-        "cliente. Se puede prestar, pero está definido a medias.",
+      porQue: `${propias} dimensiones propias y ${datos.delCliente} que aporta el cliente. Se puede prestar, pero está definido a medias.`,
     };
   }
+
   return {
     veredicto: "MANTENER",
     porQue:
-      `${propias} dimensiones propias, ${datos.delCliente} del cliente, cubierto por ` +
-      `${cubre.join(", ")}.`,
+      `${propias} dimensiones propias, ${datos.delCliente} del cliente` +
+      (agente ? `, ejecutado por ${agente}` : "") +
+      (cubre.length ? `, departamento ${cubre.join(", ")}` : "") +
+      (p ? `, personalización medida ${p.veredicto} (cobertura ${p.cobertura})` : "") +
+      ".",
   };
 }
 
-const filas = [...porServicio.entries()]
-  .map(([servicio, datos]) => ({
+const filas = CANONICOS.map((servicio) => {
+  const datos = porServicio.get(servicio) ?? { propias: [], delCliente: 0 };
+  const p = personalizacion.get(servicio) ?? null;
+  return {
     servicio,
     propias: datos.propias.length,
     delCliente: datos.delCliente,
-    departamentos: (DEPARTAMENTO_DE[servicio] ?? []).filter((d) => operativos.has(d)),
-    ...veredictoDe(servicio, datos),
-  }))
-  .sort((a, b) => b.propias - a.propias);
+    agente: AGENTES.get(servicio) ?? null,
+    departamentos: (DEPARTAMENTO_DE[servicio] ?? []).filter((dep) => operativos.has(dep)),
+    personalizacion: p ? p.veredicto : "NO_MEDIDO",
+    cobertura: p ? p.cobertura : null,
+    ...veredictoDe(servicio),
+  };
+}).sort((a, b) => b.propias - a.propias);
 
 const cuenta = {};
 for (const f of filas) cuenta[f.veredicto] = (cuenta[f.veredicto] ?? 0) + 1;

@@ -1,0 +1,205 @@
+{
+  "_lee_esto": [
+    "Cuanto distingue cada servicio entre clientes RADICALMENTE distintos.",
+    "",
+    "COBERTURA: que parte de lo que distingue al cliente llega a la",
+    "instruccion. El agente no puede tener en cuenta lo que no ve.",
+    "",
+    "SEPARACION: quitando lo identico para los cinco, cuanto queda de",
+    "propio. Cero significa que los cinco reciben literalmente lo mismo.",
+    "",
+    "Medido con cinco clientes cuyas decisiones correctas se contradicen",
+    "entre si. Coste externo 0 EUR: el modelo nunca se llama."
+  ],
+  "generado": "2026-08-29T14:46:23.725Z",
+  "total": 26,
+  "medidos": 25,
+  "porVeredicto": {
+    "PERSONALIZA": 25
+  },
+  "servicios": [
+    {
+      "servicio": "landing_premium",
+      "veredicto": "PERSONALIZA",
+      "cobertura": 1,
+      "separacion": 0.342,
+      "hechosQueNoLlegan": []
+    },
+    {
+      "servicio": "web_premium",
+      "veredicto": "PERSONALIZA",
+      "cobertura": 1,
+      "separacion": 0.342,
+      "hechosQueNoLlegan": []
+    },
+    {
+      "servicio": "ecommerce_premium",
+      "veredicto": "PERSONALIZA",
+      "cobertura": 1,
+      "separacion": 0.358,
+      "hechosQueNoLlegan": []
+    },
+    {
+      "servicio": "funnel_premium",
+      "veredicto": "PERSONALIZA",
+      "cobertura": 1,
+      "separacion": 0.358,
+      "hechosQueNoLlegan": []
+    },
+    {
+      "servicio": "social_media_premium",
+      "veredicto": "PERSONALIZA",
+      "cobertura": 1,
+      "separacion": 0.38,
+      "hechosQueNoLlegan": []
+    },
+    {
+      "servicio": "seo_premium",
+      "veredicto": "PERSONALIZA",
+      "cobertura": 1,
+      "separacion": 0.389,
+      "hechosQueNoLlegan": []
+    },
+    {
+      "servicio": "ads_premium",
+      "veredicto": "PERSONALIZA",
+      "cobertura": 1,
+      "separacion": 0.394,
+      "hechosQueNoLlegan": []
+    },
+    {
+      "servicio": "branding_premium",
+      "veredicto": "PERSONALIZA",
+      "cobertura": 1,
+      "separacion": 0.397,
+      "hechosQueNoLlegan": []
+    },
+    {
+      "servicio": "fotografia_producto_premium",
+      "veredicto": "PERSONALIZA",
+      "cobertura": 1,
+      "separacion": 0.409,
+      "hechosQueNoLlegan": []
+    },
+    {
+      "servicio": "contenido_copywriting_premium",
+      "veredicto": "PERSONALIZA",
+      "cobertura": 1,
+      "separacion": 0.41,
+      "hechosQueNoLlegan": []
+    },
+    {
+      "servicio": "diseno_grafico_creatividades_premium",
+      "veredicto": "PERSONALIZA",
+      "cobertura": 1,
+      "separacion": 0.411,
+      "hechosQueNoLlegan": []
+    },
+    {
+      "servicio": "email_marketing_premium",
+      "veredicto": "PERSONALIZA",
+      "cobertura": 1,
+      "separacion": 0.412,
+      "hechosQueNoLlegan": []
+    },
+    {
+      "servicio": "mantenimiento_web_premium",
+      "veredicto": "PERSONALIZA",
+      "cobertura": 1,
+      "separacion": 0.425,
+      "hechosQueNoLlegan": []
+    },
+    {
+      "servicio": "video_multimedia_premium",
+      "veredicto": "PERSONALIZA",
+      "cobertura": 1,
+      "separacion": 0.429,
+      "hechosQueNoLlegan": []
+    },
+    {
+      "servicio": "formacion_capacitacion_digital_premium",
+      "veredicto": "PERSONALIZA",
+      "cobertura": 1,
+      "separacion": 0.431,
+      "hechosQueNoLlegan": []
+    },
+    {
+      "servicio": "reputacion_online_orm_premium",
+      "veredicto": "PERSONALIZA",
+      "cobertura": 1,
+      "separacion": 0.431,
+      "hechosQueNoLlegan": []
+    },
+    {
+      "servicio": "voz_premium",
+      "veredicto": "PERSONALIZA",
+      "cobertura": 1,
+      "separacion": 0.431,
+      "hechosQueNoLlegan": []
+    },
+    {
+      "servicio": "advisor_empresarial_premium",
+      "veredicto": "PERSONALIZA",
+      "cobertura": 1,
+      "separacion": 0.436,
+      "hechosQueNoLlegan": []
+    },
+    {
+      "servicio": "integraciones_apis_premium",
+      "veredicto": "PERSONALIZA",
+      "cobertura": 1,
+      "separacion": 0.436,
+      "hechosQueNoLlegan": []
+    },
+    {
+      "servicio": "3d_contenido_inmersivo_premium",
+      "veredicto": "PERSONALIZA",
+      "cobertura": 1,
+      "separacion": 0.436,
+      "hechosQueNoLlegan": []
+    },
+    {
+      "servicio": "influencer_marketing_premium",
+      "veredicto": "PERSONALIZA",
+      "cobertura": 1,
+      "separacion": 0.437,
+      "hechosQueNoLlegan": []
+    },
+    {
+      "servicio": "bots_premium",
+      "veredicto": "PERSONALIZA",
+      "cobertura": 1,
+      "separacion": 0.443,
+      "hechosQueNoLlegan": []
+    },
+    {
+      "servicio": "canales_comunicaciones_premium",
+      "veredicto": "PERSONALIZA",
+      "cobertura": 1,
+      "separacion": 0.443,
+      "hechosQueNoLlegan": []
+    },
+    {
+      "servicio": "personal_digital_premium",
+      "veredicto": "PERSONALIZA",
+      "cobertura": 1,
+      "separacion": 0.445,
+      "hechosQueNoLlegan": []
+    },
+    {
+      "servicio": "consultoria_automatizacion_premium",
+      "veredicto": "PERSONALIZA",
+      "cobertura": 1,
+      "separacion": 0.481,
+      "hechosQueNoLlegan": []
+    }
+  ],
+  "noEjecutables": [
+    {
+      "servicio": {
+        "recibido": []
+      },
+      "motivo": "no pidió nada al modelo"
+    }
+  ]
+}

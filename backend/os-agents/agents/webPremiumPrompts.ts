@@ -1,14 +1,25 @@
 import type { OsJobPayload } from "../types";
+import { CLAVE_CONTEXTO, contextoDelCliente } from "./elitePayloadStrings";
 
 /**
- * Replaces `{key}` placeholders in a template. Values must be strings (defaults applied upstream).
+ * Compone el prompt e IMPONE el contexto del cliente.
+ *
+ * `CLAVE_CONTEXTO` no se interpola en ningún hueco: se PREPONE. Es
+ * deliberado. Son veinticuatro plantillas, y confiar en que todas se acuerden
+ * de colocar una variable es exactamente cómo se perdió el 60 % de lo que
+ * distingue a un cliente — incluidas sus restricciones legales.
+ *
+ * Medido antes: cobertura 0,40. Es decir, más de la mitad de lo que hace único
+ * a un cliente no llegaba al agente que trabaja para él.
  */
 export function buildPrompt(template: string, vars: Record<string, string>): string {
   let out = template;
   for (const [key, value] of Object.entries(vars)) {
+    if (key === CLAVE_CONTEXTO) continue;
     out = out.split(`{${key}}`).join(value);
   }
-  return out;
+  const contexto = vars[CLAVE_CONTEXTO];
+  return contexto && contexto.trim() ? `${contexto.trim()}\n\n${out}` : out;
 }
 
 function asTrimmedString(v: unknown, fallback: string): string {
@@ -35,6 +46,17 @@ function defaultBrief(payload: OsJobPayload): string {
 /** Maps `OsJobPayload` / intake merge fields to string placeholders with descriptive fallbacks. */
 export function webPremiumIntakeStrings(payload: OsJobPayload): Record<string, string> {
   return {
+    // EL CONTEXTO REAL DEL CLIENTE, tambien aqui.
+    //
+    // Esta funcion es una copia paralela de `eliteCommonIntakeStrings`: mismos
+    // campos, mismos textos por defecto, otro fichero. Por eso la mejora que se
+    // hizo alli no llegaba a los agentes de web, landing, ecommerce ni funnel —
+    // cuatro servicios seguian sin ver el presupuesto ni las restricciones
+    // legales del cliente.
+    //
+    // Unificar las dos es una limpieza aparte y con su riesgo; lo que no puede
+    // esperar es que cuatro servicios trabajen a ciegas.
+    [CLAVE_CONTEXTO]: contextoDelCliente(payload),
     clientName: asTrimmedString(payload.clientName, "Cliente premium (nombre por confirmar en kickoff)"),
     industry: asTrimmedString(payload.industry, "Sector a definir con el cliente en sesión estratégica"),
     targetAudience: asTrimmedString(payload.targetAudience, "Público objetivo por perfilar con research cualitativo/cuantitativo"),

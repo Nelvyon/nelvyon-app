@@ -19,8 +19,8 @@ de prometerse**.
 |---|---|---|
 | MANTENER | 3 | definido, con lo que necesita y con dueño |
 | MEJORAR | 3 | se puede prestar, pero está definido a medias |
-| COMPLETAR | 4 | declarado y casi vacío: prometerlo hoy es arriesgado |
-| REVISAR | 3 | algo no cuadra; que lo mire una persona |
+| COMPLETAR | 19 | declarado y casi vacío: prometerlo hoy es arriesgado |
+| REVISAR | 0 | algo no cuadra; que lo mire una persona |
 
 **Ningún veredicto es ELIMINAR.** Quitar un servicio afecta a clientes que quizá
 lo tengan contratado, y este análisis no tiene ni de lejos la información para
@@ -40,11 +40,23 @@ esa decisión. Sólo dice cuáles están flojos.
 | `funnel_premium` | 3 | 1 | funnels, cro | **MEJORAR** |
 | `ecommerce_premium` | 1 | 1 | ecommerce | **COMPLETAR** |
 | `branding_premium` | 1 | 1 | marca | **COMPLETAR** |
-| `influencer_marketing_premium` | 1 | 1 | **ninguno** | **REVISAR** |
-| `canales_comunicaciones_premium` | 1 | 1 | **ninguno** | **REVISAR** |
-| `diseno_grafico_creatividades_premium` | 1 | 0 | creatividad | **COMPLETAR** |
+| `bots_premium` | 1 | 1 | **ninguno** | **COMPLETAR** |
 | `advisor_empresarial_premium` | 1 | 0 | estrategia | **COMPLETAR** |
-| `bots_premium` | 1 | 1 | **ninguno** | **REVISAR** |
+| `canales_comunicaciones_premium` | 1 | 1 | **ninguno** | **COMPLETAR** |
+| `diseno_grafico_creatividades_premium` | 1 | 0 | creatividad | **COMPLETAR** |
+| `influencer_marketing_premium` | 1 | 1 | **ninguno** | **COMPLETAR** |
+| `web_premium` | 0 | 0 | **ninguno** | **COMPLETAR** |
+| `voz_premium` | 0 | 0 | **ninguno** | **COMPLETAR** |
+| `personal_digital_premium` | 0 | 0 | **ninguno** | **COMPLETAR** |
+| `video_multimedia_premium` | 0 | 0 | **ninguno** | **COMPLETAR** |
+| `3d_contenido_inmersivo_premium` | 0 | 0 | **ninguno** | **COMPLETAR** |
+| `fotografia_producto_premium` | 0 | 0 | **ninguno** | **COMPLETAR** |
+| `consultoria_automatizacion_premium` | 0 | 0 | **ninguno** | **COMPLETAR** |
+| `integraciones_apis_premium` | 0 | 0 | **ninguno** | **COMPLETAR** |
+| `mantenimiento_web_premium` | 0 | 0 | **ninguno** | **COMPLETAR** |
+| `reputacion_online_orm_premium` | 0 | 0 | **ninguno** | **COMPLETAR** |
+| `formacion_capacitacion_digital_premium` | 0 | 0 | **ninguno** | **COMPLETAR** |
+| `landing_premium` | 0 | 0 | **ninguno** | **COMPLETAR** |
 
 ---
 
@@ -52,55 +64,103 @@ esa decisión. Sólo dice cuáles están flojos.
 
 ### `ads_premium` — MANTENER
 
-13 dimensiones propias, 7 del cliente, cubierto por paid_media.
+13 dimensiones propias, 7 del cliente, ejecutado por AdsPremiumAgent, departamento paid_media, personalización medida PERSONALIZA (cobertura 0.85).
 
 ### `seo_premium` — MANTENER
 
-6 dimensiones propias, 4 del cliente, cubierto por seo, seo_tecnico, seo_local.
+6 dimensiones propias, 4 del cliente, ejecutado por SeoPremiumAgent, departamento seo, seo_tecnico, seo_local, personalización medida PERSONALIZA (cobertura 1).
 
 ### `social_media_premium` — MANTENER
 
-4 dimensiones propias, 3 del cliente, cubierto por social.
+4 dimensiones propias, 3 del cliente, ejecutado por SocialMediaPremiumAgent, departamento social, personalización medida PERSONALIZA (cobertura 0.85).
 
 ### `email_marketing_premium` — MEJORAR
 
-declara 3 dimensiones propias y 1 que aporta el cliente. Se puede prestar, pero está definido a medias.
+3 dimensiones propias y 1 que aporta el cliente. Se puede prestar, pero está definido a medias.
 
 ### `contenido_copywriting_premium` — MEJORAR
 
-declara 3 dimensiones propias y 1 que aporta el cliente. Se puede prestar, pero está definido a medias.
+3 dimensiones propias y 1 que aporta el cliente. Se puede prestar, pero está definido a medias.
 
 ### `funnel_premium` — MEJORAR
 
-declara 3 dimensiones propias y 1 que aporta el cliente. Se puede prestar, pero está definido a medias.
+3 dimensiones propias y 1 que aporta el cliente. Se puede prestar, pero está definido a medias.
 
 ### `ecommerce_premium` — COMPLETAR
 
-declara 1 dimensión(es) propias. Recibirá las imprescindibles comunes y prácticamente nada específico suyo: trabajaría a ciegas sobre lo que hace distinto a este servicio.
+declara 1 dimensión propia. Está definido casi al mínimo.
 
 ### `branding_premium` — COMPLETAR
 
-declara 1 dimensión(es) propias. Recibirá las imprescindibles comunes y prácticamente nada específico suyo: trabajaría a ciegas sobre lo que hace distinto a este servicio.
+declara 1 dimensión propia. Está definido casi al mínimo.
 
-### `influencer_marketing_premium` — REVISAR
+### `bots_premium` — COMPLETAR
 
-ningún departamento operativo lo cubre. Es una promesa sin dueño: si un cliente lo contrata hoy, no hay a quién asignárselo.
-
-### `canales_comunicaciones_premium` — REVISAR
-
-ningún departamento operativo lo cubre. Es una promesa sin dueño: si un cliente lo contrata hoy, no hay a quién asignárselo.
-
-### `diseno_grafico_creatividades_premium` — COMPLETAR
-
-declara 1 dimensión(es) propias. Recibirá las imprescindibles comunes y prácticamente nada específico suyo: trabajaría a ciegas sobre lo que hace distinto a este servicio.
+declara 1 dimensión propia. Está definido casi al mínimo.
 
 ### `advisor_empresarial_premium` — COMPLETAR
 
-declara 1 dimensión(es) propias. Recibirá las imprescindibles comunes y prácticamente nada específico suyo: trabajaría a ciegas sobre lo que hace distinto a este servicio.
+declara 1 dimensión propia. Está definido casi al mínimo.
 
-### `bots_premium` — REVISAR
+### `canales_comunicaciones_premium` — COMPLETAR
 
-ningún departamento operativo lo cubre. Es una promesa sin dueño: si un cliente lo contrata hoy, no hay a quién asignárselo.
+declara 1 dimensión propia. Está definido casi al mínimo.
+
+### `diseno_grafico_creatividades_premium` — COMPLETAR
+
+declara 1 dimensión propia. Está definido casi al mínimo.
+
+### `influencer_marketing_premium` — COMPLETAR
+
+declara 1 dimensión propia. Está definido casi al mínimo.
+
+### `web_premium` — COMPLETAR
+
+ninguna dimensión del cerebro lo menciona. Recibe el contexto común del cliente y las imprescindibles, pero nada específico de esta disciplina: no hay intake propio que le pregunte al cliente lo que este servicio necesita.
+
+### `voz_premium` — COMPLETAR
+
+ninguna dimensión del cerebro lo menciona. Recibe el contexto común del cliente y las imprescindibles, pero nada específico de esta disciplina: no hay intake propio que le pregunte al cliente lo que este servicio necesita.
+
+### `personal_digital_premium` — COMPLETAR
+
+ninguna dimensión del cerebro lo menciona. Recibe el contexto común del cliente y las imprescindibles, pero nada específico de esta disciplina: no hay intake propio que le pregunte al cliente lo que este servicio necesita.
+
+### `video_multimedia_premium` — COMPLETAR
+
+ninguna dimensión del cerebro lo menciona. Recibe el contexto común del cliente y las imprescindibles, pero nada específico de esta disciplina: no hay intake propio que le pregunte al cliente lo que este servicio necesita.
+
+### `3d_contenido_inmersivo_premium` — COMPLETAR
+
+ninguna dimensión del cerebro lo menciona. Recibe el contexto común del cliente y las imprescindibles, pero nada específico de esta disciplina: no hay intake propio que le pregunte al cliente lo que este servicio necesita.
+
+### `fotografia_producto_premium` — COMPLETAR
+
+ninguna dimensión del cerebro lo menciona. Recibe el contexto común del cliente y las imprescindibles, pero nada específico de esta disciplina: no hay intake propio que le pregunte al cliente lo que este servicio necesita.
+
+### `consultoria_automatizacion_premium` — COMPLETAR
+
+ninguna dimensión del cerebro lo menciona. Recibe el contexto común del cliente y las imprescindibles, pero nada específico de esta disciplina: no hay intake propio que le pregunte al cliente lo que este servicio necesita.
+
+### `integraciones_apis_premium` — COMPLETAR
+
+ninguna dimensión del cerebro lo menciona. Recibe el contexto común del cliente y las imprescindibles, pero nada específico de esta disciplina: no hay intake propio que le pregunte al cliente lo que este servicio necesita.
+
+### `mantenimiento_web_premium` — COMPLETAR
+
+ninguna dimensión del cerebro lo menciona. Recibe el contexto común del cliente y las imprescindibles, pero nada específico de esta disciplina: no hay intake propio que le pregunte al cliente lo que este servicio necesita.
+
+### `reputacion_online_orm_premium` — COMPLETAR
+
+ninguna dimensión del cerebro lo menciona. Recibe el contexto común del cliente y las imprescindibles, pero nada específico de esta disciplina: no hay intake propio que le pregunte al cliente lo que este servicio necesita.
+
+### `formacion_capacitacion_digital_premium` — COMPLETAR
+
+ninguna dimensión del cerebro lo menciona. Recibe el contexto común del cliente y las imprescindibles, pero nada específico de esta disciplina: no hay intake propio que le pregunte al cliente lo que este servicio necesita.
+
+### `landing_premium` — COMPLETAR
+
+ninguna dimensión del cerebro lo menciona. Recibe el contexto común del cliente y las imprescindibles, pero nada específico de esta disciplina: no hay intake propio que le pregunte al cliente lo que este servicio necesita.
 
 
 ---
