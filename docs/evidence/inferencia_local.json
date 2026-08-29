@@ -1,0 +1,29 @@
+{
+  "_lee_esto": [
+    "Lo escribe laInferenciaLocalEsRealOSeDiceQueNo. No se edita a mano.",
+    "modeloDisponible=false NO significa que NELVYON AI no funcione: significa",
+    "que en la maquina donde se ejecuto esto no habia ningun modelo instalado."
+  ],
+  "medidoEn": "2026-08-29",
+  "base": "http://127.0.0.1:11434",
+  "modeloDisponible": true,
+  "modelosInstalados": [
+    "llama3.1:8b-instruct-q4_K_M",
+    "mxbai-embed-large:latest",
+    "nomic-embed-text:latest",
+    "qwen2.5:3b-instruct-q4_K_M",
+    "phi3:mini",
+    "llama3.2:3b-instruct-q4_K_M"
+  ],
+  "modeloElegido": "llama3.1:8b-instruct-q4_K_M",
+  "costeExternoEuros": 0,
+  "llamadaReal": {
+    "procedencia": "REAL_LLM_SUCCESS",
+    "proveedor": "ollama",
+    "modelo": "llama3.1:8b-instruct-q4_K_M",
+    "tokensEntrada": 81,
+    "tokensSalida": 184,
+    "costeUsd": 0,
+    "milisegundos": 63425
+  }
+}

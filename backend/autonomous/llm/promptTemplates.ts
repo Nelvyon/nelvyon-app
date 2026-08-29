@@ -84,46 +84,52 @@ export function getSystemPrompt(role: AgentRole): string {
 }
 
 function sectorBlock(payload: Record<string, unknown>): string {
+  // Un `payload` ausente reventaba aqui con un TypeError, y eso es peor que un
+  // error limpio: la excepcion escapa antes de que el adaptador registre la
+  // procedencia, asi que la llamada no deja rastro de haber ocurrido. Quien la
+  // hizo se lleva una traza y el sistema no se entera de nada.
+  if (!payload || typeof payload !== "object") return "";
   const ctx = payload._sector_context ?? payload.sector_context;
   if (!ctx || typeof ctx !== "object") return "";
   return `\nSector context (Phase E):\n${JSON.stringify(ctx)}\n`;
 }
 
 export function buildUserPrompt(role: AgentRole, payload: Record<string, unknown>): string {
-  const json = JSON.stringify(payload, null, 0);
-  const sector = sectorBlock(payload);
+  const datos = payload && typeof payload === "object" ? payload : {};
+  const json = JSON.stringify(datos, null, 0);
+  const sector = sectorBlock(datos);
   switch (role) {
     case "agent-pm-landing":
       return (
         renderTemplate(
           "Valida brief y genera PMPlan:\n{{brief_json}}\nTier: {{tier}}\nOS: {{project_slug}}",
-          { brief_json: json, tier: String(payload.tier ?? ""), project_slug: String(payload.project_slug ?? "") },
+          { brief_json: json, tier: String(datos.tier ?? ""), project_slug: String(datos.project_slug ?? "") },
         ) + sector
       );
     case "agent-strategist-landing":
-      return `Brief:\n${json}\nPlantilla: ${String(payload.template_id ?? "")}`;
+      return `Brief:\n${json}\nPlantilla: ${String(datos.template_id ?? "")}`;
     case "agent-copywriter-landing":
-      return `Estrategia:\n${JSON.stringify(payload.strategy ?? {})}\nBrief:\n${JSON.stringify(payload.brief ?? {})}\nReintento: ${String(payload.retry_attempt ?? 0)}`;
+      return `Estrategia:\n${JSON.stringify(datos.strategy ?? {})}\nBrief:\n${JSON.stringify(datos.brief ?? {})}\nReintento: ${String(datos.retry_attempt ?? 0)}`;
     case "agent-designer-landing":
-      return `Copy:\n${JSON.stringify(payload.copy ?? {})}\nTemplate: ${String(payload.template_id ?? "")}\nBrand: ${JSON.stringify(payload.brand ?? {})}`;
+      return `Copy:\n${JSON.stringify(datos.copy ?? {})}\nTemplate: ${String(datos.template_id ?? "")}\nBrand: ${JSON.stringify(datos.brand ?? {})}`;
     case "agent-seo-landing":
-      return `Copy:\n${JSON.stringify(payload.copy ?? {})}\nDomain: ${String(payload.domain ?? "")}`;
+      return `Copy:\n${JSON.stringify(datos.copy ?? {})}\nDomain: ${String(datos.domain ?? "")}`;
     case "agent-pm-chatbot":
-      return `Brief:\n${json}\nTier: ${String(payload.tier ?? "")}`;
+      return `Brief:\n${json}\nTier: ${String(datos.tier ?? "")}`;
     case "agent-strategist-chatbot":
       return `Brief:\n${json}`;
     case "agent-copywriter-chatbot":
-      return `Strategy:\n${JSON.stringify(payload.strategy ?? {})}\nBrief:\n${JSON.stringify(payload.brief ?? {})}\nFaqs target: ${String(payload.faqs_target ?? 15)}`;
+      return `Strategy:\n${JSON.stringify(datos.strategy ?? {})}\nBrief:\n${JSON.stringify(datos.brief ?? {})}\nFaqs target: ${String(datos.faqs_target ?? 15)}`;
     case "agent-pm-seo":
       return `Brief:\n${json}`;
     case "agent-strategist-seo":
-      return `Brief:\n${json}\nPages target: ${String(payload.pages_target ?? 5)}`;
+      return `Brief:\n${json}\nPages target: ${String(datos.pages_target ?? 5)}`;
     case "agent-copywriter-seo":
-      return `Priority:\n${JSON.stringify(payload.priority ?? {})}\nKeywords:\n${JSON.stringify(payload.keywords ?? {})}`;
+      return `Priority:\n${JSON.stringify(datos.priority ?? {})}\nKeywords:\n${JSON.stringify(datos.keywords ?? {})}`;
     case "agent-seo-audit":
-      return `Dominio: ${String(payload.primary_domain ?? "")}\nKeywords: ${JSON.stringify(payload.seed_keywords ?? [])}`;
+      return `Dominio: ${String(datos.primary_domain ?? "")}\nKeywords: ${JSON.stringify(datos.seed_keywords ?? [])}`;
     case "agent-seo-report":
-      return `Brief:\n${JSON.stringify(payload.brief ?? {})}\nOn-page:\n${JSON.stringify(payload.on_page ?? {})}`;
+      return `Brief:\n${JSON.stringify(datos.brief ?? {})}\nOn-page:\n${JSON.stringify(datos.on_page ?? {})}`;
     default:
       return json + sector;
   }

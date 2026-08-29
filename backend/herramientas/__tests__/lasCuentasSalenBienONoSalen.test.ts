@@ -19,6 +19,8 @@
  * «Faltan datos» no sirve para pedirlos. «Falta el ticket medio del pedido», sí.
  */
 import { describe, expect, it } from "vitest";
+import fs from "node:fs";
+import path from "node:path";
 
 import {
   HERRAMIENTAS,
@@ -360,7 +362,125 @@ describe("dónde está el cuello de botella", () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
+describe("cuadran las fuentes: si el panel se puede enseñar a alguien", () => {
+  it("una diferencia pequeña es normal y se dice que lo es", () => {
+    // Dos herramientas nunca cuadran al 100 %: consentimiento, ventanas de
+    // atribución y husos horarios explican un margen. Llamar «error» a eso
+    // manda a alguien a perseguir un fantasma durante una semana.
+    const r = usar("cuadran-las-fuentes", { fuenteA: 412, fuenteB: 390 });
+    expect(r.estado).toBe("CALCULADO");
+    if (r.estado !== "CALCULADO") return;
+    expect(r.valor.veredicto).toBe("tolerable");
+    expect(r.valor.discrepanciaPct).toBeLessThan(10);
+  });
+
+  it("CASO DIFÍCIL: con un tercio de diferencia no se puede informar de nada", () => {
+    const r = usar("cuadran-las-fuentes", { fuenteA: 1000, fuenteB: 600 });
+    expect(r.estado).toBe("CALCULADO");
+    if (r.estado !== "CALCULADO") return;
+    expect(r.valor.veredicto).toBe("no_se_puede_informar");
+    expect(String(r.queSignifica)).toMatch(/no se puede afirmar/i);
+  });
+
+  it("dos ceros NO significan que cuadren", () => {
+    // Es el resultado que más engaña: la diferencia es cero, así que un
+    // comparador ingenuo diría «perfecto». Lo que dicen dos ceros es que
+    // probablemente no se está midiendo nada.
+    const r = usar("cuadran-las-fuentes", { fuenteA: 0, fuenteB: 0 });
+    expect(r.estado).toBe("NO_SE_PUEDE_CALCULAR");
+    if (r.estado !== "NO_SE_PUEDE_CALCULAR") return;
+    expect(r.porQueImporta).toMatch(/no se está midiendo/i);
+  });
+
+  it("con una sola fuente dice cuál falta, con nombre", () => {
+    const r = usar("cuadran-las-fuentes", { fuenteA: 300 });
+    expect(r.estado).toBe("NO_SE_PUEDE_CALCULAR");
+    if (r.estado !== "NO_SE_PUEDE_CALCULAR") return;
+    expect(r.falta).toEqual(["cuánto cuenta la segunda fuente"]);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+describe("concentración del mercado: contra quién se compite de verdad", () => {
+  it("un mercado dominado por uno se dice que lo está", () => {
+    const r = usar("concentracion-del-mercado", {
+      cuotasDeMercado: [{ cuotaPct: 70 }, { cuotaPct: 12 }, { cuotaPct: 10 }, { cuotaPct: 8 }],
+    });
+    expect(r.estado).toBe("CALCULADO");
+    if (r.estado !== "CALCULADO") return;
+    expect(r.valor.lectura).toBe("concentrado");
+    expect(r.valor.lider).toBe(70);
+    expect(r.comoSeCalcula).toMatch(/Herfindahl/i);
+  });
+
+  it("EL CONTROL: un mercado repartido se dice que lo está", () => {
+    // Sin esto, la herramienta podría devolver «concentrado» siempre y la
+    // prueba de arriba seguiría verde mientras el consejo es constante.
+    const r = usar("concentracion-del-mercado", {
+      cuotasDeMercado: [12, 11, 11, 10, 10, 9, 9, 9, 9, 8],
+    });
+    expect(r.estado).toBe("CALCULADO");
+    if (r.estado !== "CALCULADO") return;
+    expect(r.valor.lectura).toBe("repartido");
+  });
+
+  it("CASO DIFÍCIL: una cuota que falta NO vale cero", () => {
+    // Tratarla como cero descuadra el índice hacia abajo y hace parecer el
+    // mercado más repartido de lo que está: exactamente el error que lleva a
+    // recomendar entrar donde no se puede.
+    const r = usar("concentracion-del-mercado", {
+      cuotasDeMercado: [{ cuotaPct: 60 }, { nombre: "el segundo" }],
+    });
+    expect(r.estado).toBe("NO_SE_PUEDE_CALCULAR");
+    if (r.estado !== "NO_SE_PUEDE_CALCULAR") return;
+    expect(r.falta[0]).toMatch(/1 competidor/);
+  });
+
+  it("si las cuotas suman más de 100 no se calcula nada", () => {
+    const r = usar("concentracion-del-mercado", { cuotasDeMercado: [70, 50] });
+    expect(r.estado).toBe("NO_SE_PUEDE_CALCULAR");
+  });
+
+  it("avisa cuando buena parte del mercado no está identificada", () => {
+    // El índice sólo puede ser un mínimo si falta un tercio del mercado por
+    // mirar. Darlo por bueno es afirmar más de lo que se sabe.
+    const r = usar("concentracion-del-mercado", { cuotasDeMercado: [30, 20, 15] });
+    expect(r.estado).toBe("CALCULADO");
+    if (r.estado !== "CALCULADO") return;
+    expect(r.salvedades?.[0]).toMatch(/no está identificado/);
+    expect(r.valor.restoSinIdentificarPct).toBe(35);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
 describe("la capa entera", () => {
+  it("LA REGLA DE VERDAD: la capa no puede actuar aunque quisiera", () => {
+    // `consecuencias: []` es una DECLARACIÓN. Una declaración no impide nada:
+    // basta con que alguien añada una herramienta que consulte una API «sólo
+    // para enriquecer el cálculo» y la capa entera deja de ser lo que dice ser
+    // —con las catorce fichas todavía diciendo que no tiene consecuencias—.
+    //
+    // Esto mira el fichero. Si no puede alcanzar la red, la base de datos ni el
+    // disco, entonces no puede actuar, lo declare o no.
+    const fuente = fs.readFileSync(path.join(__dirname, "..", "Herramientas.ts"), "utf8");
+
+    const importa = [...fuente.matchAll(/^import[^;]+from\s+"([^"]+)";/gm)].map((m) => m[1]);
+    expect(importa, "las herramientas no importan nada: son aritmética").toEqual([]);
+
+    const prohibido: Array<[RegExp, string]> = [
+      [/\bfetch\s*\(/, "sale a la red"],
+      [/\bXMLHttpRequest\b/, "sale a la red"],
+      [/\brequire\s*\(/, "carga módulos en tiempo de ejecución"],
+      [/\bprocess\.env\b/, "lee el entorno: dejaría de ser determinista"],
+      [/\bDate\.now\s*\(|new Date\s*\(/, "depende del reloj: dejaría de ser determinista"],
+      [/\bMath\.random\s*\(/, "es aleatorio: dos veces la misma entrada daría dos respuestas"],
+    ];
+    const encontrados = prohibido
+      .filter(([re]) => re.test(fuente))
+      .map(([re, porQue]) => `${re.source} — ${porQue}`);
+    expect(encontrados, "la capa de cálculo ha dejado de ser pura").toEqual([]);
+  });
+
   it("NINGUNA herramienta tiene consecuencias: calculan, no actúan", () => {
     // Lo que toca el mundo real pasa por el puente. Una herramienta que gastara
     // dinero saltándose las siete puertas sería un agujero, no una capacidad.
