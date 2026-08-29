@@ -1506,6 +1506,20 @@ export class MotorDeCalidad {
 
     const disponible = modoDisponible();
     const comprobaciones = comprobacionesDe(pieza.dominio);
+    /**
+     * Las de SU disciplina, aparte de las comunes.
+     *
+     * Hace falta contarlas por separado por lo que se vio al pasar prosa de un
+     * modelo real por aqui: un informe de mercado salio **PASS con 100 puntos**
+     * y sus CINCO comprobaciones de dominio en «no se pudo comprobar». Lo unico
+     * que se le habia mirado era la higiene comun —que no estuviera vacio, que
+     * no prometiera imposibles—, que es lo mismo que se le mira a una foto.
+     *
+     * Cien puntos ahi no significa «bien»: significa «no revisado como lo que
+     * es». Y es el peor sitio para el optimismo, porque el numero se enseña.
+     */
+    const deSuDisciplina = new Set((POR_DOMINIO[pieza.dominio] ?? []).map((c) => c.id));
+    let usadasDeSuDisciplina = 0;
     const hallazgos: Hallazgo[] = [];
     const noComprobado: Array<{ id: string; porQue: string }> = [];
     /** Las bloqueantes que no se pudieron ejecutar. Deciden en alto riesgo. */
@@ -1535,6 +1549,7 @@ export class MotorDeCalidad {
         continue;
       }
       usadas += 1;
+      if (deSuDisciplina.has(c.id)) usadasDeSuDisciplina += 1;
       if (r !== null) {
         hallazgos.push({
           id: c.id,
@@ -1558,7 +1573,10 @@ export class MotorDeCalidad {
             : "RULE_BASED";
 
     return {
-      veredicto: this.decidir(hallazgos, modo, pieza, bloqueantesNoEvaluadas),
+      veredicto: this.decidir(hallazgos, modo, pieza, bloqueantesNoEvaluadas, {
+        tiene: deSuDisciplina.size,
+        ejecutadas: usadasDeSuDisciplina,
+      }),
       modo,
       hallazgos,
       puntuacion: usadas === 0 ? null : Math.round(((usadas - hallazgos.length) / usadas) * 100),
@@ -1579,8 +1597,21 @@ export class MotorDeCalidad {
     modo: ModoDeEvaluacion,
     pieza: Pieza,
     bloqueantesNoEvaluadas: readonly string[] = [],
+    disciplina: { tiene: number; ejecutadas: number } = { tiene: 0, ejecutadas: 0 },
   ): Veredicto {
     if (hallazgos.some((h) => h.gravedad === "bloqueante")) return "FAIL";
+
+    // NO SE APRUEBA COMO SEO ALGO A LO QUE NO SE LE HA MIRADO NADA DE SEO.
+    //
+    // Si la disciplina tiene comprobaciones y NINGUNA ha podido ejecutarse, lo
+    // unico que se ha revisado es la higiene comun. Eso no es una revision de
+    // la pieza: es una revision de cualquier pieza. Va a una persona.
+    //
+    // El caso limite importa: si la disciplina no tiene comprobaciones propias
+    // —todavia—, esto no aplica y el veredicto sigue su curso. Confundir «no
+    // hay nada que mirar» con «no se pudo mirar» mandaria a revision humana
+    // todo lo de las disciplinas sin rubrica, que es ruido, no seguridad.
+    if (disciplina.tiene > 0 && disciplina.ejecutadas === 0) return "REVIEW_REQUIRED";
 
     if (modo === "MOCK") {
       // Un veredicto simulado no aprueba nada. Va a revisión humana.

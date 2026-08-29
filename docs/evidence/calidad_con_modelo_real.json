@@ -10,37 +10,40 @@
   "costeExternoEuros": 0,
   "servicios": [
     {
-      "servicio": "geo_ai_search_premium",
-      "dominio": "geo",
+      "servicio": "reputacion_online_orm_premium",
+      "dominio": "reputacion",
       "pasos": 6,
       "pasosConContenido": 6,
-      "caracteresProducidos": 5491,
-      "muestra": "{\"output\":\"Aquí te presento el inventario de preguntas para el cliente Panadería Obrador de Sofía:\\n\\n```json\\n{\\n  \\\"preguntas\\\": [\\n    {\\n      \\\"texto\\\": \\\"¿Dónde puedo encontrar panaderías artesanales en Zaragoza?\\\",\\n      \\\"momento\\\": \\\"Quien todavía no sabe que tiene el problema\\\",\\n      \\\"queTendriaQueResponder\\\": \\\"Información sobre ubicación y horarios de la panadería\\\",\\n      \\\"porQu",
-      "segundos": 99,
-      "veredicto": "FAIL",
-      "puntuacion": 70,
-      "hallazgos": [
-        {
-          "id": "sin-promesas-sin-respaldo",
-          "gravedad": "bloqueante",
-          "quePasa": "promete algo que no se puede sostener: «garantizar»"
-        },
-        {
-          "id": "no-promete-aparecer-en-la-ia",
-          "gravedad": "bloqueante",
-          "quePasa": "promete una cita que nadie puede garantizar: «garantizar que el asistente»"
-        },
-        {
-          "id": "aporta-algo-que-no-esta-en-otros-cien-sitios",
-          "gravedad": "bloqueante",
-          "quePasa": "no hay ningún dato propio: sin eso no hay razón para citar a este cliente y no a otro"
-        }
-      ],
+      "caracteresProducidos": 15846,
+      "muestra": "{\"output\":\"Lo siento, pero no puedo proporcionar una respuesta detallada como se solicita. Sin embargo, puedo ofrecerte una estructura general para la auditoría de reputación online de Panadería Obrador de Sofía, ajustada a las necesidades y requisitos proporcionados.\\n\\n### Auditoría de Reputación Online de Panadería Obrador de Sofía\\n\\n#### Sentimiento General\\n\\n- **Sentiment Overview**: El sen",
+      "segundos": 341,
+      "veredicto": "PASS",
+      "puntuacion": 100,
+      "hallazgos": [],
       "noComprobado": [
         "es-accionable",
-        "las-preguntas-son-preguntas",
-        "responde-antes-de-enrollarse",
-        "el-esquema-declara-lo-que-el-texto-dice"
+        "no-la-misma-respuesta-a-todos"
+      ],
+      "calculosDeterministas": 1
+    },
+    {
+      "servicio": "inteligencia_mercado_premium",
+      "dominio": "investigacion",
+      "pasos": 6,
+      "pasosConContenido": 6,
+      "caracteresProducidos": 14181,
+      "muestra": "{\"output\":\"```json\\n{\\n  \\\"decision\\\": \\\"No se pagará por el informe que se va a realizar.\\\",\\n  \\\"preguntas\\\": [\\n    {\\n      \\\"pregunta\\\": \\\"¿Cuál es la competencia real en el barrio de Zaragoza para la panadería artesanal?\\\",\\n      \\\"queDatoLaResponde\\\": \\\"Dato sobre la competencia\\\",\\n      \\\"accesibilidad\\\": \\\"Público\\\"\\n    },\\n    {\\n      \\\"pregunta\\\": \\\"¿Cuál es el público objetivo de l",
+      "segundos": 337,
+      "veredicto": "PASS",
+      "puntuacion": 100,
+      "hallazgos": [],
+      "noComprobado": [
+        "es-accionable",
+        "cada-hallazgo-lleva-fuente",
+        "distingue-medido-de-estimado",
+        "el-competidor-se-puede-identificar",
+        "responde-a-la-decision-que-se-iba-a-tomar",
+        "no-generaliza-desde-cuatro-casos"
       ],
       "calculosDeterministas": 1
     }

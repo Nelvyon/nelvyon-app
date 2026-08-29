@@ -67,11 +67,21 @@ function buildSteps(llm: ILlmClient): OsAgentStep[] {
         completeLlmStep(
           llm,
           S5,
+          // AL PASO DE QA SE LE RESUMEN LOS ANTERIORES, y no es una economia
+          // de tokens: es lo que hace que el paso termine. Medido contra un
+          // modelo local de 8B, la cadena entera crece hasta que el quinto
+          // paso recibe todo lo que produjeron los cuatro primeros y agota el
+          // plazo de la peticion. El paso de informe ya resumia por lo mismo;
+          // QA no lo hacia y era el que reventaba.
+          //
+          // Lo que QA necesita es RECONOCER promesas, datos inventados y
+          // marcado que no cuadra. Eso se ve en la parte de arriba de cada
+          // paso; no hace falta el texto integro para encontrarlo.
           promptGeoAiSearchQa(
-            stepResult(ctx, S1),
-            stepResult(ctx, S2),
-            stepResult(ctx, S3),
-            stepResult(ctx, S4),
+            summarize(stepResult(ctx, S1)),
+            summarize(stepResult(ctx, S2)),
+            summarize(stepResult(ctx, S3)),
+            summarize(stepResult(ctx, S4)),
             payload,
           ),
         ),

@@ -436,6 +436,76 @@ describe("Reputación: no discutir, no repetir, no pedir que borren", () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
+describe("no se aprueba como SEO algo a lo que no se le ha mirado nada de SEO", () => {
+  /**
+   * LO QUE ENCONTRÓ ESTO, y no fue una revisión de código.
+   *
+   * Al ejecutar `inteligencia_mercado_premium` entero contra un modelo local y
+   * pasar lo que escribió por su rúbrica, salió **PASS con 100 puntos** y sus
+   * CINCO comprobaciones de dominio en «no se pudo comprobar»: el texto no
+   * traía los campos que miran. Lo único que se le había revisado era la
+   * higiene común —que no estuviera vacío, que no prometiera imposibles—, que
+   * es exactamente lo mismo que se le revisa a una fotografía.
+   *
+   * Cien puntos ahí no significa «bien». Significa «no revisado como lo que
+   * es». Y es el peor sitio posible para el optimismo, porque el número se
+   * enseña y nadie lee la lista de lo que no se pudo mirar.
+   */
+  it("LA REGLA: si ninguna comprobación de la disciplina pudo ejecutarse, va a una persona", () => {
+    const r = evaluar({
+      dominio: "investigacion",
+      // Texto correcto y vacío de estructura: pasa la higiene común y no trae
+      // ni hallazgos, ni competidores, ni decisión, ni muestra.
+      contenido: { cuerpo: "Hemos revisado el mercado y hay margen para crecer en el segmento medio." },
+    });
+    expect(r.hallazgos, "no debería haber hallazgos: el texto es correcto").toEqual([]);
+    expect(
+      r.veredicto,
+      "aprueba como investigación de mercado algo a lo que no se le ha mirado nada de investigación",
+    ).toBe("REVIEW_REQUIRED");
+    expect(r.noComprobado.length).toBeGreaterThan(0);
+  });
+
+  it("EL CONTROL: con una sola comprobación de la disciplina ejecutada, el veredicto sigue su curso", () => {
+    // Sin este control, la regla de arriba podría mandar TODO a revisión humana
+    // y seguiría en verde. Una puerta que no deja pasar nada no es una puerta.
+    const r = evaluar({
+      dominio: "investigacion",
+      contenido: {
+        cuerpo: "Informe de mercado.",
+        // Basta con que UNA se pueda ejecutar: aquí, la de las fuentes.
+        hallazgos: [{ hallazgo: "el segundo competidor ha bajado precios", fuente: "su propia web, 12-08" }],
+      },
+    });
+    expect(r.veredicto).not.toBe("REVIEW_REQUIRED");
+  });
+
+  it("una disciplina sin rúbrica propia NO va a revisión por eso", () => {
+    // «No hay nada que mirar» y «no se pudo mirar» son cosas distintas. Tratar
+    // la primera como la segunda mandaría a una persona todo lo de las
+    // disciplinas que aún no tienen criterio propio: eso es ruido, no
+    // seguridad, y una cola de revisión con ruido deja de mirarse.
+    const r = motor.evaluar(
+      { dominio: "dominio-que-no-existe", autor: "productor", contenido: { cuerpo: "Un texto correcto y normal." } },
+      "qa-entregable",
+    );
+    expect(r.veredicto).toBe("PASS");
+  });
+
+  it("y la regla se aplica también cuando el riesgo es bajo", () => {
+    // El agujero estaba justo aquí. La rama de alto riesgo ya fallaba cerrada
+    // ante una bloqueante sin comprobar; la de riesgo bajo aprobaba sin haber
+    // mirado una sola comprobación de la disciplina.
+    const r = evaluar({
+      dominio: "geo",
+      riesgo: "bajo",
+      contenido: { cuerpo: "Un texto perfectamente correcto sobre buscadores." },
+    });
+    expect(r.veredicto).toBe("REVIEW_REQUIRED");
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
 describe("el inventario y la profundidad", () => {
   it("ninguna disciplina se queda sin criterio propio", () => {
     // `estrategia` y `compliance` tenían CERO comprobaciones: sus piezas sólo
