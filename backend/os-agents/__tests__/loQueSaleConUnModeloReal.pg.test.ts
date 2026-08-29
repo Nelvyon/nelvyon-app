@@ -77,15 +77,21 @@ const conModelo = MODELO ? describe : describe.skip;
  * guion. Ejecutarlos todos serían cuarenta minutos, y lo que se está midiendo
  * —si el motor de calidad sabe juzgar prosa real— no necesita veintinueve.
  */
-const ELEGIDOS = [
-  "seo_premium",
-  "ads_premium",
-  "reputacion_online_orm_premium",
-  "crm_captacion_premium",
-  "analitica_atribucion_premium",
-  "inteligencia_mercado_premium",
-  "geo_ai_search_premium",
-];
+const ELEGIDOS = (process.env.NELVYON_MODELO_REAL_SERVICIOS?.trim() || "").split(",").filter(Boolean)
+  .length
+  ? process.env.NELVYON_MODELO_REAL_SERVICIOS!.split(",").map((s) => s.trim())
+  : [
+      // Cuatro, no veintinueve. Cada paso son entre treinta segundos y dos
+      // minutos de modelo local, y la cadena crece porque cada paso recibe lo
+      // que produjo el anterior: siete servicios fueron 53 minutos. Lo que se
+      // mide aqui —si el control de calidad sabe juzgar prosa real— no mejora
+      // por repetirlo veintinueve veces. `NELVYON_MODELO_REAL_SERVICIOS` acepta
+      // una lista separada por comas para mirar otros.
+      "seo_premium",
+      "reputacion_online_orm_premium",
+      "inteligencia_mercado_premium",
+      "geo_ai_search_premium",
+    ];
 
 const CLIENTE: OsJobPayload = {
   clientName: "Panadería Obrador de Sofía",
@@ -127,10 +133,24 @@ function contextoFalso(payload: OsJobPayload, serviceId: string): OsJobContext {
  * rúbrica del dominio mira. Elegir qué enseñarle al inspector sería exactamente
  * la trampa que estas pruebas existen para impedir.
  */
-function comoPieza(dominio: string, pasos: Array<{ name: string; output?: string }>) {
+function textoDelPaso(p: { name: string; data?: Record<string, unknown> }): string {
+  // Un paso guarda `data`, no `output`. La primera version de esta prueba miro
+  // `output`, encontro undefined en los siete servicios y los dio por vacios
+  // DESPUES de 53 minutos de modelo. El fallo no estaba en lo que se medía sino
+  // en como se leia lo medido, que es la forma mas cara de equivocarse.
+  const d = p.data;
+  if (!d) return "";
+  if (typeof d.raw === "string") return d.raw;
+  if (typeof d.text === "string") return d.text;
+  if (typeof d.content === "string") return d.content;
+  return JSON.stringify(d);
+}
+
+function comoPieza(dominio: string, pasos: Array<{ name: string; data?: Record<string, unknown> }>) {
   const contenido: Record<string, unknown> = {};
   for (const p of pasos) {
-    if (typeof p.output === "string" && p.output.trim()) contenido[p.name] = p.output;
+    const t = textoDelPaso(p);
+    if (t.trim()) contenido[p.name] = t;
   }
   const todo = Object.values(contenido).join("\n\n");
   contenido.texto = todo;
@@ -200,9 +220,7 @@ conModelo("lo que sale con un modelo real pasa por el mismo control", () => {
 
         // 1. Ha producido pasos con contenido. Un agente que devuelve vacío con
         //    un modelo real es un fallo, aunque no lance.
-        const conTexto = (r.steps ?? []).filter(
-          (s) => typeof s.output === "string" && s.output.trim().length > 20,
-        );
+        const conTexto = (r.steps ?? []).filter((s) => textoDelPaso(s).trim().length > 20);
         expect(conTexto.length, `${serviceId} no produjo ni un paso con contenido`).toBeGreaterThan(
           0,
         );
@@ -211,7 +229,7 @@ conModelo("lo que sale con un modelo real pasa por el mismo control", () => {
         //    sobre este contenido, no un veredicto por defecto.
         const dominio = QA_DE[serviceId];
         const res = new MotorDeCalidad().evaluar(
-          comoPieza(dominio, r.steps as Array<{ name: string; output?: string }>),
+          comoPieza(dominio, r.steps),
           "qa-independiente",
         );
         expect(
@@ -224,7 +242,10 @@ conModelo("lo que sale con un modelo real pasa por el mismo control", () => {
           dominio,
           pasos: (r.steps ?? []).length,
           pasosConContenido: conTexto.length,
-          caracteresProducidos: conTexto.reduce((t, s) => t + (s.output?.length ?? 0), 0),
+          caracteresProducidos: conTexto.reduce((t, s) => t + textoDelPaso(s).length, 0),
+          // Un trozo de lo que de verdad escribio, para poder leerlo. Un informe
+          // de calidad sin una muestra del texto obliga a fiarse de su resumen.
+          muestra: textoDelPaso(conTexto[0] ?? { name: "", data: {} }).slice(0, 400),
           segundos: Math.round(ms / 1000),
           veredicto: res.veredicto,
           puntuacion: res.puntuacion,

@@ -135,6 +135,29 @@ describe("el cliente recibe un documento", () => {
     expect(files["informe.md"]).not.toContain('{"result"');
   });
 
+  it("LA FORMA EN QUE ESCRIBE UN MODELO DE VERDAD: prosa, valla de código y JSON", () => {
+    // MEDIDO, no supuesto. Ejecutando un servicio contra un modelo local, el
+    // primer paso volvio asi: una frase de cortesia, despues ```json y despues
+    // el objeto. `comoTexto` exigia que el texto EMPEZARA por `{`, asi que
+    // daba todo por prosa y el cliente recibia las llaves y las comillas en
+    // crudo. El contenido llegaba entero; la presentacion era un volcado.
+    const bruto = [
+      "Aquí te presento el inventario de preguntas para el cliente:",
+      "",
+      "```json",
+      JSON.stringify({
+        preguntas: ["¿Hacéis tartas por encargo?", "¿Cuánto tardáis?"],
+        recomendacion: "Responder ambas en la página de contacto",
+      }),
+      "```",
+    ].join("\n");
+
+    const files = construirEntregable({ serviceId: "x", jobId: "j", pasos: [paso("analysis", bruto)] });
+    expect(files["informe.md"]).toContain("- ¿Hacéis tartas por encargo?");
+    expect(files["informe.md"]).toContain("Responder ambas en la página de contacto");
+    expect(files["informe.md"], "el cliente sigue viendo el JSON en crudo").not.toContain('"preguntas":');
+  });
+
   it("si el modelo NO devolvió JSON, el texto se conserva igual", () => {
     // Un entregable que revienta porque la respuesta no era JSON es un
     // entregable que no llega. Degradar a texto no oculta nada: el contenido

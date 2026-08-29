@@ -31,6 +31,7 @@
  */
 
 import type { ArtifactFileMap } from "./artifactPublisher";
+import { parseJsonFromLlm } from "../../autonomous/llm/parseJson";
 
 export interface PasoProducido {
   name: string;
@@ -98,9 +99,19 @@ function legible(name: string): string {
 function comoTexto(bruto: string): string {
   const limpio = bruto.trim();
   if (!limpio) return "";
-  if (!limpio.startsWith("{") && !limpio.startsWith("[")) return limpio;
+  // MEDIDO CON UN MODELO DE VERDAD, no supuesto. Esto exigia que el texto
+  // EMPEZARA por `{`, y un modelo real casi nunca lo hace: antepone una frase
+  // («Aqui te presento el inventario…») y envuelve el JSON en un bloque de
+  // codigo. Con eso, el entregable del cliente enseñaba las llaves y las
+  // comillas en crudo en vez de las secciones — el contenido estaba entero y la
+  // presentacion era la de un volcado.
+  //
+  // El extractor es el mismo que usa el camino autonomo: bloque de codigo
+  // primero, y si no, de la primera llave a la ultima.
+  const objeto = parseJsonFromLlm<unknown>(limpio);
+  if (objeto === null) return limpio;
   try {
-    const o = JSON.parse(limpio);
+    const o = objeto;
     if (typeof o === "string") return o;
     if (Array.isArray(o)) return o.map((x) => `- ${typeof x === "string" ? x : JSON.stringify(x)}`).join("\n");
     const partes: string[] = [];

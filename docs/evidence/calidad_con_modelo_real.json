@@ -1,0 +1,48 @@
+{
+  "_lee_esto": [
+    "Lo escribe loQueSaleConUnModeloReal. No se edita a mano.",
+    "Los hallazgos NO son fallos de la prueba: son lo que el motor de calidad",
+    "encontro en prosa escrita por un modelo real. Que encuentre cosas es",
+    "senal de que funciona; que no encontrara ninguna nunca seria sospechoso."
+  ],
+  "medidoEn": "2026-08-29",
+  "modelo": "llama3.1:8b-instruct-q4_K_M",
+  "costeExternoEuros": 0,
+  "servicios": [
+    {
+      "servicio": "geo_ai_search_premium",
+      "dominio": "geo",
+      "pasos": 6,
+      "pasosConContenido": 6,
+      "caracteresProducidos": 5491,
+      "muestra": "{\"output\":\"Aquí te presento el inventario de preguntas para el cliente Panadería Obrador de Sofía:\\n\\n```json\\n{\\n  \\\"preguntas\\\": [\\n    {\\n      \\\"texto\\\": \\\"¿Dónde puedo encontrar panaderías artesanales en Zaragoza?\\\",\\n      \\\"momento\\\": \\\"Quien todavía no sabe que tiene el problema\\\",\\n      \\\"queTendriaQueResponder\\\": \\\"Información sobre ubicación y horarios de la panadería\\\",\\n      \\\"porQu",
+      "segundos": 99,
+      "veredicto": "FAIL",
+      "puntuacion": 70,
+      "hallazgos": [
+        {
+          "id": "sin-promesas-sin-respaldo",
+          "gravedad": "bloqueante",
+          "quePasa": "promete algo que no se puede sostener: «garantizar»"
+        },
+        {
+          "id": "no-promete-aparecer-en-la-ia",
+          "gravedad": "bloqueante",
+          "quePasa": "promete una cita que nadie puede garantizar: «garantizar que el asistente»"
+        },
+        {
+          "id": "aporta-algo-que-no-esta-en-otros-cien-sitios",
+          "gravedad": "bloqueante",
+          "quePasa": "no hay ningún dato propio: sin eso no hay razón para citar a este cliente y no a otro"
+        }
+      ],
+      "noComprobado": [
+        "es-accionable",
+        "las-preguntas-son-preguntas",
+        "responde-antes-de-enrollarse",
+        "el-esquema-declara-lo-que-el-texto-dice"
+      ],
+      "calculosDeterministas": 1
+    }
+  ]
+}
