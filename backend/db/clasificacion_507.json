@@ -14,18 +14,18 @@
     "",
     "Se regenera con scripts/clasificar-las-55-omisiones-de-la-507.mjs"
   ],
-  "generado": "2026-08-29T10:18:36.810Z",
+  "generado": "2026-08-29T15:55:51.989Z",
   "esquemaMedido": {
     "base": "nelvyon_desdecero",
-    "tablas": 723,
-    "indices": 2339
+    "tablas": 728,
+    "indices": 2389
   },
   "total": 55,
   "cuenta": {
-    "LEGACY_COMPATIBILITY": 4,
+    "LEGACY_COMPATIBILITY": 5,
     "NEEDS_REPAIR": 25,
-    "REAL_DEFECT": 8,
-    "EXPECTED_IDEMPOTENT": 17,
+    "EXPECTED_IDEMPOTENT": 19,
+    "REAL_DEFECT": 5,
     "DESCONOCIDO": 1
   },
   "resultados": [
@@ -64,8 +64,8 @@
       "code": "42703",
       "sentencia": "CREATE INDEX IF NOT EXISTS affiliate_clicks_affiliate_idx ON affiliate_clicks (affiliate_id, created_at DESC)",
       "motivoOriginal": "column \"affiliate_id\" does not exist",
-      "clase": "LEGACY_COMPATIBILITY",
-      "porQue": "affiliate_clicks existe sin created_at. La tabla sí se consulta, pero por otras columnas: la 507 habla de una forma anterior del esquema"
+      "clase": "EXPECTED_IDEMPOTENT",
+      "porQue": "el índice affiliate_clicks_affiliate_idx existe en el esquema final: otra migración lo creó después"
     },
     {
       "id": "804a3676527d26a0",
@@ -106,8 +106,8 @@
       "porQue": "a bookings le falta start_at, y hay código que la nombra",
       "evidencia": [
         "C:\\Users\\Daniel\\nelvyon-w3/backend/services/booking_service.py:136",
-        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/booking_service.py:293",
-        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/booking_service.py:301"
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/booking_service.py:301",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/booking_service.py:310"
       ]
     },
     {
@@ -129,13 +129,8 @@
       "code": "42703",
       "sentencia": "CREATE INDEX IF NOT EXISTS bookings_zoom_meeting_idx ON bookings (zoom_meeting_id) WHERE zoom_meeting_id IS NOT NULL",
       "motivoOriginal": "column \"zoom_meeting_id\" does not exist",
-      "clase": "REAL_DEFECT",
-      "impacto": "correccion",
-      "confianza": "aproximada: tabla y columna aparecen en el mismo fichero",
-      "porQue": "a bookings le falta zoom_meeting_id, y hay código que la nombra",
-      "evidencia": [
-        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/booking_service.py:331"
-      ]
+      "clase": "EXPECTED_IDEMPOTENT",
+      "porQue": "el índice bookings_zoom_meeting_idx existe en el esquema final: otra migración lo creó después"
     },
     {
       "id": "ffa00a6445fd7d22",
@@ -150,29 +145,16 @@
       "code": "42703",
       "sentencia": "CREATE INDEX IF NOT EXISTS chatbot_conversations_bot_idx ON chatbot_conversations (chatbot_id, last_message_at DESC)",
       "motivoOriginal": "column \"last_message_at\" does not exist",
-      "clase": "REAL_DEFECT",
-      "impacto": "correccion",
-      "confianza": "aproximada: tabla y columna aparecen en el mismo fichero",
-      "porQue": "a chatbot_conversations le falta last_message_at, y hay código que la nombra",
-      "evidencia": [
-        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/chatbot_service.py:541",
-        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/finetuning_service.py:232"
-      ]
+      "clase": "LEGACY_COMPATIBILITY",
+      "porQue": "chatbot_conversations existe sin last_message_at. La tabla sí se consulta, pero por otras columnas: la 507 habla de una forma anterior del esquema"
     },
     {
       "id": "edbb028d2ad16caa",
       "code": "42703",
       "sentencia": "CREATE INDEX IF NOT EXISTS chatbot_conversations_workspace_idx ON chatbot_conversations (workspace_id, started_at DESC)",
       "motivoOriginal": "column \"workspace_id\" does not exist",
-      "clase": "REAL_DEFECT",
-      "impacto": "correccion",
-      "confianza": "aproximada: tabla y columna aparecen en el mismo fichero",
-      "porQue": "a chatbot_conversations le falta workspace_id, started_at, y hay código que la nombra",
-      "evidencia": [
-        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/cdp_service.py:303",
-        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/chatbot_service.py:216",
-        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/chatbot_service.py:447"
-      ]
+      "clase": "LEGACY_COMPATIBILITY",
+      "porQue": "chatbot_conversations existe sin workspace_id, started_at. La tabla sí se consulta, pero por otras columnas: la 507 habla de una forma anterior del esquema"
     },
     {
       "id": "4a2ebd34edb98963",
@@ -184,7 +166,7 @@
       "confianza": "aproximada: tabla y columna aparecen en el mismo fichero",
       "porQue": "a crm_activities le falta deal_id, y hay código que la nombra",
       "evidencia": [
-        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/crm_service.py:754"
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/crm_service.py:759"
       ]
     },
     {

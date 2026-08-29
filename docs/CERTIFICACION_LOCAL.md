@@ -21,11 +21,51 @@ en `LOCAL_CERTIFIED` + `PRODUCTION_UNVERIFIED`, y ya está.
 
 ---
 
+## Fase de profundidad de servicios (29-08-2026)
+
+Esta fase cambió el foco: de demostrar que la **maquinaria** funciona a
+demostrar que **lo que hace** vale.
+
+### Lo que se midió y salió mal
+
+| Qué | Antes | Después |
+|---|---|---|
+| Contexto del cliente que llega al agente | **0,40** | **1,00** |
+| Servicios que personalizan de verdad | 2 de 25 | **25 de 25** |
+| Servicios con intake propio de su disciplina | 6 de 25 | **25 de 25** |
+| Comprobaciones de calidad | 21 | **60 en 16 disciplinas** |
+| Servicios que entregan un fichero al cliente | 8 de 25 | **25 de 25** |
+
+El peor hallazgo no fue el presupuesto: fueron **las restricciones legales**. Una
+tienda de suplementos que no puede prometer resultados y una clínica dental
+sujeta a publicidad sanitaria recibían un plan que ignoraba las dos cosas. Eso no
+es un plan flojo: es una sanción con el nombre de NELVYON.
+
+### Los cinco defectos de esquema, arreglados en la causa raíz
+
+`chatbot_conversations` no era «faltan columnas»: eran **dos subsistemas
+distintos compartiendo una tabla**, y la clave ajena hacía imposible arreglarlo
+añadiendo columnas.
+
+**Dos de los cinco se arreglaron SIN tocar el esquema** — el dato ya existía con
+otro nombre. Añadir la columna habría dejado dos fuentes para lo mismo.
+
+### Lo que la pasada adversarial encontró
+
+Diez intentos de colar trabajo mediocre. Ocho rebotaron. Uno encontró un agujero
+real: **la forma de aprobar un plan que no cabe en el presupuesto era no decir
+cuánto cuesta**. Las comprobaciones que comparan dos números se esquivan no
+declarando uno.
+
+Cinco intentos pasan y quedan escritos como límites, no como cobertura.
+
+---
+
 ## Las tres comprobaciones que cierran la sesión
 
 | Comprobación | Resultado |
 |---|---|
-| Suite completa contra PostgreSQL real | **8.161 pruebas pasan, 0 fallan** |
+| Suite completa contra PostgreSQL real | **8.305 pruebas pasan, 0 fallan** |
 | `next build` de producción | **OK** |
 | 153 rutas sobre el build real, con un inquilino nuevo | **0 respuestas 5xx** |
 

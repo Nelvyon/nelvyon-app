@@ -21,7 +21,7 @@ hecho: la capacidad de registrar existía y funcionaba, y el resultado era cero.
 
 ### Agentes sectoriales distintos entre sí
 
-**1521 de 1521 medidos**
+**1519 de 1519 medidos**
 
 ejecutados los 1.605 con la misma entrada y un modelo que sólo escucha; 0 parejas equivalentes
 
@@ -33,7 +33,7 @@ backend/agentes/departamentos.ts, con estado operativo/planeado y motivo
 
 ### Migraciones aplicables desde cero
 
-**485 migraciones**
+**488 migraciones**
 
 esquema reconstruido desde cero contra PostgreSQL real
 
@@ -58,7 +58,7 @@ scripts/puerta-de-build.mjs ejecuta un `next build` real, no un typecheck
 
 ### Pruebas que pasan
 
-**8142 pruebas pasan** y **0 fallan**, ejecutadas ahora mismo.
+**7926 pruebas pasan** y **1 fallan**, ejecutadas ahora mismo.
 
 El número sale de ejecutar la suite, no de contar ficheros de prueba. Un
 fichero de prueba que nadie ejecuta no prueba nada.

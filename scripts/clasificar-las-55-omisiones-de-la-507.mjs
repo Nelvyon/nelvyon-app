@@ -296,7 +296,7 @@ function sqlAlrededor(lineas, centro) {
     .filter((l) => !/^\s*(def |class |return |import |from \w+ import|const |let |var |function )/.test(l))
     // Una asignación del lenguaje anfitrión (`endpoint_id = str(uuid4())`)
     // sólo cuenta si además lleva SQL dentro.
-    .filter((l) => !/^\s*[\w.]+\s*=\s*/.test(l) || /(SELECT|FROM|WHERE|INSERT|UPDATE|JOIN|VALUES|ORDER BY|GROUP BY)/i.test(l))
+    .filter((l) => !/^\s*[\w.]+\s*=\s*/.test(l) || /\b(SELECT|FROM|WHERE|INSERT|UPDATE|JOIN|VALUES|ORDER BY|GROUP BY)\b/i.test(l))
     .join("\n");
 }
 
@@ -533,7 +533,7 @@ for (const [clase, n] of Object.entries(cuenta).sort((a, b) => b[1] - a[1])) {
 
 const defectos = resultados.filter((r) => r.clase === "REAL_DEFECT");
 if (defectos.length > 0) {
-  console.log(`\n  LO QUE HAY QUE MIRAR (${defectos.length}):`);
+  console.log(`\n  CANDIDATOS A MIRAR (${defectos.length}) - el heuristico senala, verificacion_manual_507.json decide:`);
   for (const d of defectos) {
     console.log(`    · ${d.sentencia.slice(0, 100)}`);
     console.log(`      ${d.porQue}`);

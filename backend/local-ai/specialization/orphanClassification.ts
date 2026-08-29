@@ -85,6 +85,22 @@ export const ORPHAN_CLASSIFICATION: readonly OrphanClassEntry[] = [
   { path: "docs/SKILLS_Y_MCP.md", disposition: "index", domain: ["nelvyon", "development_tech"], priority: 0, title: "Skills y MCP auditados", reason: "Las 16 propias, las 8 oficiales instaladas y la clasificacion de seguridad del resto" },
   { path: "docs/BLOQUE_3_LINEA_BASE.md", disposition: "index", domain: ["nelvyon", "development_tech"], priority: 0, title: "Bloque 3 — línea base", reason: "Qué se certifica en la empresa IA autónoma y con qué método" },
   { path: "docs/NEXT_SESSION_START_HERE.md", disposition: "index", domain: ["nelvyon", "development_tech"], priority: 0, title: "Empieza aquí", reason: "Estado de los cuatro bloques, lo bloqueado por el fundador y cómo se ejecuta la puerta" },
+  // —— Fase de profundidad de servicios (2026-08-29) ——
+  //
+  // Seis documentos nuevos, y el detector de huecos paso de 5 a 6 y se puso en
+  // rojo. Se CLASIFICAN, no se sube el techo: un documento activo que nadie ha
+  // clasificado ES un hueco de conocimiento, y apagar el detector para que no
+  // moleste es la forma mas rapida de quedarse sin detector.
+  //
+  // Todos `index` y no `archive`: son estado vivo que se regenera, no
+  // instantaneas de un momento.
+  { path: "docs/LEDGER_CONSTRUCCION.md", disposition: "index", domain: ["nelvyon", "development_tech"], priority: 0, title: "Ledger de construccion", reason: "Checkpoint persistente: fase, estado, SHA y evidencia" },
+  { path: "docs/CERTIFICACION_LOCAL.md", disposition: "index", domain: ["nelvyon", "development_tech"], priority: 0, title: "Certificacion local", reason: "Que esta certificado en local y que sigue PRODUCTION_UNVERIFIED" },
+  { path: "docs/LO_QUE_SE_PUEDE_AFIRMAR.md", disposition: "index", domain: "nelvyon", priority: 0, title: "Lo que se puede afirmar", reason: "Capacidad frente a resultado; NOT_MEASURED donde toca" },
+  { path: "docs/MATRIZ_DE_SERVICIOS.md", disposition: "index", domain: "nelvyon", priority: 0, title: "Matriz de servicios", reason: "Los 25 servicios por eslabon del ciclo, derivado del arbol" },
+  { path: "docs/REVISION_DE_SERVICIOS.md", disposition: "index", domain: "nelvyon", priority: 0, title: "Revision de servicios", reason: "Que servicio esta en condiciones de prometerse y que le falta" },
+  { path: "docs/QUE_ES_NELVYON_AI.md", disposition: "index", domain: ["nelvyon", "development_tech"], priority: 0, title: "Que es NELVYON AI", reason: "Las capas medidas, y la de inferencia declarada como UNAVAILABLE" },
+
   // —— Wave 3: points 1–4 prep (2026-07-26) — remaining top-level orphans ——
   { path: "docs/ARCHITECTURE_LOCAL_AI_RUNTIME.md", disposition: "index", domain: ["nelvyon", "development_tech"], priority: 0, title: "Architecture Local AI Runtime", reason: "Local AI/runtime SSOT" },
   { path: "docs/COMPLIANCE_COMPANY_DB_CHECKLIST.md", disposition: "index", domain: "security_privacy", priority: 1, title: "Compliance Company DB Checklist", reason: "Company DB compliance" },

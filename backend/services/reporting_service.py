@@ -632,7 +632,13 @@ class ReportingService:
                     SELECT
                         COUNT(*) AS total,
                         COUNT(*) FILTER (WHERE escalated) AS escalated
-                    FROM chatbot_conversations
+                    -- `workspace_chatbot_conversations`, no `chatbot_conversations`.
+                    --
+                    -- Son dos subsistemas distintos. El legado no tiene
+                    -- `workspace_id` ni `started_at`: esta consulta llevaba
+                    -- fallando desde siempre, y el informe de conversaciones
+                    -- salia a cero sin dar un solo error.
+                    FROM workspace_chatbot_conversations
                     WHERE workspace_id = :ws
                       AND started_at >= :start AND started_at < :end
                     """

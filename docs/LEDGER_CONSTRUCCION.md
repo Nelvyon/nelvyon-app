@@ -85,6 +85,15 @@ Nada se marca `DONE`: una fase cuya prueba final exige producción es
 | **honestidad de afirmaciones** | LOCAL_CERTIFIED | `c4e357b7` | capacidad ≠ resultado · 4 de 5 resultados NO_MEDIDO |
 | **pasada adversarial** | LOCAL_CERTIFIED | `7487229b` | 7 vías de ataque · **1 agujero real encontrado y cerrado** |
 | **humo sobre build de producción** | LOCAL_CERTIFIED | `7487229b` | **153 rutas, 0 respuestas 5xx** · el script no podía ejecutarse y ahora sí |
+| **los 5 defectos de esquema** | LOCAL_CERTIFIED | pendiente | 587/588 · **2 arreglados sin tocar el esquema** |
+| **personalizacion por servicio** | LOCAL_CERTIFIED | pendiente | **cobertura 0,40 → 1,00 · 25/25 PERSONALIZA** |
+| **profundidad por disciplina** | LOCAL_CERTIFIED | pendiente | 54 dimensiones · 60 comprobaciones de calidad en 16 disciplinas |
+| **matriz de los 25 servicios** | LOCAL_CERTIFIED | pendiente | 6 LOCAL_CERTIFIED · 19 PARTIAL · 0 FAIL |
+| **entregable universal** | LOCAL_CERTIFIED | pendiente | los 17 que solo daban texto ahora dan un fichero |
+| **cadena comercial completa** | LOCAL_CERTIFIED | pendiente | prospecto → respuesta → oportunidad → cliente |
+| **E2E por familia** | LOCAL_SIMULATED_EXTERNAL | pendiente | 8 familias con clientes reales distintos |
+| **QA adversarial de servicio** | LOCAL_CERTIFIED | pendiente | 10 intentos · **1 agujero real** · 5 limites escritos |
+| **limites artificiales** | LOCAL_CERTIFIED | pendiente | 10 propiedades estructurales, sin afirmar capacidad |
 | Fase 31 · E2E agencia completa | LOCAL_CERTIFIED | `9eddce4c` | 13 pasos, 3 pruebas PG |
 
 ---
@@ -110,6 +119,17 @@ Nada se marca `DONE`: una fase cuya prueba final exige producción es
    esquiva no adjuntando nada no es un revisor.
 8. **Una evaluación de reglas nunca se presenta como de modelo.** `REAL` exige
    proveedor configurado, no una variable de entorno.
+17. **Las restricciones legales del cliente llegan a TODOS los agentes.** Se
+    midió cuánto de lo que distingue a un cliente llegaba a su instrucción: el
+    40 %. El otro 60 % incluía lo que ese cliente tiene PROHIBIDO decir. Para un
+    sector regulado eso no es un matiz: es una sanción con el nombre de NELVYON.
+18. **«No aplica» no es «no se pudo comprobar».** Una bloqueante sin comprobar
+    manda una acción de alto riesgo a revisión humana; marcar así lo que
+    simplemente no aplica llenaría la bandeja de ruido, y una bandeja con ruido
+    se deja de mirar.
+19. **Dos subsistemas distintos no comparten tabla.** El chatbot legado y el de
+    inquilino compartían `chatbot_conversations` con formas incompatibles, y la
+    clave ajena hacía imposible arreglarlo añadiendo columnas.
 16. **Un guardián que aborta siempre no protege: lo parece.** El humo sobre el
     build de producción llevaba sin poder ejecutarse porque arrancaba un
     servidor de producción sin `JWT_SECRET`: se quedaba en «falta algo para

@@ -157,6 +157,34 @@ conBase("dos sistemas de chatbot, dos tablas", () => {
       expect(Number(rows[0].n)).toBe(1);
     });
 
+    it("la del INFORME de conversaciones (reporting_service.py:635)", async () => {
+      // ESTE CONSUMIDOR SE ESCAPO en la primera pasada: se arreglaron
+      // `chatbot_service`, `cdp_service` y `finetuning_service`, y
+      // `reporting_service` se quedo consultando la tabla legada con las
+      // columnas del subsistema por inquilino. Lo encontro el clasificador de
+      // la 507 al volver a ejecutarse, no una revision a ojo.
+      //
+      // El informe de conversaciones salia a CERO y sin dar un solo error.
+      botId = await crearBot(WS);
+      await pool.query(
+        `INSERT INTO workspace_chatbot_conversations
+           (chatbot_id, workspace_id, session_id, escalated, started_at)
+         VALUES ($1::uuid, $2, 'sesion-informe', TRUE, NOW() - interval '2 hours')`,
+        [botId, WS],
+      );
+
+      const { rows } = await pool.query<{ total: string; escalated: string }>(
+        `SELECT COUNT(*) AS total,
+                COUNT(*) FILTER (WHERE escalated) AS escalated
+           FROM workspace_chatbot_conversations
+          WHERE workspace_id = $1
+            AND started_at >= $2 AND started_at < $3`,
+        [WS, "2020-01-01", "2030-01-01"],
+      );
+      expect(Number(rows[0].total)).toBe(1);
+      expect(Number(rows[0].escalated)).toBe(1);
+    });
+
     it("la de AFINADO, que lee los mensajes (finetuning_service.py:232)", async () => {
       botId = await crearBot(WS);
       await pool.query(
