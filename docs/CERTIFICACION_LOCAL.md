@@ -108,20 +108,30 @@ producción diciendo `ok: true` sobre trabajo que ninguna IA hizo.
 ### Los 1.605 agentes sectoriales son distintos de verdad
 
 Ejecutados los 1.605 con la misma entrada y un modelo que sólo escucha:
-**1.521 medidos, 1.521 instrucciones distintas, cero parejas equivalentes.**
+**1.518 medidos, 1.518 instrucciones distintas, cero parejas equivalentes.**
 
 La sospecha razonable de que aquí hay «un agente copiado 1.605 veces» es
 **falsa**, y ahora está medida en vez de opinada. Consecuencia práctica: no hay
-nada que consolidar, y fusionarlos perdería 1.521 matices sectoriales.
+nada que consolidar, y fusionarlos perdería 1.518 matices sectoriales.
 
-### Las 55 sentencias de la migración 507, clasificadas
+### Las 55 sentencias de la migración 507, clasificadas **y arregladas**
 
-25 `NEEDS_REPAIR`, 17 `EXPECTED_IDEMPOTENT`, 8 candidatos a defecto,
-4 `LEGACY_COMPATIBILITY`, 1 sin clasificar. De los 8 candidatos,
-**5 confirmados a mano** como defectos reales.
+25 `NEEDS_REPAIR`, 19 `EXPECTED_IDEMPOTENT`, 5 `LEGACY_COMPATIBILITY`, 1 sin
+clasificar. Los **cinco defectos confirmados están arreglados** (migraciones 587
+y 588, más tres correcciones de código) y verificados en
+`backend/db/verificacion_manual_507.json`.
 
-El peor: `chatbot_conversations` tiene siete columnas y dos servicios vivos le
-piden seis que no existen. Esa consulta no ha devuelto un resultado nunca.
+El peor no era «faltan columnas»: eran **dos subsistemas de chatbot compartiendo
+una tabla**, con formas incompatibles y una clave ajena que hacía imposible
+arreglarlo añadiendo columnas.
+
+**Dos de los cinco se arreglaron sin tocar el esquema.** El dato ya existía con
+otro nombre; añadir la columna habría dejado dos fuentes para lo mismo.
+
+El clasificador sigue señalando esos pares porque el arreglo consistió
+precisamente en dejar de usar esa columna —ahora el código dice
+`(booking_date + booking_time) AS start_at`—. Por eso su salida se llama
+**candidatos a mirar**: el heurístico señala, la verificación decide.
 
 ### El índice que RLS ya exigía
 
@@ -168,7 +178,7 @@ Claude:
 | Qué | Por qué es suyo |
 |---|---|
 | **Dónde vive el modelo de IA** | decisión empresarial con coste recurrente. Sin ella, todo lo que exige IA real sigue en `UNAVAILABLE`, que es lo correcto pero no es lo útil |
-| **Aplicar las migraciones 578–586** | son migraciones productivas; ADR-064 exige aprobación auditable y la exige con razón |
+| **Aplicar las migraciones 578–589** | son migraciones productivas; ADR-064 exige aprobación auditable y la exige con razón |
 | **Desplegar** | acción productiva |
 | **Los 12 trabajos parados en producción** | ejecutarlos gasta dinero de clientes reales |
 | **Los tres servicios sin departamento** | `influencer_marketing_premium`, `canales_comunicaciones_premium` y `bots_premium` se prometen sin nadie que los haga. O se les asigna departamento o se dejan de ofrecer: las dos son decisiones de negocio |
