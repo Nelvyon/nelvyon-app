@@ -86,10 +86,21 @@ export async function resolverCliente(
   if (filas.length > 1) {
     return { encontrado: false, motivo: "ambiguo", candidatos: filas.length };
   }
-  return {
-    encontrado: true,
-    cliente: { workspaceId: filas[0].workspace_id, clientId: filas[0].id },
-  };
+
+  // SIN INQUILINO NO HAY RESOLUCIÓN.
+  //
+  // Una fila sin `workspace_id` utilizable no es un cliente medio resuelto: es
+  // una resolución que llevaría a consultar el cerebro sin inquilino. En un
+  // sistema aislado por inquilino eso o revienta o —bastante peor— devuelve lo
+  // que no debe. Se trata como «no existe», que es la verdad.
+  // `> 0` y no solo `isInteger`: `Number(null)` es 0, y 0 pasaba por entero
+  // perfectamente válido. Un inquilino cero no es un inquilino.
+  const ws = Number(filas[0].workspace_id);
+  if (!Number.isInteger(ws) || ws <= 0) {
+    return { encontrado: false, motivo: "no_existe", candidatos: 0 };
+  }
+
+  return { encontrado: true, cliente: { workspaceId: ws, clientId: filas[0].id } };
 }
 
 /**

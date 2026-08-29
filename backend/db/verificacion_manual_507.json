@@ -1,0 +1,114 @@
+{
+  "_lee_esto": [
+    "CONFIRMACION A MANO de los candidatos que el clasificador automatico marca",
+    "como REAL_DEFECT.",
+    "",
+    "POR QUE EXISTE ESTE FICHERO. El clasificador decide con una aproximacion:",
+    "busca la columna que falta cerca de donde se nombra la tabla. Esa",
+    "aproximacion se equivoco de cuatro formas distintas antes de estabilizarse",
+    "-fichero entero, ventana con comentarios, ventana sin comentarios,",
+    "variables locales del lenguaje anfitrion-, y no hay razon para creer que",
+    "ya no se equivoca. Lo que hace es SEÑALAR DONDE MIRAR.",
+    "",
+    "Lo de aqui esta mirado: se ha abierto el fichero, se ha leido la consulta",
+    "y se ha comparado con las columnas reales de la base construida desde",
+    "cero. Un candidato sin linea en este fichero es un candidato SIN",
+    "CONFIRMAR, y no cuenta como defecto.",
+    "",
+    "Se edita a mano. No lo regenera ningun script."
+  ],
+  "verificado_el": "2026-08-29",
+  "esquema_contrastado": "nelvyon_desdecero (477 migraciones desde cero, 723 tablas)",
+  "confirmados": [
+    {
+      "tabla": "bookings",
+      "columnas_ausentes": ["start_at"],
+      "columnas_reales_equivalentes": ["booking_date", "booking_time"],
+      "donde": "backend/services/booking_service.py:293",
+      "consulta": "SELECT * FROM bookings WHERE {where} ORDER BY start_at ASC",
+      "veredicto": "REAL_DEFECT",
+      "que_pasa": "el listado de reservas falla siempre: ordena por una columna que la tabla no tiene",
+      "arreglo_probable": "ordenar por booking_date, booking_time"
+    },
+    {
+      "tabla": "bookings",
+      "columnas_ausentes": ["zoom_meeting_id"],
+      "donde": "backend/services/booking_service.py:331",
+      "consulta": "UPDATE bookings SET status='completed' WHERE workspace_id=:ws AND zoom_meeting_id=:id",
+      "veredicto": "REAL_DEFECT",
+      "que_pasa": "el webhook de Zoom no puede cerrar ninguna reserva: filtra por una columna inexistente",
+      "arreglo_probable": "añadir la columna, o guardar la referencia de Zoom donde ya haya sitio"
+    },
+    {
+      "tabla": "crm_activities",
+      "columnas_ausentes": ["deal_id"],
+      "donde": "backend/services/crm_service.py:750-754",
+      "consulta": "SELECT COUNT(*) FROM crm_activities WHERE ... AND deal_id = CAST(:deal_id AS uuid)",
+      "veredicto": "REAL_DEFECT",
+      "que_pasa": "filtrar actividades por oportunidad falla; el writer del mismo fichero ya guarda deal_id dentro de metadata",
+      "arreglo_probable": "leer de metadata->>'deal_id', igual que se escribe"
+    },
+    {
+      "tabla": "chatbot_conversations",
+      "columnas_ausentes": [
+        "workspace_id", "started_at", "last_message_at",
+        "visitor_info", "lead_captured", "satisfaction"
+      ],
+      "columnas_reales": [
+        "id", "chatbot_id", "session_id", "messages",
+        "captured_lead", "escalated", "created_at"
+      ],
+      "donde": "backend/services/chatbot_service.py:537-543",
+      "consulta": "SELECT id, session_id, visitor_info, lead_captured, escalated, satisfaction, started_at, last_message_at ... FROM chatbot_conversations WHERE chatbot_id=... AND workspace_id=:ws ORDER BY last_message_at DESC",
+      "veredicto": "REAL_DEFECT",
+      "gravedad": "la mas alta de las cinco",
+      "que_pasa": [
+        "La tabla tiene SIETE columnas. Esta consulta pide SEIS que no existen.",
+        "No puede haber devuelto un resultado nunca. Y `lead_captured` frente a",
+        "`captured_lead` no es un descuido de esta consulta: son dos nombres para",
+        "lo mismo, lo que dice que hay dos definiciones de esta tabla circulando.",
+        "",
+        "Es exactamente el patron que ya costo caro: la 507 declaraba una forma,",
+        "las migraciones construyeron otra, y nadie se entero porque el aplicador",
+        "callaba y la pantalla que lo usa se visita poco."
+      ],
+      "arreglo_probable": "decidir cual es la definicion buena y migrar la consulta o la tabla; no las dos a medias"
+    },
+    {
+      "tabla": "chatbot_conversations",
+      "columnas_ausentes": ["workspace_id", "visitor_info"],
+      "donde": "backend/services/cdp_service.py:303",
+      "consulta": "SELECT COUNT(*) FROM chatbot_conversations WHERE workspace_id=:ws AND lower(COALESCE(visitor_info->>'email','')) = :uid",
+      "veredicto": "REAL_DEFECT",
+      "que_pasa": "el perfil unificado de cliente cuenta conversaciones con una consulta que no puede ejecutarse",
+      "arreglo_probable": "el mismo que el anterior; los dos dependen de la misma decision"
+    }
+  ],
+  "descartados": [
+    {
+      "tabla": "webhook_deliveries",
+      "columna": "endpoint_id",
+      "candidato_de": "backend/services/webhook_service.py:378",
+      "veredicto": "FALSO POSITIVO",
+      "por_que": [
+        "El INSERT usa `webhook_id`, que si existe. `endpoint_id` aparece cerca",
+        "por dos motivos, ninguno de ellos una consulta: un comentario que",
+        "explica que este defecto YA se arreglo, y una variable de Python del",
+        "mismo fichero que se llama igual.",
+        "",
+        "Contar la nota del arreglo como el fallo es el error opuesto al que",
+        "este trabajo persigue, y merece quedar escrito igual."
+      ]
+    },
+    {
+      "tabla": "calendar_events",
+      "columnas": ["workspace_id", "start_time", "user_id"],
+      "veredicto": "LEGACY_COMPATIBILITY",
+      "por_que": [
+        "Medio arbol consulta `calendar_events`, pero por `tenant_id`,",
+        "`event_date` y `start_at`, que existen todas. Las columnas de la 507",
+        "son de una forma anterior del esquema que ya no usa nadie."
+      ]
+    }
+  ]
+}

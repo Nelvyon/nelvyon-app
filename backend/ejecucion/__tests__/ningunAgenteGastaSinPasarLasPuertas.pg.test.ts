@@ -21,6 +21,7 @@
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import pg from "pg";
 
+import { MotorDeCalidad } from "../../calidad/MotorDeCalidad";
 import { CATALOGO } from "../../agentes/catalogo";
 import type { ContratoDeAgente } from "../../agentes/contratoDeAgente";
 import { GuardaDeGasto } from "../../gasto/guardaDeGasto";
@@ -74,12 +75,30 @@ const copywriter = (): ContratoDeAgente => CATALOGO.find((a) => a.id === "copywr
 /** Un agente que publica en nombre del cliente: exige persona. */
 const social = (): ContratoDeAgente => CATALOGO.find((a) => a.id === "social-media")!;
 
+/**
+ * Una pieza que pasa calidad sin un solo aviso.
+ *
+ * Va por defecto en `accion()` A PROPOSITO: las pruebas de las puertas 1, 2, 5,
+ * 6 y 7 no deben fallar por un problema de contenido, o dejarian de probar lo
+ * que dicen probar. La puerta 3 tiene su propio bloque, con sus piezas malas.
+ */
+const piezaLimpia = () => ({
+  dominio: "ads",
+  autor: "planificador-de-medios",
+  contenido: {
+    urlDestino: "https://cliente-real.es/oferta",
+    presupuestoDiarioCents: 5_000,
+    negativas: ["gratis", "empleo"],
+  },
+});
+
 function accion(extra: Partial<AccionPropuesta> = {}): AccionPropuesta {
   return {
     ejecutor: "meta_ads",
     operacion: "crear_campana",
     consecuencias: ["gasta_dinero"],
     argumentos: { nombre: "campaña de prueba" },
+    pieza: piezaLimpia(),
     tenantId: TENANT,
     workspaceId: WS,
     serviceId: SERVICIO,
@@ -133,7 +152,7 @@ conBase("el puente de ejecución", () => {
     aprobadas = new Set();
     solicitadas = [];
     meta = new EjecutorSimulado("meta_ads");
-    puente = new PuenteDeEjecucion(guarda, registroDeAprobaciones(), () => {});
+    puente = new PuenteDeEjecucion(guarda, registroDeAprobaciones(), () => {}, new MotorDeCalidad());
     puente.registrarEjecutor(meta);
   });
 
@@ -218,7 +237,156 @@ conBase("el puente de ejecución", () => {
   });
 
   // ═════════════════════════════════════════════════════════════════════════
-  describe("puerta 3 · la autorización de gasto", () => {
+  describe("puerta 3 · la calidad de lo que sale", () => {
+    it("una campaña con una promesa que no se puede sostener NO sale", async () => {
+      await autorizarGasto();
+      const r = await puente.cruzar(planificador(), accion({
+        pieza: {
+          dominio: "ads",
+          autor: "planificador-de-medios",
+          contenido: {
+            urlDestino: "https://cliente-real.es/oferta",
+            presupuestoDiarioCents: 5_000,
+            titular: "Te garantizamos el primer puesto en Google",
+          },
+        },
+      }));
+
+      expect(r.estado).toBe("denegado");
+      if (r.estado === "denegado") expect(r.puerta).toBe("calidad");
+      expect(meta.llamadas, "se llamó al ejecutor pese a suspender calidad").toHaveLength(0);
+    });
+
+    it("y NO llega a reservar presupuesto", async () => {
+      // Por esto la puerta va antes que la de gasto: una reserva colgando por
+      // algo que nunca debió salir es dinero comprometido de un cliente.
+      await autorizarGasto();
+      await puente.cruzar(planificador(), accion({
+        pieza: {
+          dominio: "ads",
+          autor: "planificador-de-medios",
+          contenido: { urlDestino: "https://x.es", presupuestoDiarioCents: 5_000,
+                       titular: "Resultados inmediatos garantizados" },
+        },
+      }));
+
+      const { rows } = await pool.query(
+        `SELECT 1 FROM gastos_ejecutados WHERE workspace_id = $1`, [WS],
+      );
+      expect(rows).toHaveLength(0);
+    });
+
+    it("NO SE PUEDE ESQUIVAR dejando de adjuntar la pieza", async () => {
+      // El fallo evidente de un revisor opcional: saltárselo es tan barato como
+      // no darle nada que mirar. Sin pieza, se deniega.
+      await autorizarGasto();
+      const a = accion();
+      delete (a as { pieza?: unknown }).pieza;
+
+      const r = await puente.cruzar(planificador(), a);
+      expect(r.estado).toBe("denegado");
+      if (r.estado === "denegado") expect(r.puerta).toBe("calidad");
+      expect(meta.llamadas).toHaveLength(0);
+    });
+
+    it("NI montando el puente sin motor de calidad", async () => {
+      // Un puente sin revisor no es más permisivo: es uno que no puede afirmar
+      // que revisó, y por tanto no deja salir nada hacia fuera.
+      await autorizarGasto();
+      const sinMotor = new PuenteDeEjecucion(guarda, registroDeAprobaciones(), () => {});
+      sinMotor.registrarEjecutor(meta);
+
+      const r = await sinMotor.cruzar(planificador(), accion());
+      expect(r.estado).toBe("denegado");
+      if (r.estado === "denegado") expect(r.puerta).toBe("calidad");
+      expect(meta.llamadas).toHaveLength(0);
+    });
+
+    it("EL CONTROL POSITIVO: una pieza impecable SÍ pasa y se ejecuta", async () => {
+      await autorizarGasto();
+      const r = await puente.cruzar(planificador(), accion());
+      expect(r.estado).toBe("ejecutado");
+      expect(meta.llamadas).toHaveLength(1);
+    });
+
+    it("una acción SIN consecuencias hacia fuera no necesita pieza", async () => {
+      // Leer datos personales no publica ni gasta. Exigir revisión de contenido
+      // ahí sería ruido, y el ruido es cómo un revisor deja de usarse.
+      const a = accion({ consecuencias: ["toca_datos_personales"], importeCents: 0 });
+      delete (a as { pieza?: unknown }).pieza;
+
+      const r = await puente.cruzar(planificador(), a);
+      expect(r.estado).toBe("ejecutado");
+    });
+
+    it("lo que calidad no puede juzgar sola va a una persona, no a ejecución", async () => {
+      // AISLADO A PROPÓSITO. La primera versión de esta prueba usaba
+      // `contacta_personas`, que ya exige persona en la puerta 2: pasaba sin
+      // que la puerta 3 hiciera nada, y una mutación que borraba esta rama no
+      // la detectaba.
+      //
+      // Aquí se usa `gasta_dinero` con el planificador, que es L4: la puerta 2
+      // NO pide aprobación. Si la acción acaba esperando a una persona, es
+      // porque la ha parado calidad y sólo calidad.
+      await autorizarGasto();
+      const a = accion({
+        pieza: {
+          dominio: "copy",
+          autor: "copywriter",
+          riesgo: "alto",
+          contenido: { titular: "Un titular perfectamente correcto" },
+        },
+      });
+
+      const r = await puente.cruzar(planificador(), a);
+      expect(r.estado).toBe("espera_aprobacion");
+      expect(meta.llamadas).toHaveLength(0);
+      expect(solicitadas).toContain(a.idempotencyKey);
+    });
+
+    it("y con la persona ya aprobándolo, esa MISMA acción sí se ejecuta", async () => {
+      // El control positivo del camino anterior: REVIEW_REQUIRED no es un no
+      // permanente, es un «que lo mire alguien».
+      await autorizarGasto();
+      const a = accion({
+        pieza: {
+          dominio: "copy",
+          autor: "copywriter",
+          riesgo: "alto",
+          contenido: { titular: "Un titular perfectamente correcto" },
+        },
+      });
+      aprobadas.add(a.idempotencyKey);
+
+      const r = await puente.cruzar(planificador(), a);
+      expect(r.estado).toBe("ejecutado");
+    });
+
+    it("una pieza que se declara autora de la identidad del revisor se DENIEGA", async () => {
+      // La suplantación: si una pieza dice venir del revisor, el revisor sería
+      // su propio autor y la independencia desaparece. Se deniega, y —esto es
+      // lo que la primera versión no hacía— se deniega en vez de reventar: un
+      // «no te dejo» es una respuesta, no una avería.
+      await autorizarGasto();
+      const r = await puente.cruzar(planificador(), accion({
+        pieza: { ...piezaLimpia(), autor: "qa:planificador-de-medios" },
+      }));
+      expect(r.estado).toBe("denegado");
+      if (r.estado === "denegado") expect(r.puerta).toBe("calidad");
+      expect(meta.llamadas).toHaveLength(0);
+    });
+
+    it("EL CONTROL: con el autor normal, el revisor es otro y pasa", async () => {
+      await autorizarGasto();
+      const r = await puente.cruzar(planificador(), accion({
+        pieza: { ...piezaLimpia(), autor: "planificador-de-medios" },
+      }));
+      expect(r.estado).toBe("ejecutado");
+    });
+  });
+
+  // ═════════════════════════════════════════════════════════════════════════
+  describe("puerta 5 · la autorización de gasto", () => {
     it("sin autorización NO se gasta, y NO se llama al ejecutor", async () => {
       const r = await puente.cruzar(planificador(), accion());
       expect(r.estado).toBe("denegado");
@@ -264,7 +432,7 @@ conBase("el puente de ejecución", () => {
   });
 
   // ═════════════════════════════════════════════════════════════════════════
-  describe("puerta 4 · idempotencia", () => {
+  describe("puerta 6 · idempotencia", () => {
     it("LA GARANTÍA: un reintento con la misma clave NO lanza dos campañas", async () => {
       await autorizarGasto();
       const a = accion();
@@ -301,7 +469,7 @@ conBase("el puente de ejecución", () => {
       // Cobrarle a un cliente por algo que no ocurrió es cobrarle por nada.
       await autorizarGasto({ presupuesto: 100_000, topeOperacion: 50_000 });
       const roto = new EjecutorSimulado("meta_ads", "falla");
-      const p = new PuenteDeEjecucion(guarda, registroDeAprobaciones(), () => {});
+      const p = new PuenteDeEjecucion(guarda, registroDeAprobaciones(), () => {}, new MotorDeCalidad());
       p.registrarEjecutor(roto);
 
       const r = await p.cruzar(planificador(), accion({ importeCents: 30_000 }));
@@ -317,7 +485,7 @@ conBase("el puente de ejecución", () => {
     it("y el gasto queda registrado como fallido, no borrado", async () => {
       await autorizarGasto();
       const roto = new EjecutorSimulado("meta_ads", "falla");
-      const p = new PuenteDeEjecucion(guarda, registroDeAprobaciones(), () => {});
+      const p = new PuenteDeEjecucion(guarda, registroDeAprobaciones(), () => {}, new MotorDeCalidad());
       p.registrarEjecutor(roto);
       await p.cruzar(planificador(), accion());
 

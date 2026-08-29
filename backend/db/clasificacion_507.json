@@ -1,0 +1,682 @@
+{
+  "_lee_esto": [
+    "Clasificacion de las 55 sentencias que la migracion 507 no aplica.",
+    "",
+    "Medido contra el esquema construido DESDE CERO con las 477 migraciones,",
+    "no contra lo que dice el fichero de la 507. Y contra el codigo vivo del",
+    "arbol, para saber si a alguien le hace falta lo que falta.",
+    "",
+    "Lo unico que hay que mirar con prisa es REAL_DEFECT: son objetos que no",
+    "existen y que el codigo consulta. El resto esta explicado y acotado.",
+    "",
+    "DESCONOCIDO no es una clase: es la ausencia de una. Nunca cuenta como",
+    "resuelto.",
+    "",
+    "Se regenera con scripts/clasificar-las-55-omisiones-de-la-507.mjs"
+  ],
+  "generado": "2026-08-29T10:18:36.810Z",
+  "esquemaMedido": {
+    "base": "nelvyon_desdecero",
+    "tablas": 723,
+    "indices": 2339
+  },
+  "total": 55,
+  "cuenta": {
+    "LEGACY_COMPATIBILITY": 4,
+    "NEEDS_REPAIR": 25,
+    "REAL_DEFECT": 8,
+    "EXPECTED_IDEMPOTENT": 17,
+    "DESCONOCIDO": 1
+  },
+  "resultados": [
+    {
+      "id": "a59e3ace9fa1fa54",
+      "code": "42703",
+      "sentencia": "ALTER TABLE calendar_events ALTER COLUMN start_time DROP NOT NULL",
+      "motivoOriginal": "column \"start_time\" of relation \"calendar_events\" does not exist",
+      "clase": "LEGACY_COMPATIBILITY",
+      "porQue": "calendar_events existe sin start_time. La tabla sí se consulta, pero por otras columnas: la 507 habla de una forma anterior del esquema"
+    },
+    {
+      "id": "f470d648cbd2affb",
+      "code": "42703",
+      "sentencia": "ALTER TABLE calendar_events ALTER COLUMN user_id DROP NOT NULL",
+      "motivoOriginal": "column \"user_id\" of relation \"calendar_events\" does not exist",
+      "clase": "LEGACY_COMPATIBILITY",
+      "porQue": "calendar_events existe sin user_id. La tabla sí se consulta, pero por otras columnas: la 507 habla de una forma anterior del esquema"
+    },
+    {
+      "id": "770bcc2969ec03c2",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS ab_experiments_workspace_idx ON ab_experiments (workspace_id, status)",
+      "motivoOriginal": "column \"workspace_id\" does not exist",
+      "clase": "NEEDS_REPAIR",
+      "impacto": "rendimiento",
+      "porQue": "ab_experiments y sus columnas existen; falta sólo el índice ab_experiments_workspace_idx, y la tabla se consulta",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/os-agents/ab-testing/AbTestingService.ts:104:      `INSERT INTO ab_experiments (user_id, name, channel, status, winner_variant, confidence_threshold, created_at, updated_at)",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/os-agents/ab-testing/AbTestingService.ts:138:      `UPDATE ab_experiments e",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/os-agents/ab-testing/AbTestingService.ts:149:       FROM ab_experiments WHERE id = $1::uuid LIMIT 1`,"
+      ]
+    },
+    {
+      "id": "8b88091e36142db0",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS affiliate_clicks_affiliate_idx ON affiliate_clicks (affiliate_id, created_at DESC)",
+      "motivoOriginal": "column \"affiliate_id\" does not exist",
+      "clase": "LEGACY_COMPATIBILITY",
+      "porQue": "affiliate_clicks existe sin created_at. La tabla sí se consulta, pero por otras columnas: la 507 habla de una forma anterior del esquema"
+    },
+    {
+      "id": "804a3676527d26a0",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS api_keys_workspace_idx ON api_keys (workspace_id)",
+      "motivoOriginal": "column \"workspace_id\" does not exist",
+      "clase": "NEEDS_REPAIR",
+      "impacto": "rendimiento",
+      "porQue": "api_keys y sus columnas existen; falta sólo el índice api_keys_workspace_idx, y la tabla se consulta",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/saas/SaasApiKeysService.ts:82:       FROM api_keys WHERE tenant_id=$1 AND revoked_at IS NULL ORDER BY created_at DESC`,",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/saas/SaasApiKeysService.ts:97:      `INSERT INTO api_keys (tenant_id, name, key_hash, key_prefix, scopes, active, expires_at, created_by)",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/saas/SaasApiKeysService.ts:108:      `UPDATE api_keys SET active=FALSE, revoked_at=NOW() WHERE tenant_id=$1 AND id=$2 AND revoked_at IS NULL RETURNING id`,"
+      ]
+    },
+    {
+      "id": "e56e5ef4bb87df4f",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS bookings_workspace_idx ON bookings (workspace_id)",
+      "motivoOriginal": "column \"workspace_id\" does not exist",
+      "clase": "NEEDS_REPAIR",
+      "impacto": "rendimiento",
+      "porQue": "bookings y sus columnas existen; falta sólo el índice bookings_workspace_idx, y la tabla se consulta",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/apps/web/src/lib/packs/localPackCeoMetrics.ts:253:       FROM bookings",
+        "C:\\Users\\Daniel\\nelvyon-w3/apps/web/src/lib/packs/localPackCeoMetrics.ts:262:       FROM bookings",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/saas/BookingService.ts:292:       FROM bookings"
+      ]
+    },
+    {
+      "id": "2d52dd0a9432d076",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS bookings_workspace_start_idx ON bookings (workspace_id, start_at)",
+      "motivoOriginal": "column \"workspace_id\" does not exist",
+      "clase": "REAL_DEFECT",
+      "impacto": "correccion",
+      "confianza": "aproximada: tabla y columna aparecen en el mismo fichero",
+      "porQue": "a bookings le falta start_at, y hay código que la nombra",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/booking_service.py:136",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/booking_service.py:293",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/booking_service.py:301"
+      ]
+    },
+    {
+      "id": "89b47d98db088b07",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS bookings_workspace_status_idx ON bookings (workspace_id, status)",
+      "motivoOriginal": "column \"workspace_id\" does not exist",
+      "clase": "NEEDS_REPAIR",
+      "impacto": "rendimiento",
+      "porQue": "bookings y sus columnas existen; falta sólo el índice bookings_workspace_status_idx, y la tabla se consulta",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/apps/web/src/lib/packs/localPackCeoMetrics.ts:253:       FROM bookings",
+        "C:\\Users\\Daniel\\nelvyon-w3/apps/web/src/lib/packs/localPackCeoMetrics.ts:262:       FROM bookings",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/saas/BookingService.ts:292:       FROM bookings"
+      ]
+    },
+    {
+      "id": "0ecb2a896f87159a",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS bookings_zoom_meeting_idx ON bookings (zoom_meeting_id) WHERE zoom_meeting_id IS NOT NULL",
+      "motivoOriginal": "column \"zoom_meeting_id\" does not exist",
+      "clase": "REAL_DEFECT",
+      "impacto": "correccion",
+      "confianza": "aproximada: tabla y columna aparecen en el mismo fichero",
+      "porQue": "a bookings le falta zoom_meeting_id, y hay código que la nombra",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/booking_service.py:331"
+      ]
+    },
+    {
+      "id": "ffa00a6445fd7d22",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS calendar_events_ws_start_at_idx ON calendar_events (workspace_id, start_at)",
+      "motivoOriginal": "column \"workspace_id\" does not exist",
+      "clase": "LEGACY_COMPATIBILITY",
+      "porQue": "calendar_events existe sin workspace_id. La tabla sí se consulta, pero por otras columnas: la 507 habla de una forma anterior del esquema"
+    },
+    {
+      "id": "64fb2a7cdf3fffdb",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS chatbot_conversations_bot_idx ON chatbot_conversations (chatbot_id, last_message_at DESC)",
+      "motivoOriginal": "column \"last_message_at\" does not exist",
+      "clase": "REAL_DEFECT",
+      "impacto": "correccion",
+      "confianza": "aproximada: tabla y columna aparecen en el mismo fichero",
+      "porQue": "a chatbot_conversations le falta last_message_at, y hay código que la nombra",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/chatbot_service.py:541",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/finetuning_service.py:232"
+      ]
+    },
+    {
+      "id": "edbb028d2ad16caa",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS chatbot_conversations_workspace_idx ON chatbot_conversations (workspace_id, started_at DESC)",
+      "motivoOriginal": "column \"workspace_id\" does not exist",
+      "clase": "REAL_DEFECT",
+      "impacto": "correccion",
+      "confianza": "aproximada: tabla y columna aparecen en el mismo fichero",
+      "porQue": "a chatbot_conversations le falta workspace_id, started_at, y hay código que la nombra",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/cdp_service.py:303",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/chatbot_service.py:216",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/chatbot_service.py:447"
+      ]
+    },
+    {
+      "id": "4a2ebd34edb98963",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS crm_activities_deal_idx ON crm_activities (deal_id)",
+      "motivoOriginal": "column \"deal_id\" does not exist",
+      "clase": "REAL_DEFECT",
+      "impacto": "correccion",
+      "confianza": "aproximada: tabla y columna aparecen en el mismo fichero",
+      "porQue": "a crm_activities le falta deal_id, y hay código que la nombra",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/crm_service.py:754"
+      ]
+    },
+    {
+      "id": "3e89a8f638b3d668",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS crm_activities_workspace_idx ON crm_activities (workspace_id)",
+      "motivoOriginal": "column \"workspace_id\" does not exist",
+      "clase": "NEEDS_REPAIR",
+      "impacto": "rendimiento",
+      "porQue": "crm_activities y sus columnas existen; falta sólo el índice crm_activities_workspace_idx, y la tabla se consulta",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/os-agents/crm/CrmService.ts:183:      `INSERT INTO crm_activities (contact_id, user_id, type, summary, agent_id, metadata)",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/os-agents/crm/CrmService.ts:204:       FROM crm_activities a",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/os-agents/crm/CrmService.ts:215:      `SELECT type, COUNT(*)::text AS c FROM crm_activities WHERE contact_id = $1::uuid GROUP BY type`,"
+      ]
+    },
+    {
+      "id": "34ba6b14a002d72d",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS crm_contacts_email_idx ON crm_contacts (workspace_id, lower(email))",
+      "motivoOriginal": "column \"workspace_id\" does not exist",
+      "clase": "NEEDS_REPAIR",
+      "impacto": "rendimiento",
+      "porQue": "crm_contacts y sus columnas existen; falta sólo el índice crm_contacts_email_idx, y la tabla se consulta",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/os-agents/crm/CrmService.ts:79:        `UPDATE crm_contacts SET",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/os-agents/crm/CrmService.ts:113:      `INSERT INTO crm_contacts (user_id, name, email, phone, company, industry, stage, tags, notes, metadata, updated_at)",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/os-agents/crm/CrmService.ts:155:      FROM crm_contacts WHERE ${conds.join(\" AND \")} ORDER BY updated_at DESC`;"
+      ]
+    },
+    {
+      "id": "c5a0f4073ccab68e",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS crm_contacts_score_idx ON crm_contacts (workspace_id, score DESC)",
+      "motivoOriginal": "column \"workspace_id\" does not exist",
+      "clase": "NEEDS_REPAIR",
+      "impacto": "rendimiento",
+      "porQue": "crm_contacts y sus columnas existen; falta sólo el índice crm_contacts_score_idx, y la tabla se consulta",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/os-agents/crm/CrmService.ts:79:        `UPDATE crm_contacts SET",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/os-agents/crm/CrmService.ts:113:      `INSERT INTO crm_contacts (user_id, name, email, phone, company, industry, stage, tags, notes, metadata, updated_at)",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/os-agents/crm/CrmService.ts:155:      FROM crm_contacts WHERE ${conds.join(\" AND \")} ORDER BY updated_at DESC`;"
+      ]
+    },
+    {
+      "id": "7773f056f3be837d",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS crm_contacts_workspace_idx ON crm_contacts (workspace_id)",
+      "motivoOriginal": "column \"workspace_id\" does not exist",
+      "clase": "NEEDS_REPAIR",
+      "impacto": "rendimiento",
+      "porQue": "crm_contacts y sus columnas existen; falta sólo el índice crm_contacts_workspace_idx, y la tabla se consulta",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/os-agents/crm/CrmService.ts:79:        `UPDATE crm_contacts SET",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/os-agents/crm/CrmService.ts:113:      `INSERT INTO crm_contacts (user_id, name, email, phone, company, industry, stage, tags, notes, metadata, updated_at)",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/os-agents/crm/CrmService.ts:155:      FROM crm_contacts WHERE ${conds.join(\" AND \")} ORDER BY updated_at DESC`;"
+      ]
+    },
+    {
+      "id": "91c24b44fb2a9d11",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS idx_bookings_ws_created ON bookings (workspace_id, created_at DESC)",
+      "motivoOriginal": "column \"workspace_id\" does not exist",
+      "clase": "NEEDS_REPAIR",
+      "impacto": "rendimiento",
+      "porQue": "bookings y sus columnas existen; falta sólo el índice idx_bookings_ws_created, y la tabla se consulta",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/apps/web/src/lib/packs/localPackCeoMetrics.ts:253:       FROM bookings",
+        "C:\\Users\\Daniel\\nelvyon-w3/apps/web/src/lib/packs/localPackCeoMetrics.ts:262:       FROM bookings",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/saas/BookingService.ts:292:       FROM bookings"
+      ]
+    },
+    {
+      "id": "56f16aba950ed478",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS idx_bookings_ws_status ON bookings (workspace_id, status)",
+      "motivoOriginal": "column \"workspace_id\" does not exist",
+      "clase": "NEEDS_REPAIR",
+      "impacto": "rendimiento",
+      "porQue": "bookings y sus columnas existen; falta sólo el índice idx_bookings_ws_status, y la tabla se consulta",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/apps/web/src/lib/packs/localPackCeoMetrics.ts:253:       FROM bookings",
+        "C:\\Users\\Daniel\\nelvyon-w3/apps/web/src/lib/packs/localPackCeoMetrics.ts:262:       FROM bookings",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/saas/BookingService.ts:292:       FROM bookings"
+      ]
+    },
+    {
+      "id": "35020fbb3bb48158",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS idx_crm_activities_ws_created ON crm_activities (workspace_id, created_at DESC)",
+      "motivoOriginal": "column \"workspace_id\" does not exist",
+      "clase": "NEEDS_REPAIR",
+      "impacto": "rendimiento",
+      "porQue": "crm_activities y sus columnas existen; falta sólo el índice idx_crm_activities_ws_created, y la tabla se consulta",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/os-agents/crm/CrmService.ts:183:      `INSERT INTO crm_activities (contact_id, user_id, type, summary, agent_id, metadata)",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/os-agents/crm/CrmService.ts:204:       FROM crm_activities a",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/os-agents/crm/CrmService.ts:215:      `SELECT type, COUNT(*)::text AS c FROM crm_activities WHERE contact_id = $1::uuid GROUP BY type`,"
+      ]
+    },
+    {
+      "id": "b7b7bc202ef32837",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS idx_crm_contacts_ws_created ON crm_contacts (workspace_id, created_at DESC)",
+      "motivoOriginal": "column \"workspace_id\" does not exist",
+      "clase": "NEEDS_REPAIR",
+      "impacto": "rendimiento",
+      "porQue": "crm_contacts y sus columnas existen; falta sólo el índice idx_crm_contacts_ws_created, y la tabla se consulta",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/os-agents/crm/CrmService.ts:79:        `UPDATE crm_contacts SET",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/os-agents/crm/CrmService.ts:113:      `INSERT INTO crm_contacts (user_id, name, email, phone, company, industry, stage, tags, notes, metadata, updated_at)",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/os-agents/crm/CrmService.ts:155:      FROM crm_contacts WHERE ${conds.join(\" AND \")} ORDER BY updated_at DESC`;"
+      ]
+    },
+    {
+      "id": "c227bdc01ce5d89e",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS idx_invoices_ws_created ON invoices (workspace_id, created_at DESC)",
+      "motivoOriginal": "column \"workspace_id\" does not exist",
+      "clase": "NEEDS_REPAIR",
+      "impacto": "rendimiento",
+      "porQue": "invoices y sus columnas existen; falta sólo el índice idx_invoices_ws_created, y la tabla se consulta",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/saas/SaasCpqEnterpriseService.ts:358:       JOIN invoices i ON i.id = d.invoice_id",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/saas/SaasCpqEnterpriseService.ts:413:         FROM invoices WHERE tenant_id=$1 AND status='overdue'`,",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/saas/SaasCpqEnterpriseService.ts:418:         JOIN invoices i ON i.id = d.invoice_id"
+      ]
+    },
+    {
+      "id": "91daa72bf1955156",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS idx_invoices_ws_status ON invoices (workspace_id, status)",
+      "motivoOriginal": "column \"workspace_id\" does not exist",
+      "clase": "NEEDS_REPAIR",
+      "impacto": "rendimiento",
+      "porQue": "invoices y sus columnas existen; falta sólo el índice idx_invoices_ws_status, y la tabla se consulta",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/saas/SaasCpqEnterpriseService.ts:358:       JOIN invoices i ON i.id = d.invoice_id",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/saas/SaasCpqEnterpriseService.ts:413:         FROM invoices WHERE tenant_id=$1 AND status='overdue'`,",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/saas/SaasCpqEnterpriseService.ts:418:         JOIN invoices i ON i.id = d.invoice_id"
+      ]
+    },
+    {
+      "id": "daa1a6c6b3020a37",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS idx_qr_codes_ws_created ON qr_codes (workspace_id, created_at DESC)",
+      "motivoOriginal": "column \"workspace_id\" does not exist",
+      "clase": "NEEDS_REPAIR",
+      "impacto": "rendimiento",
+      "porQue": "qr_codes y sus columnas existen; falta sólo el índice idx_qr_codes_ws_created, y la tabla se consulta",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/saas/SaasSurveysService.ts:229:      `SELECT ${QR_SEL} FROM qr_codes WHERE tenant_id=$1 ORDER BY created_at DESC`,",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/saas/SaasSurveysService.ts:237:      `SELECT ${QR_SEL} FROM qr_codes WHERE id=$1::uuid AND tenant_id=$2`,",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/saas/SaasSurveysService.ts:247:      `INSERT INTO qr_codes (tenant_id, name, destination_url, color, bg_color)"
+      ]
+    },
+    {
+      "id": "54627189cdd86e13",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS idx_webhook_deliveries_endpoint ON webhook_deliveries (endpoint_id, created_at DESC)",
+      "motivoOriginal": "column \"endpoint_id\" does not exist",
+      "clase": "REAL_DEFECT",
+      "impacto": "correccion",
+      "confianza": "aproximada: tabla y columna aparecen en el mismo fichero",
+      "porQue": "a webhook_deliveries le falta endpoint_id, y hay código que la nombra",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/webhook_service.py:378",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/webhook_service.py:443",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/webhook_service.py:488"
+      ]
+    },
+    {
+      "id": "62777f9b12462279",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS invoices_workspace_created_idx ON invoices (workspace_id, created_at DESC)",
+      "motivoOriginal": "column \"workspace_id\" does not exist",
+      "clase": "NEEDS_REPAIR",
+      "impacto": "rendimiento",
+      "porQue": "invoices y sus columnas existen; falta sólo el índice invoices_workspace_created_idx, y la tabla se consulta",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/saas/SaasCpqEnterpriseService.ts:358:       JOIN invoices i ON i.id = d.invoice_id",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/saas/SaasCpqEnterpriseService.ts:413:         FROM invoices WHERE tenant_id=$1 AND status='overdue'`,",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/saas/SaasCpqEnterpriseService.ts:418:         JOIN invoices i ON i.id = d.invoice_id"
+      ]
+    },
+    {
+      "id": "fd497ad01313d7b1",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS invoices_workspace_status_idx ON invoices (workspace_id, status)",
+      "motivoOriginal": "column \"workspace_id\" does not exist",
+      "clase": "NEEDS_REPAIR",
+      "impacto": "rendimiento",
+      "porQue": "invoices y sus columnas existen; falta sólo el índice invoices_workspace_status_idx, y la tabla se consulta",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/saas/SaasCpqEnterpriseService.ts:358:       JOIN invoices i ON i.id = d.invoice_id",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/saas/SaasCpqEnterpriseService.ts:413:         FROM invoices WHERE tenant_id=$1 AND status='overdue'`,",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/saas/SaasCpqEnterpriseService.ts:418:         JOIN invoices i ON i.id = d.invoice_id"
+      ]
+    },
+    {
+      "id": "51d68cdfcbb030de",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS qr_codes_workspace_idx ON qr_codes (workspace_id, created_at DESC)",
+      "motivoOriginal": "column \"workspace_id\" does not exist",
+      "clase": "NEEDS_REPAIR",
+      "impacto": "rendimiento",
+      "porQue": "qr_codes y sus columnas existen; falta sólo el índice qr_codes_workspace_idx, y la tabla se consulta",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/saas/SaasSurveysService.ts:229:      `SELECT ${QR_SEL} FROM qr_codes WHERE tenant_id=$1 ORDER BY created_at DESC`,",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/saas/SaasSurveysService.ts:237:      `SELECT ${QR_SEL} FROM qr_codes WHERE id=$1::uuid AND tenant_id=$2`,",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/saas/SaasSurveysService.ts:247:      `INSERT INTO qr_codes (tenant_id, name, destination_url, color, bg_color)"
+      ]
+    },
+    {
+      "id": "a88b54943c7823b4",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS webhook_deliveries_endpoint_idx ON webhook_deliveries (endpoint_id, created_at DESC)",
+      "motivoOriginal": "column \"endpoint_id\" does not exist",
+      "clase": "REAL_DEFECT",
+      "impacto": "correccion",
+      "confianza": "aproximada: tabla y columna aparecen en el mismo fichero",
+      "porQue": "a webhook_deliveries le falta endpoint_id, y hay código que la nombra",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/webhook_service.py:378",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/webhook_service.py:443",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/webhook_service.py:488"
+      ]
+    },
+    {
+      "id": "945b914c16ede14b",
+      "code": "42703",
+      "sentencia": "CREATE INDEX IF NOT EXISTS webhook_deliveries_retry_idx ON webhook_deliveries (status, next_retry_at) WHERE status IN ('",
+      "motivoOriginal": "column \"status\" does not exist",
+      "clase": "REAL_DEFECT",
+      "impacto": "correccion",
+      "confianza": "aproximada: tabla y columna aparecen en el mismo fichero",
+      "porQue": "a webhook_deliveries le falta status, y hay código que la nombra",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/webhook_service.py:339",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/webhook_service.py:488"
+      ]
+    },
+    {
+      "id": "44dae8df39265a76",
+      "code": "42703",
+      "sentencia": "CREATE POLICY ab_experiments_tenant ON ab_experiments FOR ALL USING (workspace_id = current_tenant_id()) WITH CHECK (wor",
+      "motivoOriginal": "column \"workspace_id\" does not exist",
+      "clase": "EXPECTED_IDEMPOTENT",
+      "porQue": "ab_experiments existe en el esquema final; la 507 se adelantó a la migración que la crea",
+      "revisarAparte": "comprobar que ab_experiments acabe con RLS activo"
+    },
+    {
+      "id": "17034cde3c988c3f",
+      "code": "42703",
+      "sentencia": "CREATE POLICY ab_variants_tenant ON ab_variants FOR ALL USING (workspace_id = current_tenant_id()) WITH CHECK (workspace",
+      "motivoOriginal": "column \"workspace_id\" does not exist",
+      "clase": "EXPECTED_IDEMPOTENT",
+      "porQue": "ab_variants existe en el esquema final; la 507 se adelantó a la migración que la crea",
+      "revisarAparte": "comprobar que ab_variants acabe con RLS activo"
+    },
+    {
+      "id": "e8cb83e66d5530f8",
+      "code": "42703",
+      "sentencia": "CREATE POLICY chatbot_conversations_tenant ON chatbot_conversations FOR ALL USING (workspace_id = current_tenant_id()) W",
+      "motivoOriginal": "column \"workspace_id\" does not exist",
+      "clase": "EXPECTED_IDEMPOTENT",
+      "porQue": "chatbot_conversations existe en el esquema final; la 507 se adelantó a la migración que la crea",
+      "revisarAparte": "comprobar que chatbot_conversations acabe con RLS activo"
+    },
+    {
+      "id": "6c6f06c092c967a7",
+      "code": "42703",
+      "sentencia": "CREATE POLICY qr_codes_public_read ON qr_codes FOR SELECT USING (short_code IS NOT NULL)",
+      "motivoOriginal": "column \"short_code\" does not exist",
+      "clase": "EXPECTED_IDEMPOTENT",
+      "porQue": "qr_codes existe en el esquema final; la 507 se adelantó a la migración que la crea",
+      "revisarAparte": "comprobar que qr_codes acabe con RLS activo"
+    },
+    {
+      "id": "fe8204ced6b7c2ec",
+      "code": "42703",
+      "sentencia": "CREATE POLICY qr_codes_tenant ON qr_codes FOR ALL USING (workspace_id = current_tenant_id()) WITH CHECK (workspace_id = ",
+      "motivoOriginal": "column \"workspace_id\" does not exist",
+      "clase": "EXPECTED_IDEMPOTENT",
+      "porQue": "qr_codes existe en el esquema final; la 507 se adelantó a la migración que la crea",
+      "revisarAparte": "comprobar que qr_codes acabe con RLS activo"
+    },
+    {
+      "id": "52fc8b124694e9d8",
+      "code": "42703",
+      "sentencia": "CREATE UNIQUE INDEX IF NOT EXISTS calendar_events_ws_google_idx ON calendar_events (workspace_id, google_event_id) WHERE",
+      "motivoOriginal": "column \"workspace_id\" does not exist",
+      "clase": "DESCONOCIDO",
+      "porQue": "no se reconoce la forma de la sentencia; clasificarla a ojo sería inventar"
+    },
+    {
+      "id": "ceb82ca91290b744",
+      "code": "42703",
+      "sentencia": "CREATE UNIQUE INDEX IF NOT EXISTS invoices_workspace_number_idx ON invoices (workspace_id, invoice_number)",
+      "motivoOriginal": "column \"workspace_id\" does not exist",
+      "clase": "NEEDS_REPAIR",
+      "impacto": "rendimiento",
+      "porQue": "invoices y sus columnas existen; falta sólo el índice invoices_workspace_number_idx, y la tabla se consulta",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/saas/SaasCpqEnterpriseService.ts:358:       JOIN invoices i ON i.id = d.invoice_id",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/saas/SaasCpqEnterpriseService.ts:413:         FROM invoices WHERE tenant_id=$1 AND status='overdue'`,",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/saas/SaasCpqEnterpriseService.ts:418:         JOIN invoices i ON i.id = d.invoice_id"
+      ]
+    },
+    {
+      "id": "76c22c17574c0da1",
+      "code": "42703",
+      "sentencia": "DO $$ DECLARE tbl TEXT; BEGIN FOR tbl IN SELECT unnest(ARRAY[ 'crm_contacts', 'crm_deals', 'crm_activities', 'campaigns'",
+      "motivoOriginal": "column \"workspace_id\" does not exist",
+      "clase": "EXPECTED_IDEMPOTENT",
+      "porQue": "las 4 tablas del bloque existen en el esquema final"
+    },
+    {
+      "id": "4d36760187ac8d6b",
+      "code": "42883",
+      "sentencia": "CREATE POLICY audit_logs_tenant_insert ON audit_logs FOR INSERT WITH CHECK (tenant_id = current_tenant_id())",
+      "motivoOriginal": "operator does not exist: uuid = integer",
+      "clase": "EXPECTED_IDEMPOTENT",
+      "porQue": "audit_logs existe en el esquema final; la 507 se adelantó a la migración que la crea",
+      "revisarAparte": "comprobar que audit_logs acabe con RLS activo"
+    },
+    {
+      "id": "d0d46a1eebdbf74f",
+      "code": "42883",
+      "sentencia": "CREATE POLICY audit_logs_tenant_select ON audit_logs FOR SELECT USING (tenant_id = current_tenant_id())",
+      "motivoOriginal": "operator does not exist: uuid = integer",
+      "clase": "EXPECTED_IDEMPOTENT",
+      "porQue": "audit_logs existe en el esquema final; la 507 se adelantó a la migración que la crea",
+      "revisarAparte": "comprobar que audit_logs acabe con RLS activo"
+    },
+    {
+      "id": "0063ac97fa43376d",
+      "code": "42P01",
+      "sentencia": "ALTER TABLE campaigns ADD COLUMN IF NOT EXISTS from_email TEXT",
+      "motivoOriginal": "relation \"campaigns\" does not exist",
+      "clase": "EXPECTED_IDEMPOTENT",
+      "porQue": "campaigns.from_email existe en el esquema final"
+    },
+    {
+      "id": "7dbdd870985209af",
+      "code": "42P01",
+      "sentencia": "ALTER TABLE campaigns ADD COLUMN IF NOT EXISTS from_name TEXT",
+      "motivoOriginal": "relation \"campaigns\" does not exist",
+      "clase": "EXPECTED_IDEMPOTENT",
+      "porQue": "campaigns.from_name existe en el esquema final"
+    },
+    {
+      "id": "81bfc3ddd6f26d05",
+      "code": "42P01",
+      "sentencia": "ALTER TABLE funnel_steps ENABLE ROW LEVEL SECURITY",
+      "motivoOriginal": "relation \"funnel_steps\" does not exist",
+      "clase": "EXPECTED_IDEMPOTENT",
+      "porQue": "funnel_steps existe en el esquema final; la 507 se adelantó a la migración que la crea",
+      "revisarAparte": "comprobar que funnel_steps acabe con RLS activo"
+    },
+    {
+      "id": "131f9e4b821f67ff",
+      "code": "42P01",
+      "sentencia": "ALTER TABLE users ADD COLUMN IF NOT EXISTS language VARCHAR(8) NOT NULL DEFAULT 'es'",
+      "motivoOriginal": "relation \"users\" does not exist",
+      "clase": "EXPECTED_IDEMPOTENT",
+      "porQue": "users.language existe en el esquema final"
+    },
+    {
+      "id": "653adbaeedf15406",
+      "code": "42P01",
+      "sentencia": "CREATE INDEX IF NOT EXISTS campaign_recipients_campaign_idx ON campaign_recipients (campaign_id)",
+      "motivoOriginal": "relation \"campaign_recipients\" does not exist",
+      "clase": "EXPECTED_IDEMPOTENT",
+      "porQue": "el índice campaign_recipients_campaign_idx existe en el esquema final: otra migración lo creó después"
+    },
+    {
+      "id": "ba27d78cac73d70e",
+      "code": "42P01",
+      "sentencia": "CREATE INDEX IF NOT EXISTS campaign_recipients_status_idx ON campaign_recipients (campaign_id, status)",
+      "motivoOriginal": "relation \"campaign_recipients\" does not exist",
+      "clase": "EXPECTED_IDEMPOTENT",
+      "porQue": "el índice campaign_recipients_status_idx existe en el esquema final: otra migración lo creó después"
+    },
+    {
+      "id": "6748d57a7009b01d",
+      "code": "42P01",
+      "sentencia": "CREATE INDEX IF NOT EXISTS campaigns_scheduled_idx ON campaigns (status, scheduled_at) WHERE status = 'scheduled' AND sc",
+      "motivoOriginal": "relation \"campaigns\" does not exist",
+      "clase": "NEEDS_REPAIR",
+      "impacto": "rendimiento",
+      "porQue": "campaigns y sus columnas existen; falta sólo el índice campaigns_scheduled_idx, y la tabla se consulta",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/routers/campaigns.py:284:        logger.error(\"Batch update campaigns: %s\", sanitize_text(str(e)), exc_info=True)",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/routers/campaigns.py:424:            sql_text(\"SELECT workspace_id FROM campaigns WHERE id = :id\"),",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/routers/campaigns.py:462:        sql_text(\"SELECT workspace_id, content FROM campaigns WHERE id = :id\"),"
+      ]
+    },
+    {
+      "id": "c759cb2a8e62ae0a",
+      "code": "42P01",
+      "sentencia": "CREATE INDEX IF NOT EXISTS campaigns_workspace_status_idx ON campaigns (workspace_id, status)",
+      "motivoOriginal": "relation \"campaigns\" does not exist",
+      "clase": "NEEDS_REPAIR",
+      "impacto": "rendimiento",
+      "porQue": "campaigns y sus columnas existen; falta sólo el índice campaigns_workspace_status_idx, y la tabla se consulta",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/routers/campaigns.py:284:        logger.error(\"Batch update campaigns: %s\", sanitize_text(str(e)), exc_info=True)",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/routers/campaigns.py:424:            sql_text(\"SELECT workspace_id FROM campaigns WHERE id = :id\"),",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/routers/campaigns.py:462:        sql_text(\"SELECT workspace_id, content FROM campaigns WHERE id = :id\"),"
+      ]
+    },
+    {
+      "id": "e059b7ae34aa308c",
+      "code": "42P01",
+      "sentencia": "CREATE INDEX IF NOT EXISTS funnel_steps_funnel_idx ON funnel_steps (funnel_id, step_order)",
+      "motivoOriginal": "relation \"funnel_steps\" does not exist",
+      "clase": "NEEDS_REPAIR",
+      "impacto": "rendimiento",
+      "porQue": "funnel_steps y sus columnas existen; falta sólo el índice funnel_steps_funnel_idx, y la tabla se consulta",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/funnel_builder_service.py:83:                    INSERT INTO funnel_steps (",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/funnel_builder_service.py:106:                        \"UPDATE funnel_steps SET next_step_id = CAST(:next AS uuid) WHERE id = CAST(:id AS uuid)\"",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/funnel_builder_service.py:113:                        \"UPDATE funnel_steps SET next_step_id = CAST(:next AS uuid) WHERE id = CAST(:id AS uuid)\""
+      ]
+    },
+    {
+      "id": "c752b8c6ec58396d",
+      "code": "42P01",
+      "sentencia": "CREATE INDEX IF NOT EXISTS idx_push_subscriptions_ws ON push_subscriptions (workspace_id, created_at DESC)",
+      "motivoOriginal": "relation \"push_subscriptions\" does not exist",
+      "clase": "NEEDS_REPAIR",
+      "impacto": "rendimiento",
+      "porQue": "push_subscriptions y sus columnas existen; falta sólo el índice idx_push_subscriptions_ws, y la tabla se consulta",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/push_service.py:144:                INSERT INTO push_subscriptions (",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/push_service.py:182:                DELETE FROM push_subscriptions",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/push_service.py:203:                FROM push_subscriptions"
+      ]
+    },
+    {
+      "id": "8adeacca9960d21e",
+      "code": "42P01",
+      "sentencia": "CREATE INDEX IF NOT EXISTS idx_qr_scans_qr ON qr_scans (qr_id, scanned_at DESC)",
+      "motivoOriginal": "relation \"qr_scans\" does not exist",
+      "clase": "NEEDS_REPAIR",
+      "impacto": "rendimiento",
+      "porQue": "qr_scans y sus columnas existen; falta sólo el índice idx_qr_scans_qr, y la tabla se consulta",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/qr_service.py:274:                INSERT INTO qr_scans (qr_id, workspace_id, ip, user_agent, country, city, device_type)",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/qr_service.py:316:                FROM qr_scans WHERE qr_id = CAST(:id AS uuid)",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/qr_service.py:326:                SELECT device_type, COUNT(*) AS cnt FROM qr_scans"
+      ]
+    },
+    {
+      "id": "033c5ed35fb29029",
+      "code": "42P01",
+      "sentencia": "CREATE INDEX IF NOT EXISTS idx_webinars_ws_created ON webinars (workspace_id, created_at DESC)",
+      "motivoOriginal": "relation \"webinars\" does not exist",
+      "clase": "NEEDS_REPAIR",
+      "impacto": "rendimiento",
+      "porQue": "webinars y sus columnas existen; falta sólo el índice idx_webinars_ws_created, y la tabla se consulta",
+      "evidencia": [
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/cdp_service.py:272:                    JOIN webinars w ON w.id = r.webinar_id",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/webinar_service.py:78:                text(\"SELECT 1 FROM webinars WHERE slug = :slug LIMIT 1\"),",
+        "C:\\Users\\Daniel\\nelvyon-w3/backend/services/webinar_service.py:113:                INSERT INTO webinars ("
+      ]
+    },
+    {
+      "id": "c72ed1fd0bf05bfc",
+      "code": "42P01",
+      "sentencia": "CREATE POLICY funnel_steps_tenant ON funnel_steps FOR ALL USING ( funnel_id IN (SELECT id FROM funnels WHERE workspace_i",
+      "motivoOriginal": "relation \"funnel_steps\" does not exist",
+      "clase": "EXPECTED_IDEMPOTENT",
+      "porQue": "funnel_steps existe en el esquema final; la 507 se adelantó a la migración que la crea",
+      "revisarAparte": "comprobar que funnel_steps acabe con RLS activo"
+    },
+    {
+      "id": "b2a978ca2fbb403e",
+      "code": "42P01",
+      "sentencia": "CREATE TABLE IF NOT EXISTS campaign_recipients ( id SERIAL PRIMARY KEY, campaign_id INTEGER NOT NULL REFERENCES campaign",
+      "motivoOriginal": "relation \"campaigns\" does not exist",
+      "clase": "EXPECTED_IDEMPOTENT",
+      "porQue": "campaign_recipients existe en el esquema final; otra migración la crea"
+    },
+    {
+      "id": "7a161c1ebdb4c70a",
+      "code": "42P01",
+      "sentencia": "CREATE TABLE IF NOT EXISTS funnel_steps ( id UUID PRIMARY KEY DEFAULT gen_random_uuid(), funnel_id UUID NOT NULL REFEREN",
+      "motivoOriginal": "relation \"landing_pages\" does not exist",
+      "clase": "EXPECTED_IDEMPOTENT",
+      "porQue": "funnel_steps existe en el esquema final; otra migración la crea"
+    }
+  ]
+}

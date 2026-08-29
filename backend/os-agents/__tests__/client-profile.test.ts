@@ -80,7 +80,13 @@ describe("ClientProfileService", () => {
       created_at: "2026-01-01T00:00:00.000Z",
       updated_at: "2026-01-01T00:00:00.000Z",
     };
-    queryMock.mockResolvedValueOnce([row]);
+    // DOS CONSULTAS, no una. `enrichInput` ya no lee `client_profiles` a pelo:
+    // pasa por la fuente canónica, que primero intenta resolver el cliente en
+    // `os_clients` para poder mirar el cerebro. Aquí ese primer intento no
+    // encuentra nada —el caso de un cliente antiguo sin migrar— y se cae al
+    // respaldo, que es lo que esta prueba comprueba.
+    queryMock.mockResolvedValueOnce([]);       // os_clients: no está
+    queryMock.mockResolvedValueOnce([row]);    // client_profiles: el respaldo
     const base = { foo: 1, brandName: "Acme" };
     const enriched = await ClientProfileService.enrichInput(USER_ID, "Acme", base);
     expect(enriched).toMatchObject({

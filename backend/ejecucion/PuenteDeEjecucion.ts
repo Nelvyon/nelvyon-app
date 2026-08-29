@@ -15,14 +15,21 @@
  *        ├─ 1 · ¿su contrato le permite ESTA acción?        autonomia.ts
  *        │      (según las consecuencias reales, no las declaradas)
  *        ├─ 2 · ¿hace falta que una persona diga que sí?    autonomia.ts
- *        ├─ 3 · ¿hay autorización de gasto?                 guardaDeGasto.ts
- *        ├─ 4 · se registra la solicitud                    (idempotente)
- *        ├─ 5 · SE EJECUTA
- *        └─ 6 · se cierra el rastro: ejecutado o fallido
+ *        ├─ 3 · ¿lo que sale ha pasado por calidad?         MotorDeCalidad.ts
+ *        ├─ 4 · ¿el ejecutor existe?
+ *        ├─ 5 · ¿hay autorización de gasto?                 guardaDeGasto.ts
+ *        │      y se registra la solicitud                  (idempotente)
+ *        ├─ 6 · SE EJECUTA
+ *        └─ 7 · se cierra el rastro: ejecutado o fallido
  *
  * NINGUNA PUERTA ES OPCIONAL. Saltarse la 1 deja que un agente de borradores
- * lance campañas; saltarse la 3 gasta dinero sin presupuesto; saltarse la 4
- * hace que un reintento de red lance dos veces la misma campaña.
+ * lance campañas; saltarse la 3 publica en nombre del cliente algo que nadie ha
+ * mirado; saltarse la 5 gasta dinero sin presupuesto y hace que un reintento de
+ * red lance dos veces la misma campaña.
+ *
+ * LA 3 VA ANTES QUE LA 5 A PROPÓSITO: una pieza que suspende no debe llegar a
+ * reservar presupuesto, porque la reserva quedaría colgando por algo que nunca
+ * tuvo que salir.
  *
  * LO QUE ESTE FICHERO NO HACE: no llama a ningún proveedor. Los ejecutores se
  * inyectan, y en las pruebas el que se inyecta es un doble que cuenta lo que le
@@ -35,6 +42,7 @@ import type { ContratoDeAgente } from "../agentes/contratoDeAgente";
 import { puedeHacer } from "../agentes/contratoDeAgente";
 import type { Consecuencia } from "../agentes/autonomia";
 import type { GuardaDeGasto, PeticionDeGasto } from "../gasto/guardaDeGasto";
+import type { MotorDeCalidad, Pieza } from "../calidad/MotorDeCalidad";
 
 /** Lo que un agente quiere hacer, antes de que ocurra. */
 export interface AccionPropuesta {
@@ -56,6 +64,16 @@ export interface AccionPropuesta {
   importeCents: number;
   /** Clave estable. Sin ella, un reintento de red ejecuta dos veces. */
   idempotencyKey: string;
+
+  /**
+   * LO QUE SE VA A PUBLICAR, GASTAR O ENVIAR, para que calidad pueda mirarlo.
+   *
+   * Es opcional en el tipo y OBLIGATORIO en la practica: si la accion tiene
+   * consecuencias hacia fuera y no trae pieza, la puerta 3 deniega. Si fuera
+   * opcional de verdad, saltarse la revision seria tan facil como no adjuntar
+   * nada, y una puerta que se esquiva no es una puerta.
+   */
+  pieza?: Pieza;
 }
 
 export type ResultadoDelPuente =
@@ -69,6 +87,7 @@ export type ResultadoDelPuente =
 
 export type PuertaQueDenego =
   | "autonomia_del_agente"
+  | "calidad"
   | "autorizacion_de_gasto"
   | "clave_en_curso"
   | "ejecutor_desconocido";
@@ -104,6 +123,13 @@ export class PuenteDeEjecucion {
     private readonly aprobaciones: RegistroDeAprobaciones,
     private readonly registrar: (evento: Record<string, unknown>) => void = (e) =>
       console.error(`[puente] ${Object.entries(e).map(([k, v]) => `${k}=${v}`).join(" ")}`),
+    /**
+     * El motor de calidad. Se inyecta, y cuando NO se inyecta la puerta de
+     * calidad deniega todo lo que salga hacia fuera en vez de dejarlo pasar:
+     * un puente montado sin revisor no es un puente mas permisivo, es uno que
+     * no puede garantizar nada.
+     */
+    private readonly calidad: MotorDeCalidad | null = null,
   ) {}
 
   registrarEjecutor(e: Ejecutor): void {
@@ -160,7 +186,94 @@ export class PuenteDeEjecucion {
       }
     }
 
-    // ── 3 · ¿el ejecutor existe? ───────────────────────────────────────────
+    // ── 3 · ¿lo que sale ha pasado por calidad? ────────────────────────────
+    //
+    // AQUI Y NO DESPUES. Una pieza que suspende no puede llegar a reservar
+    // presupuesto: la reserva quedaria colgando por algo que nunca debio salir.
+    //
+    // Y la puerta es FAIL-CLOSED en los dos sentidos que importan:
+    //
+    //   · sin pieza adjunta, una accion hacia fuera se deniega. Si no fuera
+    //     asi, esquivar la revision seria tan barato como no adjuntar nada.
+    //   · sin motor inyectado, tambien se deniega. Un puente sin revisor no
+    //     es mas permisivo: es uno que no puede afirmar que reviso.
+    const revisable = accion.consecuencias.some((c) =>
+      c === "publica_en_nombre_del_cliente" ||
+      c === "contacta_personas" ||
+      c === "gasta_dinero" ||
+      c === "tiene_efecto_legal",
+    );
+
+    if (revisable) {
+      if (!this.calidad) {
+        this.registrar({ ...traza, evento: "denegado", puerta: "calidad", motivo: "sin_motor" });
+        return {
+          estado: "denegado",
+          puerta: "calidad",
+          motivo: "no hay motor de calidad conectado y esta acción sale hacia fuera",
+        };
+      }
+      if (!accion.pieza) {
+        this.registrar({ ...traza, evento: "denegado", puerta: "calidad", motivo: "sin_pieza" });
+        return {
+          estado: "denegado",
+          puerta: "calidad",
+          motivo: "la acción sale hacia fuera y no adjunta qué se va a publicar o enviar",
+        };
+      }
+
+      // El productor no se juzga a si mismo. El revisor es una identidad
+      // distinta por construccion (`qa:` delante), asi que la unica forma de
+      // que coincidan es que la pieza se declare autora de la identidad del
+      // revisor — que es exactamente la suplantacion que la guardia existe
+      // para parar. El motor lanza, y aqui se convierte en una DENEGACION: el
+      // contrato de este puente es que un «no te dejo» es una respuesta, no
+      // una averia que tumbe al que llama.
+      let informe;
+      try {
+        informe = this.calidad.evaluar(accion.pieza, `qa:${agente.id}`);
+      } catch (err) {
+        const motivo = err instanceof Error ? err.message : String(err);
+        this.registrar({ ...traza, evento: "denegado", puerta: "calidad", motivo: "autoevaluacion" });
+        return { estado: "denegado", puerta: "calidad", motivo };
+      }
+
+      if (informe.veredicto === "FAIL") {
+        this.registrar({
+          ...traza, evento: "denegado", puerta: "calidad",
+          motivo: informe.hallazgos.map((h) => h.id).join(","),
+        });
+        return {
+          estado: "denegado",
+          puerta: "calidad",
+          motivo: `calidad la ha suspendido: ${informe.hallazgos.map((h) => h.quePasa).join("; ")}`,
+        };
+      }
+
+      if (informe.veredicto === "REVIEW_REQUIRED") {
+        // No es un no: es un «que lo vea una persona». Se encamina por la
+        // misma via de aprobacion que ya existe, en vez de inventar otra.
+        const aprobada = await this.aprobaciones.estaAprobada(accion.idempotencyKey);
+        if (!aprobada) {
+          await this.aprobaciones.solicitar(
+            accion.idempotencyKey,
+            `calidad (${informe.modo}) pide revisión humana de ${accion.operacion}`,
+          );
+          this.registrar({ ...traza, evento: "espera_aprobacion", puerta: "calidad" });
+          return {
+            estado: "espera_aprobacion",
+            motivo: `calidad no puede aprobarlo sola (modo ${informe.modo})`,
+          };
+        }
+      }
+
+      this.registrar({
+        ...traza, evento: "calidad_ok",
+        veredicto: informe.veredicto, modo: informe.modo,
+      });
+    }
+
+    // ── 4 · ¿el ejecutor existe? ───────────────────────────────────────────
     //
     // Antes de la puerta de gasto: reservar presupuesto para una operación que
     // no se puede hacer deja una reserva colgando.
@@ -174,7 +287,7 @@ export class PuenteDeEjecucion {
       };
     }
 
-    // ── 4 · ¿hay autorización de gasto? ────────────────────────────────────
+    // ── 5 · ¿hay autorización de gasto? ────────────────────────────────────
     //
     // Se pasa por la guarda SIEMPRE que la acción gaste, aunque el importe sea
     // cero: un importe cero declarado por quien propone no es un importe cero
@@ -232,11 +345,11 @@ export class PuenteDeEjecucion {
       gastoId = solicitud.gastoId;
     }
 
-    // ── 5 · Se ejecuta ─────────────────────────────────────────────────────
+    // ── 6 · Se ejecuta ─────────────────────────────────────────────────────
     try {
       const r = await ejecutor.ejecutar(accion.operacion, accion.argumentos);
 
-      // ── 6 · Se cierra el rastro ──────────────────────────────────────────
+      // ── 7 · Se cierra el rastro ──────────────────────────────────────────
       if (gasta && gastoId && autorizacionId) {
         await this.guarda.marcarEjecutado(
           gastoId,

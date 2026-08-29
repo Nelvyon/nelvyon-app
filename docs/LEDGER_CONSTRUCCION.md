@@ -66,12 +66,16 @@ Nada se marca `DONE`: una fase cuya prueba final exige producción es
 | Fase 4 · departamentos | LOCAL_CERTIFIED | pendiente | 24 departamentos, 0 vacíos |
 | Fase 5 · contrato de agente | LOCAL_CERTIFIED | pendiente | 23 contratos, 27 pruebas |
 | Fase 6 · caracterización sectorial | LOCAL_CERTIFIED | pendiente | 1.605 al 100 %, 3 familias, 0 rebeldes |
+| **Fase 6b · equivalencia por SALIDA** | LOCAL_CERTIFIED | pendiente | 1.521/1.605 medidos · **1.521 instrucciones distintas · 0 redundantes** |
 | Fase 19 · autonomía L0–L5 | LOCAL_CERTIFIED | pendiente | suelo por consecuencia |
-| Fase 11 · puente agente→ejecutor | LOCAL_CERTIFIED | pendiente | 20 pruebas PG, 6 puertas |
+| Fase 11 · puente agente→ejecutor | LOCAL_CERTIFIED | pendiente | 30 pruebas PG, **7 puertas** |
 | Fase 16 · motor de resultados | LOCAL_CERTIFIED | pendiente | 19 pruebas PG, 4 mutaciones |
 | Fase 23 · customer success | LOCAL_CERTIFIED | pendiente | 19 pruebas PG, 6 tipos de señal |
+| **Fase 17 · inteligencia entre deptos.** | LOCAL_CERTIFIED | `385fc8cb` | 29 pruebas PG, 6 mutaciones |
+| **contexto de cliente consolidado** | LOCAL_CERTIFIED | `385fc8cb` | 18 pruebas, 3 fuentes → 1 canónica |
+| **Fase 18 · motor de calidad** | LOCAL_CERTIFIED | pendiente | 39 pruebas, 6 mutaciones, puerta 3 del puente |
+| **Fase 29 · las 55 sentencias** | LOCAL_CERTIFIED | pendiente | 55/55 clasificadas · **5 defectos reales confirmados** |
 | Fase 24 · portal premium | PENDIENTE | — | |
-| Fase 29 · las 55 sentencias | PENDIENTE | — | |
 | Fase 31 · E2E agencia completa | LOCAL_CERTIFIED | pendiente | 13 pasos, 3 pruebas PG |
 
 ---
@@ -87,7 +91,20 @@ Nada se marca `DONE`: una fase cuya prueba final exige producción es
 4. **`RULE_ENGINE` es publicable; `MOCK` y `FALLBACK` no.** Un generador
    determinista por diseño no es una degradación.
 5. **La deuda de la 507 se escribe y se fija** en `omisiones_conocidas_507.json`.
-   Un fallo no listado rompe la migración.
+   Un fallo no listado rompe la migración. Y desde la Fase 29, cada una de las 55
+   lleva clase y evidencia en `clasificacion_507.json`; los defectos reales se
+   confirman A MANO en `verificacion_manual_507.json`, porque el clasificador
+   automático se equivocó de cuatro formas distintas antes de estabilizarse.
+7. **Nadie evalúa su propio trabajo.** El motor de calidad lanza si el evaluador
+   coincide con el autor, y el puente convierte eso en denegación. Sin motor o
+   sin pieza adjunta, lo que sale hacia fuera se DENIEGA: un revisor que se
+   esquiva no adjuntando nada no es un revisor.
+8. **Una evaluación de reglas nunca se presenta como de modelo.** `REAL` exige
+   proveedor configurado, no una variable de entorno.
+9. **NO se consolidan los agentes sectoriales.** Medido por salida: 1.521 agentes
+   producen 1.521 instrucciones distintas y no hay ni una pareja equivalente. La
+   sospecha de «un agente copiado 1.605 veces» es falsa, y fusionarlos perdería
+   1.521 matices. La medición se repite sola en cada suite.
 6. **Los `require()` perezosos de `DbClient` están prohibidos** y lo vigila la
    puerta de build: en el bundle de Next devuelven `undefined`.
 

@@ -301,3 +301,30 @@ conBase("la fuente canónica de contexto", () => {
     });
   });
 });
+
+describe("sin inquilino no hay resolución", () => {
+  it("una fila sin workspace utilizable NO se da por resuelta", async () => {
+    // Lo destapó una prueba de otro fichero: `resolverCliente` devolvía
+    // `encontrado: true` con un workspace indefinido, y con eso se consultaría
+    // el cerebro SIN inquilino. En un sistema aislado por inquilino eso o
+    // revienta o —bastante peor— devuelve lo que no debe.
+    const falso = {
+      async query<T>(): Promise<T[]> {
+        return [{ id: "aaaaaaaa-0000-4000-8000-000000000001", workspace_id: null }] as T[];
+      },
+    };
+    const r = await resolverCliente(falso, "u-1", "Acme");
+    expect(r.encontrado).toBe(false);
+  });
+
+  it("EL CONTROL: con workspace válido sí se resuelve", async () => {
+    const falso = {
+      async query<T>(): Promise<T[]> {
+        return [{ id: "aaaaaaaa-0000-4000-8000-000000000001", workspace_id: 42 }] as T[];
+      },
+    };
+    const r = await resolverCliente(falso, "u-1", "Acme");
+    expect(r.encontrado).toBe(true);
+    if (r.encontrado) expect(r.cliente.workspaceId).toBe(42);
+  });
+});

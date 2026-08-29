@@ -1,0 +1,37 @@
+{
+  "_lee_esto": [
+    "Equivalencia de los agentes sectoriales medida por SALIDA, no por fuente.",
+    "",
+    "Cada agente se ejecuto con el MISMO input y un modelo que no responde:",
+    "solo se queda con la instruccion que recibe. Dos agentes con la misma",
+    "huella piden literalmente lo mismo y son redundantes de verdad.",
+    "",
+    "`no_ejecutable` NO es equivalencia: es una medicion que no se pudo",
+    "hacer, y no se mezcla con las que si.",
+    "",
+    "Esto MIDE. No migra nada. Fusionar antes de probar la equivalencia es",
+    "como se pierden matices de mil en mil."
+  ],
+  "generado": "2026-08-29T10:28:55.248Z",
+  "total": 1605,
+  "medidos": 1521,
+  "noEjecutables": 84,
+  "instruccionesDistintas": 1521,
+  "gruposRedundantes": 0,
+  "agentesEnGruposRedundantes": 0,
+  "mayoresGrupos": [],
+  "porQueNoSePudoMedir": [
+    [
+      "sin metodo run/execute/generate",
+      67
+    ],
+    [
+      "falla sin llegar a pedir: Cannot read properties of undefined (reading 'length')",
+      9
+    ],
+    [
+      "falla sin llegar a pedir: Cannot read properties of undefined (reading 'trim')",
+      8
+    ]
+  ]
+}

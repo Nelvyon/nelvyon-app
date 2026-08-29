@@ -22,6 +22,7 @@
  *       → un trabajador lo reclama             (P3)
  *       → el agente comprueba su contrato      (Fase 5)
  *       → propone una acción con gasto         (Fase 11)
+ *       → calidad revisa lo que se va a lanzar  (Fase 18)
  *       → el puente la para: falta autorización
  *       → se autoriza el gasto
  *       → la acción se ejecuta                 (Fase 11 + P4)
@@ -42,6 +43,7 @@ import { TrabajadorDeCola } from "../queue/trabajadorDeCola";
 import { CATALOGO } from "../agentes/catalogo";
 import { prepararEjecucion } from "../agentes/contratoDeAgente";
 import { GuardaDeGasto } from "../gasto/guardaDeGasto";
+import { MotorDeCalidad } from "../calidad/MotorDeCalidad";
 import {
   EjecutorSimulado,
   PuenteDeEjecucion,
@@ -147,7 +149,7 @@ conBase("la agencia completa", () => {
       },
       async solicitar() {},
     };
-    puente = new PuenteDeEjecucion(guarda, aprobaciones, () => {});
+    puente = new PuenteDeEjecucion(guarda, aprobaciones, () => {}, new MotorDeCalidad());
     puente.registrarEjecutor(meta);
   });
 
@@ -228,6 +230,17 @@ conBase("la agencia completa", () => {
         operacion: "crear_campana",
         consecuencias: ["gasta_dinero"],
         argumentos: { objetivo: trabajo.payload.objetivo },
+        // Lo que se va a lanzar, para que calidad pueda mirarlo. Sin esto la
+        // puerta 3 deniega, y hace bien: no se aprueba lo que no se enseña.
+        pieza: {
+          dominio: "ads",
+          autor: "planificador-de-medios",
+          contenido: {
+            urlDestino: "https://cliente-real.es/aterrizaje",
+            presupuestoDiarioCents: 5_000,
+            negativas: ["gratis", "empleo"],
+          },
+        },
         tenantId: TENANT,
         workspaceId: WS,
         serviceId: SERVICIO,
