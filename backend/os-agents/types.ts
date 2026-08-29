@@ -22,6 +22,13 @@ export interface OsStepResultRecord {
 export interface OsJobResult {
   serviceId: string;
   steps: OsStepResultRecord[];
+  /**
+   * El fichero que el cliente se descarga.
+   *
+   * Opcional porque los servicios con constructor propio publican el suyo
+   * dentro de un paso y no repiten aqui la referencia.
+   */
+  entregable?: { downloadUrl: string; fileCount: number };
 }
 
 /** Normalized job input from API / dashboard (extensible per premium service). */
