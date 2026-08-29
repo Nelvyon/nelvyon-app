@@ -180,6 +180,125 @@ const COMUNES: readonly Comprobacion[] = [
       return m ? `contiene un enlace que no es real: ${m[0]}` : null;
     },
   },
+  {
+    id: "sin-metricas-inventadas",
+    descripcion: "No cita cifras que nadie ha medido",
+    clase: "determinista",
+    gravedad: "bloqueante",
+    evaluar: (p) => {
+      // LA MÁS IMPORTANTE DE TODO EL FICHERO.
+      //
+      // Un texto que dice «aumentarás un 47 % las conversiones» suena mucho
+      // mejor que uno honesto, y por eso sale solo. El problema es que ese 47 %
+      // no lo ha medido nadie: es una cifra bonita que el cliente repetirá
+      // hasta que alguien le pida la fuente.
+      //
+      // Se permite una cifra CUANDO VIENE DE UN DATO DEL PROPIO CLIENTE — su
+      // histórico, su analítica— y esos llegan por `contexto`. Lo que se
+      // persigue es la promesa numérica sin respaldo.
+      const todo = JSON.stringify(p.contenido);
+      const contexto = JSON.stringify(p.contexto ?? {});
+      const promesas = [
+        /\b(aumentar\w*|subir\w*|incrementar\w*|multiplicar\w*|reducir\w*|bajar\w*)[^.]{0,40}\b\d{1,3}\s*%/gi,
+        /\b\d{1,3}\s*%\s+(más|menos|de\s+(aumento|mejora|incremento|reducción))/gi,
+        /\bx\s?\d{1,2}\s+(en|de)\s+(ventas|leads|conversiones|tráfico)/gi,
+        /\bROI\s+(de|del)\s+\d/gi,
+      ];
+      for (const re of promesas) {
+        const m = re.exec(todo);
+        if (!m) continue;
+        // Si esa misma cifra está en el contexto del cliente, es un dato suyo.
+        const cifra = /\d{1,3}/.exec(m[0])?.[0];
+        if (cifra && contexto.includes(cifra)) continue;
+        return `promete «${m[0].trim()}» y esa cifra no sale de ningún dato del cliente`;
+      }
+      return null;
+    },
+  },
+  {
+    id: "sin-fuentes-inventadas",
+    descripcion: "No cita estudios que no puede enseñar",
+    clase: "determinista",
+    gravedad: "bloqueante",
+    evaluar: (p) => {
+      // «Según un estudio de Harvard» sin enlace es la forma más rápida de que
+      // un cliente pierda una discusión con su competencia.
+      const todo = JSON.stringify(p.contenido);
+      const cita =
+        /\b(seg[úu]n\s+(un\s+)?(estudio|informe|investigaci[óo]n)|un\s+estudio\s+de|de\s+acuerdo\s+con\s+(un\s+)?estudio)/i.exec(
+          todo,
+        );
+      if (!cita) return null;
+      // Con enlace es comprobable; sin enlace es una apelación a la autoridad.
+      const hayEnlace = /https?:\/\/[^\s"]{8,}/.test(todo);
+      return hayEnlace ? null : `cita un estudio sin enlace: «${cita[0]}»`;
+    },
+  },
+  {
+    id: "sin-relleno",
+    descripcion: "No usa frases que no dicen nada",
+    clase: "rubrica",
+    gravedad: "aviso",
+    evaluar: (p) => {
+      // El relleno es lo que separa un entregable de un documento. Estas
+      // fórmulas concretas aparecen cuando no hay nada que decir.
+      const todo = JSON.stringify(p.contenido).toLowerCase();
+      if (todo.length < 200) return undefined;
+      const formulas = [
+        "en el mundo actual",
+        "en la era digital",
+        "hoy en día es fundamental",
+        "no es ningún secreto",
+        "como todos sabemos",
+        "en un mercado cada vez más competitivo",
+        "sinergias",
+        "poner en valor",
+        "llevar al siguiente nivel",
+      ];
+      const halladas = formulas.filter((f) => todo.includes(f));
+      return halladas.length > 0
+        ? `usa ${halladas.length} fórmula(s) de relleno: «${halladas[0]}»`
+        : null;
+    },
+  },
+  {
+    id: "es-accionable",
+    descripcion: "Dice qué hacer, no sólo qué pasa",
+    clase: "rubrica",
+    gravedad: "aviso",
+    evaluar: (p) => {
+      // Un diagnóstico sin siguiente paso obliga al cliente a hacer el trabajo
+      // que ha pagado por no hacer.
+      const acciones = p.contenido.recommendedActions ?? p.contenido.acciones ?? p.contenido.siguientesPasos;
+      if (acciones === undefined) return undefined;
+      if (!Array.isArray(acciones)) return "las acciones recomendadas no son una lista";
+      if (acciones.length === 0) return "no propone ninguna acción concreta";
+      const vagas = acciones.filter((a) => typeof a === "string" && a.trim().length < 25);
+      return vagas.length > 0
+        ? `${vagas.length} acción(es) demasiado vagas para ejecutarlas: «${String(vagas[0])}»`
+        : null;
+    },
+  },
+  {
+    id: "sin-mezcla-de-clientes",
+    descripcion: "No menciona a un cliente que no es éste",
+    clase: "determinista",
+    gravedad: "bloqueante",
+    evaluar: (p) => {
+      // CONTAMINACIÓN ENTRE CLIENTES. Es el fallo que destruye la confianza de
+      // golpe: ver el nombre de otra empresa en tu informe significa que tus
+      // datos están en el suyo.
+      const otros = p.contexto?.otrosClientes;
+      if (!Array.isArray(otros) || otros.length === 0) return undefined;
+      const todo = JSON.stringify(p.contenido).toLowerCase();
+      const colados = otros.filter(
+        (o) => typeof o === "string" && o.trim().length > 3 && todo.includes(o.toLowerCase()),
+      );
+      return colados.length > 0
+        ? `menciona a «${colados[0]}», que es otro cliente`
+        : null;
+    },
+  },
 ];
 
 // ── Comprobaciones por dominio ──────────────────────────────────────────────
@@ -206,6 +325,24 @@ const POR_DOMINIO: Readonly<Record<string, readonly Comprobacion[]>> = {
         const ctas = p.contenido.ctas;
         if (!Array.isArray(ctas)) return undefined;
         return ctas.length > 1 ? `hay ${ctas.length} llamadas a la acción; una pieza, una acción` : null;
+      },
+    },
+    {
+      id: "habla-de-lo-que-le-importa-al-lector",
+      descripcion: "No habla sólo de nosotros",
+      clase: "rubrica",
+      gravedad: "aviso",
+      evaluar: (p) => {
+        // El copy que empieza por «somos líderes en» habla del que escribe. El
+        // que funciona habla del problema del que lee. Se compara cuántas veces
+        // aparece cada uno, no si aparecen: una marca puede nombrarse.
+        const cuerpo = texto(p, "cuerpo");
+        if (cuerpo.length < 120) return undefined;
+        const nosotros = (cuerpo.match(/\b(somos|nuestro|nuestra|nuestros|nuestras|ofrecemos|contamos con)\b/gi) ?? []).length;
+        const lector = (cuerpo.match(/\b(t[úu]|tu|tus|te|ti|usted|vosotros|su negocio)\b/gi) ?? []).length;
+        return nosotros > lector * 2 && nosotros >= 3
+          ? `habla de nosotros ${nosotros} veces y del lector ${lector}: al lector le importa su problema`
+          : null;
       },
     },
     {
@@ -259,6 +396,57 @@ const POR_DOMINIO: Readonly<Record<string, readonly Comprobacion[]>> = {
         return h1.length !== 1 ? `hay ${h1.length} encabezados principales; debe haber uno` : null;
       },
     },
+    {
+      id: "keywords-con-intencion",
+      descripcion: "Cada palabra clave dice qué busca quien la escribe",
+      clase: "rubrica",
+      gravedad: "aviso",
+      evaluar: (p) => {
+        // Una lista de palabras clave sin intención es una lista de palabras.
+        // «Zapatillas» no es lo mismo si quien busca quiere comprar, comparar o
+        // saber cómo lavarlas, y el contenido que hay que escribir es distinto.
+        const kws = p.contenido.keywords;
+        if (!Array.isArray(kws) || kws.length === 0) return undefined;
+        const conIntencion = kws.filter(
+          (k) => typeof k === "object" && k !== null && "intencion" in (k as object),
+        );
+        return conIntencion.length === 0
+          ? `las ${kws.length} palabras clave van sin intención de búsqueda: no se puede decidir qué escribir para cada una`
+          : null;
+      },
+    },
+    {
+      id: "canibalizacion",
+      descripcion: "Dos páginas no compiten por lo mismo",
+      clase: "determinista",
+      gravedad: "aviso",
+      evaluar: (p) => {
+        // Dos páginas propias peleando por la misma búsqueda se quitan fuerza
+        // entre ellas. Es el error clásico de un plan de contenidos largo.
+        const paginas = p.contenido.paginas;
+        if (!Array.isArray(paginas)) return undefined;
+        const objetivos = paginas
+          .map((x) => (x as { objetivo?: string })?.objetivo?.trim().toLowerCase())
+          .filter((x): x is string => Boolean(x));
+        const repetidos = objetivos.filter((o, i) => objetivos.indexOf(o) !== i);
+        return repetidos.length > 0
+          ? `${repetidos.length} página(s) compiten por «${repetidos[0]}»: se quitan fuerza entre ellas`
+          : null;
+      },
+    },
+    {
+      id: "sin-promesa-de-posicion",
+      descripcion: "No promete un puesto concreto en Google",
+      clase: "determinista",
+      gravedad: "bloqueante",
+      evaluar: (p) => {
+        // Nadie controla el buscador. Prometer el primer puesto es prometer lo
+        // que no se puede cumplir, y además lo prohíben las buenas prácticas.
+        const todo = JSON.stringify(p.contenido);
+        const m = /\b(primer\w*\s+(puesto|posici[óo]n|resultado)|top\s?[1-3]\b|#1\s+en\s+google)/i.exec(todo);
+        return m ? `promete una posición concreta: «${m[0]}»` : null;
+      },
+    },
   ],
   ads: [
     {
@@ -295,6 +483,39 @@ const POR_DOMINIO: Readonly<Record<string, readonly Comprobacion[]>> = {
           : null;
       },
     },
+    {
+      id: "presupuesto-da-para-el-plan",
+      descripcion: "El presupuesto llega para lo que se propone",
+      clase: "rubrica",
+      gravedad: "bloqueante",
+      evaluar: (p) => {
+        // Repartir 300 € entre cuatro canales no es una estrategia
+        // multicanal: es no estar en ninguno. Un canal necesita un mínimo de
+        // volumen para que el sistema de pujas aprenda.
+        const diario = p.contenido.presupuestoDiarioCents;
+        const canales = p.contenido.canales;
+        if (typeof diario !== "number" || !Array.isArray(canales) || canales.length === 0) {
+          return undefined;
+        }
+        const porCanal = diario / canales.length;
+        return porCanal < 1000
+          ? `${canales.length} canales con ${(porCanal / 100).toFixed(2)} €/día cada uno: ninguno tendrá volumen para aprender`
+          : null;
+      },
+    },
+    {
+      id: "objetivo-medible",
+      descripcion: "La campaña dice con qué cifra se juzga",
+      clase: "rubrica",
+      gravedad: "aviso",
+      evaluar: (p) => {
+        const kpi = p.contenido.kpi ?? p.contenido.objetivo;
+        if (kpi === undefined) return "la campaña no dice con qué número se va a juzgar";
+        return typeof kpi === "string" && kpi.trim().length < 8
+          ? `el objetivo «${String(kpi)}» no es medible`
+          : null;
+      },
+    },
   ],
   social: [
     {
@@ -311,6 +532,40 @@ const POR_DOMINIO: Readonly<Record<string, readonly Comprobacion[]>> = {
         if (!limite) return undefined;
         return t.length > limite
           ? `${t.length} caracteres para ${red}, que admite ${limite}`
+          : null;
+      },
+    },
+    {
+      id: "no-el-mismo-post-en-todas",
+      descripcion: "No se publica lo mismo en todas las redes",
+      clase: "rubrica",
+      gravedad: "aviso",
+      evaluar: (p) => {
+        // Publicar el mismo texto en LinkedIn y en TikTok no es eficiencia: es
+        // no haber pensado en ninguna de las dos audiencias.
+        const posts = p.contenido.publicaciones;
+        if (!Array.isArray(posts) || posts.length < 2) return undefined;
+        const textos = posts
+          .map((x) => (x as { texto?: string })?.texto?.trim())
+          .filter((x): x is string => Boolean(x));
+        const unicos = new Set(textos);
+        return unicos.size < textos.length
+          ? `${textos.length - unicos.size} publicación(es) repiten el mismo texto en redes distintas`
+          : null;
+      },
+    },
+    {
+      id: "calendario-realista",
+      descripcion: "La frecuencia cabe en el tiempo que el cliente tiene",
+      clase: "rubrica",
+      gravedad: "aviso",
+      evaluar: (p) => {
+        const porSemana = p.contenido.publicacionesPorSemana;
+        const horas = p.contexto?.horasSemanalesDelCliente;
+        if (typeof porSemana !== "number" || typeof horas !== "number") return undefined;
+        // Media hora por publicación es optimista ya.
+        return porSemana * 0.5 > horas
+          ? `${porSemana} publicaciones semanales para quien tiene ${horas} h: el plan no se va a cumplir`
           : null;
       },
     },
@@ -344,6 +599,123 @@ const POR_DOMINIO: Readonly<Record<string, readonly Comprobacion[]>> = {
         return null;
       },
     },
+    {
+      id: "hay-consentimiento",
+      descripcion: "A esta lista se le puede escribir",
+      clase: "determinista",
+      gravedad: "bloqueante",
+      evaluar: (p) => {
+        // La pregunta que un especialista de email hace ANTES de escribir una
+        // sola línea. Una lista comprada no se envía, por buena que sea la
+        // campaña.
+        const origen = p.contexto?.origenDeLaLista;
+        if (typeof origen !== "string") return undefined;
+        return /\b(comprad\w+|alquilad\w+|scraping|extra[íi]d\w+)\b/i.test(origen)
+          ? `la lista es de origen «${origen}»: a esa gente no se le puede escribir`
+          : null;
+      },
+    },
+    {
+      id: "segmentado",
+      descripcion: "No se manda lo mismo a toda la base",
+      clase: "rubrica",
+      gravedad: "aviso",
+      evaluar: (p) => {
+        const seg = p.contenido.segmento ?? p.contenido.segmentos;
+        if (seg === undefined) return undefined;
+        if (typeof seg === "string" && /\b(todos|toda la base|base completa)\b/i.test(seg)) {
+          return "se envía a toda la base: quien no le interesa se da de baja y se pierde para siempre";
+        }
+        return null;
+      },
+    },
+  ],
+  cro: [
+    {
+      id: "hipotesis-antes-que-cambio",
+      descripcion: "Cada experimento dice qué espera y por qué",
+      clase: "rubrica",
+      gravedad: "bloqueante",
+      evaluar: (p) => {
+        const h = texto(p, "hipotesis");
+        if (!h && p.contenido.experimento === undefined) return undefined;
+        if (!h) return "el experimento no declara hipótesis: sin ella no se puede aprender nada del resultado";
+        return h.length < 30 ? `la hipótesis «${h}» no dice qué se espera ni por qué` : null;
+      },
+    },
+    {
+      id: "hay-trafico-para-concluir",
+      descripcion: "El experimento puede llegar a una conclusión",
+      clase: "determinista",
+      gravedad: "bloqueante",
+      evaluar: (p) => {
+        // Con poco tráfico, cualquier ganador es ruido. Proponer un test A/B a
+        // quien tiene 200 visitas al mes es prometerle una respuesta que no va
+        // a llegar.
+        const visitas = p.contexto?.visitasMensuales;
+        if (typeof visitas !== "number") return undefined;
+        return visitas < 1000
+          ? `con ${visitas} visitas al mes un test no alcanzará significación: cualquier ganador sería ruido`
+          : null;
+      },
+    },
+    {
+      id: "criterio-fijado-antes",
+      descripcion: "El criterio de éxito se fija antes de empezar",
+      clase: "rubrica",
+      gravedad: "bloqueante",
+      evaluar: (p) => {
+        const criterio = p.contenido.criterioDeExito;
+        if (criterio === undefined) return undefined;
+        return typeof criterio === "string" && criterio.trim().length > 10
+          ? null
+          : "el criterio de éxito no está fijado: se podrá declarar ganador a posteriori";
+      },
+    },
+  ],
+  crm: [
+    {
+      id: "sin-duplicados",
+      descripcion: "Un contacto, una ficha",
+      clase: "determinista",
+      gravedad: "aviso",
+      evaluar: (p) => {
+        const contactos = p.contenido.contactos;
+        if (!Array.isArray(contactos)) return undefined;
+        const correos = contactos
+          .map((c) => (c as { email?: string })?.email?.trim().toLowerCase())
+          .filter((x): x is string => Boolean(x));
+        const repes = correos.filter((c, i) => correos.indexOf(c) !== i);
+        return repes.length > 0 ? `${repes.length} contacto(s) duplicados: «${repes[0]}»` : null;
+      },
+    },
+    {
+      id: "cada-lead-tiene-dueno",
+      descripcion: "Alguien es responsable de cada contacto",
+      clase: "rubrica",
+      gravedad: "aviso",
+      evaluar: (p) => {
+        const contactos = p.contenido.contactos;
+        if (!Array.isArray(contactos)) return undefined;
+        const sinDueno = contactos.filter((c) => !(c as { responsable?: string })?.responsable).length;
+        return sinDueno > 0
+          ? `${sinDueno} contacto(s) sin responsable: nadie los va a llamar`
+          : null;
+      },
+    },
+    {
+      id: "cualificacion-explicada",
+      descripcion: "Se dice por qué un lead es bueno",
+      clase: "rubrica",
+      gravedad: "aviso",
+      evaluar: (p) => {
+        const criterios = p.contenido.criteriosDeCualificacion;
+        if (criterios === undefined) return undefined;
+        return Array.isArray(criterios) && criterios.length === 0
+          ? "no hay criterios de cualificación: todo lead entra igual y ventas pierde el tiempo"
+          : null;
+      },
+    },
   ],
   web: [
     {
@@ -372,24 +744,65 @@ const POR_DOMINIO: Readonly<Record<string, readonly Comprobacion[]>> = {
         return sinAlt > 0 ? `${sinAlt} imagen(es) sin texto alternativo` : null;
       },
     },
-  ],
-  contenido: [],
-  creatividad: [],
-  crm: [],
-  cro: [],
-  analitica: [],
-  reporting: [
     {
-      id: "no-omite-lo-que-va-mal",
-      descripcion: "Un informe no esconde los objetivos incumplidos",
+      id: "formulario-pide-lo-justo",
+      descripcion: "El formulario no ahuyenta con preguntas de más",
       clase: "rubrica",
+      gravedad: "aviso",
+      evaluar: (p) => {
+        // Cada campo obligatorio de más cuesta conversiones. Pedir el NIF para
+        // descargar un PDF es pedir que se vayan.
+        const campos = p.contenido.camposDelFormulario;
+        if (!Array.isArray(campos)) return undefined;
+        const obligatorios = campos.filter((c) => (c as { obligatorio?: boolean })?.obligatorio).length;
+        return obligatorios > 5
+          ? `${obligatorios} campos obligatorios: cada uno de más cuesta conversiones`
+          : null;
+      },
+    },
+    {
+      id: "una-idea-por-pantalla",
+      descripcion: "Cada pantalla pide una sola cosa",
+      clase: "rubrica",
+      gravedad: "aviso",
+      evaluar: (p) => {
+        const ctas = p.contenido.ctasPrincipales;
+        if (!Array.isArray(ctas)) return undefined;
+        return ctas.length > 1
+          ? `${ctas.length} llamadas principales compitiendo: ninguna gana`
+          : null;
+      },
+    },
+  ],
+  ecommerce: [
+    {
+      id: "el-pedido-deja-margen",
+      descripcion: "Lo que cuesta traer un pedido cabe en su margen",
+      clase: "determinista",
       gravedad: "bloqueante",
       evaluar: (p) => {
-        const objetivos = p.contenido.objetivos;
-        const incluidos = p.contenido.objetivosIncluidos;
-        if (!Array.isArray(objetivos) || !Array.isArray(incluidos)) return undefined;
-        return incluidos.length < objetivos.length
-          ? `el informe omite ${objetivos.length - incluidos.length} objetivo(s)`
+        // La cuenta que decide si una tienda gana o pierde. Vender más no es
+        // ganar más si cada pedido cuesta más de lo que deja.
+        const margen = p.contexto?.margenPorPedidoCents;
+        const coste = p.contenido.costePorPedidoObjetivoCents;
+        if (typeof margen !== "number" || typeof coste !== "number") return undefined;
+        return coste >= margen
+          ? `traer un pedido costaría ${(coste / 100).toFixed(2)} € y deja ${(margen / 100).toFixed(2)} €: cada venta pierde dinero`
+          : null;
+      },
+    },
+    {
+      id: "ficha-con-lo-necesario",
+      descripcion: "La ficha responde lo que decide la compra",
+      clase: "rubrica",
+      gravedad: "aviso",
+      evaluar: (p) => {
+        const ficha = p.contenido.ficha;
+        if (typeof ficha !== "object" || ficha === null) return undefined;
+        const f = ficha as Record<string, unknown>;
+        const faltan = ["precio", "envio", "devoluciones"].filter((k) => !f[k]);
+        return faltan.length > 0
+          ? `la ficha no dice: ${faltan.join(", ")} — son las tres cosas que se miran antes de comprar`
           : null;
       },
     },
@@ -407,9 +820,274 @@ const POR_DOMINIO: Readonly<Record<string, readonly Comprobacion[]>> = {
         return beligerante ? `la respuesta discute en público: «${beligerante[0]}»` : null;
       },
     },
+    {
+      id: "no-la-misma-respuesta-a-todos",
+      descripcion: "No se contesta con plantilla a todas las reseñas",
+      clase: "rubrica",
+      gravedad: "aviso",
+      evaluar: (p) => {
+        // Ver la misma respuesta copiada bajo veinte reseñas es peor que no
+        // contestar: dice que no se ha leído ninguna.
+        const respuestas = p.contenido.respuestas;
+        if (!Array.isArray(respuestas) || respuestas.length < 2) return undefined;
+        const textos = respuestas
+          .map((x) => (typeof x === "string" ? x : (x as { texto?: string })?.texto))
+          .filter((x): x is string => Boolean(x));
+        const unicos = new Set(textos.map((t) => t.trim().toLowerCase()));
+        return unicos.size < textos.length
+          ? `${textos.length - unicos.size} respuesta(s) repetidas: se nota que no se ha leído la reseña`
+          : null;
+      },
+    },
+    {
+      id: "no-pide-borrar-la-resena",
+      descripcion: "No se le pide a nadie que quite lo que escribió",
+      clase: "determinista",
+      gravedad: "bloqueante",
+      evaluar: (p) => {
+        const r = texto(p, "respuesta");
+        if (!r) return undefined;
+        return /\b(elimin\w+|borr\w+|quit\w+)\s+(la\s+)?(rese[ñn]a|comentario|valoraci[óo]n)/i.test(r)
+          ? "pide que se borre la reseña: eso incumple las normas de las plataformas y se ve fatal"
+          : null;
+      },
+    },
   ],
-  estrategia: [],
-  compliance: [],
+  contenido: [
+    {
+      id: "responde-a-alguien-concreto",
+      descripcion: "El contenido sabe a quién le habla",
+      clase: "rubrica",
+      gravedad: "aviso",
+      evaluar: (p) => {
+        const audiencia = p.contenido.audiencia ?? p.contenido.paraQuien;
+        if (audiencia === undefined) return "el contenido no dice a quién le habla";
+        return typeof audiencia === "string" && audiencia.trim().length < 12
+          ? `«${String(audiencia)}» no es una audiencia: es una etiqueta`
+          : null;
+      },
+    },
+    {
+      id: "aporta-algo-que-no-esta-en-todas-partes",
+      descripcion: "Dice algo que el cliente sabe y otros no",
+      clase: "rubrica",
+      gravedad: "aviso",
+      evaluar: (p) => {
+        const angulo = texto(p, "anguloPropio");
+        if (!angulo && p.contenido.tema === undefined) return undefined;
+        return angulo ? null : "no declara qué aporta este contenido que no esté ya en cualquier otro sitio";
+      },
+    },
+  ],
+  creatividad: [
+    {
+      id: "respeta-lo-que-la-marca-no-hace",
+      descripcion: "No propone lo que la marca tiene prohibido",
+      clase: "determinista",
+      gravedad: "bloqueante",
+      evaluar: (p) => {
+        const prohibido = p.contexto?.loQueLaMarcaNoHace;
+        if (!Array.isArray(prohibido) || prohibido.length === 0) return undefined;
+        const todo = JSON.stringify(p.contenido).toLowerCase();
+        const roto = prohibido.filter(
+          (x) => typeof x === "string" && x.length > 4 && todo.includes(x.toLowerCase()),
+        );
+        return roto.length > 0 ? `propone «${roto[0]}», que la marca no hace` : null;
+      },
+    },
+    {
+      id: "sabe-donde-se-va-a-ver",
+      descripcion: "La pieza se diseña para donde se va a usar",
+      clase: "rubrica",
+      gravedad: "aviso",
+      evaluar: (p) => {
+        const donde = p.contenido.formato ?? p.contenido.donde;
+        return donde === undefined
+          ? "no dice dónde se va a ver: un diseño para escaparate y uno para móvil no se parecen"
+          : null;
+      },
+    },
+  ],
+  analitica: [
+    {
+      id: "compara-con-algo",
+      descripcion: "Un número solo no dice nada",
+      clase: "rubrica",
+      gravedad: "aviso",
+      evaluar: (p) => {
+        // «1.200 visitas» no es un dato: es una cifra. Un dato es «1.200
+        // visitas, un 30 % menos que el mes pasado».
+        const metricas = p.contenido.metricas;
+        if (!Array.isArray(metricas) || metricas.length === 0) return undefined;
+        const sinComparar = metricas.filter(
+          (m) => typeof m === "object" && m !== null && !("comparativa" in (m as object)) && !("variacion" in (m as object)),
+        ).length;
+        return sinComparar > 0
+          ? `${sinComparar} métrica(s) sin comparación: un número suelto no dice si va bien o mal`
+          : null;
+      },
+    },
+    {
+      id: "no-confunde-correlacion-con-causa",
+      descripcion: "No atribuye un resultado a una acción sin más",
+      clase: "rubrica",
+      gravedad: "bloqueante",
+      evaluar: (p) => {
+        const todo = JSON.stringify(p.contenido);
+        const m = /\bgracias a\b[^.]{0,60}\b(sub\w+|aument\w+|mejor\w+)/i.exec(todo);
+        if (!m) return null;
+        const hayControl = /\b(grupo de control|holdout|l[íi]nea base|antes de)\b/i.test(todo);
+        return hayControl ? null : `atribuye un resultado sin línea base: «${m[0].trim()}»`;
+      },
+    },
+  ],
+  reporting: [
+    {
+      id: "no-omite-lo-que-va-mal",
+      descripcion: "Un informe no esconde los objetivos incumplidos",
+      clase: "rubrica",
+      gravedad: "bloqueante",
+      evaluar: (p) => {
+        const objetivos = p.contenido.objetivos;
+        const incluidos = p.contenido.objetivosIncluidos;
+        if (!Array.isArray(objetivos) || !Array.isArray(incluidos)) return undefined;
+        return incluidos.length < objetivos.length
+          ? `el informe omite ${objetivos.length - incluidos.length} objetivo(s)`
+          : null;
+      },
+    },
+    {
+      id: "empieza-por-lo-que-el-cliente-queria",
+      descripcion: "El informe empieza por el objetivo, no por lo que hicimos",
+      clase: "rubrica",
+      gravedad: "aviso",
+      evaluar: (p) => {
+        const primera = p.contenido.primeraSeccion;
+        if (typeof primera !== "string") return undefined;
+        return /\b(objetivo|resultado|conseguid\w+)\b/i.test(primera)
+          ? null
+          : `el informe empieza por «${primera}»: al cliente le importa qué consiguió, no qué hicimos`;
+      },
+    },
+    {
+      id: "lo-no-medido-se-dice",
+      descripcion: "Lo que no se pudo medir aparece como no medido",
+      clase: "determinista",
+      gravedad: "bloqueante",
+      evaluar: (p) => {
+        const noMedido = p.contenido.noMedido;
+        if (noMedido === undefined) return undefined;
+        return Array.isArray(noMedido) ? null : "lo no medido no está declarado como tal";
+      },
+    },
+  ],
+  estrategia: [
+    {
+      id: "el-plan-cabe-en-el-presupuesto",
+      descripcion: "Lo que se propone se puede pagar",
+      clase: "determinista",
+      gravedad: "bloqueante",
+      evaluar: (p) => {
+        const disponible = p.contexto?.presupuestoMensualCents;
+        const propuesto = p.contenido.costeMensualPropuestoCents;
+        if (typeof disponible !== "number" || typeof propuesto !== "number") return undefined;
+        return propuesto > disponible
+          ? `el plan cuesta ${(propuesto / 100).toFixed(0)} €/mes y hay ${(disponible / 100).toFixed(0)} €`
+          : null;
+      },
+    },
+    {
+      id: "no-repite-lo-que-ya-fallo",
+      descripcion: "No propone otra vez lo que al cliente ya le salió mal",
+      clase: "rubrica",
+      gravedad: "bloqueante",
+      evaluar: (p) => {
+        // Proponerle a alguien exactamente lo que ya probó y le costó dinero es
+        // la forma más rápida de que deje de leer.
+        const fallo = p.contexto?.loQueYaFallo;
+        if (typeof fallo !== "string" || fallo.length < 8) return undefined;
+        const todo = JSON.stringify(p.contenido).toLowerCase();
+        // POR RAÍZ, no por palabra exacta. «campañas de display» y «campaña de
+        // display» son lo mismo para un cliente que ya se gastó un año en ello,
+        // y comparar palabras completas dejaba pasar el caso por una `s`.
+        const raiz = (w: string): string => w.slice(0, 6);
+        const nucleo = fallo
+          .toLowerCase()
+          .split(/[^\p{L}\p{N}]+/u)
+          .filter((w) => w.length > 5)
+          .map(raiz)
+          .slice(0, 4);
+        const repetido = nucleo.filter((r) => todo.includes(r));
+        return repetido.length >= 2
+          ? `vuelve a proponer algo muy parecido a lo que ya falló: «${fallo}»`
+          : null;
+      },
+    },
+    {
+      id: "prioriza",
+      descripcion: "Dice qué va primero",
+      clase: "rubrica",
+      gravedad: "aviso",
+      evaluar: (p) => {
+        const acciones = p.contenido.acciones;
+        if (!Array.isArray(acciones) || acciones.length < 3) return undefined;
+        const conOrden = acciones.filter(
+          (a) => typeof a === "object" && a !== null && ("prioridad" in (a as object) || "orden" in (a as object)),
+        ).length;
+        return conOrden === 0
+          ? `${acciones.length} acciones sin prioridad: el cliente no sabe por dónde empezar`
+          : null;
+      },
+    },
+  ],
+  compliance: [
+    {
+      id: "respeta-el-sector-regulado",
+      descripcion: "No propone lo que el sector del cliente prohíbe",
+      clase: "determinista",
+      gravedad: "bloqueante",
+      evaluar: (p) => {
+        // La comprobación que evita una sanción con el nombre de NELVYON.
+        const restricciones = p.contexto?.restricciones;
+        if (!Array.isArray(restricciones) || restricciones.length === 0) return undefined;
+        const todo = JSON.stringify(p.contenido).toLowerCase();
+
+        // Prohibiciones frecuentes en sectores regulados, con lo que las
+        // delata en un texto.
+        const senales: Array<[RegExp, RegExp]> = [
+          [/no\s+.*(prometer|garantizar).*(resultado|curaci)/i, /\b(garantiz\w+|prometemos|asegura\w+ resultados)\b/i],
+          [/no\s+.*(antes y despu[ée]s|before.after)/i, /\bantes y despu[ée]s\b/i],
+          [/no\s+.*(comparaci|comparar)/i, /\b(mejor que|superior a)\s+\w+/i],
+          [/no\s+.*(propiedades curativas|curar)/i, /\b(cura|curativ\w+|adelgaza|elimina la grasa)\b/i],
+        ];
+
+        for (const r of restricciones) {
+          if (typeof r !== "string") continue;
+          for (const [queProhibe, comoSeDelata] of senales) {
+            if (queProhibe.test(r) && comoSeDelata.test(todo)) {
+              const m = comoSeDelata.exec(todo);
+              return `el cliente tiene prohibido esto y la pieza lo hace: «${m?.[0]}» (restricción: ${r})`;
+            }
+          }
+        }
+        return null;
+      },
+    },
+    {
+      id: "hay-base-legal-para-contactar",
+      descripcion: "Se puede escribir a esta gente",
+      clase: "determinista",
+      gravedad: "bloqueante",
+      evaluar: (p) => {
+        const contacta = p.contenido.contactaPersonas;
+        if (contacta !== true) return undefined;
+        const base = p.contexto?.baseLegal;
+        return typeof base === "string" && base.trim().length > 3
+          ? null
+          : "la pieza contacta con personas y no declara base legal";
+      },
+    },
+  ],
 };
 
 export function dominiosConQa(): string[] {

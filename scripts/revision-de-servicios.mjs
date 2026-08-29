@@ -107,7 +107,10 @@ for (const b of bloques) {
   const laAporta = /laAporta:\s*"([^"]+)"/.exec(b)?.[1] ?? "?";
   const imprescindible = /imprescindible:\s*true/.test(b);
   const usan = /serviciosQueLaUsan:\s*\[([^\]]*)\]/.exec(b)?.[1] ?? "";
-  for (const s of [...usan.matchAll(/"([a-z_]+)"/g)].map((m) => m[1])) {
+  // `[a-z0-9_]`, con digitos: `3d_contenido_inmersivo_premium` empieza por
+  // numero y la expresion anterior lo saltaba en silencio. El servicio salia
+  // con CERO dimensiones y veredicto COMPLETAR teniendo cuatro.
+  for (const s of [...usan.matchAll(/"([a-z0-9_]+)"/g)].map((m) => m[1])) {
     if (!porServicio.has(s)) porServicio.set(s, { propias: [], delCliente: 0 });
     const e = porServicio.get(s);
     e.propias.push({ id, laAporta, imprescindible });

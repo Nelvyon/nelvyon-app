@@ -271,10 +271,21 @@ describe("avisos frente a bloqueos", () => {
 });
 
 describe("el alto riesgo falla cerrado", () => {
+  /**
+   * Una campaña IMPECABLE, y la definición se ha endurecido a propósito.
+   *
+   * Antes bastaba con destino, presupuesto y negativas. Al especializar las
+   * rúbricas de Ads se añadió que una campaña diga con qué cifra se la juzga
+   * y que el presupuesto dé para los canales que propone — y esta pieza dejó
+   * de pasar, con razón: una campaña sin objetivo medible no es impecable, es
+   * una campaña de la que nadie podrá decir si funcionó.
+   */
   const contenidoLimpio = {
     urlDestino: "https://cliente.es/oferta",
     presupuestoDiarioCents: 2500,
     negativas: ["gratis", "empleo"],
+    canales: ["google"],
+    kpi: "coste por lead cualificado por debajo de 25 EUR",
   };
 
   it("una acción de alto riesgo con un aviso NO se aprueba sola", () => {
