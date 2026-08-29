@@ -87,6 +87,8 @@ export type ResultadoDelPuente =
 
 export type PuertaQueDenego =
   | "autonomia_del_agente"
+  /** La acción se contradice: declara un importe y a la vez que no gasta. */
+  | "declaracion_incoherente"
   | "calidad"
   | "autorizacion_de_gasto"
   | "clave_en_curso"
@@ -184,6 +186,29 @@ export class PuenteDeEjecucion {
           motivo: `${accion.operacion} tiene consecuencias que exigen una persona: ${accion.consecuencias.join(", ")}`,
         };
       }
+    }
+
+    // ── 2b · LA ACCIÓN NO PUEDE CONTRADECIRSE A SÍ MISMA ───────────────────
+    //
+    // Lo encontró la pasada adversarial. Las consecuencias las DECLARA quien
+    // llama, así que quien llama puede mentir: una acción con
+    // `importeCents: 5000` y `consecuencias: []` se saltaba a la vez la puerta
+    // de calidad —que mira las consecuencias— y la de gasto —que mira
+    // `gasta_dinero`—. Dos puertas esquivadas con un array vacío.
+    //
+    // No se puede comprobar si una declaración es HONESTA sin ejecutar la
+    // acción, y ejecutarla es justo lo que se está decidiendo. Pero sí se puede
+    // comprobar si es COHERENTE: declarar un importe y a la vez que no se gasta
+    // dinero es una contradicción, y una contradicción se deniega.
+    if (accion.importeCents > 0 && !accion.consecuencias.includes("gasta_dinero")) {
+      this.registrar({ ...traza, evento: "denegado", puerta: "declaracion_incoherente" });
+      return {
+        estado: "denegado",
+        puerta: "declaracion_incoherente",
+        motivo:
+          `declara ${accion.importeCents} céntimos y a la vez que no gasta dinero. ` +
+          "Una acción que se contradice no se ejecuta.",
+      };
     }
 
     // ── 3 · ¿lo que sale ha pasado por calidad? ────────────────────────────

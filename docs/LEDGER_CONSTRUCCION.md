@@ -83,6 +83,8 @@ Nada se marca `DONE`: una fase cuya prueba final exige producción es
 | **E2E multiservicio** | LOCAL_SIMULATED_EXTERNAL | pendiente | **13/13 servicios recorren el cableado entero** |
 | **invariante de negocio** | LOCAL_CERTIFIED | pendiente | 3 contradicciones «sin agencia» corregidas · prueba que impide la deriva |
 | **honestidad de afirmaciones** | LOCAL_CERTIFIED | pendiente | capacidad ≠ resultado · 4 de 5 resultados NO_MEDIDO |
+| **pasada adversarial** | LOCAL_CERTIFIED | pendiente | 7 vías de ataque · **1 agujero real encontrado y cerrado** |
+| **humo sobre build de producción** | LOCAL_CERTIFIED | pendiente | **153 rutas, 0 respuestas 5xx** · el script no podía ejecutarse y ahora sí |
 | Fase 31 · E2E agencia completa | LOCAL_CERTIFIED | pendiente | 13 pasos, 3 pruebas PG |
 
 ---
@@ -108,6 +110,17 @@ Nada se marca `DONE`: una fase cuya prueba final exige producción es
    esquiva no adjuntando nada no es un revisor.
 8. **Una evaluación de reglas nunca se presenta como de modelo.** `REAL` exige
    proveedor configurado, no una variable de entorno.
+16. **Un guardián que aborta siempre no protege: lo parece.** El humo sobre el
+    build de producción llevaba sin poder ejecutarse porque arrancaba un
+    servidor de producción sin `JWT_SECRET`: se quedaba en «falta algo para
+    poder medir». Ahora usa secretos desechables locales y recorre las 153
+    rutas de verdad.
+15. **Una acción no puede contradecirse a sí misma.** Las consecuencias las
+    declara quien llama, así que quien llama puede mentir: `importeCents: 5000`
+    con `consecuencias: []` esquivaba a la vez la puerta de calidad y la de
+    gasto. No se puede comprobar si una declaración es honesta sin ejecutarla,
+    pero sí si es COHERENTE. Lo encontró la pasada adversarial, no una prueba
+    normal.
 13. **NELVYON ES la agencia, y eso lo vigila una prueba.** «Sin agencia»
     posiciona a NELVYON como sustituto de una agencia cuando NELVYON *es* la
     agencia. Había tres, una de ellas en las instrucciones que recibe el agente

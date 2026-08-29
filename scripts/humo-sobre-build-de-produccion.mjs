@@ -140,6 +140,20 @@ const servidor = spawn(process.execPath, ["server.js"], {
     ...process.env,
     PORT: String(PUERTO),
     NODE_ENV: "production",
+    // SECRETOS DESECHABLES, sólo para este proceso local.
+    //
+    // Sin ellos el servidor arranca pero el alta devuelve 500 y el humo se
+    // queda en «falta algo para poder medir» — es decir, esta comprobación
+    // nunca llegaba a ejecutarse. Un guardián que aborta siempre no protege
+    // nada, sólo lo parece.
+    //
+    // NO son credenciales inventadas de producción: son valores de usar y
+    // tirar para un servidor local contra una base desechable. Se respeta lo
+    // que ya haya en el entorno, por si alguien quiere probar con lo suyo.
+    JWT_SECRET:
+      process.env.JWT_SECRET ??
+      "humo-local-desechable-no-usar-fuera-de-esta-prueba-32+",
+    CRON_SECRET: process.env.CRON_SECRET ?? "humo-local-desechable-cron",
     UPSTASH_REDIS_REST_URL: `http://127.0.0.1:${PUERTO_UPSTASH}`,
     UPSTASH_REDIS_REST_TOKEN: "local",
     NEXT_PUBLIC_APP_URL: BASE,
@@ -178,6 +192,13 @@ const alta = await json(`${BASE}/api/auth/register`, {
   body: JSON.stringify({ email: correo, password: clave, name: "Humo Local" }),
 });
 if (alta.status !== 200 && alta.status !== 201) {
+  // EL REGISTRO DEL SERVIDOR, aqui tambien.
+  //
+  // Solo se volcaba cuando fallaba una RUTA, no cuando fallaba el alta. Y el
+  // alta es donde mas falta hace: sin ella no se recorre nada, y un «500:
+  // null» no dice absolutamente nada de por que.
+  console.error("\nDel registro del servidor:");
+  console.error(registro.join("").slice(-3000));
   cerrar();
   abortar(1, `El alta devolvió ${alta.status}: ${JSON.stringify(alta.cuerpo)}`);
 }
