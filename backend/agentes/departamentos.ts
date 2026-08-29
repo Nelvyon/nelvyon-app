@@ -308,6 +308,53 @@ export const DEPARTAMENTOS: readonly Departamento[] = [
     kpis: ["informes entregados a tiempo", "informes con resultado medido"],
     estado: "operativo",
   },
+
+  // ── La agencia vendiéndose a sí misma ────────────────────────────────────
+  //
+  // Estos tres no trabajan PARA un cliente: trabajan para que NELVYON tenga
+  // clientes. Es una distinción que el organigrama no hacía y que importa,
+  // porque `captacion` capta para el cliente y esto capta para la casa. Meter
+  // las dos cosas en el mismo departamento haría que nadie supiera de quién es
+  // el embudo del que se habla.
+  {
+    id: "ventas",
+    nombre: "Ventas",
+    responsabilidad:
+      "Llevar a una empresa desde que oye hablar de NELVYON hasta que firma, con un motivo propio para cada contacto.",
+    noDecide: "Qué se le hará una vez firme; eso es de estrategia.",
+    dependeDe: ["inteligencia_mercado"],
+    kpis: [
+      "contactos preparados con motivo propio",
+      "conversaciones abiertas",
+      "propuestas aceptadas",
+      "bajas solicitadas",
+    ],
+    estado: "operativo",
+  },
+  {
+    id: "comunidad",
+    nombre: "Comunidad",
+    responsabilidad:
+      "Sostener la conversación con quien ya sigue al cliente: responder, moderar y detectar lo que se repite.",
+    noDecide: "Qué se publica; eso es de contenido y social.",
+    dependeDe: ["social", "reputacion"],
+    kpis: ["tiempo hasta la primera respuesta", "conversaciones sin responder", "temas recurrentes detectados"],
+    estado: "planeado",
+    motivoSiPlaneado:
+      "Responder en nombre del cliente en sus redes exige credenciales de publicación y una autorización que hoy no existe. El departamento se declara para que el trabajo tenga dueño cuando llegue, no para aparentar que ya se hace.",
+  },
+  {
+    id: "growth",
+    nombre: "Growth",
+    responsabilidad:
+      "Buscar la palanca que mueve el negocio del cliente ahora, mirando el embudo entero en vez de un canal.",
+    noDecide: "Ejecutar la palanca; la propone y la mide, la hace el especialista.",
+    dependeDe: ["analitica", "estrategia", "cro"],
+    kpis: ["palancas propuestas con hipótesis medible", "palancas con efecto demostrado"],
+    estado: "planeado",
+    motivoSiPlaneado:
+      "Necesita series históricas de varios canales a la vez, y hoy el motor de resultados sólo tiene medidas de las últimas semanas. Sin histórico, cualquier palanca que propusiera sería una corazonada con formato de análisis.",
+  },
 ] as const;
 
 const POR_ID = new Map(DEPARTAMENTOS.map((d) => [d.id, d]));

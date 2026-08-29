@@ -685,4 +685,85 @@ export const CATALOGO: readonly ContratoDeAgente[] = [
     reintentos: 1,
     exigeIaReal: true,
   },
+
+  // ══ Ventas ═══════════════════════════════════════════════════════════════
+  //
+  // Estos dos no trabajan para un cliente: trabajan para que NELVYON tenga
+  // clientes. Y son los dos únicos agentes del catálogo cuyo trabajo, si sale
+  // mal, molesta a alguien que no ha pedido nada — de ahí que sus `nuncaHace`
+  // sean más largos que los de nadie.
+  {
+    id: "investigacion-comercial",
+    rol: "Averigua qué le pasa a una empresa antes de que nadie le escriba",
+    objetivo:
+      "Una razón concreta y comprobable para hablar con ESA empresa, o la conclusión de que no la hay",
+    responsabilidad:
+      "Que cada afirmación sobre un prospecto se pueda enseñar con su fuente. Una observación sin fuente es suya.",
+    departamento: "ventas",
+    necesita: [
+      { dimension: "icp", imprescindible: true },
+      { dimension: "propuesta_de_valor", imprescindible: true },
+      { dimension: "sector", imprescindible: false },
+    ],
+    produce: "investigacion_de_prospecto",
+    herramientas: ["web.read"],
+    consecuencias: [],
+    autonomia: "L1_RECOMENDAR",
+    nuncaHace: [
+      "usar datos personales que no estén publicados por la propia empresa",
+      "comprar o consultar bases de datos de contactos",
+      "afirmar algo de un prospecto sin poder enseñar de dónde sale",
+      "investigar a una empresa que ya pidió la baja",
+    ],
+    escalaSi: [
+      "no encuentra ni una observación concreta: entonces no hay motivo para escribir",
+      "la empresa está en un sector con restricciones legales de contacto",
+    ],
+    rubrica: [
+      "cada observación lleva fuente y fecha",
+      "la conclusión dice explícitamente si HAY o NO HAY motivo para escribir",
+      "no vale ninguna frase que sirviera para otra empresa distinta",
+    ],
+    kpis: ["prospectos con motivo propio", "prospectos descartados por falta de motivo"],
+    timeoutMs: TIMEOUT,
+    reintentos: 1,
+    exigeIaReal: true,
+  },
+  {
+    id: "redaccion-comercial",
+    rol: "Escribe el primer mensaje a una empresa concreta",
+    objetivo: "Un mensaje que sólo tenga sentido enviado a ESA empresa",
+    responsabilidad: "El tono y el respeto. Un mensaje que molesta es suyo, aunque el motivo fuera bueno.",
+    departamento: "ventas",
+    necesita: [
+      { dimension: "propuesta_de_valor", imprescindible: true },
+      { dimension: "brand_voice", imprescindible: false },
+    ],
+    produce: "borrador_comercial",
+    herramientas: [],
+    // Redacta. NO envía: el envío no está autorizado y `enviar()` lanza
+    // siempre. Declarar aquí `contacta_personas` sería declarar una
+    // consecuencia que este agente no puede producir.
+    consecuencias: [],
+    autonomia: "L2_BORRADOR",
+    nuncaHace: [
+      "enviar nada",
+      "escribir sin que la investigación haya encontrado un motivo",
+      "prometer resultados concretos a quien todavía no es cliente",
+      "omitir cómo dejar de recibir mensajes",
+      "fingir una relación previa que no existe",
+      "usar asuntos que engañan para que se abra el mensaje",
+    ],
+    escalaSi: ["el motivo que le pasan no distingue a esa empresa de cualquier otra"],
+    rubrica: [
+      "el mensaje nombra algo que sólo le pasa a esa empresa",
+      "dice quién escribe y por qué tiene sus datos",
+      "la baja está en el cuerpo, no escondida",
+      "se entiende en veinte segundos",
+    ],
+    kpis: ["borradores aprobados por una persona", "respuestas obtenidas", "bajas solicitadas"],
+    timeoutMs: TIMEOUT,
+    reintentos: 1,
+    exigeIaReal: true,
+  },
 ] as const;

@@ -76,6 +76,8 @@ Nada se marca `DONE`: una fase cuya prueba final exige producción es
 | **Fase 18 · motor de calidad** | LOCAL_CERTIFIED | pendiente | 39 pruebas, 6 mutaciones, puerta 3 del puente |
 | **Fase 29 · las 55 sentencias** | LOCAL_CERTIFIED | pendiente | 55/55 clasificadas · **5 defectos reales confirmados** |
 | **Fase 33 · rendimiento** | LOCAL_CERTIFIED | pendiente | 34 tablas con RLS sin índice por inquilino · **9,88 ms → 0,14 ms (73x)** |
+| **maquinaria comercial de NELVYON** | LOCAL_CERTIFIED | pendiente | 21 pruebas PG, 8 mutaciones · **envío imposible por diseño** |
+| **departamentos: ventas, comunidad, growth** | LOCAL_CERTIFIED | pendiente | 25 operativos, 5 planeados con motivo |
 | Fase 24 · portal premium | PENDIENTE | — | |
 | Fase 31 · E2E agencia completa | LOCAL_CERTIFIED | pendiente | 13 pasos, 3 pruebas PG |
 
@@ -102,6 +104,14 @@ Nada se marca `DONE`: una fase cuya prueba final exige producción es
    esquiva no adjuntando nada no es un revisor.
 8. **Una evaluación de reglas nunca se presenta como de modelo.** `REAL` exige
    proveedor configurado, no una variable de entorno.
+11. **Una baja comercial es de NELVYON entera.** `comercial_bajas` no tiene
+    `workspace_id` ni RLS, y es la única tabla del sistema que se salta el
+    aislamiento a propósito: aislar las bajas por inquilino convertiría cada
+    workspace nuevo en una segunda oportunidad para molestar a quien ya dijo
+    que no. La migración lo comprueba y falla si alguien le pone RLS.
+12. **Enviar comunicaciones comerciales es imposible por diseño**, no por
+    configuración. `enviar()` lanza siempre. No es un hueco pendiente de
+    rellenar: es la puerta cerrada.
 10. **RLS por inquilino ⟹ índice por inquilino.** No es rendimiento, es
     estructura: si la política obliga a filtrar por `workspace_id` en toda
     consulta, sin ese índice cada lectura recorre las filas de todos los
