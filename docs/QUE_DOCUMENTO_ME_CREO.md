@@ -9,8 +9,8 @@ Un documento obsoleto que parece vigente no molesta — se cita en una decisión
 | Cajón | Cuántos | Qué quiere decir |
 |---|---|---|
 | `GENERADO` | 8 | lo reescribe un script o una prueba en cada ejecución. Es el único que no puede quedarse obsoleto |
-| `VIGENTE` | 47 | a mano, tocado en los últimos 30 días |
-| `HISTORICO` | 121 | a mano, sin tocar desde hace más. Memoria del proyecto, no estado actual |
+| `VIGENTE` | 45 | a mano, tocado en los últimos 30 días |
+| `HISTORICO` | 125 | a mano, sin tocar desde hace más. Memoria del proyecto, no estado actual |
 | `DICE_SER_GENERADO_Y_NO_SE_VE_QUIEN` | 5 | declara ser automático y no se encuentra quién lo escribe. Promete frescura sin tenerla |
 
 **Nada se borra.** Un documento viejo guarda el porqué de decisiones que siguen
@@ -24,7 +24,7 @@ borrarlos, era que se supiera cuál es cuál.
 | [CAMBIO_EN_PRODUCCION.md](CAMBIO_EN_PRODUCCION.md) — Qué cambiaría en producción | `scripts/que-cambiaria-en-produccion.mjs` | 0 |
 | [CONTRATO_DE_SERVICIO.md](CONTRATO_DE_SERVICIO.md) — El contrato de cada servicio | `scripts/contrato-de-servicio.mjs` | 0 |
 | [INVENTARIO_DE_CONECTORES.md](INVENTARIO_DE_CONECTORES.md) — Qué se puede conectar hoy | `apps/web/src/lib/os-core/__tests__/elInventarioDeConectoresNoPromete.test.ts` | 0 |
-| [LO_QUE_SE_PUEDE_AFIRMAR.md](LO_QUE_SE_PUEDE_AFIRMAR.md) — Lo que se puede afirmar de NELVYON, y lo que no | `scripts/lo-que-se-puede-afirmar.mjs` | 0 |
+| [LO_QUE_SE_PUEDE_AFIRMAR.md](LO_QUE_SE_PUEDE_AFIRMAR.md) — Lo que se puede afirmar de NELVYON, y lo que no | `scripts/lo-que-se-puede-afirmar.mjs` | 1 |
 | [MATRIZ_DE_SERVICIOS.md](MATRIZ_DE_SERVICIOS.md) — Matriz de servicios | `scripts/matriz-de-servicios.mjs` | 0 |
 | [QUE_DOCUMENTO_ME_CREO.md](QUE_DOCUMENTO_ME_CREO.md) — Qué documento me creo | `scripts/que-documento-me-creo.mjs` | 0 |
 | [QUE_ES_NELVYON_AI.md](QUE_ES_NELVYON_AI.md) — Que es NELVYON AI, tecnicamente | `scripts/que-es-nelvyon-ai.mjs` | 0 |
@@ -34,37 +34,39 @@ borrarlos, era que se supiera cuál es cuál.
 
 | Documento | Días desde el último cambio | Líneas |
 |---|---|---|
-| [BLOQUE_6_ESTADO.md](BLOQUE_6_ESTADO.md) — BLOQUE 6 — estado por categoría operacional | 3 | 85 |
-| [BLOQUE_4_ESTADO.md](BLOQUE_4_ESTADO.md) — BLOQUE 4 — estado vivo | 4 | 40 |
 | [BLOQUE_5_ESTADO.md](BLOQUE_5_ESTADO.md) — BLOQUE 5 — estado por categoría de producto | 4 | 239 |
+| [BLOQUE_6_ESTADO.md](BLOQUE_6_ESTADO.md) — BLOQUE 6 — estado por categoría operacional | 4 | 85 |
 | [BLOQUE_3_ESTADO.md](BLOQUE_3_ESTADO.md) — BLOQUE 3 — estado vivo | 5 | 80 |
+| [BLOQUE_4_ESTADO.md](BLOQUE_4_ESTADO.md) — BLOQUE 4 — estado vivo | 5 | 40 |
 | [BLOQUE_2_ESTADO.md](BLOQUE_2_ESTADO.md) — BLOQUE 2 — estado vivo | 7 | 60 |
 
-## VIGENTE — 47
+## VIGENTE — 45
 
 | Documento | Días desde el último cambio | Líneas |
 |---|---|---|
 | [AUDITORIA_DE_COSTE.md](AUDITORIA_DE_COSTE.md) — Auditoría de coste — qué se puede tocar sin que suba la factura | 0 | 138 |
 | [CERTIFICACION_LOCAL.md](CERTIFICACION_LOCAL.md) — Certificación local | 0 | 372 |
-| [LEDGER_CONSTRUCCION.md](LEDGER_CONSTRUCCION.md) — Ledger de construcción | 0 | 224 |
-| [BLOQUE_9_CIERRE.md](BLOQUE_9_CIERRE.md) — BLOQUE 9 — OPERACIÓN, OBSERVABILIDAD, BACKUP/RESTORE Y RECUPERACIÓN | 2 | 217 |
-| [CIERRE_DE_PENDIENTES.md](CIERRE_DE_PENDIENTES.md) — Cierre de pendientes post-certificación | 2 | 192 |
-| [COMO_EJECUTAR_LAS_PUERTAS.md](COMO_EJECUTAR_LAS_PUERTAS.md) — Cómo se ejecutan las puertas de certificación | 2 | 165 |
-| [INFORME_NOCTURNO_BLOQUES_8_9_10.md](INFORME_NOCTURNO_BLOQUES_8_9_10.md) — Informe de la ejecución nocturna · Bloques 8, 9 y 10 | 2 | 159 |
+| [PREFLIGHT_DEL_DESPLIEGUE.md](PREFLIGHT_DEL_DESPLIEGUE.md) — Preflight del despliegue | 0 | 131 |
+| [SI_FALLA_UNA_MIGRACION.md](SI_FALLA_UNA_MIGRACION.md) — Si falla una migración a mitad | 0 | 99 |
+| [LEDGER_CONSTRUCCION.md](LEDGER_CONSTRUCCION.md) — Ledger de construcción | 1 | 224 |
 | [LO_QUE_TIENE_QUE_HACER_EL_FUNDADOR.md](LO_QUE_TIENE_QUE_HACER_EL_FUNDADOR.md) — Lo que solo puedes hacer tú | 2 | 244 |
 | [BLOQUE_10_CIERRE.md](BLOQUE_10_CIERRE.md) — BLOQUE 10 — CERTIFICACIÓN INTEGRAL FINAL | 3 | 210 |
-| [BLOQUE_6_CIERRE.md](BLOQUE_6_CIERRE.md) — BLOQUE 6 — cierre | 3 | 309 |
-| [BLOQUE_7_CIERRE.md](BLOQUE_7_CIERRE.md) — BLOQUE 7 — SEGURIDAD OFENSIVA Y ABUSO DE EXTREMO A EXTREMO | 3 | 393 |
-| [BLOQUE_7_ESTADO.md](BLOQUE_7_ESTADO.md) — BLOQUE 7 — ESTADO POR CATEGORÍA DE SUPERFICIE ATACABLE | 3 | 198 |
 | [BLOQUE_8_CIERRE.md](BLOQUE_8_CIERRE.md) — BLOQUE 8 — RENDIMIENTO, CARGA, CONCURRENCIA Y ESCALABILIDAD | 3 | 257 |
 | [BLOQUE_8_ESTADO.md](BLOQUE_8_ESTADO.md) — BLOQUE 8 — ESTADO POR CLASE DE PUNTO DE ESCALADO | 3 | 103 |
+| [BLOQUE_9_CIERRE.md](BLOQUE_9_CIERRE.md) — BLOQUE 9 — OPERACIÓN, OBSERVABILIDAD, BACKUP/RESTORE Y RECUPERACIÓN | 3 | 217 |
 | [BLOQUE_9_ESTADO.md](BLOQUE_9_ESTADO.md) — BLOQUE 9 — ESTADO POR FAMILIA DE CAPACIDAD DE OPERACIÓN | 3 | 115 |
+| [CIERRE_DE_PENDIENTES.md](CIERRE_DE_PENDIENTES.md) — Cierre de pendientes post-certificación | 3 | 192 |
+| [COMO_EJECUTAR_LAS_PUERTAS.md](COMO_EJECUTAR_LAS_PUERTAS.md) — Cómo se ejecutan las puertas de certificación | 3 | 165 |
 | [DECISION_WORKSPACE_ID.md](DECISION_WORKSPACE_ID.md) — Decisión pendiente · el workspace derivado del inquilino | 3 | 140 |
 | [ESTADO_DE_LANZAMIENTO.md](ESTADO_DE_LANZAMIENTO.md) — Estado de lanzamiento de NELVYON | 3 | 107 |
+| [INFORME_NOCTURNO_BLOQUES_8_9_10.md](INFORME_NOCTURNO_BLOQUES_8_9_10.md) — Informe de la ejecución nocturna · Bloques 8, 9 y 10 | 3 | 159 |
 | [NEXT_SESSION_START_HERE.md](NEXT_SESSION_START_HERE.md) — EMPIEZA AQUÍ | 3 | 345 |
-| [BLOQUE_4_CIERRE.md](BLOQUE_4_CIERRE.md) — BLOQUE 4 — cierre | 4 | 175 |
 | [BLOQUE_5_CIERRE.md](BLOQUE_5_CIERRE.md) — BLOQUE 5 — cierre | 4 | 292 |
+| [BLOQUE_6_CIERRE.md](BLOQUE_6_CIERRE.md) — BLOQUE 6 — cierre | 4 | 309 |
+| [BLOQUE_7_CIERRE.md](BLOQUE_7_CIERRE.md) — BLOQUE 7 — SEGURIDAD OFENSIVA Y ABUSO DE EXTREMO A EXTREMO | 4 | 393 |
+| [BLOQUE_7_ESTADO.md](BLOQUE_7_ESTADO.md) — BLOQUE 7 — ESTADO POR CATEGORÍA DE SUPERFICIE ATACABLE | 4 | 198 |
 | [BLOQUE_3_CIERRE.md](BLOQUE_3_CIERRE.md) — BLOQUE 3 — cierre | 5 | 301 |
+| [BLOQUE_4_CIERRE.md](BLOQUE_4_CIERRE.md) — BLOQUE 4 — cierre | 5 | 175 |
 | [SKILLS_Y_MCP.md](SKILLS_Y_MCP.md) — Skills y MCP de NELVYON — inventario auditado | 5 | 212 |
 | [BLOQUE_1_CIERRE.md](BLOQUE_1_CIERRE.md) — Bloque 1 — clasificación de cierre | 7 | 328 |
 | [BLOQUE_2_CIERRE.md](BLOQUE_2_CIERRE.md) — BLOQUE 2 — cierre | 7 | 287 |
@@ -76,26 +78,26 @@ borrarlos, era que se supiera cuál es cuál.
 | [NELVYON_CLOSURE_STATE.md](NELVYON_CLOSURE_STATE.md) — NELVYON — ESTADO OPERATIVO DE CIERRE | 16 | 472 |
 | [NELVYON_RELEASE_CANDIDATE_REPORT.md](NELVYON_RELEASE_CANDIDATE_REPORT.md) — NELVYON — Informe de Release Candidate | 16 | 179 |
 | [TODO.md](TODO.md) — TODO | 17 | 704 |
-| [ELITE_QUALITY_FINALIZATION.md](ELITE_QUALITY_FINALIZATION.md) — ELITE_QUALITY_FINALIZATION | 21 | 61 |
 | [ARCHITECTURE_LOCAL_AI_RUNTIME.md](ARCHITECTURE_LOCAL_AI_RUNTIME.md) — ARCHITECTURE — Local AI runtime for agents (cost = 0) | 22 | 193 |
-| [CHANGELOG.md](CHANGELOG.md) — CHANGELOG — Documentación y cambios registrados | 22 | 539 |
-| [DEPLOYMENTS.md](DEPLOYMENTS.md) — DEPLOYMENTS — Historial | 22 | 1041 |
-| [HANDOVER.md](HANDOVER.md) — HANDOVER — NELVYON | 22 | 47 |
+| [ELITE_QUALITY_FINALIZATION.md](ELITE_QUALITY_FINALIZATION.md) — ELITE_QUALITY_FINALIZATION | 22 | 61 |
+| [CHANGELOG.md](CHANGELOG.md) — CHANGELOG — Documentación y cambios registrados | 23 | 539 |
+| [DEPLOYMENTS.md](DEPLOYMENTS.md) — DEPLOYMENTS — Historial | 23 | 1041 |
+| [HANDOVER.md](HANDOVER.md) — HANDOVER — NELVYON | 23 | 47 |
 | [AUDITORIA_TECNICA_ABSOLUTA.md](AUDITORIA_TECNICA_ABSOLUTA.md) — AUDITORÍA TÉCNICA ABSOLUTA — NELVYON | 29 | 20 |
 | [CTO_FINAL_VERIFY.md](CTO_FINAL_VERIFY.md) — CTO Final Verify — 2026-07-31 (certificación final SaaS) | 29 | 25 |
 | [DECISIONS.md](DECISIONS.md) — DECISIONS — Decisiones técnicas (ADR) | 29 | 977 |
 | [KNOWN_ISSUES.md](KNOWN_ISSUES.md) — KNOWN_ISSUES — Errores conocidos | 29 | 824 |
 | [PROJECT_STATUS.md](PROJECT_STATUS.md) — PROJECT_STATUS | 29 | 16 |
 | [ROADMAP.md](ROADMAP.md) — ROADMAP — NELVYON | 29 | 135 |
-| [DEPLOY_FINAL.md](DEPLOY_FINAL.md) — DEPLOY FINAL — Nelvyon Production Checklist | 30 | 366 |
-| [INTEGRATIONS.md](INTEGRATIONS.md) — INTEGRATIONS — Estado de integraciones | 30 | 147 |
-| [OPS_SES_PROD.md](OPS_SES_PROD.md) — OPS — SES producción (checklist humana mínima) | 30 | 37 |
-| [OPS_STRIPE_PROD.md](OPS_STRIPE_PROD.md) — OPS — Stripe producción (checklist humana mínima) | 30 | 38 |
 
-## HISTORICO — 121
+## HISTORICO — 125
 
 | Documento | Días desde el último cambio | Líneas |
 |---|---|---|
+| [DEPLOY_FINAL.md](DEPLOY_FINAL.md) — DEPLOY FINAL — Nelvyon Production Checklist | 31 | 366 |
+| [INTEGRATIONS.md](INTEGRATIONS.md) — INTEGRATIONS — Estado de integraciones | 31 | 147 |
+| [OPS_SES_PROD.md](OPS_SES_PROD.md) — OPS — SES producción (checklist humana mínima) | 31 | 37 |
+| [OPS_STRIPE_PROD.md](OPS_STRIPE_PROD.md) — OPS — Stripe producción (checklist humana mínima) | 31 | 38 |
 | [DATABASE.md](DATABASE.md) — DATABASE — PostgreSQL / Supabase | 32 | 178 |
 | [DEVELOPER_ONBOARDING.md](DEVELOPER_ONBOARDING.md) — DEVELOPER ONBOARDING — NELVYON | 32 | 116 |
 | [ENVIRONMENTS.md](ENVIRONMENTS.md) — ENVIRONMENTS — Entornos | 32 | 108 |
@@ -110,13 +112,13 @@ borrarlos, era que se supiera cuál es cuál.
 | [README.md](README.md) — NELVYON — Documentación | 32 | 64 |
 | [OS_CATALOG_V1.md](OS_CATALOG_V1.md) — NELVYON OS Catalog v1 | 36 | 51 |
 | [OS_ELITE_STATE_MATRIX.md](OS_ELITE_STATE_MATRIX.md) — OS Elite — Matriz canónica (ADR-057 Blocks 11–25) | 36 | 60 |
-| [OS_UNIVERSAL_SERVICE_CATALOG.md](OS_UNIVERSAL_SERVICE_CATALOG.md) — OS Universal Service Catalog — NELVYON | 36 | 47 |
 | [FREE_TOOLS_EVALUATION.md](FREE_TOOLS_EVALUATION.md) — Free Tools Evaluation — NELVYON | 37 | 99 |
 | [OS_NEW_SERVICES_CONTRACTS.md](OS_NEW_SERVICES_CONTRACTS.md) — OS New Services — Strategy · Funnel · Retention | 37 | 87 |
+| [OS_UNIVERSAL_SERVICE_CATALOG.md](OS_UNIVERSAL_SERVICE_CATALOG.md) — OS Universal Service Catalog — NELVYON | 37 | 47 |
 | [COMPLIANCE_COMPANY_DB_CHECKLIST.md](COMPLIANCE_COMPANY_DB_CHECKLIST.md) — Checklist — Base de empresas / marketing (software only) | 38 | 36 |
-| [CTO_FINAL_CLOSURE_AUDIT.md](CTO_FINAL_CLOSURE_AUDIT.md) — CTO Final Closure Audit — 2026-07-22 | 38 | 27 |
 | [CTO_STRATEGIC_GAPS_MATRIX.md](CTO_STRATEGIC_GAPS_MATRIX.md) — CTO — Matriz de gaps estratégicos (honesta) | 38 | 24 |
-| [OPS_QUALITY_AUDIT.md](OPS_QUALITY_AUDIT.md) — OPS QUALITY AUDIT — 2026-07-22 (refresh cierre) | 38 | 21 |
+| [CTO_FINAL_CLOSURE_AUDIT.md](CTO_FINAL_CLOSURE_AUDIT.md) — CTO Final Closure Audit — 2026-07-22 | 39 | 27 |
+| [OPS_QUALITY_AUDIT.md](OPS_QUALITY_AUDIT.md) — OPS QUALITY AUDIT — 2026-07-22 (refresh cierre) | 39 | 21 |
 | [OS_AGENT_TEAM_AUDIT.md](OS_AGENT_TEAM_AUDIT.md) — OS Agent Team Audit — NELVYON | 39 | 133 |
 | [OS_AUTONOMOUS_OPERATIONS.md](OS_AUTONOMOUS_OPERATIONS.md) — OS Autonomous Operations Runbook — NELVYON | 39 | 59 |
 | [OS_FLOW_AUDIT.md](OS_FLOW_AUDIT.md) — OS Production Flows Audit — 2026-07-22 | 39 | 54 |
@@ -171,46 +173,46 @@ borrarlos, era que se supiera cuál es cuál.
 | [PRODUCTION_CERTIFICATION_REPORT.md](PRODUCTION_CERTIFICATION_REPORT.md) — NELVYON — Informe de certificación final de producción (2026-07-17) | 42 | 147 |
 | [PRODUCTION_SECRETS.md](PRODUCTION_SECRETS.md) — Producción — Secretos y variables (Fuente de verdad) | 42 | 196 |
 | [QUALITY_STANDARD.md](QUALITY_STANDARD.md) — Estándar definitivo de calidad — NELVYON | 42 | 45 |
-| [PHASE2_ELITE_CERT.md](PHASE2_ELITE_CERT.md) — PHASE 2 ELITE CERT — estado honesto | 43 | 63 |
-| [PHASE2_ORCHESTRATOR.md](PHASE2_ORCHESTRATOR.md) — PHASE2 — Orquestador | 43 | 25 |
-| [PHASE2_THREAT_MODEL_ELITE.md](PHASE2_THREAT_MODEL_ELITE.md) — PHASE2 — Threat model (Elite Real) | 43 | 23 |
-| [PHASE2_AI_ARCHITECTURE.md](PHASE2_AI_ARCHITECTURE.md) — PHASE 2 — Arquitectura IA Local NELVYON | 49 | 104 |
-| [PHASE2_BENCHMARK_RESULTS.md](PHASE2_BENCHMARK_RESULTS.md) — PHASE 2 — Benchmark Results (Ollama) | 49 | 89 |
+| [PHASE2_ELITE_CERT.md](PHASE2_ELITE_CERT.md) — PHASE 2 ELITE CERT — estado honesto | 44 | 63 |
+| [PHASE2_ORCHESTRATOR.md](PHASE2_ORCHESTRATOR.md) — PHASE2 — Orquestador | 44 | 25 |
+| [PHASE2_THREAT_MODEL_ELITE.md](PHASE2_THREAT_MODEL_ELITE.md) — PHASE2 — Threat model (Elite Real) | 44 | 23 |
 | [PHASE2_SPECIALIZATION.md](PHASE2_SPECIALIZATION.md) — PHASE 2 — Especialización NELVYON IA Privada | 49 | 194 |
-| [PRIVATE_AI_ARCHITECTURE.md](PRIVATE_AI_ARCHITECTURE.md) — Nelvyon Private AI — Technical Architecture (Prep Phase) | 49 | 199 |
+| [PHASE2_AI_ARCHITECTURE.md](PHASE2_AI_ARCHITECTURE.md) — PHASE 2 — Arquitectura IA Local NELVYON | 50 | 104 |
+| [PHASE2_BENCHMARK_RESULTS.md](PHASE2_BENCHMARK_RESULTS.md) — PHASE 2 — Benchmark Results (Ollama) | 50 | 89 |
+| [PRIVATE_AI_ARCHITECTURE.md](PRIVATE_AI_ARCHITECTURE.md) — Nelvyon Private AI — Technical Architecture (Prep Phase) | 50 | 199 |
 | [SES_PRODUCTION_ACCESS_APPEAL.md](SES_PRODUCTION_ACCESS_APPEAL.md) — Amazon SES — Apelación Production Access (Case 178372013800016) | 50 | 353 |
 | [SES_PRODUCTION_SETUP.md](SES_PRODUCTION_SETUP.md) — Amazon SES — Producción (Fase 1) | 50 | 135 |
 | [ARCHITECTURE.md](ARCHITECTURE.md) — ARCHITECTURE — Arquitectura real NELVYON | 52 | 163 |
-| [SMOKE_GATES.md](SMOKE_GATES.md) — Smoke & CI Gates — Nelvyon | 56 | 47 |
+| [SMOKE_GATES.md](SMOKE_GATES.md) — Smoke & CI Gates — Nelvyon | 57 | 47 |
 | [STRIPE_BILLING_P0.md](STRIPE_BILLING_P0.md) — Stripe Billing P0 — Checkout + Webhook E2E | 57 | 167 |
-| [MANUAL_OPS_ONLY.md](MANUAL_OPS_ONLY.md) — Manual ops only — Nelvyon producción | 59 | 64 |
-| [NELVYON_QUALITY_SCORE.md](NELVYON_QUALITY_SCORE.md) — NELVYON — Puntuación de calidad real (0–10) | 59 | 45 |
-| [PARITY_GHL_HUBSPOT.md](PARITY_GHL_HUBSPOT.md) — Paridad Nelvyon SaaS vs GoHighLevel + HubSpot | 59 | 63 |
-| [OS_AGENT_AUDIT_TRAIL.md](OS_AGENT_AUDIT_TRAIL.md) — OS Agent Audit Trail (O28) | 63 | 46 |
-| [OS_BRIEF_DIFF_RERUN.md](OS_BRIEF_DIFF_RERUN.md) — OS Brief Diff & Re-run (O29) | 63 | 45 |
-| [OS_COMPETITOR_GAP.md](OS_COMPETITOR_GAP.md) — OS Competitor Gap Pack (O24) | 63 | 57 |
-| [OS_DELIVERY_CERTIFICATE.md](OS_DELIVERY_CERTIFICATE.md) — OS Delivery Certificate (O23) | 63 | 57 |
-| [OS_REGULATED_SECTOR_SHIELD.md](OS_REGULATED_SECTOR_SHIELD.md) — OS Regulated Sector Shield (O27) | 63 | 65 |
-| [OS_RETAINER_AUTOPILOT.md](OS_RETAINER_AUTOPILOT.md) — OS Retainer Autopilot v2 (O25) | 63 | 52 |
-| [OS_TEMPLATE_DNA.md](OS_TEMPLATE_DNA.md) — OS Template DNA (O26) | 63 | 45 |
-| [OS_TRUTH_GUARD.md](OS_TRUTH_GUARD.md) — OS Truth Guard (O30) | 63 | 41 |
+| [MANUAL_OPS_ONLY.md](MANUAL_OPS_ONLY.md) — Manual ops only — Nelvyon producción | 60 | 64 |
+| [NELVYON_QUALITY_SCORE.md](NELVYON_QUALITY_SCORE.md) — NELVYON — Puntuación de calidad real (0–10) | 60 | 45 |
+| [PARITY_GHL_HUBSPOT.md](PARITY_GHL_HUBSPOT.md) — Paridad Nelvyon SaaS vs GoHighLevel + HubSpot | 60 | 63 |
+| [OS_AGENT_AUDIT_TRAIL.md](OS_AGENT_AUDIT_TRAIL.md) — OS Agent Audit Trail (O28) | 64 | 46 |
 | [OS_AGENT_DATA.md](OS_AGENT_DATA.md) — OS Agent Data — Semrush / DataForSEO in production (O21) | 64 | 62 |
+| [OS_BRIEF_DIFF_RERUN.md](OS_BRIEF_DIFF_RERUN.md) — OS Brief Diff & Re-run (O29) | 64 | 45 |
+| [OS_COMPETITOR_GAP.md](OS_COMPETITOR_GAP.md) — OS Competitor Gap Pack (O24) | 64 | 57 |
+| [OS_DELIVERY_CERTIFICATE.md](OS_DELIVERY_CERTIFICATE.md) — OS Delivery Certificate (O23) | 64 | 57 |
 | [OS_GATE_RUNBOOK.md](OS_GATE_RUNBOOK.md) — OS Pack Gate — Runbook (O22) | 64 | 61 |
 | [OS_LEARNING.md](OS_LEARNING.md) — OS Learning Loop — GA4 → Seed Selector Weights | 64 | 92 |
+| [OS_REGULATED_SECTOR_SHIELD.md](OS_REGULATED_SECTOR_SHIELD.md) — OS Regulated Sector Shield (O27) | 64 | 65 |
+| [OS_RETAINER_AUTOPILOT.md](OS_RETAINER_AUTOPILOT.md) — OS Retainer Autopilot v2 (O25) | 64 | 52 |
+| [OS_TEMPLATE_DNA.md](OS_TEMPLATE_DNA.md) — OS Template DNA (O26) | 64 | 45 |
+| [OS_TRUTH_GUARD.md](OS_TRUTH_GUARD.md) — OS Truth Guard (O30) | 64 | 41 |
 | [OS_AUTONOMOUS_PROD.md](OS_AUTONOMOUS_PROD.md) — OS Autonomous Production — Runbook | 66 | 79 |
 | [OS_QA.md](OS_QA.md) — OS QA Engine — Visual + Legal Pre-Portal | 66 | 78 |
 | [OS_RECURRING.md](OS_RECURRING.md) — OS Recurring Services — Servicios Continuos Mensuales | 66 | 99 |
-| [OS_SEEDS.md](OS_SEEDS.md) — OS Seeds — 20 Sector Agents | 66 | 127 |
+| [OS_SEEDS.md](OS_SEEDS.md) — OS Seeds — 20 Sector Agents | 67 | 127 |
 | [STAGING_P0_SMOKES.md](STAGING_P0_SMOKES.md) — Staging P0 smokes — quality gate | 67 | 107 |
-| [PARTNERS_HQ_COMMISSION_ONBOARDING_FLOW.md](PARTNERS_HQ_COMMISSION_ONBOARDING_FLOW.md) — Partner HQ — Flujo “Cómo cobro y qué hago” (diseño UX) | 75 | 162 |
+| [PARTNERS_HQ_COMMISSION_ONBOARDING_FLOW.md](PARTNERS_HQ_COMMISSION_ONBOARDING_FLOW.md) — Partner HQ — Flujo “Cómo cobro y qué hago” (diseño UX) | 76 | 162 |
 | [PARTNERS_P2_REBILLING_PORTAL_WL.md](PARTNERS_P2_REBILLING_PORTAL_WL.md) — P2 — Rebilling Stripe Connect + White-label Portal | 76 | 303 |
 | [PARTNERS_WHITELABEL_PROGRAM.md](PARTNERS_WHITELABEL_PROGRAM.md) — Programa Partners / White-Label SaaS & Agencia — Diseño v1 | 76 | 258 |
-| [AUTONOMOUS_SERVICES_MODE.md](AUTONOMOUS_SERVICES_MODE.md) — NELVYON — Autonomous Services Mode | 83 | 689 |
 | [PRODUCTION_READINESS_FINAL.md](PRODUCTION_READINESS_FINAL.md) — NELVYON — Production Readiness Final | 83 | 325 |
+| [AUTONOMOUS_SERVICES_MODE.md](AUTONOMOUS_SERVICES_MODE.md) — NELVYON — Autonomous Services Mode | 84 | 689 |
 | [OS_PRODUCTION_GO_LIVE_CHECKLIST.md](OS_PRODUCTION_GO_LIVE_CHECKLIST.md) — OS Production Go-Live Checklist — Lunes | 84 | 325 |
-| [OS_PRODUCTION_MIGRATIONS.md](OS_PRODUCTION_MIGRATIONS.md) — Migraciones OS en producción (281 + 282) | 84 | 113 |
 | [OS_RLS_AUDIT.md](OS_RLS_AUDIT.md) — OS RLS Audit — NELVYON OS (322_os_rls.sql) | 84 | 90 |
 | [SERVICES_MASTER_PLAN.md](SERVICES_MASTER_PLAN.md) — NELVYON SERVICES — Master Plan (Fase diseño operativo) | 84 | 917 |
+| [OS_PRODUCTION_MIGRATIONS.md](OS_PRODUCTION_MIGRATIONS.md) — Migraciones OS en producción (281 + 282) | 85 | 113 |
 | [NELVYON_SCALABILITY_REVIEW.md](NELVYON_SCALABILITY_REVIEW.md) — NELVYON — Revisión de escalabilidad | 86 | 60 |
 | [NELVYON_UNIVERSAL_PLATFORM.md](NELVYON_UNIVERSAL_PLATFORM.md) — NELVYON — Plataforma universal (arquitectura) | 86 | 77 |
 | [SAAS_TECHNICAL_AUDIT.md](SAAS_TECHNICAL_AUDIT.md) — NELVYON SaaS — Auditoría técnica completa | 86 | 279 |

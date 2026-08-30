@@ -93,8 +93,23 @@ BEGIN
         SELECT 1 FROM pg_constraint WHERE conname = 'os_jobs_status_ck'
     ) THEN
         -- Se valida NOT VALID primero para no bloquear la tabla comprobando
-        -- filas históricas; los 12 trabajos actuales son todos 'queued', así
-        -- que la validación pasa, pero el patrón vale para cuando no lo sean.
+        -- filas históricas, y sólo después se valida.
+        --
+        -- LA LISTA LLEVABA SEIS Y LE FALTABA UNA. El comentario anterior decía
+        -- «los 12 trabajos actuales son todos 'queued', así que la validación
+        -- pasa». Era cierto el día que se escribió y dejó de serlo cuando esos
+        -- doce se cancelaron: la migración falló en producción con
+        --
+        --     check constraint "os_jobs_status_ck" is violated by some row
+        --
+        -- `cancelled` no estaba porque cuando se escribió esto el sistema no
+        -- sabía cancelar. Ahora sí, y es un estado legítimo: ni `failed` —que
+        -- significa «se intentó y salió mal»— ni `dead_letter` —«se agotaron
+        -- los reintentos»— describen «esto no debía ejecutarse nunca».
+        --
+        -- La lista sale de `EstadoDeTrabajo` en `backend/queue/colaDeTrabajos.ts`,
+        -- y hay una prueba que compara las dos: si una crece y la otra no, se
+        -- pone en rojo antes de que lo haga una migración en producción.
         ALTER TABLE os_jobs
           ADD CONSTRAINT os_jobs_status_ck
           CHECK (status IN (
@@ -103,7 +118,8 @@ BEGIN
             'waiting_approval',
             'completed',
             'failed',
-            'dead_letter'
+            'dead_letter',
+            'cancelled'
           )) NOT VALID;
         ALTER TABLE os_jobs VALIDATE CONSTRAINT os_jobs_status_ck;
     END IF;

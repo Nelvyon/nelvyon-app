@@ -1,0 +1,135 @@
+{
+  "_lee_esto": [
+    "Comprueba si los DATOS actuales de produccion caben en las",
+    "RESTRICCIONES que anadirian las migraciones pendientes.",
+    "Es la comprobacion que falto antes de la 579."
+  ],
+  "medidoEn": "2026-08-30T17:48:12.340Z",
+  "pendientes": 11,
+  "violadas": 0,
+  "noComprobables": 1,
+  "informe": [
+    {
+      "migracion": "579_la_cola_que_nadie_vaciaba.sql",
+      "restricciones": [
+        {
+          "tipo": "CHECK IN",
+          "tabla": "os_jobs",
+          "nombre": "os_jobs_status_ck",
+          "columna": "status",
+          "valores": [
+            "queued",
+            "running",
+            "waiting_approval",
+            "completed",
+            "failed",
+            "dead_letter",
+            "cancelled"
+          ],
+          "consulta": "SELECT count(*)::int AS n FROM public.os_jobs WHERE status IS NOT NULL AND status <> ALL($1::text[])",
+          "params": [
+            [
+              "queued",
+              "running",
+              "waiting_approval",
+              "completed",
+              "failed",
+              "dead_letter",
+              "cancelled"
+            ]
+          ],
+          "queViola": "filas cuyo status no está en la lista",
+          "estado": "ok",
+          "violan": 0
+        },
+        {
+          "tipo": "UNIQUE",
+          "tabla": "os_jobs",
+          "nombre": "os_jobs_idempotency_uidx",
+          "columna": "idempotency_key",
+          "consulta": "SELECT coalesce(sum(c - 1), 0)::int AS n FROM (SELECT count(*) AS c FROM public.os_jobs GROUP BY idempotency_key HAVING count(*) > 1) t",
+          "params": [],
+          "queViola": "filas duplicadas en esas columnas",
+          "estado": "no_comprobable",
+          "error": "column \"idempotency_key\" does not exist"
+        }
+      ]
+    },
+    {
+      "migracion": "580_autorizacion_de_gasto_externo.sql",
+      "restricciones": []
+    },
+    {
+      "migracion": "581_cerebro_de_negocio.sql",
+      "restricciones": []
+    },
+    {
+      "migracion": "582_el_cliente_puede_pedir_y_conectar.sql",
+      "restricciones": [
+        {
+          "tipo": "UNIQUE",
+          "tabla": "os_service_requests",
+          "nombre": "os_service_requests_viva_uidx",
+          "columna": "workspace_id, client_id, service_id",
+          "consulta": "SELECT coalesce(sum(c - 1), 0)::int AS n FROM (SELECT count(*) AS c FROM public.os_service_requests GROUP BY workspace_id, client_id, service_id HAVING count(*) > 1) t",
+          "params": [],
+          "queViola": "filas duplicadas en esas columnas",
+          "estado": "tabla_nueva",
+          "violan": 0
+        }
+      ]
+    },
+    {
+      "migracion": "583_motor_de_resultados.sql",
+      "restricciones": [
+        {
+          "tipo": "UNIQUE",
+          "tabla": "os_mediciones",
+          "nombre": "os_mediciones_linea_base_uidx",
+          "columna": "objetivo_id",
+          "consulta": "SELECT coalesce(sum(c - 1), 0)::int AS n FROM (SELECT count(*) AS c FROM public.os_mediciones GROUP BY objetivo_id HAVING count(*) > 1) t",
+          "params": [],
+          "queViola": "filas duplicadas en esas columnas",
+          "estado": "tabla_nueva",
+          "violan": 0
+        }
+      ]
+    },
+    {
+      "migracion": "584_inteligencia_entre_departamentos.sql",
+      "restricciones": [
+        {
+          "tipo": "UNIQUE",
+          "tabla": "os_insights",
+          "nombre": "os_insights_huella_uidx",
+          "columna": "workspace_id, client_id, origen_dep, destino_dep, huella",
+          "consulta": "SELECT coalesce(sum(c - 1), 0)::int AS n FROM (SELECT count(*) AS c FROM public.os_insights GROUP BY workspace_id, client_id, origen_dep, destino_dep, huella HAVING count(*) > 1) t",
+          "params": [],
+          "queViola": "filas duplicadas en esas columnas",
+          "estado": "tabla_nueva",
+          "violan": 0
+        }
+      ]
+    },
+    {
+      "migracion": "585_indice_por_inquilino_donde_manda_rls.sql",
+      "restricciones": []
+    },
+    {
+      "migracion": "586_prospeccion_responsable.sql",
+      "restricciones": []
+    },
+    {
+      "migracion": "587_dos_chatbots_dos_tablas.sql",
+      "restricciones": []
+    },
+    {
+      "migracion": "588_lo_que_faltaba_de_verdad.sql",
+      "restricciones": []
+    },
+    {
+      "migracion": "589_del_prospecto_al_cliente.sql",
+      "restricciones": []
+    }
+  ]
+}

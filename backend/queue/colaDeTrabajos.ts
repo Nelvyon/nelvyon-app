@@ -38,14 +38,31 @@ import { randomUUID } from "node:crypto";
 
 import { DbJobsClient } from "../db/DbJobsClient";
 
-/** Estados posibles. Cerrado: la restricción de la migración 579 los fija. */
+/**
+ * Estados posibles. Cerrado: la restricción de la migración 579 los fija.
+ *
+ * ESTA LISTA Y LA DE LA MIGRACIÓN TIENEN QUE SER LA MISMA, y hasta ahora nada
+ * lo comprobaba. Se descubrió de la peor manera: cancelando doce trabajos
+ * huérfanos en producción con un estado que la 579 no contemplaba, y viéndola
+ * fallar al aplicarse. Ahora hay una prueba que compara las dos listas.
+ */
 export type EstadoDeTrabajo =
   | "queued"
   | "running"
   | "waiting_approval"
   | "completed"
   | "failed"
-  | "dead_letter";
+  | "dead_letter"
+  /**
+   * Cancelado: no se ejecutará, y no porque fallara.
+   *
+   * Es distinto de los otros dos finales y por eso no se reutiliza ninguno:
+   * `failed` dice «se intentó y salió mal», `dead_letter` dice «se agotaron los
+   * reintentos». Un trabajo que nunca debió existir —sin inquilino, sin
+   * encargo— no es ninguna de las dos cosas, y llamarlo `failed` mentiría en
+   * cualquier informe que cuente fallos.
+   */
+  | "cancelled";
 
 /** Estados desde los que un trabajador PUEDE tomar trabajo. Lista blanca. */
 export const RECLAMABLES: readonly EstadoDeTrabajo[] = ["queued"] as const;
@@ -61,6 +78,10 @@ export const INTOCABLES: readonly EstadoDeTrabajo[] = [
   "completed",
   "failed",
   "dead_letter",
+  // Cancelado es terminal: un trabajo cancelado no vuelve a la cola ni cuando
+  // vence su arriendo. Sin esto, el rescate de trabajos varados lo devolvería
+  // a `queued` y acabaría ejecutándose lo que alguien decidió no ejecutar.
+  "cancelled",
 ] as const;
 
 export interface TrabajoReclamado {

@@ -3,7 +3,26 @@ import type { StoredClientIntake } from "./intakeSchemas";
 
 export type { OsPremiumServiceId } from "./constants";
 
-export type OsJobStatus = "queued" | "running" | "completed" | "failed";
+/**
+ * El estado de un trabajo, como lo ve el almacén.
+ *
+ * ESTA UNIÓN LLEVABA MINTIENDO desde antes de que se cancelara nada: declaraba
+ * cuatro estados mientras la cola escribía seis. `waiting_approval` y
+ * `dead_letter` se escriben en `colaDeTrabajos.ts` y aquí no existían, así que
+ * cualquier `switch` sobre este tipo se creía exhaustivo y no lo era.
+ *
+ * Se alinea con `EstadoDeTrabajo` de la cola, que es quien manda porque es
+ * quien escribe. Hay una prueba que compara las dos y la lista de la migración
+ * 579: las tres tienen que decir lo mismo.
+ */
+export type OsJobStatus =
+  | "queued"
+  | "running"
+  | "waiting_approval"
+  | "completed"
+  | "failed"
+  | "dead_letter"
+  | "cancelled";
 
 export type OsJobStepRuntimeStatus = "pending" | "running" | "completed" | "failed";
 

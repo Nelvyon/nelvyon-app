@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-08-30T14:11:28.999Z",
-  "database": "postgres://nelvyon:***@127.0.0.1:5435/nelvyon_pg18",
-  "ran": 32,
-  "skipped": 456,
+  "timestamp": "2026-08-30T17:47:09.792Z",
+  "database": "postgres://nelvyon:***@127.0.0.1:5433/nelvyon_fresh579",
+  "ran": 488,
+  "skipped": 0,
   "totalFiles": 488,
   "failed": null,
   "ok": true,

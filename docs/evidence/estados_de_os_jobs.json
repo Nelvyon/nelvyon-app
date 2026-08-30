@@ -1,0 +1,1780 @@
+{
+  "_lee_esto": [
+    "Cruce de los cuatro sitios donde vive el estado de un trabajo:",
+    "la base, el CHECK de la 579, el tipo OsJobStatus y lo que escribe el codigo.",
+    "Medido en solo lectura contra produccion."
+  ],
+  "medidoEn": "2026-08-30T17:42:10.162Z",
+  "enLaBase": [
+    {
+      "status": "cancelled",
+      "filas": 12,
+      "desde": "2026-06-30",
+      "hasta": "2026-07-09"
+    }
+  ],
+  "delCheck": [
+    "completed",
+    "dead_letter",
+    "failed",
+    "queued",
+    "running",
+    "waiting_approval"
+  ],
+  "delTipo": [
+    "completed",
+    "failed",
+    "queued",
+    "running"
+  ],
+  "filas": [
+    {
+      "estado": "accepted",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:81433"
+      ]
+    },
+    {
+      "estado": "active",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "apps/web/src/lib/packs/__tests__/packAutoApprove.test.ts:133",
+        "apps/web/src/lib/packs/__tests__/packSeedMetadata.test.ts:127",
+        "backend/admin/AdminAnalyticsService.ts:73",
+        "backend/admin/AdminAnalyticsService.ts:78"
+      ]
+    },
+    {
+      "estado": "ads",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": false,
+      "soloEnPruebas": true,
+      "sitios": [
+        "backend/admin/__tests__/nelvyonAdmin.test.ts:22"
+      ]
+    },
+    {
+      "estado": "analytics_setup",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "apps/web/src/lib/packs/betaPacksRunners.ts:421"
+      ]
+    },
+    {
+      "estado": "approved",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:75619",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:75691",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78697",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:79789"
+      ]
+    },
+    {
+      "estado": "approved_by_client",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78697"
+      ]
+    },
+    {
+      "estado": "archived",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:77425",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:77905",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78583",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78697"
+      ]
+    },
+    {
+      "estado": "automations_ops",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "apps/web/src/lib/packs/automationsReputationPacksRunners.ts:93"
+      ]
+    },
+    {
+      "estado": "banned",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:75655"
+      ]
+    },
+    {
+      "estado": "blocked",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78895",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78979",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:79165",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:79201"
+      ]
+    },
+    {
+      "estado": "bounced",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:79957"
+      ]
+    },
+    {
+      "estado": "brand_voice",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "apps/web/src/lib/packs/betaPacksRunners.ts:499"
+      ]
+    },
+    {
+      "estado": "canceled",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/gdpr/dataSubjectService.ts:275"
+      ]
+    },
+    {
+      "estado": "cancelled",
+      "enLaBase": 12,
+      "desde": "2026-06-30",
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:75691",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:77839",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78169",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78883"
+      ]
+    },
+    {
+      "estado": "changes_requested",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78697"
+      ]
+    },
+    {
+      "estado": "churned",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/admin/AdminAnalyticsService.ts:100",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:80125"
+      ]
+    },
+    {
+      "estado": "clicked",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:79957"
+      ]
+    },
+    {
+      "estado": "client",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/admin/AdminAnalyticsService.ts:106",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:80125"
+      ]
+    },
+    {
+      "estado": "client_visible",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": false,
+      "soloEnPruebas": true,
+      "sitios": [
+        "scripts/cuadro-de-mando.mjs:208"
+      ]
+    },
+    {
+      "estado": "closed",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:76357",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:80233",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:80599",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:82735"
+      ]
+    },
+    {
+      "estado": "collecting",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:83455"
+      ]
+    },
+    {
+      "estado": "compared",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78565"
+      ]
+    },
+    {
+      "estado": "completed",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": true,
+      "enElTipo": true,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "apps/web/src/lib/packs/__tests__/packAutoApprove.test.ts:158",
+        "apps/web/src/lib/packs/__tests__/packAutoApprove.test.ts:177",
+        "apps/web/src/lib/packs/__tests__/packAutoApprove.test.ts:261",
+        "apps/web/src/lib/packs/__tests__/packSeedMetadata.test.ts:143"
+      ]
+    },
+    {
+      "estado": "connected",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:80671"
+      ]
+    },
+    {
+      "estado": "content_plan",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "apps/web/src/lib/packs/betaPacksRunners.ts:292"
+      ]
+    },
+    {
+      "estado": "critical",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/os-agents/healthcheck/OsHealthCheck.ts:5",
+        "backend/os-agents/healthcheck/OsHealthCheck.ts:60"
+      ]
+    },
+    {
+      "estado": "cro_plan",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "apps/web/src/lib/packs/betaPacksRunners.ts:355"
+      ]
+    },
+    {
+      "estado": "dead_letter",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": true,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/queue/colaDeTrabajos.ts:267",
+        "backend/queue/colaDeTrabajos.ts:328",
+        "scripts/cuadro-de-mando.mjs:134"
+      ]
+    },
+    {
+      "estado": "deauthorized",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:79315"
+      ]
+    },
+    {
+      "estado": "declined",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:76885"
+      ]
+    },
+    {
+      "estado": "delivered",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78697",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:79045",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:80197",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:81463"
+      ]
+    },
+    {
+      "estado": "disabled",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78859"
+      ]
+    },
+    {
+      "estado": "disconnected",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:80671",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:82423"
+      ]
+    },
+    {
+      "estado": "dismissed",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:80311"
+      ]
+    },
+    {
+      "estado": "done",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "apps/web/src/lib/packs/automationsReputationPacksRunners.ts:93",
+        "apps/web/src/lib/packs/automationsReputationPacksRunners.ts:165",
+        "apps/web/src/lib/packs/betaPacksRunners.ts:85",
+        "apps/web/src/lib/packs/betaPacksRunners.ts:225"
+      ]
+    },
+    {
+      "estado": "downloaded",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78733"
+      ]
+    },
+    {
+      "estado": "draft",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:76885",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:77377",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:77425",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:77839"
+      ]
+    },
+    {
+      "estado": "ended",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:74814",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:74878",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:83281"
+      ]
+    },
+    {
+      "estado": "expired",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:76885",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:80065",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:80167",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:81043"
+      ]
+    },
+    {
+      "estado": "failed",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": true,
+      "enElTipo": true,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "apps/web/src/lib/packs/packOrchestrator.ts:887",
+        "backend/admin/NelvyonAdminService.ts:273",
+        "backend/admin/__tests__/nelvyonAdmin.test.ts:23",
+        "backend/admin/__tests__/nelvyonAdmin.test.ts:41"
+      ]
+    },
+    {
+      "estado": "funnel_map",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "apps/web/src/lib/packs/funnelGrowthPack.ts:78"
+      ]
+    },
+    {
+      "estado": "generated",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:81463"
+      ]
+    },
+    {
+      "estado": "generating",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:79117",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:79255"
+      ]
+    },
+    {
+      "estado": "healthy",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/os-agents/healthcheck/OsHealthCheck.ts:5",
+        "backend/os-agents/healthcheck/OsHealthCheck.ts:56",
+        "backend/os-agents/healthcheck/OsHealthCheck.ts:58"
+      ]
+    },
+    {
+      "estado": "in_progress",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:79165",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:79657",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:80599",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:82735"
+      ]
+    },
+    {
+      "estado": "in_review",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78697"
+      ]
+    },
+    {
+      "estado": "inbound",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:82369"
+      ]
+    },
+    {
+      "estado": "invited",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:82807"
+      ]
+    },
+    {
+      "estado": "invoiced",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:81961"
+      ]
+    },
+    {
+      "estado": "issued",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78727"
+      ]
+    },
+    {
+      "estado": "lead",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:80125"
+      ]
+    },
+    {
+      "estado": "live",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:74814",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:74831",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:74878",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:83281"
+      ]
+    },
+    {
+      "estado": "metadata_only",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78733"
+      ]
+    },
+    {
+      "estado": "needs_review",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "apps/web/src/lib/packs/__tests__/packAutoApprove.test.ts:212",
+        "apps/web/src/lib/packs/__tests__/packAutoApprove.test.ts:231",
+        "apps/web/src/lib/packs/__tests__/packAutoApprove.test.ts:269",
+        "apps/web/src/lib/packs/packOrchestrator.ts:790"
+      ]
+    },
+    {
+      "estado": "no_change",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78565"
+      ]
+    },
+    {
+      "estado": "none",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:82099"
+      ]
+    },
+    {
+      "estado": "not_connected",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:82147"
+      ]
+    },
+    {
+      "estado": "open",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:54618",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:76357",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78433",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78949"
+      ]
+    },
+    {
+      "estado": "opened",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:79957"
+      ]
+    },
+    {
+      "estado": "opt_out",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:82369"
+      ]
+    },
+    {
+      "estado": "os_dup_test",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": false,
+      "soloEnPruebas": true,
+      "sitios": [
+        "backend/qa/__tests__/flows/agent.flow.test.ts:201"
+      ]
+    },
+    {
+      "estado": "os_fail_test",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": false,
+      "soloEnPruebas": true,
+      "sitios": [
+        "backend/qa/__tests__/flows/agent.flow.test.ts:228"
+      ]
+    },
+    {
+      "estado": "os_result_test",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": false,
+      "soloEnPruebas": true,
+      "sitios": [
+        "backend/qa/__tests__/flows/agent.flow.test.ts:176"
+      ]
+    },
+    {
+      "estado": "outbound_playbook",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "apps/web/src/lib/packs/saasB2bGrowthPack.ts:145"
+      ]
+    },
+    {
+      "estado": "overdue",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:77839"
+      ]
+    },
+    {
+      "estado": "paid",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:75619",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:75691",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:77839",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:79045"
+      ]
+    },
+    {
+      "estado": "partial",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78949"
+      ]
+    },
+    {
+      "estado": "passed",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78799",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78811",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78895",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78961"
+      ]
+    },
+    {
+      "estado": "paused",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:75547",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:75655",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:75709",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78883"
+      ]
+    },
+    {
+      "estado": "pending",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "apps/web/src/lib/packs/packRunStore.ts:25",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:49118",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:54753",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:75619"
+      ]
+    },
+    {
+      "estado": "pending_auth",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:82339",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:82495"
+      ]
+    },
+    {
+      "estado": "pending_stripe",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:77977",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:79105"
+      ]
+    },
+    {
+      "estado": "planned",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:77299",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:79657"
+      ]
+    },
+    {
+      "estado": "processing",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:75637",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:76789",
+        "backend/qa/__tests__/flows/agent.flow.test.ts:113",
+        "backend/qa/__tests__/flows/agent.flow.test.ts:131"
+      ]
+    },
+    {
+      "estado": "prospect",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:80125"
+      ]
+    },
+    {
+      "estado": "published",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:56083",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:56093",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:62567",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:62582"
+      ]
+    },
+    {
+      "estado": "queued",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": true,
+      "enElTipo": true,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/__tests__/agenciaCompletaDePuntaAPunta.pg.test.ts:289",
+        "backend/__tests__/todosLosServiciosPorElMismoCableado.pg.test.ts:309",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78925",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:81115"
+      ]
+    },
+    {
+      "estado": "read",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:80197"
+      ]
+    },
+    {
+      "estado": "ready",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "apps/web/src/lib/packs/betaPacksRunners.ts:111",
+        "apps/web/src/lib/packs/funnelGrowthPack.ts:50",
+        "apps/web/src/lib/packs/retentionPack.ts:56",
+        "apps/web/src/lib/packs/saasB2bGrowthPack.ts:93"
+      ]
+    },
+    {
+      "estado": "received",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:77299"
+      ]
+    },
+    {
+      "estado": "refunded",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:77995",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78169",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:79045",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:80857"
+      ]
+    },
+    {
+      "estado": "rejected",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78697",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:81241",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:81433"
+      ]
+    },
+    {
+      "estado": "reputation_ops",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "apps/web/src/lib/packs/automationsReputationPacksRunners.ts:165"
+      ]
+    },
+    {
+      "estado": "rerunning",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78565"
+      ]
+    },
+    {
+      "estado": "resolved",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78433",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:80599",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:82735",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:82933"
+      ]
+    },
+    {
+      "estado": "restricted",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:79315",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:82147"
+      ]
+    },
+    {
+      "estado": "retention_plan",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "apps/web/src/lib/packs/retentionPack.ts:99"
+      ]
+    },
+    {
+      "estado": "reviewing",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:77299"
+      ]
+    },
+    {
+      "estado": "revoked",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:80065",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:81091"
+      ]
+    },
+    {
+      "estado": "running",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": true,
+      "enElTipo": true,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "apps/web/src/__tests__/os-agents/osJobStore.test.ts:19",
+        "apps/web/src/__tests__/os-agents/webPremiumAgent.test.ts:26",
+        "apps/web/src/__tests__/os-agents/webPremiumAgentReal.test.ts:60",
+        "apps/web/src/__tests__/os-agents/webPremiumAgentReal.test.ts:88"
+      ]
+    },
+    {
+      "estado": "scheduled",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:55763",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:79975",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:81709",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:81721"
+      ]
+    },
+    {
+      "estado": "sending",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:82339"
+      ]
+    },
+    {
+      "estado": "sent",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:76885",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:77839",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:79957",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:80167"
+      ]
+    },
+    {
+      "estado": "seo",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": false,
+      "soloEnPruebas": true,
+      "sitios": [
+        "backend/admin/__tests__/nelvyonAdmin.test.ts:21",
+        "backend/admin/__tests__/nelvyonAdmin.test.ts:23"
+      ]
+    },
+    {
+      "estado": "shipped",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:79045"
+      ]
+    },
+    {
+      "estado": "signed",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:76885",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:80167"
+      ]
+    },
+    {
+      "estado": "skipped",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78781",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78925",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:80401"
+      ]
+    },
+    {
+      "estado": "social_calendar",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "apps/web/src/lib/packs/betaPacksRunners.ts:226"
+      ]
+    },
+    {
+      "estado": "social_cm_paid_off",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "apps/web/src/lib/packs/betaPacksRunners.ts:228"
+      ]
+    },
+    {
+      "estado": "social_multinet_kit",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "apps/web/src/lib/packs/betaPacksRunners.ts:227"
+      ]
+    },
+    {
+      "estado": "social_strategy",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "apps/web/src/lib/packs/betaPacksRunners.ts:225"
+      ]
+    },
+    {
+      "estado": "spam",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:80233"
+      ]
+    },
+    {
+      "estado": "strategy_plan",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "apps/web/src/lib/packs/strategyPack.ts:87"
+      ]
+    },
+    {
+      "estado": "string",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/os-agents/OsJobStorePersistent.ts:276"
+      ]
+    },
+    {
+      "estado": "succeeded",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:83455"
+      ]
+    },
+    {
+      "estado": "success",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78511"
+      ]
+    },
+    {
+      "estado": "suggested",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:80311"
+      ]
+    },
+    {
+      "estado": "suspended",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:75709",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:81829",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:82807"
+      ]
+    },
+    {
+      "estado": "transferred",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:80083"
+      ]
+    },
+    {
+      "estado": "unsubscribed",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:79957",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:81547"
+      ]
+    },
+    {
+      "estado": "uploading",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:83455"
+      ]
+    },
+    {
+      "estado": "verified",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:56093",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78949",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:80065",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:82099"
+      ]
+    },
+    {
+      "estado": "viewed",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:76885"
+      ]
+    },
+    {
+      "estado": "waiting",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:76357",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:83077"
+      ]
+    },
+    {
+      "estado": "waiting_approval",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": true,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/operacion/SalaDeMaquinas.ts:190",
+        "backend/queue/__tests__/laColaQueNadieVaciaba.pg.test.ts:178",
+        "backend/queue/__tests__/laColaQueNadieVaciaba.pg.test.ts:188",
+        "backend/queue/__tests__/laColaQueNadieVaciaba.pg.test.ts:424"
+      ]
+    },
+    {
+      "estado": "warning",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:78979",
+        "backend/db/certificacion/catalogo_virgen_semantico.json:79201",
+        "backend/os-agents/healthcheck/OsHealthCheck.ts:5",
+        "backend/os-agents/healthcheck/OsHealthCheck.ts:62"
+      ]
+    },
+    {
+      "estado": "wont_fix",
+      "enLaBase": 0,
+      "desde": null,
+      "enElCheck": false,
+      "enElTipo": false,
+      "loEscribeElCodigo": true,
+      "soloEnPruebas": false,
+      "sitios": [
+        "backend/db/certificacion/catalogo_virgen_semantico.json:77299"
+      ]
+    }
+  ],
+  "desajustes": {
+    "enBaseYNoEnCheck": [
+      "cancelled"
+    ],
+    "escritosYNoEnCheck": [
+      "accepted",
+      "active",
+      "analytics_setup",
+      "approved",
+      "approved_by_client",
+      "archived",
+      "automations_ops",
+      "banned",
+      "blocked",
+      "bounced",
+      "brand_voice",
+      "canceled",
+      "cancelled",
+      "changes_requested",
+      "churned",
+      "clicked",
+      "client",
+      "closed",
+      "collecting",
+      "compared",
+      "connected",
+      "content_plan",
+      "critical",
+      "cro_plan",
+      "deauthorized",
+      "declined",
+      "delivered",
+      "disabled",
+      "disconnected",
+      "dismissed",
+      "done",
+      "downloaded",
+      "draft",
+      "ended",
+      "expired",
+      "funnel_map",
+      "generated",
+      "generating",
+      "healthy",
+      "in_progress",
+      "in_review",
+      "inbound",
+      "invited",
+      "invoiced",
+      "issued",
+      "lead",
+      "live",
+      "metadata_only",
+      "needs_review",
+      "no_change",
+      "none",
+      "not_connected",
+      "open",
+      "opened",
+      "opt_out",
+      "outbound_playbook",
+      "overdue",
+      "paid",
+      "partial",
+      "passed",
+      "paused",
+      "pending",
+      "pending_auth",
+      "pending_stripe",
+      "planned",
+      "processing",
+      "prospect",
+      "published",
+      "read",
+      "ready",
+      "received",
+      "refunded",
+      "rejected",
+      "reputation_ops",
+      "rerunning",
+      "resolved",
+      "restricted",
+      "retention_plan",
+      "reviewing",
+      "revoked",
+      "scheduled",
+      "sending",
+      "sent",
+      "shipped",
+      "signed",
+      "skipped",
+      "social_calendar",
+      "social_cm_paid_off",
+      "social_multinet_kit",
+      "social_strategy",
+      "spam",
+      "strategy_plan",
+      "string",
+      "succeeded",
+      "success",
+      "suggested",
+      "suspended",
+      "transferred",
+      "unsubscribed",
+      "uploading",
+      "verified",
+      "viewed",
+      "waiting",
+      "warning",
+      "wont_fix"
+    ],
+    "escritosYNoEnTipo": [
+      "accepted",
+      "active",
+      "analytics_setup",
+      "approved",
+      "approved_by_client",
+      "archived",
+      "automations_ops",
+      "banned",
+      "blocked",
+      "bounced",
+      "brand_voice",
+      "canceled",
+      "cancelled",
+      "changes_requested",
+      "churned",
+      "clicked",
+      "client",
+      "closed",
+      "collecting",
+      "compared",
+      "connected",
+      "content_plan",
+      "critical",
+      "cro_plan",
+      "dead_letter",
+      "deauthorized",
+      "declined",
+      "delivered",
+      "disabled",
+      "disconnected",
+      "dismissed",
+      "done",
+      "downloaded",
+      "draft",
+      "ended",
+      "expired",
+      "funnel_map",
+      "generated",
+      "generating",
+      "healthy",
+      "in_progress",
+      "in_review",
+      "inbound",
+      "invited",
+      "invoiced",
+      "issued",
+      "lead",
+      "live",
+      "metadata_only",
+      "needs_review",
+      "no_change",
+      "none",
+      "not_connected",
+      "open",
+      "opened",
+      "opt_out",
+      "outbound_playbook",
+      "overdue",
+      "paid",
+      "partial",
+      "passed",
+      "paused",
+      "pending",
+      "pending_auth",
+      "pending_stripe",
+      "planned",
+      "processing",
+      "prospect",
+      "published",
+      "read",
+      "ready",
+      "received",
+      "refunded",
+      "rejected",
+      "reputation_ops",
+      "rerunning",
+      "resolved",
+      "restricted",
+      "retention_plan",
+      "reviewing",
+      "revoked",
+      "scheduled",
+      "sending",
+      "sent",
+      "shipped",
+      "signed",
+      "skipped",
+      "social_calendar",
+      "social_cm_paid_off",
+      "social_multinet_kit",
+      "social_strategy",
+      "spam",
+      "strategy_plan",
+      "string",
+      "succeeded",
+      "success",
+      "suggested",
+      "suspended",
+      "transferred",
+      "unsubscribed",
+      "uploading",
+      "verified",
+      "viewed",
+      "waiting",
+      "waiting_approval",
+      "warning",
+      "wont_fix"
+    ],
+    "enCheckYNadieUsa": []
+  }
+}
