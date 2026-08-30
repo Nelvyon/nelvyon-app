@@ -1,6 +1,6 @@
 # Railway @nelvyon/web — build context = repo root (monorepo)
 FROM node:20-alpine AS base
-RUN npm install -g pnpm
+RUN npm install -g pnpm@10.33.0
 
 FROM base AS deps
 WORKDIR /app

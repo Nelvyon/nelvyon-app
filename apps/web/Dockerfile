@@ -1,7 +1,7 @@
 # Nelvyon web — production Dockerfile (Railway @nelvyon/web)
 # release: 2026-07-21 build-fix revert-phase2-barrel
 FROM node:20-alpine AS base
-RUN npm install -g pnpm
+RUN npm install -g pnpm@10.33.0
 
 FROM base AS deps
 WORKDIR /app
