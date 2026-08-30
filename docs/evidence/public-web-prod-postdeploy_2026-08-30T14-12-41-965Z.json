@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-30T14:14:18.858Z",
+  "generatedAt": "2026-08-30T14:12:30.162Z",
   "commit": null,
   "deploymentId": null,
   "service": "@nelvyon/web",
@@ -12,7 +12,7 @@
         "body": {
           "status": "ok",
           "version": "0.1.4",
-          "timestamp": "2026-08-30T14:14:19.184Z"
+          "timestamp": "2026-08-30T14:12:30.460Z"
         }
       },
       "contactApi": {
@@ -22,154 +22,141 @@
       "routes": {
         "/": {
           "status": 200,
-          "ms": 208,
+          "ms": 202,
           "ok": true
         },
         "/producto": {
           "status": 200,
-          "ms": 704,
+          "ms": 426,
           "ok": true
         },
         "/producto/crm": {
           "status": 200,
-          "ms": 277,
+          "ms": 238,
           "ok": true
         },
         "/producto/ia": {
           "status": 200,
-          "ms": 1228,
+          "ms": 698,
           "ok": true
         },
         "/agencia": {
           "status": 200,
-          "ms": 402,
+          "ms": 423,
           "ok": true
         },
         "/enterprise": {
           "status": 200,
-          "ms": 1870,
+          "ms": 742,
           "ok": true
         },
         "/servicios": {
           "status": 200,
-          "ms": 396,
+          "ms": 472,
           "ok": true
         },
         "/sectores": {
           "status": 200,
-          "ms": 862,
+          "ms": 239,
           "ok": true
         },
         "/plataforma": {
           "status": 200,
-          "ms": 1461,
+          "ms": 858,
           "ok": true
         },
         "/automatizaciones-ia": {
           "status": 200,
-          "ms": 3713,
+          "ms": 229,
           "ok": true
         },
         "/precios": {
           "status": 200,
-          "ms": 1898,
+          "ms": 514,
           "ok": true
         },
         "/contacto": {
           "status": 200,
-          "ms": 908,
+          "ms": 404,
           "ok": true
         },
         "/faq": {
           "status": 200,
-          "ms": 424,
+          "ms": 395,
           "ok": true
         },
         "/login": {
           "status": 200,
-          "ms": 380,
+          "ms": 212,
           "ok": true
         },
         "/saas": {
           "status": 200,
-          "ms": 430,
+          "ms": 409,
           "ok": true
         },
         "/seguridad": {
           "status": 200,
-          "ms": 554,
+          "ms": 237,
           "ok": true
         },
         "/legal/dpa": {
           "status": 200,
-          "ms": 265,
+          "ms": 226,
           "ok": true
         }
       },
       "assets": {
         "/brand/public/library/photos/F-01.webp": {
           "status": 200,
-          "ms": 1575,
+          "ms": 1324,
           "ok": true,
           "bytes": 155001
         },
         "/brand/public/library/photos/F-02.webp": {
           "status": 200,
-          "ms": 8956,
+          "ms": 571,
           "ok": true,
           "bytes": 497034
         },
         "/brand/public/saas-shots/dashboard.webp": {
           "status": 200,
-          "ms": 243,
+          "ms": 281,
           "ok": true,
           "bytes": 54652
         },
         "/brand/public/saas-shots/crm.webp": {
           "status": 200,
-          "ms": 227,
+          "ms": 276,
           "ok": true,
           "bytes": 36910
         },
         "/brand/public/saas-shots/ai.webp": {
           "status": 200,
-          "ms": 244,
+          "ms": 301,
           "ok": true,
           "bytes": 70182
         },
         "/brand/public/library/icons/I-03/019-crm.svg": {
           "status": 200,
-          "ms": 204,
+          "ms": 239,
           "ok": true,
           "bytes": 4475
         },
         "/brand/public/library/icons/I-04/workflow.svg": {
           "status": 200,
-          "ms": 202,
+          "ms": 268,
           "ok": true,
           "bytes": 1154
         }
       },
       "markers": {
+        "home_hasMacbook": false,
+        "home_hasSaasShots": false,
+        "home_hasLibraryIcons": false,
         "home_hasNelvyon": true,
         "home_noSofax": true,
         "home_noNivia": true,
-        "home_hasMacbook": false,
-        "home_hasSaasShots": false,
-        "home_hasLibraryIcons": false,
-        "producto_hasMacbook": false,
-        "producto_hasF02": false,
-        "producto_hasIcons": false
-      },
-      "markersBloqueantes": {
-        "home_hasNelvyon": true,
-        "home_noSofax": true,
-        "home_noNivia": true
-      },
-      "markersInformativas": {
-        "home_hasMacbook": false,
-        "home_hasSaasShots": false,
-        "home_hasLibraryIcons": false,
         "producto_hasMacbook": false,
         "producto_hasF02": false,
         "producto_hasIcons": false
@@ -180,5 +167,5 @@
       "assetTotal": 7
     }
   },
-  "verdict": "PROD_LIVE_PASS"
+  "verdict": "PROD_LIVE_FAIL"
 }

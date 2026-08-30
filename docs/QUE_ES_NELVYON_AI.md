@@ -1,6 +1,6 @@
 # Que es NELVYON AI, tecnicamente
 
-> Generado por `scripts/que-es-nelvyon-ai.mjs` el 2026-08-29.
+> Generado por `scripts/que-es-nelvyon-ai.mjs` el 2026-08-30.
 > No se edita a mano: se regenera.
 
 «Tenemos IA propia» es la frase mas facil de decir y la mas dificil de
@@ -68,7 +68,7 @@ Seis niveles, de observar a exigir aprobación humana, y un suelo por CONSECUENC
 
 ## Cómo llega al mundo real
 
-**19 denegaciones tipificadas**
+**21 denegaciones tipificadas**
 
 Un puente entre el agente y el ejecutor con siete puertas: contrato, aprobación humana, coherencia de la declaración, calidad, ejecutor, gasto e idempotencia, y cierre del rastro.
 
@@ -113,7 +113,7 @@ explicito. Y hay que separar DOS preguntas que se responden distinto:
 | **Inferencia real EN LOCAL** | **`LOCAL_REAL_MEASURED`** |
 | **Inferencia servida para produccion** | **`UNAVAILABLE`** |
 
-**Que significa `LOCAL_REAL_MEASURED`.** El 2026-08-29 se ejecuto una peticion completa por el adaptador
+**Que significa `LOCAL_REAL_MEASURED`.** El 2026-08-30 se ejecuto una peticion completa por el adaptador
 contra un modelo local y volvio asi:
 
 | | |

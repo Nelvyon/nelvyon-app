@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-30T14:14:18.858Z",
+  "generatedAt": "2026-08-30T14:13:34.269Z",
   "commit": null,
   "deploymentId": null,
   "service": "@nelvyon/web",
@@ -12,7 +12,7 @@
         "body": {
           "status": "ok",
           "version": "0.1.4",
-          "timestamp": "2026-08-30T14:14:19.184Z"
+          "timestamp": "2026-08-30T14:13:34.487Z"
         }
       },
       "contactApi": {
@@ -22,130 +22,130 @@
       "routes": {
         "/": {
           "status": 200,
-          "ms": 208,
+          "ms": 210,
           "ok": true
         },
         "/producto": {
           "status": 200,
-          "ms": 704,
+          "ms": 819,
           "ok": true
         },
         "/producto/crm": {
           "status": 200,
-          "ms": 277,
+          "ms": 1332,
           "ok": true
         },
         "/producto/ia": {
-          "status": 200,
-          "ms": 1228,
-          "ok": true
+          "status": 0,
+          "ms": 13027,
+          "ok": false
         },
         "/agencia": {
           "status": 200,
-          "ms": 402,
+          "ms": 459,
           "ok": true
         },
         "/enterprise": {
           "status": 200,
-          "ms": 1870,
+          "ms": 1617,
           "ok": true
         },
         "/servicios": {
           "status": 200,
-          "ms": 396,
+          "ms": 404,
           "ok": true
         },
         "/sectores": {
           "status": 200,
-          "ms": 862,
+          "ms": 262,
           "ok": true
         },
         "/plataforma": {
           "status": 200,
-          "ms": 1461,
+          "ms": 660,
           "ok": true
         },
         "/automatizaciones-ia": {
           "status": 200,
-          "ms": 3713,
+          "ms": 220,
           "ok": true
         },
         "/precios": {
           "status": 200,
-          "ms": 1898,
+          "ms": 492,
           "ok": true
         },
         "/contacto": {
           "status": 200,
-          "ms": 908,
+          "ms": 391,
           "ok": true
         },
         "/faq": {
           "status": 200,
-          "ms": 424,
+          "ms": 576,
           "ok": true
         },
         "/login": {
           "status": 200,
-          "ms": 380,
+          "ms": 263,
           "ok": true
         },
         "/saas": {
           "status": 200,
-          "ms": 430,
+          "ms": 697,
           "ok": true
         },
         "/seguridad": {
           "status": 200,
-          "ms": 554,
+          "ms": 231,
           "ok": true
         },
         "/legal/dpa": {
           "status": 200,
-          "ms": 265,
+          "ms": 223,
           "ok": true
         }
       },
       "assets": {
         "/brand/public/library/photos/F-01.webp": {
           "status": 200,
-          "ms": 1575,
+          "ms": 259,
           "ok": true,
           "bytes": 155001
         },
         "/brand/public/library/photos/F-02.webp": {
           "status": 200,
-          "ms": 8956,
+          "ms": 391,
           "ok": true,
           "bytes": 497034
         },
         "/brand/public/saas-shots/dashboard.webp": {
           "status": 200,
-          "ms": 243,
+          "ms": 228,
           "ok": true,
           "bytes": 54652
         },
         "/brand/public/saas-shots/crm.webp": {
           "status": 200,
-          "ms": 227,
+          "ms": 207,
           "ok": true,
           "bytes": 36910
         },
         "/brand/public/saas-shots/ai.webp": {
           "status": 200,
-          "ms": 244,
+          "ms": 222,
           "ok": true,
           "bytes": 70182
         },
         "/brand/public/library/icons/I-03/019-crm.svg": {
           "status": 200,
-          "ms": 204,
+          "ms": 206,
           "ok": true,
           "bytes": 4475
         },
         "/brand/public/library/icons/I-04/workflow.svg": {
           "status": 200,
-          "ms": 202,
+          "ms": 203,
           "ok": true,
           "bytes": 1154
         }
@@ -174,11 +174,11 @@
         "producto_hasF02": false,
         "producto_hasIcons": false
       },
-      "routePass": 17,
+      "routePass": 16,
       "routeTotal": 17,
       "assetPass": 7,
       "assetTotal": 7
     }
   },
-  "verdict": "PROD_LIVE_PASS"
+  "verdict": "PROD_LIVE_FAIL"
 }

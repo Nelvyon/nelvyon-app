@@ -1,6 +1,6 @@
 # Revisión de los servicios
 
-> Generado por `scripts/revision-de-servicios.mjs` el 2026-08-29.
+> Generado por `scripts/revision-de-servicios.mjs` el 2026-08-30.
 > No se edita a mano: se regenera.
 
 Un servicio de NELVYON no es una línea en una lista de precios: es la promesa de

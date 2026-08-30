@@ -1,6 +1,6 @@
 # Matriz de servicios
 
-> Generado por `scripts/matriz-de-servicios.mjs` el 2026-08-29.
+> Generado por `scripts/matriz-de-servicios.mjs` el 2026-08-30.
 > No se edita a mano: se regenera.
 
 Una fila por servicio vendido, una columna por eslabón del ciclo.

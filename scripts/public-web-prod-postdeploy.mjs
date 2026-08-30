@@ -87,18 +87,37 @@ for (const base of bases) {
 
   const home = await check(`${base}/`);
   const producto = await check(`${base}/producto`);
-  const markers = {
-    home_hasMacbook: /nv-device--macbook/.test(home.text),
-    home_hasSaasShots: /saas-shots\//.test(home.text),
-    home_hasLibraryIcons: /library\/icons\//.test(home.text),
+  /**
+   * DOS CLASES DE MARCA, Y SÓLO UNA DECIDE EL VEREDICTO.
+   *
+   * BLOQUEANTES: que la página sea de NELVYON y no lleve el nombre de otra
+   * marca. Si eso falla, se ha desplegado el sitio equivocado, y no hay nada
+   * más que mirar.
+   *
+   * INFORMATIVAS: que aparezcan unas imágenes concretas de un diseño anterior
+   * —el portátil, las capturas, unos iconos—. Eran bloqueantes, y con el
+   * rediseño dejaron de estar: el veredicto salía `PROD_LIVE_FAIL` con las 17
+   * rutas y los 7 recursos en 200 y la salud correcta.
+   *
+   * Un post-despliegue que dice FAIL cuando no pasa nada deja de mirarse, y
+   * entonces no avisa el día que sí pasa. Se siguen midiendo y se siguen
+   * publicando; lo que ya no hacen es tumbar el veredicto.
+   */
+  const bloqueantes = {
     home_hasNelvyon: /NELVYON/.test(home.text),
     home_noSofax: !/Sofax/.test(home.text),
     home_noNivia: !/Nivia/.test(home.text),
+  };
+  const informativas = {
+    home_hasMacbook: /nv-device--macbook/.test(home.text),
+    home_hasSaasShots: /saas-shots\//.test(home.text),
+    home_hasLibraryIcons: /library\/icons\//.test(home.text),
     producto_hasMacbook: /nv-device--macbook/.test(producto.text),
     producto_hasF02: /library\/photos\/F-02/.test(producto.text),
     producto_hasIcons: /library\/icons\//.test(producto.text),
   };
-  if (!Object.values(markers).every(Boolean)) allOk = false;
+  const markers = { ...bloqueantes, ...informativas };
+  if (!Object.values(bloqueantes).every(Boolean)) allOk = false;
   if (!health.ok) allOk = false;
 
   const contact = await fetch(`${base}/api/contact`, {
@@ -113,6 +132,8 @@ for (const base of bases) {
     routes: routeResults,
     assets: assetResults,
     markers,
+    markersBloqueantes: bloqueantes,
+    markersInformativas: informativas,
     routePass: Object.values(routeResults).filter((x) => x.ok).length,
     routeTotal: routes.length,
     assetPass: Object.values(assetResults).filter((x) => x.ok).length,
