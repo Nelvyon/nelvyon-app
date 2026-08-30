@@ -19,9 +19,13 @@
  * Este guard vigila la FORMA: un `describe.skip(` sin condicion es un test
  * apagado, y eso si seria perdida de cobertura disfrazada de skip.
  */
-import { describe, it, expect } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
+
+/** Plazo del fichero: recorre el arbol. El porque, en `nelvyonEsLaAgencia`. */
+vi.setConfig({ testTimeout: 60_000 });
+
 
 const RAIZ = join(__dirname, "..", "..", "..", "..", "..");
 

@@ -23,7 +23,7 @@
  * Si alguno de estos siete llegara a funcionar, la garantía correspondiente no
  * existe: existiría la apariencia de la garantía.
  */
-import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import pg from "pg";
 
 import { MotorDeCalidad, modoDisponible } from "../calidad/MotorDeCalidad";
@@ -80,6 +80,20 @@ conBase("intentando romper lo construido", () => {
     }
     await pool.query(`DELETE FROM comercial_bajas WHERE dominio LIKE '%.adversario'`).catch(() => undefined);
   }
+
+  beforeEach(() => {
+    // EL MODO DE COSTE CERO SE APAGA EN TODO ESTE FICHERO, y es a proposito.
+    //
+    // Aqui se intenta ROMPER las puertas: colar contenido malo, esquivar la
+    // revision, sacar datos de otro inquilino. Para poder comprobar que cada
+    // puerta aguanta, la accion tiene que llegar hasta ella.
+    //
+    // Con el modo encendido, una campana se deniega en la puerta de coste
+    // —correcto en produccion— y todas las de detras quedarian sin probar. Un
+    // ataque que rebota en la primera valla no demuestra que la segunda exista.
+    // La puerta de coste tiene su propio fichero.
+    vi.stubEnv("NELVYON_MODO_COSTE_CERO", "0");
+  });
 
   afterEach(async () => {
     await limpiar();

@@ -20,9 +20,13 @@
  * No se puede satisfacer bajando la guardia: apagar la variable no da verde,
  * da una puerta que ya no es puerta, y eso se ve en el comando.
  */
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+
+/** Plazo del fichero: recorre el arbol. El porque, en `nelvyonEsLaAgencia`. */
+vi.setConfig({ testTimeout: 60_000 });
+
 
 const AQUI = __dirname;
 const ES_PUERTA = process.env.NELVYON_B2_PUERTA === "1";

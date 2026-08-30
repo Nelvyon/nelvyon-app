@@ -149,6 +149,18 @@ conBase("el puente de ejecución", () => {
     await pool.query(`DELETE FROM gastos_ejecutados WHERE workspace_id = $1`, [WS]);
     await pool.query(`DELETE FROM autorizaciones_de_gasto WHERE workspace_id = $1`, [WS]);
     vi.stubEnv("NELVYON_GASTO_EXTERNO_HABILITADO", "1");
+    // EL MODO DE COSTE CERO SE APAGA AQUÍ, Y ES A PROPÓSITO.
+    //
+    // Este fichero prueba las puertas que autorizan un gasto: que exista
+    // autorización, que quepa en el tope, que no se ejecute dos veces. Para
+    // poder probarlas hay que dejar llegar la acción hasta ellas.
+    //
+    // Con el modo encendido, `meta_ads/crear_campana` se deniega en la puerta
+    // de coste y ninguna de las de abajo llega a evaluarse — lo cual es
+    // CORRECTO, y tiene su propio fichero: `elModoDeCosteCeroCierraElPuente`.
+    // Son dos protecciones distintas y se prueban por separado; mezclarlas
+    // dejaría una de las dos sin comprobar de verdad.
+    vi.stubEnv("NELVYON_MODO_COSTE_CERO", "0");
     aprobadas = new Set();
     solicitadas = [];
     meta = new EjecutorSimulado("meta_ads");

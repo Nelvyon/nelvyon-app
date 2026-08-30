@@ -67,7 +67,75 @@ export interface ConectorInventariado {
   /** Quién lo desbloquea. Sin esto, un hueco no se puede asignar a nadie. */
   dependeDe: "nadie" | "credencial" | "proveedor" | "codigo";
   claves: string[];
+  /**
+   * Qué se podría comprobar de este conector SIN gastar un céntimo, el día que
+   * hubiera credenciales.
+   *
+   * No es lo mismo «no verificado» que «no verificable». Leer quién soy, a qué
+   * cuenta estoy atado y qué permisos tengo no cuesta nada en ninguna de estas
+   * APIs; crear una campaña sí. Distinguirlo es lo que convierte una lista de
+   * pendientes en un plan: lo de arriba se hace en cuanto haya una clave, lo de
+   * abajo no se hace nunca bajo este modo.
+   */
+  verificacionGratuita: VerificacionGratuita;
 }
+
+/** Qué se puede comprobar de un conector sin que suba la factura. */
+export interface VerificacionGratuita {
+  /** Comprobaciones de solo lectura que no cuestan nada en este proveedor. */
+  posibles: readonly string[];
+  /** Lo que exigiría dinero o una acción irreversible. Nunca se ejecuta. */
+  bloqueadas: readonly string[];
+  /**
+   * Si HOY se podría ejecutar la parte gratuita. Falso mientras falten
+   * credenciales — que es el caso de los dieciséis.
+   */
+  ejecutableHoy: boolean;
+}
+
+/**
+ * Lo que cada familia de conector deja comprobar gratis.
+ *
+ * Se agrupa por categoría y no por conector porque la respuesta es la misma
+ * dentro de cada familia: toda API de anuncios deja leer la cuenta y cobra por
+ * lanzar; toda API de mensajería deja leer el número y cobra por enviar.
+ */
+const VERIFICACION_POR_CATEGORIA: Readonly<
+  Record<ConnectorDefinition["category"], { posibles: string[]; bloqueadas: string[] }>
+> = {
+  analytics: {
+    posibles: ["identidad del token", "propiedades accesibles", "permisos", "salud de la API"],
+    bloqueadas: [],
+  },
+  seo: {
+    posibles: ["identidad del token", "sitios verificados", "permisos", "salud de la API"],
+    bloqueadas: ["consultas de volumen en herramientas de pago por crédito"],
+  },
+  ads: {
+    posibles: ["identidad del token", "cuentas publicitarias visibles", "permisos", "salud de la API"],
+    bloqueadas: ["crear campaña", "activar campaña", "cambiar presupuesto"],
+  },
+  crm: {
+    posibles: ["identidad del token", "portal o instancia asociada", "permisos"],
+    bloqueadas: ["escribir contactos reales"],
+  },
+  email: {
+    posibles: ["identidad", "dominios verificados", "cuota y estado de sandbox", "salud de la API"],
+    bloqueadas: ["enviar correo real", "envío masivo"],
+  },
+  social: {
+    posibles: ["identidad del token", "páginas o perfiles accesibles", "permisos"],
+    bloqueadas: ["publicar"],
+  },
+  commerce: {
+    posibles: ["identidad de la app", "tienda asociada", "permisos concedidos"],
+    bloqueadas: ["modificar catálogo o pedidos"],
+  },
+  comms: {
+    posibles: ["identidad", "números o bots asociados", "estado de las plantillas"],
+    bloqueadas: ["enviar mensaje", "abrir conversación"],
+  },
+};
 
 /**
  * Qué claves de entorno están puestas.
@@ -198,6 +266,13 @@ export function inventariar(
     queFalta,
     dependeDe,
     claves: c.envKeys,
+    verificacionGratuita: {
+      ...VERIFICACION_POR_CATEGORIA[c.category],
+      // Sólo cuando hay adaptador Y credenciales. Sin una de las dos, la
+      // comprobación gratuita tampoco se puede hacer — y decir que sí se
+      // podría sería prometer un trabajo que hoy no se puede empezar.
+      ejecutableHoy: hayAdaptador && clavesQueFaltan.length === 0,
+    },
   };
 }
 

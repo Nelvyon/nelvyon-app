@@ -20,11 +20,25 @@
  * El LLM es un doble determinista. No es una limitacion: preguntarle a otro
  * modelo «esta bien?» no seria evidencia de nada, y ademas costaria dinero.
  */
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { OS_AGENT_REGISTRY } from "../OsAgentRegistry";
 import type { BaseOsAgent } from "../BaseOsAgent";
 import type { OsJobContext, OsJobPayload } from "../types";
+
+/**
+ * PLAZO DEL FICHERO.
+ *
+ * Ejecuta los 29 agentes enteros contra un doble determinista. Son cientos
+ * de pasos encadenados y, con la suite completa en paralelo, algunos no caben
+ * en los cinco segundos por defecto: fallaba uno distinto cada vez, siempre por
+ * plazo y nunca por contenido.
+ *
+ * Una prueba que falla segun lo ocupada que este la maquina ensena a
+ * relanzarla en vez de a mirar, y a partir de ahi un fallo de verdad se
+ * confunde con «hoy iba lento».
+ */
+vi.setConfig({ testTimeout: 60_000 });
 
 /** Los servicios Premium del registro: los que NELVYON cobra. */
 function serviciosPremium(): Array<[string, () => BaseOsAgent]> {

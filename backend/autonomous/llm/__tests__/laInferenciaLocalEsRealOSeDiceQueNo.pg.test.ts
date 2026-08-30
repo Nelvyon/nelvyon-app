@@ -154,7 +154,11 @@ conModelo("la inferencia local es real, y la procedencia lo demuestra", () => {
       expect(r.provenance?.tokensOut ?? 0).toBeGreaterThan(3);
 
       // 3. El coste. Es local: si cuesta, no es local.
-      expect(r.provenance?.costUsd ?? 0, "una inferencia local no cuesta dinero").toBe(0);
+      // `costEstimateUsd`, NO `costUsd`. La primera version usaba el nombre
+      // equivocado, y `undefined ?? 0` da 0: la comprobacion pasaba sin mirar
+      // nada. Una asercion sobre un campo que no existe es peor que no tenerla,
+      // porque ocupa el sitio de la que si comprobaria y ademas da confianza.
+      expect(r.provenance?.costEstimateUsd, "una inferencia local no cuesta dinero").toBe(0);
 
       // 4. Y que haya dicho algo. Un modelo real que devuelve vacío es un fallo
       //    igual, sólo que más difícil de ver.
@@ -187,7 +191,7 @@ conModelo("la inferencia local es real, y la procedencia lo demuestra", () => {
             modelo: r.provenance?.model ?? null,
             tokensEntrada: r.provenance?.tokensIn ?? null,
             tokensSalida: r.provenance?.tokensOut ?? null,
-            costeUsd: r.provenance?.costUsd ?? 0,
+            costeUsd: r.provenance?.costEstimateUsd ?? null,
             milisegundos: ms,
           },
         },

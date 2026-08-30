@@ -13,7 +13,11 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+/** Plazo del fichero: recorre el arbol. El porque, en `nelvyonEsLaAgencia`. */
+vi.setConfig({ testTimeout: 60_000 });
+
 
 type Omision = { id: string; code: string; sentencia: string; motivo: string };
 

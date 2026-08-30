@@ -27,9 +27,32 @@
  * distingue. Lo único que persigue son las fórmulas que niegan que haya alguien
  * haciendo el trabajo por el cliente.
  */
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
+
+/**
+ * PLAZO EXPLICITO PARA TODO EL FICHERO.
+ *
+ * Estas pruebas recorren el arbol leyendo ficheros. Eso tarda segundos de
+ * verdad, y el plazo por defecto de vitest —cinco— esta pensado para una prueba
+ * unitaria, no para una auditoria del codigo fuente.
+ *
+ * Con la suite entera en paralelo empezaron a fallar por plazo agotado mientras
+ * pasaban una a una. Es lo peor que le puede pasar a una prueba: enseña a
+ * relanzarla en vez de a mirar, y a partir de ahi un fallo de verdad se
+ * confunde con «hoy iba lento».
+ *
+ * Se pone AL FICHERO y no prueba a prueba porque hacerlo una a una ya fallo dos
+ * veces: se cubrian las que fallaban ese dia y al siguiente fallaban otras que
+ * hacen exactamente el mismo trabajo. Cuando todas las pruebas de un fichero
+ * son de la misma clase, el plazo es del fichero.
+ *
+ * El plazo no oculta nada: el trabajo se hace entero y la comprobacion es la
+ * misma. Lo unico que cambia es que se le da el tiempo que necesita.
+ */
+vi.setConfig({ testTimeout: 60_000 });
+
 
 const RAIZ = path.resolve(__dirname, "..", "..");
 

@@ -41,6 +41,32 @@ taparía que nadie lo ha visto funcionar.
 | Twilio SMS/Voice `twilio` | comms | `stub` | `CREDENTIAL_REQUIRED` | credencial | claves sin poner: TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN |
 | Telegram Bot `telegram` | comms | `stub` | `CREDENTIAL_REQUIRED` | credencial | claves sin poner: TELEGRAM_BOT_TOKEN |
 
+## Qué se podría comprobar sin gastar un céntimo
+
+«No verificado» y «no verificable» no son lo mismo. Leer quién soy, a qué cuenta
+estoy atado y qué permisos tengo no cuesta nada en ninguna de estas APIs; crear una
+campaña o enviar un mensaje sí. Esta tabla separa las dos cosas para que, el día que
+haya una credencial, se sepa exactamente qué se puede hacer en ese momento.
+
+| Conector | Gratis de comprobar | Nunca bajo este modo | ¿Hoy? |
+|---|---|---|---|
+| `google-analytics-4` | identidad del token, propiedades accesibles, permisos, salud de la API | — | faltan credenciales |
+| `google-search-console` | identidad del token, sitios verificados, permisos, salud de la API | consultas de volumen en herramientas de pago por crédito | faltan credenciales |
+| `google-ads` | identidad del token, cuentas publicitarias visibles, permisos, salud de la API | crear campaña, activar campaña, cambiar presupuesto | faltan credenciales |
+| `meta-ads` | identidad del token, cuentas publicitarias visibles, permisos, salud de la API | crear campaña, activar campaña, cambiar presupuesto | faltan credenciales |
+| `tiktok-ads` | identidad del token, cuentas publicitarias visibles, permisos, salud de la API | crear campaña, activar campaña, cambiar presupuesto | faltan credenciales |
+| `linkedin-ads` | identidad del token, cuentas publicitarias visibles, permisos, salud de la API | crear campaña, activar campaña, cambiar presupuesto | faltan credenciales |
+| `semrush` | identidad del token, sitios verificados, permisos, salud de la API | consultas de volumen en herramientas de pago por crédito | faltan credenciales |
+| `shopify` | identidad de la app, tienda asociada, permisos concedidos | modificar catálogo o pedidos | faltan credenciales |
+| `hubspot-crm` | identidad del token, portal o instancia asociada, permisos | escribir contactos reales | faltan credenciales |
+| `salesforce-crm` | identidad del token, portal o instancia asociada, permisos | escribir contactos reales | faltan credenciales |
+| `klaviyo` | identidad, dominios verificados, cuota y estado de sandbox, salud de la API | enviar correo real, envío masivo | faltan credenciales |
+| `mailchimp` | identidad, dominios verificados, cuota y estado de sandbox, salud de la API | enviar correo real, envío masivo | faltan credenciales |
+| `amazon-ses` | identidad, dominios verificados, cuota y estado de sandbox, salud de la API | enviar correo real, envío masivo | faltan credenciales |
+| `whatsapp` | identidad, números o bots asociados, estado de las plantillas | enviar mensaje, abrir conversación | faltan credenciales |
+| `twilio` | identidad, números o bots asociados, estado de las plantillas | enviar mensaje, abrir conversación | faltan credenciales |
+| `telegram` | identidad, números o bots asociados, estado de las plantillas | enviar mensaje, abrir conversación | faltan credenciales |
+
 ## Lo que este inventario NO dice
 
 - **Que ninguno funcione.** Dice que el código está escrito y a dónde llama. Que la

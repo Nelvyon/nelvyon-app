@@ -2,6 +2,9 @@
  * S38 — Inbox 10/10: threading, round-robin, SLA, email SES
  * 30+ tests covering all new SaasInboxService v2 methods
  */
+
+// Plazo explicito en las que hacen trabajo de verdad: ver el porque en
+// `backend/billing/__tests__/elPrecioProvisionalNoSeCobra.test.ts`.
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { SaasInboxService, resetSaasInboxServiceForTests } from "../SaasInboxService";
 
@@ -322,7 +325,7 @@ describe("SaasInboxService.replyToConversation email via SES", () => {
     // channelDispatched depends on SES being configured in this env
     expect(result.message.id).toBe("m1");
     expect(result.message.body).toBe("Hello");
-  });
+  }, 60_000);
 
   it("sets channelError when contact has no email", async () => {
     const emailConv = { ...baseConvRow, channel: "email", contact_id: "c1", contact_email: null, first_response_at: null };
@@ -360,7 +363,7 @@ describe("SaasInboxService.replyToConversation email via SES", () => {
       typeof c[0] === "string" && (c[0] as string).includes("first_response_at"),
     );
     expect(firstRespUpdate).toBeDefined();
-  });
+  }, 60_000);
 
   it("skips first_response_at update when already set", async () => {
     const emailConv = { ...baseConvRow, channel: "email", first_response_at: new Date() };
@@ -379,7 +382,7 @@ describe("SaasInboxService.replyToConversation email via SES", () => {
       typeof c[0] === "string" && (c[0] as string).includes("first_response_at=NOW"),
     );
     expect(firstRespUpdates).toHaveLength(0);
-  });
+  }, 60_000);
 });
 
 // ── enrichConversationList ────────────────────────────────────────────────────

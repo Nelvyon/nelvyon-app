@@ -21,11 +21,12 @@
  * ambas cosas: busca `process.env.X`, no la aparicion del nombre.
  */
 
-// Plazo explicito en las que recorren el arbol: ver el porque en
-// `backend/billing/__tests__/elPrecioProvisionalNoSeCobra.test.ts`.
-import { describe, it, expect } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
+
+/** Plazo del fichero: recorre el arbol. El porque, en `nelvyonEsLaAgencia`. */
+vi.setConfig({ testTimeout: 60_000 });
 
 /** Identificadores de CUENTA publicitaria. Nunca deben salir del entorno. */
 const CUENTAS_CORPORATIVAS = [
@@ -90,12 +91,12 @@ describe("aislamiento de proveedor de Ads (lado Node)", () => {
     // cuentas corporativas" no probaria nada; aqui SI debe encontrar algo.
     const encontradas = lecturasDeEntorno(CREDENCIALES_DE_APLICACION);
     expect(encontradas.length).toBeGreaterThan(0);
-  }, 60_000);
+  });
 
   it("ninguna superficie Node lee una cuenta publicitaria corporativa", () => {
     const hallazgos = lecturasDeEntorno(CUENTAS_CORPORATIVAS);
     expect(hallazgos).toEqual([]);
-  }, 60_000);
+  });
 
   it("GoogleAdsExecutor resuelve la credencial del propio usuario y falla cerrado", () => {
     const src = readFileSync(

@@ -22,9 +22,13 @@
  * probar el aislamiento— ni que dos ficheros compartan tabla. Sólo persigue lo
  * que produce interferencia: el mismo inquilino en dos ficheros distintos.
  */
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
+
+/** Plazo del fichero: recorre el arbol. El porque, en `nelvyonEsLaAgencia`. */
+vi.setConfig({ testTimeout: 60_000 });
+
 
 const RAIZ = path.resolve(__dirname, "..", "..");
 

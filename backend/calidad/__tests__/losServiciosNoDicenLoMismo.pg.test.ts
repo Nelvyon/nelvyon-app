@@ -27,7 +27,7 @@
  *
  * COSTE EXTERNO: 0 €.
  */
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -39,6 +39,10 @@ import {
   type Veredicto,
 } from "../bancoAntiGenerico";
 import { CLIENTES, cargaDe, variante } from "../clientesSinteticos";
+
+/** Plazo del fichero: recorre el arbol. El porque, en `nelvyonEsLaAgencia`. */
+vi.setConfig({ testTimeout: 60_000 });
+
 
 const RAIZ = path.resolve(__dirname, "..", "..", "..");
 const DIR = path.join(RAIZ, "backend", "os-agents", "agents");

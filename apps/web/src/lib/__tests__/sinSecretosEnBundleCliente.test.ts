@@ -1,6 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
+
+/** Plazo del fichero: recorre el arbol. El porque, en `nelvyonEsLaAgencia`. */
+vi.setConfig({ testTimeout: 60_000 });
 
 /**
  * Ninguna credencial se lee de una variable `NEXT_PUBLIC_`.
@@ -26,8 +29,6 @@ import path from "node:path";
  * detectarlo.
  */
 
-// Plazo explicito en las que recorren el arbol: ver el porque en
-// `backend/billing/__tests__/elPrecioProvisionalNoSeCobra.test.ts`.
 
 const RAIZ = path.resolve(__dirname, "../..");
 
@@ -73,7 +74,7 @@ describe("secretos y bundle de cliente", () => {
       "Next incrusta NEXT_PUBLIC_* en el bundle del navegador; leer un secreto " +
         `de ahí es publicarlo:\n  ${culpables.join("\n  ")}`,
     ).toEqual([]);
-  }, 60_000);
+  });
 
   it("el detector reconoce el patrón exacto que se retiró", () => {
     // Control negativo: sin esto, un regex que no casara nada daría verde.

@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -64,8 +64,23 @@ import path from "node:path";
  * obligue a reabrirla.
  */
 
-// Plazo explicito en las que recorren el arbol: ver el porque en
+// Plazo explicito en las que hacen trabajo de verdad: ver el porque en
 // `backend/billing/__tests__/elPrecioProvisionalNoSeCobra.test.ts`.
+
+/**
+ * PLAZO EXPLICITO PARA TODO EL FICHERO.
+ *
+ * Cada prueba de aqui recorre `src` y `public` enteros leyendo ficheros. Eso
+ * tarda segundos de verdad, y el plazo por defecto de vitest —cinco— esta
+ * pensado para una prueba unitaria, no para una auditoria del arbol.
+ *
+ * Se pone al fichero y no prueba a prueba porque poniendolo una a una ya fallo:
+ * se cubrieron las tres que fallaban ese dia y al siguiente fallaron otras dos,
+ * que hacen exactamente el mismo trabajo. Cuando TODAS las pruebas de un
+ * fichero son de la misma clase, el plazo es del fichero.
+ */
+vi.setConfig({ testTimeout: 60_000 });
+
 
 const SRC = path.resolve(__dirname, "../..");
 const DIR_FUENTES = path.join(SRC, "fonts");
@@ -212,7 +227,7 @@ describe("fuentes — el build no sale a Internet a por ellas", () => {
       `${culpables.length} ficheros descargan la fuente de Google durante el build ` +
         `en vez de usar next/font/local con un woff2 de src/fonts:\n  ${culpables.join("\n  ")}`,
     ).toEqual([]);
-  }, 60_000);
+  });
 
   it("hay consumidores de localFont — el cambio no se deshizo por la via facil", () => {
     // Si alguien quitase los imports remotos borrando las fuentes en vez de
@@ -315,7 +330,7 @@ describe("fuentes — el navegador tampoco sale a Internet a por ellas", () => {
         `o con un @font-face contra /fonts si es del pack estatico de public:\n  ` +
         `${culpables.join("\n  ")}`,
     ).toEqual([]);
-  }, 60_000);
+  });
 
   it("la CSP no autoriza ya esos origenes", () => {
     // El barrido de arriba ya cubre `headers.ts` —dejo de estar excepcionado al

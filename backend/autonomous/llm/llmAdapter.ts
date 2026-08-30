@@ -51,6 +51,7 @@ import {
 } from "./providers";
 import { ollamaEstaConfigurado, proveedorOllama } from "./providers/ollamaProvider";
 import { openAiEstaPermitido, proveedorOpenAi } from "./providers/openAiProvider";
+import { decidirCoste } from "../../coste/PoliticaDeCosteCero";
 
 // Registro por defecto. Registrar no habilita: cada proveedor sigue decidiendo
 // si está configurado y si la política le deja actuar.
@@ -386,6 +387,19 @@ function normalizarRespuesta(req: LlmRequest, res: LlmResponse): LlmResponse {
   };
 }
 
+/**
+ * Deja constancia de qué proveedores se han apartado por coste.
+ *
+ * Sin esto, la única señal de que el modo está actuando sería que la respuesta
+ * viene de otro sitio — y eso se confunde con «hoy el otro estaba caído». Un
+ * veto silencioso es indistinguible de una avería.
+ */
+function logLlmCostEvent(agentId: string, vetados: readonly string[]): void {
+  console.info(
+    `[coste-cero] agent=${agentId} proveedores_apartados=${vetados.join(",")} coste_adicional=0`,
+  );
+}
+
 export async function invokeLlm(req: LlmRequest): Promise<LlmResponse> {
   if (customInvoke) return normalizarRespuesta(req, await customInvoke(req));
 
@@ -426,7 +440,30 @@ export async function invokeLlm(req: LlmRequest): Promise<LlmResponse> {
     return salidaDeReglas(req, started, "MOCK", motivo, null, null, 0, degradacionOk);
   }
 
-  const disponibles = proveedoresDisponibles();
+  /**
+   * EL MODO DE COSTE CERO SE APLICA AQUÍ, ANTES DE INTENTAR NADA.
+   *
+   * `AUTONOMOUS_ALLOW_OPENAI` ya existía y sirve, pero es un permiso por
+   * proveedor: hay que acordarse de apagarlo uno a uno, y el que se añada
+   * mañana nace encendido si nadie se acuerda. Esto es al revés — la regla es
+   * general y el proveedor tiene que demostrar que no cuesta.
+   *
+   * Se filtra la lista en vez de fallar: si queda Ollama, el trabajo sigue por
+   * el camino local, que es exactamente lo que se quiere. Sólo cuando no queda
+   * ninguno se comporta como «no hay proveedor», que es la rama de abajo y ya
+   * está probada.
+   */
+  const todos = proveedoresDisponibles();
+  const vetadosPorCoste: string[] = [];
+  const disponibles = todos.filter((p) => {
+    const v = decidirCoste({ proveedor: p.id, operacion: "generar", agente: req.agentId });
+    if (v.permitido) return true;
+    vetadosPorCoste.push(`${p.id} (${v.motivo})`);
+    return false;
+  });
+  if (vetadosPorCoste.length > 0) {
+    logLlmCostEvent(req.agentId, vetadosPorCoste);
+  }
 
   if (disponibles.length === 0) {
     const motivo = "ningún proveedor de modelo configurado y permitido";

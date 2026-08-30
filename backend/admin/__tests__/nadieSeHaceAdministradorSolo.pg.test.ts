@@ -33,11 +33,12 @@
  * fallando — porque el camino nuevo todavía no estaría en la lista.
  */
 
-// Plazo explicito en la que recorre el arbol: ver el porque en
-// `backend/billing/__tests__/elPrecioProvisionalNoSeCobra.test.ts`.
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
+
+/** Plazo del fichero: recorre el arbol. El porque, en `nelvyonEsLaAgencia`. */
+vi.setConfig({ testTimeout: 60_000 });
 
 const DSN =
   process.env.NELVYON_PG_CERT_DSN ?? process.env.DATABASE_URL ?? process.env.NELVYON_B2_DSN ?? "";
@@ -304,5 +305,5 @@ describe("el camino de escritura es UNO, y está guardado", () => {
     expect(generico, "la jerarquía no está definida en el router genérico").toContain(
       "No puedes asignar un rol superior al tuyo",
     );
-  }, 60_000);
+  });
 });

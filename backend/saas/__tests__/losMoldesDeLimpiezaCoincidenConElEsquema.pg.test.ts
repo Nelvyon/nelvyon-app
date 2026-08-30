@@ -23,9 +23,13 @@
  *
  * Se salta sin `NELVYON_B2_DSN`.
  */
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
+
+/** Plazo del fichero: recorre el arbol. El porque, en `nelvyonEsLaAgencia`. */
+vi.setConfig({ testTimeout: 60_000 });
+
 
 const DSN = process.env.NELVYON_B2_DSN;
 const describeSiHayPg = DSN ? describe : describe.skip;

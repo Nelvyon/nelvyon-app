@@ -4,7 +4,7 @@
     "modeloDisponible=false NO significa que NELVYON AI no funcione: significa",
     "que en la maquina donde se ejecuto esto no habia ningun modelo instalado."
   ],
-  "medidoEn": "2026-08-29",
+  "medidoEn": "2026-08-30",
   "base": "http://127.0.0.1:11434",
   "modeloDisponible": true,
   "modelosInstalados": [
@@ -24,6 +24,6 @@
     "tokensEntrada": 81,
     "tokensSalida": 184,
     "costeUsd": 0,
-    "milisegundos": 13716
+    "milisegundos": 14069
   }
 }

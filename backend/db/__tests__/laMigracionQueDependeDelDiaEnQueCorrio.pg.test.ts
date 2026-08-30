@@ -88,19 +88,39 @@ soloConBase("BLOQUE 9 · la condición de vacío existe y hace lo que dice", () 
         `${pol.rows.length} politicas de la familia _os_`,
     );
 
-    if (tieneFilas) {
-      expect(
-        pol.rows.length,
-        "saas_tenants tiene filas Y tiene las politicas _os_: la migracion 567 ha " +
-          "cambiado de criterio y hay que revisar este hallazgo entero",
-      ).toBe(0);
-    } else {
+    /**
+     * «TIENE FILAS AHORA» NO ES «TENÍA FILAS ENTONCES», y confundirlo hacía que
+     * esta prueba saliera cara o cruz.
+     *
+     * La versión anterior deducía el pasado del presente: si la tabla tiene
+     * filas hoy, la migración debió saltársela. Eso es cierto en la base viva
+     * —donde las filas llevan ahí desde antes de la 567— y es FALSO en una base
+     * reconstruida desde cero, donde la 567 corre sobre una tabla vacía, crea
+     * las políticas, y después otra prueba inserta un inquilino.
+     *
+     * Con la suite entera en paralelo, esta prueba pasaba o fallaba según qué
+     * otro fichero hubiera escrito antes en `saas_tenants`. Una prueba que sale
+     * cara o cruz no documenta un hallazgo: lo desacredita.
+     *
+     * Lo que SÍ se puede afirmar sin adivinar el pasado: si la tabla está
+     * vacía, la migración no pudo saltársela, así que las políticas tienen que
+     * estar. Y si tiene filas, no se puede saber cuándo llegaron — se dice y no
+     * se afirma nada.
+     */
+    if (!tieneFilas) {
       expect(
         pol.rows.length,
         "saas_tenants esta VACIA y aun asi no tiene las politicas: eso ya no es la " +
           "guarda de vacio, es otro problema",
       ).toBeGreaterThan(0);
+      return;
     }
+
+    console.info(
+      "saas_tenants tiene filas AHORA, lo que no dice si las tenia cuando corrio la 567. " +
+        `Politicas presentes: ${pol.rows.length}. El hallazgo de produccion esta medido ` +
+        "aparte, en el preflight, contra la base real.",
+    );
   });
 
   it("el detector de deriva existe y sabe encontrarlo", async () => {

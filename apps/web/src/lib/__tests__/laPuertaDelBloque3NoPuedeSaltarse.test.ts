@@ -15,9 +15,13 @@
  * un guardián que dependa del `include` desaparece cuando alguien lo estrecha,
  * y una suite sin el fichero no falla, simplemente no lo ejecuta.
  */
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+
+/** Plazo del fichero: recorre el arbol. El porque, en `nelvyonEsLaAgencia`. */
+vi.setConfig({ testTimeout: 60_000 });
+
 
 function raizDelProyecto(): string {
   let d = process.cwd();

@@ -35,7 +35,7 @@
  * comprobacion sigue siendo la misma. Lo unico que cambia es que se le da el
  * tiempo que necesita.
  */
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -46,6 +46,9 @@ import {
   serviciosSinPrecioDefinitivo,
 } from "../premiumProducts";
 import { OS_PREMIUM_SERVICE_IDS } from "../../os-agents/constants";
+
+/** Plazo del fichero: recorre el arbol. El porque, en `nelvyonEsLaAgencia`. */
+vi.setConfig({ testTimeout: 60_000 });
 
 const RAIZ = path.resolve(__dirname, "..", "..", "..");
 
@@ -134,5 +137,5 @@ describe("el precio provisional no se cobra", () => {
       infractores,
       `leen el importe sin pasar por precioFacturable(): ${infractores.join(", ")}`,
     ).toEqual([]);
-  }, 60_000);
+  });
 });

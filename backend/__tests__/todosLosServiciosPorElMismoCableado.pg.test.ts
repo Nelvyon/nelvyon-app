@@ -139,6 +139,12 @@ conBase("todos los servicios, por el mismo cableado", () => {
   beforeEach(async () => {
     await limpiar();
     vi.stubEnv("NELVYON_GASTO_EXTERNO_HABILITADO", "1");
+    // Y el modo de coste cero se apaga: este fichero prueba el CABLEADO, y
+    // para recorrerlo hay que dejar llegar la accion hasta el final. Con el
+    // modo encendido, `crear_campana` se deniega en la puerta de coste —lo
+    // correcto en produccion, y probado en `elModoDeCosteCeroCierraElPuente`—
+    // pero entonces esto no probaria nada de lo que dice probar.
+    vi.stubEnv("NELVYON_MODO_COSTE_CERO", "0");
   });
 
   afterEach(() => vi.unstubAllEnvs());

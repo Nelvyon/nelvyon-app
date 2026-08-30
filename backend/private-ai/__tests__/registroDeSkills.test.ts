@@ -11,7 +11,7 @@
  *      que revisa su propio trabajo no revisa, relee — y ese es justo el fallo
  *      que el bloque persigue: el QA que siempre aprueba.
  */
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 
@@ -27,6 +27,9 @@ import {
   SKILLS_EXTERNAS,
   externasDe,
 } from "../skills/registroDeSkills";
+
+/** Plazo del fichero: recorre el arbol. El porque, en `nelvyonEsLaAgencia`. */
+vi.setConfig({ testTimeout: 60_000 });
 
 function raizDelProyecto(): string {
   let d = process.cwd();

@@ -215,6 +215,23 @@ describe("el inventario de conectores no promete más de lo que hay", () => {
       );
     }
     l.push("");
+    l.push("## Qué se podría comprobar sin gastar un céntimo");
+    l.push("");
+    l.push(
+      "«No verificado» y «no verificable» no son lo mismo. Leer quién soy, a qué cuenta",
+      "estoy atado y qué permisos tengo no cuesta nada en ninguna de estas APIs; crear una",
+      "campaña o enviar un mensaje sí. Esta tabla separa las dos cosas para que, el día que",
+      "haya una credencial, se sepa exactamente qué se puede hacer en ese momento.",
+    );
+    l.push("");
+    l.push("| Conector | Gratis de comprobar | Nunca bajo este modo | ¿Hoy? |");
+    l.push("|---|---|---|---|");
+    for (const c of inv) {
+      l.push(
+        `| \`${c.id}\` | ${c.verificacionGratuita.posibles.join(", ")} | ${c.verificacionGratuita.bloqueadas.join(", ") || "—"} | ${c.verificacionGratuita.ejecutableHoy ? "sí" : "faltan credenciales"} |`,
+      );
+    }
+    l.push("");
     l.push("## Lo que este inventario NO dice");
     l.push("");
     l.push(
@@ -227,6 +244,36 @@ describe("el inventario de conectores no promete más de lo que hay", () => {
     l.push("");
     fs.writeFileSync(path.join(RAIZ, "docs", "INVENTARIO_DE_CONECTORES.md"), l.join("\n"), "utf8");
     expect(fs.existsSync(path.join(RAIZ, "docs", "INVENTARIO_DE_CONECTORES.md"))).toBe(true);
+  });
+
+  it("cada conector dice qué se podría comprobar de él sin gastar un céntimo", () => {
+    // «No verificado» y «no verificable» no son lo mismo, y confundirlos
+    // convierte un plan en una lista de imposibles. Leer quién soy, a qué
+    // cuenta estoy atado y qué permisos tengo no cuesta nada en ninguna de
+    // estas APIs; crear una campaña sí.
+    for (const c of inventarioDeConectores({ ...arbol, leerEntorno: sinClaves })) {
+      expect(c.verificacionGratuita.posibles.length, `${c.id} no dice qué se puede comprobar gratis`).toBeGreaterThan(0);
+      // Y hoy NINGUNO es ejecutable, porque no hay credenciales. Que esto sea
+      // `false` para los dieciséis es el estado real, no un defecto.
+      expect(c.verificacionGratuita.ejecutableHoy, `${c.id} dice ser comprobable sin credenciales`).toBe(false);
+    }
+  });
+
+  it("lo que cuesta dinero NUNCA aparece como comprobación gratuita", () => {
+    // La dirección que hace daño: si «crear campaña» se colara en la lista de
+    // lo gratuito, alguien la ejecutaría creyendo que no pasa nada.
+    const prohibido = /crear campa|activar campa|enviar correo|enviar mensaje|publicar|cambiar presupuesto|abrir conversaci/i;
+    for (const c of inventarioDeConectores({ ...arbol, leerEntorno: sinClaves })) {
+      const coladas = c.verificacionGratuita.posibles.filter((p) => prohibido.test(p));
+      expect(coladas, `${c.id} da por gratuito algo que cuesta`).toEqual([]);
+    }
+  });
+
+  it("EL CONTROL: con credenciales, la comprobación gratuita SÍ sería ejecutable", () => {
+    // Sin esto, la regla de arriba seguiría en verde con un `ejecutableHoy`
+    // clavado a `false`, que no protegería de nada: sería una constante.
+    const conClaves = inventarioDeConectores({ ...arbol, leerEntorno: () => "valor-de-prueba" });
+    expect(conClaves.some((c) => c.verificacionGratuita.ejecutableHoy)).toBe(true);
   });
 
   it("el recuento suma exactamente los conectores del registro", () => {

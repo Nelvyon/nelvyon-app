@@ -229,6 +229,12 @@ conBase("cada familia de servicio, de punta a punta", () => {
     describe(`${f.familia} · ${f.cliente}`, () => {
       it("recorre el ciclo entero y acaba en algo que el cliente puede usar", async () => {
         vi.stubEnv("NELVYON_GASTO_EXTERNO_HABILITADO", "1");
+        // Y el modo de coste cero se apaga: este fichero prueba el CABLEADO, y
+        // para recorrerlo hay que dejar llegar la accion hasta el final. Con el
+        // modo encendido, `crear_campana` se deniega en la puerta de coste —lo
+        // correcto en produccion, y probado en `elModoDeCosteCeroCierraElPuente`—
+        // pero entonces esto no probaria nada de lo que dice probar.
+        vi.stubEnv("NELVYON_MODO_COSTE_CERO", "0");
         const cliente = CLIENTES.find((c) => c.id === f.cliente)!;
         const clientId = await darDeAlta(f.cliente, f.servicio);
 

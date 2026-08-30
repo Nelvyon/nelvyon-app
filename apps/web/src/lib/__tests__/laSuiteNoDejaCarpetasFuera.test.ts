@@ -24,9 +24,13 @@
  * `src/**` es la unica ruta que el `include` cubre siempre, porque es la de la
  * aplicacion. Un vigilante no puede estar dentro de lo que vigila.
  */
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, join, sep } from "node:path";
+
+/** Plazo del fichero: recorre el arbol. El porque, en `nelvyonEsLaAgencia`. */
+vi.setConfig({ testTimeout: 60_000 });
+
 
 /**
  * Se BUSCA la raiz en vez de contar niveles con `..`.

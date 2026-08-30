@@ -43,6 +43,7 @@ import { puedeHacer } from "../agentes/contratoDeAgente";
 import type { Consecuencia } from "../agentes/autonomia";
 import type { GuardaDeGasto, PeticionDeGasto } from "../gasto/guardaDeGasto";
 import type { MotorDeCalidad, Pieza } from "../calidad/MotorDeCalidad";
+import { apuntar, decidirCoste } from "../coste/PoliticaDeCosteCero";
 
 /** Lo que un agente quiere hacer, antes de que ocurra. */
 export interface AccionPropuesta {
@@ -92,7 +93,9 @@ export type PuertaQueDenego =
   | "calidad"
   | "autorizacion_de_gasto"
   | "clave_en_curso"
-  | "ejecutor_desconocido";
+  | "ejecutor_desconocido"
+  /** El modo de coste cero: esta acción podría subir la factura, o no se sabe. */
+  | "coste";
 
 /**
  * Un ejecutor. Sólo tiene que saber hacer una cosa y devolver una referencia
@@ -208,6 +211,52 @@ export class PuenteDeEjecucion {
         motivo:
           `declara ${accion.importeCents} céntimos y a la vez que no gasta dinero. ` +
           "Una acción que se contradice no se ejecuta.",
+      };
+    }
+
+    // ── 2c · ¿ESTO PUEDE SUBIR LA FACTURA? ─────────────────────────────────
+    //
+    // Va ANTES que calidad y que gasto, y el orden es deliberado. La puerta de
+    // gasto sabe de importes: protege el dinero que alguien declara. Ésta sabe
+    // de PROVEEDORES y OPERACIONES: protege el dinero que nadie declara —una
+    // llamada a un modelo que factura por token, una conversación de WhatsApp
+    // que se cobra por abrirse, una réplica de más—.
+    //
+    // Y protege sobre todo el caso que no parece un caso: un proveedor cuyo
+    // coste no se sabe. Bajo el modo de coste cero, desconocido es que no.
+    const veredictoDeCoste = decidirCoste({
+      proveedor: accion.ejecutor,
+      operacion: accion.operacion,
+      importeCents: accion.importeCents,
+      tenantId: accion.tenantId,
+      serviceId: accion.serviceId,
+      actor: agente.id,
+    });
+    if (!veredictoDeCoste.permitido) {
+      const apunte = apuntar(
+        {
+          proveedor: accion.ejecutor,
+          operacion: accion.operacion,
+          importeCents: accion.importeCents,
+          tenantId: accion.tenantId,
+          serviceId: accion.serviceId,
+          actor: agente.id,
+        },
+        veredictoDeCoste,
+      );
+      this.registrar({
+        ...traza,
+        evento: "denegado",
+        puerta: "coste",
+        motivo: veredictoDeCoste.motivo,
+        clase: apunte.clase,
+      });
+      return {
+        estado: "denegado",
+        puerta: "coste",
+        motivo:
+          `modo de coste cero: ${veredictoDeCoste.motivo} (${veredictoDeCoste.clase}). ` +
+          veredictoDeCoste.porQue,
       };
     }
 

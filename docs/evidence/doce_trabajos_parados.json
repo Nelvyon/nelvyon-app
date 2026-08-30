@@ -1,0 +1,32 @@
+{
+  "_lee_esto": [
+    "Medido en SOLO LECTURA contra la base de produccion el 2026-08-30.",
+    "NINGUNO se ha ejecutado, cancelado ni tocado."
+  ],
+  "medidoEn": "2026-08-30",
+  "total": 12,
+  "estados": {
+    "queued": 12
+  },
+  "servicios": {
+    "web_premium": 9,
+    "seo_premium": 3
+  },
+  "encolados": {
+    "2026-06-30": 4,
+    "2026-07-09": 8
+  },
+  "clasificacion": {
+    "HUERFANO_SIN_ENCARGO": 12
+  },
+  "porQue": [
+    "Los doce tienen tenant_id NULL: no pertenecen a ningun inquilino.",
+    "Los doce tienen el payload vacio: no hay encargo con el que trabajar.",
+    "Los client_id son identificadores de prueba (c_fail, c_prog, c_res...),",
+    "no clientes reales.",
+    "Llegaron en dos rafagas, no de uno en uno como llegaria trabajo real."
+  ],
+  "conclusion": "No son trabajo de clientes esperando: son restos de pruebas de humo que quedaron en la cola de produccion. Ejecutarlos produciria un entregable para nadie a partir de nada.",
+  "recomendacion": "Cancelarlos, no ejecutarlos. Cancelar es una escritura en produccion y necesita autorizacion de Daniel; no se ha hecho.",
+  "costeExternoGenerado": 0
+}
