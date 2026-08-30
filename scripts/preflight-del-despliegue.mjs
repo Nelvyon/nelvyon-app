@@ -187,7 +187,10 @@ const migracionesNuevas = ficheros
 const tablasNuevas = new Set();
 for (const m of migracionesNuevas) {
   const sql = fs.readFileSync(path.join(RAIZ, "backend", "db", "migrations", m), "utf8");
+  // Mismo cuidado con CRLF que en `son-atomicas-las-migraciones`: sin
+  // normalizar, `/--.*$/` no limpia una linea terminada en `\\r`.
   const limpio = sql
+    .replace(/\r\n/g, "\n")
     .replace(/\/\*[\s\S]*?\*\//g, " ")
     .split("\n")
     .map((l) => l.replace(/--.*$/, ""))

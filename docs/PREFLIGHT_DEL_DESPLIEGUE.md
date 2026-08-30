@@ -1,11 +1,11 @@
 # Preflight del despliegue
 
 Lo escribe `scripts/preflight-del-despliegue.mjs` comparando **f62916afa740** —lo que
-corre en producción— con **5f59f02d**. **No despliega nada.**
+corre en producción— con **f3c4f92f**. **No despliega nada.**
 
 | | |
 |---|---|
-| Commits | 208 |
+| Commits | 209 |
 | Ficheros tocados | 784 |
 | Migraciones nuevas | 21 |
 | Rutas nuevas / borradas | 5 / 0 |

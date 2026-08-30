@@ -71,7 +71,13 @@ function objetosQueCrea(fichero) {
    * atrás. Un detector que grita cuando no pasa nada enseña a no hacerle caso,
    * y a partir de ahí el aviso que sí importa se lee igual que los otros.
    */
+  // LOS FINALES DE LINEA, PRIMERO. El arbol mezcla CRLF y LF, y en JavaScript
+  // el punto de una expresion regular NO cruza un `\r`: sobre un fichero CRLF,
+  // `/--.*$/` no llega al final de la linea y el comentario sobrevive entero.
+  // Asi es como la migracion 573 salio marcada con un DROP que solo esta en un
+  // comentario que explica la vuelta atras.
   const sql = bruto
+    .replace(/\r\n/g, "\n")
     .replace(/\/\*[\s\S]*?\*\//g, " ")
     .split("\n")
     .map((l) => l.replace(/--.*$/, ""))
