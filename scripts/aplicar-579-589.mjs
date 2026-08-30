@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * APLICAR LAS MIGRACIONES 568–589. NADA MÁS.
+ * APLICAR LAS MIGRACIONES 579–589. NADA MÁS.
  *
  * QUÉ LO DIFERENCIA DEL MIGRADOR NORMAL. `migrate-pg.mjs` aplica **todo lo
  * pendiente**. La autorización es para veintiuna migraciones concretas, así que
@@ -9,7 +9,7 @@
  *
  * LAS REGLAS, y las cumple el guion, no la persona que lo lanza:
  *
- *   · Sólo 568–589. Cualquier otra pendiente se ignora y se dice cuál.
+ *   · Sólo 579–589. Cualquier otra pendiente se ignora y se dice cuál.
  *   · Al PRIMER fallo, para. No reintenta, no tolera errores, no salta.
  *   · No fuerza nada. No hay modo «tolerar» aquí: si algo falla, falla.
  *   · Cada migración se aplica en UNA petición, que es lo que le da la
@@ -29,8 +29,8 @@
  * MODO DE ENSAYO POR DEFECTO. Sin `--ejecutar` no escribe nada.
  *
  * USO
- *   DATABASE_URL="…" node scripts/aplicar-568-589.mjs            (ensayo)
- *   DATABASE_URL="…" node scripts/aplicar-568-589.mjs --ejecutar
+ *   DATABASE_URL="…" node scripts/aplicar-579-589.mjs            (ensayo)
+ *   DATABASE_URL="…" node scripts/aplicar-579-589.mjs --ejecutar
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -42,16 +42,29 @@ const pg = require("pg");
 
 const DIR = path.join(RAIZ, "backend", "db", "migrations");
 const EJECUTAR = process.argv.includes("--ejecutar");
-const EVIDENCIA = path.join(RAIZ, "docs", "evidence", "migracion_568_589.json");
+const EVIDENCIA = path.join(RAIZ, "docs", "evidence", "migracion_579_589.json");
 
-/** El rango autorizado, cerrado en el código. 571 no existe; son 21 ficheros. */
+/**
+ * El rango autorizado, cerrado en el código. Son 11 ficheros.
+ *
+ * EMPEZÓ EN 568 Y AHORA EMPIEZA EN 579, y el cambio es deliberado. La primera
+ * autorización cubría 568–589; se aplicaron diez y la 579 falló. La segunda
+ * autorización cubre exclusivamente 579–589.
+ *
+ * El guion salta lo que ya está aplicado, así que dejar el rango en 568 habría
+ * funcionado igual. Se estrecha de todos modos: **lo que no está autorizado no
+ * debe poder ejecutarse ni por accidente**, y confiar en que el libro de
+ * migraciones filtre es confiar en un dato en vez de en una regla. Si alguien
+ * borrara una fila de `_migrations`, el rango ancho volvería a tocar las diez
+ * ya aplicadas. El estrecho, no.
+ */
 const AUTORIZADAS = fs
   .readdirSync(DIR)
   .filter((f) => {
     const m = /^(\d{3})_.*\.sql$/.exec(f);
     if (!m) return false;
     const n = Number(m[1]);
-    return n >= 568 && n <= 589;
+    return n >= 579 && n <= 589;
   })
   .sort();
 
@@ -64,7 +77,7 @@ async function main() {
 
   console.log(`objetivo: ${new URL(dsn).hostname}`);
   console.log(`modo:     ${EJECUTAR ? "ESCRITURA" : "ENSAYO — no se escribe nada"}`);
-  console.log(`rango:    568–589 · ${AUTORIZADAS.length} ficheros\n`);
+  console.log(`rango:    579–589 · ${AUTORIZADAS.length} ficheros\n`);
 
   const pool = new pg.Pool({
     connectionString: dsn,
@@ -79,7 +92,7 @@ async function main() {
       "Lo escribe scripts/aplicar-568-589.mjs. No se edita a mano.",
     ],
     momento: new Date().toISOString(),
-    rango: "568-589",
+    rango: "579-589",
     autorizadas: AUTORIZADAS.length,
     precondiciones: {},
     resultados: [],

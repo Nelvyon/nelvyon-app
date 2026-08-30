@@ -1,0 +1,110 @@
+{
+  "_lee_esto": [
+    "Resultado de aplicar las migraciones 568-589 a produccion.",
+    "Lo escribe scripts/aplicar-568-589.mjs. No se edita a mano."
+  ],
+  "momento": "2026-08-30T19:29:47.395Z",
+  "rango": "579-589",
+  "autorizadas": 11,
+  "precondiciones": {
+    "libroDeMigraciones": "_migrations",
+    "totalAplicadasAntes": 477,
+    "pendientesDelRango": 11,
+    "yaAplicadasDelRango": [],
+    "transaccionesOciosas": 0,
+    "bloqueosSinConceder": 0
+  },
+  "resultados": [
+    {
+      "migracion": "579_la_cola_que_nadie_vaciaba.sql",
+      "estado": "ok",
+      "ms": 404,
+      "avisos": []
+    },
+    {
+      "migracion": "580_autorizacion_de_gasto_externo.sql",
+      "estado": "ok",
+      "ms": 404,
+      "avisos": [
+        "NOTICE: policy \"autorizaciones_de_gasto_tenant\" for relation \"autorizaciones_de_gasto\" does not exist, skipping",
+        "NOTICE: policy \"gastos_ejecutados_tenant\" for relation \"gastos_ejecutados\" does not exist, skipping"
+      ]
+    },
+    {
+      "migracion": "581_cerebro_de_negocio.sql",
+      "estado": "ok",
+      "ms": 407,
+      "avisos": [
+        "NOTICE: policy \"os_client_brain_tenant\" for relation \"os_client_brain\" does not exist, skipping",
+        "NOTICE: policy \"os_client_brain_history_tenant\" for relation \"os_client_brain_history\" does not exist, skipping"
+      ]
+    },
+    {
+      "migracion": "582_el_cliente_puede_pedir_y_conectar.sql",
+      "estado": "ok",
+      "ms": 401,
+      "avisos": [
+        "NOTICE: policy \"os_service_requests_tenant\" for relation \"os_service_requests\" does not exist, skipping",
+        "NOTICE: policy \"os_client_connections_tenant\" for relation \"os_client_connections\" does not exist, skipping"
+      ]
+    },
+    {
+      "migracion": "583_motor_de_resultados.sql",
+      "estado": "ok",
+      "ms": 426,
+      "avisos": [
+        "NOTICE: policy \"os_objetivos_tenant\" for relation \"os_objetivos\" does not exist, skipping",
+        "NOTICE: policy \"os_mediciones_tenant\" for relation \"os_mediciones\" does not exist, skipping",
+        "NOTICE: policy \"os_acciones_tenant\" for relation \"os_acciones\" does not exist, skipping",
+        "NOTICE: policy \"os_aprendizajes_tenant\" for relation \"os_aprendizajes\" does not exist, skipping"
+      ]
+    },
+    {
+      "migracion": "584_inteligencia_entre_departamentos.sql",
+      "estado": "ok",
+      "ms": 386,
+      "avisos": [
+        "NOTICE: policy \"os_insights_tenant\" for relation \"os_insights\" does not exist, skipping"
+      ]
+    },
+    {
+      "migracion": "585_indice_por_inquilino_donde_manda_rls.sql",
+      "estado": "ok",
+      "ms": 436,
+      "avisos": []
+    },
+    {
+      "migracion": "586_prospeccion_responsable.sql",
+      "estado": "ok",
+      "ms": 399,
+      "avisos": [
+        "NOTICE: policy \"comercial_preparaciones_tenant\" for relation \"comercial_preparaciones\" does not exist, skipping"
+      ]
+    },
+    {
+      "migracion": "587_dos_chatbots_dos_tablas.sql",
+      "estado": "ok",
+      "ms": 404,
+      "avisos": [
+        "NOTICE: policy \"workspace_chatbot_conversations_tenant\" for relation \"workspace_chatbot_conversations\" does not exist, skipping"
+      ]
+    },
+    {
+      "migracion": "588_lo_que_faltaba_de_verdad.sql",
+      "estado": "ok",
+      "ms": 396,
+      "avisos": []
+    },
+    {
+      "migracion": "589_del_prospecto_al_cliente.sql",
+      "estado": "ok",
+      "ms": 401,
+      "avisos": [
+        "NOTICE: policy \"comercial_respuestas_tenant\" for relation \"comercial_respuestas\" does not exist, skipping",
+        "NOTICE: policy \"comercial_oportunidades_tenant\" for relation \"comercial_oportunidades\" does not exist, skipping"
+      ]
+    }
+  ],
+  "fallo": null,
+  "costeAdicionalEuros": 0
+}
