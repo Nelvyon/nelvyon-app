@@ -166,6 +166,57 @@ describe("los arrays se recorren", () => {
   });
 });
 
+describe("el saneador no se cuelga con lo que se le pasa de verdad", () => {
+  /**
+   * ── UN REGISTRADOR QUE SE CUELGA ES PEOR QUE UNO QUE FILTRA ──────────────
+   *
+   * La version del lado web NO recorria los objetos anidados. Al hacer que
+   * bajara —para tapar `{ headers: { authorization: ... } }`— aparecio el
+   * problema de siempre con cualquier recorrido: un objeto que se referencia a
+   * si mismo no termina nunca.
+   *
+   * Y no es rebuscado: lo que se pasa a un registro son precisamente las cosas
+   * que tienen ciclos —un cliente de un proveedor, un pool de conexiones, una
+   * peticion HTTP, un doble de prueba—. Dos pruebas de `saasInboxS38` se
+   * quedaron colgadas hasta agotar los 60 segundos de plazo. No fallaban: se
+   * colgaban, y se llevaban por delante a quien las llamo.
+   */
+  it("un objeto que se referencia a si mismo no lo cuelga", () => {
+    const ciclico: Record<string, unknown> = { nombre: "raiz" };
+    ciclico.yo = ciclico;
+    const limpio = sanitizeMeta({ ciclico }) as { ciclico: Record<string, unknown> };
+    expect(limpio.ciclico.nombre).toBe("raiz");
+    expect(limpio.ciclico.yo).toBe("[circular]");
+  });
+
+  it("ni un ciclo indirecto, de ida y vuelta", () => {
+    const a: Record<string, unknown> = { quien: "a" };
+    const b: Record<string, unknown> = { quien: "b", a };
+    a.b = b;
+    const limpio = JSON.stringify(sanitizeMeta({ a }));
+    expect(limpio).toContain("[circular]");
+  });
+
+  it("ni un ciclo dentro de un array", () => {
+    const lista: unknown[] = [1, 2];
+    lista.push(lista);
+    expect(JSON.stringify(sanitizeMeta({ lista }))).toContain("[circular]");
+  });
+
+  it("y una estructura muy honda se corta en vez de costar lo que quiera", () => {
+    let hondo: Record<string, unknown> = { fin: true };
+    for (let i = 0; i < 40; i += 1) hondo = { dentro: hondo };
+    expect(JSON.stringify(sanitizeMeta({ hondo }))).toContain("[demasiado hondo]");
+  });
+
+  it("EL CONTROL: una estructura normal se conserva entera", () => {
+    // Sin esto, cortar a la primera pasaria todo lo de arriba y dejaria los
+    // registros sin nada dentro.
+    const limpio = sanitizeMeta({ a: { b: { c: { d: "valor" } } } }) as Record<string, never>;
+    expect(JSON.stringify(limpio)).toContain("valor");
+  });
+});
+
 describe("los errores tampoco cuelan su mensaje", () => {
   it("el mensaje de un Error se redacta", () => {
     const limpio = sanitizeMeta({ causa: new Error(`upstream dijo: ${CLAVE_OPENAI}`) });

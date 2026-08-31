@@ -68,27 +68,63 @@ function isForbiddenKey(key: string): boolean {
  * El nombre y la forma deciden por separado a proposito: cualquiera de los dos
  * basta para tapar, y hacen falta los dos para dejar pasar.
  */
+/**
+ * Hasta donde se baja en un objeto anidado.
+ *
+ * Un registro no gana nada por bajar mas: lo que hay a diez niveles de
+ * profundidad no lo va a leer nadie, y recorrerlo cuesta.
+ */
+const PROFUNDIDAD_MAXIMA = 8;
+
 export function sanitizeMeta(meta: LogMeta | undefined): LogMeta {
   if (!meta) return {};
+  return sanitizeObjeto(meta, new WeakSet<object>(), 0);
+}
+
+function sanitizeObjeto(meta: LogMeta, vistos: WeakSet<object>, hondura: number): LogMeta {
   const out: LogMeta = {};
   for (const [key, value] of Object.entries(meta)) {
     if (isForbiddenKey(key)) continue;
-    out[key] = sanitizeValue(value);
+    out[key] = sanitizeValue(value, vistos, hondura);
   }
   return out;
 }
 
-/** Un valor cualquiera, dejado en algo que se puede imprimir sin miedo. */
-function sanitizeValue(value: unknown): unknown {
+/**
+ * Un valor cualquiera, dejado en algo que se puede imprimir sin miedo.
+ *
+ * ── EL `WeakSet` NO ES UNA OPTIMIZACION ─────────────────────────────────────
+ *
+ * Antes de recorrer, esta funcion no recorria: la version del lado web copiaba
+ * los objetos tal cual. Al hacer que bajara —para tapar
+ * `{ headers: { authorization: ... } }`— aparecio el problema de siempre con
+ * cualquier recorrido: un objeto que se referencia a si mismo no termina nunca.
+ *
+ * Y no es rebuscado. Lo que se pasa a un registro son precisamente las cosas
+ * que tienen ciclos: un cliente de un proveedor, un pool de conexiones, una
+ * peticion HTTP, un doble de prueba. Dos pruebas de `saasInboxS38` se quedaron
+ * colgadas hasta agotar los 60 segundos de plazo — no fallaban, se colgaban.
+ *
+ * Un registrador que se cuelga es PEOR que uno que filtra: se lleva por delante
+ * a quien lo llamo, y encima justo cuando algo ya estaba yendo mal.
+ *
+ * La profundidad maxima cubre el otro lado: una estructura muy honda sin ciclos
+ * tampoco puede costar lo que quiera.
+ */
+function sanitizeValue(value: unknown, vistos: WeakSet<object>, hondura: number): unknown {
   if (typeof value === "string") return redactar(value);
   if (value instanceof Error) {
     // El mensaje de un error tambien es texto del que no se sabe el origen: un
     // error de proveedor puede echar de vuelta la peticion con sus cabeceras.
     return { name: value.name, message: redactar(value.message) };
   }
-  if (Array.isArray(value)) return value.map(sanitizeValue);
-  if (value && typeof value === "object" && !(value instanceof Date)) {
-    return sanitizeMeta(value as LogMeta);
-  }
-  return value;
+  if (value === null || typeof value !== "object") return value;
+  if (value instanceof Date) return value;
+
+  if (vistos.has(value)) return "[circular]";
+  if (hondura >= PROFUNDIDAD_MAXIMA) return "[demasiado hondo]";
+  vistos.add(value);
+
+  if (Array.isArray(value)) return value.map((v) => sanitizeValue(v, vistos, hondura + 1));
+  return sanitizeObjeto(value as LogMeta, vistos, hondura + 1);
 }
