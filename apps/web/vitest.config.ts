@@ -6,6 +6,29 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: ["./vitest.setup.ts"],
     globals: true,
+
+    // EL PLAZO POR DEFECTO DE VITEST SON 5 SEGUNDOS, Y AQUI SE QUEDA CORTO.
+    //
+    // No por lentitud del codigo: por inanicion. Esta suite son 922 ficheros
+    // corriendo en paralelo, y hay pruebas cuyo IMPORT solo tarda 38 s
+    // (`agentsGenerativos.test.ts` carga el arbol de agentes entero). Aisladas
+    // pasan en dos segundos; acompanadas, no llegan.
+    //
+    // Se veia en cada ejecucion completa: dos o tres ficheros en rojo con
+    // «Test timed out in 5000ms», SIEMPRE distintos, segun a quien le tocara
+    // competir. Veinticuatro ficheros ya llevaban su propio
+    // `vi.setConfig({ testTimeout: 60_000 })` por esta razon, anadido de uno en
+    // uno cada vez que le tocaba a otro. Eso no es un arreglo: es una ronda
+    // interminable de parches al sintoma.
+    //
+    // UN PLAZO MAS LARGO NO OCULTA UN CUELGUE. Una prueba realmente colgada
+    // sigue fallando, solo que 30 s despues en vez de 5. Y no cuesta tiempo de
+    // suite: el plazo solo se agota cuando algo va mal.
+    //
+    // Los 60 s por fichero que ya existen se dejan como estan: son pruebas que
+    // recorren el arbol entero y necesitan mas que las demas.
+    testTimeout: 30_000,
+    hookTimeout: 30_000,
     include: [
       "src/**/*.{test,spec}.?(c|m)[jt]s?(x)",
       // UN comodin, no una lista blanca.

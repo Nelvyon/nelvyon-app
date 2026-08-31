@@ -11,8 +11,110 @@ export const ELITE_V300_STANDARDS = `### ESTÁNDAR NELVYON OS — PROMPTS ÉLITE
 6. **CALIDAD**: tu output será revisado por el mejor especialista del mundo en esta disciplina.
 7. **BENCHMARKS**: Siempre compara los datos del cliente contra los mejores estándares mundiales de la industria. Indica explícitamente si el cliente está por encima o por debajo del promedio y cuánto.`;
 
+/** Un hueco de plantilla: `{loQueSea}`. */
+const HUECO = /\{(\w+)\}/g;
+
+/**
+ * Los huecos que una plantilla declara, en orden y sin repetir.
+ *
+ * Se derivan de la propia plantilla. Una lista escrita a mano de «lo que hay
+ * que rellenar» se queda desfasada en cuanto alguien edita el texto, y entonces
+ * miente justo cuando haría falta.
+ */
+export function variablesDeLaPlantilla(template: string): string[] {
+  return [...new Set([...String(template ?? "").matchAll(HUECO)].map((m) => m[1]))];
+}
+
+/**
+ * ¿Hay valor PROPIO para esta clave?
+ *
+ * `Object.hasOwn` y no `vars[k] ?? …`. Con el acceso directo, `{constructor}` o
+ * `{toString}` encontraban la propiedad heredada de `Object.prototype` —que no
+ * es nula, así que `??` no saltaba— y la plantilla acababa con
+ * «function Object() { [native code] }» dentro del prompt que se le manda al
+ * modelo. Comprobado sobre el código anterior antes de cambiarlo.
+ */
+function tieneValor(vars: Record<string, string>, clave: string): boolean {
+  if (!vars || typeof vars !== "object") return false;
+  if (!Object.hasOwn(vars, clave)) return false;
+  const v = vars[clave];
+  // Una cadena vacía es un hueco, no un valor: mandar «SECTOR: » al modelo es
+  // peor que decir que falta el sector.
+  return v !== undefined && v !== null && String(v).trim() !== "";
+}
+
+/** Los huecos que quedarían sin rellenar. Vacío significa que no falta nada. */
+export function variablesQueFaltan(template: string, vars: Record<string, string>): string[] {
+  return variablesDeLaPlantilla(template).filter((k) => !tieneValor(vars, k));
+}
+
+/** Lo que se avisa cuando una plantilla sale con huecos sin rellenar. */
+export interface HuecosSinRellenar {
+  faltan: string[];
+  /** Los primeros caracteres de la plantilla, para saber cuál era. */
+  plantilla: string;
+}
+
+export type SumideroDeHuecos = (aviso: HuecosSinRellenar) => void;
+
+const AVISO_POR_DEFECTO: SumideroDeHuecos = (a) => {
+  // eslint-disable-next-line no-console
+  console.warn(
+    `[prompts] plantilla con huecos sin rellenar: ${a.faltan.join(", ")} — «${a.plantilla}»`,
+  );
+};
+
+let sumideroDeHuecos: SumideroDeHuecos = AVISO_POR_DEFECTO;
+
+/**
+ * Cambia dónde van los avisos de huecos. Devuelve la función que lo restaura.
+ *
+ * Existe para que una prueba pueda comprobar QUE SE AVISA. Sin un punto
+ * observable, el arreglo sería indistinguible de seguir callándose.
+ */
+export function observarHuecosSinRellenar(nuevo: SumideroDeHuecos): () => void {
+  const anterior = sumideroDeHuecos;
+  sumideroDeHuecos = nuevo;
+  return () => {
+    sumideroDeHuecos = anterior;
+  };
+}
+
+/**
+ * Rellena una plantilla de prompt.
+ *
+ * QUÉ HACÍA MAL. Dos cosas, las dos comprobadas antes de tocar el código:
+ *
+ *   1. `vars[key]` alcanzaba las propiedades heredadas de `Object.prototype`,
+ *      así que `{constructor}` metía «function Object() { [native code] }» en
+ *      el prompt.
+ *
+ *   2. UN HUECO SIN RELLENAR SE IBA AL MODELO TAL CUAL, EN SILENCIO. Una
+ *      plantilla con `{clientDomain}` sin valor le llegaba al modelo con las
+ *      llaves puestas, y no quedaba constancia en ningún sitio de que el dato
+ *      del cliente no había llegado.
+ *
+ * Lo segundo importa más de lo que parece. Este sistema se juzga por NO ser
+ * genérico, y la forma exacta de producir un entregable genérico es que los
+ * datos que distinguen a este cliente de los demás no lleguen a la instrucción.
+ * Eso ocurría sin ruido, y lo que no hace ruido no se arregla.
+ *
+ * SIGUE SIN LANZAR. Lo llaman 168 sitios, y un prompt a medio rellenar es peor
+ * que uno completo pero mejor que ninguno: tumbar el encargo del cliente por un
+ * hueco sería un remedio peor que la enfermedad. Se rellena lo que se pueda, se
+ * deja el hueco a la vista —para que se note en la salida— y se avisa.
+ */
 export function fillPromptTemplate(template: string, vars: Record<string, string>): string {
-  return template.replace(/\{(\w+)\}/g, (_, key: string) => vars[key] ?? `{${key}}`);
+  const texto = String(template ?? "");
+  const faltan = variablesQueFaltan(texto, vars);
+  if (faltan.length > 0) {
+    try {
+      sumideroDeHuecos({ faltan, plantilla: texto.slice(0, 80) });
+    } catch {
+      // Avisar no puede romper el encargo.
+    }
+  }
+  return texto.replace(HUECO, (_, key: string) => (tieneValor(vars, key) ? vars[key] : `{${key}}`));
 }
 
 export function eliteReviewerLine(discipline: string): string {

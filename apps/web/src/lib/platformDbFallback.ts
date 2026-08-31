@@ -56,6 +56,24 @@ async function countMembers(workspaceId: number): Promise<number> {
   return Number(rows[0]?.count ?? 0);
 }
 
+/**
+ * Una fila de `workspaces` en la forma que espera el cliente.
+ *
+ * `members_count` ES EL RECUENTO, SIN SUMARLE NADA. Antes decía
+ * `membersCount + 1`, y ese `+ 1` era una compensación que dejó de tener
+ * sentido: se escribió cuando el dueño NO aparecía en `workspace_members`.
+ *
+ * Aquello se arregló —está contado en `test_autoservicio_fundador_ausente.py`:
+ * `POST /workspaces/create` devolvía `role: "owner", members_count: 1` y nunca
+ * escribía la pertenencia, así que con RLS activo el dueño se quedaba fuera de
+ * su propio espacio— y desde entonces `dbCreateWorkspace` sí inserta al dueño
+ * como miembro activo. Pero el `+ 1` se quedó, y pasó a contarlo dos veces.
+ *
+ * Se comprobó contra la implementación que manda: `_count_workspace_members`
+ * en `backend/routers/billing_usage.py` cuenta las filas de `workspace_members`
+ * y no le suma nada. Era el mismo concepto calculado de dos formas que se
+ * llevaban uno, y la de facturación es la que gobierna los límites de plan.
+ */
 function mapWorkspaceRow(
   row: Record<string, unknown>,
   role: string,
@@ -71,7 +89,7 @@ function mapWorkspaceRow(
     plan: (row.plan as string | null) ?? null,
     status: (row.status as string | null) ?? "active",
     role,
-    members_count: membersCount + 1,
+    members_count: membersCount,
     created_at: row.created_at ? String(row.created_at) : null,
   };
 }
@@ -142,7 +160,10 @@ export async function dbCreateWorkspace(
     [wsId, claims.userId, claims.email, now],
   );
 
-  return mapWorkspaceRow(ws, "owner", 0);
+  // UNO: el dueño, que se acaba de insertar como miembro activo ahí arriba.
+  // Antes se pasaba `0` porque `mapWorkspaceRow` le sumaba uno; ya no lo suma,
+  // así que el recuento se pasa entero desde aquí.
+  return mapWorkspaceRow(ws, "owner", 1);
 }
 
 export class WorkspaceAccessError extends Error {
