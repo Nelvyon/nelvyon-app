@@ -1000,11 +1000,40 @@ const NPS_THANK_YOU: Record<EmailLocale, NpsThankYouCopy> = {
   },
 };
 
+/** Los seis que este fichero tiene traducidos. Mismo juego que `AgentLocale`. */
+const LOCALES_DE_CORREO: readonly EmailLocale[] = ["es", "en", "fr", "de", "it", "pt"];
+
+/**
+ * El idioma de un correo, a partir de lo que traiga quien lo pide.
+ *
+ * QUÉ HACÍA MAL. Comparaba por igualdad EXACTA:
+ *
+ *     if (locale === "en" || locale === "fr" || …) return locale;
+ *     return "es";
+ *
+ * Así que `"de-DE"`, `"DE"`, `"pt-BR"` o `"de "` caían todos a español. Y no
+ * son formas raras: son **la forma normal** de un locale. `localeDeCliente()`,
+ * que es de donde sale el locale de un cliente, produce exactamente `de-DE`,
+ * `pt-BR` y `en-GB`.
+ *
+ * LO QUE ESO SIGNIFICABA. Un cliente alemán recibía en ESPAÑOL su correo de
+ * bienvenida, su recuperación de contraseña, su factura, su aviso de impago,
+ * su segundo aviso, su advertencia final, su suspensión y su cancelación. Son
+ * catorce catálogos y el ciclo de facturación entero — y este fichero no tenía
+ * ninguna prueba.
+ *
+ * Se descubrió justo después de conectar el idioma del cliente hasta los
+ * agentes: el trabajo salía en alemán y los correos seguían en español.
+ *
+ * CÓMO SE RESUELVE AHORA. Igual que `resolveAgentLocale`: minúsculas, se quita
+ * lo que sobra, se toma la raíz antes del `-` o `_`, y se valida contra los
+ * seis que existen. Un idioma que no tenemos traducido sigue cayendo a español,
+ * porque devolver un catálogo que no existe sería peor.
+ */
 export function resolveEmailLocale(locale?: string | null): EmailLocale {
-  if (locale === "en" || locale === "fr" || locale === "de" || locale === "it" || locale === "pt") {
-    return locale;
-  }
-  return "es";
+  if (typeof locale !== "string") return "es";
+  const raiz = locale.trim().toLowerCase().split(/[-_]/)[0];
+  return (LOCALES_DE_CORREO as readonly string[]).includes(raiz) ? (raiz as EmailLocale) : "es";
 }
 
 export function getWelcomeCopy(locale?: string | null): WelcomeCopy {
