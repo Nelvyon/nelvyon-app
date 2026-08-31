@@ -4,6 +4,7 @@ import { ELITE_V300_STANDARDS } from "../../prompts/elitePromptLibrary";
 import type { ILlmClient, LlmOptions } from "../../LlmClient";
 import { LlmClient } from "../../LlmClient";
 import { LearningService } from "../../learning/LearningService";
+import { esUnSi } from "../../loQueDiceElModelo";
 
 export const AUDIT_LOG_SECTOR = "auditlog";
 
@@ -81,7 +82,10 @@ export function parseAuditLlmJson(raw: string, label: string): Omit<AuditLogOutp
   }>(raw, label);
   const summary = typeof p.summary === "string" ? p.summary : String(p.summary ?? "");
   const riskScore = clampRisk(typeof p.riskScore === "number" ? p.riskScore : Number(p.riskScore));
-  const anomalyDetected = Boolean(p.anomalyDetected);
+  // `Boolean("false")` es `true`, y los modelos devuelven booleanos como cadena
+  // constantemente: asi se levantaba una alarma que el modelo no habia dado. Un
+  // detector que grita lobo ensena a ignorarlo.
+  const anomalyDetected = esUnSi(p.anomalyDetected);
   const anomalyReason =
     typeof p.anomalyReason === "string" && p.anomalyReason.trim() ? p.anomalyReason.trim() : undefined;
   return { summary, riskScore, anomalyDetected, anomalyReason };

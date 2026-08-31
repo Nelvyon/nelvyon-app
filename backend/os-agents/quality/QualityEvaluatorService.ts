@@ -2,6 +2,7 @@ import { DbClient } from "../../db/DbClient";
 import type { EvalResult } from "./types";
 import type { ILlmClient } from "../LlmClient";
 import { LlmClient } from "../LlmClient";
+import { esUnSi } from "../loQueDiceElModelo";
 
 type QualityScoreRow = {
   id: string;
@@ -19,6 +20,17 @@ type QualityScoreRow = {
 function n(v: unknown): number {
   const out = typeof v === "number" ? v : Number(v ?? 0);
   return Number.isFinite(out) ? out : 0;
+}
+
+/**
+ * Se exporta con nombre propio para poder probarlo sin llamar a ningun modelo.
+ *
+ * El parser es donde vive la decision —un `"false"` de cadena se leia como
+ * aprobado— y probarlo por la via del servicio exigiria doblar el LLM entero
+ * para acabar midiendo el doble en vez del parser.
+ */
+export function parseEvalJsonParaPruebas(raw: string): Omit<EvalResult, "attempt"> {
+  return parseEvalJson(raw);
 }
 
 function parseEvalJson(raw: string): Omit<EvalResult, "attempt"> {
@@ -41,7 +53,21 @@ function parseEvalJson(raw: string): Omit<EvalResult, "attempt"> {
       impacto_comercial: Math.max(0, Math.min(20, Math.round(n(parsed.breakdown?.impacto_comercial)))),
     },
     feedback: typeof parsed.feedback === "string" ? parsed.feedback : "",
-    passed: Boolean(parsed.passed) || n(parsed.score) >= 99,
+    /**
+     * ANTES ERA `Boolean(parsed.passed)`, y `Boolean("false")` es `true`.
+     *
+     * Los modelos devuelven booleanos como cadena constantemente, asi que una
+     * evaluacion de `{ "score": 40, "passed": "false" }` quedaba APROBADA. Y no
+     * era solo una fila mal escrita: `improveUntilExcellent` corta el bucle de
+     * mejora con este campo, asi que el entregable salia en el primer intento,
+     * sin mejorar, con un 40 de cien y marcado como bueno.
+     *
+     * NO SE TOCA el `|| score >= 99`, y es deliberado: endurecerlo haria que el
+     * bucle agotara siempre los intentos, y cada intento es una llamada al
+     * modelo que cuesta dinero. La severidad de la puerta es una decision de
+     * producto; que `"false"` signifique falso no lo es.
+     */
+    passed: esUnSi(parsed.passed) || n(parsed.score) >= 99,
   };
 }
 

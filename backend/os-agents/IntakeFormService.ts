@@ -1,5 +1,6 @@
 import { OS_PREMIUM_SERVICE_IDS } from "./constants";
 import type { StoredClientIntake } from "./intakeSchemas";
+import { siONo } from "./loQueDiceElModelo";
 
 export type IntakeFieldType = "text" | "textarea" | "select" | "multiselect" | "color" | "url" | "number" | "boolean";
 
@@ -150,12 +151,11 @@ function asStringArray(v: unknown): string[] {
   return [];
 }
 
-function asBoolean(v: unknown): boolean | undefined {
-  if (typeof v === "boolean") return v;
-  if (v === "true" || v === "1") return true;
-  if (v === "false" || v === "0") return false;
-  return undefined;
-}
+// `asBoolean` vivia aqui en privado y era correcto. Se ha sacado a
+// `loQueDiceElModelo` porque habia OTROS dos sitios leyendo booleanos de
+// modelos con `Boolean(x)` — que dice que `"false"` es cierto—. Mismo conjunto
+// de valores, mismo comportamiento: solo deja de estar escrito tres veces.
+const asBoolean = siONo;
 
 function asNumber(v: unknown): number | undefined {
   if (typeof v === "number" && Number.isFinite(v)) return v;
