@@ -154,6 +154,43 @@ export function detectLanguageFromText(text: string, fallback: AgentLocale = "es
   return mejor;
 }
 
+/**
+ * El `locale` de un cliente, a partir de lo que él mismo declaró.
+ *
+ * QUÉ SUSTITUYE. `packOrchestrator` escribía `locale: "es-ES"` a mano, con el
+ * `country` del propio encargo justo al lado y sin usarlo. Así que un cliente
+ * alemán que hubiera dicho que vende en Alemania recibía igualmente `es-ES`.
+ *
+ * EL VALOR POR DEFECTO SIGUE SIENDO `es-ES`, exactamente el de antes. Sin
+ * idioma declarado no se adivina aquí: adivinar es trabajo de
+ * `detectLanguageFromText`, y sólo cuando no hay nada declarado. Este cambio no
+ * puede alterar ningún encargo que no traiga el dato.
+ *
+ * EL PAÍS SOLO SE USA SI VIENE COMO CÓDIGO DE DOS LETRAS. En este esquema
+ * `country` es texto libre y puede traer «España» o «Alemania»; meter eso en un
+ * `locale` produciría `de-ALEMANIA`, que no es un `locale` y rompería a
+ * cualquiera que lo interprete. Ante la duda, sólo el idioma.
+ */
+export function localeDeCliente(language?: string | null, country?: string | null): string {
+  const raiz = typeof language === "string" ? language.trim().toLowerCase().split(/[-_]/)[0] : "";
+  if (!(LOCALES_SOPORTADOS as readonly string[]).includes(raiz)) return "es-ES";
+
+  const region = typeof country === "string" ? country.trim() : "";
+  if (/^[A-Za-z]{2}$/.test(region)) return `${raiz}-${region.toUpperCase()}`;
+
+  // Sin región utilizable, la del propio idioma: es lo que hacen los
+  // navegadores y evita inventarse un país que el cliente no ha dicho.
+  const PROPIA: Record<AgentLocale, string> = {
+    es: "ES",
+    en: "GB",
+    fr: "FR",
+    pt: "PT",
+    de: "DE",
+    it: "IT",
+  };
+  return `${raiz}-${PROPIA[raiz as AgentLocale]}`;
+}
+
 export function localizedPrompt(basePrompt: string, locale: AgentLocale): string {
   const labels: Record<AgentLocale, string> = {
     es: "español",

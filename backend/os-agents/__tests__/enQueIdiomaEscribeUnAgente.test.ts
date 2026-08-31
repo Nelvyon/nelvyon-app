@@ -30,6 +30,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   detectLanguageFromText,
+  localeDeCliente,
   localizedPrompt,
   puntuarIdiomas,
   resolveAgentLocale,
@@ -240,6 +241,45 @@ describe("un dato declarado gana a una conjetura", () => {
     expect(resolveAgentLocale({ brief: "Wir brauchen mehr Anfragen fur unser Unternehmen." })).toBe(
       "de",
     );
+  });
+});
+
+describe("el locale del cliente sale de lo que el cliente declaró", () => {
+  /**
+   * QUÉ SUSTITUYE. `packOrchestrator` escribía `locale: "es-ES"` a mano, con el
+   * `country` del propio encargo justo al lado y sin usarlo. El dato del cliente
+   * existía —`os_clients.language` entra, y el cerebro lo guarda como
+   * `preferencias.idioma`— y no llegaba a ninguna parte.
+   */
+  it("LA REGLA: idioma y país declarados producen su locale", () => {
+    expect(localeDeCliente("de", "DE")).toBe("de-DE");
+    expect(localeDeCliente("pt", "BR")).toBe("pt-BR");
+    expect(localeDeCliente("en", "GB")).toBe("en-GB");
+  });
+
+  it("EL CONTROL: sin idioma declarado, sigue siendo es-ES", () => {
+    // Es exactamente lo que había escrito a mano. Sin esta prueba, el cambio
+    // podría alterar en silencio encargos que hoy no traen el dato.
+    expect(localeDeCliente(undefined, undefined)).toBe("es-ES");
+    expect(localeDeCliente("", "DE")).toBe("es-ES");
+    expect(localeDeCliente(null, null)).toBe("es-ES");
+  });
+
+  it("un idioma que no soportamos no se cuela en el locale", () => {
+    expect(localeDeCliente("zz", "ZZ")).toBe("es-ES");
+  });
+
+  it("un país en texto libre no ensucia el locale", () => {
+    // `country` es texto libre en este esquema y puede traer «Alemania».
+    // Meterlo produciría `de-ALEMANIA`, que no es un locale y rompería a quien
+    // lo interprete. Se cae a la región propia del idioma.
+    expect(localeDeCliente("de", "Alemania")).toBe("de-DE");
+    expect(localeDeCliente("pt", "")).toBe("pt-PT");
+  });
+
+  it("acepta un idioma con región y se queda con la raíz", () => {
+    expect(localeDeCliente("pt-BR", "BR")).toBe("pt-BR");
+    expect(localeDeCliente("DE_de", "DE")).toBe("de-DE");
   });
 });
 

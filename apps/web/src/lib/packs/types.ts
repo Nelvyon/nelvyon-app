@@ -51,6 +51,12 @@ export type GrowthPackIntakeBase = {
   business_name: string;
   city: string;
   country?: string;
+  /**
+   * ISO 639-1: `es`, `de`, `en`... El idioma en que el cliente habla con los
+   * suyos. Opcional: sin el, el `locale` sigue cayendo a `es-ES` como hasta
+   * ahora, asi que anadirlo no cambia ningun encargo existente.
+   */
+  language?: string;
   contact_email?: string;
   contact_name?: string;
   value_proposition: string;

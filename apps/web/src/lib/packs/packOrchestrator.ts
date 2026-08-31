@@ -41,6 +41,7 @@ import {
 import { buildGenericProductionDeliverable } from "@/lib/packs/genericProductionDeliverable";
 import { containsMockUrl } from "@/lib/packs/localPackProduction";
 import { buildSkuVisualQaInput, skuNeedsSoftReview } from "@/lib/packs/skuVisualQaInput";
+import { localeDeCliente } from "@/../../backend/os-agents/agentLanguage";
 
 /** Returns true only when AUTONOMOUS_PRODUCTION=true is set in the environment. */
 export function isAutonomousProductionEnabled(): boolean {
@@ -88,7 +89,9 @@ export function buildBaseBrief(
     cta_type: "form",
     traffic_source: "google_ads",
     target_geo: intake.city,
-    locale: "es-ES",
+    // Del cliente, no fijo. Sin `language` declarado cae a `es-ES`, que es
+    // exactamente lo que habia aqui escrito a mano.
+    locale: localeDeCliente(intake.language, intake.country),
     primary_domain: website_url,
     website_url,
     bot_name: `Asistente ${intake.business_name}`,
