@@ -11,7 +11,9 @@
  *
  * COSTE EXTERNO: 0 EUR.
  */
-import { esNombreSensible, redactar } from "../seguridad/loQueNoSeImprime.mjs";
+// Del modulo PURO, no de `loQueNoSeImprime.mjs`: aquel importa `node:crypto` y
+// esto entra en el grafo del navegador a traves de `serverLogger`.
+import { esNombreSensible, redactar } from "../seguridad/formaDeUnSecreto.mjs";
 
 export type LogMeta = Record<string, unknown>;
 

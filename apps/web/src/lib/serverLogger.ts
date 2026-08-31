@@ -1,4 +1,4 @@
-import { redactar } from "@/../../backend/seguridad/loQueNoSeImprime.mjs";
+import { redactar } from "@/../../backend/seguridad/formaDeUnSecreto.mjs";
 
 const isDev = process.env.NODE_ENV !== "production";
 

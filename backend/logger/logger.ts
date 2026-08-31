@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/nextjs";
 
-import { redactar } from "../seguridad/loQueNoSeImprime.mjs";
+import { redactar } from "../seguridad/formaDeUnSecreto.mjs";
 import { sanitizeMeta } from "./sanearParaElRegistro";
 
 export type { LogMeta } from "./sanearParaElRegistro";
