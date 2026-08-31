@@ -57,16 +57,36 @@ function almacen() {
   };
 }
 
+/** Un inquilino de mentira, pero presente: un trabajo real siempre tiene uno. */
+const INQUILINO = "11111111-1111-1111-1111-111111111111";
+
+/**
+ * Siembra un trabajo.
+ *
+ * LLEVA `tenant_id` A PROPOSITO, y no lo llevaba. Este fichero se escribio
+ * antes de que el trabajador exigiera inquilino, asi que sembraba trabajos con
+ * `tenant_id` nulo — que es justo lo que producia el agujero: un contexto vacio
+ * es el que el guardian de `DbJobsClient` deja pasar, y el trabajo corria con
+ * alcance entre inquilinos.
+ *
+ * Ahora un trabajo sin inquilino cae a `dead_letter`, asi que sembrar sin el
+ * hacia fallar estas pruebas. NO se relaja el trabajador para que pasen: se
+ * arregla la siembra, porque un trabajo real SIEMPRE tiene inquilino. El caso
+ * sin inquilino se prueba aparte, y se exige que NO se ejecute.
+ *
+ * Se descubrio al levantar PostgreSQL en local: estas pruebas llevaban
+ * omitidas toda la sesion y nadie habia visto el efecto del cambio.
+ */
 async function sembrar(
   jobId: string,
-  extra: Partial<{ status: string; runAfter: string; attempts: number; maxAttempts: number; leaseExpires: string | null; lockedBy: string | null }> = {},
+  extra: Partial<{ status: string; runAfter: string; attempts: number; maxAttempts: number; leaseExpires: string | null; lockedBy: string | null; tenantId: string | null }> = {},
 ): Promise<void> {
   await pool.query(
     `INSERT INTO os_jobs
-       (job_id, service_id, client_id, status, progress, steps, payload,
+       (job_id, service_id, client_id, tenant_id, status, progress, steps, payload,
         created_at, updated_at, attempts, max_attempts, run_after,
         lease_expires_at, locked_by)
-     VALUES ($1, $2, $3, $4, 0, '[]'::jsonb, '{"brief":"x"}'::jsonb,
+     VALUES ($1, $2, $3, $10::uuid, $4, 0, '[]'::jsonb, '{"brief":"x"}'::jsonb,
              NOW(), NOW(), $5, $6, COALESCE($7::timestamptz, NOW()), $8::timestamptz, $9)`,
     [
       jobId,
@@ -78,6 +98,7 @@ async function sembrar(
       extra.runAfter ?? null,
       extra.leaseExpires ?? null,
       extra.lockedBy ?? null,
+      "tenantId" in extra ? extra.tenantId : INQUILINO,
     ],
   );
 }
@@ -366,6 +387,45 @@ conBase("la cola de trabajos, sobre PostgreSQL real", () => {
       const e = await estado("j-1");
       expect(e.status).toBe("completed");
       expect(e.result.ok).toBe(1);
+    });
+
+    it("un trabajo SIN inquilino no se ejecuta: cae a dead_letter", async () => {
+      /**
+       * CONTRA POSTGRESQL DE VERDAD. Habia una prueba de esto con la cola
+       * doblada, pero doblar la cola no demuestra que la fila acabe donde debe.
+       * Aqui se mira la tabla.
+       *
+       * Las 12 filas que habia en produccion tenian `tenant_id IS NULL`. Antes,
+       * un trabajo asi se ejecutaba con contexto vacio — el que el guardian de
+       * `DbJobsClient` deja pasar— y por tanto con alcance entre inquilinos.
+       */
+      await sembrar("j-sin-inquilino", { tenantId: null });
+      const cola = new ColaDeTrabajos(almacen(), { serviciosQueAtiende: [SERVICIO], identidad: "W" });
+      const w = new TrabajadorDeCola(cola, { registrar: () => {} });
+      let corrio = false;
+      w.registrarManejador(SERVICIO, async () => {
+        corrio = true;
+        return { tipo: "completado", resultado: { ok: 1 } };
+      });
+
+      expect(await w.unaVuelta()).toBe(1);
+      expect(corrio, "el manejador se ejecuto sin inquilino").toBe(false);
+
+      const e = await estado("j-sin-inquilino");
+      expect(e.status).toBe("dead_letter");
+      expect(String(e.last_error)).toMatch(/no tiene inquilino/);
+    });
+
+    it("EL CONTROL: el MISMO trabajo CON inquilino si se ejecuta", async () => {
+      // Sin este control, un trabajador que no ejecutara nunca nada pasaria la
+      // prueba de arriba tan tranquilo.
+      await sembrar("j-con-inquilino");
+      const cola = new ColaDeTrabajos(almacen(), { serviciosQueAtiende: [SERVICIO], identidad: "W" });
+      const w = new TrabajadorDeCola(cola, { registrar: () => {} });
+      w.registrarManejador(SERVICIO, async () => ({ tipo: "completado", resultado: { ok: 1 } }));
+
+      expect(await w.unaVuelta()).toBe(1);
+      expect((await estado("j-con-inquilino")).status).toBe("completed");
     });
 
     it("un manejador que pide aprobación deja el trabajo esperando", async () => {

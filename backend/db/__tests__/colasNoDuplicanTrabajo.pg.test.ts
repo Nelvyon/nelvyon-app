@@ -56,6 +56,72 @@ describeSiHayPg("las colas de trabajo no entregan la misma fila dos veces", () =
     const { Pool } = await import("pg");
     // Al menos dos conexiones: con una sola no habria concurrencia que medir.
     pool = new Pool({ connectionString: DSN, max: 4 });
+
+    /**
+     * LA PRUEBA CREA SU PROPIA MESA.
+     *
+     * Antes daba por hecho que `cert_cola` existia, y NADA en el arbol la
+     * creaba: ni una migracion, ni `pg-cert-db.mjs`, ni un `beforeAll`. Alguien
+     * la habia creado a mano en su base alguna vez.
+     *
+     * Nunca se noto porque este fichero llevaba omitido: sin DSN no corria, y
+     * sin correr no podia quejarse. Al levantar PostgreSQL en local, seis
+     * pruebas fallaron de golpe con `relation "cert_cola" does not exist`.
+     *
+     * Una prueba que solo funciona si alguien recuerda un paso no escrito no es
+     * una prueba: es una nota. Ahora se monta sola.
+     */
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS cert_cola (
+        id         bigserial PRIMARY KEY,
+        status     text NOT NULL DEFAULT 'pending',
+        -- La consulta de reclamo ordena por antiguedad, igual que la real.
+        created_at timestamptz NOT NULL DEFAULT NOW(),
+        -- Cuando se envio. NULL mientras siga en la cola.
+        sent_at    timestamptz
+      )`);
+
+    /**
+     * Y SE ARREGLA LA MESA QUE YA ESTUVIERA PUESTA.
+     *
+     * `CREATE TABLE IF NOT EXISTS` no mira la FORMA de lo que encuentra. En la
+     * base local habia una `cert_cola` anterior con solo `(id, status)`, asi
+     * que el CREATE no hizo nada y las seis pruebas siguieron fallando — ahora
+     * con `column "created_at" does not exist`, que es el mismo problema un
+     * piso mas abajo: seguir dependiendo de lo que alguien dejo puesto.
+     *
+     * Se anaden las columnas que falten en vez de tirar la tabla: `ADD COLUMN
+     * IF NOT EXISTS` es idempotente y no destruye nada que no sea suyo.
+     */
+    for (const columna of [
+      "created_at timestamptz NOT NULL DEFAULT NOW()",
+      // La usa la prueba de recuperacion: `COALESCE(sent_at, created_at)` es lo
+      // que distingue «tomado hace un rato» de «tomado hace una hora».
+      "sent_at timestamptz",
+    ]) {
+      await pool.query(`ALTER TABLE cert_cola ADD COLUMN IF NOT EXISTS ${columna}`);
+    }
+
+    /**
+     * Y SI AUN ASI NO SIRVE, SE DICE. Un tipo incompatible —un `status` que no
+     * sea texto, un `id` que no autoincremente— no lo arregla ningun ALTER, y
+     * el fallo saldria luego disfrazado de otra cosa a mitad de una prueba de
+     * concurrencia. Mejor aqui, con nombre.
+     */
+    const forma = await pool.query<{ attname: string }>(
+      `SELECT a.attname FROM pg_class c
+         JOIN pg_attribute a ON a.attrelid = c.oid AND a.attnum > 0 AND NOT a.attisdropped
+        WHERE c.relname = 'cert_cola' AND c.relkind = 'r'`,
+    );
+    const columnas = new Set(forma.rows.map((f) => f.attname));
+    for (const necesaria of ["id", "status", "created_at", "sent_at"]) {
+      if (!columnas.has(necesaria)) {
+        throw new Error(
+          `cert_cola existe pero le falta "${necesaria}" (tiene: ${[...columnas].join(", ")}). ` +
+            `Es una tabla de certificacion local: borrala y vuelve a ejecutar.`,
+        );
+      }
+    }
   });
 
   afterAll(async () => { await pool?.end(); });
