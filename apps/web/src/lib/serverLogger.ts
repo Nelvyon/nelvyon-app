@@ -1,3 +1,5 @@
+import { redactar } from "@/../../backend/seguridad/loQueNoSeImprime.mjs";
+
 const isDev = process.env.NODE_ENV !== "production";
 
 export type LogMeta = Record<string, unknown>;
@@ -9,28 +11,30 @@ export interface Logger {
   error(message: string, meta?: LogMeta, cause?: Error): void;
 }
 
-const FORBIDDEN_KEYS = new Set(["password", "token", "secret", "authorization", "cookie"]);
-
-export function sanitizeMeta(meta: LogMeta | undefined): LogMeta {
-  if (!meta) return {};
-  const out: LogMeta = {};
-  for (const [key, value] of Object.entries(meta)) {
-    if (FORBIDDEN_KEYS.has(key.toLowerCase())) continue;
-    if (value instanceof Error) {
-      out[key] = { name: value.name, message: value.message };
-      continue;
-    }
-    out[key] = value;
-  }
-  return out;
-}
+/**
+ * ESTA COPIA TENIA CUATRO AGUJEROS, uno mas que su gemela del backend.
+ *
+ *   1. el nombre se comparaba entero contra cinco palabras, asi que
+ *      `accessToken`, `apiKey`, `client_secret` o `set-cookie` pasaban;
+ *   2. los valores no se miraban: un secreto bajo un nombre inocente salia;
+ *   3. los arrays no se recorrian;
+ *   4. y ESTA ademas no recorria los objetos anidados, asi que
+ *      `{ headers: { authorization: "Bearer ..." } }` salia entero.
+ *
+ * Se reexporta el saneador comun. Tener dos copias del mismo filtro con dos
+ * conjuntos de agujeros distintos era el problema de fondo.
+ */
+export { sanitizeMeta } from "@/../../backend/logger/sanearParaElRegistro";
 
 function write(level: string, message: string, meta?: LogMeta, context?: string, cause?: Error): void {
   const payload = sanitizeMeta(meta);
-  if (cause) payload.cause = { name: cause.name, message: cause.message };
+  // El mensaje tambien se redacta: interpolar el dato en la frase es la forma
+  // natural de escribir un log, y era por donde salia casi todo.
+  const mensajeSeguro = redactar(message);
+  if (cause) payload.cause = { name: cause.name, message: redactar(cause.message) };
   const prefix = context ? `[${context}] ` : "";
   const suffix = Object.keys(payload).length > 0 ? ` ${JSON.stringify(payload)}` : "";
-  const line = `${prefix}${message}${suffix}`;
+  const line = `${prefix}${mensajeSeguro}${suffix}`;
 
   if (level === "error") {
     console.error(`[${level}]`, line);

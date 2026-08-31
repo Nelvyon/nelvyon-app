@@ -1,14 +1,11 @@
 import * as Sentry from "@sentry/nextjs";
 
-export type LogMeta = Record<string, unknown>;
+import { redactar } from "../seguridad/loQueNoSeImprime.mjs";
+import { sanitizeMeta } from "./sanearParaElRegistro";
 
-const FORBIDDEN_KEYS = new Set([
-  "password",
-  "token",
-  "secret",
-  "authorization",
-  "cookie",
-]);
+export type { LogMeta } from "./sanearParaElRegistro";
+export { sanitizeMeta } from "./sanearParaElRegistro";
+import type { LogMeta } from "./sanearParaElRegistro";
 
 type LogLevelName = "debug" | "info" | "warn" | "error";
 
@@ -35,29 +32,6 @@ function allowDebug(): boolean {
 
 function meetsMinLevel(level: LogLevelName): boolean {
   return LEVEL_RANK[level] >= LEVEL_RANK[parseLogLevel()];
-}
-
-function isForbiddenKey(key: string): boolean {
-  return FORBIDDEN_KEYS.has(key.toLowerCase());
-}
-
-/** Strip sensitive keys and normalize values for safe logging. */
-export function sanitizeMeta(meta: LogMeta | undefined): LogMeta {
-  if (!meta) return {};
-  const out: LogMeta = {};
-  for (const [key, value] of Object.entries(meta)) {
-    if (isForbiddenKey(key)) continue;
-    if (value instanceof Error) {
-      out[key] = { name: value.name, message: value.message };
-      continue;
-    }
-    if (value && typeof value === "object" && !Array.isArray(value) && !(value instanceof Date)) {
-      out[key] = sanitizeMeta(value as LogMeta);
-      continue;
-    }
-    out[key] = value;
-  }
-  return out;
 }
 
 function findErrorForSentry(meta: LogMeta | undefined, cause: Error | undefined): Error | undefined {
@@ -137,6 +111,19 @@ function emit(
   }
   /* warn + error always emit when called */
 
+  /**
+   * EL MENSAJE TAMBIEN SE REDACTA, y era lo que mas se escapaba.
+   *
+   * `sanitizeMeta` solo miraba el objeto `meta`. El mensaje se escribia literal,
+   * asi que cualquier
+   *
+   *     logger.error(`no se pudo conectar a ${DATABASE_URL}`)
+   *
+   * salia entero. Y esa es la forma NATURAL de escribir un log: interpolar el
+   * dato en la frase. Pedir que nadie lo haga nunca no es una politica, es una
+   * esperanza.
+   */
+  const mensajeSeguro = redactar(message);
   const merged: LogMeta = { ...sanitizeMeta(baseMeta), ...sanitizeMeta(meta) };
   const forSentry = findErrorForSentry(meta, cause) ?? findErrorForSentry(baseMeta, undefined);
 
@@ -150,7 +137,7 @@ function emit(
     const payload: Record<string, unknown> = {
       level,
       timestamp,
-      message,
+      message: mensajeSeguro,
       ...merged,
     };
     if (context) payload.context = context;
@@ -158,7 +145,7 @@ function emit(
     return;
   }
 
-  writeDevLine(level, message, context, merged);
+  writeDevLine(level, mensajeSeguro, context, merged);
 }
 
 export function createLogger(context?: string): Logger {
