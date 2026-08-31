@@ -172,27 +172,28 @@ describe("el contrafactual: cambiar UNA sola variable", () => {
     expect(medidos, "no se ha medido ningún agente").toBeGreaterThan(10);
 
     /**
-     * EL RESULTADO MEDIDO, y no es el que uno querría: los 29 agentes producen
-     * la MISMA instrucción cambiando el idioma del cliente.
+     * ESTA PRUEBA MIDIÓ PRIMERO EL FALLO Y DESPUÉS EL ARREGLO, y conviene que
+     * quede contado porque es la razón de que exista.
      *
-     * NO es un defecto de los agentes. Es dónde está la frontera: el idioma no
-     * lo pone el agente en su prompt, lo pone `localizedPrompt` en el envoltorio
-     * de `SectorAgentWrapper`, que es una capa por encima de lo que este banco
-     * ejecuta. El agente compone su instrucción; el envoltorio le antepone
-     * «ALWAYS write output in Deutsch (de)».
+     * La primera medición dio **29 de 29 agentes produciendo la instrucción
+     * IDÉNTICA** al cambiar el idioma del cliente. No era culpa de los agentes:
+     * el idioma no llegaba hasta ellos. `contextoDelCliente` —el bloque que se
+     * antepone a cada instrucción— llevaba objetivo, propuesta de valor,
+     * ubicación, presupuesto, historial y restricciones, pero **no el idioma**.
+     * El dato entraba en `os_clients.language`, el cerebro de negocio lo
+     * guardaba en `preferencias.idioma`, y ahí se quedaba.
      *
-     * Se deja ESCRITO en vez de forzar un verde: el banco mide el primer paso
-     * del agente, y ahí el idioma efectivamente no interviene. Quien lea esto
-     * tiene que saber que la cobertura del idioma vive en
-     * `enQueIdiomaEscribeUnAgente.test.ts`, no aquí.
+     * Añadidas las dos líneas al contexto, la medición pasó a **0 de 29**.
      *
-     * Si algún día un agente empieza a usar el idioma en su propia instrucción,
-     * esta prueba lo dirá: el número dejará de ser 29.
+     * Y esto NO sustituye a `localizedPrompt`, que es quien le ordena al modelo
+     * en qué idioma escribir. Sirve para lo otro: que el agente RAZONE con el
+     * idioma. Buscar palabras clave para un cliente alemán no es traducir las
+     * españolas.
      */
     expect(
-      noCambian.length,
-      `${medidos - noCambian.length} de ${medidos} agentes cambian su instruccion con el idioma`,
-    ).toBe(medidos);
+      noCambian,
+      `${noCambian.length} de ${medidos} agentes NO reaccionan al idioma del cliente:\n  ${noCambian.join("\n  ")}`,
+    ).toEqual([]);
   });
 
   it("cambiar el PAÍS sí cambia lo que se le pide", async () => {

@@ -72,6 +72,24 @@ export function contextoDelCliente(payload: OsJobPayload): string {
   decir("Qué le hace distinto", payload.uniqueValue ?? payload.usp);
   decir("Dónde opera", payload.location);
 
+  // EN QUÉ IDIOMA HABLA Y EN QUÉ MERCADO VENDE.
+  //
+  // No estaban, y por eso el idioma del cliente no llegaba nunca al agente. La
+  // cadena se cortaba aquí: el dato entra en `os_clients.language`, el cerebro
+  // de negocio lo guarda como `preferencias.idioma`, y de ahí no salía a
+  // ninguna parte.
+  //
+  // Que el idioma vaya en la instrucción NO sustituye a `localizedPrompt`, que
+  // es quien le ordena al modelo en qué idioma escribir. Sirve para lo otro:
+  // que el agente RAZONE con ello. Buscar palabras clave para un cliente alemán
+  // no es traducir las españolas, y un calendario de contenidos para Brasil no
+  // es el de Portugal con otro acento.
+  //
+  // Sin el dato no se añade nada —`decir` sólo escribe cuando hay valor— así
+  // que ningún encargo de hoy cambia de instrucción.
+  decir("Idioma en que habla con sus clientes", payload.language ?? payload.locale);
+  decir("Mercado donde vende", payload.country ?? payload.market);
+
   const presupuesto = payload.monthlyBudget ?? payload.budget;
   if (typeof presupuesto === "number" && Number.isFinite(presupuesto)) {
     lineas.push(`- Presupuesto mensual disponible: ${presupuesto} EUR`);
