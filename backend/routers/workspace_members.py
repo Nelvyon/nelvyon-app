@@ -8,6 +8,7 @@ from pydantic import BaseModel, ConfigDict
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
+from core.tope_de_miembros import asegurar_hueco_para_miembros
 from dependencies.workspace import WorkspaceContext, require_workspace, require_workspace_operator
 from services.workspace_members import Workspace_membersService
 
@@ -206,6 +207,9 @@ async def create_workspace_members(
         payload = data.model_dump()
         if int(payload.get("workspace_id") or 0) != ws_ctx.workspace_id:
             raise HTTPException(status_code=400, detail="workspace_id mismatch with workspace header")
+        # El tope anti-abuso se aplicaba SOLO en la ruta de invitacion. Esta
+        # puerta creaba pertenencias sin mirarlo. Ver `core/tope_de_miembros`.
+        await asegurar_hueco_para_miembros(db, ws_ctx.workspace_id, 1)
         result = await service.create(payload)
         if not result:
             raise HTTPException(status_code=400, detail="Failed to create workspace_members")
@@ -233,6 +237,10 @@ async def create_workspace_memberss_batch(
     results = []
     
     try:
+        # SE RESERVA SITIO PARA TODAS DE UNA VEZ, no de una en una: comprobar
+        # por item dejaria pasar una peticion de treinta cuando solo quedan diez
+        # huecos, y fallaria a mitad dejando veinte filas escritas.
+        await asegurar_hueco_para_miembros(db, ws_ctx.workspace_id, len(request.items))
         for item_data in request.items:
             payload = item_data.model_dump()
             if int(payload.get("workspace_id") or 0) != ws_ctx.workspace_id:

@@ -29,7 +29,10 @@ logger = logging.getLogger(__name__)
 
 #: Tope de miembros por workspace. Se comprueba en la misma sentencia que
 #: inserta, para que dos invitaciones simultaneas no lo rebasen.
-MAX_MIEMBROS_POR_WORKSPACE = 50
+# La constante vive en `core/tope_de_miembros` porque hay TRES puertas que
+# crean pertenencias y hasta ahora solo esta la miraba. Se reexporta para no
+# romper a quien la importa de aqui.
+from core.tope_de_miembros import MAX_MIEMBROS_POR_WORKSPACE  # noqa: F401
 
 router = APIRouter(prefix="/api/v1/workspace", tags=["workspace-management"])
 
