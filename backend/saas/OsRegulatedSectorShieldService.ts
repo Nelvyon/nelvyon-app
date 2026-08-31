@@ -71,6 +71,24 @@ export const EU_DISCLAIMERS: Record<string, string> = {
   medical: "Información de salud orientativa, no sustituye el criterio de un profesional sanitario. No realizamos diagnósticos online.",
   pharmacy: "Información no sustituye el consejo farmacéutico ni la prescripción médica. Lea las instrucciones de cada producto.",
   finance: "Información general, no constituye recomendación de inversión. Rentabilidades pasadas no garantizan rentabilidades futuras.",
+
+  // `salud` y `clinica` ESTABAN en `REGULATED_SECTORS` y NO tenían aviso.
+  //
+  // Eso abría un agujero silencioso: `hasRequiredDisclaimer` devuelve `true`
+  // cuando no encuentra frases para el sector —«no specific disclaimer required
+  // for this sector»—, que es correcto para uno NO regulado y es justo lo
+  // contrario para uno que está en la lista de regulados PRECISAMENTE porque
+  // necesita aviso.
+  //
+  // Resultado: una clínica quedaba marcada como sector regulado y aprobaba el
+  // escudo sin llevar ningún aviso legal. `computeShieldStatus` con
+  // `regulated: true, disclaimerOk: true` devuelve `passed`.
+  //
+  // El texto es el mismo que `medical`: son el mismo supuesto sanitario escrito
+  // en castellano. Se añaden en vez de sacarlos de `REGULATED_SECTORS` porque
+  // regulados lo son; lo que faltaba era el aviso.
+  salud: "Información de salud orientativa, no sustituye el criterio de un profesional sanitario. No realizamos diagnósticos online.",
+  clinica: "Información orientativa, no sustituye el diagnóstico de un profesional sanitario colegiado. Resultados individuales pueden variar.",
 };
 
 // Phrases (normalized, lowercase) that identify the required disclaimer per sector.
@@ -84,6 +102,8 @@ const DISCLAIMER_KEYPHRASES: Record<string, string[]> = {
   medical: ["no sustituye", "profesional sanitario"],
   pharmacy: ["consejo farmaceutico", "no sustituye"],
   finance: ["no constituye recomendacion", "rentabilidades pasadas"],
+  salud: ["no sustituye", "profesional sanitario"],
+  clinica: ["no sustituye", "profesional sanitario"],
 };
 
 // ── Prohibited claims (EU advertising / health / finance / legal) ─────────────────
@@ -199,7 +219,15 @@ function rowToAudit(r: AuditRow): ShieldAuditResult & { auditedAt: string } {
 
 // ── Default ports ────────────────────────────────────────────────────────────────
 
-const REGULATED_SECTORS = new Set(["dental", "legal", "beauty", "solar", "seguros", "contabilidad", "medical", "pharmacy", "finance", "salud", "clinica"]);
+/**
+ * Los sectores que se consideran regulados.
+ *
+ * SE EXPORTA para que una prueba pueda comprobar que esta lista y
+ * `EU_DISCLAIMERS` no se separen. Se separaron: `salud` y `clinica` estaban
+ * aqui sin aviso definido, y `hasRequiredDisclaimer` los aprobaba por eso
+ * mismo.
+ */
+export const REGULATED_SECTORS = new Set(["dental", "legal", "beauty", "solar", "seguros", "contabilidad", "medical", "pharmacy", "finance", "salud", "clinica"]);
 
 const defaultSectorPort: SectorPort = {
   async isRegulated(sectorId) {

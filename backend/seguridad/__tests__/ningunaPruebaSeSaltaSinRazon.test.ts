@@ -102,14 +102,27 @@ describe("el repositorio entero no tiene saltos sin razón", () => {
     expect(ficheros.length).toBeGreaterThan(500);
   });
 
-  it("EL CONTROL: no se acusa al vigilante", () => {
+  it("EL CONTROL: no se acusa al vigilante, ni a esta misma prueba", () => {
     /**
-     * `skipsAreGated.test.ts` es el guardián que busca `describe.skip(` sin
-     * condición. Sus cadenas de detección SON el patrón que busca, así que se
-     * señalaba a sí mismo. Acusar al vigilante es el falso positivo más tonto
-     * que puede tener una herramienta como ésta.
+     * ACUSAR AL VIGILANTE es el falso positivo más tonto posible, y aquí pasó
+     * dos veces:
+     *
+     *   · `skipsAreGated.test.ts` busca `describe.skip(` sin condición, así que
+     *     sus cadenas de detección SON el patrón que busca;
+     *   · y esta misma prueba, que necesita un `describe.skip` de ejemplo para
+     *     su control positivo de ahí arriba.
+     *
+     * LA SEGUNDA ENSEÑÓ ALGO PEOR. Pasó al ejecutarla sola y falló en la suite
+     * completa, porque `git ls-files` no lista un fichero hasta que se
+     * consolida: **el veredicto dependía de si estaba commiteada**. Una prueba
+     * que cambia de resultado al hacer `git add` no mide lo que cree medir.
+     *
+     * La exclusión es una regla general —un fichero que IMPORTA la herramienta
+     * habla de ella— y no una lista de nombres, que habría que ampliar cada vez
+     * y que fallaría el día que alguien se olvidara.
      */
     expect(ficheros.some((f: string) => /skipsAreGated/.test(f))).toBe(false);
+    expect(ficheros.some((f: string) => /ningunaPruebaSeSaltaSinRazon/.test(f))).toBe(false);
   });
 
   it("LA REGLA: cada salto tiene una razón clasificable", () => {

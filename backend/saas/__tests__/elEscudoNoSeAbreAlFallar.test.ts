@@ -35,7 +35,10 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  EU_DISCLAIMERS,
   OsRegulatedSectorShieldService,
+  REGULATED_SECTORS,
+  hasRequiredDisclaimer,
   type QaPort,
   type SectorPort,
 } from "../OsRegulatedSectorShieldService";
@@ -156,6 +159,55 @@ describe("cuando SÍ se puede saber, manda la respuesta", () => {
   it("y el portal publica lo que no está regulado", async () => {
     const r = await servicio(SECTORES_QUE_RESPONDEN(false)).canPublishToPortal("ecommerce", {});
     expect(r.allowed).toBe(true);
+  });
+});
+
+describe("un sector regulado no puede aprobar por no tener aviso configurado", () => {
+  /**
+   * EL TERCER AGUJERO DE ESTE SERVICIO, y el más silencioso de los tres.
+   *
+   *     const phrases = DISCLAIMER_KEYPHRASES[sectorId];
+   *     if (!phrases) return true;  // «no specific disclaimer required»
+   *
+   * Devolver `true` es correcto para un sector NO regulado. Es justo lo
+   * contrario para uno que está en `REGULATED_SECTORS` **precisamente porque
+   * necesita aviso**.
+   *
+   * Y las dos listas se habían separado: `salud` y `clinica` estaban entre los
+   * regulados y no tenían aviso definido. Una clínica quedaba marcada como
+   * sector regulado y aprobaba el escudo sin llevar ninguno —
+   * `computeShieldStatus({ regulated: true, disclaimerOk: true })` devuelve
+   * `passed`.
+   *
+   * Se arregla añadiendo los dos avisos, no sacándolos de la lista: regulados
+   * lo son. Lo que faltaba era el texto.
+   */
+  it("LA REGLA: todo sector regulado tiene su aviso definido", () => {
+    const sinAviso = [...REGULATED_SECTORS].filter((s) => !EU_DISCLAIMERS[s]);
+    expect(
+      sinAviso,
+      `sectores regulados SIN aviso legal: ${sinAviso.join(", ")}. ` +
+        "Sin aviso, `hasRequiredDisclaimer` los aprueba sin comprobar nada.",
+    ).toEqual([]);
+  });
+
+  it("y `salud` sin aviso en el texto NO aprueba", () => {
+    // El caso concreto que estaba abierto.
+    expect(hasRequiredDisclaimer("Somos una clínica que cuida de ti.", "salud")).toBe(false);
+  });
+
+  it("EL CONTROL: con el aviso puesto, sí aprueba", () => {
+    // Sin esto, «devolver siempre false» pasaría la prueba de arriba y
+    // bloquearía todo, que es el problema contrario.
+    const conAviso =
+      "Somos una clínica. Información de salud orientativa, no sustituye el criterio de un profesional sanitario.";
+    expect(hasRequiredDisclaimer(conAviso, "salud")).toBe(true);
+  });
+
+  it("un sector NO regulado sigue sin necesitar aviso", () => {
+    // La regla original era correcta para este caso y tiene que seguir siéndolo.
+    expect(REGULATED_SECTORS.has("ecommerce")).toBe(false);
+    expect(hasRequiredDisclaimer("Compra zapatillas.", "ecommerce")).toBe(true);
   });
 });
 

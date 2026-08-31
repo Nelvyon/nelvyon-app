@@ -60,17 +60,43 @@ const CLASES = [
   [/DOCKER|CONTAINER|E2E|INTEGRATION|INTEGRACION/i, "INTEGRACION_DELIBERADA"],
 ];
 
+/**
+ * ¿Este fichero habla DE esta herramienta en vez de ser algo que auditar?
+ *
+ * ACUSAR AL VIGILANTE ES EL FALSO POSITIVO MÁS TONTO QUE PUEDE TENER UNA
+ * HERRAMIENTA COMO ÉSTA, y aquí pasó dos veces:
+ *
+ *   · `skipsAreGated.test.ts` busca `describe.skip(` sin condición, así que sus
+ *     cadenas de detección SON el patrón que busca;
+ *   · y la prueba de esta misma herramienta, que necesita un `describe.skip` de
+ *     ejemplo para su control positivo.
+ *
+ * LA SEGUNDA ENSEÑÓ ALGO PEOR. Pasó al ejecutarla sola y falló en la suite
+ * completa, porque `git ls-files` no lista un fichero hasta que se consolida:
+ * **el resultado de la prueba dependía de si estaba commiteada**. Una prueba
+ * cuyo veredicto cambia al hacer `git add` no está midiendo lo que cree.
+ *
+ * La regla es la general, no una lista de nombres: un fichero que IMPORTA esta
+ * herramienta es un fichero que habla de ella. Una lista de nombres habría que
+ * ampliarla cada vez, y el día que se olvidara volvería el falso positivo.
+ */
+function esUnFicheroSobreLaHerramienta(raiz, rel) {
+  if (/skipsAreGated/.test(rel)) return true;
+  try {
+    const texto = fs.readFileSync(path.join(raiz, rel), "utf8");
+    return /por-que-se-salta-esta-prueba/.test(texto);
+  } catch {
+    return false;
+  }
+}
+
 /** Ficheros de prueba, derivados del árbol. */
 export function ficherosDePrueba(raiz = RAIZ) {
   try {
     return execFileSync("git", ["ls-files"], { cwd: raiz, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 })
       .split("\n")
       .filter((f) => f && /\.(test|spec)\.(ts|tsx|js|mjs)$/.test(f))
-      // `skipsAreGated` es el guardian que vigila que no haya un
-      // `describe.skip` sin condicion. Sus cadenas de deteccion SON el
-      // patron que busca, asi que se senala a si mismo. Acusar al
-      // vigilante es el falso positivo mas tonto posible.
-      .filter((f) => !/skipsAreGated/.test(f));
+      .filter((f) => !esUnFicheroSobreLaHerramienta(raiz, f));
   } catch {
     return [];
   }
