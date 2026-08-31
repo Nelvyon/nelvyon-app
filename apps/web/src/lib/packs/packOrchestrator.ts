@@ -42,6 +42,7 @@ import { buildGenericProductionDeliverable } from "@/lib/packs/genericProduction
 import { containsMockUrl } from "@/lib/packs/localPackProduction";
 import { buildSkuVisualQaInput, skuNeedsSoftReview } from "@/lib/packs/skuVisualQaInput";
 import { localeDeCliente } from "@/../../backend/os-agents/agentLanguage";
+import { regulacionDe, tratarComoRegulado } from "../../../../../backend/cumplimiento/regulacionDeSector";
 
 /** Returns true only when AUTONOMOUS_PRODUCTION=true is set in the environment. */
 export function isAutonomousProductionEnabled(): boolean {
@@ -112,8 +113,41 @@ export function buildBaseBrief(
       ga4_id: "G-PACK-PLACEHOLDER",
     },
     compliance_flags: {
-      regulated_sector: intake.sector === "dental" || intake.sector === "fintech_b2b",
-      requires_legal_review: intake.sector === "dental",
+      /**
+       * ── DOS BANDERAS QUE PARECEN LA MISMA Y NO LO SON ──────────────────────
+       *
+       * Aqui habia dos nombres de sector escritos a mano:
+       *
+       *     regulated_sector:      sector === "dental" || sector === "fintech_b2b"
+       *     requires_legal_review: sector === "dental"
+       *
+       * `regulated_sector` alimenta `scorer.ts` (comprobacion L-CNT-03, marcada
+       * CRITICA), que exige `regulated_disclaimer` en la copia SOLO si la
+       * bandera es cierta. Con dos sectores en la lista, un pack de farmacia, de
+       * despacho juridico o de una clinica aprobaba el control de calidad sin
+       * llevar ningun aviso legal.
+       *
+       * Las dos derivan ya de `regulacionDeSector`, pero NO de la misma
+       * pregunta, porque no significan lo mismo:
+       *
+       *   `regulated_sector` = SABEMOS que esta regulado.
+       *      Obliga a que la copia lleve un aviso concreto. Ponerla a cierto
+       *      «por si acaso» ante un sector desconocido no protegeria a nadie:
+       *      haria fallar el control de calidad de todos los packs de todo
+       *      sector no catalogado hasta que alguien escribiera un aviso que
+       *      nadie ha definido. Eso no es cautela, es romperlo.
+       *
+       *   `requires_legal_review` = NO SABEMOS que sea seguro.
+       *      Es una marca para que lo mire una persona, y no bloquea nada por
+       *      si sola. Ahi si cabe la incertidumbre, y ahi es donde va:
+       *      `tratarComoRegulado` devuelve cierto tanto para REGULADO como para
+       *      DESCONOCIDO.
+       *
+       * Fusionarlas seria el error que se queria evitar. Se modela la
+       * diferencia.
+       */
+      regulated_sector: regulacionDe(intake.sector) === "REGULADO",
+      requires_legal_review: tratarComoRegulado(intake.sector),
       no_ranking_guarantee_ack: true,
     },
     seed_keywords: [

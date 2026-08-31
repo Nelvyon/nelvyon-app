@@ -53,8 +53,17 @@ describe("O27 — hasRequiredDisclaimer", () => {
   it("dental without disclaimer → false", () => {
     expect(hasRequiredDisclaimer("Ven a nuestra clínica dental", "dental")).toBe(false);
   });
-  it("non-regulated sector with no template → true (n.a.)", () => {
-    expect(hasRequiredDisclaimer("cualquier texto", "restaurant")).toBe(true);
+  it("sector sin aviso definido → false (no verificable, no «n.a.»)", () => {
+    /**
+     * Antes esto esperaba `true` con el nombre «n.a.». Ese `true` significaba
+     * dos cosas a la vez —«no hace falta aviso» y «no se sabe que aviso hace
+     * falta»— y por la segunda se colaba un sector regulado sin comprobar nada.
+     *
+     * La funcion responde ahora solo lo que puede verificar. Quien sabe si hace
+     * falta es `evaluateShield`, que ni la llama cuando el sector no esta
+     * regulado.
+     */
+    expect(hasRequiredDisclaimer("cualquier texto", "restaurant")).toBe(false);
   });
 });
 

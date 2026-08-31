@@ -9,6 +9,7 @@
  */
 import { DbClient } from "../db/DbClient";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
+import { regulacionDe, SECTORES_REGULADOS_LIBRES, tratarComoRegulado } from "../cumplimiento/regulacionDeSector";
 
 /**
  * Acceso deliberado a las auditorias de TODOS los inquilinos.
@@ -181,9 +182,46 @@ export function scanClaims(text: string): { ok: boolean; violations: string[] } 
   return { ok: violations.length === 0, violations };
 }
 
+/**
+ * ¿Sabemos siquiera QUE aviso exige este sector?
+ *
+ * Distinguir «no hace falta aviso» de «no se ha definido el aviso» es toda la
+ * diferencia entre aprobar y tener que mirar. Antes las dos cosas devolvian lo
+ * mismo.
+ */
+export function hayAvisoDefinidoPara(sectorId: string): boolean {
+  return Object.hasOwn(DISCLAIMER_KEYPHRASES, normalizarSector(sectorId));
+}
+
+function normalizarSector(sectorId: unknown): string {
+  return typeof sectorId === "string" ? sectorId.trim().toLowerCase() : "";
+}
+
 export function hasRequiredDisclaimer(text: string, sectorId: string): boolean {
-  const phrases = DISCLAIMER_KEYPHRASES[sectorId];
-  if (!phrases) return true; // no specific disclaimer required for this sector
+  /**
+   * `DISCLAIMER_KEYPHRASES[sectorId]` era un acceso directo sobre un objeto
+   * literal, asi que llegaba a `Object.prototype`: un sector llamado
+   * `constructor` o `toString` devolvia algo truthy y `phrases.some` reventaba
+   * o mentia. Es el mismo defecto que se corrigio en `elitePromptLibrary`.
+   */
+  const clave = normalizarSector(sectorId);
+  if (!Object.hasOwn(DISCLAIMER_KEYPHRASES, clave)) {
+    /**
+     * NO SE SABE, Y ESO NO ES QUE ESTE BIEN.
+     *
+     * Antes esto devolvia `true` con el comentario «no specific disclaimer
+     * required for this sector». Eso es correcto para un sector NO regulado, y
+     * es exactamente lo contrario para uno regulado: si esta en la lista de
+     * regulados es PORQUE necesita aviso, y no tener las frases definidas
+     * significa que no se puede comprobar, no que se cumpla.
+     *
+     * Quien llama ya sabe si el sector es regulado, asi que aqui se devuelve
+     * `false` —no verificado— y `evaluateShield` decide: para un sector no
+     * regulado ni se consulta.
+     */
+    return false;
+  }
+  const phrases = DISCLAIMER_KEYPHRASES[clave]!;
   const norm = normalize(text);
   // require at least one key phrase from the sector's disclaimer to be present
   return phrases.some((p) => norm.includes(normalize(p)));
@@ -227,19 +265,33 @@ function rowToAudit(r: AuditRow): ShieldAuditResult & { auditedAt: string } {
  * aqui sin aviso definido, y `hasRequiredDisclaimer` los aprobaba por eso
  * mismo.
  */
-export const REGULATED_SECTORS = new Set(["dental", "legal", "beauty", "solar", "seguros", "contabilidad", "medical", "pharmacy", "finance", "salud", "clinica"]);
+/**
+ * Se mantiene el nombre porque lo importan otros sitios, pero el contenido ya
+ * no vive aqui: viene de `regulacionDeSector`, que es la unica lista.
+ */
+export const REGULATED_SECTORS: ReadonlySet<string> = SECTORES_REGULADOS_LIBRES;
 
+/**
+ * QUIEN DECIDE SI UN SECTOR ESTA REGULADO YA NO ES ESTE FICHERO.
+ *
+ * Habia tres respuestas distintas a la misma pregunta —esta, el registro de
+ * sectores autonomos y dos nombres escritos a mano en `packOrchestrator`— y no
+ * coincidian. Ahora las tres derivan de `regulacionDe`.
+ *
+ * QUE HACE ESTE PUERTO CON `DESCONOCIDO`: lo trata como regulado. Es la
+ * politica del proyecto —UNKNOWN != SAFE— y aqui es donde mas barata sale: un
+ * aviso legal de mas se ve y se quita; un claim prohibido publicado en un
+ * sector regulado no se deshace.
+ *
+ * LO QUE ESTABA MAL ANTES, ademas de la divergencia: `SECTOR_REGISTRY[sectorId]`
+ * era un acceso directo sobre un objeto literal y llegaba a `Object.prototype`.
+ * Un sector llamado `constructor` devolvia el constructor de Object —truthy—,
+ * `!!profile.regulated` daba `false`, y el sector salia por «no regulado» sin
+ * llegar siquiera a consultar la lista estatica.
+ */
 const defaultSectorPort: SectorPort = {
   async isRegulated(sectorId) {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { SECTOR_REGISTRY } = require("../autonomous/sectors/sectorRegistry") as {
-        SECTOR_REGISTRY: Record<string, { regulated?: boolean }>;
-      };
-      const profile = SECTOR_REGISTRY[sectorId];
-      if (profile) return !!profile.regulated;
-    } catch { /* fall through to static set */ }
-    return REGULATED_SECTORS.has(sectorId);
+    return tratarComoRegulado(sectorId);
   },
 };
 
@@ -331,7 +383,7 @@ export class OsRegulatedSectorShieldService {
   /** Evaluate disclaimer + claims for a piece of content (no persistence). */
   async evaluateShield(input: { sectorId: string; packRunId?: string | null; deliverableRef?: string | null; htmlOrText: string; metadata?: Record<string, unknown> }): Promise<ShieldAuditResult> {
     const text = input.htmlOrText ?? "";
-    const { regulado: regulated } = await this.esReguladoOSeSupone(input.sectorId);
+    const { regulado: regulated, porQue: porQueNoSeSabe } = await this.esReguladoOSeSupone(input.sectorId);
 
     const claimsLocal = scanClaims(text);
     let claimsViolations = claimsLocal.violations;
@@ -343,7 +395,47 @@ export class OsRegulatedSectorShieldService {
     const claimsOk = claimsViolations.length === 0;
 
     const disclaimerOk = regulated ? hasRequiredDisclaimer(text, input.sectorId) : true;
-    const status = computeShieldStatus({ regulated, disclaimerOk, claimsOk });
+
+    /**
+     * ── REVISION HUMANA ────────────────────────────────────────────────────
+     *
+     * Un sector regulado del que NO se sabe que aviso exige no puede aprobarse
+     * solo. No es que incumpla: es que no se ha podido comprobar, y eso no es
+     * lo mismo que estar bien.
+     *
+     * Pasa en tres casos, y los tres acaban igual:
+     *
+     *   DESCONOCIDO   nadie reconoce el identificador del sector
+     *   ERROR         no se pudo consultar (`esReguladoOSeSupone` supone que si)
+     *   SIN AVISO     regulado, pero sin frases definidas en el catalogo
+     *
+     * POR QUE EL ESTADO ES `blocked` Y NO UNO NUEVO. La tabla lo tiene cerrado:
+     * `CHECK (status IN ('pending','passed','blocked','warning'))`. Emitir un
+     * `review_required` exigiria migrar produccion, y hasta que esa migracion
+     * este aplicada cada auditoria fallaria al escribirse. `blocked` es el
+     * estado canonico que YA significa «no se publica» y que YA respetan todos
+     * los consumidores —`canPublishToPortal`, `portalDeliverablesStore`,
+     * `skuVisualQaInput`—, asi que la garantia se cumple hoy, sin migracion.
+     *
+     * El MOTIVO, que es lo que se perderia al meterlo todo en `blocked`, viaja
+     * aparte: en `checks` y en `metadata.revision_humana`, que son JSONB sin
+     * restriccion. Asi «no cumple» y «no se ha podido comprobar» siguen siendo
+     * distinguibles por quien revise, que es de lo que se trata.
+     */
+    const avisoDefinido = hayAvisoDefinidoPara(input.sectorId);
+    const motivoDeRevision = !regulated
+      ? null
+      : porQueNoSeSabe !== null
+        ? `no se pudo determinar el sector: ${porQueNoSeSabe}`
+        : regulacionDe(input.sectorId) === "DESCONOCIDO"
+          ? `sector no reconocido: «${String(input.sectorId).slice(0, 60)}»`
+          : !avisoDefinido
+            ? "sector regulado sin aviso legal definido en el catalogo"
+            : null;
+
+    const status: ShieldStatus = motivoDeRevision
+      ? "blocked"
+      : computeShieldStatus({ regulated, disclaimerOk, claimsOk });
     const disclaimerText = this.disclaimerFor(input.sectorId);
 
     const checks: ShieldCheck[] = [
@@ -351,6 +443,9 @@ export class OsRegulatedSectorShieldService {
       { name: "disclaimer", ok: disclaimerOk, detail: disclaimerOk ? "presente/n.a." : "falta disclaimer EU" },
       { name: "claims", ok: claimsOk, detail: claimsOk ? "sin claims prohibidos" : `${claimsViolations.length} violaciones` },
     ];
+    if (motivoDeRevision) {
+      checks.push({ name: "revision_humana", ok: false, detail: motivoDeRevision });
+    }
 
     return {
       sectorId: input.sectorId,
@@ -363,7 +458,9 @@ export class OsRegulatedSectorShieldService {
       disclaimerText,
       claimsViolations,
       checks,
-      metadata: input.metadata ?? {},
+      metadata: motivoDeRevision
+        ? { ...(input.metadata ?? {}), revision_humana: motivoDeRevision }
+        : (input.metadata ?? {}),
     };
   }
 
@@ -424,18 +521,62 @@ export class OsRegulatedSectorShieldService {
     return result;
   }
 
-  /** Portal gate: regulated + shield blocked → not publishable. */
+  /**
+   * ¿Se puede publicar esto en el portal del cliente?
+   *
+   * ── EL AGUJERO QUE TENIA, LEIDO LINEA A LINEA ─────────────────────────────
+   *
+   *     if (metadata?.shield_status === "blocked") → denegar
+   *     if (!regulated)                            → permitir
+   *     if (metadata?.shield_status && ...)        → denegar
+   *     return { allowed: true }
+   *
+   * La tercera condicion empieza por `metadata?.shield_status &&`. Cuando el
+   * escudo NO ha dejado señal —`undefined`— la condicion es falsa, no entra, y
+   * se cae hasta el `allowed: true` final.
+   *
+   * Es decir: un sector regulado SIN NINGUNA señal de escudo se publicaba. El
+   * comentario original lo decia sin querer —«require an explicit non-blocked
+   * shield signal WHEN PRESENT»—: cuando no estaba presente, no se exigia nada.
+   *
+   * Y es el caso que mas se da, no el raro: un entregable que nunca paso por el
+   * escudo, uno cuyo metadata se perdio, uno creado por una ruta que todavia no
+   * lo escribe. El fallo abierto estaba justo donde la señal falta.
+   *
+   * ── LA REGLA AHORA ────────────────────────────────────────────────────────
+   *
+   *     no regulado                → se publica
+   *     regulado + passed/warning  → se publica
+   *     regulado + cualquier otra  → NO, y se dice por que
+   *     regulado + SIN señal       → NO, y se dice por que
+   *
+   * `pending` deja de pasar tambien, y es deliberado: significa «el escudo
+   * todavia no ha corrido», que es precisamente no tener veredicto.
+   *
+   * MISSING != SAFE · UNKNOWN != SAFE · ERROR != SAFE.
+   */
   async canPublishToPortal(sectorId: string, metadata: Record<string, unknown>): Promise<{ allowed: boolean; reason?: string }> {
     if (metadata?.shield_status === "blocked") {
       return { allowed: false, reason: "Shield bloqueado: disclaimer EU o claims prohibidos en sector regulado" };
     }
-    const { regulado: regulated } = await this.esReguladoOSeSupone(sectorId);
+    const { regulado: regulated, porQue } = await this.esReguladoOSeSupone(sectorId);
     if (!regulated) return { allowed: true };
-    // Regulated: require an explicit non-blocked shield signal when present.
-    if (metadata?.shield_status && metadata.shield_status !== "passed" && metadata.shield_status !== "warning") {
-      return { allowed: false, reason: "Sector regulado sin shield aprobado" };
+
+    const senal = metadata?.shield_status;
+    if (senal === "passed" || senal === "warning") return { allowed: true };
+
+    if (senal === undefined || senal === null || senal === "") {
+      return {
+        allowed: false,
+        reason:
+          "REVISION HUMANA: sector regulado sin ninguna señal de escudo. " +
+          (porQue
+            ? `Ademas no se pudo determinar el sector (${porQue}).`
+            : "El entregable no ha pasado por el escudo, asi que no hay veredicto que respetar."),
+      };
     }
-    return { allowed: true };
+
+    return { allowed: false, reason: `REVISION HUMANA: sector regulado con escudo en «${String(senal)}», que no es una aprobacion` };
   }
 
   /**
