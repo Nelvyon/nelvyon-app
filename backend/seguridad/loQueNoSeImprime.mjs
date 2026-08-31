@@ -145,7 +145,13 @@ const FORMAS = [
   // Cookie completa
   [/\b(cookie\s*[:=]\s*)[^\s;]{8,}/gi, (m, p) => `${p}<REDACTADO>`],
   // Claves con prefijo conocido: sk-, pk_, rk_, ghp_, xoxb-, AKIA…
-  [/\b(sk|pk|rk|ak)[-_][A-Za-z0-9]{12,}/g, () => "<REDACTADO>"],
+  //
+  // EL CUERPO ADMITE `-` Y `_`. La primera version usaba `[A-Za-z0-9]{12,}` y
+  // se paraba en el segundo separador, asi que `sk-proj-AAAA...` y
+  // `rk_live_ZZZZ...` —las formas REALES de OpenAI y de una clave restringida
+  // de Stripe— no llegaban al minimo de doce y pasaban enteras. Se descubrio
+  // atacando el redactor con dieciocho formas distintas, no leyendolo.
+  [/\b(sk|pk|rk|ak)[-_][A-Za-z0-9_-]{12,}/g, () => "<REDACTADO>"],
   [/\bghp_[A-Za-z0-9]{20,}/g, () => "<REDACTADO>"],
   [/\bxox[baprs]-[A-Za-z0-9-]{10,}/g, () => "<REDACTADO>"],
   [/\bAKIA[0-9A-Z]{12,}/g, () => "<REDACTADO>"],

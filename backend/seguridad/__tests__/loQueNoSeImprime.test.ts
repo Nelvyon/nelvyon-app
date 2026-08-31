@@ -209,6 +209,80 @@ describe("redactar limpia lo que uno no escribió", () => {
   });
 });
 
+describe("el redactor, atacado con las formas que existen de verdad", () => {
+  /**
+   * TODOS LOS VALORES SON SINTÉTICOS. Ninguno es una credencial real, ni
+   * recortada. Probar un redactor con un secreto de verdad sería exactamente el
+   * error que este módulo existe para impedir.
+   *
+   * CÓMO SE ENCONTRARON DOS HUECOS. No leyendo el código: atacándolo con
+   * dieciocho formas distintas. El patrón de claves con prefijo era
+   * `[A-Za-z0-9]{12,}` y se paraba en el segundo separador, así que
+   * `sk-proj-AAAA…` y `rk_live_ZZZZ…` —las formas REALES de OpenAI y de una
+   * clave restringida de Stripe— no llegaban al mínimo de doce caracteres y
+   * pasaban enteras. Las dieciséis restantes sí se tapaban.
+   */
+  const ATAQUES: ReadonlyArray<[string, string, string]> = [
+    ["postgres", "postgres://usr:ClaveInventada123@db.example:5432/x", "ClaveInventada123"],
+    ["mysql", "mysql://root:OtraClaveFalsa@127.0.0.1:3306/db", "OtraClaveFalsa"],
+    ["redis", "redis://default:ClaveRedisFalsa@cache:6379", "ClaveRedisFalsa"],
+    ["amqp", "amqp://user:ClaveAmqpFalsa@rabbit:5672", "ClaveAmqpFalsa"],
+    ["jwt", "token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.FirmaInventadaAqui", "eyJhbGciOiJIUzI1NiJ9"],
+    ["bearer", "Authorization: Bearer abcdefghijklmnop1234567890", "abcdefghijklmnop"],
+    ["cookie", "Cookie: session=abcdef1234567890abcdef", "abcdef1234567890"],
+    ["stripe secreta", "STRIPE_SECRET_KEY=sk" + "_live_AAAABBBBCCCCDDDDEEEE", "sk" + "_live_AAAABBBBCCCCDDDDEEEE"],
+    ["stripe restringida", "clave rk" + "_live_ZZZZYYYYXXXXWWWWVVVV en uso", "rk" + "_live_ZZZZYYYYXXXXWWWWVVVV"],
+    ["openai", "key sk" + "-proj-AAAABBBBCCCCDDDDEEEEFFFF", "sk" + "-proj-AAAABBBBCCCCDDDDEEEEFFFF"],
+    ["github", "token gh" + "p_AAAABBBBCCCCDDDDEEEEFFFFGGGG", "gh" + "p_AAAABBBBCCCCDDDDEEEEFFFFGGGG"],
+    ["slack", "xo" + "xb-1111-2222-AAAABBBBCCCC", "xo" + "xb-1111-2222-AAAABBBBCCCC"],
+    ["aws key id", "AK" + "IAIOSFODNN7EXAMPLE en el perfil", "AK" + "IAIOSFODNN7EXAMPLE"],
+    ["aws secreta", "AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMIfakeKEY", "wJalrXUtnFEMIfakeKEY"],
+    ["oauth", "CLIENT_SECRET=GOCSPX-ClaveInventadaAqui", "GOCSPX-ClaveInventadaAqui"],
+    ["en la url", "https://api.example/x?api_key=ClaveEnLaUrlFalsa&y=1", "ClaveEnLaUrlFalsa"],
+    ["token en la url", "https://api.example/x?token=OtroTokenEnUrl123", "OtroTokenEnUrl123"],
+    ["multilinea", "linea 1\nPASSWORD=ClaveEnVariasLineas\nlinea 3", "ClaveEnVariasLineas"],
+  ];
+
+  it.each(ATAQUES)("tapa un secreto en forma de %s", (_nombre, texto, secreto) => {
+    expect(redactar(texto)).not.toContain(secreto);
+  });
+
+  it("EL CONTROL: no destroza texto que sólo se parece", () => {
+    // Si el patrón fuera demasiado ansioso, tacharía frases normales y la
+    // salida de cualquier diagnóstico se volvería ilegible.
+    for (const inocente of [
+      "el sistema respondio 200 OK",
+      "usa el modo sk si aplica",
+      "ask-me-anything es un formato",
+      "488 migraciones, 0 pendientes",
+      // ESTOS DOS SON LOS QUE IMPORTAN, y llegaron después: sin el mínimo de
+      // doce caracteres, `pk_id` —un nombre de columna clave primaria, de lo
+      // más corriente en cualquier esquema— saldría tachado. Un redactor que
+      // tacha nombres de columna convierte cualquier diagnóstico de base de
+      // datos en un muro de «<REDACTADO>», y se desactiva el mismo día.
+      "la tabla usa pk_id como clave primaria",
+      "el indice sk_ref no se usa",
+    ]) {
+      expect(redactar(inocente), inocente).toBe(inocente);
+    }
+  });
+
+  it("LO QUE NO TAPA, y se dice: un secreto codificado en base64", () => {
+    /**
+     * Un DSN metido en base64 no se reconoce, y no se intenta: detectar base64
+     * genérico marcaría como secreto cualquier cadena larga —un hash, un
+     * identificador, un fragmento de imagen— y el redactor se volvería
+     * inservible por ruidoso.
+     *
+     * Es una limitación real y por eso el orden correcto sigue siendo NO llevar
+     * el secreto hasta aquí: `describir()` primero, `redactar()` como red para
+     * lo que uno no escribió.
+     */
+    const dsnEnBase64 = "cfg: cG9zdGdyZXM6Ly91OnBAaDo1NDMyL2Q=";
+    expect(redactar(dsnEnBase64)).toBe(dsnEnBase64);
+  });
+});
+
 describe("el detector encuentra el fallo real y no señala lo correcto", () => {
   it("EL CONTROL POSITIVO: reconoce la línea exacta que filtró", () => {
     // Si esta prueba se pusiera verde con un detector roto, todo lo demás
