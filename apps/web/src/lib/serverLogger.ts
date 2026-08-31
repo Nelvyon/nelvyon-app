@@ -21,10 +21,22 @@ export interface Logger {
  *   4. y ESTA ademas no recorria los objetos anidados, asi que
  *      `{ headers: { authorization: "Bearer ..." } }` salia entero.
  *
- * Se reexporta el saneador comun. Tener dos copias del mismo filtro con dos
- * conjuntos de agujeros distintos era el problema de fondo.
+ * Se usa el saneador comun. Tener dos copias del mismo filtro con dos conjuntos
+ * de agujeros distintos era el problema de fondo.
+ *
+ * SE IMPORTA Y SE REEXPORTA EN DOS PASOS, y no con `export { x } from`.
+ *
+ * Esa forma NO crea un enlace local: reexporta el nombre hacia fuera y dentro
+ * de este fichero `sanitizeMeta` sigue sin existir. `write()` la llama, asi que
+ * habria reventado en ejecucion con «sanitizeMeta is not defined» — y en un
+ * registrador, es decir, justo cuando algo ya estaba yendo mal.
+ *
+ * Las pruebas de este fichero pasaban igual, porque no ejercitan `write`. Lo
+ * caza el comprobador de tipos, que es exactamente para lo que esta.
  */
-export { sanitizeMeta } from "@/../../backend/logger/sanearParaElRegistro";
+import { sanitizeMeta } from "@/../../backend/logger/sanearParaElRegistro";
+
+export { sanitizeMeta };
 
 function write(level: string, message: string, meta?: LogMeta, context?: string, cause?: Error): void {
   const payload = sanitizeMeta(meta);
