@@ -96,6 +96,42 @@ describe("describir cuenta lo útil sin contar el valor", () => {
   });
 });
 
+describe("la FORMA del valor también decide, no sólo el nombre", () => {
+  /**
+   * EL HUECO QUE ESTO CIERRA. Clasificar por el nombre es una heurística:
+   * acierta con `DB_PASSWORD` y falla con `config_value`. Apareció de
+   * inmediato en una tabla real de configuración cuyas columnas son `key` y
+   * `value`: el nombre no dice nada y el valor podría serlo todo.
+   */
+  it("LA REGLA: un nombre inocente con un valor secreto NO se imprime", () => {
+    const secreto = "postgresql://u:claveSuperSecreta@h:5432/d";
+    const salida = describir("config_value", secreto);
+    expect(salida).not.toContain("claveSuperSecreta");
+    expect(salida).not.toContain(secreto);
+    expect(salida).toContain("la forma del valor parecia un secreto");
+  });
+
+  it("también con un token, que no se parece a una URL", () => {
+    const jwt = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.firmafirmafirma";
+    expect(describir("dato", jwt)).not.toContain(jwt);
+  });
+
+  it("un objeto se serializa en vez de dar «[object Object]»", () => {
+    // `String({})` daba «[object Object]»: no filtraba, pero tampoco informaba,
+    // y con un secreto dentro habría escondido el problema en vez de verlo.
+    expect(describir("value", { modelo: "llama3.2", activo: true })).toContain('"modelo":"llama3.2"');
+  });
+
+  it("EL CONTROL: lo inocente sigue leyéndose entero", () => {
+    // Si esta prueba se pusiera roja, la herramienta habría dejado de servir:
+    // una que lo tacha todo protege igual que apagar el servidor.
+    expect(describir("PORT", "3000")).toBe("PORT: 3000");
+    expect(describir("checksum", "2ced6015e0a6acde4f3b150d2d4fa558")).toContain(
+      "2ced6015e0a6acde4f3b150d2d4fa558",
+    );
+  });
+});
+
 describe("la huella compara sin revelar", () => {
   it("el mismo valor da la misma huella, y otro valor da otra", () => {
     expect(huella(CADENA)).toBe(huella(CADENA));

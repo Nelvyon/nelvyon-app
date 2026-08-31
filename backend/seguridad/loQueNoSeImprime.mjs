@@ -87,11 +87,34 @@ export function huella(valor) {
  */
 export function describir(nombre, valor, opciones = {}) {
   const sensible = esNombreSensible(nombre);
-  if (valor === undefined || valor === null || String(valor).length === 0) {
-    return `${nombre}: UNDEFINED`;
+  if (valor === undefined || valor === null) return `${nombre}: UNDEFINED`;
+
+  // Un objeto convertido con `String()` da «[object Object]», que no informa de
+  // nada y ademas oculta si dentro habia un secreto. Se serializa primero.
+  const v =
+    typeof valor === "object" ? JSON.stringify(valor) ?? "" : String(valor);
+  if (v.length === 0) return `${nombre}: UNDEFINED`;
+
+  // SEGUNDA BARRERA, Y LA QUE DE VERDAD IMPORTA.
+  //
+  // Clasificar por el NOMBRE es una heuristica: acierta con `DB_PASSWORD` y
+  // falla con `config_value`, `dato`, `linea` o cualquier nombre inocente que
+  // resulte contener una cadena de conexion. Ese caso apareció de inmediato:
+  // una tabla de configuración con las columnas `key` y `value`, donde el
+  // nombre no dice nada y el valor podría serlo todo.
+  //
+  // Así que lo que se va a imprimir pasa SIEMPRE por `redactar`, que mira la
+  // FORMA del valor y no su etiqueta. El nombre decide si se resume; la forma
+  // decide si, aun resumido, hay que tachar algo.
+  if (!sensible) {
+    const limpio = redactar(v);
+    // Si la forma delató un secreto, se deja de tratar como valor público: se
+    // describe igual que si el nombre lo hubiera anunciado.
+    if (limpio !== v) {
+      return `${nombre}: DEFINED longitud=${v.length} huella=${huella(v)} (la forma del valor parecia un secreto)`;
+    }
+    return `${nombre}: ${limpio}`;
   }
-  const v = String(valor);
-  if (!sensible) return `${nombre}: ${v}`;
 
   const partes = [`DEFINED`, `longitud=${v.length}`, `huella=${huella(v)}`];
   const { ultimosCaracteres, porQue } = opciones;
