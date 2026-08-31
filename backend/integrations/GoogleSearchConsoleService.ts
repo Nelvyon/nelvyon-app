@@ -1,6 +1,7 @@
 import type { DbClient } from "../db/DbClient";
 import { DbClient as DbClientClass } from "../db/DbClient";
 import { OsAgentError } from "../os-agents/OsAgentError";
+import { fetchWithTimeout } from "../http/fetchWithTimeout";
 
 const API_BASE = "https://searchconsole.googleapis.com/webmasters/v3/sites";
 
@@ -109,7 +110,23 @@ export class GoogleSearchConsoleService {
   }
 
   private get fetchImpl(): typeof fetch {
-    return this.deps.fetchFn ?? globalThis.fetch.bind(globalThis);
+    /**
+     * SIN PLAZO, UNA LLAMADA A UN PROVEEDOR NO TERMINA NUNCA.
+     *
+     * Aqui habia `globalThis.fetch` a pelo. `fetch` no tiene plazo por defecto:
+     * si el proveedor acepta la conexion y no responde, la promesa se queda
+     * esperando y con ella el trabajador que la lanzo. No da error, no reintenta,
+     * no aparece en ningun registro como fallo — simplemente deja de avanzar.
+     *
+     * `fetchWithTimeout` existe en este arbol justo para esto («prevents
+     * cron/worker hangs on slow upstreams») y ya lo usaban ocho servicios de
+     * `backend/saas`. Los doce de `backend/integrations` se habian quedado sin
+     * migrar.
+     *
+     * El doble inyectado (`deps.fetchFn`) sigue mandando: las pruebas ponen el
+     * suyo y no pasan por aqui.
+     */
+    return this.deps.fetchFn ?? fetchWithTimeout;
   }
 
   async saveCredentials(
