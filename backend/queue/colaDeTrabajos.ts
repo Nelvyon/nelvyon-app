@@ -36,6 +36,8 @@
 
 import { randomUUID } from "node:crypto";
 
+import { redactar } from "../seguridad/loQueNoSeImprime.mjs";
+
 import { DbJobsClient } from "../db/DbJobsClient";
 
 /**
@@ -279,7 +281,36 @@ export class ColaDeTrabajos {
    * mire. Rendirse en silencio y rendirse ruidosamente no son lo mismo.
    */
   async fallar(jobId: string, error: unknown, intentos: number, maxIntentos: number): Promise<"reintenta" | "dead_letter"> {
-    const mensaje = (error instanceof Error ? error.message : String(error ?? "")).slice(0, 2000);
+    /**
+     * EL MENSAJE SE REDACTA ANTES DE GUARDARLO, y éste es el sitio donde hay
+     * que hacerlo: por aquí pasa TODO error antes de convertirse en una fila de
+     * `os_jobs.error` y `os_jobs.last_error`.
+     *
+     * QUÉ LO MOTIVA, y no es hipotético. `LlmClient` construye el mensaje de un
+     * fallo del proveedor así:
+     *
+     *     `OpenAI returned non-JSON (HTTP ${res.status}). First bytes: ${raw.slice(0, 200)}`
+     *
+     * Los primeros bytes CRUDOS de la respuesta. Un proxy, una pasarela o un
+     * cortafuegos que devuelva una página en vez de JSON suele **devolver la
+     * petición** — cabeceras incluidas, y ahí viaja `Authorization: Bearer …`.
+     * Ese texto acababa escrito en la base de datos.
+     *
+     * Y es otra vez la misma lección: `slice(0, 200)` es un recorte, y recortar
+     * no protege. Un secreto truncado sigue siendo material sensible.
+     *
+     * SE REDACTA AQUÍ Y TAMBIÉN EN EL ORIGEN. En el origen para que el valor no
+     * viaje; aquí porque este método persiste errores de CUALQUIER procedencia,
+     * no sólo del modelo, y quien escriba mañana un `throw` nuevo no tiene por
+     * qué acordarse.
+     *
+     * `redactar` sólo sustituye lo que tiene FORMA de secreto. Un mensaje de
+     * error normal sale intacto, y hay una prueba de control que lo fija: una
+     * redacción que borrara todo dejaría los fallos indiagnosticables, que es
+     * el problema contrario y no una solución.
+     */
+    const crudo = error instanceof Error ? error.message : String(error ?? "");
+    const mensaje = redactar(crudo).slice(0, 2000);
     const agotado = intentos >= maxIntentos;
 
     if (agotado) {

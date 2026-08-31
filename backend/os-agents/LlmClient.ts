@@ -11,6 +11,7 @@ import {
 import { getCurrentOpenAiApiKey } from "./llmAsyncContext";
 import { isNelvyonAiEnabled } from "../private-ai/config";
 import { OsAgentError } from "./OsAgentError";
+import { redactar } from "../seguridad/loQueNoSeImprime.mjs";
 
 export interface LlmOptions {
   model?: string;
@@ -145,18 +146,31 @@ export class LlmClient implements ILlmClient {
       parsed = JSON.parse(raw) as OpenAiChatCompletionResponse;
     } catch {
       throw new OsAgentError(
-        `OpenAI returned non-JSON (HTTP ${res.status}). First bytes: ${raw.slice(0, 200)}`,
+        // SE REDACTA ANTES DE RECORTAR, y las dos cosas importan.
+        //
+        // Cuando un proveedor devuelve algo que no es JSON suele ser un proxy,
+        // una pasarela o un cortafuegos — y esos DEVUELVEN LA PETICION, con sus
+        // cabeceras. Ahi viaja `Authorization: Bearer ...`. Este mensaje acaba
+        // escrito en `os_jobs.error` y `os_jobs.last_error`.
+        //
+        // Recortar a 200 bytes NO protege: un secreto truncado sigue siendo
+        // material sensible, y en una cabecera los primeros caracteres son
+        // justo los que llevan el token.
+        `OpenAI returned non-JSON (HTTP ${res.status}). First bytes: ${redactar(raw).slice(0, 200)}`,
         "llm_http",
       );
     }
 
     if (!res.ok) {
-      const msg = parsed.error?.message ?? raw.slice(0, 400);
+      // Mismo motivo que arriba: `raw` son bytes crudos del proveedor y este
+      // mensaje se persiste. El `parsed.error.message` tambien se redacta: un
+      // error de proveedor puede echar de vuelta el valor que rechazo.
+      const msg = redactar(parsed.error?.message ?? raw).slice(0, 400);
       throw new OsAgentError(`OpenAI error (HTTP ${res.status}): ${msg}`, "llm_api");
     }
 
     if (parsed.error?.message) {
-      throw new OsAgentError(`OpenAI error: ${parsed.error.message}`, "llm_api");
+      throw new OsAgentError(`OpenAI error: ${redactar(parsed.error.message)}`, "llm_api");
     }
 
     const text = parsed.choices?.[0]?.message?.content;
