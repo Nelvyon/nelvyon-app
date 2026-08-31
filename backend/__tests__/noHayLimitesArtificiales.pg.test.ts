@@ -100,7 +100,20 @@ conBase("no hay límites artificiales", () => {
              SELECT 1 FROM pg_index i
                JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = i.indkey[0]
               WHERE i.indrelid = pc.oid AND a.attname = 'workspace_id'
-           )`);
+           )
+           -- Las mesas de certificacion no cuentan. Varias pruebas de RLS crean
+           -- su propia tabla cert_algo con politicas de verdad y la dejan
+           -- puesta: son fixtures de dos filas, no tablas de producto, y no van
+           -- a tener indice. Sin esta linea, esta comprobacion falla por lo que
+           -- ha dejado OTRA prueba —se vio con cert_cutover_rls—, que es la peor
+           -- clase de fallo: el que no esta donde te manda a mirar.
+           --
+           -- Se compara con left(...) y no con LIKE porque el guion bajo es un
+           -- comodin en LIKE y escaparlo dentro de una plantilla de JavaScript
+           -- no sobrevive: el escape se evapora y el comodin se queda. Y no da
+           -- igual: certificates y certificate_templates SI son tablas de
+           -- producto y no pueden quedar fuera de esta comprobacion.
+           AND left(c.table_name, 5) <> 'cert_'`);
 
       expect(
         rows.map((r) => r.tabla),
