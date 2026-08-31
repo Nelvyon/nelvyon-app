@@ -20,7 +20,7 @@
  *     blanca— ni al rescatar arriendos vencidos.
  */
 
-import { conInquilino } from "../db/contextoDeInquilino";
+import { conInquilino, sinInquilinoAPropósito } from "../db/contextoDeInquilino";
 import { ColaDeTrabajos, type TrabajoReclamado } from "./colaDeTrabajos";
 
 /**
@@ -53,6 +53,43 @@ export interface OpcionesDeTrabajador {
 }
 
 const SIN_MANEJADOR = Symbol("sin-manejador");
+const SIN_INQUILINO = Symbol("sin-inquilino");
+
+/**
+ * Los servicios que legítimamente trabajan SIN inquilino.
+ *
+ * LISTA BLANCA, y vacía a propósito. Un servicio nuevo nace con inquilino
+ * obligatorio; para que trabaje entre inquilinos hay que escribirlo aquí, y
+ * quien lo escriba tiene que poder explicar por qué.
+ *
+ * POR QUÉ HACE FALTA. `os_jobs.tenant_id` es `NULL`-able, y el trabajador hacía:
+ *
+ *     conInquilino({ tenantId: trabajo.tenantId ?? undefined }, …)
+ *
+ * Con `tenant_id` nulo eso instala un contexto VACÍO. Y un contexto vacío es
+ * justamente el que el guardián de `DbJobsClient` deja pasar —comprueba si HAY
+ * inquilino, no si falta— así que el trabajo quedaba con la conexión que salta
+ * RLS y alcance sobre las 62 tablas concedidas a `nelvyon_jobs`.
+ *
+ * El resultado estaba del revés: **cuanta menos información llevaba un trabajo,
+ * más lejos llegaba**. Un trabajo que perdiera su `tenant_id` no fallaba: se
+ * volvía global.
+ *
+ * Y el principio ya estaba escrito en este repositorio, en
+ * `sinInquilinoAPropósito`:
+ *
+ *     «Es una función con nombre y no la ausencia de una llamada: lo global
+ *      tiene que escribirse, porque "me olvidé" y "lo quiero todo" no pueden
+ *      parecerse.»
+ *
+ * Esto es lo que hace que el trabajador lo cumpla.
+ *
+ * MEDIDO cuando se escribió: las 12 filas de `os_jobs` en producción tienen
+ * `tenant_id IS NULL`. Están todas en `cancelled` y ninguna es reclamable, así
+ * que no había exposición viva — pero el siguiente trabajo encolado sin
+ * inquilino la habría tenido, y en silencio.
+ */
+export const SERVICIOS_ENTRE_INQUILINOS: ReadonlySet<string> = new Set<string>();
 
 export class TrabajadorDeCola {
   private readonly manejadores = new Map<string, ManejadorDeTrabajo>();
@@ -125,14 +162,28 @@ export class TrabajadorDeCola {
 
       // El contexto de inquilino se instala AQUI y no antes: el reclamo es
       // cruzado entre inquilinos por necesidad, la ejecucion nunca lo es.
-      const salida = await conInquilino(
-        { tenantId: trabajo.tenantId ?? undefined },
-        () =>
-          manejador(trabajo, {
-            latir: () => this.cola.latir(trabajo.jobId),
-            señal: control.signal,
-          }),
-      );
+      //
+      // Y un trabajo SIN inquilino no se ejecuta por descuido. Antes,
+      // `tenantId ?? undefined` convertia un `tenant_id` nulo en un contexto
+      // vacio —el mismo que el guardian de `DbJobsClient` deja pasar— y el
+      // trabajo se volvia global sin que nadie lo hubiera pedido.
+      const sinInquilino = !trabajo.tenantId || String(trabajo.tenantId).trim() === "";
+      if (sinInquilino && !SERVICIOS_ENTRE_INQUILINOS.has(trabajo.serviceId)) {
+        throw SIN_INQUILINO;
+      }
+
+      const correr = () =>
+        manejador(trabajo, {
+          latir: () => this.cola.latir(trabajo.jobId),
+          señal: control.signal,
+        });
+
+      // Las dos ramas se escriben. La global va por `sinInquilinoAPropósito`,
+      // que es una llamada con nombre, para que en una traza se distinga de un
+      // olvido.
+      const salida = sinInquilino
+        ? await sinInquilinoAPropósito(correr)
+        : await conInquilino({ tenantId: trabajo.tenantId }, correr);
 
       if (salida.tipo === "esperandoAprobacion") {
         await this.cola.dejarEsperandoAprobacion(trabajo.jobId, salida.motivo);
@@ -158,11 +209,24 @@ export class TrabajadorDeCola {
       // Un servicio sin manejador no es un fallo transitorio: reintentarlo tres
       // veces no va a hacer que aparezca. Se agotan los intentos de golpe para
       // que caiga a `dead_letter` en la primera vuelta y se vea.
+      //
+      // Un trabajo sin inquilino tampoco lo es: reintentarlo no le va a poner
+      // un `tenant_id`. Y sobre todo, NO puede degradar a ejecutarse igual: un
+      // rechazo de aislamiento que acaba en exito es peor que el fallo que
+      // evitaba. Cae a `dead_letter` en la primera vuelta, donde se ve.
       const sinManejador = err === SIN_MANEJADOR;
+      const sinInquilino = err === SIN_INQUILINO;
+      const irrecuperable = sinManejador || sinInquilino;
       const causa = sinManejador
         ? new Error(`no hay manejador registrado para el servicio "${trabajo.serviceId}"`)
-        : err;
-      const intentos = sinManejador ? trabajo.maxAttempts : trabajo.attempts;
+        : sinInquilino
+          ? new Error(
+              `el trabajo no tiene inquilino y "${trabajo.serviceId}" no esta declarado `
+                + "en SERVICIOS_ENTRE_INQUILINOS. Ejecutarlo le daria alcance entre "
+                + "inquilinos sin que nadie lo haya pedido.",
+            )
+          : err;
+      const intentos = irrecuperable ? trabajo.maxAttempts : trabajo.attempts;
 
       const destino = await this.cola.fallar(
         trabajo.jobId,
