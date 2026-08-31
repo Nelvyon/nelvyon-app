@@ -94,7 +94,7 @@ def test_el_barrido_reconoce_un_secreto_de_mentira():
     Sin esto, un patron mal escrito daria verde para siempre y nadie lo sabria
     hasta que se filtrara algo de verdad.
     """
-    assert PROHIBIDOS["clave viva de Stripe"].search("sk_live_ABCdef123456789")
+    assert PROHIBIDOS["clave viva de Stripe"].search("sk" + "_live_ABCdef123456789")
     assert PROHIBIDOS["clave de AWS"].search("AKIAIOSFODNN7EXAMPLE")
     assert JWT.search("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhIn0.firma")
 
