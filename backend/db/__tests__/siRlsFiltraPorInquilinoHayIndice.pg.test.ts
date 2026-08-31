@@ -58,6 +58,20 @@ conBase("si RLS filtra por inquilino, tiene que haber índice", () => {
              JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = i.indkey[0]
             WHERE i.indrelid = pc.oid AND a.attname = 'workspace_id'
          )
+         -- Las mesas de certificacion no cuentan. Varias pruebas de RLS crean su
+         -- propia tabla cert_algo, con politicas de verdad y dos filas, y la
+         -- dejan puesta; vitest corre los ficheros en paralelo contra la misma
+         -- base, asi que esta comprobacion las encontraba y se quejaba con razon
+         -- —no tienen indice— de algo que no le incumbe. Se vio con
+         -- cert_cutover_rls, que crea elCutoverDelRolDelLadoWeb.pg.test.ts.
+         --
+         -- Es la peor clase de fallo: el que no esta donde te manda a mirar.
+         --
+         -- Se compara con left(...) y no con LIKE porque el guion bajo es
+         -- comodin en LIKE y escaparlo dentro de una plantilla de JavaScript no
+         -- sobrevive. Y no da igual el atajo: certificates y
+         -- certificate_templates SI son tablas de producto.
+         AND left(c.table_name, 5) <> 'cert_'
        ORDER BY 1`);
 
     expect(
