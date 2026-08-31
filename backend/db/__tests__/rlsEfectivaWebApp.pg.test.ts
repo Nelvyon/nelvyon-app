@@ -42,6 +42,13 @@
  */
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
+import {
+  crearMesaDeCertificacion,
+  FAMILIAS_REALES,
+  sembrarSujetosReales,
+  type PredicadosReales,
+} from "./politicasRealesDeCertificacion";
+
 const DSN = process.env.NELVYON_WEB_APP_CERT_DSN;
 const describeSiHayRol = DSN ? describe : describe.skip;
 
@@ -54,6 +61,8 @@ const AJENO = "cccccccc-3333-4000-8000-00000000000c";
 let pool: import("pg").Pool;
 /** Conexión de siembra, con el dueño de las tablas (no pasa por las políticas). */
 let siembra: import("pg").Pool;
+/** Los predicados que se leyeron del catálogo para montar la mesa. */
+let predicados: PredicadosReales;
 
 type Ctx = { ws?: number | null; usuario?: string | null };
 
@@ -96,6 +105,47 @@ describeSiHayRol("RLS efectiva con nelvyon_web_app (PostgreSQL real)", () => {
       connectionString: process.env.NELVYON_WEB_CERT_DSN,
       max: 2,
     });
+
+    /**
+     * LA MESA SE MONTA SOLA, Y CON LA POLITICA DE VERDAD.
+     *
+     * `cert_os_rls` no existia en ningun fichero del arbol: se creo a mano en
+     * alguna base local durante el Bloque 8. Es decir, la certificacion de RLS
+     * efectiva —la que decide si se puede retirar `postgres` del servicio web—
+     * dependia de un objeto que nadie podia reconstruir leyendo el repositorio.
+     *
+     * No se noto porque sin DSN el fichero se omitia entero, y una prueba que
+     * no corre no puede quejarse. Al levantar PostgreSQL en local fallaron 21
+     * de golpe.
+     *
+     * La politica NO se escribe aqui: `crearMesaDeCertificacion` la lee del
+     * catalogo vivo y la aplica tal cual. Escribir una version «equivalente»
+     * certificaria mi version, no la que decide.
+     */
+    predicados = await crearMesaDeCertificacion(siembra, {
+      tabla: "cert_os_rls",
+      familia: FAMILIAS_REALES.porWorkspaceOs,
+      columnas: ["channel text", "status text", "content_preview text"],
+    });
+    await sembrarSujetosReales(siembra);
+  });
+
+  it("la mesa lleva la politica REAL, no una simplificacion", () => {
+    /**
+     * EL GUARDIAN DE LA DERIVACION. Si `crearMesaDeCertificacion` dejara de
+     * encontrar la familia y cayera en cualquier otra cosa, todo lo de abajo
+     * seguiria pasando —aislaria igual— pero estaria certificando una politica
+     * que el producto no usa.
+     *
+     * Se comprueba que el predicado es el de la familia OS y que esa familia
+     * cubre de verdad decenas de tablas del producto.
+     */
+    expect(predicados.seleccionar).toContain("nelvyon_os_workspace_select");
+    expect(predicados.insertar).toContain("nelvyon_os_workspace_mutate");
+    expect(
+      predicados.tablas,
+      "la familia OS ya no cubre casi ninguna tabla: esta prueba mediria una excepcion",
+    ).toBeGreaterThanOrEqual(50);
   });
 
   afterAll(async () => { await pool?.end(); await siembra?.end(); });
@@ -307,10 +357,128 @@ describeSiHayRol("RLS efectiva con nelvyon_web_app (PostgreSQL real)", () => {
     await expect(pool.query("CREATE TABLE intento_de_creacion (x int)")).rejects.toThrow();
   });
 
+  it("FORCE esta puesto, aunque desde aqui no pueda notarse", async () => {
+    /**
+     * ── UNA MUTACION QUE SOBREVIVE, Y POR QUE SE DEJA ASI ──────────────────
+     *
+     * Quitar `FORCE ROW LEVEL SECURITY` de la mesa no rompe ninguna de las
+     * pruebas de este fichero. Se intento escribir una que lo notara y NO se
+     * puede, por dos razones que se acumulan:
+     *
+     *   · las pruebas leen como `nelvyon_web_app`, que no es el dueño de la
+     *     tabla, y a un no-dueño la politica le aplica con FORCE o sin el;
+     *   · la conexion de siembra es `nelvyon`, que es SUPERUSUARIO, y un
+     *     superusuario se salta RLS tenga FORCE o no.
+     *
+     * O sea que FORCE solo cambiaria algo con un propietario que no fuera
+     * superusuario, y esa configuracion no existe aqui. Escribir una prueba
+     * «de comportamiento» que en realidad no distinguiera nada seria peor que
+     * no tenerla: pareceria cubrir lo que no cubre.
+     *
+     * Lo que si se puede afirmar es que la bandera esta puesta. Eso es lo que
+     * se comprueba, y el comentario dice exactamente hasta donde llega.
+     */
+    const { rows } = await siembra.query<{ f: boolean }>(
+      "SELECT relforcerowsecurity AS f FROM pg_class WHERE relname = 'cert_os_rls'",
+    );
+    expect(rows[0].f, "la mesa perdio FORCE").toBe(true);
+  });
+
+  it("la pertenencia solo cuenta si esta `active`", async () => {
+    /**
+     * LA OTRA MITAD QUE FALTABA, y la encontro otra mutacion.
+     *
+     * `nelvyon_user_in_workspace` acepta por dos vias:
+     *
+     *     w.user_id = jwt_sub                        ← es el dueño
+     *     wm.user_id = jwt_sub AND wm.status='active' ← es miembro activo
+     *
+     * Los sujetos sembrados cumplen LAS DOS: son dueños en `workspaces` y ademas
+     * miembros. Asi que al cambiar la siembra a `status='invited'` no pasaba
+     * nada —la rama de propiedad seguia dejandolos entrar— y la exigencia de
+     * `active` no estaba medida por nadie.
+     *
+     * Importa mas de lo que parece: es la misma palabra que fija la migracion
+     * 590 y la que decide si una invitacion consume asiento. Aqui decide ademas
+     * si se ven los datos.
+     *
+     * Se usa un usuario que NO es dueño de nada, para que la unica via posible
+     * sea la pertenencia.
+     */
+    const soloMiembro = "eeeeeeee-5555-4000-8000-00000000000e";
+    await siembra.query(
+      `INSERT INTO workspace_members (workspace_id, user_id, email, role, status, created_at)
+       VALUES ($1, $2, $3, 'member', 'active', NOW()::text)`,
+      [WS_A, soloMiembro, "solo-miembro@ejemplo.test"],
+    );
+    try {
+      const ctx = { ws: WS_A, usuario: soloMiembro };
+
+      // Control positivo: activo, ve lo suyo.
+      const activo = await comoWebApp(ctx, async (c) =>
+        (await c.query("SELECT workspace_id FROM cert_os_rls")).rows);
+      expect(activo, "un miembro activo no ve lo de su workspace").toHaveLength(2);
+
+      // Y en cuanto deja de estar activo, deja de ver.
+      await siembra.query(
+        "UPDATE workspace_members SET status = 'invited' WHERE user_id = $1", [soloMiembro]);
+      const invitado = await comoWebApp(ctx, async (c) =>
+        (await c.query("SELECT workspace_id FROM cert_os_rls")).rows);
+      expect(
+        invitado,
+        "una pertenencia que no esta `active` sigue dando acceso a los datos",
+      ).toHaveLength(0);
+    } finally {
+      await siembra.query("DELETE FROM workspace_members WHERE user_id = $1", [soloMiembro]);
+    }
+  });
+
   it("no puede leer una tabla que no se le concedio", async () => {
-    // `os_agent_data_cache` existe y NO esta en los grants de esta certificacion.
-    // Sin privilegio, la respuesta es un error de permiso: ni filas ni silencio.
-    await expect(pool.query("SELECT * FROM os_agent_data_cache")).rejects.toThrow(/permission denied/i);
+    /**
+     * LA TABLA DE EJEMPLO SE BUSCA, NO SE ESCRIBE.
+     *
+     * Antes estaba fija: `os_agent_data_cache`. Cuando se escribio, el rol no
+     * tenia privilegio sobre ella; una migracion posterior se lo concedio
+     * —INSERT y SELECT— y la prueba empezo a fallar señalando un problema de
+     * permisos que no existia.
+     *
+     * Una prueba que nombra un ejemplo concreto certifica ese ejemplo, no la
+     * propiedad. La propiedad es «el rol NO tiene acceso universal», y esa se
+     * comprueba pidiendo al catalogo una tabla cualquiera que no se le haya
+     * concedido.
+     *
+     * El denominador va incluido: si no quedara NINGUNA tabla sin conceder, el
+     * rol tendria acceso a todo y esta prueba tiene que decirlo en vez de pasar
+     * por no encontrar contraejemplo.
+     */
+    const { rows } = await siembra.query<{ tabla: string; total: string }>(
+      `SELECT t.table_name AS tabla,
+              (SELECT count(*) FROM information_schema.tables x
+                WHERE x.table_schema = 'public' AND x.table_type = 'BASE TABLE') AS total
+         FROM information_schema.tables t
+        WHERE t.table_schema = 'public'
+          AND t.table_type = 'BASE TABLE'
+          AND left(t.table_name, 5) <> 'cert_'
+          AND NOT EXISTS (
+            SELECT 1 FROM information_schema.table_privileges tp
+             WHERE tp.table_schema = 'public'
+               AND tp.table_name = t.table_name
+               AND tp.grantee = 'nelvyon_web_app'
+          )
+        ORDER BY t.table_name
+        LIMIT 1`,
+    );
+
+    expect(
+      rows.length,
+      "no queda ni una tabla sin conceder a nelvyon_web_app: el rol tiene acceso universal",
+    ).toBe(1);
+
+    const sinConceder = rows[0].tabla;
+    await expect(
+      pool.query(`SELECT * FROM ${sinConceder}`),
+      `${sinConceder} no esta concedida y aun asi se pudo leer`,
+    ).rejects.toThrow(/permission denied/i);
   });
 
   it("no puede vaciar una tabla aunque pueda borrar filas de ella", async () => {

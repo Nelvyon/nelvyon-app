@@ -49,16 +49,32 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 const DSN = process.env.NELVYON_WEB_APP_CERT_DSN;
 const describeSiHayRol = DSN ? describe : describe.skip;
 
-const USUARIO_A = "aaaaaaaa-1111-4000-8000-00000000000a";
-const USUARIO_B = "bbbbbbbb-2222-4000-8000-00000000000b";
-const AJENO = "cccccccc-3333-4000-8000-00000000000c";
-const TENANT_A = "11111111-aaaa-4000-8000-000000000001";
-const TENANT_B = "22222222-bbbb-4000-8000-000000000002";
-const WS_A = 101;
-const WS_B = 202;
+/**
+ * Los sujetos vienen del modulo compartido y no se repiten aqui.
+ *
+ * Estaban duplicados en tres ficheros con los mismos valores, y las tres
+ * suites siembran contra la MISMA base: en cuanto uno de los tres cambiara un
+ * digito, las filas sembradas por una suite dejarian de coincidir con el
+ * contexto de otra y el fallo se leeria como un fallo de aislamiento.
+ */
+import {
+  AJENO,
+  crearMesaDeCertificacion,
+  FAMILIAS_REALES,
+  sembrarSujetosReales,
+  TENANT_A,
+  TENANT_B,
+  USUARIO_A,
+  USUARIO_B,
+  WS_A,
+  WS_B,
+  type PredicadosReales,
+} from "./politicasRealesDeCertificacion";
 
 let pool: import("pg").Pool;
 let siembra: import("pg").Pool;
+/** Los predicados leidos del catalogo para cada familia. */
+const predicados = new Map<string, PredicadosReales>();
 
 type Ctx = { sub?: string | null; tenantId?: string | number | null };
 
@@ -86,6 +102,9 @@ const FAMILIAS = [
   {
     nombre: "por usuario (804 politicas · 201 tablas)",
     tabla: "cert_por_usuario",
+    // La clave de la familia en `politicasRealesDeCertificacion`: de ahi sale
+    // el predicado real con el que se monta la mesa.
+    familia: "porUsuario",
     columna: "user_id",
     valorA: USUARIO_A, valorB: USUARIO_B,
     ctxA: { sub: USUARIO_A } as Ctx,
@@ -98,6 +117,9 @@ const FAMILIAS = [
   {
     nombre: "por tenant uuid derivado (512 politicas · 136 tablas)",
     tabla: "cert_por_tenant_uuid",
+    // La clave de la familia en `politicasRealesDeCertificacion`: de ahi sale
+    // el predicado real con el que se monta la mesa.
+    familia: "porTenantUuid",
     columna: "tenant_id",
     valorA: TENANT_A, valorB: TENANT_B,
     ctxA: { sub: USUARIO_A } as Ctx,
@@ -109,6 +131,9 @@ const FAMILIAS = [
   {
     nombre: "por workspace directo (79 politicas · 36 tablas)",
     tabla: "cert_por_ws_directo",
+    // La clave de la familia en `politicasRealesDeCertificacion`: de ahi sale
+    // el predicado real con el que se monta la mesa.
+    familia: "porWorkspaceDirecto",
     columna: "workspace_id",
     valorA: WS_A, valorB: WS_B,
     ctxA: { sub: USUARIO_A, tenantId: WS_A } as Ctx,
@@ -119,6 +144,9 @@ const FAMILIAS = [
   {
     nombre: "por tenant texto ERP (33 politicas · 33 tablas)",
     tabla: "cert_por_erp_text",
+    // La clave de la familia en `politicasRealesDeCertificacion`: de ahi sale
+    // el predicado real con el que se monta la mesa.
+    familia: "porErpTexto",
     columna: "tenant_id",
     valorA: "erp-A", valorB: "erp-B",
     ctxA: { sub: USUARIO_A, tenantId: "erp-A" } as Ctx,
@@ -133,6 +161,50 @@ describeSiHayRol("familias de politica SaaS con nelvyon_web_app", () => {
     const { Pool } = await import("pg");
     pool = new Pool({ connectionString: DSN, max: 1 });        // misma conexion fisica
     siembra = new Pool({ connectionString: process.env.NELVYON_WEB_CERT_DSN, max: 2 });
+
+    /**
+     * LAS CUATRO MESAS SE MONTAN SOLAS, CON LAS POLITICAS DE VERDAD.
+     *
+     * Ninguna de las cuatro existia en el arbol: se crearon a mano en alguna
+     * base local, asi que esta certificacion —47 pruebas sobre las cuatro
+     * familias de politica que cubren casi todo el esquema— dependia de objetos
+     * que nadie podia reconstruir leyendo el repositorio.
+     *
+     * Los predicados NO se escriben aqui. `crearMesaDeCertificacion` los lee de
+     * `pg_policies` y los aplica tal cual, eligiendo para cada familia el que
+     * mas tablas reales cubre y exigiendo un minimo. Escribir una version
+     * «equivalente» certificaria esa version, no la que decide.
+     */
+    for (const f of FAMILIAS) {
+      predicados.set(
+        f.tabla,
+        await crearMesaDeCertificacion(siembra, {
+          tabla: f.tabla,
+          familia: FAMILIAS_REALES[f.familia],
+          columnas: ["marca text"],
+        }),
+      );
+    }
+    await sembrarSujetosReales(siembra);
+  });
+
+  it("las cuatro mesas llevan la politica REAL, no una simplificacion", () => {
+    /**
+     * EL GUARDIAN DE LA DERIVACION. Si la busqueda dejara de encontrar una
+     * familia y cayera en cualquier otro predicado, las 47 pruebas de abajo
+     * seguirian pasando —aislarian igual— mientras certifican una politica que
+     * el producto no usa. Aqui se comprueba que cada mesa lleva la funcion de
+     * su familia y que esa familia cubre de verdad muchas tablas.
+     */
+    for (const f of FAMILIAS) {
+      const p = predicados.get(f.tabla)!;
+      const familia = FAMILIAS_REALES[f.familia];
+      expect(p.seleccionar, `${f.tabla} no usa ${familia.marcador}`).toContain(familia.marcador);
+      expect(
+        p.tablas,
+        `la familia «${familia.nombre}» apenas cubre tablas: se estaria midiendo una excepcion`,
+      ).toBeGreaterThanOrEqual(familia.minimoTablas);
+    }
   });
 
   afterAll(async () => { await pool?.end(); await siembra?.end(); });
