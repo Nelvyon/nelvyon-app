@@ -173,7 +173,33 @@ def _utc_year_start() -> datetime:
 
 
 async def _count_workspace_members(db: AsyncSession, workspace_id: int) -> int:
-    q = select(func.count()).select_from(Workspace_members).where(Workspace_members.workspace_id == workspace_id)
+    """Asientos consumidos: SOLO las pertenencias activas.
+
+    POLITICA DE PRODUCTO: una invitacion pendiente NO consume asiento.
+
+    QUE CONTABA ANTES. Todas las filas de `workspace_members`, sin mirar el
+    estado. Y el flujo de invitacion inserta con `status = 'invited'`, asi que
+    una invitacion que nadie habia aceptado ya gastaba un hueco del plan.
+
+    LA CONSECUENCIA ERA VISIBLE PARA EL CLIENTE Y NO LA PODIA ENTENDER: este
+    recuento alimenta el medidor «Miembros workspace» contra
+    `get_limit(plan_id, "workspace_users")`, mientras que el producto le
+    ensenaba solo los activos —`platformDbFallback.ts` si filtraba—. Con 2
+    activos y 3 invitaciones pendientes veia «2» y chocaba con el limite en 5.
+
+    NO ES EL MISMO CONCEPTO QUE EL TOPE POR WORKSPACE. `MAX_MIEMBROS_POR_WORKSPACE`
+    en `workspace_management.py` cuenta TODAS las filas a proposito: es un tope
+    anti-abuso que impide invitar sin fin. Un asiento se paga; una fila de
+    invitacion solo ocupa sitio. Se dejan separados porque son cosas distintas.
+    """
+    q = (
+        select(func.count())
+        .select_from(Workspace_members)
+        .where(
+            Workspace_members.workspace_id == workspace_id,
+            Workspace_members.status == "active",
+        )
+    )
     r = await db.execute(q)
     return int(r.scalar() or 0)
 

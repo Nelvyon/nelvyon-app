@@ -343,7 +343,7 @@ async def test_un_workspace_sin_miembros_no_genera_trabajo(ws):
     from core.autopilot_ciclo import planear
 
     await ws["adm"].execute(
-        "UPDATE workspace_members SET status='inactive' WHERE workspace_id=$1",
+        "UPDATE workspace_members SET status='invited' WHERE workspace_id=$1",
         ws["id"])
     async with ws["maker"]() as s:
         await planear(s)

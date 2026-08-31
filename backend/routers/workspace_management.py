@@ -98,17 +98,42 @@ def _format_created_at(value) -> Optional[str]:
 
 
 async def _count_workspace_members(db: AsyncSession, workspace_id: int) -> int:
+    """Miembros del workspace: SOLO las pertenencias activas.
+
+    POLITICA DE PRODUCTO: una invitacion pendiente NO cuenta como miembro.
+
+    Contaba todas las filas, y el flujo de invitacion de este mismo fichero
+    inserta con `status = 'invited'`. Asi que este numero —el que viaja en la
+    respuesta de la API— incluia invitaciones sin aceptar, mientras que el
+    fallback de TypeScript solo contaba las activas. Dos numeros distintos para
+    lo mismo, segun por donde entrara la peticion.
+
+    EL `except` SE MANTIENE, Y AQUI ESO ES LO CORRECTO. Esta funcion alimenta
+    el LISTADO de workspaces, no la facturacion —esa tiene la suya en
+    `billing_usage.py`, que si propaga—. Romper el listado entero porque un
+    recuento falla seria peor que ensenar un numero incompleto.
+
+    LO QUE SI CAMBIA: se registra como ERROR y no como `debug`. Un cero que en
+    realidad es «no se pudo contar» es un cero que miente, y a nivel `debug` no
+    lo ve nadie. Sigue devolviendo 0 para no tumbar la respuesta, pero deja de
+    hacerlo en silencio.
+    """
     try:
         mc = (
             await db.execute(
                 select(func.count(Workspace_members.id)).where(
-                    Workspace_members.workspace_id == workspace_id
+                    Workspace_members.workspace_id == workspace_id,
+                    Workspace_members.status == "active",
                 )
             )
         ).scalar()
         return int(mc or 0)
     except Exception as exc:
-        logger.debug("workspace member count skipped for ws=%s: %s", workspace_id, exc)
+        logger.error(
+            "no se pudo contar los miembros de ws=%s; el 0 que se devuelve NO es un cero medido: %s",
+            workspace_id,
+            exc,
+        )
         return 0
 
 
@@ -586,6 +611,16 @@ async def invite_member(
                 (workspace_id, user_id, email, role, status, invited_by, created_at)
             SELECT :ws, '', :email, :role, 'invited', :invited_by, :creado
             WHERE (
+                -- CUENTA TODAS LAS FILAS A PROPOSITO, invitaciones incluidas.
+                --
+                -- NO es el recuento de asientos. Un asiento se paga y solo lo
+                -- consume una pertenencia ACTIVA —ver `_count_workspace_members`
+                -- aqui mismo y en `billing_usage.py`—. Esto es otra cosa: un
+                -- tope anti-abuso que impide invitar sin fin.
+                --
+                -- Si esto filtrara por `status = 'active'` se podrian mandar
+                -- invitaciones ilimitadas, porque ninguna contaria hasta ser
+                -- aceptada. Son dos conceptos distintos y se dejan separados.
                 SELECT COUNT(*) FROM workspace_members WHERE workspace_id = :ws
             ) < :tope
             """

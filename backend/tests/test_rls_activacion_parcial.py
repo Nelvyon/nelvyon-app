@@ -1260,7 +1260,7 @@ def test_mutacion_de_la_pertenencia_retira_el_acceso(admin, app_conn, esc):
 
     try:
         cur_admin.execute(
-            "UPDATE workspace_members SET status = 'revoked' "
+            "UPDATE workspace_members SET status = 'invited' "
             "WHERE workspace_id = %s AND user_id = %s",
             (esc.ws_a, esc.usuarios["operator"]),
         )
