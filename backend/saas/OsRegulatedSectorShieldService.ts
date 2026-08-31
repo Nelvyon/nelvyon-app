@@ -258,10 +258,52 @@ export class OsRegulatedSectorShieldService {
     return EU_DISCLAIMERS[sectorId] ?? null;
   }
 
+  /**
+   * ¿Es un sector regulado? Y si no se puede saber, se supone que SÍ.
+   *
+   * ANTES ERA `.catch(() => false)`, y eso abría la puerta. Con `false`:
+   *
+   *   · en `evaluateShield`, `disclaimerOk` pasa a `true` sin mirar nada — el
+   *     contenido aprueba el escudo sin llevar el aviso legal obligatorio;
+   *   · en `canPublishToPortal`, se devuelve `{ allowed: true }` — el
+   *     contenido se publica.
+   *
+   * Es decir: un fallo al consultar convertía un sector regulado en uno que no
+   * lo es, y una puerta de cumplimiento en un trámite. La dirección estaba del
+   * revés — un error no puede ser más permisivo que la respuesta.
+   *
+   * HOY NO HAY FALLO VIVO: la implementación por defecto de `isRegulated` tiene
+   * su propio `try/catch` y no puede lanzar. Pero `sectors` se inyecta por el
+   * constructor, y el `.catch` estaba ahí precisamente porque se contaba con una
+   * implementación que sí pudiera —una que consulte la base, por ejemplo—.
+   *
+   * SUPONER «regulado» es el lado conservador: obliga al aviso y al escudo en
+   * vez de saltárselos. Como mucho bloquea de más, y eso se ve y se corrige;
+   * publicar un claim prohibido en un sector regulado no se deshace.
+   *
+   * `porQue` queda en el objeto para que quien lo lea sepa que la respuesta es
+   * una suposición y no una consulta.
+   */
+  private async esReguladoOSeSupone(
+    sectorId: string,
+  ): Promise<{ regulado: boolean; porQue: string | null }> {
+    try {
+      return { regulado: await this.sectors.isRegulated(sectorId), porQue: null };
+    } catch (e) {
+      const motivo = e instanceof Error ? e.message : String(e);
+      // eslint-disable-next-line no-console
+      console.error(
+        `[shield] no se pudo determinar si «${sectorId}» es un sector regulado; ` +
+          `se supone que SI para no saltarse el aviso legal. Causa: ${motivo.slice(0, 200)}`,
+      );
+      return { regulado: true, porQue: `no se pudo consultar: ${motivo.slice(0, 200)}` };
+    }
+  }
+
   /** Evaluate disclaimer + claims for a piece of content (no persistence). */
   async evaluateShield(input: { sectorId: string; packRunId?: string | null; deliverableRef?: string | null; htmlOrText: string; metadata?: Record<string, unknown> }): Promise<ShieldAuditResult> {
     const text = input.htmlOrText ?? "";
-    const regulated = await this.sectors.isRegulated(input.sectorId).catch(() => false);
+    const { regulado: regulated } = await this.esReguladoOSeSupone(input.sectorId);
 
     const claimsLocal = scanClaims(text);
     let claimsViolations = claimsLocal.violations;
@@ -359,7 +401,7 @@ export class OsRegulatedSectorShieldService {
     if (metadata?.shield_status === "blocked") {
       return { allowed: false, reason: "Shield bloqueado: disclaimer EU o claims prohibidos en sector regulado" };
     }
-    const regulated = await this.sectors.isRegulated(sectorId).catch(() => false);
+    const { regulado: regulated } = await this.esReguladoOSeSupone(sectorId);
     if (!regulated) return { allowed: true };
     // Regulated: require an explicit non-blocked shield signal when present.
     if (metadata?.shield_status && metadata.shield_status !== "passed" && metadata.shield_status !== "warning") {

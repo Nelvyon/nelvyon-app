@@ -41,7 +41,7 @@ async function gotoBenchmark(page: import("@playwright/test").Page): Promise<voi
  */
 function esErrorDeHidratacion(mensaje: string): boolean {
   if (/hydration/i.test(mensaje)) return true;
-  return /Minified React error #(418|423)/.test(mensaje);
+  return /Minified React error #(418|423)\b/.test(mensaje);
 }
 
 test.describe("S51 — /saas/benchmark page", () => {

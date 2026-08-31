@@ -323,9 +323,7 @@ function alguienUsaLaColumna(tabla, columna) {
   return { usada: aciertos.length > 0, ficheros: aciertos.slice(0, 3) };
 }
 
-/** `C:
-utaichero.ts:12:texto` → `C:
-utaichero.ts` (la unidad lleva `:`). */
+/** `C:\ruta\fichero.ts:12:texto` → `C:\ruta\fichero.ts` (la unidad lleva `:`). */
 function nombreDeFichero(linea) {
   const m = /^(.*?):\d+:/.exec(linea);
   return m ? m[1] : linea;
