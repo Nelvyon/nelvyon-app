@@ -45,7 +45,23 @@ import {
 
 const DSN_APP = process.env.NELVYON_WEB_APP_CERT_DSN;
 const DSN_DUENO = process.env.NELVYON_WEB_CERT_DSN;
-const describeSiHayRol = DSN_APP && DSN_DUENO ? describe : describe.skip;
+
+/**
+ * La condicion nombra las variables ENTERAS, no los alias.
+ *
+ * `ningunaPruebaSeSaltaSinRazon` clasifica cada salto por su RAZON leyendo la
+ * expresion, y con `DSN_APP && DSN_DUENO` no hay razon que leer: son dos
+ * nombres. Se salto de este fichero salia como «sin clasificar», que es
+ * exactamente lo que ese guardian existe para impedir.
+ *
+ * Se salta sin `NELVYON_WEB_APP_CERT_DSN` y `NELVYON_WEB_CERT_DSN`: sin un
+ * PostgreSQL con el rol sin privilegios no hay politicas que medir, y medir el
+ * aislamiento con un superusuario seria aprobar por la razon equivocada.
+ */
+const describeSiHayRol =
+  process.env.NELVYON_WEB_APP_CERT_DSN && process.env.NELVYON_WEB_CERT_DSN
+    ? describe
+    : describe.skip;
 
 const MESA = "cert_trabajo_ajeno";
 
