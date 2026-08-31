@@ -15,6 +15,18 @@ vi.mock("../../db/DbClient", () => ({
   DbClient: { getInstance: () => ({ query: consulta }) },
 }));
 
+/**
+ * Plazo del fichero. Estas pruebas pasan solas en 2,4 s y fallaban por
+ * agotar los 5 s por defecto cuando corren junto a las otras 917: no es
+ * lentitud del codigo, es inanicion bajo carga paralela. Medido: aisladas,
+ * 21 de 21 en verde; en la suite completa, dos timeouts.
+ *
+ * Un plazo mas largo NO oculta un cuelgue: si de verdad se colgara, seguiria
+ * fallando, solo que un minuto mas tarde.
+ */
+vi.setConfig({ testTimeout: 60_000 });
+
+
 describe("JWT — algoritmo y manipulación", () => {
   beforeEach(() => {
     process.env.JWT_SECRET = SECRETO;
