@@ -34,6 +34,16 @@ EXTENSIONES = {".ts", ".tsx", ".js", ".py", ".json", ".yml", ".yaml", ".env",
 #: Secretos que no admiten matiz: si aparecen, son un incidente.
 PROHIBIDOS = {
     "clave viva de Stripe": re.compile(r"sk_live_[A-Za-z0-9]{10,}"),
+    # LA RESTRINGIDA TAMBIEN, y faltaba. Este guardia cubria `sk_live_` —la
+    # clave secreta— y no `rk_live_` —la restringida—, que es una credencial
+    # viva igual: da acceso al API de Stripe, solo que con menos permisos.
+    #
+    # Lo descubrio GitHub, no este fichero. Un push entero quedo rechazado con
+    # «Stripe Live API Restricted Key» por una cadena de prueba que este
+    # guardia habia dejado pasar. Que un escaner externo encuentre lo que el
+    # tuyo no ve es la forma mas barata de enterarse, pero no es la que uno
+    # quiere.
+    "clave restringida de Stripe": re.compile(r"rk_live_[A-Za-z0-9]{10,}"),
     "clave de AWS": re.compile(r"AKIA[0-9A-Z]{16}"),
     "clave privada": re.compile(r"-----BEGIN (?:RSA |EC )?PRIVATE KEY-----"),
     "token de Slack": re.compile(r"xox[baprs]-[A-Za-z0-9-]{10,}"),
@@ -95,6 +105,7 @@ def test_el_barrido_reconoce_un_secreto_de_mentira():
     hasta que se filtrara algo de verdad.
     """
     assert PROHIBIDOS["clave viva de Stripe"].search("sk" + "_live_ABCdef123456789")
+    assert PROHIBIDOS["clave restringida de Stripe"].search("rk" + "_live_51ABCdef123456")
     assert PROHIBIDOS["clave de AWS"].search("AKIAIOSFODNN7EXAMPLE")
     assert JWT.search("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhIn0.firma")
 

@@ -26,12 +26,27 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createLogger, sanitizeMeta } from "../logger";
+import {
+  DSN_CONTRASENA,
+  DSN_CON_CLAVE,
+  JWT,
+  JWT_PREFIJO,
+  OPENAI_PROYECTO,
+  STRIPE_RESTRINGIDA,
+} from "../../seguridad/__tests__/secretosDeMentira";
 
-/** Secretos sinteticos con forma real. Ninguno vale para nada. */
-const CLAVE_OPENAI = "sk" + "-proj-AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTt";
-const CLAVE_STRIPE = "rk" + "_live_51AaBbCcDdEeFfGgHhIiJjKkLl";
-const DSN = "postgresql://usuario:ContrasenaSuperSecreta@db.interno:5432/nelvyon";
-const BEARER = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.abcdefghijklmnop";
+/**
+ * Secretos de mentira con forma real, montados en trozos.
+ *
+ * NO son literales, y no es un capricho: un literal con la forma exacta de una
+ * clave viva ES una clave viva para cualquier escaner. GitHub rechazo un push
+ * entero por la que habia aqui —«Stripe Live API Restricted Key»— y tenia
+ * razon: mirando el fichero, nadie podia saber que era inventada.
+ */
+const CLAVE_OPENAI = OPENAI_PROYECTO;
+const CLAVE_STRIPE = STRIPE_RESTRINGIDA;
+const DSN = DSN_CON_CLAVE;
+const BEARER = `Bearer ${JWT}`;
 
 let salida: string[];
 
@@ -53,7 +68,7 @@ const todo = () => salida.join("\n");
 describe("el MENSAJE se redacta, que era lo que mas se escapaba", () => {
   it("una cadena de conexion interpolada en el mensaje no sale", () => {
     createLogger("prueba").error(`no se pudo conectar a ${DSN}`);
-    expect(todo(), "la cadena de conexion salio en el mensaje").not.toContain("ContrasenaSuperSecreta");
+    expect(todo(), "la cadena de conexion salio en el mensaje").not.toContain(DSN_CONTRASENA);
   });
 
   it("una clave de proveedor interpolada en el mensaje no sale", () => {
@@ -63,7 +78,7 @@ describe("el MENSAJE se redacta, que era lo que mas se escapaba", () => {
 
   it("y una cabecera de autorizacion, tampoco", () => {
     createLogger("prueba").error(`fallo con cabecera ${BEARER}`);
-    expect(todo()).not.toContain("eyJhbGciOiJIUzI1NiJ9");
+    expect(todo()).not.toContain(JWT_PREFIJO);
   });
 
   it("EL CONTROL: el mensaje sigue siendo legible cuando no hay secreto", () => {
@@ -143,7 +158,7 @@ describe("los valores se miran aunque el nombre sea inocente", () => {
 
   it("una cadena de conexion guardada bajo `config`, tampoco", () => {
     const limpio = sanitizeMeta({ config: `usa ${DSN} para conectar` });
-    expect(JSON.stringify(limpio)).not.toContain("ContrasenaSuperSecreta");
+    expect(JSON.stringify(limpio)).not.toContain(DSN_CONTRASENA);
   });
 });
 
@@ -151,7 +166,7 @@ describe("los arrays se recorren", () => {
   it("cabeceras como pares no salen enteras", () => {
     const limpio = sanitizeMeta({ headers: [["authorization", BEARER]] });
     expect(JSON.stringify(limpio), "un array de pares salio tal cual").not.toContain(
-      "eyJhbGciOiJIUzI1NiJ9",
+      JWT_PREFIJO,
     );
   });
 

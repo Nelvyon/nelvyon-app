@@ -34,6 +34,16 @@
 import { describe, expect, it } from "vitest";
 import path from "node:path";
 import fs from "node:fs";
+import {
+  AWS_KEY_ID,
+  OPENAI_PROYECTO,
+  GITHUB_TOKEN,
+  JWT,
+  JWT_PREFIJO,
+  SLACK_BOT,
+  STRIPE_RESTRINGIDA,
+  STRIPE_SECRETA,
+} from "./secretosDeMentira";
 
 import {
   describir,
@@ -112,7 +122,7 @@ describe("la FORMA del valor también decide, no sólo el nombre", () => {
   });
 
   it("también con un token, que no se parece a una URL", () => {
-    const jwt = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.firmafirmafirma";
+    const jwt = JWT;
     expect(describir("dato", jwt)).not.toContain(jwt);
   });
 
@@ -183,10 +193,10 @@ describe("redactar limpia lo que uno no escribió", () => {
   const casos: Array<[string, string]> = [
     ["fallo: postgresql://usuario:clavesecreta@db:5432/x", "clavesecreta"],
     [
-      "authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.firmafirmafirma",
-      "eyJhbGciOiJIUzI1NiJ9",
+      `authorization: Bearer ${JWT}`,
+      JWT_PREFIJO,
     ],
-    ["OPENAI_API_KEY=sk" + "-proj-AAAABBBBCCCCDDDD", "sk" + "-proj-AAAABBBBCCCCDDDD"],
+    [`OPENAI_API_KEY=${OPENAI_PROYECTO}`, OPENAI_PROYECTO],
     ["cookie: session=abcdef1234567890abcdef", "abcdef1234567890abcdef"],
   ];
 
@@ -218,7 +228,7 @@ describe("el redactor, atacado con las formas que existen de verdad", () => {
    * CÓMO SE ENCONTRARON DOS HUECOS. No leyendo el código: atacándolo con
    * dieciocho formas distintas. El patrón de claves con prefijo era
    * `[A-Za-z0-9]{12,}` y se paraba en el segundo separador, así que
-   * `sk-proj-AAAA…` y `rk_live_ZZZZ…` —las formas REALES de OpenAI y de una
+   * Las formas REALES de OpenAI y de una
    * clave restringida de Stripe— no llegaban al mínimo de doce caracteres y
    * pasaban enteras. Las dieciséis restantes sí se tapaban.
    */
@@ -227,15 +237,15 @@ describe("el redactor, atacado con las formas que existen de verdad", () => {
     ["mysql", "mysql://root:OtraClaveFalsa@127.0.0.1:3306/db", "OtraClaveFalsa"],
     ["redis", "redis://default:ClaveRedisFalsa@cache:6379", "ClaveRedisFalsa"],
     ["amqp", "amqp://user:ClaveAmqpFalsa@rabbit:5672", "ClaveAmqpFalsa"],
-    ["jwt", "token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.FirmaInventadaAqui", "eyJhbGciOiJIUzI1NiJ9"],
+    ["jwt", `token=${JWT}`, JWT_PREFIJO],
     ["bearer", "Authorization: Bearer abcdefghijklmnop1234567890", "abcdefghijklmnop"],
     ["cookie", "Cookie: session=abcdef1234567890abcdef", "abcdef1234567890"],
-    ["stripe secreta", "STRIPE_SECRET_KEY=sk" + "_live_AAAABBBBCCCCDDDDEEEE", "sk" + "_live_AAAABBBBCCCCDDDDEEEE"],
-    ["stripe restringida", "clave rk" + "_live_ZZZZYYYYXXXXWWWWVVVV en uso", "rk" + "_live_ZZZZYYYYXXXXWWWWVVVV"],
-    ["openai", "key sk" + "-proj-AAAABBBBCCCCDDDDEEEEFFFF", "sk" + "-proj-AAAABBBBCCCCDDDDEEEEFFFF"],
-    ["github", "token gh" + "p_AAAABBBBCCCCDDDDEEEEFFFFGGGG", "gh" + "p_AAAABBBBCCCCDDDDEEEEFFFFGGGG"],
-    ["slack", "xo" + "xb-1111-2222-AAAABBBBCCCC", "xo" + "xb-1111-2222-AAAABBBBCCCC"],
-    ["aws key id", "AK" + "IAIOSFODNN7EXAMPLE en el perfil", "AK" + "IAIOSFODNN7EXAMPLE"],
+    ["stripe secreta", `STRIPE_SECRET_KEY=${STRIPE_SECRETA}`, STRIPE_SECRETA],
+    ["stripe restringida", `clave ${STRIPE_RESTRINGIDA} en uso`, STRIPE_RESTRINGIDA],
+    ["openai", `key ${OPENAI_PROYECTO}`, OPENAI_PROYECTO],
+    ["github", `token ${GITHUB_TOKEN}`, GITHUB_TOKEN],
+    ["slack", SLACK_BOT, SLACK_BOT],
+    ["aws key id", `${AWS_KEY_ID} en el perfil`, AWS_KEY_ID],
     ["aws secreta", "AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMIfakeKEY", "wJalrXUtnFEMIfakeKEY"],
     ["oauth", "CLIENT_SECRET=GOCSPX-ClaveInventadaAqui", "GOCSPX-ClaveInventadaAqui"],
     ["en la url", "https://api.example/x?api_key=ClaveEnLaUrlFalsa&y=1", "ClaveEnLaUrlFalsa"],
