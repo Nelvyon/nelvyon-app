@@ -75,7 +75,18 @@ def _columnas_de(lista: str):
 
 
 def esquema_virgen(db: str) -> dict:
-    conn = psycopg2.connect(BASE + db)
+    """`db` puede ser un NOMBRE de base o un DSN completo.
+
+    Antes solo aceptaba el nombre y lo pegaba a `BASE`, un DSN fijo con host,
+    puerto y credenciales dentro. La prueba que la usa recibe un DSN completo
+    por `NELVYON_VIRGEN_DSN`, le arrancaba el nombre y lo pegaba al fijo: la
+    conexion acababa yendo a OTRA instancia con OTRAS credenciales, y el salto
+    de esa prueba era permanente aunque le dieras la base correcta.
+
+    Un ayudante que ignora el DSN que le pasan convierte una prueba en un
+    adorno: parece configurable y no lo es.
+    """
+    conn = psycopg2.connect(db if "://" in db else BASE + db)
     cur = conn.cursor()
     cur.execute("""
         SELECT c.relname, a.attname

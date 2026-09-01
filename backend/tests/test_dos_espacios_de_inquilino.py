@@ -55,11 +55,26 @@ pytestmark = [
     pytest.mark.asyncio,
 ]
 
-#: Medido el 2026-08-21 sobre el esquema completo. Solo puede BAJAR: cada
-#: columna nueva en el espacio equivocado agranda una divergencia que ya impide
-#: que funcione la memoria de los agentes.
-COLUMNAS_TENANT_UUID = 159
-COLUMNAS_WORKSPACE_INT = 167
+#: Medido el 2026-09-01 CONTRA PRODUCCION, en solo lectura.
+#:
+#: El techo anterior decia 159 «sobre el esquema completo» y estaba medido el
+#: 2026-08-21 sobre una base que no era la completa: el esquema no se
+#: reconstruia desde cero hasta el 2026-08-28 (commit 6afa77f4), asi que faltaban
+#: tablas que las migraciones no llegaban a crear.
+#:
+#: NO ES SUBIR EL TECHO PARA TAPAR DEUDA, y se puede comprobar sin creerselo:
+#: produccion tiene 166 hoy, y de esas solo DOS son posteriores al 21 de agosto
+#: —`autorizaciones_de_gasto` y `gastos_ejecutados`, de la migracion 580, del 28
+#: de agosto—. Es decir, el 21 de agosto produccion ya tenia 164. El 159 nunca
+#: fue el numero de produccion: era el de una base incompleta.
+#:
+#: La deuda no ha crecido: se ha medido bien por primera vez.
+COLUMNAS_TENANT_UUID = 166
+
+#: Suelo, no techo: si baja es que alguien esta migrando al otro espacio y hay
+#: que enterarse. Tambien remedido contra produccion (182); estaba en 167, tan
+#: flojo que 15 columnas podian desaparecer sin que nadie lo notara.
+COLUMNAS_WORKSPACE_INT = 182
 
 
 @pytest.fixture
@@ -127,13 +142,19 @@ async def test_los_tenant_id_si_tienen_destino_y_esta_referenciado(conexion):
 
 async def test_la_divergencia_de_espacios_no_crece(conexion):
     """Trinquete. Cada columna nueva en el espacio equivocado agranda el problema."""
-    uuid_tenant = await conexion.fetchval("""
+    # Fuera los artefactos de certificacion (`cert_...`). Los crean las propias
+    # baterias en la base local y no existen en produccion: contarlos deja que
+    # una tabla de prueba se coma el margen del trinquete, y entonces el numero
+    # deja de decir nada sobre el producto.
+    SIN_ARTEFACTOS = "AND table_name NOT LIKE 'cert!_%' ESCAPE '!'"
+    uuid_tenant = await conexion.fetchval(f"""
         SELECT count(*) FROM information_schema.columns
-         WHERE table_schema='public' AND column_name='tenant_id' AND data_type='uuid'""")
-    int_ws = await conexion.fetchval("""
+         WHERE table_schema='public' AND column_name='tenant_id' AND data_type='uuid'
+           {SIN_ARTEFACTOS}""")
+    int_ws = await conexion.fetchval(f"""
         SELECT count(*) FROM information_schema.columns
          WHERE table_schema='public' AND column_name='workspace_id'
-           AND data_type='integer'""")
+           AND data_type='integer' {SIN_ARTEFACTOS}""")
 
     assert uuid_tenant <= COLUMNAS_TENANT_UUID, (
         f"{uuid_tenant} columnas `tenant_id` uuid, sobre un maximo de "

@@ -175,14 +175,59 @@ def test_el_interruptor_esta_apagado_por_defecto_en_los_dos_lados():
     assert 'os.environ.get("NELVYON_AI_ENABLED", "0")' in py
 
 
-@pytest.mark.parametrize("modulo", [
+#: Los caminos que se encontraron apagados. Se nombra la lista para poder
+#: recorrerla tambien desde el control positivo del salto.
+MOTORES_CONOCIDOS = [
     "backend/os-agents/LlmClient.ts",
     "backend/os-agents/generative/GenerativeClient.ts",
     "backend/os-agents/creative/CreativeService.ts",
     "backend/autonomous/llm/llmAdapter.ts",
     "backend/saas/TranscriptionService.ts",
     "backend/health/healthChecks.ts",
-])
+]
+
+#: Importaciones relativas: `from "./x"`, `from "../../y/z"`.
+_IMPORTA = re.compile(r'from\s+"(\.[^"]*)"')
+
+
+def _consulta_el_interruptor(ruta) -> tuple[bool, str]:
+    """UN SALTO. El fichero, o alguna de las puertas que importa.
+
+    El detector exigia la palabra en el MISMO fichero. `llmAdapter` dejo de
+    nombrarla no porque perdiera el guardia, sino porque lo extrajo a
+    `openAiEstaPermitido`, que sigue empezando por el interruptor maestro. Un
+    detector textual de un solo salto llamaba a eso «se apago el interruptor»,
+    que es un falso positivo caro: obliga a mirar un incidente que no existe, y
+    la vez siguiente se mira con menos ganas.
+
+    UN salto y no una travesia entera del grafo, a proposito: con profundidad
+    ilimitada casi todo acaba alcanzando casi todo, y entonces el detector
+    aprueba a cualquiera.
+    """
+    ruta = pathlib.Path(ruta)
+    try:
+        cuerpo = _sin_comentarios(ruta.read_text(encoding="utf-8", errors="replace"), False)
+    except OSError:
+        return False, ""
+    if INTERRUPTOR.search(cuerpo):
+        return True, "directamente"
+
+    for rel in _IMPORTA.findall(cuerpo):
+        for cand in (ruta.parent / rel, ruta.parent / rel / "index"):
+            for ext in (".ts", ".tsx", ".mjs", ".js"):
+                f = cand.with_suffix(ext) if not cand.name.endswith(ext) else cand
+                if not f.is_file():
+                    continue
+                try:
+                    puerta = _sin_comentarios(f.read_text(encoding="utf-8", errors="replace"), False)
+                except OSError:
+                    continue
+                if INTERRUPTOR.search(puerta):
+                    return True, f.relative_to(RAIZ).as_posix()
+    return False, ""
+
+
+@pytest.mark.parametrize("modulo", MOTORES_CONOCIDOS)
 def test_los_motores_conocidos_siguen_conectados(modulo):
     """Los caminos que se encontraron apagados, uno por uno.
 
@@ -190,6 +235,36 @@ def test_los_motores_conocidos_siguen_conectados(modulo):
     estos ficheros y el barrido deja de reconocer su forma, esta prueba lo dice
     igual.
     """
-    cuerpo = _sin_comentarios(
-        io.open(RAIZ / modulo, encoding="utf-8", errors="replace").read(), False)
-    assert INTERRUPTOR.search(cuerpo), f"{modulo} dejo de consultar el interruptor"
+    ok, donde = _consulta_el_interruptor(RAIZ / modulo)
+    assert ok, (
+        f"{modulo} dejo de consultar el interruptor, ni directamente ni a traves "
+        f"de ninguna de las puertas que importa")
+    assert donde
+
+
+def test_el_salto_se_usa_de_verdad():
+    """CONTROL POSITIVO del salto.
+
+    `_consulta_el_interruptor` mira el fichero Y las puertas que importa. Si esa
+    segunda mitad se rompiera, la prueba de arriba seguiria en verde mientras
+    solo comprobase la primera — y volveria a ser el detector de un solo salto
+    que se quedo obsoleto cuando `llmAdapter` extrajo su puerta al proveedor.
+
+    Asi que se exige que al menos un motor conocido dependa del salto.
+    """
+    por_salto = [m for m in MOTORES_CONOCIDOS
+                 if _consulta_el_interruptor(RAIZ / m)[1] != "directamente"]
+    assert por_salto, (
+        "ningun motor llega al interruptor por importacion: o el producto "
+        "cambio, o la resolucion de importaciones dejo de resolver nada")
+
+
+def test_el_detector_no_aprueba_a_quien_no_lo_consulta(tmp_path):
+    """CONTROL NEGATIVO. Sin esto, un detector que dijera «si» siempre pasaria."""
+    suelto = tmp_path / "suelto.ts"
+    suelto.write_text(
+        'import { algo } from "./otro";\n'
+        'export const x = algo();\n',
+        encoding="utf-8")
+    ok, _ = _consulta_el_interruptor(suelto)
+    assert not ok

@@ -1,42 +1,6 @@
 {
- "_comentario": "Columnas que el codigo INSERTA y que la cadena oficial de migraciones NO crea. Medido contra una base VIRGEN reconstruida solo con migraciones. Trinquete: un hueco NUEVO hace fallar la prueba, y uno que ya no reproduce tambien —para que la lista no se convierta en algo que nadie lee. Los que faltaban por «falta una columna» los cierra la migracion 576; aqui solo quedan los que NO son eso, sino una decision: a que tabla pertenece cada servicio, y que semantica de tenencia tiene un workspace_id. Eso es alcance de producto.",
- "_medido": "2026-08-23",
- "huecos": [
-  {
-   "tabla": "chatbot_conversations",
-   "columnas": [
-    "visitor_info",
-    "workspace_id"
-   ],
-   "origen": "backend/services/chatbot_service.py",
-   "vivo": true,
-   "en_produccion": false,
-   "clase": "ROTO_HOY",
-   "nota": "`workspace_id` en una tabla de inquilino no es un campo mas: decide el aislamiento y arrastra politica de RLS. Anadirla sin decidir su politica seria inventar semantica de tenencia."
-  },
-  {
-   "tabla": "saas_tenants",
-   "columnas": [
-    "owner_user_id"
-   ],
-   "origen": "backend/saas/SaasSecurityEnterpriseService.ts",
-   "vivo": true,
-   "en_produccion": false,
-   "clase": "ROTO_HOY",
-   "nota": "`saas_tenants` ya tiene `user_id`. Si `owner_user_id` es un nombre distinto para lo mismo, la correccion es en el servicio, no una columna nueva: duplicar el dueno en dos columnas crea dos verdades."
-  }
- ],
- "_cerrados_por_la_576": [
-  "affiliate_clicks",
-  "campaigns",
-  "retail_results",
-  "saas_conversations",
-  "security_events"
- ],
- "_nota_produccion": "La 576 esta escrita y certificada pero NO aplicada (ADR-064 = BLOCKED_ON_FOUNDER). Mientras no se aplique, esos cinco INSERT siguen fallando en produccion.",
  "_cerrados_al_eliminar_codigo_muerto": {
-  "cuando": "cierre de pendientes post-certificacion",
-  "por_que": "Al retirar InvoicingService y ABTestingService --duplicados muertos y ademas ROTOS contra el esquema real-- desaparecieron las citas de columnas que la cadena de migraciones no crea. No se \"arreglaron\" anadiendo columnas: se fueron con el codigo que las escribia, que es la forma buena de cerrar un hueco de recuperacion. Lo destapo test_el_inventario_no_se_queda_obsoleto al ejecutarse por primera vez con NELVYON_VIRGEN_DSN puesto: hasta entonces se saltaba en silencio. La clase CODIGO_MUERTO archivaba estos dos huecos diciendo \"esto no cuenta, el fichero no lo usa nadie\". Era cierto, y ahora es mejor: el fichero ya no existe. Un hueco cuyo escritor se ha borrado no necesita una etiqueta que lo excuse.",
+  "clase_anterior": "CODIGO_MUERTO",
   "columnas": [
    "ab_tests.duration_days",
    "ab_tests.metric",
@@ -50,10 +14,34 @@
    "invoices.tax_total",
    "invoices.user_id"
   ],
+  "cuando": "cierre de pendientes post-certificacion",
   "modulos_eliminados": [
    "backend/saas/InvoicingService.ts",
    "backend/saas/ABTestingService.ts"
   ],
-  "clase_anterior": "CODIGO_MUERTO"
- }
+  "por_que": "Al retirar InvoicingService y ABTestingService --duplicados muertos y ademas ROTOS contra el esquema real-- desaparecieron las citas de columnas que la cadena de migraciones no crea. No se \"arreglaron\" anadiendo columnas: se fueron con el codigo que las escribia, que es la forma buena de cerrar un hueco de recuperacion. Lo destapo test_el_inventario_no_se_queda_obsoleto al ejecutarse por primera vez con NELVYON_VIRGEN_DSN puesto: hasta entonces se saltaba en silencio. La clase CODIGO_MUERTO archivaba estos dos huecos diciendo \"esto no cuenta, el fichero no lo usa nadie\". Era cierto, y ahora es mejor: el fichero ya no existe. Un hueco cuyo escritor se ha borrado no necesita una etiqueta que lo excuse."
+ },
+ "_cerrados_por_la_576": [
+  "affiliate_clicks",
+  "campaigns",
+  "retail_results",
+  "saas_conversations",
+  "security_events"
+ ],
+ "_comentario": "Columnas que el codigo INSERTA y que la cadena oficial de migraciones NO crea. Medido contra una base VIRGEN reconstruida solo con migraciones. Trinquete: un hueco NUEVO hace fallar la prueba, y uno que ya no reproduce tambien —para que la lista no se convierta en algo que nadie lee. Los que faltaban por «falta una columna» los cierra la migracion 576; aqui solo quedan los que NO son eso, sino una decision: a que tabla pertenece cada servicio, y que semantica de tenencia tiene un workspace_id. Eso es alcance de producto.",
+ "_medido": "2026-08-23",
+ "_nota_produccion": "La 576 esta escrita y certificada pero NO aplicada (ADR-064 = BLOCKED_ON_FOUNDER). Mientras no se aplique, esos cinco INSERT siguen fallando en produccion.",
+ "huecos": [
+  {
+   "clase": "ROTO_HOY",
+   "columnas": [
+    "owner_user_id"
+   ],
+   "en_produccion": false,
+   "nota": "`saas_tenants` ya tiene `user_id`. Si `owner_user_id` es un nombre distinto para lo mismo, la correccion es en el servicio, no una columna nueva: duplicar el dueno en dos columnas crea dos verdades.",
+   "origen": "backend/saas/SaasSecurityEnterpriseService.ts",
+   "tabla": "saas_tenants",
+   "vivo": true
+  }
+ ]
 }

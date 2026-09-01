@@ -34,11 +34,19 @@ DSN = os.environ.get("NELVYON_PG_CERT_DSN")
 #: esquema, asi que el fichero no viaja en el commit desplegable. La puerta ADR-064
 #: aprueba TODAS las pendientes a la vez, y dejarlo dentro la aplicaria sin permiso.
 #:
-#: Las dos pruebas que LEEN ese fichero se saltan mientras no este, en vez de
+#: Las pruebas que dependen de la 571 se saltan mientras no este, en vez de
 #: borrarse: cuando la 571 vuelva, vuelven con ella sin que nadie tenga que
-#: acordarse. Las otras pruebas de este fichero —que las herramientas existen, se
-#: ejecutan contra PostgreSQL y no publican— NO dependen de la migracion y siguen
-#: corriendo.
+#: acordarse.
+#:
+#: DEPENDEN DE ELLA POR DOS VIAS, y al principio solo se vio una. Dos leen el
+#: FICHERO. Otras dos leen los DATOS: `agent_policies` no trae ninguna fila
+#: `redes.%` de serie —las tres las inserta la 571— y `decidir` falla cerrado,
+#: asi que sin la migracion todo sale en DENY. Es la misma dependencia por otro
+#: camino, y sin la puerta esas dos daban un rojo permanente que no dice nada
+#: sobre el producto: dice que falta una migracion apartada a proposito.
+#:
+#: Las demas —que las herramientas existen, se ejecutan contra PostgreSQL y no
+#: publican— NO dependen de la migracion y siguen corriendo.
 MIGRACION_571 = (pathlib.Path(__file__).resolve().parents[1]
                  / "db" / "migrations" / "571_equipo_de_redes_sociales.sql")
 
@@ -179,6 +187,7 @@ async def test_la_politica_real_deniega_publicar():
         await motor.dispose()
 
 
+@sin_571
 @pytest.mark.skipif(not DSN, reason="sin NELVYON_PG_CERT_DSN")
 @pytest.mark.asyncio
 async def test_redactar_un_borrador_si_esta_permitido_con_aprobacion():
@@ -202,6 +211,7 @@ async def test_redactar_un_borrador_si_esta_permitido_con_aprobacion():
         await motor.dispose()
 
 
+@sin_571
 @pytest.mark.skipif(not DSN, reason="sin NELVYON_PG_CERT_DSN")
 @pytest.mark.asyncio
 async def test_los_de_solo_lectura_no_esperan_a_nadie():

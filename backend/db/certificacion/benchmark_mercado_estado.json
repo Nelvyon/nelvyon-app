@@ -190,7 +190,7 @@
           "auditoria_de_rutas (888 rutas derivadas)",
           "medicion-por-categoria.spec.ts (axe-core + 375px, navegador real)"
         ],
-        "pantallas": 31
+        "pantallas": 32
       },
       "referentes": [
         "Keycloak (codigo abierto)"

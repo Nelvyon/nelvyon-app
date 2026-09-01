@@ -28,9 +28,15 @@ import {
   proveedoresClasificados,
 } from "../PoliticaDeCosteCero";
 
-const antes = process.env.NELVYON_MODO_COSTE_CERO;
+// DENTRO del `beforeEach`, no al cargar el modulo. Capturarlo al cargar guarda
+// lo que hubiera en ese instante —posiblemente lo que dejo OTRO fichero de
+// pruebas—, y entonces el `afterEach` restaura un valor que nunca fue el de
+// nadie. Es la dependencia de orden que hacia fallar `authSessionSecurity`
+// una de cada cinco corridas.
+let antes: string | undefined;
 
 beforeEach(() => {
+  antes = process.env.NELVYON_MODO_COSTE_CERO;
   delete process.env.NELVYON_MODO_COSTE_CERO;
 });
 

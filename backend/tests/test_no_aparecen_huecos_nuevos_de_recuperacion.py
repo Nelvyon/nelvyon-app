@@ -58,7 +58,8 @@ def _medidos() -> set:
     sys.path.insert(0, str(CERT))
     import huecos_de_recuperacion as hr  # noqa: E402
 
-    esquema = hr.esquema_virgen(DSN.rsplit("/", 1)[-1])
+    # El DSN entero, no solo el nombre: es la base que quien ejecuta eligio.
+    esquema = hr.esquema_virgen(DSN)
     encontrados = set()
     for base in (RAIZ / "backend", RAIZ / "apps" / "web" / "src"):
         for ext in ("*.py", "*.ts", "*.tsx"):

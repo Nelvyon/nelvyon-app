@@ -128,9 +128,18 @@ async def escenario():
             "VALUES ($1, $2, $3, $4, 'active')",
             ws_a, usuarios[nombre], f"{MARCA}-{nombre}@nelvyon.test", nombre,
         )
+    # `invited` y no `pending`. La intencion —un miembro con status != 'active'—
+    # no cambia; lo que cambio es que la migracion 590 cerro el contrato de
+    # `workspace_members.status` a ('active','invited'), asi que `pending` ya no
+    # se puede escribir.
+    #
+    # El conjunto se derivo de los productores REALES: 42 sitios escriben
+    # `active` y 2 escriben `invited`. `pending` no lo escribia nadie en
+    # produccion: solo esta prueba, como «un estado cualquiera que no sea
+    # activo». `invited` es exactamente eso, y ademas ocurre de verdad.
     await admin.execute(
         "INSERT INTO workspace_members (workspace_id, user_id, email, role, status) "
-        "VALUES ($1, $2, $3, 'admin', 'pending')",
+        "VALUES ($1, $2, $3, 'admin', 'invited')",
         ws_a, usuarios["inactivo"], f"{MARCA}-inactivo@nelvyon.test",
     )
     for ws, etiqueta, duenno in ((ws_a, "A", usuarios["owner"]), (ws_b, "B", usuarios["owner_b"])):
