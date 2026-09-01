@@ -63,8 +63,28 @@ PERMITIDAS: dict[tuple[str, str], dict[str, str]] = {}
 #:
 #: DRIFT sigue en 0, que es la parte que importa: ninguna de esas consultas
 #: menciona una columna que el esquema no cree.
-UNRESOLVED_BASELINE = 162
-UNRESOLVED_POR_MOTIVO = {"join_ambiguo": 124, "multiples_from": 38}
+#: Baja de 162 a 160, y los dos que se van son `join_ambiguo`. No se ha tocado
+#: ninguna consulta: el analizador dejo de leer los COMENTARIOS SQL como si
+#: fueran consulta.
+#:
+#: La casa escribe los comentarios dentro del SQL, que es donde sirven. El
+#: analizador partia el cuerpo de un `CREATE TABLE` por las comas SIN quitarlos
+#: antes, asi que una coma dentro de un comentario partia un trozo y la primera
+#: palabra del siguiente pasaba a ser una columna. De
+#:
+#:     -- `workspace_chatbot_conversations`, no `chatbot_conversations`.
+#:
+#: salia una columna `no`; de un «y por tanto», una columna `y`.
+#:
+#: Eso producia DRIFT inventado —cinco, todos sobre la consulta que acababa de
+#: arreglarse, cuyo comentario explicaba el arreglo— y, peor, columnas fantasma
+#: en el esquema: una columna que el esquema cree tener hace que el guard
+#: APRUEBE una consulta que la cite. Es decir, falsos negativos: deriva real sin
+#: detectar.
+#:
+#: Con los comentarios fuera: DRIFT 0 y UNRESOLVED 160.
+UNRESOLVED_BASELINE = 160
+UNRESOLVED_POR_MOTIVO = {"join_ambiguo": 122, "multiples_from": 38}
 
 #: Drift conocido pendiente de decision de migracion. NO es una allowlist: el
 #: test falla si aparece cualquier otro, y falla tambien si estos desaparecen

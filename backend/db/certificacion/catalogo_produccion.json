@@ -1,6 +1,6 @@
 {
  "_comentario": "Instantanea del catalogo de PRODUCCION. La usa `test_ninguna_consulta_cita_una_columna_que_no_existe` para detectar deriva entre el SQL del codigo y el esquema real. Se regenera con backend/db/certificacion/qcatalogo.py cuando cambie el esquema.",
- "_migraciones_aplicadas": 467,
+ "_migraciones_aplicadas": 491,
  "tablas": {
   "_migrations": [
    "executed_at",
@@ -85,6 +85,7 @@
    "workspace_id"
   ],
   "affiliate_clicks": [
+   "affiliate_id",
    "code",
    "id",
    "ip_hash",
@@ -591,6 +592,26 @@
    "output",
    "user_id"
   ],
+  "autorizaciones_de_gasto": [
+   "aprobada_en",
+   "aprobada_por",
+   "consumido_cents",
+   "created_at",
+   "estado",
+   "id",
+   "motivo",
+   "presupuesto_cents",
+   "proveedor",
+   "revocada_en",
+   "service_id",
+   "solicitada_por",
+   "tenant_id",
+   "tope_por_operacion_cents",
+   "updated_at",
+   "vigente_desde",
+   "vigente_hasta",
+   "workspace_id"
+  ],
   "b2b_results": [
    "agent_id",
    "created_at",
@@ -686,7 +707,8 @@
    "status",
    "updated_at",
    "user_id",
-   "workspace_id"
+   "workspace_id",
+   "zoom_meeting_id"
   ],
   "branding_results": [
    "agent_id",
@@ -748,6 +770,18 @@
    "type",
    "updated_at"
   ],
+  "campaign_recipients": [
+   "campaign_id",
+   "clicked_at",
+   "contact_id",
+   "created_at",
+   "email",
+   "id",
+   "opened_at",
+   "phone",
+   "sent_at",
+   "status"
+  ],
   "campaigns": [
    "click_count",
    "client_id",
@@ -755,6 +789,8 @@
    "content",
    "created_at",
    "deal_id",
+   "from_email",
+   "from_name",
    "id",
    "name",
    "open_count",
@@ -1014,6 +1050,55 @@
    "status",
    "updated_at",
    "user_id"
+  ],
+  "comercial_bajas": [
+   "dominio",
+   "literal",
+   "pedida_en",
+   "pedida_por"
+  ],
+  "comercial_oportunidades": [
+   "cerrada_en",
+   "cerrada_por",
+   "client_id",
+   "created_at",
+   "dominio",
+   "empresa",
+   "estado",
+   "id",
+   "motivo_de_perdida",
+   "respuesta_id",
+   "servicios_de_interes",
+   "updated_at",
+   "workspace_id"
+  ],
+  "comercial_preparaciones": [
+   "aprobada_en",
+   "aprobada_por",
+   "base_legal",
+   "base_legal_desde",
+   "borrador_asunto",
+   "borrador_cuerpo",
+   "creada_en",
+   "creada_por",
+   "dominio",
+   "empresa",
+   "estado",
+   "id",
+   "por_que_esta_empresa",
+   "se_apoya_en",
+   "sector",
+   "workspace_id"
+  ],
+  "comercial_respuestas": [
+   "canal",
+   "id",
+   "literal",
+   "preparacion_id",
+   "recibida_en",
+   "registrada_por",
+   "sentido",
+   "workspace_id"
   ],
   "communities": [
    "created_at",
@@ -2112,6 +2197,17 @@
    "visitors",
    "workspace_id"
   ],
+  "funnel_steps": [
+   "created_at",
+   "exit_url",
+   "funnel_id",
+   "id",
+   "landing_page_id",
+   "name",
+   "next_step_id",
+   "step_order",
+   "updated_at"
+  ],
   "funnelmultipaso_results": [
    "agent_id",
    "created_at",
@@ -2138,6 +2234,22 @@
    "input",
    "output",
    "user_id"
+  ],
+  "gastos_ejecutados": [
+   "actor",
+   "autorizacion_id",
+   "created_at",
+   "detalle",
+   "estado",
+   "id",
+   "idempotency_key",
+   "importe_cents",
+   "operacion",
+   "proveedor",
+   "referencia_externa",
+   "tenant_id",
+   "updated_at",
+   "workspace_id"
   ],
   "gbp_reviews": [
    "author_name",
@@ -3509,6 +3621,19 @@
    "output",
    "user_id"
   ],
+  "os_acciones": [
+   "actor",
+   "client_id",
+   "created_at",
+   "deliverable_id",
+   "descripcion",
+   "efectiva_desde",
+   "gasto_id",
+   "id",
+   "objetivo_id",
+   "service_id",
+   "workspace_id"
+  ],
   "os_agent_audit_events": [
    "agent_id",
    "agent_status",
@@ -3552,6 +3677,18 @@
    "prompt_encrypted",
    "sector",
    "updated_at"
+  ],
+  "os_aprendizajes": [
+   "acciones",
+   "client_id",
+   "conclusion",
+   "confianza_atribucion",
+   "created_at",
+   "id",
+   "mediciones",
+   "metodo",
+   "objetivo_id",
+   "workspace_id"
   ],
   "os_assets": [
    "client_id",
@@ -3599,6 +3736,49 @@
    "source_type",
    "updated_at",
    "user_id",
+   "workspace_id"
+  ],
+  "os_client_brain": [
+   "client_id",
+   "confianza",
+   "created_at",
+   "dimension",
+   "id",
+   "origen",
+   "procedencia",
+   "updated_at",
+   "valor",
+   "version",
+   "vigente_hasta",
+   "workspace_id"
+  ],
+  "os_client_brain_history": [
+   "client_id",
+   "confianza",
+   "dimension",
+   "id",
+   "origen",
+   "procedencia",
+   "reemplazado_por",
+   "valido_desde",
+   "valido_hasta",
+   "valor",
+   "version",
+   "workspace_id"
+  ],
+  "os_client_connections": [
+   "client_id",
+   "conectada_en",
+   "created_at",
+   "cuenta_externa",
+   "estado",
+   "id",
+   "para_que",
+   "proveedor",
+   "servicios",
+   "solicitada_en",
+   "ultimo_error",
+   "updated_at",
    "workspace_id"
   ],
   "os_clients": [
@@ -3808,6 +3988,29 @@
    "status",
    "tenant_id"
   ],
+  "os_insights": [
+   "accion_id",
+   "afirmacion",
+   "autor",
+   "client_id",
+   "confianza",
+   "consumido_en",
+   "consumido_por",
+   "created_at",
+   "derivado_de",
+   "destino_dep",
+   "estado",
+   "evidencia",
+   "huella",
+   "id",
+   "origen_dep",
+   "procedencia",
+   "profundidad",
+   "resultado",
+   "updated_at",
+   "vigente_hasta",
+   "workspace_id"
+  ],
   "os_job_results": [
    "client_id",
    "created_at",
@@ -3818,15 +4021,24 @@
    "tenant_id"
   ],
   "os_jobs": [
+   "attempts",
    "client_id",
    "created_at",
+   "dead_lettered_at",
    "duration_ms",
    "error",
+   "idempotency_key",
    "intake",
    "job_id",
+   "last_error",
+   "lease_expires_at",
+   "locked_at",
+   "locked_by",
+   "max_attempts",
    "payload",
    "progress",
    "result",
+   "run_after",
    "scheduled_deletion_at",
    "service_id",
    "status",
@@ -3847,6 +4059,34 @@
    "status",
    "templates_ranked",
    "trigger_source"
+  ],
+  "os_mediciones": [
+   "client_id",
+   "created_at",
+   "derivada_de",
+   "desde",
+   "es_linea_base",
+   "fuente",
+   "hasta",
+   "id",
+   "metrica",
+   "objetivo_id",
+   "unidad",
+   "valor",
+   "workspace_id"
+  ],
+  "os_objetivos": [
+   "client_id",
+   "created_at",
+   "direccion",
+   "estado",
+   "id",
+   "metrica",
+   "plazo",
+   "unidad",
+   "updated_at",
+   "valor_objetivo",
+   "workspace_id"
   ],
   "os_pack_certifications": [
    "auto_approved",
@@ -4031,6 +4271,11 @@
    "tenant_id",
    "workspace_id"
   ],
+  "os_sector_shield_audits_backfill_574": [
+   "aplicado_en",
+   "id",
+   "workspace_asignado"
+  ],
   "os_seed_weights": [
    "conversions",
    "cvr",
@@ -4055,6 +4300,24 @@
    "status",
    "tenant_id",
    "updated_at"
+  ],
+  "os_service_requests": [
+   "alcance",
+   "client_id",
+   "created_at",
+   "decidida_en",
+   "estado",
+   "id",
+   "moneda",
+   "motivo",
+   "nota_interna",
+   "precio_cents",
+   "propuesta_en",
+   "propuesta_por",
+   "service_id",
+   "solicitada_por",
+   "updated_at",
+   "workspace_id"
   ],
   "os_store_discounts": [
    "code",
@@ -4727,7 +4990,9 @@
    "created_at",
    "id",
    "input",
+   "output",
    "result",
+   "sector",
    "user_id"
   ],
   "revenue_records": [
@@ -5202,6 +5467,7 @@
    "id",
    "last_message",
    "last_message_at",
+   "metadata",
    "priority",
    "sla_breached",
    "sla_due_at",
@@ -7465,6 +7731,14 @@
    "monthly_calls",
    "plan"
   ],
+  "user_provider_api_keys": [
+   "created_at",
+   "encrypted_key",
+   "id",
+   "provider",
+   "updated_at",
+   "user_id"
+  ],
   "user_roles": [
    "assigned_by",
    "created_at",
@@ -7508,6 +7782,19 @@
    "input",
    "output",
    "user_id"
+  ],
+  "visual_workflow_executions": [
+   "completed_at",
+   "error_message",
+   "id",
+   "started_at",
+   "status",
+   "steps_log",
+   "trigger_data",
+   "trigger_type",
+   "user_id",
+   "workflow_id",
+   "workspace_id"
   ],
   "voice_commands": [
    "action",
@@ -7882,6 +8169,18 @@
    "user_id",
    "workspace_id"
   ],
+  "workflow_nodes": [
+   "category",
+   "config",
+   "created_at",
+   "id",
+   "label",
+   "node_id",
+   "node_type",
+   "position_x",
+   "position_y",
+   "workflow_id"
+  ],
   "workflow_results": [
    "agent_id",
    "created_at",
@@ -7907,9 +8206,19 @@
    "user_id",
    "workspace_id"
   ],
+  "workflow_trigger_registry": [
+   "created_at",
+   "id",
+   "is_active",
+   "trigger_config",
+   "trigger_type",
+   "workflow_id",
+   "workspace_id"
+  ],
   "workflows": [
    "created_at",
    "description",
+   "edges_json",
    "id",
    "is_active",
    "last_run_at",
@@ -7920,6 +8229,19 @@
    "trigger_type",
    "updated_at",
    "user_id",
+   "workspace_id"
+  ],
+  "workspace_chatbot_conversations": [
+   "chatbot_id",
+   "escalated",
+   "id",
+   "last_message_at",
+   "lead_captured",
+   "messages",
+   "satisfaction",
+   "session_id",
+   "started_at",
+   "visitor_info",
    "workspace_id"
   ],
   "workspace_members": [

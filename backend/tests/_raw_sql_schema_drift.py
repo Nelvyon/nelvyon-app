@@ -69,11 +69,42 @@ def _columnas_de_create(body: str) -> set[str]:
     return cols
 
 
+#: Comentarios SQL. Se quitan ANTES de partir el cuerpo de un `CREATE TABLE`.
+#:
+#: `_columnas_de_create` parte por las comas de profundidad cero y toma la
+#: primera palabra de cada trozo. Un comentario dentro del cuerpo mete comas
+#: que no separan columnas:
+#:
+#:     -- A `chatbots`, NO a `chatbot_configs`. Esta es la correccion
+#:     chatbot_id UUID NOT NULL REFERENCES chatbots (id),
+#:
+#: esa coma parte el trozo, la primera palabra del siguiente pasa a ser `no`, y
+#: `chatbot_id` deja de contarse. Falla en las dos direcciones a la vez:
+#: inventa columnas que no existen —de ahi un `workspace_chatbot_conversations.y`
+#: sacado de un «y por tanto»— y pierde las de verdad. Las inventadas son las
+#: peores: una columna fantasma en el esquema hace que el guard APRUEBE una
+#: consulta que la cite, es decir, deriva real sin detectar.
+#:
+#: Se acusaba a la migracion mas comentada del arbol, que es justo la que mejor
+#: explica lo que hace.
+_COMENTARIO = re.compile(r"--[^\n]*|/\*.*?\*/", re.S)
+
+
+def _sin_comentarios(sql: str) -> str:
+    """Quita comentarios SQL.
+
+    No distingue un `--` dentro de una cadena literal. En el cuerpo de un
+    `CREATE TABLE` no aparece ninguno, y la alternativa —un analizador lexico
+    de SQL— es mas maquinaria de la que este guard necesita.
+    """
+    return _COMENTARIO.sub(" ", sql)
+
+
 def esquema_de_migraciones() -> dict[str, set[str]]:
     """tabla -> columnas, agregando TODAS las migraciones en orden."""
     esquema: dict[str, set[str]] = {}
     for fichero in sorted(MIGRACIONES.glob("*.sql")):
-        sql = fichero.read_text(encoding="utf-8", errors="ignore")
+        sql = _sin_comentarios(fichero.read_text(encoding="utf-8", errors="ignore"))
         for m in _CREATE_RE.finditer(sql):
             esquema.setdefault(m.group("table").lower(), set()).update(
                 _columnas_de_create(m.group("body"))
@@ -331,7 +362,16 @@ def usos_en_sql_crudo() -> list[UsoDeColumna]:
                 continue
             rel = str(fichero.relative_to(RAIZ)).replace(chr(92), "/")
             for sql in _sql_literales(fichero):
-                u, nr = analizar_sql(sql, rel)
+                # Tambien aqui. La casa escribe los comentarios DENTRO del SQL,
+                # que es donde sirven, y el analizador los leia como consulta.
+                # De un comentario que dice
+                #
+                #     -- `workspace_chatbot_conversations`, no `chatbot_...`
+                #
+                # salia una columna `no`; de otro que empezaba «y por tanto»,
+                # una columna `y`. Dos DRIFT inventados sobre la consulta que
+                # acababa de ARREGLARSE, y cuyo comentario explicaba el arreglo.
+                u, nr = analizar_sql(_sin_comentarios(sql), rel)
                 usos.extend(u)
                 no_resueltos.extend(nr)
     return usos

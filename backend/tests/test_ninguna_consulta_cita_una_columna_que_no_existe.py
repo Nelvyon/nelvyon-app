@@ -83,35 +83,35 @@ DERIVA_DECLARADA: dict[tuple[str, str], str] = {
     ("ab_experiments", "winner_variant_id"):
         "existe `winner_variant` (texto), no `winner_variant_id`. Puede ser un "
         "renombrado o un cambio de tipo: no se adivina",
-    ("affiliate_clicks", "affiliate_id"):
-        "la tabla identifica al afiliado por `code`, no por id. Cambiarlo afecta "
-        "a como se atribuyen las comisiones: decision de producto",
+    # NO ES DEUDA DE ESQUEMA: ES ORDEN DE DESPLIEGUE.
+    #
+    # La 593 anade esta columna, porque `webhook_deliveries` sirve a dos
+    # subsistemas con padres disjuntos y una sola columna no puede referenciar
+    # dos tablas. La migracion esta escrita y aplicada en local; en produccion
+    # NO, y esta instantanea es de produccion. Por eso aparece aqui.
+    #
+    # DESPLEGAR EL CODIGO SIN APLICAR LA 593 NO EMPEORA NADA: hoy la ruta viola
+    # la foranea a `webhooks` en cada entrega, y sin la columna lanzaria por
+    # columna inexistente. Rota antes y rota despues. Pero tampoco arregla nada
+    # hasta que la 593 se aplique.
+    #
+    # Esta entrada se quita en cuanto la 593 este en produccion; el catalogo se
+    # regenera con `backend/db/certificacion/qcatalogo.py`.
+    ("webhook_deliveries", "endpoint_id"):
+        "la anade la migracion 593, pendiente de aplicar en produccion. No es "
+        "una columna que falte: es una que todavia no esta desplegada",
     ("bookings", "zoom_host_url"):
         "no hay columnas de Zoom. La integracion de videollamada en reservas "
         "esta escrita contra un esquema que no se llego a migrar",
     ("bookings", "zoom_join_url"):
         "tampoco existe la URL de union; la reserva no puede guardar la "
         "videollamada que dice crear",
-    ("campaigns", "from_email"):
-        "no hay remitente por campaña. Hoy sale del whitelabel del workspace; "
-        "si se quiere por campaña hace falta migracion",
-    ("campaigns", "from_name"):
-        "tampoco hay nombre de remitente por campaña",
-    ("chatbot_conversations", "workspace_id"):
-        "LA TABLA NO TIENE COLUMNA DE INQUILINO. Se acota indirectamente por "
-        "`chatbot_id`. Añadirla es una migracion y una decision de aislamiento, "
-        "no un renombrado",
-    ("chatbot_conversations", "last_message_at"): "no existe; se puede derivar de `messages`",
-    ("chatbot_conversations", "visitor_info"): "no existe ninguna columna equivalente",
     ("invoices", "pdf_path"):
         "no hay columna para el PDF. Generarlo y no poder guardar donde quedo "
         "explica que la descarga de facturas no funcione",
     ("invoices", "sent_at"):
         "no existe; hay `paid_at` y `created_at`. Sin ella no se sabe cuando se "
         "envio una factura, solo cuando se cobro",
-    ("workflows", "edges_json"):
-        "solo existe `nodes_json`. Las aristas del grafo no tienen donde "
-        "guardarse: el editor visual no puede persistir conexiones",
 }
 
 #: Tablas que el codigo crea o consulta y NO estan en el catalogo de produccion:
