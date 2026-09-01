@@ -46,6 +46,28 @@
  * Estas 47 no tienen `tenant_id`: tienen `user_id`. El barrido las salto una a
  * una sin que nadie lo leyera, y no habia nada que preguntara despues.
  *
+ * ── SU VERDE NO ES CONCLUYENTE PARA PRODUCCION, Y HAY QUE SABERLO ──────────
+ *
+ * Esta prueba corre contra una base LOCAL recien migrada, donde casi todas las
+ * tablas estan VACIAS. Y la migracion 567 —la que aplica RLS en masa— salta a
+ * proposito las tablas que tienen filas:
+ *
+ *     IF tiene_filas THEN … '567: % tiene filas; pertenece a otro lote' … CONTINUE
+ *
+ * Fue una decision prudente en su momento; el «otro lote» nunca llego.
+ *
+ * El efecto es que una tabla poblada en produccion puede estar SIN RLS mientras
+ * su gemela vacia en local SI lo tiene. Esta prueba la veria protegida y estaria
+ * diciendo la verdad sobre la base que mira.
+ *
+ * Paso de verdad: `saas_tenants` sale protegida en local y en produccion no
+ * tiene RLS, con 22 filas de clientes reales. No es un fallo de esta prueba —lo
+ * que mide, lo mide bien— sino un limite de donde mira.
+ *
+ * Para esa pregunta esta `scripts/auditar-rls-produccion.mjs`, que hace lo mismo
+ * contra produccion en solo lectura. Las dos hacen falta: esta impide que entre
+ * una tabla nueva desprotegida; aquella encuentra lo que ya estaba.
+ *
  * ── LA LISTA DE EXCEPCIONES ES BLANCA, NO NEGRA ─────────────────────────────
  *
  * Lo que no este declarado abajo falla. Una tabla nueva nace protegida o nace
