@@ -159,26 +159,63 @@ $bloque_591$;
 -- `user_id = ...` obligatoriamente, y sin indice cada consulta recorre las filas
 -- de todos los clientes para responder por uno. Es la misma razon por la que
 -- existe la 585 para las tablas por workspace.
+--
+-- ── ACOTADO A LAS MISMAS TABLAS DE ARRIBA, Y NO A TODAS ─────────────────────
+--
+-- La primera version de este bloque recorria TODA tabla con `user_id`, con RLS y
+-- sin indice. Despues del bloque anterior eso incluye las 47... y CUALQUIER OTRA
+-- que ya tuviera RLS y le faltara el indice.
+--
+-- Medido en produccion en solo lectura: serian 59 tablas mas. La migracion
+-- decia tocar 47 y habria tocado 106.
+--
+-- El riesgo material era despreciable —esas 59 suman 4.491 filas y la tabla mas
+-- grande de la base tiene 4.828—, pero una migracion que hace mas de lo que dice
+-- es una migracion que nadie puede revisar leyendola. Se acota.
+--
+-- LAS 59 QUE QUEDAN FUERA NO SON UN OLVIDO: ya tenian RLS antes de esta
+-- migracion y ya les faltaba el indice. Es una condicion previa que la 591 no
+-- causa y no pretende arreglar. Ponerles indice es una mejora defendible y sera
+-- su propia migracion, con su propia decision.
 DO $indices_591$
 DECLARE
     t text;
     creados int := 0;
 BEGIN
-    FOR t IN
-        SELECT c.relname
-          FROM pg_class c
-          JOIN pg_namespace n ON n.oid = c.relnamespace AND n.nspname = 'public'
-          JOIN pg_attribute a ON a.attrelid = c.oid AND a.attname = 'user_id'
-                             AND NOT a.attisdropped
-         WHERE c.relkind = 'r'
-           AND c.relrowsecurity
-           AND left(c.relname, 5) <> 'cert_'
-           AND NOT EXISTS (
-             SELECT 1 FROM pg_index i
-               JOIN pg_attribute ia ON ia.attrelid = i.indrelid AND ia.attnum = i.indkey[0]
-              WHERE i.indrelid = c.oid AND ia.attname = 'user_id'
-           )
-    LOOP
+    FOREACH t IN ARRAY ARRAY[
+        'agent_feedback', 'agent_outcomes', 'attribution_reports',
+        'attribution_touchpoints', 'audit_log', 'booking_availability',
+        'chatbot_configs', 'client_briefings', 'client_profiles',
+        'cold_email_campaigns', 'cold_email_prospects', 'creative_assets',
+        'digital_contracts', 'generated_logos', 'geo_ai_checks',
+        'geo_ai_scores', 'heatmap_alerts', 'heatmap_sites',
+        'integration_ga4', 'integration_google_ads',
+        'integration_linkedin_ads', 'integration_meta_ads',
+        'integration_search_console', 'integration_semrush',
+        'integration_shopify', 'integration_telegram',
+        'integration_tiktok_ads', 'integration_twilio', 'intent_actions',
+        'intent_signals', 'os_reports', 'quality_scores',
+        'roi_conversions', 'roi_events', 'roi_loops', 'roi_predictions',
+        'saas_api_keys', 'saas_profile_changelog',
+        'saas_user_invoices_legacy', 'sentiment_alerts',
+        'sentiment_mentions', 'telegram_messages', 'transcriptions',
+        'twilio_messages', 'user_roles', 'video_enhancements',
+        'whatsapp_messages'
+    ] LOOP
+        IF to_regclass(format('public.%I', t)) IS NULL THEN
+            CONTINUE;
+        END IF;
+        -- Solo si le falta: `CREATE INDEX IF NOT EXISTS` ya es idempotente, pero
+        -- preguntando antes no se toma ni el bloqueo cuando no hace falta.
+        IF EXISTS (
+            SELECT 1 FROM pg_class c
+              JOIN pg_namespace n ON n.oid = c.relnamespace AND n.nspname = 'public'
+              JOIN pg_index i ON i.indrelid = c.oid
+              JOIN pg_attribute ia ON ia.attrelid = i.indrelid AND ia.attnum = i.indkey[0]
+             WHERE c.relname = t AND ia.attname = 'user_id'
+        ) THEN
+            CONTINUE;
+        END IF;
         EXECUTE format('CREATE INDEX IF NOT EXISTS %I ON public.%I (user_id)', t || '_user_idx', t);
         creados := creados + 1;
     END LOOP;
