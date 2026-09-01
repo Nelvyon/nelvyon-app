@@ -149,6 +149,31 @@ CREATE TABLE IF NOT EXISTS workflow_trigger_registry (
 CREATE INDEX IF NOT EXISTS workflow_trigger_registry_lookup_idx
     ON workflow_trigger_registry (workspace_id, trigger_type, is_active);
 
+-- ── RLS de las dos que se crearon sin ella ──────────────────────────────────
+--
+-- Se quedaron fuera. Acabaron protegidas igual, pero por otro camino y mas
+-- tarde: exactamente la forma en que `saas_tenants` se quedo abierta en
+-- produccion con 22 clientes dentro mientras local estaba en verde.
+--
+-- Una tabla de inquilino tiene que nacer protegida en el fichero que la crea.
+-- Si depende de que un lote posterior la recoja, basta con que ese lote no
+-- llegue —o que la salte, que es lo que hacen siete de ellos con las tablas
+-- pobladas— para que quede abierta sin que nadie lo note.
+--
+-- Se usa `nelvyon_apply_os_workspace_rls` (migracion 322), que es la que ya
+-- produce las cuatro politicas `*_os_*` que estas tablas tienen hoy. NO se
+-- escribe una politica propia: seria una quinta politica permisiva, y las
+-- permisivas se SUMAN con OR. Una politica «equivalente» pero no identica
+-- ampliaria lo que se ve en vez de restringirlo.
+--
+-- Idempotente: la funcion hace DROP POLICY IF EXISTS antes de crear, asi que
+-- sobre una base que ya las tiene deja exactamente lo mismo.
+ALTER TABLE visual_workflow_executions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE workflow_trigger_registry  ENABLE ROW LEVEL SECURITY;
+
+SELECT public.nelvyon_apply_os_workspace_rls('visual_workflow_executions');
+SELECT public.nelvyon_apply_os_workspace_rls('workflow_trigger_registry');
+
 -- ── autocomprobación ────────────────────────────────────────────────────────
 --
 -- Una migración que dice haber creado algo y no lo creó es exactamente el
