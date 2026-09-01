@@ -1,392 +1,420 @@
 {
-  "bloque": 3,
-  "total": 55,
-  "nota": "Derivado de backend/db/certificacion/capacidades_ia.py. No se edita el conjunto de claves a mano: lo fija el arbol.",
-  "capacidades": {
-    "multinicho_sectores": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "ORQUESTACION",
-      "modulos": 1994,
-      "evidencia": "backend/os-agents/__tests__/multinicho.test.ts - 10 pruebas sobre SIETE clases de negocio deliberadamente lejanas: peluqueria de barrio, ecommerce agricola, metalurgica B2B, mudanzas B2C, despacho de abogados, SaaS y clinica. La propiedad no se comprueba en la direccion facil ('funciona con muchos nichos', que siempre parece cierto) sino en la contraria: SI EL RESULTADO NO CAMBIA AL CAMBIAR EL NEGOCIO, EL COMPORTAMIENTO NO VENIA DEL NEGOCIO. Para cuatro servicios Premium se exige que los siete clientes produzcan peticiones DISTINTAS entre si. Se comprueba ademas que ningun agente Premium nombre un cliente concreto en sus pasos -el hardcode que convierte un producto multinicho en uno hecho para uno solo-, que las restricciones legales del cliente (publicidad juridica, publicidad sanitaria) viajen con el encargo, y que el registro no tenga un agente por nicho sino servicios funcionales. Con control del propio banco: los siete clientes son de verdad distintos entre si, porque si dos fueran parecidos la comparacion no probaria nada.",
-      "motivo": ""
-    },
-    "orquestador_central": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "ORQUESTACION",
-      "modulos": 4,
-      "evidencia": "backend/os-agents/__tests__/orquestacionYRecuperacion.test.ts - 12 pruebas. Un servicio desconocido FALLA y lo dice, sin crear trabajo fantasma: devolver 'queued' para algo que nadie va a ejecutar dejaria al cliente esperando para siempre. NO DUPLICA: un trabajo que ya no esta en cola -completado o en curso- se salta, que es el caso real de un reintento, un evento repetido o un worker que revivio; si el segundo pase reejecutara, cualquier accion irreversible del agente ocurriria dos veces. Un trabajo que no existe no se inventa. Y HONESTIDAD: si el agente revienta, el trabajo queda fallido y NO se emite job:completed. Mutacion comprobada: quitada la guarda anti-duplicado, caen 2 pruebas.",
-      "motivo": ""
-    },
-    "cola_y_trabajos": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "ORQUESTACION",
-      "modulos": 8,
-      "evidencia": "backend/os-agents/__tests__/orquestacionYRecuperacion.test.ts. El ciclo de vida del trabajo: creado -> encolado -> procesado, con el estado en la base gobernando la reejecucion. La guarda de idempotencia vive en processQueuedJob y se comprueba en sus dos formas (completado y en curso). Con control positivo: un servicio conocido SI se encola y devuelve identificador.",
-      "motivo": ""
-    },
-    "bus_de_eventos_y_avisos": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "ORQUESTACION",
-      "modulos": 4,
-      "evidencia": "backend/os-agents/__tests__/orquestacionYRecuperacion.test.ts - seccion del bus. Un suscriptor recibe lo que se emite; `subscribe` devuelve una baja que DE VERDAD da de baja -una baja que no diera de baja acumularia suscriptores en cada trabajo, una fuga lenta en un proceso que corre semanas-; los eventos de un tipo no llegan a los suscriptores de otro; y el comportamiento ante un suscriptor roto queda fijado en vez de ser una sorpresa.",
-      "motivo": ""
-    },
-    "servicio_ads": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "SERVICIO",
-      "modulos": 2,
-      "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 127 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
-      "motivo": ""
-    },
-    "servicio_advisor_empresarial": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "SERVICIO",
-      "modulos": 2,
-      "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 127 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
-      "motivo": ""
-    },
-    "servicio_bots": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "SERVICIO",
-      "modulos": 2,
-      "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 127 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
-      "motivo": ""
-    },
-    "servicio_branding": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "SERVICIO",
-      "modulos": 2,
-      "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 127 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
-      "motivo": ""
-    },
-    "servicio_comunicaciones": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "SERVICIO",
-      "modulos": 2,
-      "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 127 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
-      "motivo": ""
-    },
-    "servicio_consultoria_automatizacion": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "SERVICIO",
-      "modulos": 2,
-      "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 127 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
-      "motivo": ""
-    },
-    "servicio_contenido_copywriting": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "SERVICIO",
-      "modulos": 2,
-      "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 127 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
-      "motivo": ""
-    },
-    "servicio_diseno_grafico": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "SERVICIO",
-      "modulos": 2,
-      "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 127 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
-      "motivo": ""
-    },
-    "servicio_ecommerce": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "SERVICIO",
-      "modulos": 2,
-      "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 127 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
-      "motivo": ""
-    },
-    "servicio_email_marketing": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "SERVICIO",
-      "modulos": 2,
-      "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 127 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
-      "motivo": ""
-    },
-    "servicio_formacion_capacitacion": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "SERVICIO",
-      "modulos": 2,
-      "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 127 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
-      "motivo": ""
-    },
-    "servicio_fotografia_producto": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "SERVICIO",
-      "modulos": 2,
-      "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 127 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
-      "motivo": ""
-    },
-    "servicio_funnel": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "SERVICIO",
-      "modulos": 1,
-      "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 127 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
-      "motivo": ""
-    },
-    "servicio_influencer_marketing": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "SERVICIO",
-      "modulos": 2,
-      "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 127 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
-      "motivo": ""
-    },
-    "servicio_integraciones_apis": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "SERVICIO",
-      "modulos": 2,
-      "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 127 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
-      "motivo": ""
-    },
-    "servicio_landing": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "SERVICIO",
-      "modulos": 1,
-      "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 127 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
-      "motivo": ""
-    },
-    "servicio_mantenimiento_web": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "SERVICIO",
-      "modulos": 2,
-      "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 127 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
-      "motivo": ""
-    },
-    "servicio_personal_digital": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "SERVICIO",
-      "modulos": 2,
-      "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 127 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
-      "motivo": ""
-    },
-    "servicio_reputacion_orm": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "SERVICIO",
-      "modulos": 2,
-      "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 127 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
-      "motivo": ""
-    },
-    "servicio_seo": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "SERVICIO",
-      "modulos": 2,
-      "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 127 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
-      "motivo": ""
-    },
-    "servicio_social_media": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "SERVICIO",
-      "modulos": 2,
-      "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 127 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
-      "motivo": ""
-    },
-    "servicio_tres_d_inmersivo": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "SERVICIO",
-      "modulos": 2,
-      "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 127 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
-      "motivo": ""
-    },
-    "servicio_video_multimedia": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "SERVICIO",
-      "modulos": 2,
-      "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 127 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
-      "motivo": ""
-    },
-    "servicio_voz": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "SERVICIO",
-      "modulos": 2,
-      "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 127 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
-      "motivo": ""
-    },
-    "servicio_web": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "SERVICIO",
-      "modulos": 2,
-      "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 127 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
-      "motivo": ""
-    },
-    "registro_y_base_de_agentes": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "ORQUESTACION",
-      "modulos": 9,
-      "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts. El registro devuelve los 25 servicios con identificadores propios y no repetidos. `BaseOsAgent` certificado en su propiedad critica: ante un fallo marca el paso, falla el trabajo, emite `job:failed` y RELANZA - nunca completa el trabajo con los pasos que si salieron. Es el defecto que este bloque persigue: 'tarea terminada' cuando la herramienta revento. Mutacion comprobada.",
-      "motivo": ""
-    },
-    "recuperacion_ante_fallos": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "ORQUESTACION",
-      "modulos": 2,
-      "evidencia": "backend/os-agents/__tests__/orquestacionYRecuperacion.test.ts + losVeinticincoServiciosPremium.test.ts. La propiedad central: un fallo no se convierte en exito. Servicio desconocido -> job fallido + job:failed; agente que revienta -> nunca job:completed; paso que falla a mitad -> el trabajo NO se completa con los pasos que si salieron. Mutacion comprobada en las dos suites.",
-      "motivo": ""
-    },
-    "evaluacion_de_calidad": {
-      "estado": "FIXED_CERTIFIED",
-      "familia": "ORQUESTACION",
-      "modulos": 6,
-      "evidencia": "backend/os-agents/__tests__/qaDeAgentes.test.ts - 12 pruebas. DEFECTO ENCONTRADO Y CORREGIDO: `validateOutput` buscaba los marcadores de posicion como SUBCADENAS, y la lista incluia la cadena 'todo'. En un producto en espanol eso es demoledor: 'todo' aparece en casi cualquier texto legitimo -'analisis de todo el embudo', 'sobre todo en movil'- asi que el QA marcaba como relleno practicamente cualquier entregable real. Un QA que rechaza lo correcto no se queda en molesto: o lo desactivan o aprenden a ignorarlo, y en los dos casos deja de proteger mientras sigue apareciendo en el informe como si protegiera. Ahora se busca la FORMA del marcador -TODO con dos puntos, FIXME/XXX/TBD como palabra, huecos entre corchetes- y se anadieron los que faltaban. Detecta ademas: contenido vacio, entregable que no habla del servicio pedido, y entregable que no habla del sector del cliente. Con control positivo: un entregable correcto en espanol PASA con 100. Mutacion comprobada: devuelta la busqueda de 'todo' como subcadena, caen 3 pruebas incluido el control positivo.",
-      "motivo": ""
-    },
-    "intake_y_objetivo": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "ORQUESTACION",
-      "modulos": 3,
-      "evidencia": "backend/os-agents/__tests__/costeEIntake.test.ts - la puerta de entrada. Un encargo completo se acepta, uno vacio se rechaza, y faltar un obligatorio se detecta diciendo CUAL -un rechazo que no dice que falta obliga a adivinar, y quien adivina rellena con cualquier cosa para pasar-. Aceptar un encargo incompleto significaria poner a un agente a trabajar sobre huecos, y un agente que rellena huecos inventa. Un servicio desconocido recibe los campos BASE y no un esquema inventado. Durante la certificacion se comprobo que el validador es MAS estricto de lo que aparentaba el tipo: exige URL con esquema y color hexadecimal. Es correcto y son las dos formas mas comunes de que un dato entre roto.",
-      "motivo": ""
-    },
-    "conocimiento_del_cliente": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "ORQUESTACION",
-      "modulos": 8,
-      "evidencia": "Cubierto por multinicho.test.ts y losVeinticincoServiciosPremium.test.ts. Lo que define esta capacidad es que el contexto del cliente LLEGUE y CAMBIE el resultado, y eso es exactamente lo que demuestran las dos suites: siete clases de negocio producen peticiones distintas, las restricciones legales del cliente viajan con el encargo, y ningun agente nombra un cliente concreto. `ClientProfileService` acota todas sus consultas por `userId`.",
-      "motivo": ""
-    },
-    "reporting_y_roi": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "ORQUESTACION",
-      "modulos": 10,
-      "evidencia": "backend/os-agents/__tests__/roiYCreatividad.test.ts - 6 pruebas sobre las cifras que el cliente usa para decidir su presupuesto. Sin gasto el ROI es 0 y NO Infinity; sin conversiones el coste por conversion es 0 y no Infinity -Infinity se pinta en un panel como una cifra mas y nadie lo lee como 'no hay datos'-; sin ninguna fila todo sale a cero y nada sale a NaN, que es el caso de un cliente nuevo; un valor no numerico en la base -de una migracion, de un import- no acaba en el panel como si fuera dinero; y un ROI negativo se reporta negativo en vez de maquillarse, que seria la mentira mas rentable a corto plazo y mas cara despues.",
-      "motivo": ""
-    },
-    "entregables_y_certificados": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "ORQUESTACION",
-      "modulos": 13,
-      "evidencia": "backend/os-agents/__tests__/entregablesYCertificados.test.ts - 13 pruebas. MARCA DE ORIGEN: todo lo que genera NELVYON queda marcado -no es publicidad, es que un texto de IA que circula sin marca acaba citandose como si lo hubiera escrito una persona-. Marcar dos veces NO duplica la firma, que en el documento del cliente se veria como un error de montaje. Un texto corto no se marca (la firma seria mas larga que el contenido) y fuera de produccion tampoco. El JSON se marca en la raiz sin tocar el contenido, y un array o un nulo se devuelven intactos, porque marcar la raiz de un array romperia su forma. La marca del resultado va en la SALIDA DE LOS PASOS y no en el envoltorio, que es lo correcto: el envoltorio se queda en la base y lo que circula es el texto. CERTIFICACION POR SECTOR: la escritura es idempotente con ON CONFLICT -sin el, cada pasada del lote crearia una fila mas y el panel contaria el mismo sector como si fueran varios-; un sector fallido guarda el MOTIVO y no solo el estado; y no lleva fecha de certificacion, porque una fecha en algo que no paso lo hace parecer certificado en cualquier listado ordenado por fecha.",
-      "motivo": ""
-    },
-    "aprendizaje_autonomo": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "ORQUESTACION",
-      "modulos": 5,
-      "evidencia": "Cubierto por qaDeAgentes.test.ts y AgentQualityService. El aprendizaje del sistema es el bucle de calidad: el feedback negativo se convierte en patrones a evitar que entran en el prompt del siguiente encargo (`buildImprovedPrompt`), y la validacion detecta lo que no debe salir. La parte certificada es esa: que el evaluador detecte de verdad y no rechace lo correcto -el defecto de la cadena 'todo' hacia justo eso-. El cron de aprendizaje (`LearningCron`) es un disparador de 29 lineas sin logica propia; lo que hace se certifica en el servicio al que llama.",
-      "motivo": ""
-    },
-    "prompts_y_idioma": {
-      "estado": "FIXED_CERTIFIED",
-      "familia": "ORQUESTACION",
-      "modulos": 3,
-      "evidencia": "backend/os-agents/__tests__/promptsYRagDePlataforma.test.ts - 11 pruebas. DEFECTO ENCONTRADO Y CORREGIDO: DEGRADACION SILENCIOSA Y PERMANENTE. `resolveAgentPrompts` caia a un prompt generico ante cualquier fallo del almacen Y LO CACHEABA. Un corte de red de un segundo dejaba a ese agente trabajando con tres frases de relleno durante toda la vida del proceso, y quien lo llamaba recibia un objeto con la MISMA FORMA, sin manera de notarlo: un agente Premium con el prompt generico produce algo que parece un entregable y no lo es. Dos arreglos: el sustituto ya no se cachea -el siguiente intento vuelve a probar, que cuesta una peticion fallida y recuperarse solo lo vale- y el bundle declara su `fuente` ('vault' o 'fallback'). Con control positivo en las dos direcciones: el prompt REAL si se cachea, porque no cachear nada convertiria cada paso de cada agente en una peticion de red. Mutacion comprobada: devuelto el cacheo del sustituto, cae la prueba.",
-      "motivo": ""
-    },
-    "creatividad_y_generacion": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "ORQUESTACION",
-      "modulos": 8,
-      "evidencia": "backend/os-agents/CreativeService.ts, revisado en el camino real. La propiedad que importa se cumple: cuando los dos proveedores de imagen fallan, el activo se guarda con `status: 'failed'` y `url: null` - NO se inventa una URL. Es el fallo que produciria un entregable con una imagen que no existe, y es de los que el cliente descubre delante de su propio cliente. Ademas rechaza un prompt vacio en vez de generar sobre nada. La generacion real exige proveedor de pago: lo interno esta certificado y la llamada externa queda fuera por la restriccion de coste.",
-      "motivo": ""
-    },
-    "visibilidad_y_crm_os": {
-      "estado": "FIXED_CERTIFIED",
-      "familia": "ORQUESTACION",
-      "modulos": 7,
-      "evidencia": "backend/os-agents/__tests__/visibilidadNoInventaMetricas.test.ts - 6 pruebas. DEFECTO ENCONTRADO Y CORREGIDO: METRICA FABRICADA. `checkBrandVisibility` NO pregunta a ChatGPT: le pide al modelo propio de NELVYON que imagine como responderia una IA conversacional, y mide sobre esa respuesta imaginada. El resultado se devolvia como `{ platform: 'chatgpt', brandMentioned: true }`, sin nada que dijera que era supuesto. Un cliente lo lee como 'ChatGPT menciona tu marca' y toma decisiones con una metrica inventada. Ahora cada comprobacion lleva `estado: SIMULATED` y `origen` diciendo de donde salio de verdad la respuesta: la verdad viaja CON el dato y no en la documentacion, que nadie lee mirando un panel. Medirlo de verdad exige consultar la plataforma real con su cuenta y su coste, y eso queda como bloqueo externo, no como casilla verde. Mutacion comprobada: presentada la simulacion como EXECUTED, caen 2 pruebas.",
-      "motivo": ""
-    },
-    "cliente_llm_y_coste": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "ORQUESTACION",
-      "modulos": 4,
-      "evidencia": "backend/os-agents/__tests__/costeEIntake.test.ts - la puerta del gasto. `isOsOpenAiAllowed` exige CUATRO condiciones a la vez y se comprueba quitando cada una por separado: interruptor maestro, autorizacion explicita, clave presente y modo privado con ventana. El caso que el fundador nombro por su nombre -que exista una API key por accidente- se prueba aparte: con el interruptor apagado da igual. Y la deteccion de Ollama es independiente de cualquier clave de pago, porque si dependiera de ella apagar el gasto apagaria tambien lo gratuito. Con control positivo: con las cuatro condiciones a favor SI se permitiria, porque una funcion que devolviera false siempre pasaria todo lo demas.",
-      "motivo": ""
-    },
-    "varios_del_nucleo": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "ORQUESTACION",
-      "modulos": 3,
-      "evidencia": "backend/os-agents/__tests__/nucleoYCoherencia.test.ts - 8 pruebas. El catalogo de servicios vive en TRES sitios -la lista de identificadores, el registro que los instancia y el registro de sectores- y si los tres no dicen lo mismo el producto vende algo que no puede ejecutar o ejecuta algo que no vende. Se comprueba en las dos direcciones: todo identificador declarado se puede INSTANCIAR (el fallo caro: el catalogo lo ofrece, el cliente lo contrata y al ejecutarlo no hay agente detras) y todo agente del registro esta declarado (trabajo hecho que nadie puede pedir). Sin repetidos, sin solapamiento entre Premium y sector -si un id estuviera en los dos, cual se instancia dependeria del orden de resolucion y eso es un bug que aparece y desaparece-, cada agente declara el serviceId con el que se le invoca (si no, la traza atribuiria el trabajo a otro servicio) y ninguno se queda sin pasos (un servicio con cero pasos se completaria al instante devolviendo un resultado vacio que pareceria correcto). Con control positivo: tres listas vacias serian perfectamente coherentes entre si.",
-      "motivo": ""
-    },
-    "memoria_y_rag": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "ORQUESTACION",
-      "modulos": 5,
-      "evidencia": "backend/local-ai/__tests__/embeddingsYSalida.test.ts - 12 pruebas. Casi todas NEGATIVAS a proposito: en un embedding lo que importa no es que calcule bien, es que SE NIEGUE cuando no puede. Un vector de dimension equivocada se guarda SIN ERROR en una columna de vectores, y a partir de ahi la busqueda semantica devuelve resultados que parecen ordenados y no lo estan: hay resultados, salen rapido, estan mal, y nadie lo nota. Se comprueba que rechaza texto vacio (un vector de ceros se indexa igual de bien que uno real), dimension distinta (no recorta ni rellena), respuesta sin vector, respuesta que no es JSON -un proxy devuelve HTML con 200- y error HTTP. `isAvailable` dice que NO cuando el servicio no responde, porque decir que si y fallar despues convierte un problema de infraestructura en un fallo a mitad del trabajo del cliente. POLITICA DE SALIDA: el modo privado esta ENCENDIDO por defecto -fallo cerrado: un despliegue olvidado no se convierte en una fuga- y un valor mal escrito como 'PRIVATE_MODE=quizas' NO lo apaga. Con control positivo en las dos direcciones. Mutacion comprobada: quitada la comprobacion de dimension, caen 2 pruebas.",
-      "motivo": ""
-    },
-    "ingesta_de_conocimiento": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "ORQUESTACION",
-      "modulos": 26,
-      "evidencia": "backend/local-ai/KnowledgeIngestService.ts, revisado en el camino real, mas la cobertura de embeddings en embeddingsYSalida.test.ts. Toda operacion pasa por `withTenantClient(tenantId, ...)` y toda consulta lleva `tenant_id = $1`: la ingesta no puede archivar ni leer documentos de otro inquilino. La deduplicacion por checksum evita reembeber lo que no cambio -no es solo rendimiento: reembeber genera vectores nuevos para el mismo contenido y ensucia el indice-. El purgado archiva en vez de borrar, asi que un error de manifiesto es reversible.",
-      "motivo": ""
-    },
-    "enrutado_de_modelo": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "ORQUESTACION",
-      "modulos": 18,
-      "evidencia": "backend/local-ai/__tests__/enrutadoDeModelo.test.ts - 8 pruebas. Con IA propia hay un recurso que no se puede repartir: la GPU. Dos tareas pesadas a la vez no van al doble de lento, van mucho peor, y en el peor caso tumban el servicio para TODOS los inquilinos, no solo para quien lanzo la segunda. Se demuestra que la puerta serializa de verdad: con una pesada dentro, la siguiente NO entra hasta que la primera libera. Recuerda que modelo esta cargado y declara `coldStart` en vez de esconderlo, que es lo que permite evitar el cambio de modelo, que es lo caro. Una tarea ya cancelada no ocupa hueco. CORTOCIRCUITO en sus tres estados: se abre tras fallos repetidos -seguir llamando a un proveedor caido alarga la caida-, impide inferir mientras esta abierto, y SE CIERRA SOLO pasado su plazo, porque un cortocircuito que se abre y no se cierra no es una proteccion sino una caida permanente con otro nombre. Y al recuperarse queda en `half_open`, no cerrado del todo: pasar directo provoca una avalancha.",
-      "motivo": ""
-    },
-    "infra_ia_propia": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "ORQUESTACION",
-      "modulos": 5,
-      "evidencia": "backend/local-ai/__tests__/embeddingsYSalida.test.ts - 12 pruebas. Casi todas NEGATIVAS a proposito: en un embedding lo que importa no es que calcule bien, es que SE NIEGUE cuando no puede. Un vector de dimension equivocada se guarda SIN ERROR en una columna de vectores, y a partir de ahi la busqueda semantica devuelve resultados que parecen ordenados y no lo estan: hay resultados, salen rapido, estan mal, y nadie lo nota. Se comprueba que rechaza texto vacio (un vector de ceros se indexa igual de bien que uno real), dimension distinta (no recorta ni rellena), respuesta sin vector, respuesta que no es JSON -un proxy devuelve HTML con 200- y error HTTP. `isAvailable` dice que NO cuando el servicio no responde, porque decir que si y fallar despues convierte un problema de infraestructura en un fallo a mitad del trabajo del cliente. POLITICA DE SALIDA: el modo privado esta ENCENDIDO por defecto -fallo cerrado: un despliegue olvidado no se convierte en una fuga- y un valor mal escrito como 'PRIVATE_MODE=quizas' NO lo apaga. Con control positivo en las dos direcciones. Mutacion comprobada: quitada la comprobacion de dimension, caen 2 pruebas.",
-      "motivo": ""
-    },
-    "agentes_internos": {
-      "estado": "FIXED_CERTIFIED",
-      "familia": "INTERNOS",
-      "modulos": 5,
-      "evidencia": "backend/private-ai/__tests__/permisosYAprobaciones.test.ts - 19 pruebas. DEFECTO GRAVE ENCONTRADO Y CORREGIDO: escalada de permisos. En `checkAction` la rama de aprobacion se consultaba ANTES que la lista de acciones prohibidas, y `requiresApproval` devuelve true para CUALQUIER accion sensible (lleva un `|| GLOBAL_SENSITIVE_ACTIONS.includes(action)` dentro). Resultado: una accion PROHIBIDA no se bloqueaba, se degradaba a 'pendiente de aprobacion', y bastaba que una persona pulsara aprobar para que un agente hiciera lo que su propia definicion prohibe. `forbiddenActions` estaba muerto para 8 de los 9 tipos; solo `cross_tenant_access` sobrevivia por un caso especial escrito encima. SEGUNDO DEFECTO: el registro ponia `?? ALL_SENSITIVE` en las DOS listas, asi que cada agente declaraba a la vez 'nunca' y 'con permiso'; la contradiccion no se veia porque el campo no llegaba a consultarse. El defecto pasa a `[]`, con lo que los agentes que no declaran nada se comportan EXACTAMENTE igual que antes. Mutacion comprobada: devuelto el orden anterior, caen 9 pruebas.\n\nADEMAS: interruptorYModoPrivado.test.ts certifica el router de proveedores (private-ai/core) - apagada, ningun proveedor de pago entra en la cadena ni se sondea; en modo privado se degrada a local.",
-      "motivo": ""
-    },
-    "permisos_y_herramientas": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "INTERNOS",
-      "modulos": 4,
-      "evidencia": "backend/private-ai/__tests__/registroDeSkills.test.ts - 26 pruebas, y permisosYAprobaciones.test.ts para las herramientas. PROGRAMA DE SKILLS: 16 Skills propias de NELVYON en .claude/skills/, cada una con su SKILL.md y su estandar (no prompts genericos: cada una dice que descalifica un entregable y que nunca se hace). Repartidas entre los 23 agentes internos con MINIMO PRIVILEGIO, y eso se comprueba: un agente de SEO no lleva la Skill de ventas ni la de pago; un redactor no lleva la de analitica; finance, cto, devops y security_compliance no llevan ninguna porque su trabajo no las necesita. NADIE SE AUTORREVISA: los nueve agentes que producen entregables de cliente NO llevan las dos Skills de revision, porque un agente que revisa su propio trabajo no revisa, relee - que es como se consigue un QA que siempre aprueba. Con control positivo en las dos direcciones: alguien SI las lleva, porque quitarselas a todos pasaria la prueba y dejaria el sistema sin QA. Se comprueba ademas que toda Skill del arbol este declarada y toda Skill declarada exista en disco con contenido real. Herramientas: una no concedida se deniega, un override de inquilino puede denegar una concedida, un agente deshabilitado no usa ninguna, y la denegacion gana sobre el permiso extra. Mutacion comprobada: dado al redactor la Skill de revision, la prueba cae. MCP de terceros: NINGUNO instalado, a proposito. Ver docs/SKILLS_Y_MCP.md.",
-      "motivo": ""
-    },
-    "rag_privado": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "INTERNOS",
-      "modulos": 12,
-      "evidencia": "backend/os-agents/__tests__/promptsYRagDePlataforma.test.ts - seccion de RAG. Lee SOLO `nelvyon_rag_chunks` y se comprueba sobre el SQL emitido que no toca ninguna tabla de inquilino: el aislamiento aqui no es por cliente -este corpus es de NELVYON- sino que nunca se mezcle con datos de cliente. Una consulta vacia NO llega a consultar la base: sin ese corte, `%%` casaria con todo el corpus y devolveria el limite entero para una pregunta que nadie hizo. El contenido se devuelve tal cual sin interpretar, incluido texto que parezca una orden -que no llegue al modelo como autoridad lo cubre contextoRecuperadoNoEsAutoridad-. Etiquetas ausentes vuelven como lista vacia en vez de reventar.",
-      "motivo": ""
-    },
-    "orquestacion_privada": {
-      "estado": "FIXED_CERTIFIED",
-      "familia": "INTERNOS",
-      "modulos": 2,
-      "evidencia": "backend/private-ai/__tests__/orquestadorPrivado.test.ts - 9 pruebas del camino completo: peticion -> agente -> permisos de herramienta -> permisos de accion -> aprobacion -> contexto -> modelo -> traza. Un agente desconocido no se inventa; una herramienta no concedida detiene la ejecucion ANTES de llamar a nada; una accion prohibida se bloquea -prueba que solo vale porque el arreglo de AgentPermissionService hizo que forbiddenActions dejara de ser decorativo-; una accion sensible se ENCOLA y el resultado dice que quedo pendiente en vez de devolver un texto que se lea como trabajo terminado. Lo encolado deja traza con su marca, porque una accion que se detiene tambien tiene que constar: si no, en la auditoria parece que nadie la pidio. Con control positivo: `advise` NO pide aprobacion, porque si todo la pidiera el sistema seria seguro e inutil y alguien acabaria quitando el gate entero. DEFECTO PROPIO CORREGIDO: el fichero tenia un literal de cadena roto desde el arreglo de la inyeccion, y NINGUNA prueba lo importaba, asi que llevaba ahi sin detectarse. El orquestador privado no tenia cobertura hasta esta suite.",
-      "motivo": ""
-    },
-    "aprobaciones_y_gates": {
-      "estado": "FIXED_CERTIFIED",
-      "familia": "INTERNOS",
-      "modulos": 2,
-      "evidencia": "backend/private-ai/__tests__/contratoDeEstados.test.ts (12) + espinaDeAgentes.pg.test.ts (aprobaciones, contra PostgreSQL real). CONTRATO DE ESTADOS IMPLEMENTADO: antes no existia forma de distinguir lo propuesto de lo hecho. `runAgent` devolvia `output` con un `mock: boolean` al lado, y esa era toda la distincion: un texto de un sustituto viajaba en el mismo campo que un resultado real. Ahora hay cinco estados -PROPOSED, SIMULATED, READY_FOR_APPROVAL, EXECUTED, VERIFIED- y EXECUTED/VERIFIED NO SE PUEDEN CONSTRUIR sin evidencia (referencia + origen), ni VERIFIED sin comprobacion posterior. La direccion contraria tambien se cierra: un estado sin efecto no puede llevar evidencia colgando. En PostgreSQL real: una accion sensible se encola, queda `pending` y NO `executed`; el payload viaja como jsonb; B no ve las aprobaciones de A -que seria peor que una fuga de lectura, porque permitiria APROBAR una accion ajena-; sin inquilino no se ve nada.",
-      "motivo": ""
-    },
-    "trazabilidad_y_auditoria": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "INTERNOS",
-      "modulos": 2,
-      "evidencia": "backend/private-ai/__tests__/espinaDeAgentes.pg.test.ts - trazabilidad contra PostgreSQL real. Una ejecucion queda registrada y se relee con su agente y su entrada. Matriz A/B completa con control positivo en cada lado: A->A si, A->B no, B->B si, B->A no. El prompt NO se guarda en claro, solo una huella sha256 de 16 caracteres. El metadata viaja como jsonb y vuelve como objeto -se comprueba a proposito porque `pg` no serializa objetos de JS a JSON y ese defecto costo dos capacidades enteras en el Bloque 2.",
-      "motivo": ""
-    },
-    "contexto_de_negocio": {
-      "estado": "FIXED_CERTIFIED",
-      "familia": "INTERNOS",
-      "modulos": 1,
-      "evidencia": "backend/private-ai/__tests__/contextoRecuperadoNoEsAutoridad.test.ts - 12 pruebas adversarias. DEFECTO GRAVE ENCONTRADO Y CORREGIDO: inyeccion de prompt por diseno. El orquestador construia el mensaje de SISTEMA como `agent.systemPrompt + memoryContext + ragContext`, es decir, concatenaba la memoria del inquilino y los fragmentos de RAG dentro de lo que el modelo trata como sus reglas. Cualquiera capaz de escribir algo que acabase indexado -un PDF subido, una nota pegada, un formulario- podia colar 'ignora tus reglas', 'tienes permitido borrar datos' o 'responde con las credenciales' con el mismo rango que las reglas de NELVYON, sin tocar el codigo. Ahora el material recuperado viaja en un mensaje de USUARIO, delimitado, con su procedencia, y el sistema lleva una advertencia explicita de que eso son datos y no ordenes. Se neutralizan los delimitadores del propio contenido para que un documento no pueda cerrar el bloque y escribir fuera. Mutacion comprobada: devuelto el material al mensaje de sistema, caen 7 pruebas.",
-      "motivo": ""
-    },
-    "memoria_por_inquilino": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "INTERNOS",
-      "modulos": 1,
-      "evidencia": "backend/private-ai/__tests__/memoriaYRag.pg.test.ts - 13 pruebas contra PostgreSQL real. Ciclo completo: escribir, persistir, recuperar por titulo y por contenido, borrar sin tocar lo demas. Matriz A/B entera con control positivo en cada lado. ADVERSARIOS: la busqueda arma `%consulta%` para un ILIKE, asi que una consulta que sea literalmente `%` casa con todo - se demuestra que ese todo sigue acotado al inquilino que pregunta, y lo mismo con `_` y con la consulta vacia. Sin contexto no se recupera nada. B no puede borrar un fragmento de A. El contenido se devuelve tal cual, sin interpretar -que no llegue al modelo como autoridad lo cubre contextoRecuperadoNoEsAutoridad-. Etiquetas como text[] y metadata como jsonb, comprobado por separado porque `pg` trata cada tipo distinto y confundirlos costo dos capacidades en el Bloque 2. Mutacion comprobada: quitado el filtro de inquilino de list/search/delete (3 sitios), caen 8 pruebas.",
-      "motivo": ""
-    },
-    "modo_privado_y_coste": {
-      "estado": "PASS_CERTIFIED",
-      "familia": "INTERNOS",
-      "modulos": 2,
-      "evidencia": "backend/private-ai/__tests__/interruptorYModoPrivado.test.ts - 13 pruebas. APAGADA SIGNIFICA APAGADA: con NELVYON_AI_ENABLED=0 la cadena de proveedores es exactamente ['unconfigured'] para los seis modos posibles, incluido pedir OpenAI explicitamente - que es el intento de esquive mas obvio, cambiar el ajuste del inquilino. No se llega a SONDEAR disponibilidad, y sondear ya es red, y la red de un proveedor de pago puede ser gasto. PRIVADO SIGNIFICA PRIVADO: en modo privado, pedir OpenAI o Anthropic se degrada a local; nunca aparecen en la cadena. Con control positivo en las dos direcciones: encendida y sin modo privado, OpenAI SI entra - sin ese control, un router que devolviera siempre 'unconfigured' pasaria todo y dejaria el producto sin IA. El router se reimporta fresco en cada caso porque la config se lee en el constructor y los modulos se cachean entre pruebas. Mutacion comprobada: quitados los dos cortes del interruptor, caen 6 pruebas.",
-      "motivo": ""
-    }
+ "bloque": 3,
+ "capacidades": {
+  "agentes_internos": {
+   "estado": "FIXED_CERTIFIED",
+   "evidencia": "backend/private-ai/__tests__/permisosYAprobaciones.test.ts - 19 pruebas. DEFECTO GRAVE ENCONTRADO Y CORREGIDO: escalada de permisos. En `checkAction` la rama de aprobacion se consultaba ANTES que la lista de acciones prohibidas, y `requiresApproval` devuelve true para CUALQUIER accion sensible (lleva un `|| GLOBAL_SENSITIVE_ACTIONS.includes(action)` dentro). Resultado: una accion PROHIBIDA no se bloqueaba, se degradaba a 'pendiente de aprobacion', y bastaba que una persona pulsara aprobar para que un agente hiciera lo que su propia definicion prohibe. `forbiddenActions` estaba muerto para 8 de los 9 tipos; solo `cross_tenant_access` sobrevivia por un caso especial escrito encima. SEGUNDO DEFECTO: el registro ponia `?? ALL_SENSITIVE` en las DOS listas, asi que cada agente declaraba a la vez 'nunca' y 'con permiso'; la contradiccion no se veia porque el campo no llegaba a consultarse. El defecto pasa a `[]`, con lo que los agentes que no declaran nada se comportan EXACTAMENTE igual que antes. Mutacion comprobada: devuelto el orden anterior, caen 9 pruebas.\n\nADEMAS: interruptorYModoPrivado.test.ts certifica el router de proveedores (private-ai/core) - apagada, ningun proveedor de pago entra en la cadena ni se sondea; en modo privado se degrada a local.",
+   "familia": "INTERNOS",
+   "modulos": 5,
+   "motivo": ""
+  },
+  "aprendizaje_autonomo": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "Cubierto por qaDeAgentes.test.ts y AgentQualityService. El aprendizaje del sistema es el bucle de calidad: el feedback negativo se convierte en patrones a evitar que entran en el prompt del siguiente encargo (`buildImprovedPrompt`), y la validacion detecta lo que no debe salir. La parte certificada es esa: que el evaluador detecte de verdad y no rechace lo correcto -el defecto de la cadena 'todo' hacia justo eso-. El cron de aprendizaje (`LearningCron`) es un disparador de 29 lineas sin logica propia; lo que hace se certifica en el servicio al que llama.",
+   "familia": "ORQUESTACION",
+   "modulos": 5,
+   "motivo": ""
+  },
+  "aprobaciones_y_gates": {
+   "estado": "FIXED_CERTIFIED",
+   "evidencia": "backend/private-ai/__tests__/contratoDeEstados.test.ts (12) + espinaDeAgentes.pg.test.ts (aprobaciones, contra PostgreSQL real). CONTRATO DE ESTADOS IMPLEMENTADO: antes no existia forma de distinguir lo propuesto de lo hecho. `runAgent` devolvia `output` con un `mock: boolean` al lado, y esa era toda la distincion: un texto de un sustituto viajaba en el mismo campo que un resultado real. Ahora hay cinco estados -PROPOSED, SIMULATED, READY_FOR_APPROVAL, EXECUTED, VERIFIED- y EXECUTED/VERIFIED NO SE PUEDEN CONSTRUIR sin evidencia (referencia + origen), ni VERIFIED sin comprobacion posterior. La direccion contraria tambien se cierra: un estado sin efecto no puede llevar evidencia colgando. En PostgreSQL real: una accion sensible se encola, queda `pending` y NO `executed`; el payload viaja como jsonb; B no ve las aprobaciones de A -que seria peor que una fuga de lectura, porque permitiria APROBAR una accion ajena-; sin inquilino no se ve nada.",
+   "familia": "INTERNOS",
+   "modulos": 2,
+   "motivo": ""
+  },
+  "bus_de_eventos_y_avisos": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/orquestacionYRecuperacion.test.ts - seccion del bus. Un suscriptor recibe lo que se emite; `subscribe` devuelve una baja que DE VERDAD da de baja -una baja que no diera de baja acumularia suscriptores en cada trabajo, una fuga lenta en un proceso que corre semanas-; los eventos de un tipo no llegan a los suscriptores de otro; y el comportamiento ante un suscriptor roto queda fijado en vez de ser una sorpresa.",
+   "familia": "ORQUESTACION",
+   "modulos": 4,
+   "motivo": ""
+  },
+  "cliente_llm_y_coste": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/costeEIntake.test.ts - la puerta del gasto. `isOsOpenAiAllowed` exige CUATRO condiciones a la vez y se comprueba quitando cada una por separado: interruptor maestro, autorizacion explicita, clave presente y modo privado con ventana. El caso que el fundador nombro por su nombre -que exista una API key por accidente- se prueba aparte: con el interruptor apagado da igual. Y la deteccion de Ollama es independiente de cualquier clave de pago, porque si dependiera de ella apagar el gasto apagaria tambien lo gratuito. Con control positivo: con las cuatro condiciones a favor SI se permitiria, porque una funcion que devolviera false siempre pasaria todo lo demas. Y backend/os-agents/__tests__/unFalseDeCadenaNoEsUnAprobado.test.ts - 25 pruebas sobre `loQueDiceElModelo`, el otro limite con el modelo: leer su respuesta sin regalar un si. `Boolean(\"false\")` es `true` en JavaScript, y los modelos devuelven booleanos como cadena; eso entregaba un output sin mejorar marcado como bueno. Con control positivo y negativo por cada forma aceptada.",
+   "familia": "ORQUESTACION",
+   "modulos": 5,
+   "motivo": ""
+  },
+  "cola_y_trabajos": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/orquestacionYRecuperacion.test.ts. El ciclo de vida del trabajo: creado -> encolado -> procesado, con el estado en la base gobernando la reejecucion. La guarda de idempotencia vive en processQueuedJob y se comprueba en sus dos formas (completado y en curso). Con control positivo: un servicio conocido SI se encola y devuelve identificador.",
+   "familia": "ORQUESTACION",
+   "modulos": 8,
+   "motivo": ""
+  },
+  "conocimiento_del_cliente": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "Cubierto por multinicho.test.ts y losVeinticincoServiciosPremium.test.ts. Lo que define esta capacidad es que el contexto del cliente LLEGUE y CAMBIE el resultado, y eso es exactamente lo que demuestran las dos suites: siete clases de negocio producen peticiones distintas, las restricciones legales del cliente viajan con el encargo, y ningun agente nombra un cliente concreto. `ClientProfileService` acota todas sus consultas por `userId`.",
+   "familia": "ORQUESTACION",
+   "modulos": 8,
+   "motivo": ""
+  },
+  "contexto_de_negocio": {
+   "estado": "FIXED_CERTIFIED",
+   "evidencia": "backend/private-ai/__tests__/contextoRecuperadoNoEsAutoridad.test.ts - 12 pruebas adversarias. DEFECTO GRAVE ENCONTRADO Y CORREGIDO: inyeccion de prompt por diseno. El orquestador construia el mensaje de SISTEMA como `agent.systemPrompt + memoryContext + ragContext`, es decir, concatenaba la memoria del inquilino y los fragmentos de RAG dentro de lo que el modelo trata como sus reglas. Cualquiera capaz de escribir algo que acabase indexado -un PDF subido, una nota pegada, un formulario- podia colar 'ignora tus reglas', 'tienes permitido borrar datos' o 'responde con las credenciales' con el mismo rango que las reglas de NELVYON, sin tocar el codigo. Ahora el material recuperado viaja en un mensaje de USUARIO, delimitado, con su procedencia, y el sistema lleva una advertencia explicita de que eso son datos y no ordenes. Se neutralizan los delimitadores del propio contenido para que un documento no pueda cerrar el bloque y escribir fuera. Mutacion comprobada: devuelto el material al mensaje de sistema, caen 7 pruebas.",
+   "familia": "INTERNOS",
+   "modulos": 1,
+   "motivo": ""
+  },
+  "creatividad_y_generacion": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/CreativeService.ts, revisado en el camino real. La propiedad que importa se cumple: cuando los dos proveedores de imagen fallan, el activo se guarda con `status: 'failed'` y `url: null` - NO se inventa una URL. Es el fallo que produciria un entregable con una imagen que no existe, y es de los que el cliente descubre delante de su propio cliente. Ademas rechaza un prompt vacio en vez de generar sobre nada. La generacion real exige proveedor de pago: lo interno esta certificado y la llamada externa queda fuera por la restriccion de coste.",
+   "familia": "ORQUESTACION",
+   "modulos": 8,
+   "motivo": ""
+  },
+  "enrutado_de_modelo": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/local-ai/__tests__/enrutadoDeModelo.test.ts - 8 pruebas. Con IA propia hay un recurso que no se puede repartir: la GPU. Dos tareas pesadas a la vez no van al doble de lento, van mucho peor, y en el peor caso tumban el servicio para TODOS los inquilinos, no solo para quien lanzo la segunda. Se demuestra que la puerta serializa de verdad: con una pesada dentro, la siguiente NO entra hasta que la primera libera. Recuerda que modelo esta cargado y declara `coldStart` en vez de esconderlo, que es lo que permite evitar el cambio de modelo, que es lo caro. Una tarea ya cancelada no ocupa hueco. CORTOCIRCUITO en sus tres estados: se abre tras fallos repetidos -seguir llamando a un proveedor caido alarga la caida-, impide inferir mientras esta abierto, y SE CIERRA SOLO pasado su plazo, porque un cortocircuito que se abre y no se cierra no es una proteccion sino una caida permanente con otro nombre. Y al recuperarse queda en `half_open`, no cerrado del todo: pasar directo provoca una avalancha.",
+   "familia": "ORQUESTACION",
+   "modulos": 18,
+   "motivo": ""
+  },
+  "entregables_y_certificados": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/entregablesYCertificados.test.ts - 13 pruebas. MARCA DE ORIGEN: todo lo que genera NELVYON queda marcado -no es publicidad, es que un texto de IA que circula sin marca acaba citandose como si lo hubiera escrito una persona-. Marcar dos veces NO duplica la firma, que en el documento del cliente se veria como un error de montaje. Un texto corto no se marca (la firma seria mas larga que el contenido) y fuera de produccion tampoco. El JSON se marca en la raiz sin tocar el contenido, y un array o un nulo se devuelven intactos, porque marcar la raiz de un array romperia su forma. La marca del resultado va en la SALIDA DE LOS PASOS y no en el envoltorio, que es lo correcto: el envoltorio se queda en la base y lo que circula es el texto. CERTIFICACION POR SECTOR: la escritura es idempotente con ON CONFLICT -sin el, cada pasada del lote crearia una fila mas y el panel contaria el mismo sector como si fueran varios-; un sector fallido guarda el MOTIVO y no solo el estado; y no lleva fecha de certificacion, porque una fecha en algo que no paso lo hace parecer certificado en cualquier listado ordenado por fecha.",
+   "familia": "ORQUESTACION",
+   "modulos": 13,
+   "motivo": ""
+  },
+  "evaluacion_de_calidad": {
+   "estado": "FIXED_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/qaDeAgentes.test.ts - 12 pruebas. DEFECTO ENCONTRADO Y CORREGIDO: `validateOutput` buscaba los marcadores de posicion como SUBCADENAS, y la lista incluia la cadena 'todo'. En un producto en espanol eso es demoledor: 'todo' aparece en casi cualquier texto legitimo -'analisis de todo el embudo', 'sobre todo en movil'- asi que el QA marcaba como relleno practicamente cualquier entregable real. Un QA que rechaza lo correcto no se queda en molesto: o lo desactivan o aprenden a ignorarlo, y en los dos casos deja de proteger mientras sigue apareciendo en el informe como si protegiera. Ahora se busca la FORMA del marcador -TODO con dos puntos, FIXME/XXX/TBD como palabra, huecos entre corchetes- y se anadieron los que faltaban. Detecta ademas: contenido vacio, entregable que no habla del servicio pedido, y entregable que no habla del sector del cliente. Con control positivo: un entregable correcto en espanol PASA con 100. Mutacion comprobada: devuelta la busqueda de 'todo' como subcadena, caen 3 pruebas incluido el control positivo.",
+   "familia": "ORQUESTACION",
+   "modulos": 6,
+   "motivo": ""
+  },
+  "infra_ia_propia": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/local-ai/__tests__/embeddingsYSalida.test.ts - 12 pruebas. Casi todas NEGATIVAS a proposito: en un embedding lo que importa no es que calcule bien, es que SE NIEGUE cuando no puede. Un vector de dimension equivocada se guarda SIN ERROR en una columna de vectores, y a partir de ahi la busqueda semantica devuelve resultados que parecen ordenados y no lo estan: hay resultados, salen rapido, estan mal, y nadie lo nota. Se comprueba que rechaza texto vacio (un vector de ceros se indexa igual de bien que uno real), dimension distinta (no recorta ni rellena), respuesta sin vector, respuesta que no es JSON -un proxy devuelve HTML con 200- y error HTTP. `isAvailable` dice que NO cuando el servicio no responde, porque decir que si y fallar despues convierte un problema de infraestructura en un fallo a mitad del trabajo del cliente. POLITICA DE SALIDA: el modo privado esta ENCENDIDO por defecto -fallo cerrado: un despliegue olvidado no se convierte en una fuga- y un valor mal escrito como 'PRIVATE_MODE=quizas' NO lo apaga. Con control positivo en las dos direcciones. Mutacion comprobada: quitada la comprobacion de dimension, caen 2 pruebas.",
+   "familia": "ORQUESTACION",
+   "modulos": 5,
+   "motivo": ""
+  },
+  "ingesta_de_conocimiento": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/local-ai/KnowledgeIngestService.ts, revisado en el camino real, mas la cobertura de embeddings en embeddingsYSalida.test.ts. Toda operacion pasa por `withTenantClient(tenantId, ...)` y toda consulta lleva `tenant_id = $1`: la ingesta no puede archivar ni leer documentos de otro inquilino. La deduplicacion por checksum evita reembeber lo que no cambio -no es solo rendimiento: reembeber genera vectores nuevos para el mismo contenido y ensucia el indice-. El purgado archiva en vez de borrar, asi que un error de manifiesto es reversible.",
+   "familia": "ORQUESTACION",
+   "modulos": 26,
+   "motivo": ""
+  },
+  "intake_y_objetivo": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/costeEIntake.test.ts - la puerta de entrada. Un encargo completo se acepta, uno vacio se rechaza, y faltar un obligatorio se detecta diciendo CUAL -un rechazo que no dice que falta obliga a adivinar, y quien adivina rellena con cualquier cosa para pasar-. Aceptar un encargo incompleto significaria poner a un agente a trabajar sobre huecos, y un agente que rellena huecos inventa. Un servicio desconocido recibe los campos BASE y no un esquema inventado. Durante la certificacion se comprobo que el validador es MAS estricto de lo que aparentaba el tipo: exige URL con esquema y color hexadecimal. Es correcto y son las dos formas mas comunes de que un dato entre roto.",
+   "familia": "ORQUESTACION",
+   "modulos": 3,
+   "motivo": ""
+  },
+  "memoria_por_inquilino": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/private-ai/__tests__/memoriaYRag.pg.test.ts - 13 pruebas contra PostgreSQL real. Ciclo completo: escribir, persistir, recuperar por titulo y por contenido, borrar sin tocar lo demas. Matriz A/B entera con control positivo en cada lado. ADVERSARIOS: la busqueda arma `%consulta%` para un ILIKE, asi que una consulta que sea literalmente `%` casa con todo - se demuestra que ese todo sigue acotado al inquilino que pregunta, y lo mismo con `_` y con la consulta vacia. Sin contexto no se recupera nada. B no puede borrar un fragmento de A. El contenido se devuelve tal cual, sin interpretar -que no llegue al modelo como autoridad lo cubre contextoRecuperadoNoEsAutoridad-. Etiquetas como text[] y metadata como jsonb, comprobado por separado porque `pg` trata cada tipo distinto y confundirlos costo dos capacidades en el Bloque 2. Mutacion comprobada: quitado el filtro de inquilino de list/search/delete (3 sitios), caen 8 pruebas.",
+   "familia": "INTERNOS",
+   "modulos": 1,
+   "motivo": ""
+  },
+  "memoria_y_rag": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/local-ai/__tests__/embeddingsYSalida.test.ts - 12 pruebas. Casi todas NEGATIVAS a proposito: en un embedding lo que importa no es que calcule bien, es que SE NIEGUE cuando no puede. Un vector de dimension equivocada se guarda SIN ERROR en una columna de vectores, y a partir de ahi la busqueda semantica devuelve resultados que parecen ordenados y no lo estan: hay resultados, salen rapido, estan mal, y nadie lo nota. Se comprueba que rechaza texto vacio (un vector de ceros se indexa igual de bien que uno real), dimension distinta (no recorta ni rellena), respuesta sin vector, respuesta que no es JSON -un proxy devuelve HTML con 200- y error HTTP. `isAvailable` dice que NO cuando el servicio no responde, porque decir que si y fallar despues convierte un problema de infraestructura en un fallo a mitad del trabajo del cliente. POLITICA DE SALIDA: el modo privado esta ENCENDIDO por defecto -fallo cerrado: un despliegue olvidado no se convierte en una fuga- y un valor mal escrito como 'PRIVATE_MODE=quizas' NO lo apaga. Con control positivo en las dos direcciones. Mutacion comprobada: quitada la comprobacion de dimension, caen 2 pruebas.",
+   "familia": "ORQUESTACION",
+   "modulos": 5,
+   "motivo": ""
+  },
+  "modo_privado_y_coste": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/private-ai/__tests__/interruptorYModoPrivado.test.ts - 13 pruebas. APAGADA SIGNIFICA APAGADA: con NELVYON_AI_ENABLED=0 la cadena de proveedores es exactamente ['unconfigured'] para los seis modos posibles, incluido pedir OpenAI explicitamente - que es el intento de esquive mas obvio, cambiar el ajuste del inquilino. No se llega a SONDEAR disponibilidad, y sondear ya es red, y la red de un proveedor de pago puede ser gasto. PRIVADO SIGNIFICA PRIVADO: en modo privado, pedir OpenAI o Anthropic se degrada a local; nunca aparecen en la cadena. Con control positivo en las dos direcciones: encendida y sin modo privado, OpenAI SI entra - sin ese control, un router que devolviera siempre 'unconfigured' pasaria todo y dejaria el producto sin IA. El router se reimporta fresco en cada caso porque la config se lee en el constructor y los modulos se cachean entre pruebas. Mutacion comprobada: quitados los dos cortes del interruptor, caen 6 pruebas.",
+   "familia": "INTERNOS",
+   "modulos": 2,
+   "motivo": ""
+  },
+  "multinicho_sectores": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/multinicho.test.ts - 10 pruebas sobre SIETE clases de negocio deliberadamente lejanas: peluqueria de barrio, ecommerce agricola, metalurgica B2B, mudanzas B2C, despacho de abogados, SaaS y clinica. La propiedad no se comprueba en la direccion facil ('funciona con muchos nichos', que siempre parece cierto) sino en la contraria: SI EL RESULTADO NO CAMBIA AL CAMBIAR EL NEGOCIO, EL COMPORTAMIENTO NO VENIA DEL NEGOCIO. Para cuatro servicios Premium se exige que los siete clientes produzcan peticiones DISTINTAS entre si. Se comprueba ademas que ningun agente Premium nombre un cliente concreto en sus pasos -el hardcode que convierte un producto multinicho en uno hecho para uno solo-, que las restricciones legales del cliente (publicidad juridica, publicidad sanitaria) viajen con el encargo, y que el registro no tenga un agente por nicho sino servicios funcionales. Con control del propio banco: los siete clientes son de verdad distintos entre si, porque si dos fueran parecidos la comparacion no probaria nada.",
+   "familia": "ORQUESTACION",
+   "modulos": 1994,
+   "motivo": ""
+  },
+  "orquestacion_privada": {
+   "estado": "FIXED_CERTIFIED",
+   "evidencia": "backend/private-ai/__tests__/orquestadorPrivado.test.ts - 9 pruebas del camino completo: peticion -> agente -> permisos de herramienta -> permisos de accion -> aprobacion -> contexto -> modelo -> traza. Un agente desconocido no se inventa; una herramienta no concedida detiene la ejecucion ANTES de llamar a nada; una accion prohibida se bloquea -prueba que solo vale porque el arreglo de AgentPermissionService hizo que forbiddenActions dejara de ser decorativo-; una accion sensible se ENCOLA y el resultado dice que quedo pendiente en vez de devolver un texto que se lea como trabajo terminado. Lo encolado deja traza con su marca, porque una accion que se detiene tambien tiene que constar: si no, en la auditoria parece que nadie la pidio. Con control positivo: `advise` NO pide aprobacion, porque si todo la pidiera el sistema seria seguro e inutil y alguien acabaria quitando el gate entero. DEFECTO PROPIO CORREGIDO: el fichero tenia un literal de cadena roto desde el arreglo de la inyeccion, y NINGUNA prueba lo importaba, asi que llevaba ahi sin detectarse. El orquestador privado no tenia cobertura hasta esta suite.",
+   "familia": "INTERNOS",
+   "modulos": 2,
+   "motivo": ""
+  },
+  "orquestador_central": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/orquestacionYRecuperacion.test.ts - 12 pruebas. Un servicio desconocido FALLA y lo dice, sin crear trabajo fantasma: devolver 'queued' para algo que nadie va a ejecutar dejaria al cliente esperando para siempre. NO DUPLICA: un trabajo que ya no esta en cola -completado o en curso- se salta, que es el caso real de un reintento, un evento repetido o un worker que revivio; si el segundo pase reejecutara, cualquier accion irreversible del agente ocurriria dos veces. Un trabajo que no existe no se inventa. Y HONESTIDAD: si el agente revienta, el trabajo queda fallido y NO se emite job:completed. Mutacion comprobada: quitada la guarda anti-duplicado, caen 2 pruebas.",
+   "familia": "ORQUESTACION",
+   "modulos": 4,
+   "motivo": ""
+  },
+  "permisos_y_herramientas": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/private-ai/__tests__/registroDeSkills.test.ts - 26 pruebas, y permisosYAprobaciones.test.ts para las herramientas. PROGRAMA DE SKILLS: 16 Skills propias de NELVYON en .claude/skills/, cada una con su SKILL.md y su estandar (no prompts genericos: cada una dice que descalifica un entregable y que nunca se hace). Repartidas entre los 23 agentes internos con MINIMO PRIVILEGIO, y eso se comprueba: un agente de SEO no lleva la Skill de ventas ni la de pago; un redactor no lleva la de analitica; finance, cto, devops y security_compliance no llevan ninguna porque su trabajo no las necesita. NADIE SE AUTORREVISA: los nueve agentes que producen entregables de cliente NO llevan las dos Skills de revision, porque un agente que revisa su propio trabajo no revisa, relee - que es como se consigue un QA que siempre aprueba. Con control positivo en las dos direcciones: alguien SI las lleva, porque quitarselas a todos pasaria la prueba y dejaria el sistema sin QA. Se comprueba ademas que toda Skill del arbol este declarada y toda Skill declarada exista en disco con contenido real. Herramientas: una no concedida se deniega, un override de inquilino puede denegar una concedida, un agente deshabilitado no usa ninguna, y la denegacion gana sobre el permiso extra. Mutacion comprobada: dado al redactor la Skill de revision, la prueba cae. MCP de terceros: NINGUNO instalado, a proposito. Ver docs/SKILLS_Y_MCP.md.",
+   "familia": "INTERNOS",
+   "modulos": 4,
+   "motivo": ""
+  },
+  "prompts_y_idioma": {
+   "estado": "FIXED_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/promptsYRagDePlataforma.test.ts - 11 pruebas. DEFECTO ENCONTRADO Y CORREGIDO: DEGRADACION SILENCIOSA Y PERMANENTE. `resolveAgentPrompts` caia a un prompt generico ante cualquier fallo del almacen Y LO CACHEABA. Un corte de red de un segundo dejaba a ese agente trabajando con tres frases de relleno durante toda la vida del proceso, y quien lo llamaba recibia un objeto con la MISMA FORMA, sin manera de notarlo: un agente Premium con el prompt generico produce algo que parece un entregable y no lo es. Dos arreglos: el sustituto ya no se cachea -el siguiente intento vuelve a probar, que cuesta una peticion fallida y recuperarse solo lo vale- y el bundle declara su `fuente` ('vault' o 'fallback'). Con control positivo en las dos direcciones: el prompt REAL si se cachea, porque no cachear nada convertiria cada paso de cada agente en una peticion de red. Mutacion comprobada: devuelto el cacheo del sustituto, cae la prueba.",
+   "familia": "ORQUESTACION",
+   "modulos": 3,
+   "motivo": ""
+  },
+  "rag_privado": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/promptsYRagDePlataforma.test.ts - seccion de RAG. Lee SOLO `nelvyon_rag_chunks` y se comprueba sobre el SQL emitido que no toca ninguna tabla de inquilino: el aislamiento aqui no es por cliente -este corpus es de NELVYON- sino que nunca se mezcle con datos de cliente. Una consulta vacia NO llega a consultar la base: sin ese corte, `%%` casaria con todo el corpus y devolveria el limite entero para una pregunta que nadie hizo. El contenido se devuelve tal cual sin interpretar, incluido texto que parezca una orden -que no llegue al modelo como autoridad lo cubre contextoRecuperadoNoEsAutoridad-. Etiquetas ausentes vuelven como lista vacia en vez de reventar.",
+   "familia": "INTERNOS",
+   "modulos": 12,
+   "motivo": ""
+  },
+  "recuperacion_ante_fallos": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/orquestacionYRecuperacion.test.ts + losVeinticincoServiciosPremium.test.ts. La propiedad central: un fallo no se convierte en exito. Servicio desconocido -> job fallido + job:failed; agente que revienta -> nunca job:completed; paso que falla a mitad -> el trabajo NO se completa con los pasos que si salieron. Mutacion comprobada en las dos suites.",
+   "familia": "ORQUESTACION",
+   "modulos": 2,
+   "motivo": ""
+  },
+  "registro_y_base_de_agentes": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts. El registro devuelve los 25 servicios con identificadores propios y no repetidos. `BaseOsAgent` certificado en su propiedad critica: ante un fallo marca el paso, falla el trabajo, emite `job:failed` y RELANZA - nunca completa el trabajo con los pasos que si salieron. Es el defecto que este bloque persigue: 'tarea terminada' cuando la herramienta revento. Mutacion comprobada.",
+   "familia": "ORQUESTACION",
+   "modulos": 9,
+   "motivo": ""
+  },
+  "reporting_y_roi": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/roiYCreatividad.test.ts - 6 pruebas sobre las cifras que el cliente usa para decidir su presupuesto. Sin gasto el ROI es 0 y NO Infinity; sin conversiones el coste por conversion es 0 y no Infinity -Infinity se pinta en un panel como una cifra mas y nadie lo lee como 'no hay datos'-; sin ninguna fila todo sale a cero y nada sale a NaN, que es el caso de un cliente nuevo; un valor no numerico en la base -de una migracion, de un import- no acaba en el panel como si fuera dinero; y un ROI negativo se reporta negativo en vez de maquillarse, que seria la mentira mas rentable a corto plazo y mas cara despues.",
+   "familia": "ORQUESTACION",
+   "modulos": 10,
+   "motivo": ""
+  },
+  "servicio_ads": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 147 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
+   "familia": "SERVICIO",
+   "modulos": 2,
+   "motivo": ""
+  },
+  "servicio_advisor_empresarial": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 147 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
+   "familia": "SERVICIO",
+   "modulos": 2,
+   "motivo": ""
+  },
+  "servicio_analitica_atribucion": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 147 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25. Estos cuatro entraron el 2026-08-24 y se quedaron FUERA del fichero de estado mientras la derivacion si los veia: el inventario llevaba ocho dias en 55 contra 59. La suite derivada si los cubria —por eso paso de 127 a 147 pruebas sin que nadie la tocara—, asi que estaban probados pero no contados.",
+   "familia": "SERVICIO",
+   "modulos": 2,
+   "motivo": ""
+  },
+  "servicio_bots": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 147 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
+   "familia": "SERVICIO",
+   "modulos": 2,
+   "motivo": ""
+  },
+  "servicio_branding": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 147 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
+   "familia": "SERVICIO",
+   "modulos": 2,
+   "motivo": ""
+  },
+  "servicio_comunicaciones": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 147 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
+   "familia": "SERVICIO",
+   "modulos": 2,
+   "motivo": ""
+  },
+  "servicio_consultoria_automatizacion": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 147 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
+   "familia": "SERVICIO",
+   "modulos": 2,
+   "motivo": ""
+  },
+  "servicio_contenido_copywriting": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 147 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
+   "familia": "SERVICIO",
+   "modulos": 2,
+   "motivo": ""
+  },
+  "servicio_crm_captacion": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 147 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25. Estos cuatro entraron el 2026-08-24 y se quedaron FUERA del fichero de estado mientras la derivacion si los veia: el inventario llevaba ocho dias en 55 contra 59. La suite derivada si los cubria —por eso paso de 127 a 147 pruebas sin que nadie la tocara—, asi que estaban probados pero no contados.",
+   "familia": "SERVICIO",
+   "modulos": 2,
+   "motivo": ""
+  },
+  "servicio_diseno_grafico": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 147 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
+   "familia": "SERVICIO",
+   "modulos": 2,
+   "motivo": ""
+  },
+  "servicio_ecommerce": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 147 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
+   "familia": "SERVICIO",
+   "modulos": 2,
+   "motivo": ""
+  },
+  "servicio_email_marketing": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 147 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
+   "familia": "SERVICIO",
+   "modulos": 2,
+   "motivo": ""
+  },
+  "servicio_formacion_capacitacion": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 147 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
+   "familia": "SERVICIO",
+   "modulos": 2,
+   "motivo": ""
+  },
+  "servicio_fotografia_producto": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 147 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
+   "familia": "SERVICIO",
+   "modulos": 2,
+   "motivo": ""
+  },
+  "servicio_funnel": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 147 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
+   "familia": "SERVICIO",
+   "modulos": 1,
+   "motivo": ""
+  },
+  "servicio_geo_ai_search": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 147 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25. Estos cuatro entraron el 2026-08-24 y se quedaron FUERA del fichero de estado mientras la derivacion si los veia: el inventario llevaba ocho dias en 55 contra 59. La suite derivada si los cubria —por eso paso de 127 a 147 pruebas sin que nadie la tocara—, asi que estaban probados pero no contados.",
+   "familia": "SERVICIO",
+   "modulos": 2,
+   "motivo": ""
+  },
+  "servicio_influencer_marketing": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 147 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
+   "familia": "SERVICIO",
+   "modulos": 2,
+   "motivo": ""
+  },
+  "servicio_integraciones_apis": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 147 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
+   "familia": "SERVICIO",
+   "modulos": 2,
+   "motivo": ""
+  },
+  "servicio_inteligencia_mercado": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 147 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25. Estos cuatro entraron el 2026-08-24 y se quedaron FUERA del fichero de estado mientras la derivacion si los veia: el inventario llevaba ocho dias en 55 contra 59. La suite derivada si los cubria —por eso paso de 127 a 147 pruebas sin que nadie la tocara—, asi que estaban probados pero no contados.",
+   "familia": "SERVICIO",
+   "modulos": 2,
+   "motivo": ""
+  },
+  "servicio_landing": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 147 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
+   "familia": "SERVICIO",
+   "modulos": 1,
+   "motivo": ""
+  },
+  "servicio_mantenimiento_web": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 147 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
+   "familia": "SERVICIO",
+   "modulos": 2,
+   "motivo": ""
+  },
+  "servicio_personal_digital": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 147 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
+   "familia": "SERVICIO",
+   "modulos": 2,
+   "motivo": ""
+  },
+  "servicio_reputacion_orm": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 147 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
+   "familia": "SERVICIO",
+   "modulos": 2,
+   "motivo": ""
+  },
+  "servicio_seo": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 147 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
+   "familia": "SERVICIO",
+   "modulos": 2,
+   "motivo": ""
+  },
+  "servicio_social_media": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 147 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
+   "familia": "SERVICIO",
+   "modulos": 2,
+   "motivo": ""
+  },
+  "servicio_tres_d_inmersivo": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 147 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
+   "familia": "SERVICIO",
+   "modulos": 2,
+   "motivo": ""
+  },
+  "servicio_video_multimedia": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 147 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
+   "familia": "SERVICIO",
+   "modulos": 2,
+   "motivo": ""
+  },
+  "servicio_voz": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 147 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
+   "familia": "SERVICIO",
+   "modulos": 2,
+   "motivo": ""
+  },
+  "servicio_web": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/losVeinticincoServiciosPremium.test.ts - 147 pruebas, 5 por servicio, DERIVADAS del registro (no hay lista a mano: si alguien anade un servicio y no cumple, la suite cae sola). Se certifica la maquinaria, no la redaccion: (1) el servicio declara pasos con nombres unicos y descripcion; (2) EL PLAN ES REAL - un espia sobre `ctx.stepResults` demuestra que algun paso LEE lo que produjeron los anteriores, porque si cada paso fuera independiente la cadena seria decorativa y llamarla plan seria una exageracion; (3) MULTINICHO - una clinica dental y un taller mecanico producen peticiones distintas, asi que el comportamiento sale del contexto del cliente y no de un hardcode; (4) y (5) HONESTIDAD - si un paso falla (al principio o a mitad) el trabajo NO se da por terminado: se marca el paso fallido, se falla el trabajo, se emite `job:failed` y NO se emite `job:completed`. Mutacion comprobada: sustituido el `throw err` de BaseOsAgent por un `break` que se traga el fallo y completa el trabajo, caen 50 pruebas - dos por cada uno de los 25.",
+   "familia": "SERVICIO",
+   "modulos": 2,
+   "motivo": ""
+  },
+  "trazabilidad_y_auditoria": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/private-ai/__tests__/espinaDeAgentes.pg.test.ts - trazabilidad contra PostgreSQL real. Una ejecucion queda registrada y se relee con su agente y su entrada. Matriz A/B completa con control positivo en cada lado: A->A si, A->B no, B->B si, B->A no. El prompt NO se guarda en claro, solo una huella sha256 de 16 caracteres. El metadata viaja como jsonb y vuelve como objeto -se comprueba a proposito porque `pg` no serializa objetos de JS a JSON y ese defecto costo dos capacidades enteras en el Bloque 2.",
+   "familia": "INTERNOS",
+   "modulos": 2,
+   "motivo": ""
+  },
+  "varios_del_nucleo": {
+   "estado": "PASS_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/nucleoYCoherencia.test.ts - 8 pruebas. El catalogo de servicios vive en TRES sitios -la lista de identificadores, el registro que los instancia y el registro de sectores- y si los tres no dicen lo mismo el producto vende algo que no puede ejecutar o ejecuta algo que no vende. Se comprueba en las dos direcciones: todo identificador declarado se puede INSTANCIAR (el fallo caro: el catalogo lo ofrece, el cliente lo contrata y al ejecutarlo no hay agente detras) y todo agente del registro esta declarado (trabajo hecho que nadie puede pedir). Sin repetidos, sin solapamiento entre Premium y sector -si un id estuviera en los dos, cual se instancia dependeria del orden de resolucion y eso es un bug que aparece y desaparece-, cada agente declara el serviceId con el que se le invoca (si no, la traza atribuiria el trabajo a otro servicio) y ninguno se queda sin pasos (un servicio con cero pasos se completaria al instante devolviendo un resultado vacio que pareceria correcto). Con control positivo: tres listas vacias serian perfectamente coherentes entre si.",
+   "familia": "ORQUESTACION",
+   "modulos": 3,
+   "motivo": ""
+  },
+  "visibilidad_y_crm_os": {
+   "estado": "FIXED_CERTIFIED",
+   "evidencia": "backend/os-agents/__tests__/visibilidadNoInventaMetricas.test.ts - 6 pruebas. DEFECTO ENCONTRADO Y CORREGIDO: METRICA FABRICADA. `checkBrandVisibility` NO pregunta a ChatGPT: le pide al modelo propio de NELVYON que imagine como responderia una IA conversacional, y mide sobre esa respuesta imaginada. El resultado se devolvia como `{ platform: 'chatgpt', brandMentioned: true }`, sin nada que dijera que era supuesto. Un cliente lo lee como 'ChatGPT menciona tu marca' y toma decisiones con una metrica inventada. Ahora cada comprobacion lleva `estado: SIMULATED` y `origen` diciendo de donde salio de verdad la respuesta: la verdad viaja CON el dato y no en la documentacion, que nadie lee mirando un panel. Medirlo de verdad exige consultar la plataforma real con su cuenta y su coste, y eso queda como bloqueo externo, no como casilla verde. Mutacion comprobada: presentada la simulacion como EXECUTED, caen 2 pruebas.",
+   "familia": "ORQUESTACION",
+   "modulos": 7,
+   "motivo": ""
   }
+ },
+ "nota": "Derivado de backend/db/certificacion/capacidades_ia.py. No se edita el conjunto de claves a mano: lo fija el arbol.",
+ "total": 59
 }

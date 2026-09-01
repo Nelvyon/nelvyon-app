@@ -53,7 +53,11 @@ MAPA: list[tuple[str, str, str]] = [
     ("prompts_y_idioma",           "ORQUESTACION", r"os-agents/(AgentPromptVault|prompts/|agentLanguage)"),
     ("creatividad_y_generacion",   "ORQUESTACION", r"os-agents/(creative/|generative/|creators/|logoDesignerAgent|videoEnhancerAgent)"),
     ("visibilidad_y_crm_os",       "ORQUESTACION", r"os-agents/(GeoAiVisibilityService|crm/|advanced/|assets/)"),
-    ("cliente_llm_y_coste",        "ORQUESTACION", r"os-agents/(LlmClient|llm/|llmAsyncContext)"),
+    # `loQueDiceElModelo` es el limite con el modelo por el otro lado: no lo que
+    # se le pide ni lo que cuesta, sino como se LEE lo que devuelve. Va aqui y
+    # no en `varios_del_nucleo` porque un cajon de sastre es donde un modulo
+    # deja de echarse de menos, que es justo lo que este trinquete evita.
+    ("cliente_llm_y_coste",        "ORQUESTACION", r"os-agents/(LlmClient|llm/|llmAsyncContext|loQueDiceElModelo)"),
     ("varios_del_nucleo",          "ORQUESTACION", r"os-agents/(constants|types|index|scripts/)"),
 
     # ── memoria, RAG y conocimiento ─────────────────────────────────────────
