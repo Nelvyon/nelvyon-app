@@ -369,14 +369,18 @@ class WebhookService:
             await self.session.execute(
                 text(
                     """
-                    -- La tabla real —migracion 405, la que gana— llama
-                    -- `webhook_id` a la referencia del endpoint y guarda el
-                    -- resultado en `status_code`, `success` y `attempt`. El
-                    -- writer hablaba la definicion de la 507: registrar una
-                    -- entrega fallaba siempre, y sin ese registro no hay
-                    -- reintentos ni diagnostico de webhooks salientes.
+                    -- `endpoint_id`, NO `webhook_id`. Son dos columnas con
+                    -- dos padres distintos: `webhook_id` referencia `webhooks`
+                    -- (el SaaS por inquilino) y `endpoint_id` referencia
+                    -- `webhook_endpoints` (esta ruta, por espacio de trabajo).
+                    --
+                    -- Antes esto escribia el uuid del endpoint en `webhook_id`,
+                    -- que la 405 ata por clave foranea a `webhooks`. Violaba la
+                    -- restriccion SIEMPRE: ninguna entrega se registraba, y sin
+                    -- registro no hay reintento ni diagnostico. La 593 anadio la
+                    -- columna que faltaba.
                     INSERT INTO webhook_deliveries (
-                        id, webhook_id, workspace_id, event, payload, status_code, response_body,
+                        id, endpoint_id, workspace_id, event, payload, status_code, response_body,
                         success, attempt, created_at
                     )
                     VALUES (
@@ -426,9 +430,10 @@ class WebhookService:
         r = await self.session.execute(
             text(
                 """
-                -- ESQUEMA REAL: la referencia al endpoint es `webhook_id`, el
-                -- contador es `attempt`, y el resultado vive en `success`. No
-                -- hay `status` ni `next_retry_at`.
+                -- ESQUEMA REAL: la referencia al endpoint es `endpoint_id`
+                -- —la columna que anadio la 593—, el contador es `attempt`, y
+                -- el resultado vive en `success`. No hay `status` ni
+                -- `next_retry_at`.
                 --
                 -- Esta consulta pedia CUATRO columnas que no existen, asi que
                 -- lanzaba siempre: los webhooks salientes NO REINTENTABAN NUNCA.
@@ -438,10 +443,10 @@ class WebhookService:
                 -- El backoff se DERIVA de `created_at` y `attempt` en vez de
                 -- guardarse: mismo resultado exponencial sin necesitar una
                 -- columna nueva, y por tanto sin migracion.
-                SELECT d.id, d.webhook_id AS endpoint_id, d.event, d.payload,
+                SELECT d.id, d.endpoint_id, d.event, d.payload,
                        d.attempt AS attempts, e.url, e.secret, e.workspace_id
                 FROM webhook_deliveries d
-                JOIN webhook_endpoints e ON e.id = d.webhook_id
+                JOIN webhook_endpoints e ON e.id = d.endpoint_id
                 WHERE d.success IS NOT TRUE
                   AND d.attempt < :max_attempts
                   AND d.created_at + (LEAST(3600, POWER(2, d.attempt)::int) || ' seconds')::interval <= :now
@@ -482,14 +487,31 @@ class WebhookService:
         endpoint_id: str | None = None,
     ) -> list[dict[str, Any]]:
         await self.ensure_schema()
+        # Esta consulta se quedo hablando ENTERA la definicion de la 507:
+        # `status`, `attempts`, `response_code` y `last_attempt_at` no existen
+        # en la tabla real. Lanzaba `UndefinedColumn` en cada llamada, y esta
+        # expuesta en `GET /webhooks/deliveries`: la lista de entregas devolvia
+        # 500 siempre. Se paso por alto al arreglar el escritor y el relector.
+        #
+        # `status` se DERIVA de `success` y `attempt`, con los mismos tres
+        # valores que usa `_deliver`, en vez de guardarse en una columna.
         q = """
-            SELECT d.id, d.endpoint_id, d.event, d.status, d.attempts,
-                   d.response_code, d.last_attempt_at, d.created_at
+            SELECT d.id, d.endpoint_id, d.event, d.attempt AS attempts,
+                   d.status_code AS response_code, d.created_at,
+                   CASE
+                       WHEN d.success IS TRUE          THEN 'success'
+                       WHEN d.attempt >= :max_attempts THEN 'failed'
+                       ELSE 'retrying'
+                   END AS status
             FROM webhook_deliveries d
             JOIN webhook_endpoints e ON e.id = d.endpoint_id
             WHERE e.workspace_id = :ws
         """
-        params: dict[str, Any] = {"ws": self.workspace_id, "limit": limit}
+        params: dict[str, Any] = {
+            "ws": self.workspace_id,
+            "limit": limit,
+            "max_attempts": MAX_ATTEMPTS,
+        }
         if endpoint_id:
             q += " AND d.endpoint_id = CAST(:endpoint_id AS uuid)"
             params["endpoint_id"] = endpoint_id

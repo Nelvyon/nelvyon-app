@@ -63,7 +63,7 @@ async def _entrega(c, endpoint_id, *, intento: int, exito: bool | None, hace_seg
     """Una fila de entrega como la que deja el servicio tras un intento."""
     return await c.fetchval(
         """INSERT INTO webhook_deliveries
-             (id, webhook_id, workspace_id, event, payload, status_code, response_body,
+             (id, endpoint_id, workspace_id, event, payload, status_code, response_body,
               success, attempt, created_at)
            VALUES ($1, $2, 7, 'pago.creado', $3::jsonb, $4, $5, $6, $7,
                    NOW() - ($8 || ' seconds')::interval)
@@ -76,10 +76,10 @@ async def _entrega(c, endpoint_id, *, intento: int, exito: bool | None, hace_seg
 
 #: La consulta de reintentos, tal y como quedo corregida en el servicio.
 SELECCION = """
-    SELECT d.id, d.webhook_id AS endpoint_id, d.event, d.payload,
+    SELECT d.id, d.endpoint_id, d.event, d.payload,
            d.attempt AS attempts, e.url, e.secret, e.workspace_id
     FROM webhook_deliveries d
-    JOIN webhook_endpoints e ON e.id = d.webhook_id
+    JOIN webhook_endpoints e ON e.id = d.endpoint_id
     WHERE d.success IS NOT TRUE
       AND d.attempt < $1
       AND d.created_at + (LEAST(3600, POWER(2, d.attempt)::int) || ' seconds')::interval <= NOW()
@@ -174,7 +174,10 @@ async def test_el_cierre_de_una_entrega_persiste_de_verdad(conexion, endpoint):
 
 
 @pytest.mark.parametrize("sql,columna", [
-    ("SELECT d.id FROM webhook_deliveries d JOIN webhook_endpoints e ON e.id = d.endpoint_id", "endpoint_id"),
+    # `endpoint_id` ESTABA en esta lista, afirmando que no existia. La 593 la
+    # crea a proposito, asi que ese caso se ha ido de aqui — y ha bajado a
+    # `test_el_endpoint_no_cabe_en_la_columna_del_inquilino`, que reproduce el
+    # fallo de verdad en vez de la ausencia de una columna.
     ("SELECT id FROM webhook_deliveries WHERE status IN ('pending','failed')", "status"),
     ("SELECT id FROM webhook_deliveries WHERE attempts < 3", "attempts"),
     ("SELECT id FROM webhook_deliveries WHERE next_retry_at <= NOW()", "next_retry_at"),
@@ -192,3 +195,43 @@ async def test_la_bateria_detecta_la_implementacion_antigua(conexion, sql, colum
     with pytest.raises(asyncpg.exceptions.UndefinedColumnError) as e:
         await conexion.fetch(sql)
     assert columna in str(e.value)
+
+
+async def test_el_endpoint_no_cabe_en_la_columna_del_inquilino(conexion, endpoint):
+    """MUTACION. La forma ANTERIOR de guardar la referencia viola la foranea.
+
+    `webhook_deliveries` sirve a dos subsistemas con padres disjuntos: el SaaS
+    por inquilino (`webhooks`) y este, por espacio de trabajo
+    (`webhook_endpoints`). El servicio metia el uuid del endpoint en
+    `webhook_id`, que la 405 ata a `webhooks`. No fallaba a veces: fallaba
+    SIEMPRE, y ninguna entrega llegaba a existir.
+
+    Es un fallo mas profundo que las cinco columnas inexistentes: alinear los
+    NOMBRES —que es lo que se intento primero— no cambia a que tabla apunta una
+    clave foranea. Por eso hizo falta la 593.
+    """
+    import asyncpg
+
+    with pytest.raises(asyncpg.exceptions.ForeignKeyViolationError) as e:
+        await conexion.execute(
+            """INSERT INTO webhook_deliveries
+                 (id, webhook_id, workspace_id, event, payload, attempt)
+               VALUES ($1, $2, 7, 'pago.creado', '{}'::jsonb, 1)""",
+            uuid.uuid4(), endpoint)
+    assert "webhook_deliveries_webhook_id_fkey" in str(e.value)
+
+
+async def test_una_entrega_no_puede_quedarse_sin_padre_ni_tener_dos(conexion, endpoint):
+    """La 593 exige EXACTAMENTE uno de los dos.
+
+    Sin esta regla la columna nueva no arregla nada: bastaria con dejar las dos
+    a NULL para volver a tener entregas huerfanas, que es el estado en el que
+    una entrega no se puede reintentar porque no se sabe a donde iba.
+    """
+    import asyncpg
+
+    with pytest.raises(asyncpg.exceptions.CheckViolationError) as e:
+        await conexion.execute(
+            """INSERT INTO webhook_deliveries (id, workspace_id, event, payload, attempt)
+               VALUES ($1, 7, 'pago.creado', '{}'::jsonb, 1)""", uuid.uuid4())
+    assert "webhook_deliveries_un_solo_padre" in str(e.value)
