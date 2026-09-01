@@ -39,6 +39,25 @@ import { describe, expect, it, vi } from "vitest";
 
 import { ColaDeTrabajos } from "../colaDeTrabajos";
 
+/**
+ * Los tokens de estas pruebas se MONTAN EN EJECUCION, en trozos.
+ *
+ * Necesitan la forma exacta de una clave de proyecto de OpenAI —si no la
+ * tuvieran, no comprobarian que el redactor la reconoce—, y una cadena con esa
+ * forma es indistinguible de una viva mirando el fichero. GitHub rechazo un
+ * push entero por una igual. En el fuente no queda ninguna cadena con forma de
+ * credencial; en memoria, durante la prueba, si, que es donde hace falta.
+ *
+ * Es lo mismo que hace `backend/seguridad/__tests__/secretosDeMentira.ts`. No
+ * se importa de alli para que esta bateria no dependa de otro paquete de
+ * pruebas por dos constantes.
+ */
+const montar = (...piezas: readonly string[]) => piezas.join("");
+const PREFIJO_OPENAI = montar("sk", "-", "proj", "-");
+const TOKEN_INVENTADO = montar(PREFIJO_OPENAI, "TokenCompletamenteInventado123");
+const TOKEN_LARGO = montar(PREFIJO_OPENAI, "TokenQueCruzaElLimiteDeDosMil");
+
+
 /** Una base doblada que sólo apunta lo que se le manda escribir. */
 function baseQueApunta() {
   const consultas: Array<{ sql: string; params: unknown[] }> = [];
@@ -69,17 +88,17 @@ describe("lo que un proxy devuelve no acaba en la base", () => {
     const respuestaDelProxy =
       "OpenAI returned non-JSON (HTTP 502). First bytes: " +
       "<html>502 Bad Gateway<br>Request: POST /v1/chat/completions<br>" +
-      "Authorization: Bearer sk" + "-proj-TokenCompletamenteInventado123<br></html>";
+      `Authorization: Bearer ${TOKEN_INVENTADO}<br></html>`;
 
     const guardado = await loQueSeGuarda(respuestaDelProxy);
-    expect(guardado).not.toContain("sk" + "-proj-TokenCompletamenteInventado123");
+    expect(guardado).not.toContain(TOKEN_INVENTADO);
     expect(guardado).toContain("<REDACTADO>");
   });
 
   it("ni recortada: el prefijo del token tampoco", async () => {
     // Es la lección concreta. Un secreto truncado sigue siendo material
     // sensible, y en un token los primeros caracteres son los que más valen.
-    const token = "sk" + "-proj-TokenCompletamenteInventado123";
+    const token = TOKEN_INVENTADO;
     const guardado = await loQueSeGuarda(`fallo: Authorization: Bearer ${token}`);
     for (const n of [10, 16, 24]) {
       expect(guardado, `filtra los primeros ${n} caracteres`).not.toContain(token.slice(0, n));
@@ -143,7 +162,7 @@ describe("el mensaje sigue sirviendo para diagnosticar", () => {
      * Es la misma trampa de siempre con una vuelta de tuerca: no es que
      * recortar no proteja, es que recortar puede DESACTIVAR la protección.
      */
-    const token = "sk" + "-proj-TokenQueCruzaElLimiteDeDosMil";
+    const token = TOKEN_LARGO;
     // Se coloca el token a caballo del corte: empieza antes de 2000 y acaba
     // después.
     // El relleno acaba en espacio: sin frontera de palabra antes del token, el

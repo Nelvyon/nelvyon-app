@@ -104,10 +104,24 @@ def test_el_barrido_reconoce_un_secreto_de_mentira():
     Sin esto, un patron mal escrito daria verde para siempre y nadie lo sabria
     hasta que se filtrara algo de verdad.
     """
-    assert PROHIBIDOS["clave viva de Stripe"].search("sk" + "_live_ABCdef123456789")
-    assert PROHIBIDOS["clave restringida de Stripe"].search("rk" + "_live_51ABCdef123456")
-    assert PROHIBIDOS["clave de AWS"].search("AKIAIOSFODNN7EXAMPLE")
-    assert JWT.search("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhIn0.firma")
+    # Se montan en EJECUCION. Este fichero es el guardia de secretos del arbol,
+    # y sus controles positivos necesitan la forma exacta de una clave real: si
+    # no la tuvieran, no probarian que el patron la reconoce. Pero una cadena
+    # con esa forma ES, para cualquier escaner, una clave real — y la de Stripe
+    # restringida de aqui abajo es exactamente la que hizo que GitHub rechazara
+    # un push entero.
+    #
+    # El guardia no puede ser la razon por la que no se puede publicar el
+    # repositorio que guarda.
+    def montar(*piezas: str) -> str:
+        return "".join(piezas)
+
+    assert PROHIBIDOS["clave viva de Stripe"].search(
+        montar("sk", "_", "live", "_", "ABCdef123456789"))
+    assert PROHIBIDOS["clave restringida de Stripe"].search(
+        montar("rk", "_", "live", "_", "51ABCdef123456"))
+    assert PROHIBIDOS["clave de AWS"].search(montar("AKIA", "IOSFODNN7EXAMPLE"))
+    assert JWT.search(montar("eyJ", "hbGciOiJIUzI1NiJ9", ".", "eyJ", "zdWIiOiJhIn0", ".firma"))
 
 
 def test_no_hay_secretos_prohibidos():
