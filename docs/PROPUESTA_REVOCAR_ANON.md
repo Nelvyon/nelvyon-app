@@ -71,13 +71,33 @@ un PostgREST delante.
 
 Pero lo que de verdad hace falta en `saas_tenants` no es revocar: es **RLS**.
 
-## Propuesta, en dos pasos y por orden
+## Estado tras la 592 — reclasificado
 
-**Primero, lo que cierra el agujero de verdad** — una migración `592` que aplique
-RLS a las 5 tablas que quedaron fuera. Requiere tu autorización aparte.
+**La 592 ya está aplicada en producción.** Las 5 tablas que quedaban —incluida
+`saas_tenants`— tienen ahora RLS + FORCE con la política de su modelo.
 
-**Después, y sólo si decides que Supabase no entra en el plan**, el revoke como
-defensa en profundidad:
+Eso cambia lo que aporta revocar: **ya no queda ninguna tabla donde el grant a
+`anon` sea lo único que separa a un lector anónimo de los datos.** Con RLS y sin
+`request.jwt.claim.sub`, `anon` no ve ni una fila en ninguna.
+
+Y hay una comprobación nueva que refuerza la clasificación: **de los siete roles
+de la base, sólo `postgres` puede conectarse.** `anon`, `authenticated`,
+`nelvyon_app`, `nelvyon_web_app`, `nelvyon_web_jobs` y `service_role` son todos
+`NOLOGIN`. No es que hoy nadie los use: es que hoy nadie *puede* usarlos sin que
+alguien antes les conceda `LOGIN` o ponga un PostgREST delante.
+
+| Clase | Tablas | Razón |
+|---|---:|---|
+| `REVOKE_SAFE` | las 46 de la 591 + las 5 de la 592 | Roles `NOLOGIN`, sin PostgREST, sin SDK, sin `SET ROLE`. Y ahora además con RLS debajo |
+| `REQUIRED_BY_DESIGN` | 0 | Ninguna ruta depende de ellos |
+| `UNKNOWN` | 0 técnicamente | La duda es de intención, no de evidencia |
+
+**Recomendación: revocar es ahora opcional, no urgente.** Era urgente cuando
+`saas_tenants` no tenía RLS; ya la tiene. Queda como higiene —quitar privilegios
+que nadie usa— y como cierre del andamio de Supabase si decides que no entra en
+el plan.
+
+## El revoke, si decides hacerlo
 
 ```sql
 -- NO EJECUTADO. Propuesta.
