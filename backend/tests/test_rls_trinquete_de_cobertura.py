@@ -95,13 +95,21 @@ pytestmark = [
 #:
 #: BLOQUE 10 · el trinquete se aprieta de 4 a 2.
 #: Al aplicar las migraciones pendientes a la base de certificacion, dos de las
-#: cuatro pasaron a tener RLS. Quedan `client_memory` y `saas_tenants`.
+#: cuatro pasaron a tener RLS. Quedaban `client_memory` y `saas_tenants`.
 #:
-#: `saas_tenants` no baja de aqui por si sola, y el motivo esta medido: la
-#: migracion 567 activa RLS SOLO sobre tablas VACIAS, y esa tiene filas. Ver
-#: RLS_SAAS_TENANTS_SOBRE_TABLA_CON_DATOS en decisiones_y_bloqueos.json — es una
-#: decision humana, no una tarea pendiente.
-DEUDA_MAXIMA = 2
+#: `saas_tenants` YA NO ESTA: la cierra la migracion 592, aplicada en produccion.
+#:
+#: Y la razon por la que estuvo aqui tanto tiempo es la que decia este mismo
+#: comentario: la 567 activa RLS SOLO sobre tablas VACIAS, y esa tiene filas.
+#: Resulta que no era una migracion sino SIETE las que saltan las pobladas —era
+#: la metodologia de toda la serie de lotes—, y el «otro lote» que todas
+#: mencionan no llego nunca. La 592 lo cierra para las cinco que quedaban, y
+#: `localVerdeNoEsProduccionSegura` vigila que no aparezca una octava.
+#:
+#: BLOQUE 11 · el trinquete se aprieta de 2 a 1. Queda `client_memory`, que en
+#: produccion esta concedida UNICAMENTE a `nelvyon_app` —un rol NOLOGIN— asi que
+#: no la alcanza ninguna via de aplicacion.
+DEUDA_MAXIMA = 1
 
 #: Margen cero a proposito. Un trinquete con holgura deja de ser un trinquete: la
 #: holgura se consume y nadie se entera.
