@@ -238,6 +238,22 @@ function coreDocs(): KnowledgeSourceEntry[] {
     entry("docs/PHASE2_BENCHMARK_RESULTS.md", "nelvyon", 0, "Benchmark Results"),
     entry("docs/PHASE2_ELITE_CERT.md", "nelvyon", 0, "Phase 2 Elite Cert"),
     entry("docs/PHASE2_RAG_UNIFIED.md", "nelvyon", 1, "Unified RAG"),
+    // ── AUDITORIAS Y PROPUESTAS DEL TRABAJO DE SEGURIDAD Y FACTURACION ────
+    //
+    // Se registran aqui porque el detector de huecos cuenta como huerfano todo
+    // `.md` de la raiz de `docs/` que no este en este manifiesto — y hace bien:
+    // un documento que nadie ha clasificado es conocimiento que la IA no puede
+    // usar y que nadie sabe si sigue vigente.
+    //
+    // Los siete estaban sin clasificar y lo canto la prueba
+    // `nelvyonBrainKnowledge` en cuanto pasaron de cinco.
+    entry("docs/AUDITORIA_DE_LA_CREDENCIAL_EXPUESTA.md", "security_privacy", 1, "Alcance de la credencial expuesta"),
+    entry("docs/PROPUESTA_REVOCAR_ANON.md", "security_privacy", 1, "Clasificacion de los grants de anon"),
+    entry("docs/CONECTORES_ESTADO_HONESTO.md", "development_tech", 1, "Estado real de los doce conectores"),
+    entry("docs/DOS_DUENOS_FUERA_DE_LO_SUYO.md", "development_tech", 1, "Duenos sin fila de pertenencia"),
+    entry("docs/PROPUESTA_DOS_DUENOS_SIN_PERTENENCIA.md", "development_tech", 1, "Propuesta para los dos duenos"),
+    entry("docs/CUATRO_FORMAS_DE_CONTAR_UN_MIEMBRO.md", "finance_operations", 1, "Las cuatro formas de contar un miembro"),
+    entry("docs/CUATRO_CONCEPTOS_QUE_PARECEN_UNO.md", "finance_operations", 0, "Asientos, miembros y topes: cuatro conceptos"),
     entry("docs/DECISIONS.md", "nelvyon", 0, "Architecture Decision Records"),
     ...entries("docs/DECISIONS.md", ["development_tech", "planning_strategy"], 0, "ADRs técnicos"),
     entry("docs/CHANGELOG.md", "nelvyon", 1, "Changelog"),
