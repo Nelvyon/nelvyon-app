@@ -46,6 +46,50 @@ const nextConfig: NextConfig = {
     SENTRY_SUPPRESS_INSTRUMENTATION_FILE_WARNING: "1",
   },
   experimental: {
+    /**
+     * EL BUILD SE QUEDABA SIN MEMORIA CON EL TOPE QUE USA EL DESPLIEGUE.
+     *
+     * `Dockerfile` y `build:prod` fijan `--max-old-space-size=4096`. Con el
+     * arbol de esta tanda, la fase de compilacion tocaba techo a los ~215 s con
+     * el heap en 3.975 MB de 4.142 y moria con «Ineffective mark-compacts».
+     * Reproducido en la condicion EXACTA del despliegue —node:20-alpine, el
+     * Dockerfile real— no solo en local: es decir, el build de Railway habria
+     * fallado.
+     *
+     * Es una REGRESION, medida: el mismo Dockerfile sobre `origin/main`
+     * (3bf8acf3, lo que hay desplegado) compila a 4096 sin problema. El margen
+     * se agoto por crecimiento acumulado del grafo del servidor, que compila
+     * `backend/**` entero con `ts-loader` (ver la clave `webpack` de abajo).
+     *
+     * Esta opcion es la palanca que Next ofrece para exactamente esto: libera
+     * antes las estructuras intermedias de webpack a cambio de algo mas de
+     * tiempo de compilacion. NO sube ningun limite ni pide mas recursos: el
+     * build sigue cabiendo en los 4.096 MB que ya habia.
+     */
+    webpackMemoryOptimizations: true,
+
+    /**
+     * Y CADA COMPILACION EN SU PROPIO PROCESO.
+     *
+     * `webpackMemoryOptimizations` por si sola no bastaba: bajaba el pico lo
+     * justo para morir a los 210 s en vez de a los 217. El problema no es que
+     * una compilacion use mucho, es que TODAS comparten el mismo heap — y el
+     * grueso esta en la del servidor, que compila `backend/**` entero con
+     * `ts-loader` (ver la clave `webpack`).
+     *
+     * Con esto, cliente, servidor y edge se compilan en procesos separados. Al
+     * terminar cada uno se lleva su memoria consigo, y ninguno arrastra lo que
+     * retuvo el anterior.
+     *
+     * HAY QUE PONERLO A MANO. Next lo desactiva solo en cuanto el proyecto
+     * define un `webpack` propio, que es justo lo que hace este —y justo lo que
+     * lo vuelve necesario—.
+     *
+     * Cuesta algo mas de tiempo de compilacion. No cuesta memoria ni recursos:
+     * sigue cabiendo en los 4.096 MB que ya habia.
+     */
+    webpackBuildWorker: true,
+
     externalDir: true,
     optimizePackageImports: [
       "lucide-react",
@@ -93,7 +137,24 @@ const nextConfig: NextConfig = {
     "node:url",
     "node:zlib",
   ],
-  webpack: (config, { isServer }) => {
+  webpack: (config, { isServer, dev }) => {
+    /**
+     * SIN CACHE DE WEBPACK EN EL BUILD DE PRODUCCION.
+     *
+     * webpack guarda una cache de sistema de ficheros y la SERIALIZA al final
+     * de la compilacion. Serializar exige tener a la vez en memoria el grafo y
+     * su forma serializada, y ese pico llega justo cuando el heap ya esta lleno.
+     *
+     * En el despliegue esa cache no sirve para NADA: cada build ocurre en una
+     * capa nueva de Docker, sin nada que reaprovechar. Se paga el pico de
+     * memoria a cambio de un ahorro que no existe.
+     *
+     * En desarrollo si sirve —ahi la recompilacion es lo que importa— y por eso
+     * se conserva.
+     */
+    if (!dev) {
+      config.cache = false;
+    }
     if (isServer) {
       const backendTsConfig = path.resolve(__dirname, "../../backend/tsconfig.json");
       config.module.rules.push({

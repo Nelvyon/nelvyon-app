@@ -120,6 +120,9 @@
       ],
       "web-push": [
         "./node_modules/web-push"
+      ],
+      "vitest": [
+        "./node_modules/vitest"
       ]
     },
     "types": [

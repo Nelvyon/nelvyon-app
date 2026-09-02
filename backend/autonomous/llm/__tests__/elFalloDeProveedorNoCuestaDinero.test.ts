@@ -197,7 +197,13 @@ describe("BLOQUE 6 · un proveedor caido no escala solo a uno de pago", () => {
     process.env.NELVYON_AI_ENABLED = "0";
     process.env.PRIVATE_MODE = "0"; // todo lo demas abierto: solo manda el maestro
 
-    const espia = vi.fn(async () => new Response("{}", { status: 200 }));
+    // Con los argumentos DECLARADOS. Sin ellos el doble es una funcion de cero
+    // parametros, `mock.calls` es una lista de tuplas vacias, y leer `c[0]`
+    // —que es como se comprueba a donde salio la peticion— no compila. Las
+    // pruebas de abajo solo miran SI se llamo; esta mira A DONDE.
+    const espia = vi.fn(
+      async (_recurso?: unknown, _opciones?: unknown) => new Response("{}", { status: 200 }),
+    );
     globalThis.fetch = espia as never;
 
     const { resolveLlmMode, isAutonomousOpenAiAllowed, invokeLlm } = await import("../llmAdapter");

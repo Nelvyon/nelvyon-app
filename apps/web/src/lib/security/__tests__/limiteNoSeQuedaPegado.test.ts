@@ -104,6 +104,7 @@ beforeEach(() => {
 afterEach(() => {
   process.env = { ...ENTORNO };
   vi.unstubAllGlobals();
+  vi.unstubAllEnvs();
 });
 
 describe("la ventana del limite siempre caduca", () => {
@@ -114,7 +115,7 @@ describe("la ventana del limite siempre caduca", () => {
     //
     // Si la respuesta dice que el EXPIRE fallo, la ventana no caducaria, y una
     // regla critica tiene que CERRARSE en vez de seguir contando sobre ella.
-    process.env.NODE_ENV = "production";
+    vi.stubEnv("NODE_ENV", "production");
     process.env.NELVYON_DEPLOY_ENV = "production";
     const { fetchFalso, caducidadDeLaClave } = upstashFalso({ fallaExpire: true });
     vi.stubGlobal("fetch", fetchFalso);
@@ -131,7 +132,7 @@ describe("la ventana del limite siempre caduca", () => {
   it("EL CONTROL de la anterior: con el EXPIRE bien, esa misma regla SI pasa", async () => {
     // Sin este control, un limitador que cerrara siempre en produccion aprobaria
     // la prueba de arriba y dejaria la aplicacion entera fuera de servicio.
-    process.env.NODE_ENV = "production";
+    vi.stubEnv("NODE_ENV", "production");
     process.env.NELVYON_DEPLOY_ENV = "production";
     const { fetchFalso, caducidadDeLaClave } = upstashFalso();
     vi.stubGlobal("fetch", fetchFalso);

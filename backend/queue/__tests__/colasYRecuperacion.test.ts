@@ -19,7 +19,9 @@ import { describe, expect, it, vi } from "vitest";
 
 import { OsEventBus } from "../../os-agents/OsEventBus";
 import { OsQueueWorker } from "../../os-agents/OsQueueWorker";
-import type { OsJob } from "../../os-agents/OsJobStore";
+// De `types`, que es donde se declara. `OsJobStore` lo IMPORTA para usarlo,
+// pero no lo reexporta, asi que pedirselo a el no compila.
+import type { OsJob } from "../../os-agents/types";
 
 /** Almacén en memoria que recuerda qué se le pidió hacer. */
 function almacen(trabajos: OsJob[]) {
