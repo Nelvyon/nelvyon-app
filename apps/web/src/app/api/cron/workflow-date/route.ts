@@ -4,7 +4,20 @@
  * Protected by CRON_SECRET header.
  */
 import { NextResponse } from "next/server";
-import { DbClient } from "../../../../../../../backend/db/DbClient";
+// CONEXION ENTRE INQUILINOS, no la de la peticion.
+//
+// Este cron trabaja sobre TODOS los inquilinos. Con la conexion de peticion
+// funciona hoy solo porque `DATABASE_URL` apunta a `postgres`, que salta RLS.
+// El dia que apunte a `nelvyon_web_app` —el plan `WEB_DB_ROLE_CUTOVER`— las
+// politicas filtrarian fila a fila y este cron NO daria error: devolveria CERO
+// FILAS, indistinguible de «no habia trabajo». Es la averia mas cara de
+// diagnosticar que puede producir ese cambio.
+//
+// `DbJobsClient` usa `NELVYON_WEB_JOBS_DATABASE_URL` y cae a `DATABASE_URL`
+// mientras esa variable no exista, asi que HOY la conducta es exactamente la
+// misma. Lo unico que cambia es que el dia del cutover este cron sigue viendo
+// lo que tiene que ver.
+import { DbJobsClient } from "../../../../../../../backend/db/DbJobsClient";
 import { dispatchDateReached } from "../../../../../../../backend/saas/saasWorkflowDispatch";
 import { verifyCronFlexible } from "@/lib/cronAuth";
 
@@ -19,7 +32,7 @@ export async function POST(req: Request) {
   if (denied) return denied;
 
   // Get all unique tenant_ids that have active date_reached workflows
-  const db = DbClient.getInstance();
+  const db = DbJobsClient.getInstance();
   let rows: { tenant_id: string }[];
   try {
     rows = await db.query<{ tenant_id: string }>(
