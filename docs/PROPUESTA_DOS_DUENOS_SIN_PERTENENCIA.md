@@ -1,111 +1,107 @@
-# Los dos dueños sin fila de pertenencia — propuesta, sin ejecutar
+# Los dos dueños sin pertenencia — auditoría del 2026-09-02
 
-> Medido en producción el 2026-09-01 en **solo lectura**, después de aplicar 590
-> y 591. **No se ha insertado nada.** Requiere autorización aparte.
+> Medido en producción en **solo lectura** con
+> `scripts/auditar-integridad-de-pertenencia.mjs`. **No se ha insertado nada.**
 
-## Lo que hay
+## Lo que se encontró
 
-`workspaces` tiene filas cuyo `user_id` —el dueño— no tiene fila en
-`workspace_members`. Son dos:
-
-| workspace_id | name | slug | status | plan | user_id |
-|---:|---|---|---|---|---|
-| 2 | Mi Workspace | default | active | starter | `4c7c793f…` (36 car.) |
-| 3 | Mi Workspace | default | active | starter | `c758ba32…` (36 car.) |
-
-Toda la tabla `workspace_members` contiene **1 fila**: `owner` / `active`.
-
-## Por qué importa
-
-`nelvyon_user_in_workspace` acepta por dos vías unidas con `OR`:
-
-```sql
-w.user_id = jwt_sub                          -- es el dueño
-wm.user_id = jwt_sub AND wm.status='active'  -- es miembro activo
+```
+workspaces: 3   ·   pertenencias: 1   ·   usuarios: 25
+claves foraneas en `workspaces`: 0
+claves foraneas en `workspace_members`: 0
 ```
 
-Estos dos entran **por la primera**, así que hoy ven sus datos. Lo que no
-ocurre es lo demás: no aparecen en el listado de miembros, no cuentan como
-asiento, y cualquier consulta que parta de `workspace_members` los ignora.
+| WS | Nombre | Estado | Plan | Dueño | ¿El dueño existe como usuario? | Pertenencias |
+|---|---|---|---|---|---|---|
+| 1 | Mi Workspace | active | starter | `35c17b24…` | **sí** | 1 (owner/active) |
+| 2 | Mi Workspace | active | starter | `4c7c793f…` | **sí** | **0** |
+| 3 | Mi Workspace | active | starter | `c758ba32…` | **NO** | **0** |
 
-## Precondición
+**Los dos casos NO son el mismo caso.** Tratarlos igual —que es lo que sugiere
+llamarlos «los dos owners»— sería fabricar datos en uno de ellos.
 
-```sql
--- Debe devolver exactamente 2 filas, con workspace_id 2 y 3.
-SELECT w.id, w.user_id
-  FROM workspaces w
- WHERE NOT EXISTS (
-   SELECT 1 FROM workspace_members m
-    WHERE m.workspace_id = w.id AND m.user_id = w.user_id
- );
-```
+## Por qué importa, y por qué ahora
 
-Si devuelve otra cosa, **parar**: el estado ha cambiado desde esta medición.
+`nelvyon_user_in_workspace`, el predicado del que cuelga toda la RLS por
+workspace, exige una **fila de pertenencia activa**. No mira `workspaces.user_id`.
 
-## La sentencia
+Hoy no duele porque la aplicación se conecta como `postgres`, que salta RLS. Pero
+**el día del cutover a `nelvyon_web_app` los dueños de WS 2 y WS 3 se quedan
+fuera de su propio espacio**, y el síntoma será «no veo nada», no un error.
 
-Es idempotente por dos vías independientes: el `WHERE NOT EXISTS` y el índice
-único `uq_workspace_members_ws_user`. Ejecutarla dos veces no crea duplicados.
+Además `BILLABLE_SEATS` cuenta pertenencias activas: hoy esos dos workspaces
+facturan **cero asientos** mientras existen.
 
-```sql
-BEGIN;
+## WS 2 — reparable. `READY_FOR_HUMAN_AUTHORIZATION`
 
-INSERT INTO workspace_members
-  (workspace_id, user_id, email, role, status, created_at)
-SELECT w.id, w.user_id, NULL, 'owner', 'active', NOW()::text
-  FROM workspaces w
- WHERE NOT EXISTS (
-   SELECT 1 FROM workspace_members m
-    WHERE m.workspace_id = w.id AND m.user_id = w.user_id
- );
-
--- Debe decir 2. Si dice otra cosa, ROLLBACK.
--- COMMIT;
-```
-
-**`role = 'owner'`** porque es lo que son y porque el `CHECK`
-`workspace_members_role_valido` lo admite.
-**`status = 'active'`** porque es el único valor que la migración 590 admite
-para una pertenencia real, y porque `nelvyon_user_in_workspace` exige
-exactamente ése.
-**`email = NULL`** porque la columna lo permite y **no sé cuál es**: ponerlo
-inventado sería peor que dejarlo vacío.
-
-## Postcondición
+El dueño es un usuario real. Falta su fila.
 
 ```sql
--- 0 dueños sin pertenencia
-SELECT count(*) FROM workspaces w
- WHERE NOT EXISTS (SELECT 1 FROM workspace_members m
-                    WHERE m.workspace_id = w.id AND m.user_id = w.user_id);
-
--- 3 filas: la que había más las dos nuevas, todas owner/active
-SELECT workspace_id, role, status FROM workspace_members ORDER BY workspace_id;
+-- NO EJECUTADO. Requiere autorización explícita.
+INSERT INTO public.workspace_members (workspace_id, user_id, email, role, status)
+SELECT w.id,
+       w.user_id,
+       u.email,
+       'owner',
+       'active'
+  FROM public.workspaces w
+  JOIN public.nelvyon_users u ON u.user_id::text = w.user_id::text
+ WHERE w.id = 2
+ON CONFLICT DO NOTHING;
 ```
 
-## Rollback
+**Por qué esta forma exacta:**
 
-```sql
-DELETE FROM workspace_members
- WHERE workspace_id IN (2, 3) AND role = 'owner' AND email IS NULL;
-```
+- **`SELECT … FROM workspaces JOIN nelvyon_users`, no valores escritos a mano.**
+  El `JOIN` es la comprobación: si el dueño no fuera un usuario, la sentencia
+  inserta cero filas en vez de fabricar una pertenencia fantasma.
+- **`ON CONFLICT DO NOTHING`** la hace idempotente. Existe
+  `uq_workspace_members_ws_user` sobre `(workspace_id, user_id)` con `user_id`
+  no vacío, así que ejecutarla dos veces no duplica.
+- **`id` no se da**: tiene `nextval('workspace_members_id_seq')`.
+- **`role = 'owner'`** cumple `workspace_members_role_valido`.
+- **`status = 'active'`** cumple `workspace_members_status_ck`, el CHECK que
+  introdujo la migración 590.
 
-Devuelve exactamente al estado anterior: esas dos filas no existían y ninguna
-otra cumple las tres condiciones a la vez.
+**Efecto medido:**
 
-## Impacto — y aquí está lo que hay que decidir
+| | Antes | Después |
+|---|---|---|
+| Filas insertadas | — | **1** |
+| Asientos facturables del WS 2 | 0 | **1** |
+| Acceso del dueño tras el cutover | denegado | concedido |
+| Reversible | — | sí: `DELETE … WHERE workspace_id=2 AND role='owner'` |
 
-**Estos dos workspaces pasarían de consumir 0 asientos a consumir 1 cada uno.**
+**Cambia facturación** (0 → 1 asiento en plan `starter`). Aunque casi con
+seguridad esté dentro de lo incluido, es un cambio de facturación y por eso se
+documenta en vez de aplicarse.
 
-Un asiento lo consume una pertenencia `active`, y ahora mismo estos dueños no
-tienen ninguna. Al insertarla:
+## WS 3 — NO insertar. `BUSINESS_DECISION_REQUIRED`
 
-- `billing_usage._count_workspace_members` pasaría de 0 a 1 para cada uno;
-- el cliente vería «1 miembro» donde ahora ve «0».
+El dueño `c758ba32-…` **no existe en `nelvyon_users`** (25 usuarios) **ni en
+`saas_tenants`**. El workspace se creó el 2026-08-15.
 
-**Hoy no cambia lo que se cobra**, porque el límite de asientos del plan se
-calcula y se muestra pero no bloquea, y `starter` admite 3. Pero es un cambio en
-un número que alimenta facturación, y por eso no lo hago por mi cuenta.
+Insertarle una pertenencia no sería una reparación: sería **inventar un miembro
+que apunta a nadie**. Y como no hay clave foránea, la base lo aceptaría sin
+protestar — que es precisamente por lo que se llegó a este estado.
 
-Lo demás no cambia: siguen viendo sus datos igual (ya entraban por ser dueños), y
-ninguna política de RLS depende de esta fila para ellos.
+Antes de tocarlo hay que decidir qué es:
+
+- ¿un registro que nunca se completó?
+- ¿una cuenta borrada que dejó su workspace atrás?
+- ¿un workspace de prueba?
+
+Según la respuesta, lo correcto es **archivar el workspace**, **reasignarlo a un
+dueño real**, o **borrarlo** — nunca darle un miembro inventado.
+
+## El defecto de fondo
+
+**Ninguna de las dos tablas tiene claves foráneas.** Por eso la base admite un
+workspace cuyo dueño no existe, y por eso este estado pudo darse en silencio.
+
+Añadirlas hoy exige decidir antes qué se hace con WS 3, porque una `FOREIGN KEY`
+sobre `workspaces.user_id` **no validaría** con esa fila dentro. El orden
+correcto es: decidir WS 3 → limpiar → añadir las claves foráneas.
+
+`scripts/auditar-integridad-de-pertenencia.mjs` vigila las cuatro condiciones
+mientras esas claves no existan.
