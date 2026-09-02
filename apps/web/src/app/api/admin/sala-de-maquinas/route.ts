@@ -28,7 +28,19 @@ import { NextResponse } from "next/server";
 
 import { OsAgentError } from "@nelvyon/os-agents";
 
-import { DbClient } from "@/../../backend/db/DbClient";
+// CONEXION ENTRE INQUILINOS, no la de la peticion.
+//
+// Esta ruta esta declarada sin contexto de inquilino a proposito (ver
+// `test_las_rutas_web_fijan_el_inquilino`): plano de administracion entre inquilinos.
+//
+// Con la conexion de peticion funciona hoy solo porque `DATABASE_URL` apunta a
+// `postgres`, que salta RLS. El dia que apunte a `nelvyon_web_app` —el plan
+// `WEB_DB_ROLE_CUTOVER`— las politicas filtrarian fila a fila y esta ruta NO
+// daria error: devolveria CERO FILAS.
+//
+// `DbJobsClient` cae a `DATABASE_URL` mientras `NELVYON_WEB_JOBS_DATABASE_URL`
+// no exista, asi que HOY no cambia ninguna conducta.
+import { DbJobsClient } from "@/../../backend/db/DbJobsClient";
 import { SalaDeMaquinas } from "@/../../backend/operacion/SalaDeMaquinas";
 import { assertAdmin } from "../_utils";
 
@@ -47,7 +59,7 @@ export const runtime = "nodejs";
 let sala: SalaDeMaquinas | null = null;
 
 function getSala(): SalaDeMaquinas {
-  if (!sala) sala = new SalaDeMaquinas(DbClient.getInstance());
+  if (!sala) sala = new SalaDeMaquinas(DbJobsClient.getInstance());
   return sala;
 }
 

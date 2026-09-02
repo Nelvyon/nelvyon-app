@@ -6,11 +6,11 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 process.env.SKIP_SNS_VERIFY = "true";
 
-// â”€â”€â”€ Mock DbClient â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â”€â”€â”€ Mock DbJobsClient â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const dbUpdates: Array<{ sql: string; params: unknown[] }> = [];
 
-vi.mock("../../db/DbClient", () => ({
-  DbClient: {
+vi.mock("../../db/DbJobsClient", () => ({
+  DbJobsClient: {
     getInstance: () => ({
       query: async (sql: string, params: unknown[]) => {
         dbUpdates.push({ sql: sql.replace(/\s+/g, " ").trim(), params });

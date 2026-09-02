@@ -14,8 +14,8 @@ import { createHmac } from "node:crypto";
 
 const { queryMock } = vi.hoisted(() => ({ queryMock: vi.fn() }));
 
-vi.mock("@/../../backend/db/DbClient", () => ({
-  DbClient: { getInstance: () => ({ query: queryMock }) },
+vi.mock("@/../../backend/db/DbJobsClient", () => ({
+  DbJobsClient: { getInstance: () => ({ query: queryMock }) },
 }));
 
 import { GET } from "@/app/api/saas/lms/cert/[id]/route";

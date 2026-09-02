@@ -6,7 +6,19 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { cssFuentesEmbebidas } from "@/lib/fonts/fuentesEmbebidas";
-import { DbClient } from "@/../../backend/db/DbClient";
+// CONEXION ENTRE INQUILINOS, no la de la peticion.
+//
+// Esta ruta esta declarada sin contexto de inquilino a proposito (ver
+// `test_las_rutas_web_fijan_el_inquilino`): acceso publico por token o id verificable.
+//
+// Con la conexion de peticion funciona hoy solo porque `DATABASE_URL` apunta a
+// `postgres`, que salta RLS. El dia que apunte a `nelvyon_web_app` —el plan
+// `WEB_DB_ROLE_CUTOVER`— las politicas filtrarian fila a fila y esta ruta NO
+// daria error: devolveria CERO FILAS.
+//
+// `DbJobsClient` cae a `DATABASE_URL` mientras `NELVYON_WEB_JOBS_DATABASE_URL`
+// no exista, asi que HOY no cambia ninguna conducta.
+import { DbJobsClient } from "@/../../backend/db/DbJobsClient";
 import { escapeHtml } from "@/../../backend/saas/htmlEscape";
 import { requireHmacSecret } from "@/../../backend/saas/hmacSecret";
 
@@ -37,7 +49,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     return new NextResponse("Certificado no válido o enlace expirado.", { status: 403, headers: { "Content-Type": "text/plain" } });
   }
 
-  const db = DbClient.getInstance();
+  const db = DbJobsClient.getInstance();
   const rows = await db.query<{
     id: string; enrollment_id: string; issued_at: Date;
     contact_name: string | null; contact_email: string; course_title: string;

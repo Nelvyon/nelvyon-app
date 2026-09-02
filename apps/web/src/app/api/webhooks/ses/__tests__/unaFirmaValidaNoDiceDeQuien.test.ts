@@ -34,8 +34,8 @@ import { createSign, generateKeyPairSync } from "crypto";
 
 const consultas: Array<{ sql: string; params: unknown[] }> = [];
 
-vi.mock("../../../../../../../../backend/db/DbClient", () => ({
-  DbClient: {
+vi.mock("../../../../../../../../backend/db/DbJobsClient", () => ({
+  DbJobsClient: {
     getInstance: () => ({
       query: vi.fn(async (sql: string, params: unknown[] = []) => {
         consultas.push({ sql, params });

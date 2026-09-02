@@ -4,8 +4,8 @@ const approveMock = vi.fn();
 const rejectMock = vi.fn();
 const queryMock = vi.fn();
 
-vi.mock("../../db/DbClient", () => ({
-  DbClient: {
+vi.mock("../../db/DbJobsClient", () => ({
+  DbJobsClient: {
     getInstance: () => ({ query: queryMock }),
   },
 }));

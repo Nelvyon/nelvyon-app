@@ -7,7 +7,21 @@
  */
 import { type NextRequest, NextResponse } from "next/server";
 import { createVerify } from "crypto";
-import { DbClient } from "../../../../../../../backend/db/DbClient";
+// CONEXION ENTRE INQUILINOS, no la de la peticion.
+//
+// El inquilino de una notificacion de SES sale del cuerpo firmado del
+// proveedor, no de una sesion: esta ruta esta declarada sin contexto de
+// inquilino a proposito.
+//
+// Con la conexion de peticion funciona hoy solo porque `DATABASE_URL` apunta a
+// `postgres`, que salta RLS. Tras el cutover a `nelvyon_web_app` las politicas
+// filtrarian fila a fila y los rebotes y quejas se registrarian sobre CERO
+// FILAS, sin error: una lista de supresion que deja de crecer en silencio es
+// peor que una que falla, porque se sigue enviando a direcciones muertas.
+//
+// Aqui el cliente aparece tambien como TIPO en cinco firmas auxiliares
+// (`ReturnType<typeof ...getInstance>`), no solo como llamada.
+import { DbJobsClient } from "../../../../../../../backend/db/DbJobsClient";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -122,7 +136,7 @@ function extractIds(mail: SesNotification["mail"]) {
 }
 
 async function markRecipientsBouncedByEmail(
-  db: ReturnType<typeof DbClient.getInstance>,
+  db: ReturnType<typeof DbJobsClient.getInstance>,
   emails: string[],
   tenantId: string,
 ) {
@@ -140,7 +154,7 @@ async function markRecipientsBouncedByEmail(
 }
 
 async function suppressContactsByEmail(
-  db: ReturnType<typeof DbClient.getInstance>,
+  db: ReturnType<typeof DbJobsClient.getInstance>,
   emails: string[],
   tenantId: string,
 ) {
@@ -162,7 +176,7 @@ async function suppressContactsByEmail(
   }
 }
 
-async function handleBounce(db: ReturnType<typeof DbClient.getInstance>, notification: SesNotification) {
+async function handleBounce(db: ReturnType<typeof DbJobsClient.getInstance>, notification: SesNotification) {
   const emails = (notification.bounce?.bouncedRecipients ?? []).map((r) => r.emailAddress);
   const { campaniaId, contactId, tenantId } = extractIds(notification.mail);
 
@@ -184,7 +198,7 @@ async function handleBounce(db: ReturnType<typeof DbClient.getInstance>, notific
   }
 }
 
-async function handleComplaint(db: ReturnType<typeof DbClient.getInstance>, notification: SesNotification) {
+async function handleComplaint(db: ReturnType<typeof DbJobsClient.getInstance>, notification: SesNotification) {
   const { campaniaId, contactId, tenantId } = extractIds(notification.mail);
 
   if (campaniaId && contactId && tenantId) {
@@ -207,7 +221,7 @@ async function handleComplaint(db: ReturnType<typeof DbClient.getInstance>, noti
   }
 }
 
-async function handleDelivery(db: ReturnType<typeof DbClient.getInstance>, notification: SesNotification) {
+async function handleDelivery(db: ReturnType<typeof DbJobsClient.getInstance>, notification: SesNotification) {
   const { campaniaId, contactId, tenantId } = extractIds(notification.mail);
   if (!campaniaId || !contactId || !tenantId) return;
 
@@ -280,7 +294,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "Invalid SES message body" }, { status: 400 });
   }
 
-  const db = DbClient.getInstance();
+  const db = DbJobsClient.getInstance();
 
   if (notification.notificationType === "Bounce") {
     await handleBounce(db, notification);

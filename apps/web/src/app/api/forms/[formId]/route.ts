@@ -3,7 +3,19 @@
  * CORS open so external sites can fetch form config.
  */
 import { NextResponse } from "next/server";
-import { DbClient } from "../../../../../../../backend/db/DbClient";
+// CONEXION ENTRE INQUILINOS, no la de la peticion.
+//
+// Esta ruta esta declarada sin contexto de inquilino a proposito (ver
+// `test_las_rutas_web_fijan_el_inquilino`): formularios publicos: quien los rellena no tiene sesion.
+//
+// Con la conexion de peticion funciona hoy solo porque `DATABASE_URL` apunta a
+// `postgres`, que salta RLS. El dia que apunte a `nelvyon_web_app` —el plan
+// `WEB_DB_ROLE_CUTOVER`— las politicas filtrarian fila a fila y esta ruta NO
+// daria error: devolveria CERO FILAS.
+//
+// `DbJobsClient` cae a `DATABASE_URL` mientras `NELVYON_WEB_JOBS_DATABASE_URL`
+// no exista, asi que HOY no cambia ninguna conducta.
+import { DbJobsClient } from "../../../../../../../backend/db/DbJobsClient";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -19,7 +31,7 @@ export async function GET(
   { params }: { params: Promise<{ formId: string }> },
 ) {
   const { formId } = await params;
-  const db = DbClient.getInstance();
+  const db = DbJobsClient.getInstance();
   const rows = await db.query<{
     id: string;
     name: string;

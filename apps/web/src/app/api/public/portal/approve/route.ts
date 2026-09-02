@@ -10,7 +10,19 @@ import {
   approvePortalDeliverableBff,
   rejectPortalDeliverableBff,
 } from "@/lib/portal/portalDeliverablesStore";
-import { DbClient } from "../../../../../../../../backend/db/DbClient";
+// CONEXION ENTRE INQUILINOS, no la de la peticion.
+//
+// Esta ruta esta declarada sin contexto de inquilino a proposito (ver
+// `test_las_rutas_web_fijan_el_inquilino`): portal por token opaco.
+//
+// Con la conexion de peticion funciona hoy solo porque `DATABASE_URL` apunta a
+// `postgres`, que salta RLS. El dia que apunte a `nelvyon_web_app` —el plan
+// `WEB_DB_ROLE_CUTOVER`— las politicas filtrarian fila a fila y esta ruta NO
+// daria error: devolveria CERO FILAS.
+//
+// `DbJobsClient` cae a `DATABASE_URL` mientras `NELVYON_WEB_JOBS_DATABASE_URL`
+// no exista, asi que HOY no cambia ninguna conducta.
+import { DbJobsClient } from "../../../../../../../../backend/db/DbJobsClient";
 
 /** GET /api/public/portal/approve?token=... — preview deliverable for one-click approval */
 export async function GET(req: Request) {
@@ -20,7 +32,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: verified.error }, { status: 400 });
   }
   const { did, wid, cid, act } = verified.payload;
-  const db = DbClient.getInstance();
+  const db = DbJobsClient.getInstance();
   const rows = await db.query<{ title: string; status: string; client_id: string }>(
     `SELECT title, status, client_id::text FROM os_deliverables WHERE id = $1::uuid AND workspace_id = $2 LIMIT 1`,
     [did, wid],
@@ -67,7 +79,7 @@ export async function POST(req: Request) {
     }
 
     const hash = hashApprovalToken(token);
-    const db = DbClient.getInstance();
+    const db = DbJobsClient.getInstance();
 
     // Atomic single-use claim before any side effects
     const claimed = await db.query<{ id: string }>(

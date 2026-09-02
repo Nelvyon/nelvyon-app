@@ -29,8 +29,8 @@ const efectos: Array<{ accion: string; deliverableId: string; workspaceId: numbe
 let reclamacion: Array<{ id: string }> = [{ id: "tok-1" }];
 let entregable: Array<{ client_id: string }> = [{ client_id: "cli-1" }];
 
-vi.mock("../../../../../../../../../backend/db/DbClient", () => ({
-  DbClient: {
+vi.mock("../../../../../../../../../backend/db/DbJobsClient", () => ({
+  DbJobsClient: {
     getInstance: () => ({
       query: async (sql: string, params: unknown[] = []) => {
         consultas.push({ sql, params });

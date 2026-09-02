@@ -36,8 +36,8 @@ vi.mock("@nelvyon/os-agents", () => ({
   OsAgentError: class OsAgentError extends Error {},
 }));
 
-vi.mock("@/../../backend/db/DbClient", () => ({
-  DbClient: { getInstance: () => ({ query: async () => [] }) },
+vi.mock("@/../../backend/db/DbJobsClient", () => ({
+  DbJobsClient: { getInstance: () => ({ query: async () => [] }) },
 }));
 
 vi.mock("@/../../backend/operacion/SalaDeMaquinas", () => ({

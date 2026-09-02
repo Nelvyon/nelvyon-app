@@ -72,38 +72,20 @@ def _codigo(texto: str) -> str:
 #: excepcion permanente: mientras quede una, el cutover a `nelvyon_web_app`
 #: rompe esa ruta en silencio.
 PENDIENTES_DE_MIGRAR: dict[str, str] = {
-    "app/api/admin/sala-de-maquinas/route.ts":
-        "plano de administracion entre inquilinos",
-    "app/api/billing/checkout/route.ts":
-        "reparacion y auditoria de precios entre inquilinos",
-    "app/api/contact/route.ts":
-        "formulario de contacto publico, sin sesion",
-    "app/api/forms/[formId]/route.ts":
-        "formularios publicos: quien los rellena no tiene sesion",
-    "app/api/forms/[formId]/submit/route.ts":
-        "formularios publicos: quien los rellena no tiene sesion",
-    "app/api/os/health/route.ts":
-        "sonda de salud sin inquilino",
-    "app/api/public/portal/approve/route.ts":
-        "portal por token opaco",
-    "app/api/saas/campanias/unsubscribe/route.ts":
-        "acceso publico por token o id verificable",
-    "app/api/saas/lms/cert/[id]/route.ts":
-        "acceso publico por token o id verificable",
-    "app/api/status/route.ts":
-        "estado publico del servicio",
-    "app/api/store/[subdomain]/checkout/route.ts":
-        "escaparate publico por subdominio",
-    "app/api/track/email/click/[token]/route.ts":
-        "seguimiento por token opaco",
-    "app/api/track/email/open/[token]/route.ts":
-        "seguimiento por token opaco",
-    "app/api/waitlist/route.ts":
-        "lista de espera publica",
-    "app/api/webhooks/ses/route.ts":
-        "el inquilino sale del cuerpo firmado del proveedor",
+    # UNA. De las 22 que usaban la conexion de peticion quedan 21 migradas.
+    #
+    # El webhook de Stripe pasa la conexion a `processStripeEvent`, que la
+    # propaga a 19 sitios tipados como `DbClient`, y de ahi a `dunningService`
+    # y a `resolveUserEmailLocale`: el tipo se filtra por toda la cadena de
+    # facturacion. Se intento desacoplarlo declarando la FORMA que se usa
+    # —solo `query`— y el cambio salio del fichero.
+    #
+    # Migrarlo es un refactor de la cadena de cobro. Hacerlo sin verificarlo
+    # contra flujos reales de Stripe, para ganar una linea en una lista, es
+    # cambiar un riesgo medido por uno que no lo esta. Queda declarado.
     "app/api/webhooks/stripe/route.ts":
-        "el inquilino sale del cuerpo firmado del proveedor",
+        "el tipo `DbClient` se propaga por toda la cadena de facturacion; "
+        "migrarlo exige un refactor verificado contra flujos reales de Stripe",
 }
 
 
