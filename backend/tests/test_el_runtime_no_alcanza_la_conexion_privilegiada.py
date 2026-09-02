@@ -94,6 +94,20 @@ def test_el_cliente_de_las_peticiones_no_lee_la_variable_privilegiada():
         f"consultando con el rol que salta RLS")
 
 
+#: Comentarios de TypeScript. Se quitan antes de buscar lecturas.
+_COMENTARIO_TS = re.compile(r"//[^\n]*|/\*.*?\*/", re.S)
+
+
+def _sin_comentarios(texto: str) -> str:
+    return _COMENTARIO_TS.sub(" ", texto)
+
+
+#: LEER la variable, no nombrarla: `process.env.<VAR>`.
+_LECTURA_PRIVILEGIADA = re.compile(
+    r"process\.env\.\s*" + re.escape(VAR_PRIVILEGIADA)
+    + r"|process\.env\[\s*[\"']" + re.escape(VAR_PRIVILEGIADA))
+
+
 def test_el_cliente_de_las_peticiones_lee_exactamente_una_variable():
     """EL CONTROL. Si no leyera ninguna, la prueba de arriba pasaria vacia."""
     codigo = CLIENTE.read_text(encoding="utf-8")
@@ -105,9 +119,21 @@ def test_el_cliente_de_las_peticiones_lee_exactamente_una_variable():
 
 
 def test_nadie_mas_lee_la_variable_privilegiada():
-    """Que `DbClient` no la lea no sirve si la lee cualquier otro fichero."""
+    """Que `DbClient` no la lea no sirve si la lee cualquier otro fichero.
+
+    SIN COMENTARIOS. Una ruta que se migra a la conexion entre inquilinos deja
+    escrito POR QUE, y para explicarlo tiene que nombrar la variable. Sin
+    sanear, este guardian acusaba a las 20 rutas que hicieron lo correcto y lo
+    documentaron — y la unica forma de callarlo habria sido borrar la
+    explicacion. Empujaba justo en la direccion contraria a la que existe para
+    proteger.
+
+    NOMBRAR no es LEER. Lo que se busca es `process.env.<VAR>`, no la cadena
+    suelta.
+    """
     culpables = [f.relative_to(RAIZ).as_posix() for f in _runtime()
-                 if VAR_PRIVILEGIADA in f.read_text(encoding="utf-8", errors="replace")]
+                 if _LECTURA_PRIVILEGIADA.search(
+                     _sin_comentarios(f.read_text(encoding="utf-8", errors="replace")))]
     permitidos = {"backend/db/DbJobsClient.ts"}   # aun no existe; se creara en el cutover
     sobran = sorted(set(culpables) - permitidos)
     assert not sobran, (
@@ -139,3 +165,22 @@ def test_ningun_fichero_nuevo_construye_su_propio_pool():
         f"declarados: {nuevos}. Cada pool nuevo es una via para alcanzar una "
         f"conexion que la ruta no deberia tener; declaralo con su motivo o usa "
         f"`DbClient`.")
+
+
+def test_nombrar_la_variable_en_un_comentario_no_es_leerla():
+    """CONTROL del saneado, y no es teorico: fallo con las 20 rutas migradas.
+
+    Sin el, la unica forma de callar al guardian seria borrar la explicacion de
+    por que una ruta usa la conexion correcta.
+    """
+    documentada = (
+        "// `DbJobsClient` usa `NELVYON_WEB_JOBS_DATABASE_URL` y cae a DATABASE_URL.@"
+        'import { DbJobsClient } from "x";@'
+    ).replace("@", chr(10))
+    assert not _LECTURA_PRIVILEGIADA.search(_sin_comentarios(documentada)), (
+        "el guardian acusa a una ruta por explicar por que hace lo correcto")
+
+    # Y sigue viendo la lectura de verdad.
+    real = "const u = process.env." + VAR_PRIVILEGIADA + ";"
+    assert _LECTURA_PRIVILEGIADA.search(_sin_comentarios(real)), (
+        "sanear comentarios dejo ciego al guardian")
