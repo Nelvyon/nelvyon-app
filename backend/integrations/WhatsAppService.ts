@@ -1,4 +1,5 @@
 import type { DbClient } from "../db/DbClient";
+import { exigirPuertaDeGasto } from "../coste/exigirPuertaDeGasto";
 import { DbClient as DbClientClass } from "../db/DbClient";
 import { OsAgentError } from "../os-agents/OsAgentError";
 import { fetchWithTimeout } from "../http/fetchWithTimeout";
@@ -178,6 +179,10 @@ export class WhatsAppService {
   }
 
   async sendTextMessage(userId: string, recipient: string, message: string): Promise<{ messageId: string }> {
+    // PUERTA DE GASTO: sin esto, lo unico que lo frena es que falten
+    // credenciales — una guarda por ausencia que desaparece el dia que
+    // se configuren.
+    exigirPuertaDeGasto({ proveedor: "whatsapp", operacion: "enviar_whatsapp" });
     const bodyText = message.trim();
     const to = recipient.trim();
     if (!bodyText || !to) {
@@ -210,6 +215,10 @@ export class WhatsAppService {
     languageCode: string,
     components: ReadonlyArray<Record<string, unknown>>,
   ): Promise<{ messageId: string }> {
+    // PUERTA DE GASTO: sin esto, lo unico que lo frena es que falten
+    // credenciales — una guarda por ausencia que desaparece el dia que
+    // se configuren.
+    exigirPuertaDeGasto({ proveedor: "whatsapp", operacion: "enviar_whatsapp" });
     const to = recipient.trim();
     const name = templateName.trim();
     const lang = languageCode.trim();

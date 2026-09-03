@@ -21,6 +21,16 @@ vi.mock("../../../logger", () => ({
 
 import { MetaAdsExecutor } from "../MetaAdsExecutor";
 
+// La politica de coste esta ENCENDIDA por defecto y deniega el gasto. Esta
+// bateria comprueba la MECANICA del conector, no la politica —que tiene su
+// propia bateria—, asi que se apaga a proposito.
+//
+// No relaja nada: si alguien quitara la puerta del conector, estas pruebas
+// seguirian pasando y `test_ninguna_via_de_gasto_nace_sin_puerta` se pondria
+// roja. Son dos comprobaciones distintas, y ahora estan separadas.
+beforeEach(() => { process.env.NELVYON_MODO_COSTE_CERO = "0"; });
+afterEach(() => { delete process.env.NELVYON_MODO_COSTE_CERO; });
+
 const fetchMock = vi.fn();
 const future = new Date(Date.now() + 60 * 24 * 60 * 60 * 1000);
 

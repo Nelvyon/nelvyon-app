@@ -1,4 +1,5 @@
 import type { DbClient } from "../db/DbClient";
+import { exigirPuertaDeGasto } from "../coste/exigirPuertaDeGasto";
 import { DbClient as DbClientClass } from "../db/DbClient";
 import { OsAgentError } from "../os-agents/OsAgentError";
 import { fetchWithTimeout } from "../http/fetchWithTimeout";
@@ -179,6 +180,10 @@ export class TwilioService {
   }
 
   async sendSms(userId: string, to: string, body: string): Promise<{ messageSid: string }> {
+    // PUERTA DE GASTO: sin esto, lo unico que lo frena es que falten
+    // credenciales — una guarda por ausencia que desaparece el dia que
+    // se configuren.
+    exigirPuertaDeGasto({ proveedor: "twilio", operacion: "enviar_sms" });
     const toNum = to.trim();
     const bodyText = body.trim();
     if (!toNum || !bodyText) {

@@ -8,6 +8,7 @@
  *   TWILIO_TWIML_URL     — optional: TwiML webhook; fallback: inline <Say> greeting
  */
 import { DbClient } from "../db/DbClient";
+import { exigirPuertaDeGasto } from "../coste/exigirPuertaDeGasto";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 
 export class SaasDialerError extends Error {
@@ -63,6 +64,9 @@ async function twilioInitiateCall(
   messageOrUrl: string,
   fetchFn: typeof fetch = fetch,
 ): Promise<string> {
+    // PUERTA DE GASTO: Twilio factura la llamada por minuto. Sin esto, lo
+    // unico que lo frena es que falten credenciales — una guarda por ausencia.
+    exigirPuertaDeGasto({ proveedor: "twilio", operacion: "enviar_mensaje" });
   const url = `https://api.twilio.com/2010-04-01/Accounts/${encodeURIComponent(accountSid)}/Calls.json`;
   const twimlUrl = process.env.TWILIO_TWIML_URL?.trim();
   const params = new URLSearchParams({ To: to, From: from });

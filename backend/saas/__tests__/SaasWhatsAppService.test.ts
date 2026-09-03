@@ -1,5 +1,15 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { SaasWhatsAppService, SaasWhatsAppError, resetSaasWhatsAppServiceForTests } from "../SaasWhatsAppService";
+
+// La politica de coste esta ENCENDIDA por defecto y deniega el gasto. Esta
+// bateria comprueba la MECANICA del conector, no la politica —que tiene su
+// propia bateria—, asi que se apaga a proposito.
+//
+// No relaja nada: si alguien quitara la puerta del conector, estas pruebas
+// seguirian pasando y `test_ninguna_via_de_gasto_nace_sin_puerta` se pondria
+// roja. Son dos comprobaciones distintas, y ahora estan separadas.
+beforeEach(() => { process.env.NELVYON_MODO_COSTE_CERO = "0"; });
+afterEach(() => { delete process.env.NELVYON_MODO_COSTE_CERO; });
 
 beforeEach(() => { resetSaasWhatsAppServiceForTests(); vi.unstubAllEnvs(); });
 

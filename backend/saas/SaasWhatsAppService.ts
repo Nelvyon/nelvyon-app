@@ -7,6 +7,7 @@
  * If credentials not set → throws SaasWhatsAppError with code NOT_CONFIGURED.
  */
 import { DbClient } from "../db/DbClient";
+import { exigirPuertaDeGasto } from "../coste/exigirPuertaDeGasto";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 
 export class SaasWhatsAppError extends Error {
@@ -102,6 +103,10 @@ export class SaasWhatsAppService {
   }
 
   async send(tenantId: string, input: WhatsAppSendInput): Promise<WhatsAppMessage> {
+    // PUERTA DE GASTO: sin esto, lo unico que lo frena es que falten
+    // credenciales — una guarda por ausencia que desaparece el dia que
+    // se configuren.
+    exigirPuertaDeGasto({ proveedor: "whatsapp", operacion: "enviar_whatsapp" });
     if (!input.to.trim()) throw new SaasWhatsAppError("to is required", "VALIDATION");
     if (!input.body.trim()) throw new SaasWhatsAppError("body is required", "VALIDATION");
 

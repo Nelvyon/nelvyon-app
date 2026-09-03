@@ -1,4 +1,5 @@
 import { createLogger } from "../../logger";
+import { exigirPuertaDeGasto } from "../../coste/exigirPuertaDeGasto";
 import { OAuthService } from "../../oauth/OAuthService";
 
 const META_API_VERSION = "v19.0";
@@ -102,6 +103,10 @@ export class MetaAdsExecutor {
     adAccountId: string,
     input: MetaCampaignInput,
   ): Promise<{ campaignId: string }> {
+    // PUERTA DE GASTO: sin esto, lo unico que lo frena es que falten
+    // credenciales — una guarda por ausencia que desaparece el dia que
+    // se configuren.
+    exigirPuertaDeGasto({ proveedor: "meta_ads", operacion: "crear_campana" });
     const accessToken = await this.getAccessToken(userId);
     const body = new URLSearchParams({
       name: input.name,
@@ -131,6 +136,10 @@ export class MetaAdsExecutor {
     adAccountId: string,
     input: MetaAdSetInput,
   ): Promise<{ adSetId: string }> {
+    // PUERTA DE GASTO: sin esto, lo unico que lo frena es que falten
+    // credenciales — una guarda por ausencia que desaparece el dia que
+    // se configuren.
+    exigirPuertaDeGasto({ proveedor: "meta_ads", operacion: "crear_campana" });
     const accessToken = await this.getAccessToken(userId);
     const targeting = {
       age_min: input.ageMin ?? 18,
@@ -170,6 +179,10 @@ export class MetaAdsExecutor {
     adAccountId: string,
     input: MetaAdCreativeInput,
   ): Promise<{ creativeId: string }> {
+    // PUERTA DE GASTO: sin esto, lo unico que lo frena es que falten
+    // credenciales — una guarda por ausencia que desaparece el dia que
+    // se configuren.
+    exigirPuertaDeGasto({ proveedor: "meta_ads", operacion: "crear_campana" });
     const accessToken = await this.getAccessToken(userId);
     const objectStorySpec = {
       page_id: input.pageId,
