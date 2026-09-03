@@ -1,5 +1,7 @@
 import type { OsJobPayload } from "../types";
-import { CLAVE_CONTEXTO, contextoDelCliente } from "./elitePayloadStrings";
+import { CLAVE_CEREBRO, CLAVE_CONTEXTO, contextoDelCliente } from "./elitePayloadStrings";
+import { contextoDeNegocio } from "../contextoDeNegocio";
+import type { Cerebro } from "../../cerebro/CerebroDeNegocioService";
 
 /**
  * Compone el prompt e IMPONE el contexto del cliente.
@@ -15,9 +17,16 @@ import { CLAVE_CONTEXTO, contextoDelCliente } from "./elitePayloadStrings";
 export function buildPrompt(template: string, vars: Record<string, string>): string {
   let out = template;
   for (const [key, value] of Object.entries(vars)) {
-    if (key === CLAVE_CONTEXTO) continue;
+    if (key === CLAVE_CONTEXTO || key === CLAVE_CEREBRO) continue;
     out = out.split(`{${key}}`).join(value);
   }
+  // Las dos se PREPONEN, en este orden: primero lo que NELVYON sabia del
+  // cliente de antes, y encima lo que ha dicho en ESTE encargo. Lo reciente
+  // manda sobre lo archivado.
+  const cerebro = vars[CLAVE_CEREBRO];
+  if (cerebro && cerebro.trim()) out = `${cerebro.trim()}
+
+${out}`;
   const contexto = vars[CLAVE_CONTEXTO];
   return contexto && contexto.trim() ? `${contexto.trim()}\n\n${out}` : out;
 }
@@ -44,8 +53,18 @@ function defaultBrief(payload: OsJobPayload): string {
 }
 
 /** Maps `OsJobPayload` / intake merge fields to string placeholders with descriptive fallbacks. */
-export function webPremiumIntakeStrings(payload: OsJobPayload): Record<string, string> {
+/**
+ * `cerebro` es opcional a proposito: mientras no se le pase, la conducta es
+ * EXACTAMENTE la de hoy. Eso permite conectarlo servicio a servicio, midiendo
+ * cada uno, en vez de cambiarle el prompt a veintinueve agentes de golpe.
+ */
+export function webPremiumIntakeStrings(
+  payload: OsJobPayload,
+  cerebro?: Cerebro | null,
+): Record<string, string> {
   return {
+    // LO QUE NELVYON SABE DEL CLIENTE, no solo lo que ha dicho en el encargo.
+    [CLAVE_CEREBRO]: cerebro === undefined ? "" : contextoDeNegocio("web_premium", cerebro).bloque,
     // EL CONTEXTO REAL DEL CLIENTE, tambien aqui.
     //
     // Esta funcion es una copia paralela de `eliteCommonIntakeStrings`: mismos

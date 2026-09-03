@@ -29,6 +29,22 @@ function defaultBrief(payload: OsJobPayload): string {
  */
 export const CLAVE_CONTEXTO = "__contextoDelCliente";
 
+/**
+ * El contexto que viene del BUSINESS BRAIN, no del encargo.
+ *
+ * `CLAVE_CONTEXTO` trae lo que el cliente dijo en ESTE trabajo. Esta trae lo
+ * que NELVYON SABE de el: dimensiones persistentes con procedencia, confianza y
+ * caducidad, y —lo que mas importa— la lista explicita de lo que NO se sabe.
+ *
+ * Se prepone igual que la otra y por el mismo motivo: son veinticuatro
+ * plantillas y confiar en que todas se acuerden de colocar una variable es
+ * exactamente como se perdio el 60 % de lo que distingue a un cliente.
+ *
+ * Va DESPUES del contexto del encargo a proposito: lo que el cliente acaba de
+ * decir manda sobre lo que se sabia de antes.
+ */
+export const CLAVE_CEREBRO = "__contextoDeNegocio";
+
 function comoLista(v: unknown): string[] {
   if (Array.isArray(v)) {
     return v.filter((x): x is string => typeof x === "string" && x.trim().length > 0).map((x) => x.trim());

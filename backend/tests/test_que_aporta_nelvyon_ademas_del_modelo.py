@@ -7,11 +7,15 @@ es sustituir el nombre del cliente y su sector en una plantilla de prompt fija,
 entonces la estrategia la pone el modelo — y cualquiera con la misma API tiene el
 mismo producto.
 
-SE MIDIO, y el numero es incomodo: de los 29 agentes Premium, DOS reciben
-enriquecimiento real —`Ads` y `Seo`, via `contextEnricher`: datos de Search
-Console, Analytics, Meta Ads y benchmarks por industria—. Los otros 27
-interpolan las palabras del cliente en una plantilla y confian el resto al
-modelo.
+SE MIDIO. De los 29 agentes Premium, tres reciben una fuente que el modelo no
+puede saber solo: `Ads` y `Seo` via `contextEnricher` —Search Console,
+Analytics, Meta Ads y benchmarks por industria— y `Web` via el Business Brain
+—dimensiones persistentes con procedencia, caducidad y huecos declarados—.
+
+Los otros 26 reciben `contextoDelCliente(payload)` —objetivo, USP, ubicacion,
+idioma, mercado, presupuesto y restricciones del ENCARGO— pero nada de lo que
+NELVYON haya aprendido de ese cliente antes. Un cliente de seis meses arranca
+cada trabajo como si fuera el primero.
 
 Eso no los hace inutiles: un buen prompt con los datos del cliente produce
 trabajo aprovechable. Pero es exactamente la diferencia entre «tenemos un
@@ -27,8 +31,9 @@ Que el servicio traiga a la decision algo que el modelo NO puede saber solo:
   · historico medido de ese cliente;
   · reglas de sector que condicionan la salida.
 
-NO cuenta interpolar `{industry}` o `{targetAudience}` en el prompt. Eso es
-pasarle el enunciado al modelo, no razonar sobre el.
+NO cuenta interpolar `{industry}` o `{targetAudience}`, ni el contexto del
+ENCARGO: eso es pasarle al modelo lo que el cliente acaba de decir. Cuenta lo
+que NELVYON sabe y el cliente no ha repetido hoy.
 
 QUE NO DICE ESTA BATERIA
 -------------------------
@@ -55,6 +60,7 @@ _APORTACION_PROPIA = re.compile(
     r"|getBenchmark|INDUSTRY_BENCHMARKS"   # benchmarks de industria medidos
     r"|buildAgentContext|AgentContext"     # el contexto compuesto
     r"|ClientProfileService|clientBrain|os_client_brain"   # el cerebro del cliente
+    r"|contextoDeNegocio|CLAVE_CEREBRO"                    # el Business Brain
     r"|regulacionDeSector|SECTOR_REGISTRY"                 # reglas de sector
     r"|historicoDelCliente|medicionesPrevias",             # su propio historico
 )
@@ -64,7 +70,7 @@ _APORTACION_PROPIA = re.compile(
 #: Medido el 2026-09-03. Subir este numero es trabajo de producto: conectar una
 #: fuente real a un servicio que hoy solo interpola. Bajarlo significa que
 #: alguien desconecto una fuente.
-CON_APORTACION_PROPIA = {"Ads", "Seo"}
+CON_APORTACION_PROPIA = {"Ads", "Seo", "Web"}
 
 
 def _servicios() -> dict[str, str]:
@@ -114,7 +120,7 @@ def test_los_que_aportan_algo_propio_son_los_declarados():
 def test_la_proporcion_esta_medida_y_no_se_disimula():
     """El numero, escrito.
 
-    No es una asercion de calidad: es un recordatorio de que 27 de 29 servicios
+    No es una asercion de calidad: es un recordatorio de que 26 de 29 servicios
     valen lo que valga el modelo que tengan detras. El dia que esa proporcion
     mejore, esta prueba lo dira; el dia que empeore, tambien.
     """
