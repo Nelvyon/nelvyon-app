@@ -1,4 +1,5 @@
 import Stripe from "stripe";
+import type { ConexionSql } from "../db/ConexionSql";
 
 import { CancellationService } from "../billing/cancellationService";
 import { DunningService, resolveTenantIdFromUserId } from "../billing/dunningService";
@@ -46,7 +47,7 @@ function logStripeEvent(event: Stripe.Event, detail: Record<string, unknown>): v
   );
 }
 
-export async function processStripeEvent(event: Stripe.Event, db: DbClient): Promise<void> {
+export async function processStripeEvent(event: Stripe.Event, db: ConexionSql): Promise<void> {
   const dunning = DunningService.getInstance();
 
   switch (event.type) {
@@ -302,7 +303,7 @@ export async function processStripeEvent(event: Stripe.Event, db: DbClient): Pro
   }
 }
 
-export async function handleStripeWebhook(rawBody: string, signatureHeader: string, db: DbClient): Promise<void> {
+export async function handleStripeWebhook(rawBody: string, signatureHeader: string, db: ConexionSql): Promise<void> {
   const event = verifyStripeWebhook(rawBody, signatureHeader);
   await processStripeEvent(event, db);
 }
@@ -316,7 +317,7 @@ function mapStripeStatus(status: Stripe.Subscription.Status): string {
 }
 
 async function upsertSubscription(
-  db: DbClient,
+  db: ConexionSql,
   opts: {
     userId: string;
     stripeSubscriptionId: string | null;
@@ -395,13 +396,13 @@ async function upsertSubscription(
   }
 }
 
-async function downgradeSaasTenantPlan(db: DbClient, userId: string): Promise<void> {
+async function downgradeSaasTenantPlan(db: ConexionSql, userId: string): Promise<void> {
   await db.query(`UPDATE nelvyon_users SET plan = 'starter', updated_at = now() WHERE user_id = $1`, [userId]);
   await db.query(`UPDATE saas_tenants SET plan = 'starter', updated_at = now() WHERE user_id = $1`, [userId]);
 }
 
 async function notifyPlanActivated(
-  db: DbClient,
+  db: ConexionSql,
   userId: string,
   plan: string,
   periodEnd: Date | null,
@@ -427,12 +428,12 @@ async function notifyPlanActivated(
   }
 }
 
-async function getUserEmail(db: DbClient, userId: string): Promise<string | null> {
+async function getUserEmail(db: ConexionSql, userId: string): Promise<string | null> {
   const rows = await db.query<{ email: string }>("SELECT email FROM nelvyon_users WHERE user_id = $1", [userId]);
   return rows[0]?.email ?? null;
 }
 
-async function getSubscriptionStatus(db: DbClient, userId: string): Promise<string | null> {
+async function getSubscriptionStatus(db: ConexionSql, userId: string): Promise<string | null> {
   const rows = await db.query<{ status: string }>(
     `SELECT status FROM subscriptions WHERE user_id = $1 LIMIT 1`,
     [userId],
@@ -440,7 +441,7 @@ async function getSubscriptionStatus(db: DbClient, userId: string): Promise<stri
   return rows[0]?.status ?? null;
 }
 
-async function isTenantSuspended(db: DbClient, userId: string): Promise<boolean> {
+async function isTenantSuspended(db: ConexionSql, userId: string): Promise<boolean> {
   const rows = await db.query<{ plan: string }>(`SELECT plan FROM nelvyon_users WHERE user_id = $1 LIMIT 1`, [userId]);
   return rows[0]?.plan === "suspended";
 }

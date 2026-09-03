@@ -1,4 +1,5 @@
 import { SendEmailCommand } from "@aws-sdk/client-ses";
+import type { ConexionSql } from "../db/ConexionSql";
 
 import type { DbClient } from "../db/DbClient";
 import { DbClient as DbClientSingleton } from "../db/DbClient";
@@ -23,7 +24,7 @@ const FROM = process.env.SES_FROM_EMAIL ?? "no-reply@nelvyon.com";
 export type DunningBannerStatus = "active" | "grace" | "warning" | "suspended";
 
 export class DunningService {
-  constructor(private readonly db: DbClient) {}
+  constructor(private readonly db: ConexionSql) {}
 
   static getInstance(): DunningService {
     return new DunningService(DbClientSingleton.getInstance());
@@ -258,7 +259,7 @@ export class DunningService {
   }
 }
 
-export async function resolveTenantIdFromUserId(db: DbClient, userId: string): Promise<string | null> {
+export async function resolveTenantIdFromUserId(db: ConexionSql, userId: string): Promise<string | null> {
   const rows = await db.query<{ tenant_id: string }>(
     `SELECT tenant_id FROM nelvyon_users WHERE user_id = $1 LIMIT 1`,
     [userId],

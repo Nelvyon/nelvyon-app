@@ -5,8 +5,8 @@ import crypto from "node:crypto";
  * Negativos del webhook principal de Stripe.
  *
  * El fichero vive JUNTO a la ruta a propósito. Desde `backend/stripe/__tests__`
- * el `vi.mock` de `DbClient` no llegaba a aplicarse al módulo que la ruta
- * resuelve, así que `DbClient.getInstance().query` usaba el cliente real, fallaba
+ * el `vi.mock` de `DbJobsClient` no llegaba a aplicarse al módulo que la ruta
+ * resuelve, así que `DbJobsClient.getInstance().query` usaba el cliente real, fallaba
  * por falta de `DATABASE_URL` y la ruta devolvía un 503 genérico. Un 503 no
  * certifica nada: los tests de replay habrían quedado verdes sin llegar nunca al
  * claim. Aquí el especificador del mock es el mismo camino que usa `route.ts`,
@@ -23,7 +23,7 @@ const SECRET = "whsec_secreto_de_pruebas_para_negativos";
 /**
  * `vi.hoisted` es obligatorio: las factorías de `vi.mock` se elevan al inicio del
  * fichero, así que un `const` normal quedaría en TDZ, la factoría lanzaría y se
- * usaría el DbClient REAL.
+ * usaría el DbJobsClient REAL.
  */
 const { estado } = vi.hoisted(() => ({
   estado: {
@@ -48,8 +48,8 @@ const { estado } = vi.hoisted(() => ({
 const AHORA = () => Date.now();
 const DIEZ_MIN = 10 * 60 * 1000;
 
-vi.mock("../../../../../../../../backend/db/DbClient", () => ({
-  DbClient: {
+vi.mock("../../../../../../../../backend/db/DbJobsClient", () => ({
+  DbJobsClient: {
     getInstance: () => {
       estado.instancias += 1;
       return {
@@ -182,7 +182,7 @@ describe("sanity — el doble de Postgres SÍ intercepta a la ruta", () => {
     const payload = evento("evt_sanity", "customer.subscription.updated");
     const res = await POST(peticion(payload, firmar(payload)) as never);
 
-    // 1. La ruta obtuvo su DbClient DEL MOCK.
+    // 1. La ruta obtuvo su DbJobsClient DEL MOCK.
     expect(estado.instancias).toBeGreaterThan(0);
 
     // 2. Le llegó el claim real, con el event.id real como $1.

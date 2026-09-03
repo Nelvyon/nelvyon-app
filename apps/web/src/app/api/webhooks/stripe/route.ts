@@ -1,13 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { DbClient } from "../../../../../../../backend/db/DbClient";
+// CONEXION ENTRE INQUILINOS, no la de la peticion.
+//
+// El inquilino de un evento de Stripe sale del cuerpo FIRMADO por el proveedor,
+// no de una sesion: esta ruta esta declarada sin contexto de inquilino a
+// proposito. Tras el cutover a `nelvyon_web_app` las politicas filtrarian fila
+// a fila y este webhook NO daria error: registraria el cobro sobre CERO FILAS.
+// Un pago que se cobra y no se refleja es la averia mas cara del sistema.
+//
+// SE COMPROBO ANTES DE MIGRARLA, y no es una formalidad: con `nelvyon_web_jobs`
+// no hay red debajo, el aislamiento lo pone cada `WHERE`. Las 36 consultas de
+// la cadena de cobro —ruta, manejador, dunning, cancelacion e idioma— acotan
+// todas por `user_id` o `tenant_id`. Lo fija
+// `test_la_cadena_de_stripe_acota_por_inquilino`.
+//
+// Lo que bloqueaba esta migracion no era el aislamiento: era que el TIPO
+// `DbJobsClient` se propagaba por toda la cadena. Se resolvio declarando la forma
+// que de verdad se usa (`ConexionSql`), no ensanchando a una union.
+import { DbJobsClient } from "../../../../../../../backend/db/DbJobsClient";
 import { verifyStripeWebhook, processStripeEvent } from "../../../../../../../backend/stripe/webhookHandler";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
-  const db = DbClient.getInstance();
+  const db = DbJobsClient.getInstance();
   let eventId: string | undefined;
 
   try {

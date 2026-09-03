@@ -1,4 +1,5 @@
 import type { DbClient } from "../db/DbClient";
+import type { ConexionSql } from "../db/ConexionSql";
 import { resolveEmailLocale, type EmailLocale } from "./localeCopy";
 
 /**
@@ -6,7 +7,7 @@ import { resolveEmailLocale, type EmailLocale } from "./localeCopy";
  * Falls back to es when missing/unsupported (backward compatible).
  */
 export async function resolveUserEmailLocale(
-  db: DbClient,
+  db: ConexionSql,
   userId: string,
 ): Promise<EmailLocale> {
   try {

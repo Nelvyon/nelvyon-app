@@ -1,4 +1,5 @@
 import { SendEmailCommand } from "@aws-sdk/client-ses";
+import type { ConexionSql } from "../db/ConexionSql";
 
 import type { DbClient } from "../db/DbClient";
 import { DbClient as DbClientSingleton } from "../db/DbClient";
@@ -41,7 +42,7 @@ interface UserBillingRow {
 }
 
 export class CancellationService {
-  constructor(private readonly db: DbClient) {}
+  constructor(private readonly db: ConexionSql) {}
 
   static getInstance(): CancellationService {
     return new CancellationService(DbClientSingleton.getInstance());

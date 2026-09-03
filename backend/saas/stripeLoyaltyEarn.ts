@@ -1,9 +1,9 @@
-import type { DbClient } from "../db/DbClient";
+import type { ConexionSql } from "../db/ConexionSql";
 import { getSaasLoyaltyService } from "./SaasLoyaltyService";
 
 /** Award loyalty points when Stripe checkout metadata includes contact_id + purchase amount. */
 export async function maybeEarnLoyaltyFromCheckout(
-  db: DbClient,
+  db: ConexionSql,
   tenantId: string,
   metadata: Record<string, string> | null | undefined,
   amountTotalCents: number | null | undefined,

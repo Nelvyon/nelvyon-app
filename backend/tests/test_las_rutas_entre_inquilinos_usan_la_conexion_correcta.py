@@ -72,20 +72,12 @@ def _codigo(texto: str) -> str:
 #: excepcion permanente: mientras quede una, el cutover a `nelvyon_web_app`
 #: rompe esa ruta en silencio.
 PENDIENTES_DE_MIGRAR: dict[str, str] = {
-    # UNA. De las 22 que usaban la conexion de peticion quedan 21 migradas.
+    # VACIO. Las 22 rutas cross-tenant usan la conexion que sobrevive al
+    # cutover. La ultima —el webhook de Stripe— se migro el 2026-09-03, cuando
+    # se desacoplo el tipo `DbClient` de la cadena de cobro.
     #
-    # El webhook de Stripe pasa la conexion a `processStripeEvent`, que la
-    # propaga a 19 sitios tipados como `DbClient`, y de ahi a `dunningService`
-    # y a `resolveUserEmailLocale`: el tipo se filtra por toda la cadena de
-    # facturacion. Se intento desacoplarlo declarando la FORMA que se usa
-    # —solo `query`— y el cambio salio del fichero.
-    #
-    # Migrarlo es un refactor de la cadena de cobro. Hacerlo sin verificarlo
-    # contra flujos reales de Stripe, para ganar una linea en una lista, es
-    # cambiar un riesgo medido por uno que no lo esta. Queda declarado.
-    "app/api/webhooks/stripe/route.ts":
-        "el tipo `DbClient` se propaga por toda la cadena de facturacion; "
-        "migrarlo exige un refactor verificado contra flujos reales de Stripe",
+    # Una entrada nueva aqui significa que alguien volvio a romper el cutover, y
+    # debe traer su motivo.
 }
 
 
