@@ -21,6 +21,15 @@ import {
   getMetaVerifyToken,
 } from "../SaasWhatsAppCloudService";
 
+  // La politica de coste esta ENCENDIDA por defecto y deniega el envio
+  // facturable. Estas pruebas comprueban la MECANICA del envio, no la politica
+  // —que tiene sus propias baterias—, asi que se apaga a proposito.
+  //
+  // No es relajar nada: si manana alguien quitara la puerta del servicio, estas
+  // pruebas seguirian pasando pero las de la politica se pondrian rojas.
+beforeEach(() => { process.env.NELVYON_MODO_COSTE_CERO = "0"; });
+afterEach(() => { delete process.env.NELVYON_MODO_COSTE_CERO; });
+
 const TENANT = "tenant-wa-cloud";
 const now = new Date();
 

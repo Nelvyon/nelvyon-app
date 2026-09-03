@@ -120,6 +120,26 @@ export class SaasSmsService {
     if (!bodyText) throw new SaasSmsError("body is required", "VALIDATION");
     const creds = getEnvCredentials();
     if (!creds) throw new SaasSmsError("Twilio not configured. Set TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM_NUMBER.", "NOT_CONFIGURED");
+
+    // PUERTA DE GASTO. Un SMS por Twilio se factura por mensaje.
+    //
+    // Lo unico que frenaba esto era que no hubiera credenciales configuradas, y
+    // eso es una guarda por AUSENCIA: el dia que se configuren, el freno
+    // desaparece sin que nadie cambie una linea.
+    //
+    // La politica ya declaraba `enviar_sms` como `mensaje_facturable`. Solo
+    // faltaba preguntar. Se comprueba en `send`, por donde pasa tambien
+    // `sendBulk`: gatear el envio masivo por separado dejaria fuera el unitario.
+    const { decidirCoste, apuntar } = await import("../coste/PoliticaDeCosteCero");
+    const op = { proveedor: "twilio", operacion: "enviar_sms", tenantId };
+    const veredicto = decidirCoste(op);
+    apuntar(op, veredicto);
+    if (!veredicto.permitido) {
+      throw new SaasSmsError(
+        `envio denegado por la politica de coste (${veredicto.motivo}): ${veredicto.porQue}`,
+        "NOT_CONFIGURED",
+      );
+    }
     try {
       const sid = await twilioSend(creds.accountSid, creds.authToken, creds.fromNumber, toNum, bodyText, this.fetchImpl);
       await this.logSms(tenantId, toNum, bodyText, sid, "sent");

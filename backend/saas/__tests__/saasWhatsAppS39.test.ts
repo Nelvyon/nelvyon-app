@@ -9,6 +9,12 @@ import {
   SaasWhatsAppCloudError,
 } from "../SaasWhatsAppCloudService";
 
+// La politica de coste esta ENCENDIDA por defecto y deniega el envio
+// facturable. Esta bateria comprueba la MECANICA de `sendTemplate`, no la
+// politica —que tiene su propia bateria—, asi que se apaga a proposito.
+beforeEach(() => { process.env.NELVYON_MODO_COSTE_CERO = "0"; });
+afterEach(() => { delete process.env.NELVYON_MODO_COSTE_CERO; });
+
 const TENANT = "t-s39";
 const now = new Date();
 

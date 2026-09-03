@@ -338,6 +338,25 @@ export class SaasWhatsAppCloudService {
     if (!input.to.trim()) throw new SaasWhatsAppCloudError("to is required", "VALIDATION");
     if (!input.templateName.trim()) throw new SaasWhatsAppCloudError("templateName is required", "VALIDATION");
 
+    // PUERTA DE GASTO. Meta cobra por conversacion abierta.
+    //
+    // Lo unico que frenaba esto era que no hubiera credenciales configuradas, y
+    // eso es una guarda por AUSENCIA: el dia que se configuren, el freno
+    // desaparece sin que nadie cambie una linea. La politica ya declaraba
+    // `whatsapp` como PAID y `enviar_whatsapp` como `mensaje_facturable`; lo
+    // unico que faltaba era preguntar.
+    const { decidirCoste: __decidir, apuntar: __apuntar } =
+      await import("../coste/PoliticaDeCosteCero");
+    const __op = { proveedor: "whatsapp", operacion: "enviar_whatsapp", tenantId };
+    const __v = __decidir(__op);
+    __apuntar(__op, __v);
+    if (__v.permitido !== true) {
+      throw new SaasWhatsAppCloudError(
+        `envio denegado por la politica de coste (${__v.motivo}): ${__v.porQue}`,
+        "NOT_CONFIGURED",
+      );
+    }
+
     const creds = getMetaCreds();
     if (!creds) throw new SaasWhatsAppCloudError("WhatsApp Cloud API not configured", "NOT_CONFIGURED");
 
@@ -434,6 +453,25 @@ export class SaasWhatsAppCloudService {
     if (!input.to.trim()) throw new SaasWhatsAppCloudError("to is required", "VALIDATION");
     if (!input.body?.trim() && !input.templateName) {
       throw new SaasWhatsAppCloudError("body or templateName is required", "VALIDATION");
+    }
+
+    // PUERTA DE GASTO. Meta cobra por conversacion abierta.
+    //
+    // Lo unico que frenaba esto era que no hubiera credenciales configuradas, y
+    // eso es una guarda por AUSENCIA: el dia que se configuren, el freno
+    // desaparece sin que nadie cambie una linea. La politica ya declaraba
+    // `whatsapp` como PAID y `enviar_whatsapp` como `mensaje_facturable`; lo
+    // unico que faltaba era preguntar.
+    const { decidirCoste: __decidir, apuntar: __apuntar } =
+      await import("../coste/PoliticaDeCosteCero");
+    const __op = { proveedor: "whatsapp", operacion: "enviar_whatsapp", tenantId };
+    const __v = __decidir(__op);
+    __apuntar(__op, __v);
+    if (__v.permitido !== true) {
+      throw new SaasWhatsAppCloudError(
+        `envio denegado por la politica de coste (${__v.motivo}): ${__v.porQue}`,
+        "NOT_CONFIGURED",
+      );
     }
 
     const creds = getMetaCreds();
