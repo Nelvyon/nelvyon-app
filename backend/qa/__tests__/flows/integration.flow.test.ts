@@ -31,6 +31,13 @@ import { decrypt, encrypt } from "../../../oauth/OAuthService";
 import { GoogleAdsExecutor } from "../../../integrations/google/GoogleAdsExecutor";
 import { MetaAdsExecutor } from "../../../integrations/meta/MetaAdsExecutor";
 
+// La politica de coste deniega ANTES de mirar credenciales, y ese orden es
+// deliberado: no se consulta el almacen OAuth para una operacion que no va a
+// ocurrir. Estas pruebas comprueban la ruta de CONEXION, asi que apagan la
+// politica para llegar hasta ella.
+beforeEach(() => { process.env.NELVYON_MODO_COSTE_CERO = "0"; });
+afterEach(() => { delete process.env.NELVYON_MODO_COSTE_CERO; });
+
 const future = new Date("2027-01-01T00:00:00.000Z");
 
 describe("flow: integraciones — Google Ads + Meta Ads (OAuth mockeado)", () => {
