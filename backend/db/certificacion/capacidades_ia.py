@@ -46,7 +46,11 @@ MAPA: list[tuple[str, str, str]] = [
     ("recuperacion_ante_fallos",   "ORQUESTACION", r"os-agents/(OsAgentError|healthcheck/)"),
     ("evaluacion_de_calidad",      "ORQUESTACION", r"os-agents/(AgentQualityService|quality/|benchmarks/)"),
     ("intake_y_objetivo",          "ORQUESTACION", r"os-agents/(IntakeFormService|intakeSchemas|IntentMulticanalService)"),
-    ("conocimiento_del_cliente",   "ORQUESTACION", r"os-agents/(client-profile/|contextEnricher|seedPersonalizer|seeds/)"),
+    # `contextoDeNegocio` es el puente del Business Brain al prompt del agente:
+    # lo que NELVYON SABE del cliente, con procedencia y huecos declarados. Va
+    # aqui y no en un cajon de sastre porque es conocimiento del cliente, que
+    # es justo lo que esta capacidad agrupa.
+    ("conocimiento_del_cliente",   "ORQUESTACION", r"os-agents/(client-profile/|contextEnricher|contextoDeNegocio|seedPersonalizer|seeds/)"),
     ("reporting_y_roi",            "ORQUESTACION", r"os-agents/(OsReportingService|ClosedLoopRoiService|PredictiveRoiService|attribution/|ab-testing/)"),
     ("entregables_y_certificados", "ORQUESTACION", r"os-agents/(OsSectorCertificationService|packs/|artifacts/|watermark)"),
     ("aprendizaje_autonomo",       "ORQUESTACION", r"os-agents/(learning/|upsell/)"),

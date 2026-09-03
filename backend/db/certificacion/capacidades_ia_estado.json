@@ -45,9 +45,9 @@
   },
   "conocimiento_del_cliente": {
    "estado": "PASS_CERTIFIED",
-   "evidencia": "Cubierto por multinicho.test.ts y losVeinticincoServiciosPremium.test.ts. Lo que define esta capacidad es que el contexto del cliente LLEGUE y CAMBIE el resultado, y eso es exactamente lo que demuestran las dos suites: siete clases de negocio producen peticiones distintas, las restricciones legales del cliente viajan con el encargo, y ningun agente nombra un cliente concreto. `ClientProfileService` acota todas sus consultas por `userId`.",
+   "evidencia": "Cubierto por multinicho.test.ts y losVeinticincoServiciosPremium.test.ts. Lo que define esta capacidad es que el contexto del cliente LLEGUE y CAMBIE el resultado, y eso es exactamente lo que demuestran las dos suites: siete clases de negocio producen peticiones distintas, las restricciones legales del cliente viajan con el encargo, y ningun agente nombra un cliente concreto. `ClientProfileService` acota todas sus consultas por `userId`. Y backend/os-agents/__tests__/elCerebroLlegaAlAgente.test.ts - 9 pruebas sobre `contextoDeNegocio`, el puente del Business Brain al prompt: dos clientes distintos producen contexto distinto, lo que NO se sabe se NOMBRA en vez de dejarse en silencio —un hueco callado invita al modelo a inventarlo—, la procedencia viaja con el dato (lo dicho por el cliente no es lo deducido por un agente), un dato caducado cuenta como hueco y no como conocimiento, sin cerebro falla cerrado en vez de devolver un bloque vacio que se leeria como «no hay restricciones», y no pasarlo deja la conducta identica — que es lo que permite conectarlo servicio a servicio.",
    "familia": "ORQUESTACION",
-   "modulos": 8,
+   "modulos": 9,
    "motivo": ""
   },
   "contexto_de_negocio": {
