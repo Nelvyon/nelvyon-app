@@ -77,8 +77,8 @@ describe("BLOQUE 4 · un componente roto no aparece sano", () => {
     // Sin esto, una comprobación que devolviera siempre `down` pasaría las
     // pruebas de abajo y dejaría el servicio permanentemente fuera de rotación.
     vi.resetModules();
-    vi.doMock("../../db/DbClient", () => ({
-      DbClient: { getInstance: () => ({ query: async () => [{ "?column?": 1 }] }) },
+    vi.doMock("../../db/DbJobsClient", () => ({
+      DbJobsClient: { getInstance: () => ({ query: async () => [{ "?column?": 1 }] }) },
     }));
     const { checkDatabase } = await import("../healthChecks");
     expect((await checkDatabase()).status).toBe("ok");
@@ -88,8 +88,8 @@ describe("BLOQUE 4 · un componente roto no aparece sano", () => {
     // El fallo que hace inútil un healthcheck. Si devolviera `ok`, el
     // balanceador seguiría mandando tráfico a una instancia que no puede servir.
     vi.resetModules();
-    vi.doMock("../../db/DbClient", () => ({
-      DbClient: {
+    vi.doMock("../../db/DbJobsClient", () => ({
+      DbJobsClient: {
         getInstance: () => ({
           query: async () => {
             throw new Error("ECONNREFUSED 10.0.0.5:5432 password=secreto123");
@@ -106,8 +106,8 @@ describe("BLOQUE 4 · un componente roto no aparece sano", () => {
     // `/health` lo mira cualquiera. El mensaje del motor lleva host, puerto y a
     // veces la contraseña.
     vi.resetModules();
-    vi.doMock("../../db/DbClient", () => ({
-      DbClient: {
+    vi.doMock("../../db/DbJobsClient", () => ({
+      DbJobsClient: {
         getInstance: () => ({
           query: async () => {
             throw new Error("ECONNREFUSED 10.0.0.5:5432 password=secreto123 user=nelvyon_app");

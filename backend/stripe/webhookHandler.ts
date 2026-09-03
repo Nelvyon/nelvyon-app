@@ -5,7 +5,6 @@ import { CancellationService } from "../billing/cancellationService";
 import { DunningService, resolveTenantIdFromUserId } from "../billing/dunningService";
 import { mapStripePriceToNelvyon } from "./stripeApi";
 import { mapBillablePlanToSaasPlan, shouldSyncSaasTenantPlan } from "../saas/saasTenantMapper";
-import type { DbClient } from "../db/DbClient";
 import { sendEmail } from "../email";
 import { dateLocaleTag, resolveUserEmailLocale } from "../email/resolveUserEmailLocale";
 import { completeStep } from "../onboarding";

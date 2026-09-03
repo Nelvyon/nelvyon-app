@@ -1,4 +1,4 @@
-import type { DbClient } from "../db/DbClient";
+import type { ConexionSql } from "../db/ConexionSql";
 import { DbClient as DbClientSingleton } from "../db/DbClient";
 
 export interface EarlyAdopterStatus {
@@ -18,7 +18,7 @@ interface ConfigRow {
 }
 
 export class EarlyAdopterService {
-  constructor(private readonly db: DbClient) {}
+  constructor(private readonly db: ConexionSql) {}
 
   static getInstance(): EarlyAdopterService {
     return new EarlyAdopterService(DbClientSingleton.getInstance());

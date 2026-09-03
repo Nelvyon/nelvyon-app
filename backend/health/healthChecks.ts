@@ -1,4 +1,9 @@
-import { DbClient } from "../db/DbClient";
+// CONEXION ENTRE INQUILINOS: este modulo lo alcanzan rutas sin contexto de
+// inquilino (sondas de salud, estado publico, aprobacion por token). Tras el
+// cutover a `nelvyon_web_app` la conexion de peticion devolveria CERO FILAS sin
+// error. `DbJobsClient` cae a `DATABASE_URL` mientras la variable dedicada no
+// exista, asi que hoy no cambia ninguna conducta.
+import { DbJobsClient } from "../db/DbJobsClient";
 import { sanitizeEnvValue } from "../db/envSanitize";
 import { isNelvyonAiEnabled } from "../private-ai/config";
 import { isSesEnvConfigured, isStripeEnvConfigured, isOpenAiEnvConfigured, missingEnvKeys } from "../saas/saasEnv";
@@ -60,7 +65,7 @@ export async function checkDatabase(timeoutMs = 3000): Promise<HealthCheckResult
   return withGlobalCap(async () => {
     const started = Date.now();
     try {
-      await Promise.race([DbClient.getInstance().query(`SELECT 1`), sleepReject(timeoutMs)]);
+      await Promise.race([DbJobsClient.getInstance().query(`SELECT 1`), sleepReject(timeoutMs)]);
       return { status: "ok", latencyMs: Date.now() - started };
     } catch {
       return {

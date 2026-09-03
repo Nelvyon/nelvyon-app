@@ -1,4 +1,9 @@
-import { DbClient } from "../db/DbClient";
+// CONEXION ENTRE INQUILINOS: este modulo lo alcanzan rutas sin contexto de
+// inquilino (sondas de salud, estado publico, aprobacion por token). Tras el
+// cutover a `nelvyon_web_app` la conexion de peticion devolveria CERO FILAS sin
+// error. `DbJobsClient` cae a `DATABASE_URL` mientras la variable dedicada no
+// exista, asi que hoy no cambia ninguna conducta.
+import { DbJobsClient } from "../db/DbJobsClient";
 import {
   checkDatabase,
   checkSES,
@@ -49,7 +54,7 @@ export async function checkService(
 }
 
 async function persistCheck(
-  db: ReturnType<typeof DbClient.getInstance>,
+  db: ReturnType<typeof DbJobsClient.getInstance>,
   service: string,
   status: ServiceStatus,
   latencyMs: number,
@@ -62,7 +67,7 @@ async function persistCheck(
 }
 
 export async function runAllChecks(baseUrl: string): Promise<void> {
-  const db = DbClient.getInstance();
+  const db = DbJobsClient.getInstance();
 
   for (const service of HTTP_SERVICES_TO_CHECK) {
     const { status, latencyMs } = await checkService(service, baseUrl);
@@ -87,7 +92,7 @@ export async function runAllChecks(baseUrl: string): Promise<void> {
 export async function getCurrentStatus(): Promise<
   Record<string, { status: ServiceStatus; latencyMs: number; checkedAt: string }>
 > {
-  const db = DbClient.getInstance();
+  const db = DbJobsClient.getInstance();
   const rows = await db.query<{
     service: string;
     status: string;

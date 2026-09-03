@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { DbClient } from "../../db/DbClient";
+import { DbJobsClient } from "../../db/DbJobsClient";
 import {
   aggregateHealthStatus,
   checkDatabase,
@@ -9,8 +9,8 @@ import {
   runDeepHealthChecks,
 } from "../healthChecks";
 
-vi.mock("../../db/DbClient", () => ({
-  DbClient: {
+vi.mock("../../db/DbJobsClient", () => ({
+  DbJobsClient: {
     getInstance: vi.fn(),
   },
 }));
@@ -20,16 +20,16 @@ describe("healthChecks", () => {
   const originalFetch = global.fetch;
 
   beforeEach(() => {
-    vi.mocked(DbClient.getInstance).mockReturnValue({
+    vi.mocked(DbJobsClient.getInstance).mockReturnValue({
       query: vi.fn().mockResolvedValue([{ ok: 1 }]),
-    } as unknown as InstanceType<typeof DbClient>);
+    } as unknown as InstanceType<typeof DbJobsClient>);
   });
 
   afterEach(() => {
     process.env = { ...originalEnv };
     global.fetch = originalFetch;
     vi.useRealTimers();
-    vi.mocked(DbClient.getInstance).mockReset();
+    vi.mocked(DbJobsClient.getInstance).mockReset();
   });
 
   it("checkDatabase ok → status ok y latencyMs > 0", async () => {
@@ -40,9 +40,9 @@ describe("healthChecks", () => {
 
   it("checkDatabase timeout → status down", async () => {
     vi.useFakeTimers();
-    vi.mocked(DbClient.getInstance).mockReturnValue({
+    vi.mocked(DbJobsClient.getInstance).mockReturnValue({
       query: () => new Promise(() => {}),
-    } as unknown as InstanceType<typeof DbClient>);
+    } as unknown as InstanceType<typeof DbJobsClient>);
     const p = checkDatabase(25);
     await vi.advanceTimersByTimeAsync(40);
     const r = await p;
@@ -105,14 +105,14 @@ describe("/api/health/deep GET", () => {
   afterEach(() => {
     process.env = { ...originalEnv };
     global.fetch = originalFetch;
-    vi.mocked(DbClient.getInstance).mockReset();
+    vi.mocked(DbJobsClient.getInstance).mockReset();
     vi.resetModules();
   });
 
   async function setupAllChecksPassing() {
-    vi.mocked(DbClient.getInstance).mockReturnValue({
+    vi.mocked(DbJobsClient.getInstance).mockReturnValue({
       query: vi.fn().mockResolvedValue([{ ok: 1 }]),
-    } as unknown as InstanceType<typeof DbClient>);
+    } as unknown as InstanceType<typeof DbJobsClient>);
     process.env.UPSTASH_REDIS_REST_URL = "https://redis-hc.test";
     process.env.UPSTASH_REDIS_REST_TOKEN = "token";
     process.env.SES_ACCESS_KEY_ID = "AKIATEST";
@@ -165,9 +165,9 @@ describe("/api/health/deep GET", () => {
 
   it("retorna 503 cuando database down", async () => {
     await setupAllChecksPassing();
-    vi.mocked(DbClient.getInstance).mockReturnValue({
+    vi.mocked(DbJobsClient.getInstance).mockReturnValue({
       query: vi.fn().mockRejectedValue(new Error("internal db failure")),
-    } as unknown as InstanceType<typeof DbClient>);
+    } as unknown as InstanceType<typeof DbJobsClient>);
     const { GET } = await import("../../../apps/web/src/app/api/health/deep/route");
     const res = await GET(deepHealthRequest() as import("next/server").NextRequest);
     expect(res.status).toBe(503);
@@ -178,9 +178,9 @@ describe("/api/health/deep GET", () => {
 
   it("runDeepHealthChecks no expone stack en errores", async () => {
     await setupAllChecksPassing();
-    vi.mocked(DbClient.getInstance).mockReturnValue({
+    vi.mocked(DbJobsClient.getInstance).mockReturnValue({
       query: vi.fn().mockRejectedValue(new Error("secret stack trace")),
-    } as unknown as InstanceType<typeof DbClient>);
+    } as unknown as InstanceType<typeof DbJobsClient>);
     const body = await runDeepHealthChecks();
     expect(body.checks.database.error).toBe("Connection failed");
     expect(JSON.stringify(body)).not.toContain("secret");

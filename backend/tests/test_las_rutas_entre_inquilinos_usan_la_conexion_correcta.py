@@ -54,6 +54,10 @@ from tests.test_las_rutas_web_fijan_el_inquilino import (
 _USA_CLIENTE_WEB = re.compile(r"(?<![A-Za-z])DbClient\b")
 _USA_CLIENTE_JOBS = re.compile(r"\bDbJobsClient\b")
 
+#: CONSTRUIR la conexion de peticion, no solo nombrar su tipo. Un servicio que
+#: la recibe por parametro no rompe el cutover; uno que la construye, si.
+_CONSTRUYE_CLIENTE_WEB = re.compile(r"(?<![A-Za-z])DbClient\.getInstance")
+
 #: Comentarios de TypeScript. Se quitan ANTES de buscar.
 #:
 #: Una ruta migrada explica en un comentario POR QUE ya no usa la conexion de
@@ -205,3 +209,64 @@ def test_existe_la_conexion_entre_inquilinos():
     fuente = cliente.read_text(encoding="utf-8", errors="replace")
     assert "NELVYON_WEB_JOBS_DATABASE_URL" in fuente, (
         "DbJobsClient dejo de leer su propia variable: ya no se separa en el cutover")
+
+
+#: Importaciones relativas, para seguir UN salto desde la ruta al servicio.
+_IMPORTA = re.compile(r'from\s+"(\.[^"]*)"')
+
+
+def _resolver(base: pathlib.Path, spec: str) -> pathlib.Path | None:
+    for cand in (base.parent / spec, base.parent / spec / "index"):
+        for ext in (".ts", ".tsx"):
+            f = cand.with_suffix(ext) if not cand.name.endswith(ext) else cand
+            if f.is_file():
+                return f
+    return None
+
+
+def test_ningun_servicio_alcanzado_desde_una_ruta_cross_tenant_construye_la_conexion_de_peticion():
+    """UN SALTO MAS ALLA DE LA RUTA.
+
+    Una ruta puede estar migrada y romperse igual: si delega en un servicio que
+    hace `DbClient.getInstance()` por su cuenta, el cutover deja ese servicio
+    devolviendo cero filas y la ruta no se entera.
+
+    Paso de verdad y no era teorico: tres servicios lo hacian —la sonda de
+    salud, el estado publico y la aprobacion del portal por token—. El ultimo es
+    el que mas duele: un cliente aprobando un entregable, sin sesion, sobre cero
+    filas.
+
+    SOLO UN SALTO, a proposito. Con profundidad ilimitada casi todo alcanza a
+    casi todo y el guardian dejaria de distinguir.
+    """
+    culpables = []
+    for rel, texto in _rutas_entre_inquilinos():
+        ruta = WEB / rel
+        for spec in _IMPORTA.findall(_codigo(texto)):
+            dep = _resolver(ruta, spec)
+            if dep is None:
+                continue
+            codigo = _codigo(dep.read_text(encoding="utf-8", errors="replace"))
+            construye = _CONSTRUYE_CLIENTE_WEB.search(codigo)
+            if construye and not _USA_CLIENTE_JOBS.search(codigo):
+                culpables.append(f"{rel} -> {dep.name}")
+
+    assert not culpables, (
+        "estos servicios construyen la conexion de peticion y los alcanza una "
+        "ruta entre inquilinos. Tras el cutover devolveran CERO FILAS sin "
+        "error:" + chr(10) + "  " + (chr(10) + "  ").join(sorted(set(culpables)))
+    )
+
+
+def test_el_detector_de_construccion_funciona():
+    """CONTROL, y no es hipotetico: la primera version de este patron llevaba una
+    barra invertida de mas y no casaba NUNCA. La prueba de arriba pasaba en
+    vacio, que es la peor forma de pasar: dice que no hay problema porque no
+    esta mirando.
+    """
+    construye = "const db = DbClient.getInstance();"
+    recibe = "constructor(private readonly db: ConexionSql) {}"
+    migrado = "const db = DbJobsClient.getInstance();"
+    assert _CONSTRUYE_CLIENTE_WEB.search(construye), "el detector no ve una construccion real"
+    assert not _CONSTRUYE_CLIENTE_WEB.search(recibe), "acusa a quien solo la recibe"
+    assert not _CONSTRUYE_CLIENTE_WEB.search(migrado), "confunde DbJobsClient con DbClient"

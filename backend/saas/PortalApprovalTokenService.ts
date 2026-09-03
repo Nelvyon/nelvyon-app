@@ -75,8 +75,13 @@ export async function createPortalApprovalLinks(params: {
   clientId: string;
   baseUrl: string;
 }): Promise<{ approveUrl: string; rejectUrl: string }> {
-  const { DbClient } = await import("../db/DbClient");
-  const db = DbClient.getInstance();
+    // CONEXION ENTRE INQUILINOS: este modulo lo alcanzan rutas sin contexto de
+  // inquilino (sondas de salud, estado publico, aprobacion por token). Tras el
+  // cutover a `nelvyon_web_app` la conexion de peticion devolveria CERO FILAS sin
+  // error. `DbJobsClient` cae a `DATABASE_URL` mientras la variable dedicada no
+  // exista, asi que hoy no cambia ninguna conducta.
+  const { DbJobsClient } = await import("../db/DbJobsClient");
+  const db = DbJobsClient.getInstance();
   const approveToken = signPortalApprovalToken({
     did: params.deliverableId,
     wid: params.workspaceId,
