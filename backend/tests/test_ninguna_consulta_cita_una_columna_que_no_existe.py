@@ -83,23 +83,6 @@ DERIVA_DECLARADA: dict[tuple[str, str], str] = {
     ("ab_experiments", "winner_variant_id"):
         "existe `winner_variant` (texto), no `winner_variant_id`. Puede ser un "
         "renombrado o un cambio de tipo: no se adivina",
-    # NO ES DEUDA DE ESQUEMA: ES ORDEN DE DESPLIEGUE.
-    #
-    # La 593 anade esta columna, porque `webhook_deliveries` sirve a dos
-    # subsistemas con padres disjuntos y una sola columna no puede referenciar
-    # dos tablas. La migracion esta escrita y aplicada en local; en produccion
-    # NO, y esta instantanea es de produccion. Por eso aparece aqui.
-    #
-    # DESPLEGAR EL CODIGO SIN APLICAR LA 593 NO EMPEORA NADA: hoy la ruta viola
-    # la foranea a `webhooks` en cada entrega, y sin la columna lanzaria por
-    # columna inexistente. Rota antes y rota despues. Pero tampoco arregla nada
-    # hasta que la 593 se aplique.
-    #
-    # Esta entrada se quita en cuanto la 593 este en produccion; el catalogo se
-    # regenera con `backend/db/certificacion/qcatalogo.py`.
-    ("webhook_deliveries", "endpoint_id"):
-        "la anade la migracion 593, pendiente de aplicar en produccion. No es "
-        "una columna que falte: es una que todavia no esta desplegada",
     ("bookings", "zoom_host_url"):
         "no hay columnas de Zoom. La integracion de videollamada en reservas "
         "esta escrita contra un esquema que no se llego a migrar",
@@ -225,7 +208,11 @@ def test_la_comprobacion_detecta_una_columna_inventada():
     assert tabla in cat, "la tabla de referencia desaparecio del catalogo"
     # Las que el codigo citaba y no existen: exactamente el fallo que se cerro.
     assert "webhook_id" in cat[tabla]
-    for inventada in ("endpoint_id", "status", "attempts", "next_retry_at"):
+    # `endpoint_id` SALIO de esta lista el 2026-09-03: la migracion 593 la creo a
+    # proposito, porque `webhook_deliveries` sirve a dos subsistemas con padres
+    # disjuntos y una columna no puede referenciar dos tablas. Las otras tres
+    # siguen sin existir y siguen valiendo como referencia.
+    for inventada in ("status", "attempts", "next_retry_at"):
         assert inventada not in cat[tabla], (
             f"`{inventada}` ya existe en `{tabla}`: si alguien la anadio, revisa "
             f"si esta prueba sigue teniendo sentido")

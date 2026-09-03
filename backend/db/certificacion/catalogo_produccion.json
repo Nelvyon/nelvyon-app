@@ -1,6 +1,6 @@
 {
  "_comentario": "Instantanea del catalogo de PRODUCCION. La usa `test_ninguna_consulta_cita_una_columna_que_no_existe` para detectar deriva entre el SQL del codigo y el esquema real. Se regenera con backend/db/certificacion/qcatalogo.py cuando cambie el esquema.",
- "_migraciones_aplicadas": 491,
+ "_migraciones_aplicadas": 493,
  "tablas": {
   "_migrations": [
    "executed_at",
@@ -7931,6 +7931,7 @@
    "attempt",
    "created_at",
    "duration_ms",
+   "endpoint_id",
    "event",
    "id",
    "payload",
