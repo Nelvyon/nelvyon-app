@@ -12,11 +12,11 @@
     "Esto MIDE. No migra nada. Fusionar antes de probar la equivalencia es",
     "como se pierden matices de mil en mil."
   ],
-  "generado": "2026-09-03T12:38:58.731Z",
+  "generado": "2026-09-03T13:22:33.409Z",
   "total": 1605,
-  "medidos": 1520,
-  "noEjecutables": 85,
-  "instruccionesDistintas": 1520,
+  "medidos": 1521,
+  "noEjecutables": 84,
+  "instruccionesDistintas": 1521,
   "gruposRedundantes": 0,
   "agentesEnGruposRedundantes": 0,
   "mayoresGrupos": [],
@@ -32,10 +32,6 @@
     [
       "falla sin llegar a pedir: Cannot read properties of undefined (reading 'trim')",
       8
-    ],
-    [
-      "no importa: EPERM: operation not permitted, rename 'C:\\Users\\Daniel\\AppData\\Local\\Temp\\N1NQDPQCnOTAA0m",
-      1
     ]
   ]
 }

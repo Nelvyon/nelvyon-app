@@ -137,3 +137,68 @@ de negocio legítima — pero debe tomarse a sabiendas, no descubrirse un martes
 **El modelo es de 3B.** La calidad esperable es la de un modelo de 3B, no la de
 un modelo frontera. Para trabajo de agencia vendido a clientes, conviene medir
 la calidad antes de prometerla.
+
+---
+
+## 3 · NELVYON AI — medido, no supuesto (2026-09-03)
+
+Medido contra Ollama local con el **mismo modelo que producción tiene
+configurado** (`llama3.2:3b-instruct-q4_K_M`). Coste: 0 €.
+
+| Prueba | Resultado |
+|---|---|
+| Latencia, 1ª petición | **2.963 ms** (carga del modelo en memoria) |
+| Latencia, en caliente | **140 ms** y **171 ms** (generación corta) |
+| Plazo de 300 ms | **aborta a los 305 ms** — el timeout funciona, no se cuelga |
+| 3 peticiones simultáneas | todas OK, **2.204 ms** en total: 615 / 1.262 / 2.204 |
+| Modelo inexistente | **404** limpio; no inventa respuesta |
+
+### El dato que cambia el plan: la concurrencia se serializa
+
+Las tres peticiones simultáneas no tardaron lo mismo: 615, 1.262 y 2.204 ms.
+Una sola instancia de Ollama **atiende de una en una**. No es un fallo — es cómo
+funciona— pero tiene una consecuencia de capacidad que conviene saber antes y no
+después:
+
+> Con un único servidor de modelo, el rendimiento de IA de toda la agencia es de
+> **una generación a la vez**. Diez trabajos simultáneos no tardan lo que uno:
+> tardan diez veces eso.
+
+Para una agencia con varios clientes y varios servicios en marcha, ese es el
+cuello de botella real, y aparece antes que cualquier límite de la aplicación.
+La cola y el `arriendo` del worker lo absorben —los trabajos esperan, no
+fallan—, pero el tiempo de entrega crece linealmente con la carga.
+
+**Opciones, todas con coste que no autorizo yo:** más instancias de Ollama,
+una máquina con GPU, o un proveedor de pago para los picos. Es una decisión de
+negocio, no técnica.
+
+### Validación del host: falla cerrado y bien
+
+`OllamaRuntimePrep.readOllamaBaseUrl` + su comprobación devuelven razones
+nombradas en vez de reventar:
+
+- `OLLAMA_HOST_unset`
+- `OLLAMA_HOST_invalid_url` — un host sin esquema (`0.0.0.0:11434`, que es la
+  convención de Ollama) se rechaza en vez de lanzar
+- `OLLAMA_HOST_loopback_forbidden_on_remote_runtime`
+- `OLLAMA_HOST_bad_protocol`
+- `OLLAMA_HOST_not_tailscale_mesh` — exige que el host esté en `100.64/10`
+
+Eso último importa: impide que alguien apunte la IA productiva a un host público
+por error.
+
+### `NELVYON_AI_PRODUCTION_ACTIVATION_READY` = **NO**, y falta una sola cosa
+
+Todo lo medible localmente está medido y en verde. Lo que falta **no se puede
+verificar sin desplegar**: que el contenedor de Railway alcance
+`100.102.207.30:11434` por la malla.
+
+Pasos exactos, en orden:
+
+1. Desplegar un canario con la malla activa y sondear el endpoint **desde
+   dentro** del contenedor (`/api/health/deep` o una ruta de diagnóstico).
+2. Si responde: `OLLAMA_CONFIGURED=1`.
+3. Después, y sólo después: `NELVYON_AI_ENABLED=1`.
+
+Invertir el orden enciende la IA sin saber si alcanza el modelo.
