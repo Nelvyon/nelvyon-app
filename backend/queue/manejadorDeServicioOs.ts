@@ -98,7 +98,72 @@ export const manejadorDeServicioOs: ManejadorDeTrabajo = async (
     return { tipo: "esperandoAprobacion", motivo: aprobacion.motivo };
   }
 
+  // EL BUCLE DE APRENDIZAJE SE CIERRA AQUI, no en cada agente.
+  //
+  // `LearningService.recordOutcome` es la entrada de ese bucle: sin outcomes no
+  // hay patrones que analizar y `analyzePatternsForAgent` mira sobre nada.
+  //
+  // Estaba cableado agente por agente. De los 244 agentes de los sectores que
+  // producen con modelo, 67 no lo llamaban — seis sectores enteros (`b2b`,
+  // `hospitality`, `influencers`, `realestate`, `sports`, `youtubers`) trabajaban
+  // sin dejar rastro del que aprender. Y el 68 lo habria olvidado igual: pedirle
+  // a cada autor de agente que se acuerde de una linea es como se pierde una
+  // capacidad entera en silencio.
+  //
+  // Aqui pasa TODO trabajo que termina, venga del agente que venga.
+  //
+  // DESPUES de la puerta de aprobacion, y eso es deliberado: un resultado que
+  // necesita que lo mire una persona todavia no es un outcome del que aprender.
+  // Aprender de trabajo sin validar es como se ensena a repetir un error.
+  await registrarParaAprender(trabajo, resultado);
+
   return { tipo: "completado", resultado };
 };
+
+/**
+ * Registra el resultado para que el sistema pueda aprender de el.
+ *
+ * NUNCA hace fallar el trabajo. El aprendizaje es secundario respecto a la
+ * entrega: si la base no esta, o el registro falla, el cliente ya tiene su
+ * trabajo hecho y perderlo por no poder anotarlo seria absurdo.
+ *
+ * Lo que si hace es DEJAR CONSTANCIA de que no pudo anotarse, en vez de tragarse
+ * el error: un bucle de aprendizaje que deja de recibir datos y no lo dice es
+ * indistinguible de uno que funciona y no encuentra patrones.
+ */
+async function registrarParaAprender(
+  trabajo: Parameters<ManejadorDeTrabajo>[0],
+  resultado: unknown,
+): Promise<void> {
+  try {
+    const { LearningService } = await import("../os-agents/learning/LearningService");
+    const userId = (trabajo.payload.userId as string | undefined) ?? trabajo.clientId;
+    // El sector sale del payload si viene; si no, el propio servicio identifica
+    // la disciplina. Inventarse un sector agruparia aprendizajes de sitios
+    // distintos bajo la misma etiqueta, que es peor que no agruparlos.
+    const sector =
+      (trabajo.payload.sector as string | undefined)
+      ?? (trabajo.payload.industry as string | undefined)
+      ?? trabajo.serviceId;
+    await new LearningService().recordOutcome(
+      userId,
+      trabajo.serviceId,
+      sector,
+      trabajo.payload,
+      resultado,
+      "generated",
+    );
+  } catch (e) {
+    // REDACTADO, no truncado. Truncar a 120 caracteres no protege nada: una
+    // cadena de conexion con credenciales cabe de sobra en ese margen, y este
+    // camino corre en produccion. Lo cazo la propia prueba de esta bateria.
+    const { redactar } = await import("../seguridad/formaDeUnSecreto.mjs");
+    const crudo = e instanceof Error ? e.message : "desconocido";
+    console.warn(
+      `[aprendizaje] no se pudo registrar el resultado de ${trabajo.serviceId}: `
+        + `${String(redactar(crudo)).slice(0, 200)}`,
+    );
+  }
+}
 
 export { exigeAprobacion as exigeAprobacionParaPruebas };
