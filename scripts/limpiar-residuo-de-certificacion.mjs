@@ -110,6 +110,28 @@ try {
   await quitar("workspace_members de cert-ws", `DELETE FROM workspace_members WHERE workspace_id IN (101, 202)`);
   await quitar("workspaces cert-ws", `DELETE FROM workspaces WHERE id IN (101, 202) AND name LIKE 'cert-ws-%'`);
 
+  // 3-bis. Los `os_jobs` que dejan las baterias de cableado.
+  //
+  // `todosLosServiciosPorElMismoCableado` encola un trabajo por servicio y
+  // reclama UNO. `reclamar(1)` devuelve el MAS ANTIGUO, asi que en cuanto
+  // quedan trabajos de una corrida anterior, la prueba reclama uno viejo y
+  // concluye «nadie pudo reclamar el trabajo recien encolado».
+  //
+  // Ya paso con `seo_premium` y esta documentado dentro de esa bateria. Volvio
+  // a pasar con `web_premium`: 76 trabajos acumulados, 57 suyos. El diagnostico
+  // anterior arreglo la suposicion de la prueba pero no la ACUMULACION, asi que
+  // el fallo reaparece cada vez que la suite corre unas cuantas veces.
+  //
+  // Es residuo de prueba, no trabajo de nadie: esta base es local —el guardia de
+  // arriba lo exige— y aqui no hay clientes.
+  await quitar(
+    "os_jobs de certificacion",
+    `DELETE FROM os_jobs
+      WHERE status IN ('queued','running')
+        AND (tenant_id IS NULL OR tenant_id::text LIKE 'cert%' OR client_id::text LIKE 'cert%'
+             OR service_id IS NOT NULL)`,
+  );
+
   // 4. Lo que queda en la vista global y no deberia.
   const restan = (
     await cli.query(
