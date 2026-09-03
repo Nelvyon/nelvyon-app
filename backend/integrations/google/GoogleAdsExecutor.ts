@@ -97,7 +97,49 @@ export class GoogleAdsExecutor {
     return (await res.json()) as T;
   }
 
+  /**
+   * Traduce la ruta de la API a la operacion que la politica de coste entiende.
+   *
+   * Se deriva de la RUTA y no de quien llama: un metodo nuevo que haga POST a
+   * `campaignBudgets` queda cubierto sin que su autor se acuerde de nada. Lo que
+   * no se reconoce se trata como `crear_campana`, la mas restrictiva de las de
+   * publicidad — porque un POST desconocido contra la API de Ads es
+   * precisamente el caso en el que no se puede suponer que no gasta.
+   */
+  private static operacionDe(path: string): string {
+    if (/campaignBudgets/i.test(path)) return "cambiar_presupuesto";
+    if (/campaigns/i.test(path)) return "crear_campana";
+    return "crear_campana";
+  }
+
+  /**
+   * TODA escritura contra Google Ads pasa por la politica de coste.
+   *
+   * Este ejecutor crea presupuestos, campanas, grupos y anuncios contra la API
+   * real. No tenia ninguna puerta de gasto: lo unico que lo frenaba era que no
+   * hubiera una cuenta conectada. Eso es una guarda por AUSENCIA, no por
+   * diseno — el dia que alguien conecte una cuenta, el freno desaparece sin que
+   * nadie cambie una linea.
+   *
+   * Se comprueba aqui, en `apiPost`, y no en cada metodo: es el punto unico por
+   * el que pasan las cuatro mutaciones que existen hoy y las que se anadan.
+   *
+   * FALLA CERRADO: si la politica dice que no, se lanza. No se degrada a una
+   * simulacion silenciosa, porque quien llamo cree que ha creado una campana.
+   */
   private async apiPost<T>(userId: string, path: string, body: unknown): Promise<T> {
+    const { decidirCoste, apuntar } = await import("../../coste/PoliticaDeCosteCero");
+    const operacion = GoogleAdsExecutor.operacionDe(path);
+    const op = { proveedor: "google_ads", operacion, actor: userId };
+    const veredicto = decidirCoste(op);
+    apuntar(op, veredicto);
+    if (!veredicto.permitido) {
+      throw new Error(
+        `Google Ads: operacion \`${operacion}\` denegada por la politica de coste `
+          + `(${veredicto.motivo}): ${veredicto.porQue}`,
+      );
+    }
+
     const headers = await this.getHeaders(userId);
     const res = await fetch(`${BASE_URL}${path}`, {
       method: "POST",
