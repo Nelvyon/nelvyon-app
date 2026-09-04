@@ -522,6 +522,8 @@ export {
   type TriggerType,
 } from "./SaasWorkflowService";
 export { dispatchDealStageChanged } from "./saasWorkflowDispatch";
+export { clasificarRespuesta } from "./clasificarRespuesta";
+export type { CategoriaDeRespuesta, RespuestaClasificada } from "./clasificarRespuesta";
 export {
   SaasCampaniasService,
   SaasCampaniasError,

@@ -8,6 +8,28 @@ function makeDb() {
   return { query };
 }
 
+/**
+ * Doble de base que responde por FORMA de consulta, no por orden de llamada.
+ *
+ * Los encadenados `mockResolvedValueOnce` de antes ataban cada prueba al número
+ * exacto de consultas que hacía el servicio. Al añadir el cierre por
+ * consentimiento retirado, siete pruebas se pusieron rojas sin que ninguna de
+ * las propiedades que comprobaban hubiera dejado de cumplirse: sólo se habían
+ * desplazado los índices.
+ *
+ * Responder por forma comprueba MÁS, no menos: un servicio que hiciera las
+ * consultas correctas en el orden equivocado pasaba el encadenado, y aquí no.
+ */
+function responderPorForma(reglas: Array<[RegExp, unknown]>) {
+  return (sql: string) => {
+    for (const [patron, valor] of reglas) if (patron.test(sql.replace(/\s+/g, " "))) return valor;
+    return [];
+  };
+}
+
+/** Ninguna baja pendiente: el cierre por consentimiento no debe tocar nada. */
+const SIN_BAJAS: [RegExp, unknown] = [/FROM saas_contacts c/, []];
+
 const SEQ = {
   id: "seq-1", tenant_id: "t1", name: "Onboarding", description: null,
   trigger_type: "manual" as const, trigger_config: {}, status: "active" as const,
@@ -102,65 +124,76 @@ describe("SaasSequencesService.handleReplyHook", () => {
   let db: ReturnType<typeof makeDb>;
   let svc: SaasSequencesService;
 
+  const ENR = {
+    id: "enr-1", sequence_id: "seq-1", tenant_id: "t1", contact_id: "c1",
+    current_step: 2, status: "active", reply_received: true,
+    next_send_at: null, enrolled_at: new Date().toISOString(), completed_at: null,
+  };
+
+  /** Una respuesta humana cualquiera. El texto decide, así que hay que darlo. */
+  const RESPUESTA_HUMANA = "Hola, cuéntame más";
+
   beforeEach(() => {
     resetSaasSequencesServiceForTests();
     db = makeDb();
     svc = new SaasSequencesService(db as never);
   });
 
-  it("marks reply_received=true on enrollment", async () => {
-    const enrollment = {
-      id: "enr-1", sequence_id: "seq-1", tenant_id: "t1", contact_id: "c1",
-      current_step: 2, status: "active", reply_received: true,
-      next_send_at: null, enrolled_at: new Date().toISOString(), completed_at: null,
-    };
-    db.query
-      .mockResolvedValueOnce([enrollment])       // UPDATE reply_received
-      .mockResolvedValueOnce([STEP_BRANCH])      // SELECT step at position 2
-      .mockResolvedValueOnce(undefined);         // UPDATE current_step
-
-    await svc.handleReplyHook("t1", "seq-1", "c1");
-    expect(db.query).toHaveBeenCalledWith(
-      expect.stringContaining("reply_received=true"),
-      expect.any(Array),
+  it("marks the enrollment as replied", async () => {
+    db.query.mockImplementation(
+      responderPorForma([
+        [/SET reply_received/, [ENR]],
+        [/COUNT\(\*\).*branch_condition/, [{ n: "1" }]],
+        [/FROM saas_sequence_steps/, [STEP_BRANCH]],
+      ]) as never,
     );
+
+    await svc.handleReplyHook("t1", "seq-1", "c1", RESPUESTA_HUMANA);
+
+    const marca = db.query.mock.calls.find((c) => /SET reply_received/.test(c[0] as string));
+    expect(marca, "no se marcó la respuesta").toBeDefined();
+    // Ahora es un parámetro y no un literal: un autorespondedor pasa `false`.
+    expect(marca![1]).toContain(true);
   });
 
   it("advances enrollment to branch_yes_position when on branch step", async () => {
-    const enrollment = {
-      id: "enr-1", sequence_id: "seq-1", tenant_id: "t1", contact_id: "c1",
-      current_step: 2, status: "active", reply_received: true,
-      next_send_at: null, enrolled_at: new Date().toISOString(), completed_at: null,
-    };
-    db.query
-      .mockResolvedValueOnce([enrollment])
-      .mockResolvedValueOnce([STEP_BRANCH])
-      .mockResolvedValueOnce(undefined);
+    db.query.mockImplementation(
+      responderPorForma([
+        [/SET reply_received/, [ENR]],
+        [/COUNT\(\*\).*branch_condition/, [{ n: "1" }]],
+        [/FROM saas_sequence_steps/, [STEP_BRANCH]],
+      ]) as never,
+    );
 
-    await svc.handleReplyHook("t1", "seq-1", "c1");
-    const lastCall = db.query.mock.calls[2]!;
-    expect(lastCall[0]).toContain("current_step");
-    expect(lastCall[1]).toContain(3); // branch_yes_position
+    await svc.handleReplyHook("t1", "seq-1", "c1", RESPUESTA_HUMANA);
+
+    const avance = db.query.mock.calls.find((c) => /SET current_step/.test(c[0] as string));
+    expect(avance, "no avanzó por la rama").toBeDefined();
+    expect(avance![1]).toContain(3); // branch_yes_position
   });
 
   it("does nothing when enrollment not found", async () => {
-    db.query.mockResolvedValueOnce([]);
-    await svc.handleReplyHook("t1", "seq-1", "c-missing");
+    db.query.mockResolvedValue([]);
+    await svc.handleReplyHook("t1", "seq-1", "c-missing", RESPUESTA_HUMANA);
     expect(db.query).toHaveBeenCalledTimes(1);
   });
 
-  it("does nothing when step is not a branch", async () => {
-    const enrollment = {
-      id: "enr-1", sequence_id: "seq-1", tenant_id: "t1", contact_id: "c1",
-      current_step: 0, status: "active", reply_received: true,
-      next_send_at: null, enrolled_at: new Date().toISOString(), completed_at: null,
-    };
-    db.query
-      .mockResolvedValueOnce([enrollment])
-      .mockResolvedValueOnce([STEP_EMAIL]); // step_type=email
+  it("sin rama sobre `replied`, una respuesta humana DETIENE la secuencia", async () => {
+    // Cambio deliberado: antes no hacía nada, y el prospecto seguía recibiendo
+    // los correos restantes después de haber contestado.
+    db.query.mockImplementation(
+      responderPorForma([
+        [/SET reply_received/, [ENR]],
+        [/COUNT\(\*\).*branch_condition/, [{ n: "0" }]],
+      ]) as never,
+    );
 
-    await svc.handleReplyHook("t1", "seq-1", "c1");
-    expect(db.query).toHaveBeenCalledTimes(2); // no third update call
+    await svc.handleReplyHook("t1", "seq-1", "c1", RESPUESTA_HUMANA);
+
+    const cierre = db.query.mock.calls.find((c) => /status='completed'/.test(c[0] as string));
+    expect(cierre, "se siguió escribiendo a quien ya había contestado").toBeDefined();
+    const avance = db.query.mock.calls.find((c) => /SET current_step/.test(c[0] as string));
+    expect(avance, "avanzó de paso sin haber rama que lo pidiera").toBeUndefined();
   });
 });
 
@@ -227,63 +260,51 @@ describe("SaasSequencesService.processDueEnrollments — branch/wait logic", () 
     sendEmail.mockClear();
   });
 
-  it("processes branch step without sending email", async () => {
-    const enrollment = {
-      id: "enr-1", sequence_id: "seq-1", tenant_id: "t1", contact_id: "c1",
-      current_step: 2, reply_received: true, email_opened: false, email_clicked: false,
-    };
-    const branchStepRow = {
-      ...STEP_BRANCH,
-      contact_email: "test@test.com", contact_name: "Test",
-    };
-    const nextStepRow = { position: 3, delay_days: 0, delay_hours: 0 };
+  /** Inscripción pendiente + el paso que le toca + el siguiente. */
+  function conPendiente(enrollment: unknown, paso: unknown, siguiente: unknown[]) {
+    db.query.mockImplementation(
+      responderPorForma([
+        SIN_BAJAS,
+        [/next_send_at <= NOW\(\)/, [enrollment]],
+        [/JOIN saas_contacts/, [paso]],
+        [/position >= \$2/, siguiente],
+      ]) as never,
+    );
+  }
 
-    db.query
-      .mockResolvedValueOnce([enrollment])           // SELECT due enrollments
-      .mockResolvedValueOnce([branchStepRow])        // SELECT step + contact
-      .mockResolvedValueOnce([nextStepRow])          // SELECT next step
-      .mockResolvedValueOnce(undefined);             // UPDATE enrollment
+  const avance = () => db.query.mock.calls.find((c) => /SET current_step/.test(c[0] as string));
+
+  it("processes branch step without sending email", async () => {
+    conPendiente(
+      { id: "enr-1", sequence_id: "seq-1", tenant_id: "t1", contact_id: "c1",
+        current_step: 2, reply_received: true, email_opened: false, email_clicked: false },
+      { ...STEP_BRANCH, contact_email: "test@test.com", contact_name: "Test" },
+      [{ position: 3, delay_days: 0, delay_hours: 0 }],
+    );
 
     await svc.processDueEnrollments(sendEmail);
     expect(sendEmail).not.toHaveBeenCalled();
   });
 
   it("processes wait step without sending email", async () => {
-    const enrollment = {
-      id: "enr-1", sequence_id: "seq-1", tenant_id: "t1", contact_id: "c1",
-      current_step: 1, reply_received: false, email_opened: false, email_clicked: false,
-    };
-    const waitStepRow = {
-      ...STEP_WAIT,
-      contact_email: "test@test.com", contact_name: "Test",
-    };
-    const nextStepRow = { position: 2, delay_days: 0, delay_hours: 0 };
-
-    db.query
-      .mockResolvedValueOnce([enrollment])
-      .mockResolvedValueOnce([waitStepRow])
-      .mockResolvedValueOnce([nextStepRow])
-      .mockResolvedValueOnce(undefined);
+    conPendiente(
+      { id: "enr-1", sequence_id: "seq-1", tenant_id: "t1", contact_id: "c1",
+        current_step: 1, reply_received: false, email_opened: false, email_clicked: false },
+      { ...STEP_WAIT, contact_email: "test@test.com", contact_name: "Test" },
+      [{ position: 2, delay_days: 0, delay_hours: 0 }],
+    );
 
     await svc.processDueEnrollments(sendEmail);
     expect(sendEmail).not.toHaveBeenCalled();
   });
 
   it("sends email for email steps and advances enrollment", async () => {
-    const enrollment = {
-      id: "enr-1", sequence_id: "seq-1", tenant_id: "t1", contact_id: "c1",
-      current_step: 0, reply_received: false, email_opened: false, email_clicked: false,
-    };
-    const emailStepRow = {
-      ...STEP_EMAIL,
-      contact_email: "user@test.com", contact_name: "User",
-    };
-
-    db.query
-      .mockResolvedValueOnce([enrollment])
-      .mockResolvedValueOnce([emailStepRow])
-      .mockResolvedValueOnce([])              // no next step → completes
-      .mockResolvedValueOnce(undefined);
+    conPendiente(
+      { id: "enr-1", sequence_id: "seq-1", tenant_id: "t1", contact_id: "c1",
+        current_step: 0, reply_received: false, email_opened: false, email_clicked: false },
+      { ...STEP_EMAIL, contact_email: "user@test.com", contact_name: "User" },
+      [], // no hay siguiente paso → se completa
+    );
 
     await svc.processDueEnrollments(sendEmail);
     expect(sendEmail).toHaveBeenCalledWith(
@@ -294,71 +315,61 @@ describe("SaasSequencesService.processDueEnrollments — branch/wait logic", () 
   });
 
   it("branch on opened follows yes path when email_opened=true", async () => {
-    const enrollment = {
-      id: "enr-1", sequence_id: "seq-1", tenant_id: "t1", contact_id: "c1",
-      current_step: 2, reply_received: false, email_opened: true, email_clicked: false,
-    };
-    const branchStepRow = {
-      ...STEP_BRANCH,
-      branch_condition: { field: "opened" as const, op: "eq" as const, value: true },
-      branch_yes_position: 5,
-      branch_no_position: 6,
-      contact_email: "test@test.com", contact_name: "Test",
-    };
-    const nextStepRow = { position: 5, delay_days: 0, delay_hours: 0 };
-
-    db.query
-      .mockResolvedValueOnce([enrollment])
-      .mockResolvedValueOnce([branchStepRow])
-      .mockResolvedValueOnce([nextStepRow])
-      .mockResolvedValueOnce(undefined);
+    conPendiente(
+      { id: "enr-1", sequence_id: "seq-1", tenant_id: "t1", contact_id: "c1",
+        current_step: 2, reply_received: false, email_opened: true, email_clicked: false },
+      { ...STEP_BRANCH,
+        branch_condition: { field: "opened" as const, op: "eq" as const, value: true },
+        branch_yes_position: 5, branch_no_position: 6,
+        contact_email: "test@test.com", contact_name: "Test" },
+      [{ position: 5, delay_days: 0, delay_hours: 0 }],
+    );
 
     await svc.processDueEnrollments(sendEmail);
     expect(sendEmail).not.toHaveBeenCalled();
-    const advanceCall = db.query.mock.calls[3]![1] as unknown[];
-    expect(advanceCall).toContain(5);
+    expect(avance()![1]).toContain(5);
   });
 
   it("branch on clicked follows no path when email_clicked=false", async () => {
-    const enrollment = {
-      id: "enr-1", sequence_id: "seq-1", tenant_id: "t1", contact_id: "c1",
-      current_step: 2, reply_received: false, email_opened: true, email_clicked: false,
-    };
-    const branchStepRow = {
-      ...STEP_BRANCH,
-      branch_condition: { field: "clicked" as const, op: "eq" as const, value: true },
-      branch_yes_position: 5,
-      branch_no_position: 6,
-      contact_email: "test@test.com", contact_name: "Test",
-    };
-    const nextStepRow = { position: 6, delay_days: 0, delay_hours: 0 };
-
-    db.query
-      .mockResolvedValueOnce([enrollment])
-      .mockResolvedValueOnce([branchStepRow])
-      .mockResolvedValueOnce([nextStepRow])
-      .mockResolvedValueOnce(undefined);
+    conPendiente(
+      { id: "enr-1", sequence_id: "seq-1", tenant_id: "t1", contact_id: "c1",
+        current_step: 2, reply_received: false, email_opened: true, email_clicked: false },
+      { ...STEP_BRANCH,
+        branch_condition: { field: "clicked" as const, op: "eq" as const, value: true },
+        branch_yes_position: 5, branch_no_position: 6,
+        contact_email: "test@test.com", contact_name: "Test" },
+      [{ position: 6, delay_days: 0, delay_hours: 0 }],
+    );
 
     await svc.processDueEnrollments(sendEmail);
-    const advanceCall = db.query.mock.calls[3]![1] as unknown[];
-    expect(advanceCall).toContain(6);
+    expect(avance()![1]).toContain(6);
   });
 
   it("marks enrollment failed when no contact email", async () => {
-    const enrollment = {
-      id: "enr-1", sequence_id: "seq-1", tenant_id: "t1", contact_id: "c1",
-      current_step: 0, reply_received: false, email_opened: false, email_clicked: false,
-    };
-    const stepWithoutEmail = { ...STEP_EMAIL, contact_email: null, contact_name: "User" };
-
-    db.query
-      .mockResolvedValueOnce([enrollment])
-      .mockResolvedValueOnce([stepWithoutEmail])
-      .mockResolvedValueOnce(undefined);
+    conPendiente(
+      { id: "enr-1", sequence_id: "seq-1", tenant_id: "t1", contact_id: "c1",
+        current_step: 0, reply_received: false, email_opened: false, email_clicked: false },
+      { ...STEP_EMAIL, contact_email: null, contact_name: "User" },
+      [],
+    );
 
     await svc.processDueEnrollments(sendEmail);
-    const failCall = db.query.mock.calls[2]![0] as string;
-    expect(failCall).toContain("status='failed'");
+    const fallo = db.query.mock.calls.find((c) => /status='failed'/.test(c[0] as string));
+    expect(fallo, "una inscripción sin correo se quedó activa para siempre").toBeDefined();
     expect(sendEmail).not.toHaveBeenCalled();
+  });
+
+  it("y NO envía a quien retiró el consentimiento, aunque le tocara hoy", async () => {
+    // El cierre va antes de elegir destinatarios: una baja llegada por una
+    // campaña tiene que cerrar también las secuencias activas.
+    db.query.mockImplementation(
+      responderPorForma([
+        [/FROM saas_contacts c/, [{ id: "enr-1" }]],
+        [/next_send_at <= NOW\(\)/, []], // ya no está activa
+      ]) as never,
+    );
+
+    await svc.processDueEnrollments(sendEmail);
+    expect(sendEmail, "se escribió a alguien que pidió la baja").not.toHaveBeenCalled();
   });
 });

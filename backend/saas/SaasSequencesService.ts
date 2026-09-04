@@ -1,5 +1,6 @@
 import { DbClient } from "../db/DbClient";
 import { signTrackingToken } from "../email/trackingToken";
+import { clasificarRespuesta, type RespuestaClasificada } from "./clasificarRespuesta";
 import type { SaasPostgresPort } from "./SaasOnboardingService";
 import { cotaDeListado } from "./cotaDeListado";
 
@@ -416,20 +417,128 @@ export class SaasSequencesService {
   }
 
   /**
-   * Mark a contact as having replied to a sequence email.
-   * Advances enrollment immediately if on a branch step with field="replied".
+   * Registra que un contacto ha respondido, y actúa según QUÉ ha respondido.
+   *
+   * Antes esto marcaba `reply_received = true` y nada más. Una respuesta era un
+   * booleano, y por tanto «dadme de baja» y «estoy de vacaciones» acababan en el
+   * mismo sitio. Ahora se clasifica primero (ver `clasificarRespuesta`) y la
+   * clasificación decide:
+   *
+   *   · un autorespondedor NO cuenta como respuesta y no detiene nada;
+   *   · una baja retira el consentimiento en el CONTACTO, no solo en esta
+   *     secuencia: quien pide que pares se lo pide a la agencia, no a una
+   *     campaña concreta;
+   *   · un rebote cierra la inscripción como fallida;
+   *   · cualquier otra respuesta humana detiene la secuencia, salvo que el autor
+   *     haya puesto una rama sobre `replied` —en cuyo caso ha tomado él el
+   *     control y se respeta—.
+   *
+   * @param texto  cuerpo de la respuesta, con el asunto si se tiene. Sin texto se
+   *               asume respuesta humana sin clasificar y se para: ante la duda,
+   *               parar.
    */
-  async handleReplyHook(tenantId: string, sequenceId: string, contactId: string): Promise<void> {
+  async handleReplyHook(
+    tenantId: string,
+    sequenceId: string,
+    contactId: string,
+    texto?: string | null,
+  ): Promise<RespuestaClasificada | null> {
+    const clase = clasificarRespuesta(texto);
+
+    // Un autorespondedor no lo ha escrito nadie. Ni se marca como respuesta ni
+    // detiene: tratarlo como respuesta haría que un prospecto dejara de recibir
+    // la secuencia por haberse ido de vacaciones, y en el CRM constaría que
+    // contestó. Nadie revisa eso jamás.
+    if (!clase.cuentaComoRespuesta && !clase.detieneLaSecuencia) return clase;
+
     const updated = await this.db.query<EnrollRow>(
-      `UPDATE saas_sequence_enrollments SET reply_received=true
+      `UPDATE saas_sequence_enrollments SET reply_received=$4
        WHERE sequence_id=$1 AND tenant_id=$2 AND contact_id=$3 AND status='active'
        RETURNING ${ENROLL_COLS}`,
-      [sequenceId, tenantId, contactId],
+      [sequenceId, tenantId, contactId, clase.cuentaComoRespuesta],
     );
     const enrollment = updated[0];
-    if (!enrollment) return;
+    if (!enrollment) return clase;
 
-    await this._maybeAdvanceReplyBranch(enrollment, sequenceId);
+    if (clase.retiraConsentimiento) {
+      await this._retirarConsentimiento(tenantId, contactId);
+      await this.db.query(
+        `UPDATE saas_sequence_enrollments SET status='unsubscribed', completed_at=NOW() WHERE id=$1`,
+        [enrollment.id],
+      );
+      return clase;
+    }
+
+    if (clase.categoria === "rebote") {
+      await this.db.query(`UPDATE saas_sequence_enrollments SET status='failed' WHERE id=$1`, [
+        enrollment.id,
+      ]);
+      return clase;
+    }
+
+    // Si el autor diseñó una rama sobre `replied`, decidió él qué pasa al
+    // responder y no se le pisa. Si no la hay, se para: seguir escribiendo a
+    // quien ya está contestando es el error que quema un dominio.
+    if (await this._tieneRamaDeRespuesta(sequenceId)) {
+      await this._maybeAdvanceReplyBranch(enrollment, sequenceId);
+      return clase;
+    }
+
+    if (clase.detieneLaSecuencia) {
+      await this.db.query(
+        `UPDATE saas_sequence_enrollments SET status='completed', completed_at=NOW() WHERE id=$1`,
+        [enrollment.id],
+      );
+    }
+    return clase;
+  }
+
+  /**
+   * Cierra toda inscripción activa cuyo contacto haya retirado el
+   * consentimiento, venga de donde venga la baja.
+   *
+   * Es idempotente y barata: un `UPDATE` que no toca nada cuando no hay bajas
+   * nuevas. Ponerla en el punto por el que pasa todo envío es deliberado —
+   * comprobarlo en cada tipo de paso dejaría fuera el cuarto tipo que se añada.
+   */
+  private async _cerrarLosQueRetiraronConsentimiento(): Promise<number> {
+    const cerradas = await this.db.query<{ id: string }>(
+      `UPDATE saas_sequence_enrollments e
+       SET status='unsubscribed', completed_at=NOW()
+       FROM saas_contacts c
+       WHERE c.id = e.contact_id AND c.tenant_id = e.tenant_id
+         AND e.status='active'
+         AND COALESCE(c.tags, '{}') @> ARRAY['unsubscribed']
+       RETURNING e.id`,
+      [],
+    );
+    return cerradas.length;
+  }
+
+  /** ¿La secuencia ramifica explícitamente sobre haber respondido? */
+  private async _tieneRamaDeRespuesta(sequenceId: string): Promise<boolean> {
+    const rows = await this.db.query<{ n: string }>(
+      `SELECT COUNT(*)::text AS n FROM saas_sequence_steps
+       WHERE sequence_id=$1 AND step_type='branch' AND branch_condition->>'field'='replied'`,
+      [sequenceId],
+    );
+    return Number(rows[0]?.n ?? 0) > 0;
+  }
+
+  /**
+   * Retira el consentimiento en el CONTACTO, no en la secuencia.
+   *
+   * Se usa la misma marca que ya honran las campañas y el webhook de SES —la
+   * etiqueta `unsubscribed`— en vez de inventar una nueva. Dos formas distintas
+   * de decir «no me escribas» significan que un día una de las dos se olvida.
+   */
+  private async _retirarConsentimiento(tenantId: string, contactId: string): Promise<void> {
+    await this.db.query(
+      `UPDATE saas_contacts
+       SET tags = array_append(COALESCE(tags, '{}'), 'unsubscribed'), updated_at = NOW()
+       WHERE id=$1 AND tenant_id=$2 AND NOT (COALESCE(tags, '{}') @> ARRAY['unsubscribed'])`,
+      [contactId, tenantId],
+    );
   }
 
   private async _maybeAdvanceReplyBranch(enrollment: EnrollRow, sequenceId: string): Promise<void> {
@@ -471,6 +580,20 @@ export class SaasSequencesService {
       typeof sendOrHandlers === "function"
         ? { sendEmail: sendOrHandlers }
         : sendOrHandlers;
+
+    // ANTES de elegir a quién escribir: cerrar a quien ya dijo que no quiere.
+    //
+    // Las campañas SÍ respetaban la etiqueta `unsubscribed` (`NOT tags @>
+    // ARRAY['unsubscribed']`) y el webhook de SES la pone. Las secuencias no la
+    // miraban en absoluto: alguien se daba de baja en una campaña y seguía
+    // recibiendo correo de una secuencia activa. Dos sistemas, la misma regla, y
+    // solo uno la conocía.
+    //
+    // Se CIERRA la inscripción en vez de saltarla en silencio: una inscripción
+    // saltada se queda «activa» para siempre y es indistinguible de una que
+    // funciona.
+    await this._cerrarLosQueRetiraronConsentimiento();
+
     const due = await this.db.query<{
       id: string; sequence_id: string; tenant_id: string; contact_id: string;
       current_step: number | string; reply_received: boolean;
