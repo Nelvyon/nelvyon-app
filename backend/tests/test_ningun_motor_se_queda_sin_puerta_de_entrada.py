@@ -109,31 +109,57 @@ ENTRADAS_POR_RUTA_CALCULADA = [
 #: Escribir un motivo plausible para algo que no se ha comprobado es la forma
 #: mas facil de que una lista de excepciones deje de significar nada.
 SIN_ALCANCE_DECLARADO: dict[str, str] = {
+    # ── B · INFRAESTRUCTURA INTERNA LEGITIMA ────────────────────────────────
     "backend/agency/NelvyonOsOrchestratorContract.ts":
-        "contrato declarativo: describe la forma que deben cumplir otros, no se ejecuta",
-    "backend/agency/VisualEliteStrategyPipeline.ts":
-        "pipeline de estrategia visual construido y sin departamento que lo reclame",
-    "backend/ejecucion/PuenteDeEjecucion.ts":
-        "las siete puertas de ejecucion, construidas y sin nadie que las cruce; la via "
-        "real pasa hoy por el manejador de la cola",
+        "B/infraestructura: contrato declarativo de la coordinacion con OpenClaw, que "
+        "esta APAGADO por defecto (NELVYON_OPENCLAW_BRIDGE_ENABLED=0). Describe la "
+        "forma que deben cumplir otros; no ejecuta nada por si mismo",
     "backend/labs/NelvyonLabsCapabilityRegistry.ts":
-        "registro de capacidades de laboratorio, sin superficie que lo consulte",
+        "B/infraestructura: registro declarativo que el script de cierre lee como DATO "
+        "—aparece en un array `components:`— para generar documentacion. No es codigo "
+        "que se ejecute, es una tabla escrita en TypeScript",
     "backend/local-ai/LocalAiBackupService.ts":
-        "copia de seguridad del modelo local; se invoca a mano cuando toca",
-    "backend/local-ai/specialization/PlanningEngine.ts":
-        "planificacion de la especializacion del modelo local, sin llamador",
-    "backend/local-ai/specialization/QualityGates.ts":
-        "puertas de calidad del modelo local; la calidad de entregables la juzga "
-        "`MotorDeCalidad`, que si esta conectado",
-    "backend/os-agents/upsell/OsUpsellEngine.ts":
-        "ya declarado huerfano en el guardian de capacidades: construido, ningun "
-        "servicio lo invoca",
-    "backend/private-ai/context/AgentContextEngine.ts":
-        "motor de contexto de la IA privada; el contexto que llega hoy a los agentes "
-        "viene de `contextEnricher` y `contextoDeNegocio`",
+        "B/infraestructura: copia y restauracion cifrada del modelo local. Se invoca a "
+        "mano cuando toca, como cualquier herramienta de operacion",
+    "backend/ejecucion/PuenteDeEjecucion.ts":
+        "B/infraestructura: es donde estan escritas las siete puertas y POR QUE ninguna "
+        "es opcional. Las puertas 1, 5, 6 y 7 SI se cumplen en la via viva —lo comprueba "
+        "test_ninguna_ejecucion_externa_se_salta_sus_puertas—, implementadas en las "
+        "rutas de lanzamiento. El fichero es la doctrina; borrarlo dejaria a la proxima "
+        "ruta sin saber contra que se protege",
+
+    # ── E · DUPLICADO FUNCIONAL ─────────────────────────────────────────────
     "backend/saas/SaasResultsService.ts":
-        "resultados del lado saas; los resultados de entregables los lleva "
-        "`MotorDeResultados`, que si esta conectado",
+        "E/duplicado: cuarta representacion de «lo entregado». La via viva es "
+        "`SaasDeliverablesHubService`, que lee os_deliverables, saas_recurring_deliverables "
+        "y nelvyon_pack_runs y SI la consumen las rutas del portal. Su tabla "
+        "`saas_service_results` no la escribe nadie y esta siempre vacia",
+    "backend/private-ai/context/AgentContextEngine.ts":
+        "E/duplicado: compone contexto desde memoria compartida y RAG, y la memoria "
+        "compartida esta APAGADA por defecto. El contexto que llega hoy a los agentes "
+        "viene de `contextEnricher` y `bloqueDeCerebro`, que si estan conectados",
+
+    # ── F · BLOQUEADO POR COSTE O POR ACTIVACION EXTERNA ────────────────────
+    "backend/os-agents/upsell/OsUpsellEngine.ts":
+        "F/bloqueado por coste: conectarlo significa una llamada al modelo por cliente y "
+        "por pasada, de forma recurrente. La puerta de salud del cliente ya esta puesta "
+        "para el dia que se conecte —no se le vende a quien tiene un problema abierto—, "
+        "pero encenderlo es una decision de gasto",
+    "backend/local-ai/specialization/PlanningEngine.ts":
+        "F/bloqueado por activacion: planifica la especializacion del modelo local y solo "
+        "sirve con NELVYON AI encendida, que hoy depende de dos variables en produccion",
+    "backend/local-ai/specialization/QualityGates.ts":
+        "F/bloqueado por activacion: evalua al modelo local contra su bateria de casos. "
+        "Mismo caso que el anterior: sin modelo activo no hay nada que evaluar",
+
+    # ── A · DEBERIA ESTAR CONECTADO, Y SE PUEDE ─────────────────────────────
+    "backend/agency/VisualEliteStrategyPipeline.ts":
+        "A/pendiente de conectar: brief → direccion creativa → guion → storyboard → "
+        "prompts → variantes → revision → aprobacion humana, todo determinista y sin "
+        "coste (strategy_only por defecto). Le tocaria a las cinco disciplinas creativas. "
+        "Solo aplica cuando el encargo declara un brief visual, y hoy ninguno lo hace: "
+        "conectarlo sin eso seria una puerta que no puede ejecutarse nunca, que es "
+        "justo el defecto que esta sesion ha estado corrigiendo",
 }
 
 
