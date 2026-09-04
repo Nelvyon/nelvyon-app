@@ -23,12 +23,18 @@
  * ── ALCANCE ─────────────────────────────────────────────────────────────────
  *
  * Es una vista de operación, transversal a inquilinos, igual que la sala de
- * máquinas. Usa la misma conexión que ella —`DbJobsClient`— y exige las mismas
- * credenciales de administración.
+ * máquinas: enseña y decide sobre trabajos de TODOS los clientes.
+ *
+ * Por eso exige ser ADMINISTRADOR, no sólo estar autenticado. La primera
+ * versión usaba `requirePlatformClaims` —que comprueba que has iniciado sesión
+ * y nada más— y lo cazó `test_toda_ruta_de_administracion_comprueba_que_lo_seas`:
+ * cualquier usuario con cuenta habría podido aprobar o rechazar entregables de
+ * otras agencias. Autenticar no es autorizar, y en una vista transversal la
+ * diferencia es toda.
  */
 import { NextResponse } from "next/server";
 
-import { requirePlatformClaims } from "@/lib/platformBffAuth";
+import { requirePlatformAdmin } from "@/lib/platformBffAuth";
 
 import { ColaDeTrabajos } from "../../../../../../../backend/queue/colaDeTrabajos";
 import { DbJobsClient } from "../../../../../../../backend/db/DbJobsClient";
@@ -43,7 +49,7 @@ function getCola(): ColaDeTrabajos {
 }
 
 export async function GET(req: Request) {
-  const claims = await requirePlatformClaims(req);
+  const claims = await requirePlatformAdmin(req);
   if (claims instanceof NextResponse) return claims;
 
   const limite = Number(new URL(req.url).searchParams.get("limite") ?? "50");
@@ -54,7 +60,7 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const claims = await requirePlatformClaims(req);
+  const claims = await requirePlatformAdmin(req);
   if (claims instanceof NextResponse) return claims;
 
   let body: Record<string, unknown> = {};
