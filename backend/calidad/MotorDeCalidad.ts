@@ -33,6 +33,11 @@
 import { resolveLlmMode } from "../autonomous/llm/llmAdapter";
 import { proveedoresDisponibles } from "../autonomous/llm/providers";
 import { ES_PARA_ESTE_CLIENTE } from "./esParaEsteCliente";
+import {
+  SOBRE_LA_PROSA_CRM,
+  SOBRE_LA_PROSA_ECOMMERCE,
+  SOBRE_LA_PROSA_WEB,
+} from "./comprobacionesSobreLaProsa";
 
 /** Con qué se evaluó. Cerrado, y nunca se infiere. */
 export type ModoDeEvaluacion =
@@ -694,6 +699,9 @@ const POR_DOMINIO: Readonly<Record<string, readonly Comprobacion[]>> = {
     },
   ],
   crm: [
+    // Comprobaciones sobre la PROSA: las unicas que pueden dispararse hoy,
+    // porque el agente devuelve texto y no una ficha estructurada.
+    ...SOBRE_LA_PROSA_CRM,
     {
       id: "sin-duplicados",
       descripcion: "Un contacto, una ficha",
@@ -738,6 +746,9 @@ const POR_DOMINIO: Readonly<Record<string, readonly Comprobacion[]>> = {
     },
   ],
   web: [
+    // Comprobaciones sobre la PROSA: las unicas que pueden dispararse hoy,
+    // porque el agente devuelve texto y no una ficha estructurada.
+    ...SOBRE_LA_PROSA_WEB,
     {
       id: "destino-declarado",
       descripcion: "Los botones llevan a algún sitio",
@@ -795,6 +806,9 @@ const POR_DOMINIO: Readonly<Record<string, readonly Comprobacion[]>> = {
     },
   ],
   ecommerce: [
+    // Comprobaciones sobre la PROSA: las unicas que pueden dispararse hoy,
+    // porque el agente devuelve texto y no una ficha estructurada.
+    ...SOBRE_LA_PROSA_ECOMMERCE,
     {
       id: "el-precio-no-aparece-tarde",
       descripcion: "El precio se ve antes de invertir tiempo",
