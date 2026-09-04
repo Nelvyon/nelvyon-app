@@ -2,6 +2,7 @@ import type { DbClient } from "../db/DbClient";
 import { DbClient as DbClientClass } from "../db/DbClient";
 import type { ILlmClient } from "../os-agents/LlmClient";
 import { LLM_DEFAULT_MAX_TOKENS, LLM_DEFAULT_MODEL, LlmClient } from "../os-agents/LlmClient";
+import { clasificarRespuesta } from "./clasificarRespuesta";
 
 export type ColdEmailSequenceEmail = {
   step: number;
@@ -64,6 +65,20 @@ export type ProspectInput = {
 };
 
 export type CreateCampaignInput = GenerateSequenceInput;
+
+/**
+ * Quien pone el correo en la red.
+ *
+ * Se recibe como parámetro en vez de importarse: sin emisor, este servicio no
+ * envía —y, sobre todo, no dice que ha enviado—. Es el mismo trato que usa
+ * `SaasSequencesService.processDueEnrollments`, y hace falta por lo mismo: el
+ * envío real necesita consentimiento y puerta de gasto, y ninguna de las dos
+ * cosas se puede resolver aquí dentro.
+ */
+export type EmisorDeCorreoFrio = (
+  destinatario: { email: string; name: string; company: string | null; role: string | null },
+  correo: { subject: string; body: string },
+) => Promise<void>;
 
 export type CampaignStats = {
   totalProspects: number;
@@ -314,15 +329,51 @@ Rules:
   }
 
   /** Cron-style: marks due emails as sent and schedules next step (actual SMTP/Resend out of scope). */
-  async processScheduledEmails(): Promise<{ processed: number }> {
+  /**
+   * Envía los correos que tocan hoy y programa el siguiente paso.
+   *
+   * ── LO QUE HACÍA ANTES ────────────────────────────────────────────────────
+   *
+   * Avanzaba el paso y escribía `status='sent', sent_at=NOW()` sin enviar nada:
+   * el envío real estaba declarado «fuera de alcance» en un comentario. El
+   * problema no era que no enviara —eso es una capacidad a medias, y se ve—,
+   * sino que dejaba constancia de haber enviado. `getStats` calcula
+   * `emailsSent` sumando `current_step`, así que la campaña informaba de
+   * correos enviados que no existían, y la tasa de respuesta se calculaba sobre
+   * ese número. Una capacidad incompleta que además miente es peor que una
+   * capacidad ausente: la ausente se nota.
+   *
+   * ── LO QUE HACE AHORA ─────────────────────────────────────────────────────
+   *
+   * Sin emisor no toca la base y lo dice. Con emisor envía de verdad, y sólo
+   * avanza el paso cuando el envío salió bien: un fallo no puede consumir un
+   * paso de la secuencia, porque ese prospecto perdería un correo para siempre.
+   *
+   * Y no escribe a quien ya dijo que no. La exclusión va en la SELECCIÓN, no en
+   * el bucle: lo que no se selecciona no se puede enviar por descuido.
+   */
+  async processScheduledEmails(
+    enviar?: EmisorDeCorreoFrio,
+  ): Promise<{ processed: number; omitidos: number; motivo?: string }> {
+    if (!enviar) {
+      // Ni una escritura. Antes de esto, llamar sin emisor marcaba todo como
+      // enviado.
+      return { processed: 0, omitidos: 0, motivo: "sin emisor de correo configurado" };
+    }
+
     const due = await this.db.query<{
       id: string;
       campaign_id: string;
       user_id: string;
       current_step: number;
       sequence: unknown;
+      email: string;
+      name: string;
+      company: string | null;
+      role: string | null;
     }>(
-      `SELECT p.id::text, p.campaign_id::text, p.user_id::text, p.current_step, c.sequence
+      `SELECT p.id::text, p.campaign_id::text, p.user_id::text, p.current_step, c.sequence,
+              p.email, p.name, p.company, p.role
        FROM cold_email_prospects p
        INNER JOIN cold_email_campaigns c ON c.id = p.campaign_id
        WHERE c.status = 'active'
@@ -333,6 +384,7 @@ Rules:
     );
 
     let processed = 0;
+    let omitidos = 0;
     const now = new Date();
 
     for (const row of due) {
@@ -340,6 +392,24 @@ Rules:
       const emails = seq?.emails ?? [];
       const idx = typeof row.current_step === "number" ? row.current_step : 0;
       if (idx >= emails.length) continue;
+
+      const correo = emails[idx];
+      if (!correo?.subject || !correo?.body) {
+        omitidos += 1;
+        continue;
+      }
+
+      try {
+        await enviar(
+          { email: row.email, name: row.name, company: row.company, role: row.role },
+          { subject: correo.subject, body: correo.body },
+        );
+      } catch {
+        // El paso NO se consume. Volverá a intentarse en la siguiente pasada;
+        // avanzarlo aquí haría que este prospecto se saltara un correo entero.
+        omitidos += 1;
+        continue;
+      }
 
       const nextIdx = idx + 1;
       if (nextIdx >= emails.length) {
@@ -362,17 +432,45 @@ Rules:
       processed += 1;
     }
 
-    return { processed };
+    return { processed, omitidos };
   }
 
-  async detectReply(prospectId: string, userId: string): Promise<ColdEmailProspect | null> {
+  /**
+   * Registra una respuesta de un prospecto, según QUÉ ha respondido.
+   *
+   * Marcaba `replied` para cualquier cosa. Se apoya ahora en el mismo
+   * clasificador que usan las secuencias, y por el mismo motivo: un
+   * autorespondedor no es una respuesta, y contarlo como tal saca al prospecto
+   * de la campaña e infla la tasa de respuesta a la vez.
+   *
+   * Que las dos vías de correo compartan clasificador es deliberado: dos
+   * criterios distintos sobre qué es una baja acaban siendo uno que funciona y
+   * otro que se olvidó.
+   *
+   * @param texto  cuerpo de la respuesta. Sin texto se conserva el
+   *               comportamiento anterior —marcar respondido— para no cambiar
+   *               en silencio lo que hacen los llamantes que aún no lo pasan.
+   */
+  async detectReply(
+    prospectId: string,
+    userId: string,
+    texto?: string | null,
+  ): Promise<ColdEmailProspect | null> {
+    const clase = clasificarRespuesta(texto);
+
+    // Un fuera-de-oficina no saca a nadie de la campaña.
+    if (clase.categoria === "automatica") return null;
+
+    const estado =
+      clase.retiraConsentimiento ? "unsubscribed" : clase.categoria === "rebote" ? "bounced" : "replied";
+
     const rows = await this.db.query<Parameters<typeof mapProspectRow>[0]>(
       `UPDATE cold_email_prospects
-       SET status = 'replied', replied_at = NOW(), send_at = NULL, updated_at = NOW()
+       SET status = $3, replied_at = NOW(), send_at = NULL, updated_at = NOW()
        WHERE id = $1::uuid AND user_id = $2::uuid
        RETURNING id::text, campaign_id::text, user_id::text, name, email, company, role,
                  status, current_step, send_at, sent_at, replied_at, created_at`,
-      [prospectId, userId],
+      [prospectId, userId, estado],
     );
     const r = rows[0];
     return r ? mapProspectRow(r) : null;
