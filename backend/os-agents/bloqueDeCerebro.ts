@@ -68,7 +68,59 @@ export type LoQueSabemosDelCliente = {
    * nunca porque nadie le decía contra qué nombres comparar.
    */
   otrosClientes: string[];
+  /**
+   * Lo que el motor de calidad necesita para poder juzgar, sacado del cerebro.
+   *
+   * Se midió: de las 55 comprobaciones que leen alguna clave, 11 no podían
+   * dispararse NUNCA porque nadie producía lo que esperan. Dos de esas once
+   * piden datos que el cerebro SÍ tiene, sólo que con otro nombre.
+   *
+   * Y son las dos bloqueantes: proponerle a una marca justo lo que tiene
+   * prohibido, o volver a proponerle lo que ya probó y le costó dinero. Dos
+   * comprobaciones escritas, documentadas y sin ejecutarse jamás.
+   */
+  contextoParaCalidad: Record<string, unknown>;
 };
+
+/**
+ * De dimensión del cerebro a clave del motor de calidad.
+ *
+ * Un mapa declarado en un sitio, y no cuatro campos sueltos que van creciendo.
+ * Lo que cambia entre una y otra no es el dato: es el nombre. `historial`
+ * responde a «¿qué habéis probado antes, y qué tal fue?» y la comprobación lo
+ * llama `loQueYaFallo` — la misma cosa vista desde los dos lados.
+ */
+const DEL_CEREBRO_A_CALIDAD: ReadonlyArray<{
+  dimension: string;
+  clave: string;
+  como: "lista" | "texto";
+}> = [
+  // Bloqueante: propone lo que la marca tiene prohibido.
+  { dimension: "lo_que_la_marca_no_hace", clave: "loQueLaMarcaNoHace", como: "lista" },
+  // Bloqueante: vuelve a proponer lo que ya salió mal. La comprobación espera
+  // un texto, así que la lista se une — busca por raíz de palabra, no por
+  // elemento.
+  { dimension: "historial", clave: "loQueYaFallo", como: "texto" },
+];
+
+/** Los elementos de una dimensión de forma «lista», si está vigente. */
+function listaDe(cerebro: Cerebro, id: string): string[] {
+  if (cerebro.caducadas.includes(id)) return [];
+  const v = cerebro.dimensiones.get(id)?.valor as { items?: unknown } | undefined;
+  if (!Array.isArray(v?.items)) return [];
+  return v.items.filter((x): x is string => typeof x === "string" && x.trim().length > 0);
+}
+
+/** Lo que el motor de calidad puede comprobar con lo que sabemos del cliente. */
+function contextoParaCalidad(cerebro: Cerebro): Record<string, unknown> {
+  const fuera: Record<string, unknown> = {};
+  for (const { dimension, clave, como } of DEL_CEREBRO_A_CALIDAD) {
+    const items = listaDe(cerebro, dimension);
+    if (items.length === 0) continue;
+    fuera[clave] = como === "lista" ? items : items.join(". ");
+  }
+  return fuera;
+}
 
 /** El valor de una dimensión de forma «texto», si está y no está vacío. */
 function textoDe(cerebro: Cerebro, id: string): string | null {
@@ -87,6 +139,7 @@ export async function bloqueDeCerebro(
     idioma: null,
     mercado: null,
     otrosClientes: [],
+    contextoParaCalidad: {},
   };
   try {
     const workspaceId = await workspaceDelCliente(clientId);
@@ -103,6 +156,7 @@ export async function bloqueDeCerebro(
       idioma: textoDe(cerebro, "idioma"),
       mercado: textoDe(cerebro, "mercado"),
       otrosClientes: await otrosClientesDelWorkspace(workspaceId, clientId),
+      contextoParaCalidad: contextoParaCalidad(cerebro),
     };
   } catch (e) {
     const { redactar } = await import("../seguridad/formaDeUnSecreto.mjs");

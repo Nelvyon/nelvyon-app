@@ -200,6 +200,13 @@ function contextoDelCliente(payload: Record<string, unknown>): Record<string, un
     ctx.datosDelCliente = payload.datosDelCliente;
   }
   if (Array.isArray(payload.otrosClientes)) ctx.otrosClientes = payload.otrosClientes;
+  // Lo que sale del cerebro para que ciertas comprobaciones puedan ejecutarse.
+  // Se reenvia por nombre declarado, no en bloque: meter el payload entero en
+  // el contexto haria que cualquier campo del encargo pudiera hacerse pasar por
+  // conocimiento verificado del cliente.
+  for (const clave of ["loQueLaMarcaNoHace", "loQueYaFallo"]) {
+    if (payload[clave] !== undefined) ctx[clave] = payload[clave];
+  }
   return ctx;
 }
 
@@ -244,6 +251,13 @@ export const manejadorDeServicioOs: ManejadorDeTrabajo = async (
   // se aplicaba nunca, porque nadie le decia contra que nombres comparar.
   if (sabido.otrosClientes.length > 0) {
     payloadConCerebro.otrosClientes = sabido.otrosClientes;
+  }
+  // Y lo demas que el motor de calidad puede comprobar con lo que sabemos: lo
+  // que la marca tiene prohibido y lo que ya se probo y salio mal. Las dos son
+  // comprobaciones BLOQUEANTES que estaban escritas y no se ejecutaban jamas
+  // porque nadie les pasaba el dato.
+  for (const [clave, valor] of Object.entries(sabido.contextoParaCalidad)) {
+    if (payloadConCerebro[clave] === undefined) payloadConCerebro[clave] = valor;
   }
 
   const salida = await osOrchestrator.processQueuedJob({

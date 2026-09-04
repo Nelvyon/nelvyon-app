@@ -203,6 +203,58 @@ describe("nada se entrega sin pasar por calidad", () => {
     expect((await ejecutar()).tipo).toBe("completado");
   });
 
+  it("proponer lo que la marca tiene PROHIBIDO se retiene", async () => {
+    // Otra bloqueante escrita y nunca ejecutada: esperaba
+    // `contexto.loQueLaMarcaNoHace` y nadie se lo pasaba. El cerebro lo tiene
+    // desde siempre, con otro nombre — la dimensión se llama
+    // `lo_que_la_marca_no_hace`.
+    processQueuedJob.mockResolvedValue({
+      status: "completed",
+      result: { texto: BUENO.texto + " Proponemos un sorteo con descuento agresivo." },
+    });
+
+    // `respeta-lo-que-la-marca-no-hace` es de la disciplina CREATIVIDAD, no de
+    // las comunes: se juzga con el servicio que le toca.
+    const r = await ejecutar({
+      serviceId: "branding_premium",
+      payload: { userId: "usr-1", loQueLaMarcaNoHace: ["descuento agresivo", "sorteos"] },
+    });
+
+    expect(r.tipo, "propuso justo lo que la marca no hace").toBe("esperandoAprobacion");
+    expect((r as { motivo: string }).motivo).toMatch(/descuento agresivo/);
+  });
+
+  it("volver a proponer lo que ya salió mal también se retiene", async () => {
+    // Proponerle a alguien exactamente lo que ya probó y le costó dinero es la
+    // forma más rápida de que deje de leer.
+    processQueuedJob.mockResolvedValue({
+      status: "completed",
+      result: { texto: BUENO.texto + " El plan arranca con campañas de display en la red." },
+    });
+
+    // `no-repite-lo-que-ya-fallo` es de la disciplina ESTRATEGIA.
+    const r = await ejecutar({
+      serviceId: "advisor_empresarial_premium",
+      payload: {
+        userId: "usr-1",
+        loQueYaFallo: "Campañas de display durante un año sin retorno medible",
+      },
+    });
+
+    expect(r.tipo, "repitió lo que ya le había fallado al cliente").toBe("esperandoAprobacion");
+  });
+
+  it("y sin esos datos no acusa a nadie", async () => {
+    // CONTROL. Las dos comprobaciones tienen que callarse cuando no se les da
+    // con qué comparar: inventarse la infracción es tan malo como no verla.
+    processQueuedJob.mockResolvedValue({
+      status: "completed",
+      result: { texto: BUENO.texto + " Proponemos un sorteo con descuento agresivo." },
+    });
+
+    expect((await ejecutar({ serviceId: "branding_premium" })).tipo).toBe("completado");
+  });
+
   it("lo que suspende calidad TAMPOCO se aprende", async () => {
     // Aprender de trabajo que no ha pasado calidad enseña a repetir lo que no
     // vale, y encima con la confianza que da un patrón con muchas muestras.
