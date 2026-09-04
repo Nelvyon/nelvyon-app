@@ -22,16 +22,24 @@ Brain ya tenia, solo que con otro nombre:
 
 Las dos se conectaron. Quedan nueve.
 
-QUE PASA CON LAS NUEVE
------------------------
-Todas esperan que el AGENTE emita una salida estructurada: paginas, llamadas a
-la accion, campos del formulario, pasos del proceso, contraste de color. No es
-un cable que falte: es que el agente devuelve prosa y estas comprobaciones
-esperan una ficha.
+QUE PASA CON LAS OCHO QUE QUEDAN
+---------------------------------
+Todas esperan que el AGENTE emita una FICHA: paginas, llamadas a la accion,
+campos del formulario, pasos del proceso, contraste de color. El agente devuelve
+prosa.
 
-Cerrarlo pide cambiar las plantillas de los 29 servicios para que emitan esas
-claves, y comprobar con un modelo real que las emiten de verdad — o sea, gasto.
-Queda declarado, no escondido.
+PERO NO ESTAN SIN PROBAR. `contratoDeSalidaEstructurada` define que campos son y
+que comprobacion lee cada uno, y `lasOchoQueEsperabanUnaFicha` demuestra con
+fixtures sinteticas que las ocho DETECTAN su fallo, que NO acusan cuando la
+pieza esta bien, y que aguantan lo que un modelo devuelve de verdad: campos a
+medias, tipos equivocados, listas vacias y JSON que no es un objeto.
+
+Lo que falta no es la comprobacion: es el PRODUCTOR. Y comprobar que un modelo
+real emite esa forma cuesta dinero, asi que lo bloqueado se llama
+`PROVIDER_REAL_OUTPUT_VERIFICATION` y no «el subsistema».
+
+Siguen aqui porque en produccion no se disparan, que es lo que esta bateria
+mide. No porque no funcionen.
 
 POR QUE UN TRINQUETE Y NO UNA REGLA
 ------------------------------------
@@ -56,9 +64,12 @@ _CONTEXTO = re.compile(r"p\.contexto\?\.([a-zA-Z_][a-zA-Z0-9_]*)")
 
 #: Comprobaciones que HOY no pueden dispararse. Medido el 2026-09-04.
 #:
-#: Todas esperan una salida estructurada del agente. Cerrarlas pide tocar las
-#: plantillas de los 29 servicios y comprobar con un modelo real que emiten esas
-#: claves — o sea, gasto. Estan aqui para que se sepa, no para que se olviden.
+#: Todas esperan una FICHA del agente, y todas estan PROBADAS con fixtures
+#: sinteticas en `lasOchoQueEsperabanUnaFicha`: detectan, no acusan de mas, y
+#: aguantan salidas a medias o mal tipadas.
+#:
+#: Lo que falta es el productor. Estan aqui porque en produccion no se disparan
+#: —que es lo que esta bateria mide— y no porque no funcionen.
 DECORATIVAS_DECLARADAS: dict[str, str] = {
     "canibalizacion": "espera un listado de paginas; el agente devuelve prosa",
     "cualificacion-explicada": "espera los criterios de cualificacion estructurados",
@@ -102,7 +113,19 @@ def _corpus() -> str:
     for base, dirs, ficheros in os.walk(RAIZ / "backend"):
         dirs[:] = [d for d in dirs if d not in ("node_modules", "__tests__", ".pytest_cache")]
         for f in ficheros:
-            if f.endswith((".ts", ".json")) and f != "MotorDeCalidad.ts":
+            # NI EL MOTOR NI EL CONTRATO cuentan como productores.
+            #
+            # El motor es quien LEE las claves; contarlo seria decir que se
+            # produce a si mismo. Y `contratoDeSalidaEstructurada` DECLARA la
+            # forma —«esto es lo que un agente tendria que emitir»— sin emitir
+            # nada: es un tipo, no una salida.
+            #
+            # Sin esta exclusion, escribir el contrato puso las ocho en verde de
+            # golpe. Declarar una forma no es producirla, igual que un comentario
+            # no es codigo.
+            if f in ("MotorDeCalidad.ts", "contratoDeSalidaEstructurada.ts"):
+                continue
+            if f.endswith((".ts", ".json")):
                 try:
                     trozos.append(
                         _COMENTARIO.sub(
@@ -178,3 +201,21 @@ def test_las_declaraciones_explican_por_que():
     """Una lista de excepciones sin motivos deja de leerse."""
     sin_motivo = sorted(c for c, p in DECORATIVAS_DECLARADAS.items() if len(p) < 25)
     assert not sin_motivo, f"estas no explican por que no pueden dispararse: {sin_motivo}"
+
+
+def test_las_ocho_siguen_teniendo_su_bateria():
+    """Estan declaradas como no disparables en produccion, no como no probadas.
+
+    Si alguien borrara la bateria de fixtures, estas ocho volverian a ser lo que
+    parecian al principio —comprobaciones de las que nadie sabe si funcionan— y
+    la declaracion de arriba pasaria a ser una excusa.
+    """
+    bateria = RAIZ / "backend" / "calidad" / "__tests__" / "lasOchoQueEsperabanUnaFicha.test.ts"
+    assert bateria.exists(), "desaparecio la bateria que demuestra que las ocho funcionan"
+
+    texto = bateria.read_text(encoding="utf-8", errors="replace")
+    for cid in DECORATIVAS_DECLARADAS:
+        assert cid in texto, f"{cid} ya no tiene prueba que demuestre que detecta su fallo"
+
+    contrato = RAIZ / "backend" / "calidad" / "contratoDeSalidaEstructurada.ts"
+    assert contrato.exists(), "desaparecio el contrato de la ficha"
