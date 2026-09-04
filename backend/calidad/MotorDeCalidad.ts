@@ -32,6 +32,7 @@
 
 import { resolveLlmMode } from "../autonomous/llm/llmAdapter";
 import { proveedoresDisponibles } from "../autonomous/llm/providers";
+import { ES_PARA_ESTE_CLIENTE } from "./esParaEsteCliente";
 
 /** Con qué se evaluó. Cerrado, y nunca se infiere. */
 export type ModoDeEvaluacion =
@@ -131,6 +132,10 @@ const PROMESAS_SIN_RESPALDO = [
 ];
 
 const COMUNES: readonly Comprobacion[] = [
+  // Ninguna disciplina se libra de estar en el idioma del cliente, en su mercado
+  // y sin inventarle la historia: un anuncio en el idioma equivocado lo esta
+  // igual de mal siendo anuncio que siendo correo.
+  ...ES_PARA_ESTE_CLIENTE,
   {
     id: "tiene-contenido",
     descripcion: "La pieza no está vacía",

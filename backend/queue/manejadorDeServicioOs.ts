@@ -10,6 +10,8 @@
  * el bucle que reclama y cierra filas.
  */
 
+import mapaDeServicio from "../calidad/mapaDeServicio.json";
+import { MotorDeCalidad, type Pieza } from "../calidad/MotorDeCalidad";
 import { osOrchestrator } from "../os-agents/OsOrchestrator";
 import { degradacionPermitida, veredictoDeEntrega } from "../autonomous/llm/llmPolicy";
 import type { LlmProvenance } from "../autonomous/llm/llmProvenance";
@@ -65,6 +67,112 @@ function extraerProcedencias(resultado: unknown): LlmProvenance[] {
   );
 }
 
+/** Qué disciplina juzga cada servicio. Fuente única, ya declarada. */
+const QA_DE = (mapaDeServicio as { qaDe: Record<string, string> }).qaDe;
+
+const motorDeCalidad = new MotorDeCalidad();
+
+/**
+ * ¿Esto se puede entregar tal cual, o tiene que verlo una persona?
+ *
+ * ── EL HUECO QUE CIERRA, Y ERA EL MAYOR ─────────────────────────────────────
+ *
+ * `MotorDeCalidad` tiene 82 comprobaciones repartidas en 18 disciplinas.
+ * `mapaDeServicio.json` dice qué disciplina juzga cada servicio. Las dos cosas
+ * estaban construidas.
+ *
+ * Y no se tocaban. El único módulo que llamaba al motor era `PuenteDeEjecucion`,
+ * que no tiene ni un consumidor; y `qaDe` sólo lo leía una prueba. La vía real
+ * —`manejadorDeServicioOs` → `OsOrchestrator.processQueuedJob`— no menciona la
+ * calidad en ninguna línea.
+ *
+ * Es decir: todo lo que se ha entregado hasta hoy salió sin pasar por calidad
+ * ni una sola vez. No porque el motor fallara: porque nadie lo llamaba.
+ *
+ * ── POR QUÉ AQUÍ ────────────────────────────────────────────────────────────
+ *
+ * Es el punto único por el que pasa todo trabajo terminado, venga del agente
+ * que venga. Ponerlo en cada agente es exactamente cómo el bucle de aprendizaje
+ * acabó faltando en 67 de ellos.
+ *
+ * Y va DESPUÉS de la puerta de procedencia y ANTES del aprendizaje: aprender de
+ * trabajo que no ha pasado calidad enseña a repetir lo que no vale, y encima
+ * con la confianza que da un patrón con muchas muestras.
+ *
+ * ── NO TIRA TRABAJO ─────────────────────────────────────────────────────────
+ *
+ * Suspender no borra nada: encamina a `esperandoAprobacion`, que es la vía que
+ * ya existe para que una persona lo mire. El trabajo está hecho y sigue ahí; lo
+ * único que se impide es que salga sin que nadie lo haya visto.
+ */
+async function revisarCalidad(
+  serviceId: string,
+  resultado: unknown,
+  payload: Record<string, unknown>,
+): Promise<{ pide: true; motivo: string } | { pide: false }> {
+  const dominio = QA_DE[serviceId];
+  // Servicio sin disciplina declarada: no se inventa una. Juzgarlo con la
+  // rúbrica equivocada sería peor que no juzgarlo, y el hueco de declaración se
+  // vigila donde corresponde, en el mapa.
+  if (!dominio) return { pide: false };
+
+  if (!resultado || typeof resultado !== "object") return { pide: false };
+
+  const pieza: Pieza = {
+    dominio,
+    autor: serviceId,
+    contenido: resultado as Record<string, unknown>,
+    contexto: contextoDelCliente(payload),
+  };
+
+  try {
+    const informe = motorDeCalidad.evaluar(pieza, `qa:${serviceId}`);
+
+    // PASS_WITH_WARNINGS es un aprobado, no un suspenso. El motor distingue las
+    // dos cosas a proposito: un aviso senala algo mejorable, no algo que impida
+    // entregar. Retener por un aviso llenaria la bandeja de revision de trabajo
+    // valido, y una bandeja llena de ruido se deja de mirar —que es como se
+    // pierde tambien lo que si importaba—.
+    if (informe.veredicto === "PASS" || informe.veredicto === "PASS_WITH_WARNINGS") {
+      return { pide: false };
+    }
+
+    const porQue = informe.hallazgos.length > 0
+      ? informe.hallazgos.map((h) => h.quePasa).join("; ")
+      : informe.noComprobado.map((n) => `${n.id}: ${n.porQue}`).join("; ");
+    return {
+      pide: true,
+      motivo: `calidad (${dominio}) dice ${informe.veredicto}: ${porQue}`,
+    };
+  } catch (e) {
+    // FALLA CERRADO. Si el propio motor revienta, no se sabe si la pieza vale
+    // — y no saberlo no es lo mismo que valer. Se encamina a revisión, que no
+    // pierde el trabajo, en vez de entregarlo sin haberlo mirado.
+    const motivo = e instanceof Error ? e.message : String(e);
+    return { pide: true, motivo: `no se pudo revisar la calidad: ${motivo}` };
+  }
+}
+
+/**
+ * Lo que el motor necesita saber del cliente para juzgar la pieza.
+ *
+ * Sin esto, las comprobaciones de idioma y mercado no aplican nunca y el motor
+ * juzgaría una landing francesa exactamente igual que una española. Se pasa lo
+ * que haya; lo que falte, falta —no se rellena con suposiciones—.
+ */
+function contextoDelCliente(payload: Record<string, unknown>): Record<string, unknown> {
+  const ctx: Record<string, unknown> = {};
+  const idioma = payload.idioma ?? payload.language ?? payload.locale;
+  if (typeof idioma === "string") ctx.idioma = idioma;
+  const mercado = payload.mercado ?? payload.market ?? payload.pais ?? payload.country;
+  if (typeof mercado === "string") ctx.mercado = mercado;
+  if (payload.datosDelCliente && typeof payload.datosDelCliente === "object") {
+    ctx.datosDelCliente = payload.datosDelCliente;
+  }
+  if (Array.isArray(payload.otrosClientes)) ctx.otrosClientes = payload.otrosClientes;
+  return ctx;
+}
+
 export const manejadorDeServicioOs: ManejadorDeTrabajo = async (
   trabajo,
 ): Promise<ResultadoDeManejador> => {
@@ -96,6 +204,13 @@ export const manejadorDeServicioOs: ManejadorDeTrabajo = async (
   const aprobacion = exigeAprobacion(trabajo.serviceId, resultado);
   if (aprobacion.pide) {
     return { tipo: "esperandoAprobacion", motivo: aprobacion.motivo };
+  }
+
+  // LA PUERTA DE CALIDAD. Antes de esto, nada de lo que se entregaba pasaba por
+  // el motor: existia, y no lo llamaba nadie en la via real.
+  const calidad = await revisarCalidad(trabajo.serviceId, resultado, trabajo.payload);
+  if (calidad.pide) {
+    return { tipo: "esperandoAprobacion", motivo: calidad.motivo };
   }
 
   // EL BUCLE DE APRENDIZAJE SE CIERRA AQUI, no en cada agente.
@@ -166,4 +281,4 @@ async function registrarParaAprender(
   }
 }
 
-export { exigeAprobacion as exigeAprobacionParaPruebas };
+export { exigeAprobacion as exigeAprobacionParaPruebas, revisarCalidad as revisarCalidadParaPruebas };

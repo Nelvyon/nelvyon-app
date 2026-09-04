@@ -97,7 +97,9 @@ describe("el bucle de aprendizaje se cierra en el manejador, no en cada agente",
   it("sin `userId` en el payload cae al cliente, no a una cadena vacía", async () => {
     // Un outcome sin sujeto no se puede atribuir a nadie y ensucia el aprendizaje
     // de todos los demás.
-    processQueuedJob.mockResolvedValue({ status: "completed", result: {} });
+    // El resultado tiene que ser entregable: uno vacío lo retiene ahora la
+    // puerta de calidad, que es justo lo que debe hacer con un entregable vacío.
+    processQueuedJob.mockResolvedValue({ status: "completed", result: { texto: "hecho" } });
     const { manejadorDeServicioOs } = await import("../manejadorDeServicioOs");
 
     await manejadorDeServicioOs({ ...trabajo, payload: { sector: "health" } } as never, utilidades);
@@ -156,7 +158,7 @@ describe("el bucle de aprendizaje se cierra en el manejador, no en cada agente",
   });
 
   it("y el aviso no filtra la cadena de conexión", async () => {
-    processQueuedJob.mockResolvedValue({ status: "completed", result: {} });
+    processQueuedJob.mockResolvedValue({ status: "completed", result: { texto: "hecho" } });
     recordOutcome.mockRejectedValue(
       new Error("connect ECONNREFUSED postgresql://usuario:SECRETO@host:5432/db"),
     );
