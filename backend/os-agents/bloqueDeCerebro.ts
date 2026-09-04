@@ -41,6 +41,11 @@ import { DbClient } from "../db/DbClient";
 
 import { contextoDeNegocio } from "./contextoDeNegocio";
 import {
+  componerBriefVisual,
+  necesitaBriefVisual,
+  type BriefVisual,
+} from "../agency/briefVisual";
+import {
   otrosClientesDelWorkspace,
   workspaceDelCliente,
 } from "../os-core/workspaceDelCliente";
@@ -80,6 +85,14 @@ export type LoQueSabemosDelCliente = {
    * comprobaciones escritas, documentadas y sin ejecutarse jamás.
    */
   contextoParaCalidad: Record<string, unknown>;
+  /**
+   * Lo que se sabe del aspecto que debe tener la pieza.
+   *
+   * `null` para los servicios que no producen nada que se vea. Una integracion
+   * de APIs no tiene direccion visual, y darle un brief vacio llenaria de
+   * campos irrelevantes lo que no los usa.
+   */
+  briefVisual: BriefVisual | null;
 };
 
 /**
@@ -140,6 +153,10 @@ export async function bloqueDeCerebro(
     mercado: null,
     otrosClientes: [],
     contextoParaCalidad: {},
+    // Sin cerebro no se compone un brief: se dice que no hay. Un brief vacio se
+    // leeria como «no hay restricciones de marca», y ese es el peor mensaje
+    // posible para una marca con reglas.
+    briefVisual: necesitaBriefVisual(serviceId) ? componerBriefVisual(null) : null,
   };
   try {
     const workspaceId = await workspaceDelCliente(clientId);
@@ -157,6 +174,7 @@ export async function bloqueDeCerebro(
       mercado: textoDe(cerebro, "mercado"),
       otrosClientes: await otrosClientesDelWorkspace(workspaceId, clientId),
       contextoParaCalidad: contextoParaCalidad(cerebro),
+      briefVisual: necesitaBriefVisual(serviceId) ? componerBriefVisual(cerebro) : null,
     };
   } catch (e) {
     const { redactar } = await import("../seguridad/formaDeUnSecreto.mjs");

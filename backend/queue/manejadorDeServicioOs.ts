@@ -263,6 +263,18 @@ export const manejadorDeServicioOs: ManejadorDeTrabajo = async (
     if (payloadConCerebro[clave] === undefined) payloadConCerebro[clave] = valor;
   }
 
+  // EL BRIEF VISUAL, solo para los servicios que producen algo que se ve.
+  //
+  // `VisualEliteStrategyPipeline` llevaba la cadena entera —direccion creativa,
+  // guion, storyboard, variantes, revision y sus puertas— y no lo llamaba nadie:
+  // ningun encargo traia brief. Conectarlo tal cual habria sido peor que dejarlo
+  // suelto, porque su direccion creativa devolvia las MISMAS cuatro palabras
+  // para cualquier cliente.
+  //
+  // Es determinista y no llama a ningun modelo: coste 0.
+  const paqueteVisual = await estrategiaVisual(trabajo, sabido.briefVisual);
+  if (paqueteVisual) payloadConCerebro.__estrategiaVisual = paqueteVisual;
+
   const salida = await osOrchestrator.processQueuedJob({
     jobId: trabajo.jobId,
     serviceId: trabajo.serviceId,
@@ -498,6 +510,64 @@ async function intentarCorregir(
     const crudo = e instanceof Error ? e.message : "desconocido";
     console.warn(
       `[correccion] no se pudo reintentar ${trabajo.serviceId}: `
+        + `${String(redactar(crudo)).slice(0, 200)}`,
+    );
+    return null;
+  }
+}
+
+/**
+ * La estrategia visual, para lo que se ve.
+ *
+ * Solo se compone si el servicio produce algo visual y si hay brief. El
+ * pipeline es determinista —direccion creativa, guion, storyboard, prompts, dos
+ * variantes y revision de cada una— y NO llama a ningun modelo: el modo por
+ * defecto es `strategy_only` y su coste es cero.
+ *
+ * NUNCA lanza. Si falla, el agente trabaja como trabajaba antes de que esto
+ * existiera y queda constancia.
+ */
+async function estrategiaVisual(
+  trabajo: Parameters<ManejadorDeTrabajo>[0],
+  brief: import("../agency/briefVisual").BriefVisual | null,
+): Promise<Record<string, unknown> | null> {
+  if (!brief) return null;
+  try {
+    const { runVisualEliteStrategyPipeline } = await import(
+      "../agency/VisualEliteStrategyPipeline"
+    );
+    const { briefVisualComoTexto } = await import("../agency/briefVisual");
+
+    const paquete = await runVisualEliteStrategyPipeline({
+      workspaceId: 0,
+      // El inquilino puede no constar en un trabajo: el pipeline no lo usa para
+      // decidir nada, solo para trazar el gasto que aqui no ocurre.
+      tenantId: trabajo.tenantId ?? "",
+      clientName: (trabajo.payload.clientName as string | undefined) ?? trabajo.clientId,
+      objective: (trabajo.payload.mainGoal as string | undefined)
+        ?? (trabajo.payload.brief as string | undefined)
+        ?? trabajo.serviceId,
+      sector: (trabajo.payload.industry as string | undefined) ?? "",
+      // NO se pide render: el modo por defecto es solo estrategia y cuesta 0.
+      budgetCentsMax: 0,
+      commercialUse: false,
+      privacyOk: false,
+      visual: brief,
+    });
+
+    return {
+      direccionCreativa: paquete.creativeDirection,
+      variantes: paquete.variants,
+      bloqueos: paquete.blockers,
+      // El texto que se le pone delante a quien produce la pieza, con los
+      // huecos NOMBRADOS.
+      brief: briefVisualComoTexto(brief),
+    };
+  } catch (e) {
+    const { redactar } = await import("../seguridad/formaDeUnSecreto.mjs");
+    const crudo = e instanceof Error ? e.message : "desconocido";
+    console.warn(
+      `[visual] ${trabajo.serviceId} trabaja sin estrategia visual: `
         + `${String(redactar(crudo)).slice(0, 200)}`,
     );
     return null;

@@ -17,6 +17,7 @@ import {
   isVisualGenerationSpendEnabled,
   type VisualGenerationResult,
 } from "./VisualGenerationProvider";
+import type { BriefVisual } from "./briefVisual";
 
 export const VISUAL_ELITE_STRATEGY_FLOW = [
   "brief",
@@ -46,6 +47,15 @@ export type VisualEliteBrief = {
   requestRenderApproved?: boolean;
   /** Test/QA only — inject specific prompts to exercise the elite review reject paths. */
   variantPromptsOverride?: string[];
+  /**
+   * Lo que NELVYON sabe del aspecto de esta marca.
+   *
+   * Es opcional para no romper a quien ya construye briefs, pero SIN esto la
+   * direccion creativa es la misma para todos: la version anterior devolvia
+   * «autentico, profesional, cercano» mas el sector, para cualquier cliente.
+   * Eso es literalmente lo generico que este sistema existe para evitar.
+   */
+  visual?: BriefVisual;
 };
 
 export type VisualEliteVariant = {
@@ -127,13 +137,58 @@ const STORYBOARD_SCENES = ["hook", "problema", "solucion", "cta"] as const;
  * so every downstream prompt/variant is anchored to an explicit mood/tone/color
  * direction instead of being improvised ad hoc per variant.
  */
+/**
+ * Lo que no se puede hacer NUNCA, venga el brief que venga.
+ *
+ * No es la lista de la marca: es la de la agencia. Una foto de stock generica
+ * o una promesa de resultado garantizado estan mal para cualquier cliente, y a
+ * las suyas se anaden, no se sustituyen.
+ */
+const NUNCA: readonly string[] = [
+  "stock photos genéricas",
+  "promesas de resultado garantizado",
+  "texto ilegible en móvil",
+];
+
+/**
+ * La direccion creativa, sacada de la marca y no de una plantilla.
+ *
+ * ANTES devolvia las mismas cuatro palabras para todos —«autentico,
+ * profesional, cercano» mas el sector—. Dos clientes que no se parecen en nada
+ * recibian la misma direccion, y eso no es una direccion: es un relleno con
+ * forma de decision.
+ *
+ * Ahora, lo que no consta NO se rellena: si no sabemos como habla la marca, el
+ * tono queda declarado como desconocido en vez de inventado.
+ */
 function buildCreativeDirection(brief: VisualEliteBrief): VisualEliteCreativeDirection {
+  const v = brief.visual;
+
+  // El sector siempre entra; el resto solo si consta.
+  const mood = [brief.sector.trim().toLowerCase()].filter(Boolean);
+  if (v?.diferenciacion) mood.push(...palabrasClave(v.diferenciacion));
+  if (v?.publico) mood.push(...palabrasClave(v.publico));
+  if (v?.dondeSeVaAVer?.length) mood.push(...v.dondeSeVaAVer.slice(0, 2));
+
   return {
-    moodKeywords: ["auténtico", "profesional", "cercano", brief.sector.trim().toLowerCase() || "genérico"],
-    colorDirection: "Paleta de marca NELVYON — sin stock genérico, contraste alto para móvil",
-    toneOfVoice: "Directo, sin promesas absolutas, prueba social real",
-    visualDoNots: ["stock photos genéricas", "promesas de resultado garantizado", "texto ilegible en móvil"],
+    moodKeywords: mood.length > 0 ? [...new Set(mood)].slice(0, 8) : ["sin dirección declarada"],
+    colorDirection: v?.marca
+      ? `Identidad del cliente: ${v.marca}. Contraste alto para móvil.`
+      : "No consta la identidad visual del cliente: NO se inventa una paleta.",
+    toneOfVoice: v?.vozDeMarca ?? "No consta cómo habla esta marca: no se supone un tono.",
+    // Las prohibiciones de la marca se SUMAN a las de la agencia. Quitar las
+    // suyas porque el cliente tenga las propias seria perder las dos.
+    visualDoNots: [...NUNCA, ...(v?.loQueNoHace ?? [])],
   };
+}
+
+/** Las palabras con peso de una frase, para la lista de mood. */
+function palabrasClave(frase: string): string[] {
+  return frase
+    .toLowerCase()
+    .split(/[^\p{L}\p{N}]+/u)
+    .filter((w) => w.length > 5)
+    .slice(0, 3);
 }
 
 function buildScript(brief: VisualEliteBrief): string {
@@ -156,15 +211,22 @@ function buildVariants(brief: VisualEliteBrief): VisualEliteVariant[] {
       rationale: "test_override",
     }));
   }
+  const v = brief.visual;
+  // Lo que distingue a ESTE cliente. Sin ello las dos variantes son la misma
+  // frase con otro nombre delante.
+  const angulo = v?.diferenciacion ? ` Diferencial: ${v.diferenciacion}.` : "";
+  const aQuien = v?.publico ? ` Para: ${v.publico}.` : "";
+  const donde = v?.dondeSeVaAVer?.length ? ` Se verá en: ${v.dondeSeVaAVer.join(", ")}.` : "";
+
   return [
     {
       variantId: "v1",
-      prompt: `${brief.clientName}: ${brief.objective} — prueba social real, hook auténtico, CTA claro para ${brief.sector}.`,
+      prompt: `${brief.clientName}: ${brief.objective} — prueba social real, hook auténtico, CTA claro para ${brief.sector}.${angulo}${aQuien}`,
       rationale: "Ángulo prueba social",
     },
     {
       variantId: "v2",
-      prompt: `${brief.clientName}: ${brief.objective} — transformación honesta antes/después, sin promesas absolutas, para ${brief.sector}.`,
+      prompt: `${brief.clientName}: ${brief.objective} — transformación honesta antes/después, sin promesas absolutas, para ${brief.sector}.${donde}`,
       rationale: "Ángulo transformación honesta",
     },
   ];

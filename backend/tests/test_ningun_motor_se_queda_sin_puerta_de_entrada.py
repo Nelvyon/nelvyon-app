@@ -97,6 +97,12 @@ ENTRADAS_POR_RUTA_CALCULADA = [
 
 #: Modulos con pinta de motor que HOY no se alcanzan. Medido el 2026-09-04.
 #:
+#: `VisualEliteStrategyPipeline` SALIO de esta lista: era el unico clasificado
+#: como «deberia conectarse», y se conecto. No por importarlo desde algun sitio
+#: —eso lo habria puesto verde sin arreglar nada— sino construyendo el brief
+#: visual que le faltaba y haciendo que su direccion creativa dependa de la
+#: marca en vez de devolver las mismas cuatro palabras a todo el mundo.
+#:
 #: Cada uno con su motivo. Un inventario sin motivos es una lista que nadie lee,
 #: y entonces vuelve a colarse un motor apagado sin que salte nada.
 #: SE CORRIGIERON CUATRO. La primera version de este guardian daba por huerfanos
@@ -151,15 +157,6 @@ SIN_ALCANCE_DECLARADO: dict[str, str] = {
     "backend/local-ai/specialization/QualityGates.ts":
         "F/bloqueado por activacion: evalua al modelo local contra su bateria de casos. "
         "Mismo caso que el anterior: sin modelo activo no hay nada que evaluar",
-
-    # ── A · DEBERIA ESTAR CONECTADO, Y SE PUEDE ─────────────────────────────
-    "backend/agency/VisualEliteStrategyPipeline.ts":
-        "A/pendiente de conectar: brief → direccion creativa → guion → storyboard → "
-        "prompts → variantes → revision → aprobacion humana, todo determinista y sin "
-        "coste (strategy_only por defecto). Le tocaria a las cinco disciplinas creativas. "
-        "Solo aplica cuando el encargo declara un brief visual, y hoy ninguno lo hace: "
-        "conectarlo sin eso seria una puerta que no puede ejecutarse nunca, que es "
-        "justo el defecto que esta sesion ha estado corrigiendo",
 }
 
 
