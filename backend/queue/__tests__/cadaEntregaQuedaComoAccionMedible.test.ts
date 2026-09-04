@@ -27,6 +27,11 @@ vi.mock("../../db/DbClient", () => ({
   DbClient: { getInstance: () => ({ query }) },
 }));
 
+const registrarEntregable = vi.fn();
+vi.mock("../../os-core/registrarEntregable", () => ({
+  registrarEntregable: (...a: unknown[]) => registrarEntregable(...a),
+}));
+
 vi.mock("../../resultados/MotorDeResultados", () => ({
   MotorDeResultados: class {
     registrarAccion = registrarAccion;
@@ -72,6 +77,7 @@ async function ejecutar(t: Partial<typeof trabajo> = {}) {
 describe("cada entrega queda como acción medible", () => {
   beforeEach(() => {
     registrarAccion.mockReset().mockResolvedValue({ id: "acc-1" });
+    registrarEntregable.mockReset().mockResolvedValue({ registrado: true, deliverableId: "d-1" });
     recordOutcome.mockReset().mockResolvedValue(undefined);
     processQueuedJob.mockReset().mockResolvedValue({ status: "completed", result: BUENO });
     // El cliente existe y pertenece al workspace 7.
@@ -142,6 +148,26 @@ describe("cada entrega queda como acción medible", () => {
     expect(texto, "el aviso filtró una credencial").not.toContain("SECRETO");
   });
 
+  it("y aparece en la lista de entregables del cliente", async () => {
+    // Medido antes: `os_deliverables` solo se escribia desde ficheros de prueba.
+    // El portal la lee y produccion no insertaba ni una fila, asi que el cliente
+    // no veia nunca lo que se le producia.
+    await ejecutar();
+
+    expect(registrarEntregable, "la entrega no llegó a la lista del cliente")
+      .toHaveBeenCalledTimes(1);
+    const e = registrarEntregable.mock.calls[0][0];
+    expect(e.clientId).toBe(CLIENTE);
+    expect(e.jobId, "sin jobId no se puede evitar duplicar en un reintento").toBe("job-1");
+    expect(e.titulo).toBeTruthy();
+  });
+
+  it("y si ESO falla, la entrega tampoco se pierde", async () => {
+    registrarEntregable.mockRejectedValue(new Error("la base no está"));
+    const r = await ejecutar();
+    expect(r.tipo).toBe("completado");
+  });
+
   it("lo que NO se entrega tampoco se registra como acción", async () => {
     // Atribuirse una mejora a partir de una pieza que no pasó calidad es como se
     // construyen los informes de agencia que no significan nada.
@@ -151,5 +177,7 @@ describe("cada entrega queda como acción medible", () => {
 
     expect(r.tipo).toBe("esperandoAprobacion");
     expect(registrarAccion, "se registró una acción de algo que no se entregó").not.toHaveBeenCalled();
+    expect(registrarEntregable, "se le enseñó al cliente algo que no pasó calidad")
+      .not.toHaveBeenCalled();
   });
 });

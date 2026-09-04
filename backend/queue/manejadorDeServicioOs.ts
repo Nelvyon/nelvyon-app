@@ -336,10 +336,35 @@ export const manejadorDeServicioOs: ManejadorDeTrabajo = async (
   // Va DESPUES de calidad, igual que el aprendizaje: atribuirse una mejora a
   // partir de una pieza que no ha pasado calidad es como se construyen los
   // informes de agencia que no significan nada.
-  const { registrarEntregaComoAccion } = await import("../resultados/registrarEntregaComoAccion");
-  await registrarEntregaComoAccion({
-    clientId: trabajo.clientId,
-    serviceId: trabajo.serviceId,
+  await sinTumbarLaEntrega("resultados", async () => {
+    const { registrarEntregaComoAccion } = await import("../resultados/registrarEntregaComoAccion");
+    await registrarEntregaComoAccion({
+      clientId: trabajo.clientId,
+      serviceId: trabajo.serviceId,
+    });
+  });
+
+  // Y APARECE EN LA LISTA DE ENTREGABLES DEL CLIENTE.
+  //
+  // Medido: `os_deliverables` solo se escribia desde ficheros de prueba. El
+  // portal la lee, el autopilot la lee, `SenalesDeCliente` levanta
+  // `sin_entregables` con gravedad BLOQUEANTE cuando esta vacia… y produccion no
+  // insertaba ni una fila. El cliente no veia nunca lo que se le producia, y esa
+  // senal saltaba para todos, siempre.
+  //
+  // Se registra como `internal` / `in_review` a proposito: que exista en el
+  // sistema y que el cliente lo vea son dos decisiones distintas, y solo la
+  // primera es automatica.
+  await sinTumbarLaEntrega("entregables", async () => {
+    const { registrarEntregable } = await import("../os-core/registrarEntregable");
+    await registrarEntregable({
+      clientId: trabajo.clientId,
+      serviceId: trabajo.serviceId,
+      jobId: trabajo.jobId,
+      titulo: tituloDeEntrega(trabajo.serviceId, entregable),
+      resumen: resumenDeEntrega(entregable),
+      metadata: calidad.rastro ? { calidad: calidad.rastro } : undefined,
+    });
   });
 
   return { tipo: "completado", resultado: entregable };
@@ -389,6 +414,62 @@ async function registrarParaAprender(
         + `${String(redactar(crudo)).slice(0, 200)}`,
     );
   }
+}
+
+/**
+ * La contabilidad de una entrega NUNCA tumba la entrega.
+ *
+ * Aprender, medir y anotar el entregable son cosas que se hacen DESPUES de que
+ * el trabajo este hecho. Perder un trabajo terminado porque no se pudo anotar
+ * seria absurdo — y ademas lo perderia dos veces, porque el reintento volveria a
+ * pagar el modelo.
+ *
+ * Cada modulo ya se protege por dentro. Esto es la segunda linea, y existe
+ * porque la primera puede desaparecer: basta con que alguien cambie uno de esos
+ * modulos y se le olvide el `try`.
+ *
+ * Lo que NO hace es callar. Un registro que deja de funcionar y no lo dice es
+ * indistinguible de uno que funciona y no encuentra nada.
+ */
+async function sinTumbarLaEntrega(que: string, hacer: () => Promise<void>): Promise<void> {
+  try {
+    await hacer();
+  } catch (e) {
+    const { redactar } = await import("../seguridad/formaDeUnSecreto.mjs");
+    const crudo = e instanceof Error ? e.message : "desconocido";
+    console.warn(
+      `[${que}] no se pudo anotar la entrega: ${String(redactar(crudo)).slice(0, 200)}`,
+    );
+  }
+}
+
+/**
+ * El titulo con el que el cliente vera la pieza en su lista.
+ *
+ * Sale del propio resultado si el agente puso uno; si no, del servicio. NO se
+ * inventa: un titulo generado a partir del texto seria una interpretacion, y en
+ * una lista que ve el cliente eso se lee como una afirmacion nuestra.
+ */
+function tituloDeEntrega(serviceId: string, resultado: unknown): string {
+  if (resultado && typeof resultado === "object") {
+    const r = resultado as Record<string, unknown>;
+    for (const clave of ["titulo", "title", "nombre", "name"]) {
+      const v = r[clave];
+      if (typeof v === "string" && v.trim().length > 2) return v.trim().slice(0, 300);
+    }
+  }
+  return serviceId;
+}
+
+/** Un resumen corto, si el agente lo trae. Nunca uno fabricado. */
+function resumenDeEntrega(resultado: unknown): string | null {
+  if (!resultado || typeof resultado !== "object") return null;
+  const r = resultado as Record<string, unknown>;
+  for (const clave of ["resumen", "summary", "descripcion", "description"]) {
+    const v = r[clave];
+    if (typeof v === "string" && v.trim().length > 0) return v.trim().slice(0, 2000);
+  }
+  return null;
 }
 
 export { exigeAprobacion as exigeAprobacionParaPruebas, revisarCalidad as revisarCalidadParaPruebas };
