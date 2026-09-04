@@ -3,6 +3,7 @@ import type { RedisClient } from "../db/RedisClient";
 import { OS_JOB_REDIS_TTL_SECONDS } from "../db/RedisClient";
 import type { IOsJobStore } from "./types";
 import type { OsJob, OsJobPayload, OsJobResult, OsJobStatus, OsJobStepState } from "./types";
+import { avisoSeguro, errorSeguro } from "../seguridad/avisoSeguro";
 
 /**
  * Persists OS jobs to Postgres (source of truth) and caches active jobs in Redis for fast reads.
@@ -48,7 +49,7 @@ export class OsJobStorePersistent implements IOsJobStore {
           }
         }
       } catch (e) {
-        console.warn("[OsJobStorePersistent] Redis get failed; falling back to Postgres.", e);
+        avisoSeguro("OsJobStorePersistent", "[OsJobStorePersistent] Redis get failed; falling back to Postgres.", e);
       }
     }
 
@@ -57,7 +58,7 @@ export class OsJobStorePersistent implements IOsJobStore {
       try {
         await this.redis.set(redisKey(jobId), JSON.stringify(job), OS_JOB_REDIS_TTL_SECONDS);
       } catch (e) {
-        console.warn("[OsJobStorePersistent] Redis recache after Postgres read failed.", e);
+        avisoSeguro("OsJobStorePersistent", "[OsJobStorePersistent] Redis recache after Postgres read failed.", e);
       }
     }
     return job;
@@ -146,7 +147,7 @@ export class OsJobStorePersistent implements IOsJobStore {
         await this.redis.set(redisKey(job.jobId), JSON.stringify(job), OS_JOB_REDIS_TTL_SECONDS);
       }
     } catch (e) {
-      console.warn("[OsJobStorePersistent] Redis set on createJob failed; job remains in Postgres.", e);
+      avisoSeguro("OsJobStorePersistent", "[OsJobStorePersistent] Redis set on createJob failed; job remains in Postgres.", e);
     }
   }
 
@@ -159,7 +160,7 @@ export class OsJobStorePersistent implements IOsJobStore {
         await this.redis.del(redisKey(job.jobId));
       }
     } catch (e) {
-      console.warn("[OsJobStorePersistent] Redis sync after update failed.", e);
+      avisoSeguro("OsJobStorePersistent", "[OsJobStorePersistent] Redis sync after update failed.", e);
     }
   }
 }

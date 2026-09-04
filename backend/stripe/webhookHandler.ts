@@ -8,6 +8,7 @@ import { mapBillablePlanToSaasPlan, shouldSyncSaasTenantPlan } from "../saas/saa
 import { sendEmail } from "../email";
 import { dateLocaleTag, resolveUserEmailLocale } from "../email/resolveUserEmailLocale";
 import { completeStep } from "../onboarding";
+import { avisoSeguro, errorSeguro } from "../seguridad/avisoSeguro";
 
 function getStripe(): Stripe {
   const key = process.env.STRIPE_SECRET_KEY ?? process.env.STRIPE_API_KEY ?? "";
@@ -391,7 +392,7 @@ async function upsertSubscription(
       await grantPackEntitlementsForTenant(db, tenantId);
     }
   } catch (err) {
-    console.error("[stripe] grantFromPlan after plan sync failed:", err);
+    errorSeguro("webhookHandler", "[stripe] grantFromPlan after plan sync failed", err);
   }
 }
 
@@ -423,7 +424,7 @@ async function notifyPlanActivated(
   try {
     await completeStep(userId, "plan_activated");
   } catch (err) {
-    console.error("[stripe] onboarding plan_activated step failed:", err);
+    errorSeguro("webhookHandler", "[stripe] onboarding plan_activated step failed", err);
   }
 }
 

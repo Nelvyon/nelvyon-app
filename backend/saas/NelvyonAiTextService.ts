@@ -32,6 +32,7 @@
  */
 import { executeTask } from "../local-ai/router/LocalModelRouter";
 import type { RouterTaskInput } from "../local-ai/router/types";
+import { avisoSeguro, errorSeguro } from "../seguridad/avisoSeguro";
 
 export type NelvyonTextRequest = {
   /** Tenant autenticado. Obligatorio: no se acepta cadena vacía. */
@@ -84,7 +85,7 @@ export async function runNelvyonTextTask(req: NelvyonTextRequest): Promise<Nelvy
      * esquema RAG, circuito abierto...). Se degrada de forma explícita.
      * NO se intenta ningún proveedor externo: ese era justo el problema.
      */
-    console.error("[NelvyonAiTextService] inferencia local no disponible", err);
+    errorSeguro("NelvyonAiTextService", "[NelvyonAiTextService] inferencia local no disponible", err);
     return { ok: false, code: "local_ai_unavailable", message: UNAVAILABLE_MESSAGE };
   }
 

@@ -2,6 +2,7 @@ import crypto from "node:crypto";
 import pg from "pg";
 
 import { assertLocalAiDatabaseUrlReady } from "./railwayRagPrep";
+import { avisoSeguro, errorSeguro } from "../seguridad/avisoSeguro";
 
 export function sha256(text: string): string {
   return crypto.createHash("sha256").update(text, "utf8").digest("hex");
@@ -31,7 +32,7 @@ export function getLocalAiPool(): pg.Pool {
       allowExitOnIdle: true,
     });
     pool.on("error", (err: Error) => {
-      console.error("[local-ai] pool idle client error:", err.message);
+      errorSeguro("db", "[local-ai] pool idle client error", err.message);
     });
   }
   return pool;

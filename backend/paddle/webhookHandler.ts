@@ -6,6 +6,7 @@ import type { DbClient } from "../db/DbClient";
 import { sendEmail } from "../email";
 import { dateLocaleTag, resolveUserEmailLocale } from "../email/resolveUserEmailLocale";
 import { completeStep } from "../onboarding";
+import { avisoSeguro, errorSeguro } from "../seguridad/avisoSeguro";
 
 export type PaddleEventType =
   | "checkout.completed"
@@ -121,7 +122,7 @@ export async function handlePaddleWebhook(rawBody: string, signatureHeader: stri
         try {
           await completeStep(userId, "plan_activated");
         } catch (err) {
-          console.error("[paddle] onboarding plan_activated step failed:", err);
+          errorSeguro("webhookHandler", "[paddle] onboarding plan_activated step failed", err);
         }
       }
       break;
