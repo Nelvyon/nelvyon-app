@@ -58,10 +58,28 @@ describe("cuando los datos se contradicen", () => {
   it("EL CONTROL: hay clientes sintéticos que no se parecen en nada", () => {
     // Sin negocios de verdad distintos, cualquier medición de personalización
     // mide el ruido de dos textos parecidos.
-    expect(CLIENTES.length).toBeGreaterThanOrEqual(5);
+    expect(CLIENTES.length).toBeGreaterThanOrEqual(6);
     expect(CLIENTES_INTERNACIONALES.length).toBeGreaterThanOrEqual(3);
     const sectores = new Set(CLIENTES.map((c) => c.sector));
     expect(sectores.size, "los clientes sintéticos comparten sector").toBe(CLIENTES.length);
+
+    // Y sus presupuestos se separan por dos órdenes de magnitud: 300 €/mes
+    // frente a 25.000 €/mes. Un plan que sirva para los dos no sirve para
+    // ninguno.
+    const presupuestos = CLIENTES.map((c) => c.presupuestoMensualCents);
+    expect(Math.max(...presupuestos) / Math.min(...presupuestos)).toBeGreaterThan(50);
+  });
+
+  it("y uno de ellos CONTRADICE a los demás en lo que más importa", () => {
+    // La marca personal de alto ticket no escala: hay una agenda y una persona.
+    // Todo consejo de «más tráfico, más leads» —que es el correcto para el
+    // restaurante— es exactamente el equivocado para ella.
+    //
+    // Sin un cliente así, cinco negocios distintos podrían aceptar el mismo plan
+    // de captación y la medición de personalización no probaría nada.
+    const personal = CLIENTES.find((c) => c.id === "marca_personal");
+    expect(personal, "falta el negocio que no escala").toBeDefined();
+    expect(personal!.restricciones.join(" ")).toMatch(/NO ESCALA/);
   });
 
   // ── 1 · LO QUE LA MARCA NO HACE vs LO QUE PIDE EL ENCARGO ─────────────────

@@ -145,6 +145,41 @@ export const CLIENTES: readonly ClienteSintetico[] = [
     hechosQueLoDistinguen: ["catorce", "clínica", "provincia", "colegiado"],
   },
   {
+    /**
+     * LA MARCA PERSONAL DE ALTO TICKET.
+     *
+     * Existe porque contradice a los otros cinco en lo que más importa: aquí el
+     * producto es una persona. No se puede escalar el volumen —hay una agenda y
+     * una sola boca— así que todo consejo de «más tráfico, más leads» es
+     * exactamente el consejo equivocado. Lo que necesita es MENOS gente y mejor
+     * cualificada.
+     *
+     * Un plan que le proponga captación masiva está copiado del restaurante.
+     */
+    id: "marca_personal",
+    quienEs: "Un consultor de operaciones que factura por proyectos de 30.000 €",
+    empresa: "Íñigo Salvatierra",
+    sector: "consultoría de operaciones industriales",
+    ubicacion: "Bilbao, trabaja en toda Europa",
+    objetivo:
+      "menos llamadas y mejores: cerrar cuatro proyectos grandes al año en vez de perseguir veinte pequeños",
+    presupuestoMensualCents: 200_000, // 2.000 €/mes
+    publico: "directores de planta y de operaciones en industria manufacturera",
+    propuestaDeValor:
+      "veinte años arreglando plantas que iban mal; se paga por el criterio, no por las horas",
+    competidores: ["las cuatro grandes consultoras", "consultores independientes más baratos"],
+    vozDeMarca: "directa y sin adornos; habla de plantas y de números, no de transformación digital",
+    restricciones: [
+      "NO ESCALA: hay una agenda y una persona; más volumen no es mejor",
+      "no puede nombrar clientes: sus contratos llevan confidencialidad",
+      "no publica precios: cada proyecto se cotiza",
+      "no quiere aparecer como «coach» ni como «mentor»",
+    ],
+    historial:
+      "una campaña de captación con lead magnet trajo 300 descargas y ninguna llamada de un director de planta",
+    hechosQueLoDistinguen: ["planta", "operaciones", "industrial", "proyecto"],
+  },
+  {
     id: "despacho",
     quienEs: "Un despacho de abogados laboralistas de tres socios",
     empresa: "Vega & Asociados",
