@@ -2,8 +2,26 @@ import { describe, expect, it, vi } from "vitest";
 
 import { OsUpsellEngine, osUpsellEngine } from "../upsell/OsUpsellEngine";
 
+// El cliente de estas pruebas esta SANO. Lo que se mide aqui es la mecanica de
+// la recomendacion, no la puerta que la frena cuando algo va mal —esa tiene su
+// propia bateria—. Sin declararlo, el motor consultaria las senales de verdad y
+// estas pruebas medirian dos cosas a la vez.
+vi.mock("../../exito/SenalesDeCliente", () => ({
+  SenalesDeCliente: class { deCliente = async () => []; },
+}));
+vi.mock("../../cerebro/CerebroDeNegocioService", () => ({
+  CerebroDeNegocioService: class {},
+}));
+vi.mock("../../portal/CicloDelClienteService", () => ({
+  CicloDelClienteService: class {},
+}));
+
 const TENANT = "00000000-0000-0000-0000-0000000000aa";
-const CLIENT = "client-upsell-1";
+// UUID, porque el motor resuelve ahora el workspace del cliente para comprobar
+// como le va antes de proponerle nada. Un identificador que no es uuid no puede
+// buscarse en `os_clients`, y sin saber como le va NO se le vende: falla
+// cerrado a proposito.
+const CLIENT = "11111111-2222-4333-8444-555555555555";
 
 function catalogRows() {
   return [
@@ -16,6 +34,7 @@ function catalogRows() {
 describe("OsUpsellEngine", () => {
   it("analyzeClient con cliente sin servicios contratados recomienda un servicio del catálogo", async () => {
     const query = vi.fn().mockImplementation(async (sql: string) => {
+      if (sql.includes("os_clients")) return [{ workspace_id: 7 }];
       if (sql.includes("os_service_contracts")) return [];
       if (sql.includes("os_service_catalog")) return catalogRows();
       if (sql.includes("os_job_results")) return [];
@@ -40,6 +59,7 @@ describe("OsUpsellEngine", () => {
   it("analyzeClient con cliente que ya tiene todos los servicios activos devuelve null", async () => {
     const contracted = catalogRows().map((c) => ({ service_id: c.service_id }));
     const query = vi.fn().mockImplementation(async (sql: string) => {
+      if (sql.includes("os_clients")) return [{ workspace_id: 7 }];
       if (sql.includes("os_service_contracts")) return contracted;
       if (sql.includes("os_service_catalog")) return catalogRows();
       if (sql.includes("os_job_results")) return [];
@@ -52,6 +72,7 @@ describe("OsUpsellEngine", () => {
 
   it("analyzeClient con catálogo activo vacío devuelve null", async () => {
     const query = vi.fn().mockImplementation(async (sql: string) => {
+      if (sql.includes("os_clients")) return [{ workspace_id: 7 }];
       if (sql.includes("os_service_contracts")) return [];
       if (sql.includes("os_service_catalog")) return [];
       if (sql.includes("os_job_results")) return [];
@@ -63,6 +84,7 @@ describe("OsUpsellEngine", () => {
 
   it("analyzeClient con LLM que devuelve JSON inválido devuelve null sin crashear", async () => {
     const query = vi.fn().mockImplementation(async (sql: string) => {
+      if (sql.includes("os_clients")) return [{ workspace_id: 7 }];
       if (sql.includes("os_service_contracts")) return [];
       if (sql.includes("os_service_catalog")) return catalogRows();
       if (sql.includes("os_job_results")) return [];
@@ -77,6 +99,7 @@ describe("OsUpsellEngine", () => {
 
   it("analyzeClient con LLM que sugiere servicio fuera del catálogo disponible devuelve null", async () => {
     const query = vi.fn().mockImplementation(async (sql: string) => {
+      if (sql.includes("os_clients")) return [{ workspace_id: 7 }];
       if (sql.includes("os_service_contracts")) return [];
       if (sql.includes("os_service_catalog")) return catalogRows();
       if (sql.includes("os_job_results")) return [];
@@ -91,6 +114,7 @@ describe("OsUpsellEngine", () => {
 
   it("analyzeClient persiste sugerencia en os_upsell_suggestions", async () => {
     const query = vi.fn().mockImplementation(async (sql: string) => {
+      if (sql.includes("os_clients")) return [{ workspace_id: 7 }];
       if (sql.includes("os_service_contracts")) return [];
       if (sql.includes("os_service_catalog")) return catalogRows();
       if (sql.includes("os_job_results")) return [];
@@ -109,6 +133,7 @@ describe("OsUpsellEngine", () => {
 
   it("analyzeClient acepta JSON envuelto en fence markdown", async () => {
     const query = vi.fn().mockImplementation(async (sql: string) => {
+      if (sql.includes("os_clients")) return [{ workspace_id: 7 }];
       if (sql.includes("os_service_contracts")) return [];
       if (sql.includes("os_service_catalog")) return catalogRows();
       if (sql.includes("os_job_results")) return [];
@@ -124,6 +149,7 @@ describe("OsUpsellEngine", () => {
 
   it("analyzeClient normaliza score al rango 0-100", async () => {
     const query = vi.fn().mockImplementation(async (sql: string) => {
+      if (sql.includes("os_clients")) return [{ workspace_id: 7 }];
       if (sql.includes("os_service_contracts")) return [];
       if (sql.includes("os_service_catalog")) return catalogRows();
       if (sql.includes("os_job_results")) return [];
@@ -142,6 +168,7 @@ describe("OsUpsellEngine", () => {
 
   it("analyzeClient excluye servicios ya contratados del conjunto disponible", async () => {
     const query = vi.fn().mockImplementation(async (sql: string) => {
+      if (sql.includes("os_clients")) return [{ workspace_id: 7 }];
       if (sql.includes("os_service_contracts")) return [{ service_id: "web_premium" }];
       if (sql.includes("os_service_catalog")) return catalogRows();
       if (sql.includes("os_job_results")) return [];
@@ -186,6 +213,7 @@ describe("OsUpsellEngine", () => {
 
   it("analyzeClient consulta historial os_job_results limit 10", async () => {
     const query = vi.fn().mockImplementation(async (sql: string) => {
+      if (sql.includes("os_clients")) return [{ workspace_id: 7 }];
       if (sql.includes("os_service_contracts")) return [];
       if (sql.includes("os_service_catalog")) return catalogRows();
       if (sql.includes("os_job_results")) {

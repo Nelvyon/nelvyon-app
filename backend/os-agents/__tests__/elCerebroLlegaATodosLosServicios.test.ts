@@ -70,7 +70,7 @@ describe("el cerebro llega al agente", () => {
     leer.mockResolvedValue(cerebroCon([["objetivo_negocio", { texto: "llenar la sala los martes" }]]));
     const { bloqueDeCerebro } = await import("../bloqueDeCerebro");
 
-    const bloque = await bloqueDeCerebro(CLI, "seo_premium");
+    const { bloque } = await bloqueDeCerebro(CLI, "seo_premium");
 
     expect(bloque.length, "el bloque salió vacío teniendo cerebro").toBeGreaterThan(0);
   });
@@ -81,7 +81,7 @@ describe("el cerebro llega al agente", () => {
     leer.mockResolvedValue(cerebroCon([]));
     const { bloqueDeCerebro } = await import("../bloqueDeCerebro");
 
-    const bloque = await bloqueDeCerebro(CLI, "seo_premium");
+    const { bloque } = await bloqueDeCerebro(CLI, "seo_premium");
 
     expect(bloque, "un cliente sin cerebro salió como silencio").not.toBe("");
     expect(bloque.toLowerCase()).toMatch(/no inventes|no se sabe|no hay/);
@@ -95,7 +95,7 @@ describe("el cerebro llega al agente", () => {
     const aviso = vi.spyOn(console, "warn").mockImplementation(() => {});
     const { bloqueDeCerebro } = await import("../bloqueDeCerebro");
 
-    const bloque = await bloqueDeCerebro(CLI, "seo_premium");
+    const { bloque } = await bloqueDeCerebro(CLI, "seo_premium");
 
     expect(bloque, "afirmó que no se sabe nada sin haber podido preguntar").toBe("");
     expect(aviso, "el agente se quedó sin cerebro y nadie se enteró").toHaveBeenCalled();
@@ -118,15 +118,44 @@ describe("el cerebro llega al agente", () => {
     query.mockResolvedValue([]);
     const { bloqueDeCerebro } = await import("../bloqueDeCerebro");
 
-    expect(await bloqueDeCerebro(CLI, "seo_premium")).toBe("");
+    expect((await bloqueDeCerebro(CLI, "seo_premium")).bloque).toBe("");
     expect(leer, "intentó leer un cerebro sin saber de qué workspace").not.toHaveBeenCalled();
   });
 
   it("un `clientId` que no es uuid no llega a la base", async () => {
     const { bloqueDeCerebro } = await import("../bloqueDeCerebro");
 
-    expect(await bloqueDeCerebro("cliente-de-prueba", "seo_premium")).toBe("");
+    expect((await bloqueDeCerebro("cliente-de-prueba", "seo_premium")).bloque).toBe("");
     expect(query).not.toHaveBeenCalled();
+  });
+
+  it("el idioma y el mercado salen APARTE del bloque", async () => {
+    // La puerta de calidad los compara con lo que salió escrito, y un texto no
+    // se puede comparar con un texto. Metidos dentro del bloque no servirían
+    // para eso, y `en-el-idioma-del-cliente` seguiría sin aplicarse nunca.
+    leer.mockResolvedValue(
+      cerebroCon([
+        ["idioma", { texto: "fr" }],
+        ["mercado", { texto: "FR" }],
+      ]),
+    );
+    const { bloqueDeCerebro } = await import("../bloqueDeCerebro");
+
+    const r = await bloqueDeCerebro(CLI, "seo_premium");
+
+    expect(r.idioma).toBe("fr");
+    expect(r.mercado).toBe("FR");
+  });
+
+  it("un dato CADUCADO no cuenta como sabido", async () => {
+    // Un idioma de hace tres años puede no ser el de ahora, y escribir en el
+    // equivocado por un dato viejo es peor que preguntar.
+    const c = cerebroCon([["idioma", { texto: "fr" }]]);
+    c.caducadas = ["idioma"];
+    leer.mockResolvedValue(c);
+    const { bloqueDeCerebro } = await import("../bloqueDeCerebro");
+
+    expect((await bloqueDeCerebro(CLI, "seo_premium")).idioma).toBeNull();
   });
 
   // ── EL CAMINO COMPLETO ────────────────────────────────────────────────────

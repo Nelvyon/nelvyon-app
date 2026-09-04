@@ -219,10 +219,24 @@ export const manejadorDeServicioOs: ManejadorDeTrabajo = async (
   // para el mismo dato.
   const { bloqueDeCerebro } = await import("../os-agents/bloqueDeCerebro");
   const { CLAVE_CEREBRO } = await import("../os-agents/agents/elitePayloadStrings");
-  const cerebro = await bloqueDeCerebro(trabajo.clientId, trabajo.serviceId);
-  const payloadConCerebro = cerebro
-    ? { ...trabajo.payload, [CLAVE_CEREBRO]: cerebro }
-    : trabajo.payload;
+  const sabido = await bloqueDeCerebro(trabajo.clientId, trabajo.serviceId);
+
+  // El idioma y el mercado viajan APARTE del bloque, y no por comodidad: la
+  // puerta de calidad los compara con lo que salio escrito, y un texto no se
+  // puede comparar con un texto. Sin esto, `en-el-idioma-del-cliente` no
+  // aplicaba nunca — la comprobacion existia y no se ejecutaba jamas.
+  //
+  // Lo que ya trae el encargo MANDA sobre lo que sabiamos: si este trabajo pide
+  // expresamente una pieza en frances, se hace en frances aunque el cliente
+  // opere en espanol.
+  const payloadConCerebro: Record<string, unknown> = { ...trabajo.payload };
+  if (sabido.bloque) payloadConCerebro[CLAVE_CEREBRO] = sabido.bloque;
+  if (sabido.idioma && payloadConCerebro.idioma === undefined) {
+    payloadConCerebro.idioma = sabido.idioma;
+  }
+  if (sabido.mercado && payloadConCerebro.mercado === undefined) {
+    payloadConCerebro.mercado = sabido.mercado;
+  }
 
   const salida = await osOrchestrator.processQueuedJob({
     jobId: trabajo.jobId,
@@ -256,7 +270,7 @@ export const manejadorDeServicioOs: ManejadorDeTrabajo = async (
 
   // LA PUERTA DE CALIDAD. Antes de esto, nada de lo que se entregaba pasaba por
   // el motor: existia, y no lo llamaba nadie en la via real.
-  const calidad = await revisarCalidad(trabajo.serviceId, resultado, trabajo.payload);
+  const calidad = await revisarCalidad(trabajo.serviceId, resultado, payloadConCerebro);
   if (calidad.pide) {
     return { tipo: "esperandoAprobacion", motivo: calidad.motivo };
   }

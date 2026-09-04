@@ -53,6 +53,45 @@ export interface Dimension {
   laAporta: "cliente" | "nelvyon" | "medicion";
 }
 
+/**
+ * Los servicios del catalogo, para las dimensiones que valen para todos.
+ *
+ * Se deriva de `mapaDeServicio.json` —la fuente unica que ya declara la
+ * disciplina de cada servicio— en vez de escribirse a mano. Una lista a mano
+ * dice «todos» sobre los que habia el dia que se escribio.
+ */
+const TODOS_LOS_SERVICIOS: string[] = [
+      "3d_contenido_inmersivo_premium",
+      "ads_premium",
+      "advisor_empresarial_premium",
+      "analitica_atribucion_premium",
+      "bots_premium",
+      "branding_premium",
+      "canales_comunicaciones_premium",
+      "consultoria_automatizacion_premium",
+      "contenido_copywriting_premium",
+      "crm_captacion_premium",
+      "diseno_grafico_creatividades_premium",
+      "ecommerce_premium",
+      "email_marketing_premium",
+      "formacion_capacitacion_digital_premium",
+      "fotografia_producto_premium",
+      "funnel_premium",
+      "geo_ai_search_premium",
+      "influencer_marketing_premium",
+      "integraciones_apis_premium",
+      "inteligencia_mercado_premium",
+      "landing_premium",
+      "mantenimiento_web_premium",
+      "personal_digital_premium",
+      "reputacion_online_orm_premium",
+      "seo_premium",
+      "social_media_premium",
+      "video_multimedia_premium",
+      "voz_premium",
+      "web_premium",
+];
+
 export const DIMENSIONES: readonly Dimension[] = [
   // ── Quién es y qué vende ─────────────────────────────────────────────────
   {
@@ -62,6 +101,47 @@ export const DIMENSIONES: readonly Dimension[] = [
     imprescindible: true,
     caducaEnDias: null,
     serviciosQueLaUsan: [],
+    laAporta: "cliente",
+  },
+  /**
+   * EL IDIOMA Y EL MERCADO.
+   *
+   * Faltaban. Noventa y dos dimensiones describian el negocio de un cliente con
+   * un detalle notable —desde su economia del pedido hasta que resenas son
+   * ciertas— y ninguna decia en que idioma escribe ni en que pais vende.
+   *
+   * Es el dato mas basico que necesita una agencia que produce texto, y su
+   * ausencia tenia una consecuencia concreta: la comprobacion de calidad
+   * `en-el-idioma-del-cliente` no podia aplicarse nunca, porque nadie sabia
+   * cual era el idioma correcto contra el que comparar.
+   *
+   * NO son imprescindibles. Lo imprescindible es lo que hace el trabajo
+   * IMPOSIBLE, y para un cliente espanol de una agencia espanola el idioma por
+   * defecto es obvio. Marcarlas como tales convertiria a todos los clientes
+   * existentes en «no listos para operar» de golpe, dispararia una senal
+   * bloqueante por cada uno y —a traves de la puerta de venta cruzada— apagaria
+   * las propuestas de todo el mundo. Un dato que falta no justifica una cascada.
+   *
+   * Las usan TODOS los servicios, y la lista se deriva del catalogo en vez de
+   * escribirse a mano: un servicio nuevo entra solo, y no hay forma de que la
+   * lista se quede atras.
+   */
+  {
+    id: "idioma",
+    pregunta: "¿En qué idioma te diriges a tus clientes?",
+    forma: "texto",
+    imprescindible: false,
+    caducaEnDias: null,
+    serviciosQueLaUsan: TODOS_LOS_SERVICIOS,
+    laAporta: "cliente",
+  },
+  {
+    id: "mercado",
+    pregunta: "¿En qué país o mercado vendes?",
+    forma: "texto",
+    imprescindible: false,
+    caducaEnDias: null,
+    serviciosQueLaUsan: TODOS_LOS_SERVICIOS,
     laAporta: "cliente",
   },
   {

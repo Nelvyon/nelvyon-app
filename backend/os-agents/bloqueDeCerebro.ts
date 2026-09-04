@@ -36,33 +36,57 @@
  * trabajaba antes de que esto existiera —con el contexto del encargo— y queda
  * constancia en los registros de que se quedó sin él.
  */
-import { CerebroDeNegocioService } from "../cerebro/CerebroDeNegocioService";
+import { CerebroDeNegocioService, type Cerebro } from "../cerebro/CerebroDeNegocioService";
 import { DbClient } from "../db/DbClient";
 
 import { contextoDeNegocio } from "./contextoDeNegocio";
 import { workspaceDelCliente } from "../os-core/workspaceDelCliente";
 
 /**
- * El bloque de contexto de negocio para este cliente y este servicio.
+ * Lo que se saca del cerebro para un trabajo.
  *
- * @returns el texto a preponer, o `""` cuando no se ha podido averiguar nada
- *          —que NO es lo mismo que saber que no hay nada—.
+ * El BLOQUE va al prompt del agente. El idioma y el mercado van aparte porque
+ * los necesita otro: la puerta de calidad los compara con lo que salió escrito.
+ * Metidos dentro del bloque no servirían para eso — un texto no se puede
+ * comparar con un texto.
  */
+export type LoQueSabemosDelCliente = {
+  /** El texto a preponer, o `""` si no se ha podido averiguar nada. */
+  bloque: string;
+  /** En qué idioma escribe este cliente, si consta. */
+  idioma: string | null;
+  /** En qué mercado vende, si consta. */
+  mercado: string | null;
+};
+
+/** El valor de una dimensión de forma «texto», si está y no está vacío. */
+function textoDe(cerebro: Cerebro, id: string): string | null {
+  if (cerebro.caducadas.includes(id)) return null;
+  const v = cerebro.dimensiones.get(id)?.valor as { texto?: unknown } | undefined;
+  const t = typeof v?.texto === "string" ? v.texto.trim() : "";
+  return t.length > 0 ? t : null;
+}
+
 export async function bloqueDeCerebro(
   clientId: string,
   serviceId: string,
-): Promise<string> {
+): Promise<LoQueSabemosDelCliente> {
+  const nada: LoQueSabemosDelCliente = { bloque: "", idioma: null, mercado: null };
   try {
     const workspaceId = await workspaceDelCliente(clientId);
     // Sin workspace no se puede leer el cerebro de nadie. Componer el bloque de
     // «cliente sin cerebro» seria afirmar algo que no se ha comprobado.
-    if (workspaceId === null) return "";
+    if (workspaceId === null) return nada;
 
     const cerebro = await new CerebroDeNegocioService(DbClient.getInstance()).leer(
       workspaceId,
       clientId,
     );
-    return contextoDeNegocio(serviceId, cerebro).bloque;
+    return {
+      bloque: contextoDeNegocio(serviceId, cerebro).bloque,
+      idioma: textoDe(cerebro, "idioma"),
+      mercado: textoDe(cerebro, "mercado"),
+    };
   } catch (e) {
     const { redactar } = await import("../seguridad/formaDeUnSecreto.mjs");
     const crudo = e instanceof Error ? e.message : "desconocido";
@@ -70,6 +94,6 @@ export async function bloqueDeCerebro(
       `[cerebro] ${serviceId} trabaja sin contexto de negocio: `
         + `${String(redactar(crudo)).slice(0, 200)}`,
     );
-    return "";
+    return nada;
   }
 }
