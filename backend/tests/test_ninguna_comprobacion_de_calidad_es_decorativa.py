@@ -61,7 +61,6 @@ _CONTEXTO = re.compile(r"p\.contexto\?\.([a-zA-Z_][a-zA-Z0-9_]*)")
 #: claves — o sea, gasto. Estan aqui para que se sepa, no para que se olviden.
 DECORATIVAS_DECLARADAS: dict[str, str] = {
     "canibalizacion": "espera un listado de paginas; el agente devuelve prosa",
-    "criterio-fijado-antes": "espera el criterio de exito como campo propio",
     "cualificacion-explicada": "espera los criterios de cualificacion estructurados",
     "el-precio-no-aparece-tarde": "espera los pasos del proceso como lista ordenada",
     "empieza-por-lo-que-el-cliente-queria": "espera la primera seccion identificada",
@@ -85,15 +84,32 @@ def _comprobaciones() -> dict[str, list[str]]:
     return fuera
 
 
+_COMENTARIO = re.compile(r"//[^\n]*|/\*.*?\*/", re.S)
+
+
 def _corpus() -> str:
-    """Todo el backend menos el propio motor: quien PRODUCE las claves."""
+    """Todo el backend menos el propio motor: quien PRODUCE las claves.
+
+    SIN COMENTARIOS, y esta linea existe por un fallo propio. La primera version
+    leia el fichero entero y dio por VIVA la comprobacion `canibalizacion` porque
+    la palabra «paginas» aparecia en un comentario que explicaba otra cosa.
+
+    Es el mismo error que este repositorio ya habia cazado cinco veces en otros
+    detectores: un comentario no produce ninguna clave, y contarlo convierte
+    cualquier explicacion en una coartada.
+    """
     trozos: list[str] = []
     for base, dirs, ficheros in os.walk(RAIZ / "backend"):
         dirs[:] = [d for d in dirs if d not in ("node_modules", "__tests__", ".pytest_cache")]
         for f in ficheros:
             if f.endswith((".ts", ".json")) and f != "MotorDeCalidad.ts":
                 try:
-                    trozos.append((pathlib.Path(base) / f).read_text(encoding="utf-8", errors="replace"))
+                    trozos.append(
+                        _COMENTARIO.sub(
+                            " ",
+                            (pathlib.Path(base) / f).read_text(encoding="utf-8", errors="replace"),
+                        )
+                    )
                 except OSError:
                     pass
     return "\n".join(trozos)
