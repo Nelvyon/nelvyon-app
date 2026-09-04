@@ -232,6 +232,24 @@ export const manejadorDeServicioOs: ManejadorDeTrabajo = async (
   // Aprender de trabajo sin validar es como se ensena a repetir un error.
   await registrarParaAprender(trabajo, resultado);
 
+  // Y QUEDA REGISTRADA COMO ACCION MEDIBLE.
+  //
+  // `MotorDeResultados` cierra el circulo objetivo → linea base → accion →
+  // medicion → resultado, tiene sus tablas y su bateria contra PostgreSQL real,
+  // y no lo importaba nadie: cero referencias en todo el repositorio fuera de
+  // sus propias pruebas. El motor que decide si NELVYON sirve de algo no recibia
+  // ni un dato, asi que `veredicto()` devolvia `desconocido` para siempre — con
+  // toda la razon, porque nadie podia demostrar lo contrario.
+  //
+  // Va DESPUES de calidad, igual que el aprendizaje: atribuirse una mejora a
+  // partir de una pieza que no ha pasado calidad es como se construyen los
+  // informes de agencia que no significan nada.
+  const { registrarEntregaComoAccion } = await import("../resultados/registrarEntregaComoAccion");
+  await registrarEntregaComoAccion({
+    clientId: trabajo.clientId,
+    serviceId: trabajo.serviceId,
+  });
+
   return { tipo: "completado", resultado };
 };
 
