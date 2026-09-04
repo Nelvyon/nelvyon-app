@@ -237,6 +237,14 @@ export const manejadorDeServicioOs: ManejadorDeTrabajo = async (
   if (sabido.mercado && payloadConCerebro.mercado === undefined) {
     payloadConCerebro.mercado = sabido.mercado;
   }
+  // Los vecinos no son contexto para el modelo: son para que la comprobacion
+  // bloqueante `sin-mezcla-de-clientes` pueda ejecutarse. Su cabecera lo llama
+  // «el fallo que destruye la confianza» —recibir un plan con el nombre de otro
+  // cliente de la misma agencia no se arregla pidiendo perdon— y hasta ahora no
+  // se aplicaba nunca, porque nadie le decia contra que nombres comparar.
+  if (sabido.otrosClientes.length > 0) {
+    payloadConCerebro.otrosClientes = sabido.otrosClientes;
+  }
 
   const salida = await osOrchestrator.processQueuedJob({
     jobId: trabajo.jobId,

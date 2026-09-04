@@ -168,6 +168,41 @@ describe("nada se entrega sin pasar por calidad", () => {
     expect(entregado.texto, "se perdió contenido al adjuntar el rastro").toBe(BUENO.texto);
   });
 
+  it("EL FALLO QUE DESTRUYE LA CONFIANZA: el nombre de otro cliente se retiene", async () => {
+    // La comprobación `sin-mezcla-de-clientes` es BLOQUEANTE y estaba escrita
+    // desde hacía tiempo. No se aplicaba nunca: espera `contexto.otrosClientes`
+    // y nadie se lo pasaba. Una bloqueante que no se ejecuta no protege de
+    // nada, y encima da la sensación contraria.
+    processQueuedJob.mockResolvedValue({
+      status: "completed",
+      result: {
+        texto:
+          "El plan de contenidos replica lo que funcionó con Clínica Dental Aurora "
+          + "el trimestre pasado, adaptándolo a vuestro público y a vuestra zona.",
+      },
+    });
+
+    const r = await ejecutar({
+      payload: { userId: "usr-1", otrosClientes: ["Clínica Dental Aurora"] },
+    });
+
+    expect(r.tipo, "se entregó una pieza que nombra a otro cliente").toBe(
+      "esperandoAprobacion",
+    );
+    expect((r as { motivo: string }).motivo).toMatch(/Aurora/);
+  });
+
+  it("y sin vecinos declarados no acusa a nadie", async () => {
+    // CONTROL. Sin la lista, la comprobación no puede opinar — y no opinar es lo
+    // correcto: inventarse una contaminación es tan malo como no verla.
+    processQueuedJob.mockResolvedValue({
+      status: "completed",
+      result: { texto: BUENO.texto + " Trabajamos también con otras clínicas de la zona." },
+    });
+
+    expect((await ejecutar()).tipo).toBe("completado");
+  });
+
   it("lo que suspende calidad TAMPOCO se aprende", async () => {
     // Aprender de trabajo que no ha pasado calidad enseña a repetir lo que no
     // vale, y encima con la confianza que da un patrón con muchas muestras.

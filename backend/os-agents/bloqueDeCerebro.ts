@@ -40,7 +40,10 @@ import { CerebroDeNegocioService, type Cerebro } from "../cerebro/CerebroDeNegoc
 import { DbClient } from "../db/DbClient";
 
 import { contextoDeNegocio } from "./contextoDeNegocio";
-import { workspaceDelCliente } from "../os-core/workspaceDelCliente";
+import {
+  otrosClientesDelWorkspace,
+  workspaceDelCliente,
+} from "../os-core/workspaceDelCliente";
 
 /**
  * Lo que se saca del cerebro para un trabajo.
@@ -57,6 +60,14 @@ export type LoQueSabemosDelCliente = {
   idioma: string | null;
   /** En qué mercado vende, si consta. */
   mercado: string | null;
+  /**
+   * Los otros clientes de la misma agencia.
+   *
+   * No es contexto para el modelo: es para que la comprobación bloqueante
+   * `sin-mezcla-de-clientes` pueda ejecutarse. Estaba escrita y no se aplicaba
+   * nunca porque nadie le decía contra qué nombres comparar.
+   */
+  otrosClientes: string[];
 };
 
 /** El valor de una dimensión de forma «texto», si está y no está vacío. */
@@ -71,7 +82,12 @@ export async function bloqueDeCerebro(
   clientId: string,
   serviceId: string,
 ): Promise<LoQueSabemosDelCliente> {
-  const nada: LoQueSabemosDelCliente = { bloque: "", idioma: null, mercado: null };
+  const nada: LoQueSabemosDelCliente = {
+    bloque: "",
+    idioma: null,
+    mercado: null,
+    otrosClientes: [],
+  };
   try {
     const workspaceId = await workspaceDelCliente(clientId);
     // Sin workspace no se puede leer el cerebro de nadie. Componer el bloque de
@@ -86,6 +102,7 @@ export async function bloqueDeCerebro(
       bloque: contextoDeNegocio(serviceId, cerebro).bloque,
       idioma: textoDe(cerebro, "idioma"),
       mercado: textoDe(cerebro, "mercado"),
+      otrosClientes: await otrosClientesDelWorkspace(workspaceId, clientId),
     };
   } catch (e) {
     const { redactar } = await import("../seguridad/formaDeUnSecreto.mjs");

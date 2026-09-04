@@ -48,3 +48,43 @@ export async function workspaceDelCliente(
   const n = typeof w === "number" ? w : typeof w === "string" ? Number(w) : NaN;
   return Number.isInteger(n) ? n : null;
 }
+
+/**
+ * Los nombres de los DEMAS clientes del mismo workspace.
+ *
+ * ── PARA QUE ────────────────────────────────────────────────────────────────
+ *
+ * `MotorDeCalidad` tiene una comprobacion bloqueante —`sin-mezcla-de-clientes`—
+ * que busca el nombre de otro cliente dentro de una pieza. Su cabecera lo llama
+ * «el fallo que destruye la confianza», y con razon: recibir un plan donde
+ * aparece el nombre de otro cliente de la misma agencia no se arregla pidiendo
+ * perdon.
+ *
+ * La comprobacion estaba escrita y NUNCA se aplicaba: espera
+ * `contexto.otrosClientes` y nadie se lo pasaba. Una comprobacion bloqueante
+ * que no se ejecuta no protege de nada, y encima da la sensacion contraria.
+ *
+ * ── POR QUE SOLO DEL MISMO WORKSPACE ────────────────────────────────────────
+ *
+ * Sacar nombres de clientes de OTRAS agencias para compararlos aqui seria
+ * filtrar entre inquilinos justo en el modulo que existe para evitar filtrar
+ * entre clientes. La contaminacion que importa es la de al lado.
+ */
+export async function otrosClientesDelWorkspace(
+  workspaceId: number,
+  clientId: string,
+  db?: ConexionDeClientes,
+): Promise<string[]> {
+  const conexion = db ?? DbClient.getInstance();
+  const filas = await conexion.query<{ business_name: string }>(
+    `SELECT business_name FROM os_clients
+      WHERE workspace_id = $1 AND id <> $2::uuid AND business_name IS NOT NULL
+      LIMIT 200`,
+    [workspaceId, clientId],
+  );
+  return filas
+    .map((f) => (f.business_name ?? "").trim())
+    // Nombres muy cortos producirian falsos positivos absurdos: un cliente que
+    // se llame «Sol» marcaria cualquier pieza que hable de energia solar.
+    .filter((n) => n.length > 3);
+}
