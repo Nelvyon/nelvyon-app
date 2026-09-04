@@ -1,6 +1,7 @@
 import { OS_PREMIUM_SERVICE_IDS } from "./constants";
 import type { StoredClientIntake } from "./intakeSchemas";
 import { siONo } from "./loQueDiceElModelo";
+import { dimensionesQueAportaElCliente } from "../cerebro/dimensiones";
 
 export type IntakeFieldType = "text" | "textarea" | "select" | "multiselect" | "color" | "url" | "number" | "boolean";
 
@@ -134,6 +135,59 @@ function getExtraFields(serviceId: string): IntakeField[] {
   }
 }
 
+/**
+ * Las preguntas que el Business Brain ya sabe que hay que hacerle al cliente
+ * PARA ESTE SERVICIO.
+ *
+ * ── EL HUECO ──────────────────────────────────────────────────────────────
+ *
+ * `getExtraFields` tenía preguntas propias para CUATRO de los veintinueve
+ * servicios. Los otros veinticinco recibían sólo los campos comunes —nombre,
+ * sector, público, tono, colores— y ni una sola pregunta de su disciplina.
+ *
+ * Un cliente que contrata `email_marketing_premium` no decía nada de su lista,
+ * de su consentimiento ni de su cadencia; uno de `ecommerce_premium`, nada de su
+ * catálogo, su margen ni sus gastos de envío. El agente trabajaba sin ese dato
+ * porque nadie lo había pedido, y el cliente creía haber contado su negocio.
+ *
+ * ── POR QUÉ SE DERIVAN Y NO SE ESCRIBEN ───────────────────────────────────
+ *
+ * `dimensionesQueAportaElCliente(serviceId)` ya declara, por servicio, qué le
+ * toca decir al cliente Y con qué pregunta exacta. Escribir esas preguntas otra
+ * vez aquí crearía dos fuentes de la misma verdad, y la que se olvida de
+ * actualizarse es siempre la segunda.
+ *
+ * Un servicio nuevo, o una dimensión nueva, entra solo.
+ *
+ * ── OPCIONALES, Y ESO ES DELIBERADO ───────────────────────────────────────
+ *
+ * Ninguna se marca obligatoria, ni siquiera las que el cerebro llama
+ * imprescindibles. Bloquear una contratación porque el cliente no ha contestado
+ * doce preguntas convierte el alta en un examen, y quien no lo aprueba se va.
+ *
+ * Lo que falte se sabrá igual: `contextoDeNegocio` NOMBRA los huecos en la
+ * instrucción del agente y `completitud` los enseña en el portal. Pedir el dato
+ * y exigirlo son dos cosas distintas, y aquí sólo se pide.
+ */
+function preguntasDelCerebro(serviceId: string): IntakeField[] {
+  const yaSePregunta = new Set([
+    ...BASE_FIELDS.map((f) => f.name),
+    ...getExtraFields(serviceId).map((f) => f.name),
+  ]);
+
+  return dimensionesQueAportaElCliente(serviceId)
+    .filter((d) => !yaSePregunta.has(d.id))
+    .map((d) => ({
+      name: d.id,
+      label: d.pregunta,
+      // Las de forma «lista» se recogen como varios valores; el resto, como
+      // texto largo. Las preguntas del cerebro son abiertas a propósito: una
+      // respuesta encajada en un desplegable ya no es lo que dijo el cliente.
+      type: d.forma === "lista" ? ("multiselect" as const) : ("textarea" as const),
+      required: false,
+    }));
+}
+
 function isNonEmptyString(v: unknown): v is string {
   return typeof v === "string" && v.trim().length > 0;
 }
@@ -167,8 +221,8 @@ function asNumber(v: unknown): number | undefined {
 }
 
 export function getSchemaForService(serviceId: string): IntakeField[] {
-  const extra = isPremiumServiceId(serviceId) ? getExtraFields(serviceId) : [];
-  return [...BASE_FIELDS, ...extra];
+  if (!isPremiumServiceId(serviceId)) return [...BASE_FIELDS];
+  return [...BASE_FIELDS, ...getExtraFields(serviceId), ...preguntasDelCerebro(serviceId)];
 }
 
 export function validateIntake(serviceId: string, data: Record<string, unknown>): ValidationResult {
