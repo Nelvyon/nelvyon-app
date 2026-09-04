@@ -177,6 +177,116 @@ export class CicloDelClienteService {
     throw new ErrorDelCiclo("YA_SOLICITADO", "no se pudo registrar la solicitud");
   }
 
+  /**
+   * NELVYON acepta la solicitud y el servicio queda contratado.
+   *
+   * ── LA TRANSICIÓN QUE FALTABA ─────────────────────────────────────────────
+   *
+   * `os_service_requests` declara seis estados —solicitado, en_revisión,
+   * propuesto, aceptado, rechazado, cancelado— y sólo se escribía el primero.
+   * Medido: en todo el repositorio, ni una sentencia movía una solicitud a
+   * `aceptado`.
+   *
+   * Un cliente pedía un servicio y se quedaba pedido para siempre. Y como
+   * `SenalesDeCliente` sólo mira las aceptadas, la mitad de las señales de
+   * salud del cliente no podían dispararse nunca: no había ninguna.
+   *
+   * ── Y EL CONTRATO ─────────────────────────────────────────────────────────
+   *
+   * `os_service_contracts` lo leen CUATRO módulos —comprobación de salud,
+   * informes, analítica de administración y el cron de mantenimiento— y no lo
+   * escribía nadie. `OsHealthCheck` recorría cero clientes y no informaba de
+   * ningún problema: un verde falso, que es peor que un rojo.
+   *
+   * Una solicitud aceptada ES un contrato. Aquí es donde nace.
+   *
+   * ── IDEMPOTENTE ───────────────────────────────────────────────────────────
+   *
+   * Aceptar dos veces la misma solicitud no crea dos contratos. Y aceptar algo
+   * que ya no está en un estado aceptable no hace nada: se dice y ya está, en
+   * vez de reabrir algo cancelado.
+   */
+  async aceptarSolicitud(params: {
+    workspaceId: number;
+    clientId: string;
+    solicitudId: string;
+    aceptadaPor: string;
+  }): Promise<{ aceptada: boolean; motivo?: string; contratoId?: string }> {
+    const movidas = await this.db.query<{ service_id: string }>(
+      `UPDATE os_service_requests
+          SET estado = 'aceptado', decidida_en = NOW(), updated_at = NOW()
+        WHERE id = $1::uuid
+          AND workspace_id = $2
+          AND client_id = $3::uuid
+          AND estado IN ('solicitado', 'en_revision', 'propuesto')
+        RETURNING service_id`,
+      [params.solicitudId, params.workspaceId, params.clientId],
+    );
+
+    if (movidas.length === 0) {
+      // O no existe, o es de otro cliente, o ya se decidió. En los tres casos
+      // la respuesta correcta es no hacer nada y decirlo.
+      const yaAceptada = await this.db.query<{ id: string }>(
+        `SELECT id FROM os_service_requests
+          WHERE id = $1::uuid AND workspace_id = $2 AND client_id = $3::uuid
+            AND estado = 'aceptado' LIMIT 1`,
+        [params.solicitudId, params.workspaceId, params.clientId],
+      );
+      return yaAceptada.length > 0
+        ? { aceptada: true, motivo: "ya estaba aceptada" }
+        : { aceptada: false, motivo: "la solicitud no existe o ya se decidió" };
+    }
+
+    const serviceId = movidas[0].service_id;
+    const contratoId = await this.crearContrato(params.workspaceId, params.clientId, serviceId);
+    return { aceptada: true, contratoId: contratoId ?? undefined };
+  }
+
+  /**
+   * El contrato que leen la comprobación de salud, los informes y la analítica.
+   *
+   * `os_service_contracts` va por `tenant_id` y las solicitudes por
+   * `workspace_id`. El puente es `saas_tenants`. Si el workspace no tiene
+   * inquilino, NO se inventa uno: se deja constancia y el contrato no se crea —
+   * meterlo con un inquilino equivocado se lo enseñaría a otra agencia.
+   */
+  private async crearContrato(
+    workspaceId: number,
+    clientId: string,
+    serviceId: string,
+  ): Promise<string | null> {
+    const inquilinos = await this.db.query<{ id: string }>(
+      `SELECT id FROM saas_tenants WHERE workspace_id = $1 LIMIT 1`,
+      [workspaceId],
+    );
+    const tenantId = inquilinos[0]?.id;
+    if (!tenantId) {
+      console.warn(
+        `[ciclo] el workspace ${workspaceId} no tiene inquilino: `
+          + `el servicio ${serviceId} queda aceptado sin contrato`,
+      );
+      return null;
+    }
+
+    const filas = await this.db.query<{ id: string }>(
+      `INSERT INTO os_service_contracts (tenant_id, service_id, client_id, status)
+       VALUES ($1::uuid, $2, $3, 'active')
+       ON CONFLICT DO NOTHING
+       RETURNING id`,
+      [tenantId, serviceId, clientId],
+    );
+    if (filas[0]) return filas[0].id;
+
+    // Ya había uno. Se devuelve el que hay en vez de crear un segundo.
+    const existentes = await this.db.query<{ id: string }>(
+      `SELECT id FROM os_service_contracts
+        WHERE tenant_id = $1::uuid AND service_id = $2 AND client_id = $3
+        LIMIT 1`,
+      [tenantId, serviceId, clientId],
+    );
+    return existentes[0]?.id ?? null;
+  }
+
   async solicitudesDe(workspaceId: number, clientId: string): Promise<SolicitudDeServicio[]> {
     const filas = await this.db.query<{
       id: string; service_id: string; estado: string; motivo: string | null;
