@@ -1,5 +1,5 @@
 import type { OsJobPayload } from "../types";
-import { CLAVE_CONTEXTO, eliteCommonIntakeStrings } from "./elitePayloadStrings";
+import { CLAVE_CEREBRO, CLAVE_CONTEXTO, eliteCommonIntakeStrings } from "./elitePayloadStrings";
 
 /** Replaces `{{KEY}}` placeholders (Lote 2 prompt convention). */
 /**
@@ -16,9 +16,16 @@ import { CLAVE_CONTEXTO, eliteCommonIntakeStrings } from "./elitePayloadStrings"
 export function buildPrompt(template: string, vars: Record<string, string>): string {
   let out = template;
   for (const [key, value] of Object.entries(vars)) {
-    if (key === CLAVE_CONTEXTO) continue;
+    if (key === CLAVE_CONTEXTO || key === CLAVE_CEREBRO) continue;
     out = out.split(`{{${key}}}`).join(value);
   }
+
+  // El Business Brain va DESPUÉS del contexto del encargo y ANTES de la
+  // plantilla. El orden no es estético: lo que el cliente acaba de decir en
+  // este trabajo manda sobre lo que sabíamos de antes, así que se lee primero.
+  const cerebro = vars[CLAVE_CEREBRO];
+  if (cerebro && cerebro.trim()) out = `${cerebro.trim()}\n\n${out}`;
+
   const contexto = vars[CLAVE_CONTEXTO];
   return contexto && contexto.trim() ? `${contexto.trim()}\n\n${out}` : out;
 }
@@ -33,6 +40,10 @@ export function eliteLote2CommonVars(payload: OsJobPayload): Record<string, stri
     // presupuesto y las restricciones legales dejaban de llegar a doce
     // servicios a la vez.
     [CLAVE_CONTEXTO]: b[CLAVE_CONTEXTO] ?? "",
+    // Y el cerebro, por lo mismo. Reconstruir el mapa en mayusculas es
+    // exactamente donde se pierde una clave que empieza por `__`: paso ya una
+    // vez con el contexto del encargo y doce servicios se quedaron sin el.
+    [CLAVE_CEREBRO]: b[CLAVE_CEREBRO] ?? "",
     CLIENT_NAME: b.clientName,
     INDUSTRY: b.industry,
     TARGET_AUDIENCE: b.targetAudience,

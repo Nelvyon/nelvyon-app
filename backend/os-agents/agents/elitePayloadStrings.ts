@@ -142,6 +142,14 @@ ${lineas.join("\n")}`);
 export function eliteCommonIntakeStrings(payload: OsJobPayload): Record<string, string> {
   return {
     [CLAVE_CONTEXTO]: contextoDelCliente(payload),
+    // EL BUSINESS BRAIN, si el manejador lo cargó.
+    //
+    // Se lee del payload y no se carga aquí porque leerlo es asíncrono y esta
+    // función es síncrona, y sobre todo porque hacerlo aquí significaría una
+    // consulta a la base por cada familia de prompts del mismo trabajo. Lo
+    // carga UNA vez quien conoce al cliente y el servicio: el manejador.
+    [CLAVE_CEREBRO]:
+      typeof payload[CLAVE_CEREBRO] === "string" ? (payload[CLAVE_CEREBRO] as string) : "",
     clientName: asTrimmedString(payload.clientName, "Cliente premium (nombre por confirmar en kickoff)"),
     industry: asTrimmedString(payload.industry, "Sector a definir con el cliente en sesión estratégica"),
     targetAudience: asTrimmedString(payload.targetAudience, "Público objetivo por perfilar con research cualitativo/cuantitativo"),

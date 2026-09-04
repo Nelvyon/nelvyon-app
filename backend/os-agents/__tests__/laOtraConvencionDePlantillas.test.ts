@@ -28,7 +28,7 @@
 import { describe, expect, it } from "vitest";
 
 import { buildPrompt, eliteLote2CommonVars } from "../agents/lote2PromptUtils";
-import { CLAVE_CONTEXTO } from "../agents/elitePayloadStrings";
+import { CLAVE_CEREBRO, CLAVE_CONTEXTO } from "../agents/elitePayloadStrings";
 
 describe("rellenar la plantilla", () => {
   it("sustituye cada hueco por su valor", () => {
@@ -104,13 +104,35 @@ describe("el mapa de variables del lote 2 reenvía el contexto", () => {
     expect(v.INDUSTRY).toBe("salud dental");
   });
 
-  it("EL CONTROL: ninguna variable sale vacía", () => {
+  it("EL CONTROL: ninguna variable INTERPOLADA sale vacía", () => {
     // Un `{{INDUSTRY}}` sustituido por «» le afirma al modelo que el sector
     // existe y está en blanco, que es peor que no decir nada.
+    //
+    // Las claves que empiezan por `__` son otra cosa: no se interpolan en
+    // ningún hueco, se PREPONEN. Vacías significan «no prepongas nada», que es
+    // lo correcto cuando no hay contexto del encargo ni cerebro del cliente.
+    // Se excluye la CONVENCIÓN y no cada clave, para que la tercera no vuelva a
+    // tropezar con esta prueba.
     const v = eliteLote2CommonVars({});
     for (const [k, valor] of Object.entries(v)) {
-      if (k === CLAVE_CONTEXTO) continue; // sin datos, el contexto SÍ es vacío
+      if (k.startsWith("__")) continue;
       expect(String(valor).trim(), `${k} sale vacía`).not.toBe("");
     }
+  });
+
+  it("y la convención se cumple: lo que empieza por `__` NO se interpola", () => {
+    // Es lo que sostiene la exclusión de arriba. Si una clave `__` acabara
+    // sustituyéndose en un hueco, vaciarla dejaría el hueco en blanco y la
+    // prueba anterior habría dejado de proteger.
+    const salida = buildPrompt("cuerpo {{__contextoDelCliente}} {{__contextoDeNegocio}}", {
+      [CLAVE_CONTEXTO]: "CONTEXTO",
+      [CLAVE_CEREBRO]: "CEREBRO",
+    });
+    expect(salida, "una clave prepuesta se interpoló en un hueco").toContain(
+      "{{__contextoDelCliente}}",
+    );
+    // Y se prepone: el cerebro después del encargo, la plantilla al final.
+    expect(salida.indexOf("CONTEXTO")).toBeLessThan(salida.indexOf("CEREBRO"));
+    expect(salida.indexOf("CEREBRO")).toBeLessThan(salida.indexOf("cuerpo"));
   });
 });

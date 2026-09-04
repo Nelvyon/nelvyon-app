@@ -206,11 +206,29 @@ function contextoDelCliente(payload: Record<string, unknown>): Record<string, un
 export const manejadorDeServicioOs: ManejadorDeTrabajo = async (
   trabajo,
 ): Promise<ResultadoDeManejador> => {
+  // EL BUSINESS BRAIN SE CARGA UNA VEZ, AQUI.
+  //
+  // Todas las piezas existian —el servicio que lo guarda, el mapa de que
+  // dimensiones usa cada uno de los 29 servicios, el compositor del texto y la
+  // clave que lo prepone— y el cerebro no llegaba a NINGUN agente. Ni siquiera
+  // a web, el unico que sabia recibirlo: su parametro era opcional y nadie se
+  // lo pasaba.
+  //
+  // Una vez por trabajo y no por familia de prompts: hay doce familias que
+  // pasan por el mismo trabajo, y cargarlo en cada una serian doce consultas
+  // para el mismo dato.
+  const { bloqueDeCerebro } = await import("../os-agents/bloqueDeCerebro");
+  const { CLAVE_CEREBRO } = await import("../os-agents/agents/elitePayloadStrings");
+  const cerebro = await bloqueDeCerebro(trabajo.clientId, trabajo.serviceId);
+  const payloadConCerebro = cerebro
+    ? { ...trabajo.payload, [CLAVE_CEREBRO]: cerebro }
+    : trabajo.payload;
+
   const salida = await osOrchestrator.processQueuedJob({
     jobId: trabajo.jobId,
     serviceId: trabajo.serviceId,
     clientId: trabajo.clientId,
-    payload: trabajo.payload,
+    payload: payloadConCerebro,
     enqueuedAt: new Date().toISOString(),
     userId: (trabajo.payload.userId as string | undefined) ?? undefined,
   });

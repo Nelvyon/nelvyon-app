@@ -54,9 +54,17 @@ function defaultBrief(payload: OsJobPayload): string {
 
 /** Maps `OsJobPayload` / intake merge fields to string placeholders with descriptive fallbacks. */
 /**
- * `cerebro` es opcional a proposito: mientras no se le pase, la conducta es
- * EXACTAMENTE la de hoy. Eso permite conectarlo servicio a servicio, midiendo
- * cada uno, en vez de cambiarle el prompt a veintinueve agentes de golpe.
+ * De donde sale el cerebro, ahora que llega a los veintinueve.
+ *
+ * El parametro `cerebro` se conserva —lo usan las pruebas y permite componer el
+ * bloque a mano— pero ya NO es la via normal: el manejador de la cola carga el
+ * cerebro una vez por trabajo y deja el bloque YA COMPUESTO en el payload, bajo
+ * `CLAVE_CEREBRO`.
+ *
+ * Sin este cambio, web era el unico servicio de los veintinueve que se quedaba
+ * sin cerebro — precisamente el unico que sabia recibirlo—, porque esperaba un
+ * objeto `Cerebro` y el payload trae texto ya compuesto. Lo caso la prueba que
+ * compone el prompt real de cada disciplina.
  */
 export function webPremiumIntakeStrings(
   payload: OsJobPayload,
@@ -64,7 +72,12 @@ export function webPremiumIntakeStrings(
 ): Record<string, string> {
   return {
     // LO QUE NELVYON SABE DEL CLIENTE, no solo lo que ha dicho en el encargo.
-    [CLAVE_CEREBRO]: cerebro === undefined ? "" : contextoDeNegocio("web_premium", cerebro).bloque,
+    [CLAVE_CEREBRO]:
+      cerebro !== undefined
+        ? contextoDeNegocio("web_premium", cerebro).bloque
+        : typeof payload[CLAVE_CEREBRO] === "string"
+          ? (payload[CLAVE_CEREBRO] as string)
+          : "",
     // EL CONTEXTO REAL DEL CLIENTE, tambien aqui.
     //
     // Esta funcion es una copia paralela de `eliteCommonIntakeStrings`: mismos
