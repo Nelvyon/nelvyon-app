@@ -276,6 +276,110 @@ export class ColaDeTrabajos {
   }
 
   /**
+   * Los trabajos que esperan a que los mire una persona.
+   *
+   * ── POR QUÉ HACÍA FALTA ───────────────────────────────────────────────────
+   *
+   * `waiting_approval` sólo se escribía en un sitio —`dejarEsperandoAprobacion`—
+   * y NADA lo escribía de vuelta. Medido: una sola sentencia en todo el árbol
+   * ponía ese estado y cero lo quitaban. Un trabajo que entraba ahí se quedaba
+   * para siempre.
+   *
+   * `SalaDeMaquinas` los enseñaba, pero sólo pasadas unas horas y como
+   * «atasco». Eso es un detector de olvidos, no una bandeja: para cuando algo
+   * aparece ahí, ya se ha perdido tiempo del cliente.
+   *
+   * La puerta de calidad multiplicó la frecuencia con la que se entra en ese
+   * estado, así que dejarlo sin salida habría convertido una mejora en un
+   * agujero.
+   */
+  async listarEsperandoAprobacion(limite = 50): Promise<
+    Array<{
+      jobId: string;
+      serviceId: string;
+      clientId: string;
+      motivo: string | null;
+      desde: string;
+    }>
+  > {
+    const filas = await this.db.query<{
+      job_id: string;
+      service_id: string;
+      client_id: string;
+      motivo: string | null;
+      desde: string;
+    }>(
+      `SELECT job_id, service_id, client_id,
+              result->>'waiting_reason' AS motivo,
+              updated_at::text AS desde
+         FROM os_jobs
+        WHERE status = 'waiting_approval'
+        ORDER BY updated_at ASC
+        LIMIT $1`,
+      [Math.max(1, Math.min(limite, 200))],
+    );
+    return filas.map((f) => ({
+      jobId: f.job_id,
+      serviceId: f.service_id,
+      clientId: f.client_id,
+      motivo: f.motivo,
+      desde: f.desde,
+    }));
+  }
+
+  /**
+   * Una persona ha mirado el trabajo y lo da por bueno.
+   *
+   * NO vuelve a ejecutarlo. El resultado ya está en la fila: aprobar significa
+   * «esto vale», no «hazlo otra vez». Reejecutar costaría otra llamada al
+   * modelo y produciría algo DISTINTO de lo que la persona acaba de aprobar,
+   * que es justo lo que no puede pasar.
+   *
+   * Deja constancia de quién y cuándo, y CONSERVA el motivo por el que se
+   * retuvo: saber que algo se aprobó a pesar de una advertencia de calidad es
+   * la mitad interesante del dato.
+   */
+  async aprobar(jobId: string, quien: string): Promise<boolean> {
+    const filas = await this.db.query<{ job_id: string }>(
+      `UPDATE os_jobs
+          SET status = 'completed',
+              progress = 100,
+              result = COALESCE(result, '{}'::jsonb)
+                       || jsonb_build_object('approved_by', $2::text, 'approved_at', NOW()::text),
+              updated_at = NOW()
+        WHERE job_id = $1
+          AND status = 'waiting_approval'
+        RETURNING job_id`,
+      [jobId, quien],
+    );
+    return filas.length > 0;
+  }
+
+  /**
+   * Una persona lo ha mirado y no vale.
+   *
+   * Va a `dead_letter` con el motivo humano, no a la cola: si volviera a
+   * ejecutarse produciría lo mismo que se acaba de rechazar. Rehacerlo es una
+   * decisión aparte, y se toma encolando un trabajo nuevo.
+   */
+  async rechazar(jobId: string, quien: string, motivo: string): Promise<boolean> {
+    const filas = await this.db.query<{ job_id: string }>(
+      `UPDATE os_jobs
+          SET status = 'dead_letter',
+              error = $3,
+              last_error = $3,
+              result = COALESCE(result, '{}'::jsonb)
+                       || jsonb_build_object('rejected_by', $2::text, 'rejected_at', NOW()::text),
+              updated_at = NOW()
+        WHERE job_id = $1
+          AND status = 'waiting_approval'
+        RETURNING job_id`,
+      [jobId, quien, motivo.slice(0, 500)],
+    );
+    return filas.length > 0;
+  }
+
+  /**
    * Falla un trabajo. Vuelve a la cola con espera creciente mientras le queden
    * intentos; agotados, va a `dead_letter` y ahí se queda hasta que alguien
    * mire. Rendirse en silencio y rendirse ruidosamente no son lo mismo.
