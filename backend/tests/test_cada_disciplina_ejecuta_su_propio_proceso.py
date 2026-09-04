@@ -1,32 +1,33 @@
-"""Cada disciplina ejecuta su proceso, y la profundidad solo puede crecer.
+"""Ninguna disciplina ejecuta el proceso de otra.
 
-LO QUE SE MIDIO
----------------
-Los 27 modulos de prompts tienen SEIS pasos cada uno. Esa uniformidad exacta ya
-dice algo: veintisiete disciplinas con la misma profundidad de proceso no se han
-disenado por separado.
+LO QUE SE MIDIO, Y LA CORRECCION QUE HUBO QUE HACERLE
+------------------------------------------------------
+Los 27 modulos de prompts tienen SEIS pasos cada uno. La primera lectura de ese
+dato fue que veintiuna disciplinas compartian un esqueleto generico —analysis,
+strategy, execution, optimization, qa, report— y que solo seis tenian proceso
+propio.
 
-Al mirar QUE hace cada paso salen dos grupos:
+Era una conclusion de mas. Al leer el CONTENIDO de esos pasos, la sustancia si
+es de cada disciplina: el de email dice «eres el mejor arquitecto de
+automatizacion de email», el de fotografia «eres el mejor still-life creative
+director», el de reputacion «eres el mejor analista de ORM». Lo que comparten es
+la CONVENCION DE NOMBRES de las funciones, no las instrucciones.
 
-  · SIETE con proceso propio: web (analisis > propuesta > generacion > setup >
-    checklist > informe), seo (auditoria > research > estrategia > tecnico >
-    enlaces > informe), ads, social, branding, ecommerce y —desde hoy— funnel.
-  · VEINTE con el mismo esqueleto: analysis > strategy > execution >
-    optimization > qa > report. Cambia el prefijo de la disciplina; el proceso,
-    no.
+Asi que lo que mide esta bateria es exactamente eso y no mas: cuantas
+disciplinas tienen nombres de paso que describen SUS etapas —seo va de auditoria
+a research, a tecnico, a enlaces— frente a las que usan el patron comun. Es una
+senal util para saber donde se penso el proceso por separado, y no es una
+acusacion de genericidad.
 
-Un esqueleto comun no es un delito: hay disciplinas donde ese ciclo es el
-correcto. Lo que no vale es que se de por hecho sin haberlo decidido, ni que el
-numero de disciplinas con proceso propio BAJE.
+EL FALLO DE VERDAD, QUE SI LO ERA
+----------------------------------
+`FunnelPremiumAgent` importaba los seis prompts de ecommerce ENTEROS. No era una
+convencion de nombres: la instruccion que llegaba al modelo decia «arquitectura
+de la tienda» cuando el servicio era de conversion.
 
-EL CASO QUE LO DESTAPO
------------------------
-`FunnelPremiumAgent` importaba los seis prompts de ecommerce ENTEROS. Sus pasos
-se llamaban «arquitectura de paginas del funnel» y la instruccion que llegaba al
-modelo decia «arquitectura de la tienda».
-
-Invisible desde fuera: seis pasos con nombres correctos, pipeline funcionando,
-pruebas en verde. Lo unico que estaba mal era que se le pedia al modelo.
+Invisible desde fuera —seis pasos con nombres correctos, pipeline funcionando,
+pruebas en verde— y lo unico que estaba mal era que se le pedia al modelo. Esa
+es la regla que esta bateria protege de verdad.
 
 COSTE EXTERNO: 0 EUR. Se leen ficheros.
 """
@@ -41,10 +42,15 @@ AGENTES = RAIZ / "backend" / "os-agents" / "agents"
 #: Los seis nombres del esqueleto generico.
 _GENERICO = {"analysis", "strategy", "execution", "optimization", "qa", "report"}
 
-#: Disciplinas con un proceso propio HOY. Medido el 2026-09-04.
+#: Disciplinas cuyos NOMBRES de paso describen sus propias etapas. Medido el
+#: 2026-09-04.
 #:
-#: Solo puede CRECER. Si una sale de aqui es que alguien le ha quitado su proceso
-#: y le ha puesto el esqueleto comun, y eso hay que verlo.
+#: No dice que las demas sean genericas: su contenido si es de cada disciplina.
+#: Dice donde se penso la forma del proceso por separado, que es una senal util
+#: y distinta.
+#:
+#: Solo puede CRECER: si una sale de aqui, alguien le ha cambiado las etapas por
+#: el patron comun y merece mirarse.
 CON_PROCESO_PROPIO = {
     "ads",
     "branding",
@@ -94,9 +100,10 @@ def test_el_barrido_encuentra_disciplinas():
 def test_la_profundidad_de_proceso_no_retrocede():
     """EL TRINQUETE.
 
-    Quitarle su proceso a una disciplina y dejarle el esqueleto comun no rompe
-    nada: el pipeline sigue funcionando y las pruebas siguen en verde. Solo se
-    nota en lo que recibe el cliente, meses despues.
+    Cambiarle las etapas a una disciplina por el patron comun no rompe nada: el
+    pipeline sigue funcionando y las pruebas siguen en verde. Merece mirarse
+    porque suele significar que se ha copiado un fichero en vez de pensar el
+    proceso — que es como aparecio el caso del embudo.
     """
     perdidas = sorted(CON_PROCESO_PROPIO - _propias())
     assert not perdidas, (
@@ -118,11 +125,12 @@ def test_lo_que_gana_proceso_propio_se_declara():
     )
 
 
-def test_el_detector_distingue_un_proceso_de_un_esqueleto():
-    """CONTROL. Es la distincion entera de esta bateria.
+def test_el_detector_distingue_las_dos_convenciones():
+    """CONTROL.
 
-    Si contara cualquier nombre como proceso propio, las veintisiete saldrian
-    disenadas y no se estaria midiendo nada.
+    Si contara cualquier nombre como etapa propia, las veintisiete saldrian
+    disenadas y no se estaria midiendo nada. Y al reves: si no reconociera
+    ninguna, la lista declarada seria imposible de mantener.
     """
     d = _disciplinas()
     assert "seo" in _propias(), "no reconoce un proceso disenado"
