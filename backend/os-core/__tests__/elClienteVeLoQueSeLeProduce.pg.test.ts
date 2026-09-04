@@ -180,6 +180,41 @@ suite("el cliente ve lo que se le produce", () => {
     expect(filas.rows[0].n).toBe(0);
   });
 
+  it("EL ACOPLAMIENTO: el estado de entrada es uno del que la máquina sabe salir", async () => {
+    // La máquina de estados vive en Python —`os_deliverables_service`— y va
+    // draft → in_review → delivered → approved → published (client_visible).
+    //
+    // Este módulo crea en `in_review` justamente porque `deliver` acepta ese
+    // estado de partida. Si alguien cambiara la creación a `draft` o inventara
+    // otro, el entregable entraría en un estado del que nadie sabe sacarlo y se
+    // quedaría ahí para siempre — que es exactamente el callejón que ya hubo que
+    // cerrar en `waiting_approval`.
+    //
+    // Los dos lados no se conocen: nada más ata este acoplamiento.
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+    const maquina = fs.readFileSync(
+      path.resolve(__dirname, "../../services/os_deliverables_service.py"),
+      "utf8",
+    );
+
+    const filas = await cliente.query(
+      `SELECT DISTINCT status FROM os_deliverables WHERE workspace_id = $1`,
+      [WS],
+    );
+    expect(filas.rowCount).toBeGreaterThan(0);
+
+    for (const f of filas.rows) {
+      const estado = f.status as string;
+      expect(
+        maquina.includes(`allowed_from=frozenset({"${estado}"`)
+          || maquina.includes(`"${estado}", `)
+          || maquina.includes(`, "${estado}"`),
+        `se crea en «${estado}» y la máquina de estados no sabe salir de ahí`,
+      ).toBe(true);
+    }
+  });
+
   it("y la señal `sin_entregables` deja de saltar cuando hay trabajo", async () => {
     // Es la consecuencia que se buscaba: la señal tenía razón por el motivo
     // equivocado, y ahora mide lo que dice medir.
