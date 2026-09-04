@@ -67,6 +67,15 @@ function extraerProcedencias(resultado: unknown): LlmProvenance[] {
   );
 }
 
+/** La constancia de que una pieza pasó por calidad, y con qué resultado. */
+type RastroDeCalidad = {
+  dominio: string;
+  veredicto: string;
+  revisadoPor: string;
+  avisos: string[];
+  noComprobado: string[];
+};
+
 /** Qué disciplina juzga cada servicio. Fuente única, ya declarada. */
 const QA_DE = (mapaDeServicio as { qaDe: Record<string, string> }).qaDe;
 
@@ -109,7 +118,10 @@ async function revisarCalidad(
   serviceId: string,
   resultado: unknown,
   payload: Record<string, unknown>,
-): Promise<{ pide: true; motivo: string } | { pide: false }> {
+): Promise<
+  | { pide: true; motivo: string }
+  | { pide: false; rastro?: RastroDeCalidad }
+> {
   const dominio = QA_DE[serviceId];
   // Servicio sin disciplina declarada: no se inventa una. Juzgarlo con la
   // rúbrica equivocada sería peor que no juzgarlo, y el hueco de declaración se
@@ -134,7 +146,25 @@ async function revisarCalidad(
     // valido, y una bandeja llena de ruido se deja de mirar —que es como se
     // pierde tambien lo que si importaba—.
     if (informe.veredicto === "PASS" || informe.veredicto === "PASS_WITH_WARNINGS") {
-      return { pide: false };
+      // DEJA CONSTANCIA DE QUE SE REVISO, aunque haya pasado.
+      //
+      // Sin esto solo quedaba rastro de lo que suspendia —el motivo va a
+      // `waiting_reason`— y un entregable aprobado era indistinguible de uno que
+      // nadie miro. La pregunta que se hace despues nunca es «por que se
+      // retuvo», que ya se sabia: es «esto lo revisó alguien, y con qué».
+      return {
+        pide: false,
+        rastro: {
+          dominio,
+          veredicto: informe.veredicto,
+          revisadoPor: `qa:${serviceId}`,
+          avisos: informe.hallazgos.map((h) => h.id),
+          // Lo que NO se pudo comprobar viaja con el entregable. Un aprobado con
+          // media rubrica sin ejecutar no es lo mismo que uno completo, y quien
+          // lo lea despues tiene derecho a distinguirlos.
+          noComprobado: informe.noComprobado.map((n) => n.id),
+        },
+      };
     }
 
     const porQue = informe.hallazgos.length > 0
@@ -213,6 +243,14 @@ export const manejadorDeServicioOs: ManejadorDeTrabajo = async (
     return { tipo: "esperandoAprobacion", motivo: calidad.motivo };
   }
 
+  // El rastro viaja CON el entregable, en su propia clave. No se mezcla con lo
+  // que produjo el agente: sobrescribir algo suyo por llamarse igual perderia
+  // trabajo, y aqui solo se anade.
+  const entregable =
+    calidad.rastro && resultado && typeof resultado === "object" && !Array.isArray(resultado)
+      ? { ...(resultado as Record<string, unknown>), calidad: calidad.rastro }
+      : resultado;
+
   // EL BUCLE DE APRENDIZAJE SE CIERRA AQUI, no en cada agente.
   //
   // `LearningService.recordOutcome` es la entrada de ese bucle: sin outcomes no
@@ -230,7 +268,7 @@ export const manejadorDeServicioOs: ManejadorDeTrabajo = async (
   // DESPUES de la puerta de aprobacion, y eso es deliberado: un resultado que
   // necesita que lo mire una persona todavia no es un outcome del que aprender.
   // Aprender de trabajo sin validar es como se ensena a repetir un error.
-  await registrarParaAprender(trabajo, resultado);
+  await registrarParaAprender(trabajo, entregable);
 
   // Y QUEDA REGISTRADA COMO ACCION MEDIBLE.
   //
@@ -250,7 +288,7 @@ export const manejadorDeServicioOs: ManejadorDeTrabajo = async (
     serviceId: trabajo.serviceId,
   });
 
-  return { tipo: "completado", resultado };
+  return { tipo: "completado", resultado: entregable };
 };
 
 /**

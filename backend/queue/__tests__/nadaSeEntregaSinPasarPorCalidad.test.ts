@@ -128,6 +128,46 @@ describe("nada se entrega sin pasar por calidad", () => {
     expect((r as { motivo: string }).motivo).toMatch(/«es».*«en»/);
   });
 
+  // ── LA CONSTANCIA ─────────────────────────────────────────────────────────
+
+  it("un entregable APROBADO lleva constancia de que se revisó", async () => {
+    // Antes solo quedaba rastro de lo que suspendia —el motivo va a
+    // `waiting_reason`— y un entregable aprobado era indistinguible de uno que
+    // nadie miro. La pregunta que se hace despues nunca es «por que se retuvo»:
+    // es «esto lo reviso alguien, y con que».
+    processQueuedJob.mockResolvedValue({ status: "completed", result: BUENO });
+
+    const r = await ejecutar();
+    const entregado = (r as { resultado: Record<string, unknown> }).resultado;
+    const calidad = entregado.calidad as Record<string, unknown>;
+
+    expect(calidad, "se entregó sin decir que había pasado por calidad").toBeDefined();
+    expect(calidad.dominio).toBe("contenido");
+    expect(calidad.revisadoPor).toBe("qa:contenido_copywriting_premium");
+    expect(calidad.veredicto).toMatch(/^PASS/);
+  });
+
+  it("y dice lo que NO se pudo comprobar, no solo lo que pasó", async () => {
+    // Un aprobado con media rúbrica sin ejecutar no es lo mismo que uno
+    // completo, y quien lo lea después tiene derecho a distinguirlos.
+    processQueuedJob.mockResolvedValue({ status: "completed", result: BUENO });
+
+    const r = await ejecutar();
+    const calidad = (r as { resultado: Record<string, unknown> }).resultado
+      .calidad as Record<string, unknown>;
+
+    expect(Array.isArray(calidad.noComprobado)).toBe(true);
+  });
+
+  it("el rastro NO pisa lo que produjo el agente", async () => {
+    processQueuedJob.mockResolvedValue({ status: "completed", result: BUENO });
+
+    const r = await ejecutar();
+    const entregado = (r as { resultado: Record<string, unknown> }).resultado;
+
+    expect(entregado.texto, "se perdió contenido al adjuntar el rastro").toBe(BUENO.texto);
+  });
+
   it("lo que suspende calidad TAMPOCO se aprende", async () => {
     // Aprender de trabajo que no ha pasado calidad enseña a repetir lo que no
     // vale, y encima con la confianza que da un patrón con muchas muestras.

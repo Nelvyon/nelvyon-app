@@ -91,7 +91,12 @@ describe("el bucle de aprendizaje se cierra en el manejador, no en cada agente",
     expect(agentId).toBe("seo_premium");
     expect(sector, "el sector se perdió: los aprendizajes se agruparían mal").toBe("health");
     expect(entrada).toBe(trabajo.payload);
-    expect(salida).toEqual({ texto: "hecho" });
+    // Lo que produjo el agente llega intacto…
+    expect(salida).toMatchObject({ texto: "hecho" });
+    // …y con la constancia de con qué se aprobó. Saber si una pieza paso limpia
+    // o con avisos es justo lo que interesa aprender de ella.
+    expect((salida as { calidad?: unknown }).calidad, "se aprendió sin saber cómo pasó calidad")
+      .toBeDefined();
   });
 
   it("sin `userId` en el payload cae al cliente, no a una cadena vacía", async () => {
