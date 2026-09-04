@@ -50,6 +50,27 @@ RAIZ = pathlib.Path(__file__).resolve().parents[2]
 _IMPORT = re.compile(r"""(?:from|import)\s*\(?\s*["']([^"']+)["']""")
 _COMENTARIO = re.compile(r"//[^\n]*|/\*.*?\*/", re.S)
 
+#: Una importacion escrita DENTRO de un programa embebido en un script.
+#:
+#: SE ENCONTRO ASI: `scripts/nelvyon-knowledge-sync.mjs` compone un programa
+#: entero en un literal de texto y lo lanza con tsx. Dentro de ese literal hay
+#: `import { ... } from "../backend/local-ai/externalKnowledgeRegistry.ts"`, que
+#: es una importacion de verdad aunque viva dentro de una cadena.
+#:
+#: EXIGE LA POSICION DE IMPORT, y no vale cualquier ruta escrita en cualquier
+#: sitio. La primera version aceptaba cualquier cadena que pareciera una ruta y
+#: se equivoco en la direccion contraria: dio por VIVOS a `PuenteDeEjecucion` y
+#: a `AgentContextEngine` porque `scripts/que-es-nelvyon-ai.mjs` los LEE como
+#: texto para contar patrones y describir el sistema, y a
+#: `NelvyonLabsCapabilityRegistry` porque aparece en un array `components:` de
+#: documentacion.
+#:
+#: Leer un fichero para describirlo no es ejecutarlo. Confundir las dos cosas
+#: convierte cualquier inventario del repositorio en una coartada.
+_IMPORT_EMBEBIDO = re.compile(
+    r"""(?:from|import)\s*\(?\s*\\?["']((?:\.\./)*(?:backend|apps)/[A-Za-z0-9_\-./]+\.(?:ts|tsx|mjs))\\?["']"""
+)
+
 #: Lo que tiene pinta de HACER algo. Un tipo suelto no enciende ni apaga nada.
 _HACE_ALGO = re.compile(
     r"(Motor|Puente|Engine|Gate|Guard|Orchestr|Pipeline|Service|Manager|Registry)", re.I
@@ -78,14 +99,20 @@ ENTRADAS_POR_RUTA_CALCULADA = [
 #:
 #: Cada uno con su motivo. Un inventario sin motivos es una lista que nadie lee,
 #: y entonces vuelve a colarse un motor apagado sin que salte nada.
+#: SE CORRIGIERON CUATRO. La primera version de este guardian daba por huerfanos
+#: a `runLearningEngine`, `externalKnowledgeRegistry` y los dos backfills, con
+#: motivos que me invente —«sin llamador», «sin ingesta conectada»—. Los cuatro
+#: SE EJECUTAN: los tres primeros tienen arrancador propio dentro de
+#: `backend/**/scripts/`, que el barrido no miraba, y el cuarto se importa desde
+#: un programa que un script compone en un literal y lanza con tsx.
+#:
+#: Escribir un motivo plausible para algo que no se ha comprobado es la forma
+#: mas facil de que una lista de excepciones deje de significar nada.
 SIN_ALCANCE_DECLARADO: dict[str, str] = {
     "backend/agency/NelvyonOsOrchestratorContract.ts":
         "contrato declarativo: describe la forma que deben cumplir otros, no se ejecuta",
     "backend/agency/VisualEliteStrategyPipeline.ts":
         "pipeline de estrategia visual construido y sin departamento que lo reclame",
-    "backend/autonomous/learning/runLearningEngine.ts":
-        "arrancador suelto del motor de aprendizaje; el bucle real se cierra en "
-        "`manejadorDeServicioOs`",
     "backend/ejecucion/PuenteDeEjecucion.ts":
         "las siete puertas de ejecucion, construidas y sin nadie que las cruce; la via "
         "real pasa hoy por el manejador de la cola",
@@ -93,8 +120,6 @@ SIN_ALCANCE_DECLARADO: dict[str, str] = {
         "registro de capacidades de laboratorio, sin superficie que lo consulte",
     "backend/local-ai/LocalAiBackupService.ts":
         "copia de seguridad del modelo local; se invoca a mano cuando toca",
-    "backend/local-ai/externalKnowledgeRegistry.ts":
-        "registro de fuentes externas de conocimiento, todavia sin ingesta conectada",
     "backend/local-ai/specialization/PlanningEngine.ts":
         "planificacion de la especializacion del modelo local, sin llamador",
     "backend/local-ai/specialization/QualityGates.ts":
@@ -103,10 +128,6 @@ SIN_ALCANCE_DECLARADO: dict[str, str] = {
     "backend/os-agents/upsell/OsUpsellEngine.ts":
         "ya declarado huerfano en el guardian de capacidades: construido, ningun "
         "servicio lo invoca",
-    "backend/os-core/OsClientsBackfillService.ts":
-        "backfill de una migracion de datos; se ejecuta a mano una vez",
-    "backend/os-core/OsProjectsBackfillService.ts":
-        "backfill de proyectos; mismo caso que el de clientes, se ejecuta a mano",
     "backend/private-ai/context/AgentContextEngine.ts":
         "motor de contexto de la IA privada; el contexto que llega hoy a los agentes "
         "viene de `contextEnricher` y `contextoDeNegocio`",
@@ -117,11 +138,20 @@ SIN_ALCANCE_DECLARADO: dict[str, str] = {
 
 
 def _imports_de(ruta: str) -> list[str]:
+    """Todo lo que este fichero puede acabar cargando.
+
+    Importaciones normales Y rutas de fuente escritas como texto: los scripts de
+    mantenimiento lanzan ficheros por ruta, y esa arista es tan real como un
+    `import`.
+    """
     try:
         s = (RAIZ / ruta).read_text(encoding="utf-8", errors="replace")
     except OSError:
         return []
-    return [m.group(1) for m in _IMPORT.finditer(_COMENTARIO.sub(" ", s))]
+    limpio = _COMENTARIO.sub(" ", s)
+    return [m.group(1) for m in _IMPORT.finditer(limpio)] + [
+        m.group(1) for m in _IMPORT_EMBEBIDO.finditer(limpio)
+    ]
 
 
 def _resolver(desde: str, spec: str) -> str | None:
@@ -130,10 +160,20 @@ def _resolver(desde: str, spec: str) -> str | None:
         cand = [f"backend/{sub}/index.ts", f"backend/{sub}.ts"]
     elif spec.startswith("."):
         base = os.path.normpath(os.path.join(os.path.dirname(desde), spec))
-        cand = [base + ".ts", base + ".tsx", os.path.join(base, "index.ts"), base + ".mjs"]
+        # `base` TAL CUAL va primero: una importacion puede traer ya la
+        # extension. Sin esto se perdia `from "../backend/…/x.ts"`, que es como
+        # importan los programas que los scripts componen y lanzan con tsx —y se
+        # daba por muerto un modulo que se ejecuta en cada sincronizacion.
+        cand = [base, base + ".ts", base + ".tsx", os.path.join(base, "index.ts"), base + ".mjs"]
     elif spec.startswith("@/"):
         base = os.path.normpath(os.path.join("apps/web/src", spec[2:]))
         cand = [base + ".ts", base + ".tsx", os.path.join(base, "index.ts")]
+    elif spec.startswith(("backend/", "apps/", "scripts/")):
+        # Ruta desde la raiz del repositorio, como la escriben los scripts.
+        cand = [spec]
+    elif spec.startswith("../") and re.search(r"/(backend|apps|scripts)/", "/" + spec):
+        # `../backend/...` dentro de un programa embebido en un script.
+        cand = [spec[spec.index("backend/"):]] if "backend/" in spec else []
     else:
         return None
     for c in cand:
@@ -165,8 +205,18 @@ def _entradas() -> list[str]:
                 fuera.append(
                     os.path.relpath(os.path.join(base, f), RAIZ).replace("\\", "/")
                 )
-    # El proceso trabajador y los scripts sueltos.
-    for base, _, ficheros in os.walk(RAIZ / "scripts"):
+    # El proceso trabajador y los scripts sueltos —los de la raiz Y los que viven
+    # DENTRO de backend/. Mirar solo los de la raiz daba por muertos los
+    # arrancadores de los backfills y del motor de aprendizaje, que se ejecutan a
+    # mano igual que los otros.
+    for carpeta in (RAIZ / "scripts",):
+        for base, _, ficheros in os.walk(carpeta):
+            for f in ficheros:
+                if f.endswith((".mjs", ".ts")):
+                    fuera.append(os.path.relpath(os.path.join(base, f), RAIZ).replace("\\", "/"))
+    for base, dirs, ficheros in os.walk(RAIZ / "backend"):
+        if os.path.basename(base) != "scripts":
+            continue
         for f in ficheros:
             if f.endswith((".mjs", ".ts")):
                 fuera.append(os.path.relpath(os.path.join(base, f), RAIZ).replace("\\", "/"))
@@ -180,6 +230,14 @@ def _alcanzables() -> set[str]:
     while pila:
         n = pila.pop()
         if n in visto:
+            continue
+        # UNA PRUEBA NO HACE VIVO A NADIE, y atravesarlas lo daba todo por vivo.
+        #
+        # `VisualEliteStrategyPipeline` salia alcanzable por una cadena de cuatro
+        # saltos que pasaba por DOS ficheros de pruebas. Que algo tenga bateria
+        # es justo lo contrario de la pregunta: se pregunta si lo ejecuta el
+        # producto, no si lo ejecuta el que lo comprueba.
+        if "__tests__" in n or n.endswith((".test.ts", ".test.tsx", ".pg.test.ts")):
             continue
         visto.add(n)
         for spec in _imports_de(n):
