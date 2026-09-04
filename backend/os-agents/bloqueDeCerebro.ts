@@ -40,20 +40,7 @@ import { CerebroDeNegocioService } from "../cerebro/CerebroDeNegocioService";
 import { DbClient } from "../db/DbClient";
 
 import { contextoDeNegocio } from "./contextoDeNegocio";
-
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-/** El workspace del cliente, o `null` si no consta. */
-async function workspaceDelCliente(clientId: string): Promise<number | null> {
-  if (!UUID.test(clientId)) return null;
-  const filas = await DbClient.getInstance().query<{ workspace_id: number | string }>(
-    `SELECT workspace_id FROM os_clients WHERE id = $1::uuid LIMIT 1`,
-    [clientId],
-  );
-  const w = filas[0]?.workspace_id;
-  const n = typeof w === "number" ? w : typeof w === "string" ? Number(w) : NaN;
-  return Number.isInteger(n) ? n : null;
-}
+import { workspaceDelCliente } from "../os-core/workspaceDelCliente";
 
 /**
  * El bloque de contexto de negocio para este cliente y este servicio.

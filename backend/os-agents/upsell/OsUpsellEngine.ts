@@ -35,7 +35,73 @@ export class OsUpsellEngine {
     return this.deps.llm ?? LlmClient.getInstance();
   }
 
+  /**
+   * ¿Es momento de proponerle algo más a este cliente?
+   *
+   * ── LA REGLA ──────────────────────────────────────────────────────────────
+   *
+   * No se le vende nada a quien tiene un problema abierto con lo que YA ha
+   * comprado. No es delicadeza: proponerle un servicio adicional a alguien que
+   * lleva tres semanas sin recibir un entregable es la forma más rápida de
+   * perderlo, y encima le confirma que nadie está mirando su cuenta.
+   *
+   * `SenalesDeCliente` ya distingue las tres gravedades que hacen falta. Una
+   * señal `bloqueante` significa literalmente «el cliente está pagando y no
+   * recibe nada». Ahí no se vende.
+   *
+   * ── FALLA CERRADO ─────────────────────────────────────────────────────────
+   *
+   * Si las señales no se pueden leer, se calla. La asimetría es clara:
+   * proponerle una venta a un cliente cuya situación no hemos podido comprobar
+   * puede costar la relación; no proponérsela cuesta una oportunidad retrasada.
+   *
+   * ── Y AHORRA LA LLAMADA AL MODELO ─────────────────────────────────────────
+   *
+   * Se comprueba ANTES de componer el prompt. Preguntarle a un modelo qué
+   * venderle a un cliente al que no se le va a vender nada cuesta dinero y no
+   * sirve para nada.
+   */
+  private async porQueNoTocaVender(clientId: string): Promise<string | null> {
+    try {
+      const { workspaceDelCliente } = await import("../../os-core/workspaceDelCliente");
+      const workspaceId = await workspaceDelCliente(clientId, this.db);
+      if (workspaceId === null) {
+        return "el cliente no consta en os_clients: no se puede comprobar cómo le va";
+      }
+
+      // Las tres piezas que `SenalesDeCliente` necesita comparten la misma
+      // conexion. Se componen aqui en vez de inyectarse para no obligar a todo
+      // llamante del motor de venta cruzada a saber de que se compone la salud
+      // de un cliente — que es justo lo que este modulo no deberia decidir.
+      const { SenalesDeCliente } = await import("../../exito/SenalesDeCliente");
+      const { CerebroDeNegocioService } = await import("../../cerebro/CerebroDeNegocioService");
+      const { CicloDelClienteService } = await import("../../portal/CicloDelClienteService");
+      const cerebro = new CerebroDeNegocioService(this.db as never);
+      const ciclo = new CicloDelClienteService(this.db as never, cerebro);
+      const senales = await new SenalesDeCliente(this.db as never, cerebro, ciclo).deCliente(
+        workspaceId,
+        clientId,
+      );
+
+      const bloqueantes = senales.filter((s) => s.gravedad === "bloqueante");
+      if (bloqueantes.length > 0) {
+        return `tiene ${bloqueantes.length} problema(s) abierto(s) con lo que ya paga: `
+          + bloqueantes.map((s) => s.tipo).join(", ");
+      }
+      return null;
+    } catch {
+      return "no se han podido leer las señales del cliente";
+    }
+  }
+
   async analyzeClient(clientId: string, tenantId: string): Promise<UpsellSuggestion | null> {
+    // ANTES DE NADA: ¿le va bien lo que ya tiene?
+    const noToca = await this.porQueNoTocaVender(clientId);
+    if (noToca) {
+      logger.info(`[UPSELL] no se propone nada a ${clientId}: ${noToca}`);
+      return null;
+    }
+
     const contracted = await this.db.query<{ service_id: string }>(
       `SELECT service_id FROM os_service_contracts WHERE client_id = $1 AND tenant_id = $2::uuid AND status = 'active'`,
       [clientId, tenantId],

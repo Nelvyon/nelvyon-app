@@ -36,23 +36,7 @@
 import { DbClient } from "../db/DbClient";
 
 import { MotorDeResultados } from "./MotorDeResultados";
-
-/** El workspace al que pertenece un cliente, o `null` si no consta. */
-async function workspaceDelCliente(clientId: string): Promise<number | null> {
-  // El `clientId` de un trabajo es TEXT y puede no ser un uuid. Se filtra antes
-  // de tocar la base: mandar un texto cualquiera a una comparación con uuid
-  // revienta la consulta, y un fallo aquí no puede costar una entrega.
-  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(clientId)) {
-    return null;
-  }
-  const filas = await DbClient.getInstance().query<{ workspace_id: number | string }>(
-    `SELECT workspace_id FROM os_clients WHERE id = $1::uuid LIMIT 1`,
-    [clientId],
-  );
-  const w = filas[0]?.workspace_id;
-  const n = typeof w === "number" ? w : typeof w === "string" ? Number(w) : NaN;
-  return Number.isInteger(n) ? n : null;
-}
+import { workspaceDelCliente } from "../os-core/workspaceDelCliente";
 
 /**
  * Registra una entrega como acción medible.
