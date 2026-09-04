@@ -1,5 +1,10 @@
 import type { OsJobPayload } from "../types";
-import { CLAVE_CEREBRO, CLAVE_CONTEXTO, contextoDelCliente } from "./elitePayloadStrings";
+import {
+  CLAVE_CEREBRO,
+  CLAVE_CONTEXTO,
+  CLAVE_CORRECCION,
+  contextoDelCliente,
+} from "./elitePayloadStrings";
 import { contextoDeNegocio } from "../contextoDeNegocio";
 import type { Cerebro } from "../../cerebro/CerebroDeNegocioService";
 
@@ -17,7 +22,7 @@ import type { Cerebro } from "../../cerebro/CerebroDeNegocioService";
 export function buildPrompt(template: string, vars: Record<string, string>): string {
   let out = template;
   for (const [key, value] of Object.entries(vars)) {
-    if (key === CLAVE_CONTEXTO || key === CLAVE_CEREBRO) continue;
+    if (key === CLAVE_CONTEXTO || key === CLAVE_CEREBRO || key === CLAVE_CORRECCION) continue;
     out = out.split(`{${key}}`).join(value);
   }
   // Las dos se PREPONEN, en este orden: primero lo que NELVYON sabia del
@@ -28,7 +33,12 @@ export function buildPrompt(template: string, vars: Record<string, string>): str
 
 ${out}`;
   const contexto = vars[CLAVE_CONTEXTO];
-  return contexto && contexto.trim() ? `${contexto.trim()}\n\n${out}` : out;
+  if (contexto && contexto.trim()) out = `${contexto.trim()}\n\n${out}`;
+
+  // LA CORRECCIÓN VA DELANTE DE TODO. Es la instrucción más inmediata que
+  // existe: lo demás sigue valiendo, pero esto hay que arreglarlo ahora.
+  const correccion = vars[CLAVE_CORRECCION];
+  return correccion && correccion.trim() ? `${correccion.trim()}\n\n${out}` : out;
 }
 
 function asTrimmedString(v: unknown, fallback: string): string {

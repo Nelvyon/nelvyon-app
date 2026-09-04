@@ -119,8 +119,8 @@ async function revisarCalidad(
   resultado: unknown,
   payload: Record<string, unknown>,
 ): Promise<
-  | { pide: true; motivo: string }
-  | { pide: false; rastro?: RastroDeCalidad }
+  | { pide: true; motivo: string; hallazgos?: Array<{ id: string; quePasa: string }> }
+  | { pide: false; rastro?: RastroDeCalidad; hallazgos?: never }
 > {
   const dominio = QA_DE[serviceId];
   // Servicio sin disciplina declarada: no se inventa una. Juzgarlo con la
@@ -173,6 +173,9 @@ async function revisarCalidad(
     return {
       pide: true,
       motivo: `calidad (${dominio}) dice ${informe.veredicto}: ${porQue}`,
+      // Los hallazgos viajan para que se pueda pedir una correccion concreta.
+      // «No cumple los criterios» no permite arreglar nada.
+      hallazgos: informe.hallazgos.map((h) => ({ id: h.id, quePasa: h.quePasa })),
     };
   } catch (e) {
     // FALLA CERRADO. Si el propio motor revienta, no se sabe si la pieza vale
@@ -284,7 +287,7 @@ export const manejadorDeServicioOs: ManejadorDeTrabajo = async (
     throw new Error(salida.message ?? "el trabajo termino sin completarse");
   }
 
-  const resultado = salida.result ?? { message: salida.message };
+  let resultado = salida.result ?? { message: salida.message };
   const aprobacion = exigeAprobacion(trabajo.serviceId, resultado);
   if (aprobacion.pide) {
     return { tipo: "esperandoAprobacion", motivo: aprobacion.motivo };
@@ -292,7 +295,26 @@ export const manejadorDeServicioOs: ManejadorDeTrabajo = async (
 
   // LA PUERTA DE CALIDAD. Antes de esto, nada de lo que se entregaba pasaba por
   // el motor: existia, y no lo llamaba nadie en la via real.
-  const calidad = await revisarCalidad(trabajo.serviceId, resultado, payloadConCerebro);
+  let calidad = await revisarCalidad(trabajo.serviceId, resultado, payloadConCerebro);
+
+  // Y SI SUSPENDE, SE INTENTA ARREGLARLO ANTES DE MOLESTAR A NADIE.
+  //
+  // Una pieza suspendida iba directa a la bandeja. Bien para lo que no tiene
+  // arreglo automatico —una afirmacion inventada, una mezcla de clientes—,
+  // desperdicio para lo que si: «se pidio en es y esta escrita en en» no
+  // necesita una persona, necesita rehacerla en espanol.
+  //
+  // Una bandeja llena de cosas que el sistema podria haber arreglado solo se
+  // acaba mirando por encima, y entonces tambien se pasan por alto las que si
+  // necesitaban un ojo humano.
+  if (calidad.pide && calidad.hallazgos && calidad.hallazgos.length > 0) {
+    const corregido = await intentarCorregir(trabajo, payloadConCerebro, calidad);
+    if (corregido) {
+      resultado = corregido.resultado;
+      calidad = corregido.calidad;
+    }
+  }
+
   if (calidad.pide) {
     return { tipo: "esperandoAprobacion", motivo: calidad.motivo };
   }
@@ -413,6 +435,72 @@ async function registrarParaAprender(
       `[aprendizaje] no se pudo registrar el resultado de ${trabajo.serviceId}: `
         + `${String(redactar(crudo)).slice(0, 200)}`,
     );
+  }
+}
+
+/**
+ * Un intento de arreglar lo que calidad rechazo.
+ *
+ * ── LO QUE HACE QUE FUNCIONE ──────────────────────────────────────────────
+ *
+ * El diagnostico. Reintentar con la misma instruccion produce lo mismo: si el
+ * modelo escribio en ingles fue porque nada le dijo que no. Lo que se le manda
+ * es la lista concreta de lo que fallo, con las palabras del propio motor.
+ *
+ * ── UN SOLO INTENTO, Y CON PERMISO ────────────────────────────────────────
+ *
+ * Producir otra vez cuesta una llamada al modelo. Si el modo coste cero esta
+ * activo NO se reintenta: una capacidad que se enciende sola y multiplica la
+ * factura es exactamente lo que este repositorio no permite.
+ *
+ * Y si el segundo intento falla por lo mismo, escala. Insistir esperando otro
+ * resultado es la definicion de un bucle que no termina.
+ *
+ * NUNCA lanza: si el reintento revienta, se escala con el veredicto original.
+ * Perder el trabajo del primer intento por un fallo del segundo seria absurdo.
+ */
+async function intentarCorregir(
+  trabajo: Parameters<ManejadorDeTrabajo>[0],
+  payload: Record<string, unknown>,
+  veredicto: { motivo: string; hallazgos?: Array<{ id: string; quePasa: string }> },
+): Promise<{
+  resultado: NonNullable<Awaited<ReturnType<typeof osOrchestrator.processQueuedJob>>["result"]> | { message: string };
+  calidad: Awaited<ReturnType<typeof revisarCalidad>>;
+} | null> {
+  try {
+    const { modoCosteCeroActivo } = await import("../coste/PoliticaDeCosteCero");
+    if (modoCosteCeroActivo()) return null;
+
+    const { pedirCorreccion } = await import("../calidad/bucleDeCorreccion");
+    const correccion = pedirCorreccion({
+      aprobada: false,
+      motivo: veredicto.motivo,
+      hallazgos: veredicto.hallazgos ?? [],
+    });
+    if (!correccion) return null;
+
+    const { CLAVE_CORRECCION } = await import("../os-agents/agents/elitePayloadStrings");
+    const salida = await osOrchestrator.processQueuedJob({
+      jobId: trabajo.jobId,
+      serviceId: trabajo.serviceId,
+      clientId: trabajo.clientId,
+      payload: { ...payload, [CLAVE_CORRECCION]: correccion },
+      enqueuedAt: new Date().toISOString(),
+      userId: (trabajo.payload.userId as string | undefined) ?? undefined,
+    });
+    if (salida.status !== "completed" || salida.skipped) return null;
+
+    const resultado = salida.result ?? { message: salida.message };
+    const calidad = await revisarCalidad(trabajo.serviceId, resultado, payload);
+    return { resultado, calidad };
+  } catch (e) {
+    const { redactar } = await import("../seguridad/formaDeUnSecreto.mjs");
+    const crudo = e instanceof Error ? e.message : "desconocido";
+    console.warn(
+      `[correccion] no se pudo reintentar ${trabajo.serviceId}: `
+        + `${String(redactar(crudo)).slice(0, 200)}`,
+    );
+    return null;
   }
 }
 

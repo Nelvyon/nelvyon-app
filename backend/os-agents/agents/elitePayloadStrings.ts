@@ -45,6 +45,18 @@ export const CLAVE_CONTEXTO = "__contextoDelCliente";
  */
 export const CLAVE_CEREBRO = "__contextoDeNegocio";
 
+/**
+ * LO QUE CALIDAD RECHAZÓ DEL INTENTO ANTERIOR.
+ *
+ * Se prepone como las otras dos, y va la PRIMERA de las tres: es la instrucción
+ * más inmediata que existe. El contexto del encargo y lo que sabemos del cliente
+ * siguen valiendo, pero por delante va lo que hay que arreglar AHORA.
+ *
+ * Sólo aparece en un reintento. En el primer intento está vacía, y una clave
+ * vacía no prepone nada.
+ */
+export const CLAVE_CORRECCION = "__correccionDeCalidad";
+
 function comoLista(v: unknown): string[] {
   if (Array.isArray(v)) {
     return v.filter((x): x is string => typeof x === "string" && x.trim().length > 0).map((x) => x.trim());
@@ -150,6 +162,9 @@ export function eliteCommonIntakeStrings(payload: OsJobPayload): Record<string, 
     // carga UNA vez quien conoce al cliente y el servicio: el manejador.
     [CLAVE_CEREBRO]:
       typeof payload[CLAVE_CEREBRO] === "string" ? (payload[CLAVE_CEREBRO] as string) : "",
+    // La corrección de un reintento, si lo es.
+    [CLAVE_CORRECCION]:
+      typeof payload[CLAVE_CORRECCION] === "string" ? (payload[CLAVE_CORRECCION] as string) : "",
     clientName: asTrimmedString(payload.clientName, "Cliente premium (nombre por confirmar en kickoff)"),
     industry: asTrimmedString(payload.industry, "Sector a definir con el cliente en sesión estratégica"),
     targetAudience: asTrimmedString(payload.targetAudience, "Público objetivo por perfilar con research cualitativo/cuantitativo"),

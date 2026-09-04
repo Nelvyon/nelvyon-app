@@ -1,5 +1,10 @@
 import type { OsJobPayload } from "../types";
-import { CLAVE_CEREBRO, CLAVE_CONTEXTO, eliteCommonIntakeStrings } from "./elitePayloadStrings";
+import {
+  CLAVE_CEREBRO,
+  CLAVE_CONTEXTO,
+  CLAVE_CORRECCION,
+  eliteCommonIntakeStrings,
+} from "./elitePayloadStrings";
 
 /** Replaces `{{KEY}}` placeholders (Lote 2 prompt convention). */
 /**
@@ -16,7 +21,7 @@ import { CLAVE_CEREBRO, CLAVE_CONTEXTO, eliteCommonIntakeStrings } from "./elite
 export function buildPrompt(template: string, vars: Record<string, string>): string {
   let out = template;
   for (const [key, value] of Object.entries(vars)) {
-    if (key === CLAVE_CONTEXTO || key === CLAVE_CEREBRO) continue;
+    if (key === CLAVE_CONTEXTO || key === CLAVE_CEREBRO || key === CLAVE_CORRECCION) continue;
     out = out.split(`{{${key}}}`).join(value);
   }
 
@@ -27,7 +32,12 @@ export function buildPrompt(template: string, vars: Record<string, string>): str
   if (cerebro && cerebro.trim()) out = `${cerebro.trim()}\n\n${out}`;
 
   const contexto = vars[CLAVE_CONTEXTO];
-  return contexto && contexto.trim() ? `${contexto.trim()}\n\n${out}` : out;
+  if (contexto && contexto.trim()) out = `${contexto.trim()}\n\n${out}`;
+
+  // LA CORRECCIÓN VA DELANTE DE TODO. Es la instrucción más inmediata que
+  // existe: lo demás sigue valiendo, pero esto hay que arreglarlo ahora.
+  const correccion = vars[CLAVE_CORRECCION];
+  return correccion && correccion.trim() ? `${correccion.trim()}\n\n${out}` : out;
 }
 
 /** Uppercase intake keys for Lote 2 templates ({{CLIENT_NAME}}, …). */
@@ -44,6 +54,7 @@ export function eliteLote2CommonVars(payload: OsJobPayload): Record<string, stri
     // exactamente donde se pierde una clave que empieza por `__`: paso ya una
     // vez con el contexto del encargo y doce servicios se quedaron sin el.
     [CLAVE_CEREBRO]: b[CLAVE_CEREBRO] ?? "",
+    [CLAVE_CORRECCION]: b[CLAVE_CORRECCION] ?? "",
     CLIENT_NAME: b.clientName,
     INDUSTRY: b.industry,
     TARGET_AUDIENCE: b.targetAudience,
