@@ -34,8 +34,12 @@ import { resolveLlmMode } from "../autonomous/llm/llmAdapter";
 import { proveedoresDisponibles } from "../autonomous/llm/providers";
 import { ES_PARA_ESTE_CLIENTE } from "./esParaEsteCliente";
 import {
+  SOBRE_LA_PROSA_ADS,
+  SOBRE_LA_PROSA_CONTENIDO,
   SOBRE_LA_PROSA_CRM,
   SOBRE_LA_PROSA_ECOMMERCE,
+  SOBRE_LA_PROSA_SEO,
+  SOBRE_LA_PROSA_SOCIAL,
   SOBRE_LA_PROSA_WEB,
 } from "./comprobacionesSobreLaProsa";
 
@@ -379,6 +383,7 @@ const POR_DOMINIO: Readonly<Record<string, readonly Comprobacion[]>> = {
     },
   ],
   seo: [
+    ...SOBRE_LA_PROSA_SEO,
     {
       id: "meta-descripcion-util",
       descripcion: "La meta descripción cabe en el resultado de búsqueda",
@@ -474,6 +479,7 @@ const POR_DOMINIO: Readonly<Record<string, readonly Comprobacion[]>> = {
     },
   ],
   ads: [
+    ...SOBRE_LA_PROSA_ADS,
     {
       id: "presupuesto-declarado",
       descripcion: "Toda campaña dice cuánto va a gastar",
@@ -543,6 +549,7 @@ const POR_DOMINIO: Readonly<Record<string, readonly Comprobacion[]>> = {
     },
   ],
   social: [
+    ...SOBRE_LA_PROSA_SOCIAL,
     {
       id: "adaptado-a-la-red",
       descripcion: "Cada red tiene sus límites",
@@ -917,6 +924,7 @@ const POR_DOMINIO: Readonly<Record<string, readonly Comprobacion[]>> = {
     },
   ],
   contenido: [
+    ...SOBRE_LA_PROSA_CONTENIDO,
     {
       id: "cabe-en-el-tiempo-del-cliente",
       descripcion: "El calendario se puede cumplir",
