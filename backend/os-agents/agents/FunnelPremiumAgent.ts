@@ -4,20 +4,20 @@ import type { OsAgentStep, OsJobContext, OsJobPayload } from "../types";
 import { buildFunnelFiles, publishFunnelZip, runFunnelCodegen } from "../artifacts/funnelBuilder";
 import { eliteCommonIntakeStrings } from "./elitePayloadStrings";
 import {
-  promptEcommerceConversion,
-  promptEcommerceDeliveryReport,
-  promptEcommerceMarketAnalysis,
-  promptEcommerceProductStrategy,
-  promptEcommerceSeo,
-  promptEcommerceStoreArchitecture,
-} from "./ecommercePremiumPrompts";
+  promptFunnelArquitectura,
+  promptFunnelDecision,
+  promptFunnelEvidencia,
+  promptFunnelExperimento,
+  promptFunnelMedicion,
+  promptFunnelOferta,
+} from "./funnelPremiumPrompts";
 
-const S1 = "market_analysis";
-const S2 = "store_architecture";
-const S3 = "product_strategy";
-const S4 = "conversion_optimization";
-const S5 = "seo_ecommerce";
-const S6 = "delivery_report";
+const S1 = "evidencia_del_embudo";
+const S2 = "arquitectura_del_embudo";
+const S3 = "oferta_y_copy_con_hipotesis";
+const S4 = "experimento_con_guardarrailes";
+const S5 = "plan_de_medicion";
+const S6 = "politica_de_decision";
 const S7 = "funnel_codegen";
 const S8 = "bundle_publish";
 
@@ -35,6 +35,7 @@ function tenantIdFrom(payload: OsJobPayload, ctx: OsJobContext): string {
   return ctx.clientId;
 }
 
+/** El diseno visual sale de la arquitectura del embudo (S2). */
 function designProxyFromStoreArchitecture(storeJson: string, payload: OsJobPayload): string {
   const { primaryColor, secondaryColor } = eliteCommonIntakeStrings(payload);
   return JSON.stringify({
@@ -51,65 +52,46 @@ function buildFunnelPremiumSteps(
   return [
     {
       name: S1,
-      description: "Análisis de mercado y oportunidad del funnel (LLM)",
-      run: async (payload) => llm.complete(promptEcommerceMarketAnalysis(payload)),
+      description: "Dónde se pierde la gente, con la evidencia que haya (LLM)",
+      run: async (payload) => llm.complete(promptFunnelEvidencia(payload)),
     },
     {
       name: S2,
-      description: "Arquitectura de páginas del funnel (LLM)",
-      run: async (payload, ctx) => llm.complete(promptEcommerceStoreArchitecture(stepResult(ctx, S1), payload)),
+      description: "Las páginas del embudo y el trabajo de cada una (LLM)",
+      run: async (payload, ctx) => llm.complete(promptFunnelArquitectura(stepResult(ctx, S1), payload)),
     },
     {
       name: S3,
-      description: "Estrategia de oferta y copy por etapa (LLM)",
+      description: "Oferta, copy por paso y las hipótesis que los sostienen (LLM)",
       run: async (payload, ctx) =>
-        llm.complete(promptEcommerceProductStrategy(stepResult(ctx, S1), stepResult(ctx, S2), payload)),
+        llm.complete(promptFunnelOferta(stepResult(ctx, S1), stepResult(ctx, S2), payload)),
     },
     {
       name: S4,
-      description: "CRO multi-paso: opt-in, oferta, cierre (LLM)",
+      description: "El experimento, con sus guardarraíles y su criterio fijado antes (LLM)",
       run: async (payload, ctx) =>
-        llm.complete(
-          promptEcommerceConversion(stepResult(ctx, S1), stepResult(ctx, S2), stepResult(ctx, S3), payload),
-        ),
+        llm.complete(promptFunnelExperimento(stepResult(ctx, S1), stepResult(ctx, S3), payload)),
     },
     {
       name: S5,
-      description: "SEO y tracking del funnel (LLM)",
-      run: async (payload, ctx) =>
-        llm.complete(
-          promptEcommerceSeo(
-            stepResult(ctx, S1),
-            stepResult(ctx, S2),
-            stepResult(ctx, S3),
-            stepResult(ctx, S4),
-            payload,
-          ),
-        ),
+      description: "Cómo se mide y qué instrumentación falta antes de empezar (LLM)",
+      run: async (payload, ctx) => llm.complete(promptFunnelMedicion(stepResult(ctx, S4), payload)),
     },
     {
       name: S6,
-      description: "Reporte ejecutivo del funnel (LLM, Markdown)",
-      run: async (payload, ctx) => {
-        const { clientName } = eliteCommonIntakeStrings(payload);
-        return llm.complete(
-          promptEcommerceDeliveryReport(
-            clientName,
-            stepResult(ctx, S1),
-            stepResult(ctx, S2),
-            summarize(stepResult(ctx, S3)),
-            summarize(stepResult(ctx, S4)),
-            stepResult(ctx, S5),
-          ),
-        );
-      },
+      description: "La política de decisión, escrita antes de tener resultados (LLM)",
+      run: async (payload, ctx) =>
+        llm.complete(promptFunnelDecision(stepResult(ctx, S4), stepResult(ctx, S5), payload)),
     },
     {
       name: S7,
       description: "Genera paso1–3 HTML + JS de navegación (plantilla determinista)",
       run: async (payload, ctx) => {
         const design = designProxyFromStoreArchitecture(stepResult(ctx, S2), payload);
-        return runFunnelCodegen(stepResult(ctx, S4), design, payload);
+        // El HTML sale del COPY (S3), no del experimento (S4). Generar las
+        // paginas a partir del diseno del test produciria un embudo que solo
+        // existe mientras dure el experimento.
+        return runFunnelCodegen(stepResult(ctx, S3), design, payload);
       },
     },
     {
@@ -118,7 +100,7 @@ function buildFunnelPremiumSteps(
       run: async (payload, ctx) => {
         const design = designProxyFromStoreArchitecture(stepResult(ctx, S2), payload);
         const { clientName } = eliteCommonIntakeStrings(payload);
-        const files = buildFunnelFiles(stepResult(ctx, S4), design, clientName);
+        const files = buildFunnelFiles(stepResult(ctx, S3), design, clientName);
         const published = await publishZip({
           clientId: ctx.clientId,
           tenantId: tenantIdFrom(payload, ctx),
@@ -132,7 +114,17 @@ function buildFunnelPremiumSteps(
   ];
 }
 
-/** Funnel multi-paso premium: pipeline ecommerce + HTML real (MIG 304). */
+/**
+ * Funnel multi-paso premium: ciclo de CRO + HTML real.
+ *
+ * Importaba los SEIS prompts de ecommerce enteros. Las descripciones de sus
+ * pasos hablaban de embudo y la instruccion que llegaba al modelo decia
+ * «arquitectura de la tienda». Un servicio de conversion ejecutando el proceso
+ * de montar una tienda.
+ *
+ * Ahora ejecuta el suyo, con el mismo numero de llamadas al modelo: el coste por
+ * trabajo no cambia, cambia la disciplina.
+ */
 export class FunnelPremiumAgent extends BaseOsAgent {
   readonly serviceId = "funnel_premium" as const;
   readonly steps: OsAgentStep[];

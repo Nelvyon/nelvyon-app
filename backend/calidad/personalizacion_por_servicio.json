@@ -11,7 +11,7 @@
     "Medido con cinco clientes cuyas decisiones correctas se contradicen",
     "entre si. Coste externo 0 EUR: el modelo nunca se llama."
   ],
-  "generado": "2026-09-04T16:14:50.161Z",
+  "generado": "2026-09-04T16:22:25.448Z",
   "total": 30,
   "medidos": 29,
   "porVeredicto": {
@@ -54,13 +54,6 @@
       "hechosQueNoLlegan": []
     },
     {
-      "servicio": "funnel_premium",
-      "veredicto": "PERSONALIZA",
-      "cobertura": 1,
-      "separacion": 0.358,
-      "hechosQueNoLlegan": []
-    },
-    {
       "servicio": "crm_captacion_premium",
       "veredicto": "PERSONALIZA",
       "cobertura": 1,
@@ -79,6 +72,13 @@
       "veredicto": "PERSONALIZA",
       "cobertura": 1,
       "separacion": 0.38,
+      "hechosQueNoLlegan": []
+    },
+    {
+      "servicio": "funnel_premium",
+      "veredicto": "PERSONALIZA",
+      "cobertura": 1,
+      "separacion": 0.389,
       "hechosQueNoLlegan": []
     },
     {
