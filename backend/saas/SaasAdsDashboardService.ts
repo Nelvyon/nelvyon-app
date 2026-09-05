@@ -5,6 +5,7 @@
  */
 import { DbClient } from "../db/DbClient";
 import { resolveAdsConnectionToken } from "./saasAdsTokenRefresh";
+import { exigirPuertaDeGasto } from "../coste/exigirPuertaDeGasto";
 
 export type AdsPlatform = "meta" | "google" | "linkedin" | "tiktok" | "snapchat";
 
@@ -458,6 +459,11 @@ export class SaasAdsDashboardService {
   }
 
   private async _setMetaCampaignStatus(token: string, campaignId: string, status: "ACTIVE" | "PAUSED"): Promise<void> {
+    // Activar una campana es empezar a gastar el presupuesto del cliente.
+    // Este panel llegaba hasta Meta sin cruzar ninguna puerta: se declaro como
+    // «reporting» y no lo es. La puerta va ANTES de tocar la red.
+    exigirPuertaDeGasto({ proveedor: "meta_ads", operacion: "activar_o_pausar_campana" });
+
     const metaStatus = status === "ACTIVE" ? "ACTIVE" : "PAUSED";
     const res = await this.fetchFn(
       `https://graph.facebook.com/v19.0/${campaignId}`,
@@ -489,6 +495,11 @@ export class SaasAdsDashboardService {
   // ── Create campaign ─────────────────────────────────────────────────────────
 
   private async _createMetaCampaign(token: string, accountId: string, input: AdsCreateCampaignInput): Promise<AdsCampaign> {
+    // Crear una campana compromete inversion en la cuenta del cliente.
+    // Este panel llegaba hasta Meta sin cruzar ninguna puerta: se declaro como
+    // «reporting» y no lo es. La puerta va ANTES de tocar la red.
+    exigirPuertaDeGasto({ proveedor: "meta_ads", operacion: "crear_campana" });
+
     const budgetCents = Math.round(input.dailyBudgetUsd * 100);
     const res = await this.fetchFn(
       `https://graph.facebook.com/v19.0/act_${accountId}/campaigns`,
@@ -700,6 +711,11 @@ export class SaasAdsDashboardService {
   // ── Update budget ───────────────────────────────────────────────────────────
 
   private async _updateMetaBudget(token: string, campaignId: string, dailyBudgetUsd: number): Promise<AdsCampaign> {
+    // Cambiar el presupuesto diario cambia cuanto se gasta cada dia.
+    // Este panel llegaba hasta Meta sin cruzar ninguna puerta: se declaro como
+    // «reporting» y no lo es. La puerta va ANTES de tocar la red.
+    exigirPuertaDeGasto({ proveedor: "meta_ads", operacion: "cambiar_presupuesto" });
+
     const budgetCents = Math.round(dailyBudgetUsd * 100);
     const res = await this.fetchFn(
       `https://graph.facebook.com/v19.0/${campaignId}`,

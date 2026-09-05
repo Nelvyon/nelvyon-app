@@ -81,8 +81,6 @@ SIN_PUERTA_A_PROPOSITO: dict[str, str] = {
         "informes de Google Ads: la API consulta por POST, pero no muta",
     "backend/integrations/meta/MetaDataFetcher.ts":
         "informes de Meta; solo lectura",
-    "backend/saas/SaasAdsDashboardService.ts":
-        "panel de metricas; sus POST son consultas de reporting",
     "backend/saas/SaasWhiteLabelService.ts":
         "lee el estado de la cuenta Connect; el alta la hace Stripe en su portal",
 
