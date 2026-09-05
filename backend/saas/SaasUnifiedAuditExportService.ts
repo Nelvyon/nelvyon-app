@@ -7,7 +7,7 @@ import { buildMinimalPdfFromText } from "./OsDeliveryCertificateService";
 
 export type UnifiedAuditRow = {
   id: string;
-  source: "audit_log" | "agent_run" | "pack_run";
+  source: "audit_log" | "agent_run" | "pack_run" | "tool_call";
   action: string;
   module: string;
   resourceId: string | null;
@@ -64,6 +64,44 @@ export class SaasUnifiedAuditExportService {
         details: {
           input: r.input,
           output: r.output,
+        },
+        createdAt: String(r.created_at),
+      });
+    }
+
+    // Las llamadas a herramienta: sin ellas la cadena se corta justo donde
+    // importa. Se podia contar «este agente ejecuto algo» pero no CON QUE
+    // permiso, en que intento, con que aprobacion ni a que coste.
+    const toolRows = await this.db
+      .query<Record<string, unknown>>(
+        `SELECT id, tool_name, success, error_code, latency_ms, created_at,
+                agent_id, user_id, decision, risk, approval_id,
+                request_id, trace_id, attempt, cost_estimate_usd
+           FROM saas_mcp_tool_audit WHERE tenant_id = $1
+          ORDER BY created_at DESC LIMIT $2`,
+        [tenantId, limit],
+      )
+      .catch(() => [] as Record<string, unknown>[]);
+    for (const r of toolRows) {
+      rows.push({
+        id: String(r.id),
+        source: "tool_call",
+        action: String(r.decision ?? (r.success ? "ok" : "error")),
+        module: `tool:${String(r.tool_name ?? "")}`,
+        resourceId: String(r.tool_name ?? ""),
+        details: {
+          agentId: r.agent_id,
+          userId: r.user_id,
+          risk: r.risk,
+          approvalId: r.approval_id,
+          requestId: r.request_id,
+          traceId: r.trace_id,
+          attempt: r.attempt,
+          durationMs: r.latency_ms,
+          errorCode: r.error_code,
+          // Se pasa tal cual: `null` significa que no se sabe, y convertirlo en
+          // 0 aqui seria afirmar que fue gratis.
+          costEstimateUsd: r.cost_estimate_usd,
         },
         createdAt: String(r.created_at),
       });

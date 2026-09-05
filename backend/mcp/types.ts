@@ -146,4 +146,19 @@ export type McpAuditRecord = {
   requestId: string;
   traceId: string;
   argsHash: string;
+  /**
+   * Cual de los intentos fue este. 1 es el primero.
+   *
+   * Sin esto un reintento y una ejecucion limpia son la misma fila repetida, y
+   * no se puede saber si algo funciono a la primera o a la tercera.
+   */
+  attempt?: number;
+  /**
+   * Coste estimado, si se sabe.
+   *
+   * `undefined`/`null` significa NO SE SABE. Un `0` significa que fue gratis de
+   * verdad. Convertir lo primero en lo segundo seria inventarse que algo no
+   * costo nada.
+   */
+  costEstimateUsd?: number | null;
 };
