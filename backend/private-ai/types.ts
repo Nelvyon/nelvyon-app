@@ -191,6 +191,17 @@ export type RagSearchResult = {
   chunks: RagChunk[];
   query: string;
   source: "platform" | "tenant";
+  /**
+   * Si el almacen consultado tiene ALGO indexado.
+   *
+   * Distingue dos cosas que se parecian demasiado: «he buscado y no hay
+   * coincidencias» y «no hay nada que buscar». Sin este campo, un almacen vacio
+   * devuelve exactamente lo mismo que una busqueda sin resultados, y el agente
+   * contesta peor sin que nadie sepa por que.
+   *
+   * `undefined` significa que quien respondio no lo sabe — no que este lleno.
+   */
+  vacio?: boolean;
 };
 
 export type GlobalPrivateAiConfig = {

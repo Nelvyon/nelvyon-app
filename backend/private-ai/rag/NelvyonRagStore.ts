@@ -36,7 +36,17 @@ export class NelvyonRagStore implements IRagStore {
       tags: Array.isArray(r.tags) ? (r.tags as string[]) : [],
     }));
 
-    return { chunks, query: q, source: "platform" };
+    // Si no hay coincidencias, se mira si es que NO HAY NADA indexado.
+    //
+    // Las dos situaciones devolvian lo mismo —cero trozos— y son muy distintas:
+    // «he buscado y no encaja» es un resultado; «esta tabla esta vacia» es una
+    // averia. Nada escribe hoy en `nelvyon_rag_chunks` —los roles del web solo
+    // tienen SELECT— y `UnifiedRagStore` cae aqui cuando el recuperador local no
+    // esta, asi que ese camino se quedaba sin conocimiento en silencio.
+    //
+    // Solo se cuenta cuando no hubo resultados: si los hubo, es que hay algo.
+    const vacio = chunks.length === 0 ? (await this.countPlatform()) === 0 : false;
+    return { chunks, query: q, source: "platform", vacio };
   }
 }
 
