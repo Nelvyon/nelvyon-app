@@ -22,6 +22,19 @@ export const AGENT_KNOWLEDGE_DOMAINS: Readonly<Record<string, readonly Knowledge
   email_marketing: ["email_marketing", "crm_sales", "copywriting"],
   content: ["content", "copywriting", "digital_marketing"],
   social_media: ["social_media", "content", "copywriting"],
+
+  // Los seis especialistas de red. Cada uno hereda el conocimiento social y de
+  // copy que necesita para redactar, y NADA mas: un especialista de Instagram no
+  // tiene por que poder leer el conocimiento de CRM o de facturacion.
+  //
+  // Los de video llevan ademas `video`, que es donde vive el criterio de guion y
+  // formato que las otras redes no usan.
+  social_instagram: ["social_media", "content", "copywriting"],
+  social_tiktok: ["social_media", "content", "copywriting", "video"],
+  social_linkedin: ["social_media", "content", "copywriting", "business_strategy"],
+  social_facebook: ["social_media", "content", "copywriting"],
+  social_x: ["social_media", "content", "copywriting"],
+  social_youtube: ["social_media", "content", "copywriting", "video"],
   workflows: ["automation", "saas", "crm_sales"],
   reporting: ["analytics_reporting", "saas", "nelvyon"],
   development: ["development_tech", "nelvyon", "saas"],

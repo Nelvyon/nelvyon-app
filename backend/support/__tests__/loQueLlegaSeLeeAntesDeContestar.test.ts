@@ -21,7 +21,10 @@ import {
   type CategoriaDeTicket,
 } from "../triajeDeTicket";
 
-const categoriaDe = (t: string): CategoriaDeTicket => triarTicket(t).categoria;
+// Acepta lo mismo que `triarTicket`: un ticket puede llegar sin texto, y esa es
+// justo una de las entradas que hay que comprobar.
+const categoriaDe = (t: string | null | undefined): CategoriaDeTicket =>
+  triarTicket(t).categoria;
 
 describe("lee de que va", () => {
   it("reconoce las categorias que no admiten equivocacion", () => {

@@ -71,7 +71,9 @@ MAPA: list[tuple[str, str, str]] = [
     ("infra_ia_propia",            "ORQUESTACION", r"local-ai/(LocalAiBackupService|LocalAiHealth|railwayRagPrep|db|rlsRoleGuard)"),
 
     # ── la empresa IA interna ───────────────────────────────────────────────
-    ("agentes_internos",           "INTERNOS",     r"private-ai/(nelvyonAgentRegistry|agents/|core/)"),
+    # `especialistasSociales` entra aqui: son definiciones de agentes internos,
+    # solo que derivadas del contrato de plataforma en vez de escritas a mano.
+    ("agentes_internos",           "INTERNOS",     r"private-ai/(nelvyonAgentRegistry|especialistasSociales|agents/|core/)"),
     # `skills/` entra aqui y no en una capacidad nueva: el reparto de Skills es
     # exactamente el mismo problema que el de herramientas -quien puede usar que-
     # y separarlo habria sido inflar el denominador por comodidad.
