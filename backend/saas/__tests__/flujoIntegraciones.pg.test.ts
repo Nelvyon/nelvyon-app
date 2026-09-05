@@ -108,8 +108,8 @@ describeSiHayPg("BLOQUE 2 · integraciones — el almacén de conexiones", () =>
 
     const enA = await svc.getConnectionStatus(A, "hubspot");
     const enB = await svc.getConnectionStatus(B, "hubspot");
-    expect(enA.status).toBe("connected");
-    expect(enB.status).not.toBe("connected");
+    expect(enA?.status).toBe("connected");
+    expect(enB?.status).not.toBe("connected");
   });
 
   it("el token de A no viaja en la respuesta de B", async () => {

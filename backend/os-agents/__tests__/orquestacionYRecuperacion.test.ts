@@ -13,8 +13,8 @@ import { describe, expect, it, vi } from "vitest";
 
 import { OsEventBus } from "../OsEventBus";
 import { OsOrchestrator } from "../OsOrchestrator";
-import type { OsJob, OsJobStore } from "../OsJobStore";
-import type { OsQueueItem } from "../types";
+import type { OsJobStore } from "../OsJobStore";
+import type { OsJob, OsQueueItem } from "../types";
 
 /** Almacén de trabajos en memoria que se comporta como el real. */
 function almacenFalso() {

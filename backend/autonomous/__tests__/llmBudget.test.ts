@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { Entorno } from "../../config/entorno";
 
 /**
  * Presupuesto agregado de LLM por ejecución de SKU.
@@ -118,18 +119,18 @@ describe("llmBudget — aislamiento entre ejecuciones", () => {
 
 describe("configuredLlmBudgetMs", () => {
   it("por defecto 600000 ms", () => {
-    expect(configuredLlmBudgetMs({} as NodeJS.ProcessEnv)).toBe(600_000);
+    expect(configuredLlmBudgetMs({} as Entorno)).toBe(600_000);
   });
 
   it("respeta AUTONOMOUS_SKU_BUDGET_MS", () => {
-    expect(configuredLlmBudgetMs({ AUTONOMOUS_SKU_BUDGET_MS: "90000" } as NodeJS.ProcessEnv)).toBe(
+    expect(configuredLlmBudgetMs({ AUTONOMOUS_SKU_BUDGET_MS: "90000" } as Entorno)).toBe(
       90_000,
     );
   });
 
   it("valores no válidos o <=0 desactivan el presupuesto", () => {
-    expect(configuredLlmBudgetMs({ AUTONOMOUS_SKU_BUDGET_MS: "0" } as NodeJS.ProcessEnv)).toBe(0);
-    expect(configuredLlmBudgetMs({ AUTONOMOUS_SKU_BUDGET_MS: "-5" } as NodeJS.ProcessEnv)).toBe(0);
-    expect(configuredLlmBudgetMs({ AUTONOMOUS_SKU_BUDGET_MS: "abc" } as NodeJS.ProcessEnv)).toBe(0);
+    expect(configuredLlmBudgetMs({ AUTONOMOUS_SKU_BUDGET_MS: "0" } as Entorno)).toBe(0);
+    expect(configuredLlmBudgetMs({ AUTONOMOUS_SKU_BUDGET_MS: "-5" } as Entorno)).toBe(0);
+    expect(configuredLlmBudgetMs({ AUTONOMOUS_SKU_BUDGET_MS: "abc" } as Entorno)).toBe(0);
   });
 });

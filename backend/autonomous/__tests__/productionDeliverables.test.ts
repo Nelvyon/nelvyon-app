@@ -43,11 +43,11 @@ describe("loadTemplateRegistry production", () => {
   });
 
   afterEach(() => {
-    process.env.NODE_ENV = prevNodeEnv;
+    vi.stubEnv("NODE_ENV", prevNodeEnv);
   });
 
   it("uses bundled registry in production without disk", () => {
-    process.env.NODE_ENV = "production";
+    vi.stubEnv("NODE_ENV", "production");
     const reg = loadTemplateRegistry();
     expect(reg.templates.length).toBe(getBundledTemplateRegistryCount());
     expect(reg.templates.length).toBeGreaterThan(10);
@@ -71,16 +71,23 @@ describe("buildOsPublishPayload production", () => {
     process.env.AUTONOMOUS_PRODUCTION = "true";
     expect(isAutonomousProductionPublish()).toBe(true);
 
-    const project = {
+    // Declarado `Partial` y convertido despues: es una fixture a proposito
+    // incompleta —solo se ejercita el armado de URLs— y decirlo asi permite la
+    // conversion, que desde un literal suelto no cuadraba.
+    const project: Partial<AutonomousProject> = {
       project_id: "p1",
       sku: "NELVYON-SEO",
       brief: { primary_domain: "https://client.test", company_name: "Co" },
       artifacts: { report: { pdf_url: "mock://storage/x.pdf" } },
       os_refs: { client_id: "c1", project_slug: "SLUG-1", workspace_id: "1" },
-      qa: { score: 90, passed: true },
-    } as AutonomousProject;
+      // Sin `qa`: esta prueba solo mira como se arman las URLs, y un
+      // `QaResult` a medias seria un informe de calidad inventado.
+    };
 
-    const payload = buildOsPublishPayload(project, { dry_run: false, production: true });
+    const payload = buildOsPublishPayload(project as AutonomousProject, {
+      dry_run: false,
+      production: true,
+    });
     const blob = JSON.stringify(payload.deliverables);
     expect(blob.includes("mock://")).toBe(false);
     expect(payload.deliverables.some((d) => d.value.startsWith("https://"))).toBe(true);

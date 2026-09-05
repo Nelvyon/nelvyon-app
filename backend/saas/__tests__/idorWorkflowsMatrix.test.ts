@@ -14,6 +14,28 @@ import { beforeEach, describe, expect, it } from "vitest";
  */
 import { SaasWorkflowService } from "../SaasWorkflowService";
 import type { SaasPostgresPort } from "../SaasOnboardingService";
+import type { SaasCrmService } from "../SaasCrmService";
+
+/**
+ * El CRM que este bloque NO usa.
+ *
+ * `SaasWorkflowService` lo exige desde hace tiempo y estas pruebas seguian
+ * construyendolo con un solo argumento. Se pasa un doble que REVIENTA si alguien
+ * lo llama: si un dia el flujo empieza a tocar el CRM, esta prueba lo dice en
+ * vez de seguir en verde con un `undefined` por dentro.
+ */
+const crmNoUsado: Pick<SaasCrmService, "updateContact" | "addActivity" | "getContact"> = {
+  updateContact: () => {
+    throw new Error("el CRM no deberia usarse en esta prueba");
+  },
+  addActivity: () => {
+    throw new Error("el CRM no deberia usarse en esta prueba");
+  },
+  getContact: () => {
+    throw new Error("el CRM no deberia usarse en esta prueba");
+  },
+};
+
 
 const A = "11111111-1111-4111-8111-111111111111";
 const B = "22222222-2222-4222-8222-222222222222";
@@ -69,7 +91,7 @@ function dbFalsa() {
   return { port, sentencias, fila, borrada };
 }
 
-const svc = (db: ReturnType<typeof dbFalsa>) => new SaasWorkflowService(db.port);
+const svc = (db: ReturnType<typeof dbFalsa>) => new SaasWorkflowService(db.port, crmNoUsado);
 
 describe("IDOR workflows — LIST", () => {
   it("A ve su workflow", async () => {

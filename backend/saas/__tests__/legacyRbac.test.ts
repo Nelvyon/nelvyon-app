@@ -32,20 +32,20 @@ function makeApiRes() {
 describe("Legacy pages routes → 410", () => {
   it("GET /pages/api/saas/analytics retorna 410", async () => {
     const res = makeApiRes();
-    const result = await (analyticsLegacy as (req: ReturnType<typeof makeApiReq>, res: ReturnType<typeof makeApiRes>) => Promise<ReturnType<typeof res.json>>)(makeApiReq(), res);
+    const result = await analyticsLegacy(makeApiReq(), res);
     expect((result as { status: number }).status).toBe(410);
     expect((result as { body: { error: string } }).body.error).toMatch(/Deprecated/);
   });
 
   it("GET /pages/api/saas/invoices retorna 410", async () => {
     const res = makeApiRes();
-    const result = await (invoicesLegacy as (req: ReturnType<typeof makeApiReq>, res: ReturnType<typeof makeApiRes>) => Promise<ReturnType<typeof res.json>>)(makeApiReq(), res);
+    const result = await invoicesLegacy(makeApiReq(), res);
     expect((result as { status: number }).status).toBe(410);
   });
 
   it("GET /pages/api/saas/profile retorna 410", async () => {
     const res = makeApiRes();
-    const result = await (profileLegacy as (req: ReturnType<typeof makeApiReq>, res: ReturnType<typeof makeApiRes>) => Promise<ReturnType<typeof res.json>>)(makeApiReq(), res);
+    const result = await profileLegacy(makeApiReq(), res);
     expect((result as { status: number }).status).toBe(410);
   });
 });

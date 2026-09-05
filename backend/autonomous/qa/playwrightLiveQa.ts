@@ -35,10 +35,10 @@ async function fetchHtmlFromUrl(url: string): Promise<string | null> {
   }
 }
 
-async function tryLoadPlaywright(): Promise<typeof import("playwright") | null> {
+async function tryLoadPlaywright(): Promise<typeof import("@playwright/test") | null> {
   if (process.env.AUTONOMOUS_PLAYWRIGHT_QA !== "1") return null;
   try {
-    const importer = new Function("s", "return import(s)") as (s: string) => Promise<typeof import("playwright")>;
+    const importer = new Function("s", "return import(s)") as (s: string) => Promise<typeof import("@playwright/test")>;
     return await importer("playwright");
   } catch {
     return null;

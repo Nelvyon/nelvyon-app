@@ -61,14 +61,14 @@ describe("ninguna campaña se crea sin pasar por la política de coste", () => {
   it("LA REGLA: crear un presupuesto se DENIEGA con el modo coste cero activo", async () => {
     const ex = new GoogleAdsExecutor();
     await expect(
-      ex.createBudget("usr-1", "123", "presupuesto", 5_000_000),
+      ex.createBudget("usr-1", "123", 5_000_000),
     ).rejects.toThrow(/politica de coste/i);
   });
 
   it("y ni una petición llega a Google: se deniega ANTES de la red", async () => {
     // Denegar después de la llamada no sirve de nada: el gasto ya se hizo.
     const ex = new GoogleAdsExecutor();
-    await expect(ex.createBudget("usr-1", "123", "p", 1_000_000)).rejects.toThrow();
+    await expect(ex.createBudget("usr-1", "123", 1_000_000)).rejects.toThrow();
 
     const aGoogle = red.mock.calls.filter((c) => String(c[0]).includes("googleads"));
     expect(aGoogle, "se llamó a Google Ads pese a estar denegado").toHaveLength(0);
@@ -77,7 +77,10 @@ describe("ninguna campaña se crea sin pasar por la política de coste", () => {
   it("crear una campaña también se deniega", async () => {
     const ex = new GoogleAdsExecutor();
     await expect(
-      ex.createCampaign("usr-1", "123", "campana", "customers/1/campaignBudgets/2"),
+      ex.createCampaign("usr-1", "123", {
+        name: "campana",
+        budgetResourceName: "customers/1/campaignBudgets/2",
+      }),
     ).rejects.toThrow(/politica de coste/i);
   });
 
@@ -86,7 +89,10 @@ describe("ninguna campaña se crea sin pasar por la política de coste", () => {
     // permite», que son dos incidencias completamente distintas.
     const ex = new GoogleAdsExecutor();
     const err = await ex
-      .createCampaign("usr-1", "123", "c", "customers/1/campaignBudgets/2")
+      .createCampaign("usr-1", "123", {
+        name: "c",
+        budgetResourceName: "customers/1/campaignBudgets/2",
+      })
       .then(() => null)
       .catch((e: Error) => e);
 
@@ -106,7 +112,7 @@ describe("ninguna campaña se crea sin pasar por la política de coste", () => {
       }),
     );
 
-    await expect(ex.createBudget("usr-1", "123", "p", 1_000_000)).resolves.toBeTruthy();
+    await expect(ex.createBudget("usr-1", "123", 1_000_000)).resolves.toBeTruthy();
     expect(red, "con la política apagada tampoco llamó a Google").toHaveBeenCalled();
   });
 

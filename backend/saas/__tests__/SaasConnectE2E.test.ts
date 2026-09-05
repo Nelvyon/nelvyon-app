@@ -16,7 +16,10 @@ const TENANT = "agency-tenant-1";
 
 type DbPort = { query: <T = Record<string, unknown>>(sql: string, params?: unknown[]) => Promise<T[]> };
 
-function makeDb(lookup: Record<string, unknown[][]> = {}): DbPort {
+// Cada clave es un fragmento de SQL y su valor UN resultado: la lista de filas
+// que devuelve esa consulta. Estaba declarado `unknown[][]` —una lista DE
+// listas— y por eso ninguna fila encajaba con su tipo.
+function makeDb(lookup: Record<string, Record<string, unknown>[]> = {}): DbPort {
   return {
     query: async <T>(sql: string): Promise<T[]> => {
       for (const [k, rows] of Object.entries(lookup)) {

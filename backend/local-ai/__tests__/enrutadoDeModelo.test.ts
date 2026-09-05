@@ -99,32 +99,37 @@ describe("BLOQUE 3 · puerta de inferencia", () => {
   it("el cortocircuito se ABRE tras fallos repetidos", async () => {
     // Seguir llamando a un proveedor caido alarga la caida y llena los registros
     // de ruido. Abrir el circuito es dejar de castigarlo.
-    const g = new InferenceGate() as InferenceGate & {
-      failures: number;
-      circuit: string;
-      lastFailureAt: number;
-    };
-    expect(g.isCircuitOpen()).toBe(false);      // control positivo
+    //
+    // Se conducen los fallos por `recordFailure()`, que es la puerta publica.
+    // Antes esta prueba escribia `g.failures = 3` directamente, y eso NO
+    // comprobaba el umbral: daba igual que valiera 3, 30 o que la clase dejara
+    // de contarlos. Ahora si se entera.
+    const g = new InferenceGate();
+    expect(g.isCircuitOpen(), "control positivo: nace cerrado").toBe(false);
 
-    g.failures = 3;
-    g.circuit = "open";
-    g.lastFailureAt = Date.now();
-    expect(g.isCircuitOpen()).toBe(true);
+    g.recordFailure();
+    g.recordFailure();
+    expect(g.isCircuitOpen(), "dos fallos no bastan").toBe(false);
+
+    g.recordFailure();
+    expect(g.isCircuitOpen(), "al tercero tiene que abrirse").toBe(true);
   });
 
   it("con el circuito abierto, no se intenta inferir", async () => {
-    const g = new InferenceGate() as InferenceGate & { circuit: string; lastFailureAt: number };
-    g.circuit = "open";
-    g.lastFailureAt = Date.now();
+    const g = new InferenceGate();
+    g.recordFailure();
+    g.recordFailure();
+    g.recordFailure();
     await expect(g.acquire(LIGERO)).rejects.toThrow(/circuit_open/i);
   });
 
   it("el cortocircuito se CIERRA solo pasado su plazo", async () => {
     // Un cortocircuito que se abre y no se cierra no es una proteccion: es una
     // caida permanente con otro nombre. Necesita el camino de vuelta.
-    const g = new InferenceGate() as InferenceGate & { circuit: string; lastFailureAt: number };
-    g.circuit = "open";
-    g.lastFailureAt = Date.now();
+    const g = new InferenceGate();
+    g.recordFailure();
+    g.recordFailure();
+    g.recordFailure();
     expect(g.isCircuitOpen()).toBe(true);
 
     vi.advanceTimersByTime(61_000);
@@ -134,11 +139,19 @@ describe("BLOQUE 3 · puerta de inferencia", () => {
   it("al recuperarse queda en `half_open`, no en abierto del todo", async () => {
     // El estado intermedio importa: se prueba con una tarea antes de volver a
     // confiar. Pasar directo de abierto a cerrado provoca una avalancha.
-    const g = new InferenceGate() as InferenceGate & { circuit: string; lastFailureAt: number };
-    g.circuit = "open";
-    g.lastFailureAt = Date.now();
+    //
+    // Se comprueba por su CONSECUENCIA, no leyendo el campo privado: si tras
+    // recuperarse el contador de fallos no se hubiera puesto a cero, un unico
+    // fallo volveria a abrirlo de golpe. Que no lo haga es lo que significa
+    // `half_open`, y es lo unico que se nota desde fuera.
+    const g = new InferenceGate();
+    g.recordFailure();
+    g.recordFailure();
+    g.recordFailure();
     vi.advanceTimersByTime(61_000);
-    g.isCircuitOpen();
-    expect(g.circuit).toBe("half_open");
+    expect(g.isCircuitOpen()).toBe(false);
+
+    g.recordFailure();
+    expect(g.isCircuitOpen(), "un solo fallo no debe reabrirlo").toBe(false);
   });
 });

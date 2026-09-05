@@ -104,6 +104,16 @@ describe("OpenClaw authorization gate", () => {
   it("orchestrator disabled throws", async () => {
     delete process.env.NELVYON_ORCHESTRATOR_ENABLED;
     resetOrchestratorForTests();
-    await expect(getAgentOrchestrator().enqueue()).rejects.toBeInstanceOf(OrchestratorNotEnabledError);
+    await expect(getAgentOrchestrator().enqueue({
+        tenantId: "t1",
+        agentId: "a1",
+        parentJobId: null,
+        correlationId: "c1",
+        traceId: "tr1",
+        priority: 1,
+        payload: {},
+        maxAttempts: 1,
+        scheduledAt: new Date().toISOString(),
+      })).rejects.toBeInstanceOf(OrchestratorNotEnabledError);
   });
 });

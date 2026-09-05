@@ -25,7 +25,17 @@ function makeDb() {
     { id: "d2", tenant_id: "t1", contact_id: "c2", stage: "won" },
     { id: "d3", tenant_id: "t2", contact_id: "c3", stage: "proposal" },
   ];
-  const campanias: Array<{ id: string; tenant_id: string; audience_filter: Record<string, unknown>; status: string }> = [];
+  // `total_recipients` y `started_at` se ESCRIBEN mas abajo al arrancar una
+  // campana, pero no estaban declarados: el doble decia guardar algo que su
+  // propio tipo no admitia.
+  const campanias: Array<{
+    id: string;
+    tenant_id: string;
+    audience_filter: Record<string, unknown>;
+    status: string;
+    total_recipients?: number;
+    started_at?: Date | null;
+  }> = [];
 
   async function query<T>(sql: string, params?: unknown[]): Promise<T[]> {
     const s = sql.replace(/\s+/g, " ").trim();

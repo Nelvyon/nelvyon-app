@@ -2,6 +2,7 @@
  * Fail-closed readers for ADR-062 dual-write transition.
  * Dual-write is PREPARED_OFF until CEO cutover — defaults are OFF.
  */
+import type { Entorno } from "../../config/entorno";
 
 function isExactOne(raw: string | undefined): boolean {
   return (raw ?? "").trim() === "1";
@@ -9,14 +10,14 @@ function isExactOne(raw: string | undefined): boolean {
 
 /** NELVYON_ERP_RELATIONAL_DUAL_WRITE — default off unless exactly "1". */
 export function isErpRelationalDualWriteEnabled(
-  env: NodeJS.ProcessEnv = process.env,
+  env: Entorno = process.env,
 ): boolean {
   return isExactOne(env.NELVYON_ERP_RELATIONAL_DUAL_WRITE);
 }
 
 /** NELVYON_ERP_RELATIONAL_READ — default off unless exactly "1". */
 export function isErpRelationalReadEnabled(
-  env: NodeJS.ProcessEnv = process.env,
+  env: Entorno = process.env,
 ): boolean {
   return isExactOne(env.NELVYON_ERP_RELATIONAL_READ);
 }
@@ -24,7 +25,7 @@ export function isErpRelationalReadEnabled(
 /**
  * Read flip requires dual-write. Misconfig (READ without DUAL_WRITE) → both treated off.
  */
-export function resolveErpRelationalMode(env: NodeJS.ProcessEnv = process.env): {
+export function resolveErpRelationalMode(env: Entorno = process.env): {
   dualWrite: boolean;
   read: boolean;
   misconfigured: boolean;

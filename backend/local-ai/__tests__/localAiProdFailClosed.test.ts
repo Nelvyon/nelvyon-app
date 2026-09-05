@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { getLocalAiConfig, resetLocalAiConfigForTests } from "../config";
+import type { Entorno } from "../../config/entorno";
 import {
   LOCAL_AI_OWNER_DEFAULT_DATABASE_URL,
   assertLocalAiDatabaseUrlReady,
@@ -58,7 +59,7 @@ describe("ADR-069 — production never uses localhost RAG/DB", () => {
     const cfg = getLocalAiConfig({
       NELVYON_DEPLOY_ENV: "production",
       DATABASE_URL: "postgresql://u:p@db.railway.app:5432/railway",
-    } as NodeJS.ProcessEnv);
+    } as Entorno);
     expect(cfg.databaseUrl).toBe("");
     expect(cfg.databaseUrl).not.toContain("127.0.0.1");
     expect(cfg.databaseUrl).not.toContain("5434");
@@ -78,7 +79,7 @@ describe("ADR-069 — production never uses localhost RAG/DB", () => {
       NELVYON_DEPLOY_ENV: "production",
       NELVYON_LOCAL_AI_USE_MAIN_DB: "1",
       DATABASE_URL: "postgresql://u:p@db.railway.app:5432/railway",
-    } as NodeJS.ProcessEnv);
+    } as Entorno);
     expect(cfg.ollamaBaseUrl).toBe("");
   });
 
@@ -101,7 +102,7 @@ describe("ADR-069 — production never uses localhost RAG/DB", () => {
   });
 
   it("non-prod still allows owner default for local Option C", () => {
-    const cfg = getLocalAiConfig({ NELVYON_DEPLOY_ENV: "development" } as NodeJS.ProcessEnv);
+    const cfg = getLocalAiConfig({ NELVYON_DEPLOY_ENV: "development" } as Entorno);
     expect(cfg.databaseUrl).toBe(LOCAL_AI_OWNER_DEFAULT_DATABASE_URL);
   });
 });

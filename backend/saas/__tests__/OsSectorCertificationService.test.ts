@@ -1,11 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
 import { OS_SECTOR_SERVICE_IDS } from "../../os-agents/sectorOsRegistry";
 import { OsSectorCertificationService } from "../../os-agents/OsSectorCertificationService";
+import { consultaFalsaCon } from "../../db/__tests__/consultaFalsa";
 
 describe("OsSectorCertificationService", () => {
   it("runBatchCertification processes sectors", async () => {
     const db = {
-      query: vi.fn(async (sql: string) => {
+      query: consultaFalsaCon((sql) => {
         if (sql.includes("FROM os_sector_certifications")) return [];
         if (sql.includes("INSERT INTO os_sector_certifications")) return [];
         return [];

@@ -2,11 +2,15 @@ import { describe, expect, it } from "vitest";
 
 import { SaasBillingSyncService } from "../SaasBillingSyncService";
 import type { SaasTenantRow } from "../saasTenantMapper";
+import { conAjustes } from "../../__tests__/conAjustes";
 
 type SubscriptionRow = { plan_id: string; status: string; workspace_id?: number; user_id?: string };
 
 function tenantRow(overrides: Partial<SaasTenantRow> & Pick<SaasTenantRow, "id" | "user_id">): SaasTenantRow {
-  return {
+  return conAjustes<SaasTenantRow>({
+    id: overrides.id,
+    user_id: overrides.user_id,
+    billing_status: "active",
     workspace_id: 10,
     company_name: "Acme",
     industry: "SaaS",
@@ -19,8 +23,7 @@ function tenantRow(overrides: Partial<SaasTenantRow> & Pick<SaasTenantRow, "id" 
     onboarding_step: 4,
     created_at: new Date("2026-01-01"),
     updated_at: new Date("2026-01-01"),
-    ...overrides,
-  };
+  }, overrides);
 }
 
 function makeBillingSyncDb(opts?: {

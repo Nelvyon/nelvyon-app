@@ -106,7 +106,8 @@ describe("Phase H — OS handoff payload", () => {
       artifacts: { build: staging.build, copy: sampleCopy() },
       agent_log: [],
       retry_count: 0,
-      simulation_mode: "phase-h",
+      max_retries: 3,
+      simulation_mode: "phase-h" as const,
       status: "OS_PUBLISH_READY" as const,
       qa: { score: 90, passed: true, threshold: 85, sku: "NELVYON-LANDING" as const, dimensions: {}, blocking_failures: [], warnings: [], failed_agents: [], retry_recommendation: null, evaluated_at: "", artifact_versions: {}, checks: [] },
     };

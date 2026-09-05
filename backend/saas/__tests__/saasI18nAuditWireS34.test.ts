@@ -57,28 +57,28 @@ describe("i18n — saas namespace ES/EN parity", () => {
   });
 
   it("saas.common.loading exists in both languages", () => {
-    const esVal = (esMessages as Record<string, Record<string, Record<string, string>>>).saas?.common?.loading;
-    const enVal = (enMessages as Record<string, Record<string, Record<string, string>>>).saas?.common?.loading;
+    const esVal = esMessages.saas?.common?.loading;
+    const enVal = enMessages.saas?.common?.loading;
     expect(esVal).toBeTruthy();
     expect(enVal).toBeTruthy();
   });
 
   it("saas.errors has 6 keys in both ES and EN", () => {
-    const esErrors = (esMessages as Record<string, Record<string, Record<string, string>>>).saas?.errors ?? {};
-    const enErrors = (enMessages as Record<string, Record<string, Record<string, string>>>).saas?.errors ?? {};
+    const esErrors = esMessages.saas?.errors ?? {};
+    const enErrors = enMessages.saas?.errors ?? {};
     expect(Object.keys(esErrors)).toHaveLength(6);
     expect(Object.keys(enErrors)).toHaveLength(6);
   });
 
   it("saas.sso.saml_available exists", () => {
-    const esVal = (esMessages as Record<string, Record<string, Record<string, string>>>).saas?.sso?.saml_available;
+    const esVal = esMessages.saas?.sso?.saml_available;
     expect(typeof esVal).toBe("string");
     expect(esVal.length).toBeGreaterThan(5);
   });
 
   it("saas.audit has title in both ES and EN", () => {
-    const esVal = (esMessages as Record<string, Record<string, Record<string, string>>>).saas?.audit?.title;
-    const enVal = (enMessages as Record<string, Record<string, Record<string, string>>>).saas?.audit?.title;
+    const esVal = esMessages.saas?.audit?.title;
+    const enVal = enMessages.saas?.audit?.title;
     expect(esVal).toBe("Registros de Auditoría");
     expect(enVal).toBe("Audit Logs");
   });
@@ -89,7 +89,7 @@ describe("i18n — saas namespace ES/EN parity", () => {
 // ─────────────────────────────────────────────────────────────────────────────
 describe("Audit wiring — SaasCrmService", () => {
   let db: SaasPostgresPort;
-  let auditLog: ReturnType<typeof vi.fn>;
+  let auditLog: ReturnType<typeof vi.fn<CrmAuditPort["log"]>>;
   let audit: CrmAuditPort;
   let svc: SaasCrmService;
 
@@ -103,7 +103,7 @@ describe("Audit wiring — SaasCrmService", () => {
 
   beforeEach(() => {
     db = { query: vi.fn() } as unknown as SaasPostgresPort;
-    auditLog = vi.fn().mockResolvedValue(undefined);
+    auditLog = vi.fn<CrmAuditPort["log"]>(async () => {});
     audit = { log: auditLog };
     svc = new SaasCrmService(db, audit);
   });
@@ -154,7 +154,7 @@ describe("Audit wiring — SaasCrmService", () => {
 // ─────────────────────────────────────────────────────────────────────────────
 describe("Audit wiring — SaasCampaniasService", () => {
   let db: SaasPostgresPort;
-  let auditLog: ReturnType<typeof vi.fn>;
+  let auditLog: ReturnType<typeof vi.fn<CrmAuditPort["log"]>>;
   let svc: SaasCampaniasService;
 
   const campaniaRow = {
@@ -181,7 +181,7 @@ describe("Audit wiring — SaasCampaniasService", () => {
     process.env.SES_SECRET_ACCESS_KEY = "test-secret";
     process.env.SES_FROM_EMAIL = "noreply@test.com";
     db = { query: vi.fn() } as unknown as SaasPostgresPort;
-    auditLog = vi.fn().mockResolvedValue(undefined);
+    auditLog = vi.fn<CrmAuditPort["log"]>(async () => {});
     const audit: CampaniasAuditPort = { log: auditLog };
     svc = new SaasCampaniasService(db, audit);
   });
@@ -206,7 +206,7 @@ describe("Audit wiring — SaasCampaniasService", () => {
 // ─────────────────────────────────────────────────────────────────────────────
 describe("Audit wiring — SaasWorkflowService", () => {
   let db: SaasPostgresPort;
-  let auditLog: ReturnType<typeof vi.fn>;
+  let auditLog: ReturnType<typeof vi.fn<CrmAuditPort["log"]>>;
   let svc: SaasWorkflowService;
 
   const wfRow = {
@@ -230,7 +230,7 @@ describe("Audit wiring — SaasWorkflowService", () => {
 
   beforeEach(() => {
     db = { query: vi.fn() } as unknown as SaasPostgresPort;
-    auditLog = vi.fn().mockResolvedValue(undefined);
+    auditLog = vi.fn<CrmAuditPort["log"]>(async () => {});
     const audit: WorkflowAuditPort = { log: auditLog };
     svc = new SaasWorkflowService(db, mockCrm, undefined, audit);
   });
@@ -274,7 +274,7 @@ describe("SSO id_token claim validation", () => {
     return {
       iss: "https://accounts.google.com",
       sub: "user-sub-123",
-      aud: "my-client-id",
+      aud: "my-client-id" as string | string[],
       iat: now - 60,
       exp: now + 3600,
       email: "user@empresa.com",

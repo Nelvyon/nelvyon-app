@@ -64,7 +64,7 @@ function makeDb() {
           const stage = String(p[base + 7]);
           if (!["lead", "prospect", "client", "churned"].includes(status) || !["new", "contacted", "qualified", "proposal", "won", "lost"].includes(stage)) {
             const e = new Error("check");
-            (e as { code: string }).code = "23514";
+            Object.assign(e, { code: "23514" });
             throw e;
           }
           const row: ContactRow = {
@@ -92,7 +92,7 @@ function makeDb() {
       const stage = String(p[7]);
       if (!["lead", "prospect", "client", "churned"].includes(status) || !["new", "contacted", "qualified", "proposal", "won", "lost"].includes(stage)) {
         const e = new Error("check");
-        (e as { code: string }).code = "23514";
+        Object.assign(e, { code: "23514" });
         throw e;
       }
       const row: ContactRow = {
@@ -166,7 +166,7 @@ function makeDb() {
       const type = String(p[2]);
       if (!["note", "call", "email", "meeting", "task"].includes(type)) {
         const e = new Error("invalid type");
-        (e as { code: string }).code = "23514";
+        Object.assign(e, { code: "23514" });
         throw e;
       }
       const row: ActivityRow = {

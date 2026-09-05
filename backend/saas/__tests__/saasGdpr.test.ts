@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { SaasGdprService, saasGdprService, GDPR_USER_DATA_COVERAGE } from "../SaasGdprService";
+import { consultaFalsaCon, type Fila } from "../../db/__tests__/consultaFalsa";
 
 const requestRow = {
   id: "00000000-0000-0000-0000-000000000001",
@@ -13,14 +14,15 @@ const requestRow = {
   createdAt: "2026-01-01T00:00:00.000Z",
 };
 
-function mockDb(handlers?: (sql: string, params: unknown[]) => unknown[] | undefined) {
-  const query = vi.fn(async (sql: string, params: unknown[] = []) => {
-    const custom = handlers?.(sql, params);
-    if (custom !== undefined) return custom;
-    if (sql.includes("INSERT INTO saas_gdpr_requests")) return [{ ...requestRow }];
-    return [];
-  });
-  return { query };
+function mockDb(handlers?: (sql: string, params: unknown[]) => Fila[] | undefined) {
+  return {
+    query: consultaFalsaCon((sql, params) => {
+      const custom = handlers?.(sql, params);
+      if (custom !== undefined) return custom;
+      if (sql.includes("INSERT INTO saas_gdpr_requests")) return [{ ...requestRow }];
+      return [];
+    }),
+  };
 }
 
 describe("SaasGdprService", () => {

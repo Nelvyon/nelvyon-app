@@ -1,11 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
 import { SaasSocialService } from "../SaasSocialService";
+import { consultaFalsa } from "../../db/__tests__/consultaFalsa";
 
 type Row = Record<string, unknown>;
-const makeDb = (rows: Row[][] = []) => {
-  let call = 0;
-  return { query: vi.fn(async () => rows[call++] ?? []) };
-};
+const makeDb = (rows: Row[][] = []) => ({ query: consultaFalsa(rows) });
 
 const TENANT = "tenant-social";
 const now = new Date();
@@ -130,7 +128,7 @@ describe("SaasSocialService", () => {
     });
     const svc = new SaasSocialService(db, mockFetch as unknown as typeof fetch);
     const result = await svc.publishPost(TENANT, "post1");
-    expect(result.ok).toBe(false);
+    if (result.ok) throw new Error("se esperaba que la publicacion fallara");
     expect(result.error).toContain("LinkedIn");
   });
 

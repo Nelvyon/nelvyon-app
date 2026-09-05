@@ -36,6 +36,7 @@
  *     registrada como DEGRADADA, no como éxito normal.
  */
 import { AsyncLocalStorage } from "node:async_hooks";
+import type { Entorno } from "../../config/entorno";
 
 export const LLM_BUDGET_DEGRADED_MODEL = "budget-exhausted";
 
@@ -64,7 +65,7 @@ export class LlmBudgetExhaustedError extends Error {
 const storage = new AsyncLocalStorage<LlmBudgetState>();
 
 /** Milisegundos de presupuesto por ejecución de SKU. `0` o negativo lo desactiva. */
-export function configuredLlmBudgetMs(env: NodeJS.ProcessEnv = process.env): number {
+export function configuredLlmBudgetMs(env: Entorno = process.env): number {
   const raw = Number(env.AUTONOMOUS_SKU_BUDGET_MS ?? 600_000);
   return Number.isFinite(raw) && raw > 0 ? raw : 0;
 }

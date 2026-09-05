@@ -32,7 +32,7 @@ async function servicioFresco() {
 describe("BLOQUE 4 · interruptor de correo", () => {
   it("por DEFECTO fuera de producción no se envía", async () => {
     // Es donde viven las fixtures. El valor por defecto tiene que ser el seguro.
-    process.env.NODE_ENV = "test";
+    vi.stubEnv("NODE_ENV", "test");
     delete process.env.NELVYON_EMAIL_ENABLED;
     const { envioDeCorreoPermitido } = await servicioFresco();
     expect(envioDeCorreoPermitido()).toBe(false);
@@ -41,7 +41,7 @@ describe("BLOQUE 4 · interruptor de correo", () => {
   it("EL CONTROL: en producción SÍ se envía", async () => {
     // Sin este control, un interruptor que apagara siempre pasaría todas las
     // pruebas de abajo y dejaría el producto sin poder avisar a nadie.
-    process.env.NODE_ENV = "production";
+    vi.stubEnv("NODE_ENV", "production");
     delete process.env.NELVYON_EMAIL_ENABLED;
     const { envioDeCorreoPermitido } = await servicioFresco();
     expect(envioDeCorreoPermitido()).toBe(true);
@@ -50,7 +50,7 @@ describe("BLOQUE 4 · interruptor de correo", () => {
   it("se puede encender explícitamente fuera de producción", async () => {
     // Alguien puede necesitar probar el envío de verdad. Que sea explícito es
     // justo la diferencia con lo que había antes.
-    process.env.NODE_ENV = "test";
+    vi.stubEnv("NODE_ENV", "test");
     process.env.NELVYON_EMAIL_ENABLED = "1";
     const { envioDeCorreoPermitido } = await servicioFresco();
     expect(envioDeCorreoPermitido()).toBe(true);
@@ -59,7 +59,7 @@ describe("BLOQUE 4 · interruptor de correo", () => {
   it("se puede APAGAR explícitamente incluso en producción", async () => {
     // Un incidente, una migración de proveedor, una lista contaminada. Poder
     // parar el correo sin desplegar vale más que la elegancia.
-    process.env.NODE_ENV = "production";
+    vi.stubEnv("NODE_ENV", "production");
     process.env.NELVYON_EMAIL_ENABLED = "0";
     const { envioDeCorreoPermitido } = await servicioFresco();
     expect(envioDeCorreoPermitido()).toBe(false);
@@ -68,7 +68,7 @@ describe("BLOQUE 4 · interruptor de correo", () => {
   it("apagado, `sendEmail` LANZA en vez de fingir que envió", async () => {
     // El corazón del asunto. Devolver `void` en silencio dejaría al llamante
     // creyendo que el aviso salió.
-    process.env.NODE_ENV = "test";
+    vi.stubEnv("NODE_ENV", "test");
     process.env.NELVYON_EMAIL_ENABLED = "0";
     const { sendEmail } = await servicioFresco();
 
@@ -80,7 +80,7 @@ describe("BLOQUE 4 · interruptor de correo", () => {
   it("el error lleva TIPO propio: desactivado no es lo mismo que fallo", async () => {
     // Tres cosas distintas -desactivado, fallo del proveedor, enviado- que si se
     // mezclan llevan a informar mal al cliente. El código lo permite distinguir.
-    process.env.NODE_ENV = "test";
+    vi.stubEnv("NODE_ENV", "test");
     process.env.NELVYON_EMAIL_ENABLED = "0";
     const { sendEmail, CorreoDesactivadoError } = await servicioFresco();
 
@@ -96,7 +96,7 @@ describe("BLOQUE 4 · interruptor de correo", () => {
   it("apagado, NO se llega a construir el cliente del proveedor", async () => {
     // La comprobación tiene que ir ANTES de tocar el SDK. Si fuera después,
     // construir el cliente ya podría resolver DNS o leer credenciales.
-    process.env.NODE_ENV = "test";
+    vi.stubEnv("NODE_ENV", "test");
     process.env.NELVYON_EMAIL_ENABLED = "0";
     process.env.SES_ACCESS_KEY_ID = "clave-que-no-debe-usarse";
 
@@ -119,7 +119,7 @@ describe("BLOQUE 4 · interruptor de correo", () => {
   it("un valor sin sentido no enciende el correo fuera de producción", async () => {
     // Fallo cerrado ante configuración mal escrita: `NELVYON_EMAIL_ENABLED=si`
     // no puede interpretarse como encendido.
-    process.env.NODE_ENV = "test";
+    vi.stubEnv("NODE_ENV", "test");
     process.env.NELVYON_EMAIL_ENABLED = "quizas";
     const { envioDeCorreoPermitido } = await servicioFresco();
     expect(envioDeCorreoPermitido()).toBe(false);
@@ -127,7 +127,7 @@ describe("BLOQUE 4 · interruptor de correo", () => {
 
   it("encendido, el envío llega al proveedor", async () => {
     // La otra mitad del control: con todo a favor, el correo tiene que salir.
-    process.env.NODE_ENV = "test";
+    vi.stubEnv("NODE_ENV", "test");
     process.env.NELVYON_EMAIL_ENABLED = "1";
 
     vi.resetModules();
@@ -150,7 +150,7 @@ describe("BLOQUE 4 · interruptor de correo", () => {
   it("encendido, un fallo del proveedor se propaga como fallo, no como apagado", async () => {
     // La tercera de las tres cosas. Si el proveedor revienta, quien llama tiene
     // que saber que fue el proveedor y no la configuración.
-    process.env.NODE_ENV = "test";
+    vi.stubEnv("NODE_ENV", "test");
     process.env.NELVYON_EMAIL_ENABLED = "1";
 
     vi.resetModules();

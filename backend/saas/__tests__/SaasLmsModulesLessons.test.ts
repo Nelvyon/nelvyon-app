@@ -12,7 +12,10 @@ const ENROLLMENT_ID = "enroll-uuid-1";
 const baseModRow = { id: MODULE_ID, course_id: COURSE_ID, tenant_id: TENANT, title: "Módulo 1", description: null, mod_order: 1, lessons_count: 0, created_at: new Date() };
 const baseLessonRow = { id: LESSON_ID, module_id: MODULE_ID, tenant_id: TENANT, title: "Lección 1", content_type: "text", content: null, video_url: null, duration_minutes: null, lesson_order: 1, quiz_json: null, created_at: new Date() };
 
-function makeDb(responses: Record<string, unknown[][]> = {}): DbPort & { calls: string[] } {
+// Cada clave es un fragmento de SQL y su valor UN resultado: la lista de filas
+// que devuelve esa consulta. Estaba declarado `unknown[][]` —una lista DE
+// listas— y por eso ninguna fila encajaba con su tipo.
+function makeDb(responses: Record<string, Record<string, unknown>[]> = {}): DbPort & { calls: string[] } {
   const calls: string[] = [];
   return {
     calls,

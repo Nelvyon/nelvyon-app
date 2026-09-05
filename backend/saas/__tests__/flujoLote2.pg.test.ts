@@ -230,10 +230,13 @@ describeSiHayPg("BLOQUE 2 · lote 2", () => {
       await svc.recordEvent(A, t.id, "var_0", "open" as never);
 
       const leida = await svc.get(A, t.id);
-      const v0 = (leida?.variants as Array<Record<string, number>>)[0]!;
-      const v1 = (leida?.variants as Array<Record<string, number>>)[1]!;
-      expect(Number(v0.opens ?? v0.open ?? 0)).toBe(2);
-      expect(Number(v1.opens ?? v1.open ?? 0)).toBe(0);
+      // `AbVariant` declara `opens` como numero obligatorio. La conversion a
+      // `Record<string, number>` y el `?? v0.open` eran defensa contra una forma
+      // que no existe: escondian que aqui no habia nada que adivinar.
+      const variantes = leida?.variants ?? [];
+      expect(variantes.length, "no se leyeron las variantes").toBeGreaterThan(1);
+      expect(variantes[0]!.opens).toBe(2);
+      expect(variantes[1]!.opens).toBe(0);
     });
 
     it("declarar ganador PERSISTE el ganador", async () => {

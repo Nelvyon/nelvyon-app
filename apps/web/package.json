@@ -5,8 +5,8 @@
   "scripts": {
     "postinstall": "fumadocs-mdx",
     "dev": "cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" next dev",
-    "build": "cross-env NODE_OPTIONS=\"--max-old-space-size=5120\" next build",
-    "build:prod": "cross-env NODE_OPTIONS=\"--max-old-space-size=5120\" next build",
+    "build": "cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" next build",
+    "build:prod": "cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" next build",
     "start": "node server.js",
     "start:prod": "node server.js",
     "migrate": "tsx ../../backend/db/migrate.ts",
@@ -24,6 +24,7 @@
     "saas:billing-backfill": "tsx ../../backend/saas/scripts/runBillingSync.ts",
     "lint": "eslint . --max-warnings 0",
     "typecheck": "cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" tsc --noEmit",
+    "typecheck:tests": "cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" tsc -p tsconfig.tests.json --noEmit",
     "test": "vitest run",
     "test:e2e": "playwright test",
     "test:e2e:saas": "playwright test --config playwright.saas.config.ts",

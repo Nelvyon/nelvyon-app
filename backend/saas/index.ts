@@ -140,6 +140,7 @@ export {
   getOsDeliveryCertificateService,
   resetOsDeliveryCertificateServiceForTests,
   type PackRunPort,
+  type CertPackRun,
   type QaAuditPort,
   type VaultPort,
   type DeliveryCertificate,

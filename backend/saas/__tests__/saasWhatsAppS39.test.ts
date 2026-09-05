@@ -8,6 +8,7 @@ import {
   resetSaasWhatsAppCloudServiceForTests,
   SaasWhatsAppCloudError,
 } from "../SaasWhatsAppCloudService";
+import { consultaFalsa, type Fila } from "../../db/__tests__/consultaFalsa";
 
 // La politica de coste esta ENCENDIDA por defecto y deniega el envio
 // facturable. Esta bateria comprueba la MECANICA de `sendTemplate`, no la
@@ -18,17 +19,26 @@ afterEach(() => { delete process.env.NELVYON_MODO_COSTE_CERO; });
 const TENANT = "t-s39";
 const now = new Date();
 
-function makeDb(rows: Record<string, unknown>[][] = []) {
-  let call = 0;
-  return { query: vi.fn(async () => rows[call++] ?? []) };
+function makeDb(rows: Fila[][] = []) {
+  return { query: consultaFalsa(rows) };
 }
 
+// Devuelve `Response` de verdad, no un objeto con la misma pinta, y expone el
+// `.mock` del espia para que las pruebas puedan seguir mirando COMO se llamo.
+// Antes se convertia con `as unknown as typeof fetch`, que apagaba la
+// comprobacion de la URL y del cuerpo enviados.
 function makeFetch(responses: Array<{ status: number; body: unknown }>) {
   let call = 0;
-  return vi.fn(async () => {
+  const espia = vi.fn((_url: string, _init?: RequestInit) => {});
+  const f = async (entrada: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+    espia(String(entrada), init);
     const r = responses[call++] ?? { status: 200, body: {} };
-    return { ok: r.status >= 200 && r.status < 300, status: r.status, json: async () => r.body };
-  }) as unknown as typeof fetch;
+    return new Response(JSON.stringify(r.body), {
+      status: r.status,
+      headers: { "content-type": "application/json" },
+    });
+  };
+  return Object.assign(f, espia);
 }
 
 function makeSingleFetch(status: number, body: unknown) {

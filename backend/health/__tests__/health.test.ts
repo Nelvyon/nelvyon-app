@@ -22,7 +22,7 @@ describe("healthChecks", () => {
   beforeEach(() => {
     vi.mocked(DbJobsClient.getInstance).mockReturnValue({
       query: vi.fn().mockResolvedValue([{ ok: 1 }]),
-    } as unknown as InstanceType<typeof DbJobsClient>);
+    } as unknown as ReturnType<typeof DbJobsClient.getInstance>);
   });
 
   afterEach(() => {
@@ -42,7 +42,7 @@ describe("healthChecks", () => {
     vi.useFakeTimers();
     vi.mocked(DbJobsClient.getInstance).mockReturnValue({
       query: () => new Promise(() => {}),
-    } as unknown as InstanceType<typeof DbJobsClient>);
+    } as unknown as ReturnType<typeof DbJobsClient.getInstance>);
     const p = checkDatabase(25);
     await vi.advanceTimersByTimeAsync(40);
     const r = await p;
@@ -112,7 +112,7 @@ describe("/api/health/deep GET", () => {
   async function setupAllChecksPassing() {
     vi.mocked(DbJobsClient.getInstance).mockReturnValue({
       query: vi.fn().mockResolvedValue([{ ok: 1 }]),
-    } as unknown as InstanceType<typeof DbJobsClient>);
+    } as unknown as ReturnType<typeof DbJobsClient.getInstance>);
     process.env.UPSTASH_REDIS_REST_URL = "https://redis-hc.test";
     process.env.UPSTASH_REDIS_REST_TOKEN = "token";
     process.env.SES_ACCESS_KEY_ID = "AKIATEST";
@@ -167,7 +167,7 @@ describe("/api/health/deep GET", () => {
     await setupAllChecksPassing();
     vi.mocked(DbJobsClient.getInstance).mockReturnValue({
       query: vi.fn().mockRejectedValue(new Error("internal db failure")),
-    } as unknown as InstanceType<typeof DbJobsClient>);
+    } as unknown as ReturnType<typeof DbJobsClient.getInstance>);
     const { GET } = await import("../../../apps/web/src/app/api/health/deep/route");
     const res = await GET(deepHealthRequest() as import("next/server").NextRequest);
     expect(res.status).toBe(503);
@@ -180,7 +180,7 @@ describe("/api/health/deep GET", () => {
     await setupAllChecksPassing();
     vi.mocked(DbJobsClient.getInstance).mockReturnValue({
       query: vi.fn().mockRejectedValue(new Error("secret stack trace")),
-    } as unknown as InstanceType<typeof DbJobsClient>);
+    } as unknown as ReturnType<typeof DbJobsClient.getInstance>);
     const body = await runDeepHealthChecks();
     expect(body.checks.database.error).toBe("Connection failed");
     expect(JSON.stringify(body)).not.toContain("secret");

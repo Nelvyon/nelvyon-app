@@ -328,7 +328,6 @@ describe("MCP Productivo — audit coverage", () => {
   });
 });
 
-import { evaluatePolicy } from "../../mcp";
 import { getToolRegistry } from "../../mcp/registry/ToolRegistry";
 
 describe("MCP PolicyEngine unit", () => {

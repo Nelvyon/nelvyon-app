@@ -1,11 +1,9 @@
 import { afterEach, describe, it, expect, vi } from "vitest";
 import { SaasAdsDashboardService, resetSaasAdsDashboardServiceForTests } from "../SaasAdsDashboardService";
+import { consultaFalsa } from "../../db/__tests__/consultaFalsa";
 
 type Row = Record<string, unknown>;
-const makeDb = (rows: Row[][] = []) => {
-  let call = 0;
-  return { query: vi.fn(async () => rows[call++] ?? []) };
-};
+const makeDb = (rows: Row[][] = []) => ({ query: consultaFalsa(rows) });
 
 const TENANT = "tenant-ads";
 const now = new Date();

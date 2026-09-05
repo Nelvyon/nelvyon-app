@@ -10,7 +10,23 @@ const JSON_TOOL_PROMPT = `Responde ÚNICAMENTE con JSON válido (sin markdown, s
 Schema: {"tool":"create_campaign","args":{"name":"string","budget_eur":number,"channels":["email","linkedin"]}}
 Crea campaña "Lanzamiento Q3" presupuesto 2500€ canales email y linkedin.`;
 
-type CaseSeed = Omit<BenchmarkCase, "id" | "domain"> & { slot: number };
+/**
+ * Un caso TAL Y COMO SE ESCRIBE en el catalogo, que no es lo mismo que un
+ * `BenchmarkCase` terminado.
+ *
+ * `gateCategory` es OBLIGATORIO en `BenchmarkCase` —cada caso acaba teniendo
+ * uno— pero aqui es opcional a proposito: `gateFor()` lo deriva del dominio y
+ * de la forma del caso, y solo 27 de los 201 necesitan decirlo a mano. Exigirlo
+ * en el seed obligaria a repetir 174 veces algo que ya se sabe deducir, y era
+ * justo lo que impedia que este fichero pasara el typecheck.
+ *
+ * El contrato del producto NO se toca: lo que sale de `buildFullBenchmarkCatalog`
+ * sigue siendo un `BenchmarkCase` completo, con su `gateCategory` puesto.
+ */
+type CaseSeed = Omit<BenchmarkCase, "id" | "domain" | "gateCategory"> & {
+  slot: number;
+  gateCategory?: GateCategory;
+};
 
 function gateFor(domain: KnowledgeDomainId, seed: CaseSeed): GateCategory {
   if (seed.gateCategory) return seed.gateCategory;

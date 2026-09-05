@@ -11,7 +11,7 @@ export interface SupabaseStagingClient {
   uploadBytes: (
     bucket: string,
     path: string,
-    data: Uint8Array,
+    data: Uint8Array<ArrayBuffer>,
     contentType: string,
   ) => Promise<SupabaseUploadResult>;
   createSignedUrl: (bucket: string, path: string, expiresIn: number) => Promise<SupabaseSignedUrlResult>;
@@ -46,7 +46,7 @@ export function createSupabaseStagingClient(): SupabaseStagingClient {
     async uploadBytes(
       bucket: string,
       path: string,
-      data: Uint8Array,
+      data: Uint8Array<ArrayBuffer>,
       contentType: string,
     ): Promise<SupabaseUploadResult> {
       const cleanPath = path.replace(/^\//, "");

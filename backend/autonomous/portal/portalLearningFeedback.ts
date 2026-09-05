@@ -136,7 +136,12 @@ export async function recordPortalLearningOutcome(
 
   try {
     const { id, mode } = await templateOutcomeRepository.recordOutcome(input);
-    return { recorded: true, mode, id };
+    // El repositorio dice `none` cuando no guardo en ningun sitio. Aqui eso se
+    // llama `skipped`, y traducirlo explicitamente evita devolver un modo que
+    // quien lee esta respuesta no conoce.
+    return mode === "none"
+      ? { recorded: false, mode: "skipped", reason: "storage_disabled" }
+      : { recorded: true, mode, id };
   } catch {
     if (!learningDbEnabled() && resolveStorageMode() === "local") {
       return { recorded: false, mode: "skipped", reason: "local_write_failed" };

@@ -15,7 +15,10 @@ const baseReviewRow = {
   syncedAt: new Date().toISOString(), createdAt: new Date().toISOString(),
 };
 
-function makeDb(responses: Record<string, unknown[][]> = {}): DbPort & { calls: string[] } {
+// Cada clave es un fragmento de SQL y su valor UN resultado: la lista de filas
+// que devuelve esa consulta. Estaba declarado `unknown[][]` —una lista DE
+// listas— y por eso ninguna fila encajaba con su tipo.
+function makeDb(responses: Record<string, Record<string, unknown>[]> = {}): DbPort & { calls: string[] } {
   const calls: string[] = [];
   return {
     calls,

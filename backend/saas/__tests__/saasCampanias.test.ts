@@ -80,7 +80,7 @@ function makeDb() {
       const channel = String(p[4]);
       if (!["draft", "scheduled", "running", "paused", "completed", "cancelled"].includes(status) || !["email", "sms", "notification", "multi"].includes(channel)) {
         const e = new Error("check");
-        (e as { code: string }).code = "23514";
+        Object.assign(e, { code: "23514" });
         throw e;
       }
       const row: CampaniaRow = {

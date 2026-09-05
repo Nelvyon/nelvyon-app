@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { SaasLmsService, SaasLmsError, resetSaasLmsServiceForTests } from "../SaasLmsService";
+import { consultaFalsa, type Fila } from "../../db/__tests__/consultaFalsa";
 
 beforeEach(() => { resetSaasLmsServiceForTests(); });
 
@@ -19,9 +20,8 @@ const enrollRow = {
   status: "active", enrolled_at: now, completed_at: null, created_at: now,
 };
 
-function makeDb(calls: unknown[][] = []) {
-  let i = 0;
-  return { query: vi.fn(async () => calls[i++] ?? []) };
+function makeDb(calls: Fila[][] = []) {
+  return { query: consultaFalsa(calls) };
 }
 
 describe("SaasLmsService.listCourses", () => {

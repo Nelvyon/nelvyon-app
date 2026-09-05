@@ -16,14 +16,27 @@ import { runRestaurantLandingPhaseI } from "../pilots/restaurantLandingPhaseI";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SAMPLE_HTML = `<!DOCTYPE html><html><head><title>La Brasa del Raval — Reserva</title><meta name="description" content="Cocina de brasas mediterránea en Barcelona Raval con reserva directa web." /><meta name="viewport" content="width=device-width" /></head><body><nav data-nav><a data-nav-link href="#">A</a><a data-nav-link href="#">B</a><a data-nav-link href="#">C</a></nav><section data-section="hero"><h1>La Brasa</h1><a data-cta href="#">Reservar</a></section><style>@media(min-width:1280px){.x{color:#fff;background:#B45309}}</style></body></html>`;
 
-function mockClient(uploadSpy?: ReturnType<typeof vi.fn>): SupabaseStagingClient {
-  const upload = uploadSpy ?? vi.fn().mockResolvedValue({
-    mock: true,
-    ok: true,
-    bucket: "autonomous-previews",
-    path: "test/index.html",
-    public_url: "https://mock.supabase.local/autonomous-previews/test/index.html",
-  });
+/** Un espia de subida con la FIRMA de verdad, para que la prueba compruebe
+ *  tambien COMO se llama y no solo si se llamo. */
+function espiaDeSubida() {
+  const espia = vi.fn(
+    (_bucket: string, _path: string, _data: Uint8Array<ArrayBuffer>, _tipo: string) => {},
+  );
+  const subir: SupabaseStagingClient["uploadBytes"] = async (bucket, path, data, tipo) => {
+    espia(bucket, path, data, tipo);
+    return {
+      mock: true,
+      ok: true,
+      bucket: "autonomous-previews",
+      path: "test/index.html",
+      public_url: "https://mock.supabase.local/autonomous-previews/test/index.html",
+    };
+  };
+  return Object.assign(subir, espia);
+}
+
+function mockClient(uploadSpy?: ReturnType<typeof espiaDeSubida>): SupabaseStagingClient {
+  const upload = uploadSpy ?? espiaDeSubida();
   return {
     isMock: () => true,
     uploadBytes: upload,
@@ -40,7 +53,7 @@ function mockClient(uploadSpy?: ReturnType<typeof vi.fn>): SupabaseStagingClient
 
 describe("Phase I — deployPreviewStaging", () => {
   it("dry-run does not upload", async () => {
-    const uploadSpy = vi.fn();
+    const uploadSpy = espiaDeSubida();
     const result = await deployPreviewStaging({
       html: SAMPLE_HTML,
       pilot_id: "test-pilot",
@@ -152,6 +165,7 @@ describe("Phase I — OsPublishPayload", () => {
         artifacts: { build: {} },
         agent_log: [],
         retry_count: 0,
+        max_retries: 3,
         simulation_mode: "phase-i",
         status: "OS_PUBLISH_READY",
         qa: {

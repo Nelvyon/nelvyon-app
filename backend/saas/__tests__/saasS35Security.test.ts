@@ -4,14 +4,24 @@
  *        rate-limit helper guards public endpoints.
  */
 import { describe, it, expect, beforeEach } from "vitest";
-import { listPermissionsForRole, type SaasRole, canSaasPerform as canDo } from "../saasRbac";
+import {
+  listPermissionsForRole,
+  type SaasAction,
+  type SaasRole,
+  canSaasPerform as canDo,
+} from "../saasRbac";
 import { checkPublicApiRateLimit, resetRateLimitForTests } from "../requirePublicApiContext";
 
-const ROLE_PERMISSIONS = {
-  owner:  listPermissionsForRole("owner"),
-  admin:  listPermissionsForRole("admin"),
-  member: listPermissionsForRole("member"),
-  viewer: listPermissionsForRole("viewer"),
+// Tipado como `Record<SaasRole, ...>` A PROPOSITO: faltaba `operator`, y sin el
+// tipo nadie se enteraba. Esta prueba se llama «matriz RBAC completa» y llevaba
+// tiempo sin mirar uno de los cinco roles. Ahora, si se anade un rol al
+// producto y no aqui, esto deja de compilar.
+const ROLE_PERMISSIONS: Record<SaasRole, readonly SaasAction[]> = {
+  owner:    listPermissionsForRole("owner"),
+  admin:    listPermissionsForRole("admin"),
+  operator: listPermissionsForRole("operator"),
+  member:   listPermissionsForRole("member"),
+  viewer:   listPermissionsForRole("viewer"),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -127,7 +137,7 @@ describe("Public API — scope validation logic", () => {
 // Security invariants
 // ─────────────────────────────────────────────────────────────────────────────
 describe("Security invariants", () => {
-  const ALL_ROLES: SaasRole[] = ["owner", "admin", "member", "viewer"];
+  const ALL_ROLES: SaasRole[] = ["owner", "admin", "operator", "member", "viewer"];
 
   it("ningún rol tiene permisos undefined", () => {
     for (const role of ALL_ROLES) {

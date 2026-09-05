@@ -32,6 +32,7 @@ vi.mock("@aws-sdk/client-ses", () => ({
 
 import { SaasWorkflowService } from "../SaasWorkflowService";
 import { SaasCrmService } from "../SaasCrmService";
+import { consultaFalsaCon } from "../../db/__tests__/consultaFalsa";
 
 const TENANT = "t-sms-wa";
 const now = new Date();
@@ -57,7 +58,7 @@ const completedRunRow = { ...runRow, status: "completed", completed_at: now };
 function makeDb(workflowRow: Record<string, unknown>) {
   let callCount = 0;
   return {
-    query: vi.fn(async (sql: string) => {
+    query: consultaFalsaCon((sql) => {
       callCount++;
       // SELECT workflow
       if (sql.includes("FROM saas_workflows") && sql.includes("WHERE tenant_id")) return [workflowRow];

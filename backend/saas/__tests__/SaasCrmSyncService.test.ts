@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { SaasCrmSyncService } from "../SaasCrmSyncService";
+import { consultaFalsaCon } from "../../db/__tests__/consultaFalsa";
 
 describe("SaasCrmSyncService", () => {
   it("getState returns idle defaults when no row", async () => {
@@ -25,7 +26,7 @@ describe("SaasCrmSyncService", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     const db = {
-      query: vi.fn(async (sql: string) => {
+      query: consultaFalsaCon((sql) => {
         if (sql.includes("INSERT INTO saas_crm_sync_state") && sql.includes("running")) return [];
         if (sql.includes("UPDATE saas_contacts")) return [];
         if (sql.includes("INSERT INTO saas_contacts")) return [];

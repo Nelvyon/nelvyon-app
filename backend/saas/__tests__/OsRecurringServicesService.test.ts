@@ -7,7 +7,12 @@ const MONTH  = "2026-06";
 type QueryFn = (sql: string, params?: unknown[]) => Promise<unknown[]>;
 
 function makeSvc(queryFn: QueryFn) {
-  return new OsRecurringServicesService({ db: { query: queryFn } as Parameters<typeof OsRecurringServicesService.prototype.constructor>[0]["db"] });
+  // `DbClient.query` es generico —devuelve lo que pida quien llama— y un doble
+  // no puede saber ese tipo. Se adapta aqui, una vez, en lugar de convertir el
+  // objeto entero: asi `sql` y `params` siguen comprobandose de verdad.
+  const query = async <T,>(sql: string, params?: unknown[]): Promise<T[]> =>
+    (await queryFn(sql, params)) as T[];
+  return new OsRecurringServicesService({ db: { query } });
 }
 
 const deliverableRow = (type: string) => ({
@@ -62,51 +67,51 @@ describe("generateMonthlyDeliverables", () => {
   });
 
   it("seo_report payload includes sections and title", async () => {
-    let capturedPayload: Record<string, unknown> | null = null;
+    const capturedCapturados: Record<string, unknown>[] = [];
     const svc = makeSvc(async (sql, params) => {
       const p = params as unknown[];
       if (p[2] === "seo_report") {
-        capturedPayload = JSON.parse(String(p[3])) as Record<string, unknown>;
+        capturedCapturados.push(JSON.parse(String(p[3])) as Record<string, unknown>);
         return [deliverableRow("seo_report")];
       }
       return [deliverableRow(String(p[2]))];
     });
     await svc.generateMonthlyDeliverables(TENANT, MONTH);
-    expect(capturedPayload).not.toBeNull();
-    expect(capturedPayload?.title).toContain(MONTH);
-    expect(Array.isArray(capturedPayload?.sections)).toBe(true);
+    expect(capturedCapturados, "no se capturo ningun payload").toHaveLength(1);
+    expect(capturedCapturados[0].title).toContain(MONTH);
+    expect(Array.isArray(capturedCapturados[0].sections)).toBe(true);
   });
 
   it("social_calendar payload includes weeks array with posts", async () => {
-    let calPayload: Record<string, unknown> | null = null;
+    const calCapturados: Record<string, unknown>[] = [];
     const svc = makeSvc(async (sql, params) => {
       const p = params as unknown[];
       if (p[2] === "social_calendar") {
-        calPayload = JSON.parse(String(p[3])) as Record<string, unknown>;
+        calCapturados.push(JSON.parse(String(p[3])) as Record<string, unknown>);
         return [deliverableRow("social_calendar")];
       }
       return [deliverableRow(String(p[2]))];
     });
     await svc.generateMonthlyDeliverables(TENANT, MONTH);
-    expect(Array.isArray(calPayload?.weeks)).toBe(true);
-    const weeks = calPayload?.weeks as Array<{ posts: unknown[] }>;
+    expect(Array.isArray(calCapturados[0].weeks)).toBe(true);
+    const weeks = calCapturados[0].weeks as Array<{ posts: unknown[] }>;
     expect(weeks.length).toBe(4);
     expect(weeks[0]?.posts.length).toBe(3);
   });
 
   it("ads_snapshot payload includes channels array", async () => {
-    let adsPayload: Record<string, unknown> | null = null;
+    const adsCapturados: Record<string, unknown>[] = [];
     const svc = makeSvc(async (sql, params) => {
       const p = params as unknown[];
       if (p[2] === "ads_snapshot") {
-        adsPayload = JSON.parse(String(p[3])) as Record<string, unknown>;
+        adsCapturados.push(JSON.parse(String(p[3])) as Record<string, unknown>);
         return [deliverableRow("ads_snapshot")];
       }
       return [deliverableRow(String(p[2]))];
     });
     await svc.generateMonthlyDeliverables(TENANT, MONTH);
-    expect(Array.isArray(adsPayload?.channels)).toBe(true);
-    const ch = adsPayload?.channels as Array<{ name: string }>;
+    expect(Array.isArray(adsCapturados[0].channels)).toBe(true);
+    const ch = adsCapturados[0].channels as Array<{ name: string }>;
     expect(ch.map(c => c.name)).toContain("Meta Ads");
     expect(ch.map(c => c.name)).toContain("Google Ads");
   });

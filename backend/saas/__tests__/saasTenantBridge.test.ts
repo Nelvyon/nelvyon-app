@@ -58,6 +58,7 @@ function makeBridgeDb() {
   function seedTenant(id: string, userId: string, workspaceId: number | null = null) {
     tenants.set(id, {
       pk: id,
+      billing_status: "active",
       id,
       user_id: userId,
       workspace_id: workspaceId,

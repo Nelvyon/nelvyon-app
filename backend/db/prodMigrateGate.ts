@@ -5,6 +5,7 @@
  * Production: apply only when CEO-auditable approval env vars are set;
  * otherwise refuse to apply and fail the deploy if any migration is pending.
  */
+import type { Entorno } from "../config/entorno";
 
 export type ProdMigrateApproval = {
   approved: boolean;
@@ -13,7 +14,7 @@ export type ProdMigrateApproval = {
   reason: string;
 };
 
-export function resolveDeployEnvironment(env: NodeJS.ProcessEnv = process.env): {
+export function resolveDeployEnvironment(env: Entorno = process.env): {
   isProduction: boolean;
   label: string;
 } {
@@ -51,7 +52,7 @@ export function resolveDeployEnvironment(env: NodeJS.ProcessEnv = process.env): 
   return { isProduction: false, label: "local/dev" };
 }
 
-export function readProdMigrateApproval(env: NodeJS.ProcessEnv = process.env): ProdMigrateApproval {
+export function readProdMigrateApproval(env: Entorno = process.env): ProdMigrateApproval {
   const flag = (env.NELVYON_PROD_MIGRATE_APPROVED ?? "").trim();
   const approvedBy = (env.NELVYON_PROD_MIGRATE_APPROVED_BY ?? "").trim();
   const commitPin = (env.NELVYON_PROD_MIGRATE_COMMIT_SHA ?? "").trim() || null;

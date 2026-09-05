@@ -74,6 +74,11 @@ async function ensurePhaseHPreview(options: PhaseIOptions): Promise<{
     project_id: `phase-i-${pilotId}`,
     sku: "NELVYON-LANDING",
     tier: "professional",
+    // Faltaba, y no era solo un hueco de tipos: `simulator.ts` compara
+    // `retry_count < project.max_retries`, y contra `undefined` esa comparacion
+    // es SIEMPRE falsa. Este piloto no habria reintentado nunca. Se pone 3, que
+    // es lo que usa `runPipeline`.
+    max_retries: 3,
     brief,
     os_refs: {
       client_id: "os_client_pilot_rest",

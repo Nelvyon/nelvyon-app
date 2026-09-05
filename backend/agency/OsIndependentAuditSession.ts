@@ -193,9 +193,22 @@ export function runIndependentAuditorE2eScenario(): {
       throw new Error(`expected_reject_got_${bad.status}`);
     }
     submitProducerRepair(bad.sessionId, "removed mock:// URLs; raised QA evidence");
-    auditorReview(bad.sessionId, { avgQaScore: 93, critical: true, containsMockUrl: false });
+    // Se usa lo que DEVUELVE la segunda revision, no la variable `bad`.
+    // `auditorReview` muta la sesion guardada, pero `bad` quedo estrechada a
+    // "rejected" | "repair_required" por la comprobacion de arriba: leer su
+    // `status` aqui comparaba contra un valor que el compilador ya daba por
+    // imposible, y nadie se enteraba porque este fichero no lo miraba ningun
+    // typecheck.
+    const badTrasReparar = auditorReview(bad.sessionId, {
+      avgQaScore: 93,
+      critical: true,
+      containsMockUrl: false,
+    });
 
-    const ok = good.status === "approved" && bad.status === "approved" && bad.rounds >= 2;
+    const ok =
+      good.status === "approved" &&
+      badTrasReparar.status === "approved" &&
+      badTrasReparar.rounds >= 2;
     return {
       ok,
       passSessionId: good.sessionId,

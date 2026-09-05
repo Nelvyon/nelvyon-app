@@ -14,6 +14,7 @@
  */
 
 import { resolveDeployEnvironment } from "../db/prodMigrateGate";
+import type { Entorno } from "../config/entorno";
 
 function isExactOne(raw: string | undefined): boolean {
   return (raw ?? "").trim() === "1";
@@ -40,14 +41,14 @@ export const LOCAL_AI_OWNER_DEFAULT_DATABASE_URL =
 
 /** Allow applying local_ai_* DDL. Default OFF. */
 export function isLocalAiSchemaApplyEnabled(
-  env: NodeJS.ProcessEnv = process.env,
+  env: Entorno = process.env,
 ): boolean {
   return isExactOne(env.NELVYON_LOCAL_AI_SCHEMA_APPLY);
 }
 
 /** Allow LocalVectorStore to use shared DATABASE_URL when LOCAL_AI_DATABASE_URL absent. Default OFF. */
 export function isLocalAiUseMainDbEnabled(
-  env: NodeJS.ProcessEnv = process.env,
+  env: Entorno = process.env,
 ): boolean {
   return isExactOne(env.NELVYON_LOCAL_AI_USE_MAIN_DB);
 }
@@ -84,7 +85,7 @@ export type LocalAiDatabaseResolve = {
 };
 
 export function resolveLocalAiDatabaseUrl(
-  env: NodeJS.ProcessEnv = process.env,
+  env: Entorno = process.env,
 ): LocalAiDatabaseResolve {
   const { isProduction } = resolveDeployEnvironment(env);
 
@@ -139,7 +140,7 @@ export function resolveLocalAiDatabaseUrl(
  * Clear error — never silently reaches localhost Postgres in production.
  */
 export function assertLocalAiDatabaseUrlReady(
-  env: NodeJS.ProcessEnv = process.env,
+  env: Entorno = process.env,
 ): string {
   const { isProduction } = resolveDeployEnvironment(env);
   const resolved = resolveLocalAiDatabaseUrl(env);
@@ -186,7 +187,7 @@ export async function assertLocalAiRagSchemaPresent(
  * Call before executeTask RAG/DB work. Never applies migrations.
  */
 export async function assertLocalAiRuntimeReadyForInference(
-  env: NodeJS.ProcessEnv = process.env,
+  env: Entorno = process.env,
   clientFactory?: () => Promise<SchemaPresenceClient>,
 ): Promise<void> {
   assertLocalAiDatabaseUrlReady(env);
@@ -195,7 +196,7 @@ export async function assertLocalAiRuntimeReadyForInference(
   await assertLocalAiRagSchemaPresent(client);
 }
 
-export function assertSchemaApplyAllowed(env: NodeJS.ProcessEnv = process.env): void {
+export function assertSchemaApplyAllowed(env: Entorno = process.env): void {
   if (!isLocalAiSchemaApplyEnabled(env)) {
     throw new Error(
       "BLOCKED: NELVYON_LOCAL_AI_SCHEMA_APPLY must be exactly '1' to apply local_ai schema (PREPARED_OFF until CEO)",

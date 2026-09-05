@@ -18,7 +18,13 @@ describe("DataSubjectService", () => {
 
   beforeEach(() => {
     queryMock.mockReset();
-    svc = new DataSubjectService({ query: queryMock });
+    svc = new DataSubjectService({
+      // `DbClient.query` es generico y `vi.fn()` no lo es. Se adapta aqui para
+      // no perder `queryMock.mockResolvedValueOnce`, que es lo que estas
+      // pruebas usan para guionizar cada consulta.
+      query: async <T,>(sql: string, params?: unknown[]): Promise<T[]> =>
+        (await queryMock(sql, params)) as T[],
+    });
     vi.mocked(sendEmail).mockClear();
     delete process.env.PADDLE_API_KEY;
   });

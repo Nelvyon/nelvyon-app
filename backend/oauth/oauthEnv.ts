@@ -3,8 +3,9 @@
  * Prefer NEXT_PUBLIC_APP_URL; default host is the product canonical app.nelvyon.com.
  * Never invent credentials — only read env.
  */
+import type { Entorno } from "../config/entorno";
 
-export function oauthAppBaseUrl(env: NodeJS.ProcessEnv = process.env): string {
+export function oauthAppBaseUrl(env: Entorno = process.env): string {
   const raw =
     env.NEXT_PUBLIC_APP_URL?.trim() ||
     env.NEXTAUTH_URL?.trim() ||
@@ -15,7 +16,7 @@ export function oauthAppBaseUrl(env: NodeJS.ProcessEnv = process.env): string {
 /** Default redirect when *_REDIRECT_URI is unset. */
 export function defaultOAuthRedirectUri(
   path: string,
-  env: NodeJS.ProcessEnv = process.env,
+  env: Entorno = process.env,
 ): string {
   const normalized = path.startsWith("/") ? path : `/${path}`;
   return `${oauthAppBaseUrl(env)}${normalized}`;
@@ -24,7 +25,7 @@ export function defaultOAuthRedirectUri(
 /** First non-empty env among aliases. */
 export function firstEnv(
   aliases: readonly string[],
-  env: NodeJS.ProcessEnv = process.env,
+  env: Entorno = process.env,
 ): string {
   for (const key of aliases) {
     const v = env[key]?.trim();
@@ -41,26 +42,26 @@ export const TIKTOK_SECRET_ALIASES = [
   "TIKTOK_CLIENT_SECRET",
 ] as const;
 
-export function metaOAuthAppId(env: NodeJS.ProcessEnv = process.env): string {
+export function metaOAuthAppId(env: Entorno = process.env): string {
   return firstEnv(META_ID_ALIASES, env);
 }
 
-export function metaOAuthAppSecret(env: NodeJS.ProcessEnv = process.env): string {
+export function metaOAuthAppSecret(env: Entorno = process.env): string {
   return firstEnv(META_SECRET_ALIASES, env);
 }
 
-export function tiktokOAuthAppId(env: NodeJS.ProcessEnv = process.env): string {
+export function tiktokOAuthAppId(env: Entorno = process.env): string {
   return firstEnv(TIKTOK_ID_ALIASES, env);
 }
 
-export function tiktokOAuthAppSecret(env: NodeJS.ProcessEnv = process.env): string {
+export function tiktokOAuthAppSecret(env: Entorno = process.env): string {
   return firstEnv(TIKTOK_SECRET_ALIASES, env);
 }
 
 /** True when every entry is set; entries may be "A|B" meaning either alias. */
 export function isAliasedEnvConfigured(
   keys: readonly string[],
-  env: NodeJS.ProcessEnv = process.env,
+  env: Entorno = process.env,
 ): boolean {
   if (keys.length === 0) return true;
   return keys.every((spec) => {
@@ -71,7 +72,7 @@ export function isAliasedEnvConfigured(
 
 export function missingAliasedEnvKeys(
   keys: readonly string[],
-  env: NodeJS.ProcessEnv = process.env,
+  env: Entorno = process.env,
 ): string[] {
   return keys.filter((spec) => {
     const aliases = spec.split("|").map((s) => s.trim()).filter(Boolean);
@@ -79,22 +80,22 @@ export function missingAliasedEnvKeys(
   });
 }
 
-export function missingGoogleOAuthEnvKeys(env: NodeJS.ProcessEnv = process.env): string[] {
+export function missingGoogleOAuthEnvKeys(env: Entorno = process.env): string[] {
   return missingAliasedEnvKeys(["GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET"], env);
 }
 
-export function missingMetaOAuthEnvKeys(env: NodeJS.ProcessEnv = process.env): string[] {
+export function missingMetaOAuthEnvKeys(env: Entorno = process.env): string[] {
   return missingAliasedEnvKeys(
     ["META_APP_ID|META_CLIENT_ID", "META_APP_SECRET|META_CLIENT_SECRET"],
     env,
   );
 }
 
-export function missingLinkedInOAuthEnvKeys(env: NodeJS.ProcessEnv = process.env): string[] {
+export function missingLinkedInOAuthEnvKeys(env: Entorno = process.env): string[] {
   return missingAliasedEnvKeys(["LINKEDIN_CLIENT_ID", "LINKEDIN_CLIENT_SECRET"], env);
 }
 
-export function missingWhatsAppCloudEnvKeys(env: NodeJS.ProcessEnv = process.env): string[] {
+export function missingWhatsAppCloudEnvKeys(env: Entorno = process.env): string[] {
   const missing: string[] = [];
   if (!env.META_WA_PHONE_NUMBER_ID?.trim()) missing.push("META_WA_PHONE_NUMBER_ID");
   if (!env.META_WA_ACCESS_TOKEN?.trim()) missing.push("META_WA_ACCESS_TOKEN");
@@ -103,6 +104,6 @@ export function missingWhatsAppCloudEnvKeys(env: NodeJS.ProcessEnv = process.env
   return missing;
 }
 
-export function isWhatsAppCloudEnvConfigured(env: NodeJS.ProcessEnv = process.env): boolean {
+export function isWhatsAppCloudEnvConfigured(env: Entorno = process.env): boolean {
   return missingWhatsAppCloudEnvKeys(env).length === 0;
 }

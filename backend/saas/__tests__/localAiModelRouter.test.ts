@@ -121,7 +121,11 @@ describe("validateResponse", () => {
       query: "Qué es NELVYON",
       hasContext: true,
       requireCitations: false,
-      citations: [{ sourceId: "kb:1", content: "NELVYON es...", score: 0.9, index: 1 }],
+      citations: [
+        // La ficha real pide `documentId` y `chunkIndex`; el `index` de esta
+        // fixture era de una version anterior del contrato.
+        { sourceId: "kb:1", documentId: "doc:1", chunkIndex: 1, content: "NELVYON es...", score: 0.9 },
+      ],
     });
     expect(v.shouldFallback).toBe(true);
   });

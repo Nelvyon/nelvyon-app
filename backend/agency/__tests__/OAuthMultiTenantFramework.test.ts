@@ -31,7 +31,7 @@ describe("OAuthMultiTenantFramework — token vault (AES-256-GCM)", () => {
   afterEach(() => {
     if (savedKey !== undefined) process.env.NELVYON_OAUTH_MT_ENCRYPTION_KEY = savedKey;
     else delete process.env.NELVYON_OAUTH_MT_ENCRYPTION_KEY;
-    process.env.NODE_ENV = savedNodeEnv;
+    vi.stubEnv("NODE_ENV", savedNodeEnv);
     process.env.VITEST = savedVitest;
   });
 
@@ -44,14 +44,14 @@ describe("OAuthMultiTenantFramework — token vault (AES-256-GCM)", () => {
 
   it("fails closed outside test runtime without a configured key", () => {
     delete process.env.NELVYON_OAUTH_MT_ENCRYPTION_KEY;
-    process.env.NODE_ENV = "production";
+    vi.stubEnv("NODE_ENV", "production");
     process.env.VITEST = undefined;
     const vault = new AesGcmOAuthTokenVault();
     expect(() => vault.encrypt("x")).toThrow(OAuthMtError);
   });
 
   it("uses a configured key when present, even outside test runtime", () => {
-    process.env.NODE_ENV = "production";
+    vi.stubEnv("NODE_ENV", "production");
     process.env.VITEST = undefined;
     process.env.NELVYON_OAUTH_MT_ENCRYPTION_KEY = "cd".repeat(32);
     const vault = new AesGcmOAuthTokenVault();

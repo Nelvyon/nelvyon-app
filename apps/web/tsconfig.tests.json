@@ -1,0 +1,21 @@
+{
+  "//": "Typecheck de TODAS las pruebas. Vive aqui porque aqui vive vitest (apps/web/node_modules) y su config; un tsconfig de pruebas en backend/ no resolveria `import ... from \"vitest\"`. Hereda paths, lib y types del config de producto para comprobar las pruebas contra los MISMOS tipos que compila el producto.",
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "incremental": false
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.d.ts",
+    "../../backend/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "../../backend/**/node_modules/**",
+    "../../backend/.venv/**",
+    "../../backend/os-agents/seeds/download-envato-browser.ts"
+  ]
+}

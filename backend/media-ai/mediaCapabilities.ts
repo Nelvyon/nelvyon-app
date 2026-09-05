@@ -28,6 +28,7 @@
  *
  * Ninguna clave externa es requisito para que NELVYON arranque.
  */
+import type { Entorno } from "../config/entorno";
 
 export type MediaCapability = "stt" | "image" | "tts";
 
@@ -37,7 +38,7 @@ export type MediaProvider =
   | { kind: "not_configured"; capability: MediaCapability; reason: string };
 
 /** Interruptor general. Sin él, ningún proveedor externo se considera jamás. */
-export function externalMediaAllowed(env: NodeJS.ProcessEnv = process.env): boolean {
+export function externalMediaAllowed(env: Entorno = process.env): boolean {
   return env.NELVYON_ALLOW_EXTERNAL_MEDIA?.trim() === "1";
 }
 
@@ -75,7 +76,7 @@ const EXTERNAL_KEY_ENV: Record<MediaCapability, Array<{ id: string; env: string 
 
 export function resolveMediaProvider(
   capability: MediaCapability,
-  env: NodeJS.ProcessEnv = process.env,
+  env: Entorno = process.env,
 ): MediaProvider {
   const localUrl = txt(env[LOCAL_URL_ENV[capability]]);
   if (localUrl) {
@@ -107,7 +108,7 @@ export function resolveMediaProvider(
 /** `true` solo si la capacidad puede ejecutarse ahora mismo. */
 export function isMediaCapabilityAvailable(
   capability: MediaCapability,
-  env: NodeJS.ProcessEnv = process.env,
+  env: Entorno = process.env,
 ): boolean {
   return resolveMediaProvider(capability, env).kind !== "not_configured";
 }
@@ -123,7 +124,7 @@ export class MediaCapabilityNotConfigured extends Error {
 /** Estado publicable en contratos HTTP/UI, sin filtrar configuración interna. */
 export function mediaCapabilityStatus(
   capability: MediaCapability,
-  env: NodeJS.ProcessEnv = process.env,
+  env: Entorno = process.env,
 ): { capability: MediaCapability; status: "available" | "not_configured"; provider: string | null } {
   const p = resolveMediaProvider(capability, env);
   if (p.kind === "not_configured") {

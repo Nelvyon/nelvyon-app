@@ -36,7 +36,7 @@ export function buildPhaseIPublishPayload(
       },
     },
     {
-      preview_metadata: input.preview_metadata as import("../wrappers/landingBuilderStaging").PreviewMetadata,
+      preview_metadata: input.preview_metadata,
       qa_report: {
         ...input.qa_report,
         live_qa: {

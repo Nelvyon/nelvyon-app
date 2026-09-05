@@ -14,7 +14,7 @@ export interface LandingStagingBuildInput {
   design: Record<string, unknown>;
 }
 
-export interface AssetsManifest {
+export type AssetsManifest = {
   version: number;
   builder: string;
   html_file: string;

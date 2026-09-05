@@ -31,6 +31,21 @@ import {
 } from "../../private-ai/adapters/OpenClawBridge";
 import { resetOperationModeForTests } from "../../agents/workforce/operationModes";
 import { indexAndEvaluateSyntheticCorpus, ragMetricsPass } from "../../private-ai/rag/syntheticCorpusIngest";
+import type { WorkforceWorkflowDef } from "../../agents/workforce/workflowCatalog";
+
+/**
+ * Que modos de ejecucion dejan a una persona en medio.
+ *
+ * Cubre la union COMPLETA de `defaultMode` a proposito: si manana aparece un
+ * modo nuevo, esto deja de compilar. Es la unica forma de que «ningun flujo
+ * actua solo» siga siendo verdad y no una frase de un comentario.
+ */
+const MODO_LLEVA_HUMANO: Record<WorkforceWorkflowDef["defaultMode"], boolean> = {
+  observe: true,
+  draft: true,
+  assisted: true,
+};
+
 
 describe("Workforce residuals — Product/DevOps/Social evals", () => {
   it("passes dedicated suites including adversarial/security", async () => {
@@ -74,9 +89,21 @@ describe("Workforce residuals — workflow catalog audit", () => {
         const a = byId.get(agentId);
         expect(a?.runtimeReady, `${w.id} agent ${agentId}`).toBe(true);
       }
-      const hasRollbackSemantics =
-        rollbackPatterns.has(w.pattern) || w.requiresHumanApproval || w.defaultMode !== "autonomous";
-      expect(hasRollbackSemantics, w.id).toBe(true);
+      // Antes esto se escribia `w.defaultMode !== "autonomous"`, y ese modo NO
+      // existe en la union: la condicion era siempre cierta y la asercion no
+      // comprobaba nada. La intencion era buena —«que no actue solo»— pero se
+      // apoyaba en una cadena que nadie validaba.
+      //
+      // Ahora la garantia es de tipos: `MODO_LLEVA_HUMANO` cubre la union
+      // ENTERA, asi que el dia que alguien anada un modo que actue sin nadie
+      // delante, este fichero deja de compilar y hay que decidir a proposito.
+      const conHumanoDetras = MODO_LLEVA_HUMANO[w.defaultMode];
+      const tieneRedDeSeguridad =
+        rollbackPatterns.has(w.pattern) || w.requiresHumanApproval || conHumanoDetras;
+      expect(
+        tieneRedDeSeguridad,
+        `${w.id} podria actuar sin vuelta atras, sin aprobacion y sin humano`,
+      ).toBe(true);
     }
   });
 
@@ -131,7 +158,6 @@ describe("Workforce residuals — OpenClaw mock + live-ready", () => {
       const out = await bridge.dispatch({
         tenantId: "t1",
         agentId: "seo",
-        correlationId: "oc-1",
         input: "audit",
         tools: ["rag.search"],
       });
@@ -144,7 +170,7 @@ describe("Workforce residuals — OpenClaw mock + live-ready", () => {
 
 describe("Workforce residuals — RAG isolation (synthetic)", () => {
   it("tenant isolation + grounding metrics pass", async () => {
-    const { metrics } = await indexAndEvaluateSyntheticCorpus({ dim: 64 });
+    const { metrics } = await indexAndEvaluateSyntheticCorpus();
     const gate = ragMetricsPass(metrics);
     expect(metrics.tenantIsolationOk).toBe(true);
     expect(gate.ok, gate.reasons?.join("; ")).toBe(true);

@@ -8,6 +8,7 @@ import {
   isLoopbackOrLocalDatabaseUrl,
   resolveLocalAiDatabaseUrl,
 } from "./railwayRagPrep";
+import type { Entorno } from "../config/entorno";
 
 export type LocalAiConfig = {
   databaseUrl: string;
@@ -51,7 +52,7 @@ function normalizarBaseUrl(valor: string): string {
   return /^[a-z][a-z0-9+.-]*:\/\//i.test(valor) ? valor : `http://${valor}`;
 }
 
-function resolveOllamaBaseUrl(env: NodeJS.ProcessEnv): string {
+function resolveOllamaBaseUrl(env: Entorno): string {
   const raw = normalizarBaseUrl(
     (
       env.OLLAMA_HOST?.trim() ||
@@ -78,7 +79,7 @@ function resolveOllamaBaseUrl(env: NodeJS.ProcessEnv): string {
   return raw;
 }
 
-export function getLocalAiConfig(env: NodeJS.ProcessEnv = process.env): LocalAiConfig {
+export function getLocalAiConfig(env: Entorno = process.env): LocalAiConfig {
   const strategyModel =
     env.OLLAMA_STRATEGY_MODEL?.trim() ||
     env.BENCHMARK_STRATEGY_MODEL?.trim() ||

@@ -139,7 +139,20 @@ export interface AutonomousProject {
   artifacts: Record<string, unknown>;
   qa: QaResult | null;
   agent_log: AgentLogEntry[];
-  simulation_mode: "phase-b-offline" | "phase-c-llm-qa";
+  /**
+   * En que modo corrio la simulacion.
+   *
+   * Las fases H e I emiten su propio modo desde hace tiempo, pero no estaban
+   * declaradas aqui: el fichero que las produce no lo miraba ningun typecheck,
+   * asi que el contrato y la realidad llevaban tiempo separados sin que nadie
+   * lo notara.
+   */
+  simulation_mode:
+    | "phase-b-offline"
+    | "phase-c-llm-qa"
+    | "phase-h"
+    | "phase-i"
+    | "phase-i-staging-deploy";
   llm_mode?: "mock" | "real";
   retry_history?: RetryHistoryEntry[];
   /** Phase E — resolved sector */

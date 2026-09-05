@@ -20,6 +20,7 @@ import {
   isMetaWaConfigured,
   getMetaVerifyToken,
 } from "../SaasWhatsAppCloudService";
+import { consultaFalsa, type Fila } from "../../db/__tests__/consultaFalsa";
 
   // La politica de coste esta ENCENDIDA por defecto y deniega el envio
   // facturable. Estas pruebas comprueban la MECANICA del envio, no la politica
@@ -33,9 +34,8 @@ afterEach(() => { delete process.env.NELVYON_MODO_COSTE_CERO; });
 const TENANT = "tenant-wa-cloud";
 const now = new Date();
 
-function makeDb(rows: Record<string, unknown>[][] = []) {
-  let call = 0;
-  return { query: vi.fn(async () => rows[call++] ?? []) };
+function makeDb(rows: Fila[][] = []) {
+  return { query: consultaFalsa(rows) };
 }
 
 function makeFetch(status: number, body: unknown) {
@@ -197,7 +197,7 @@ describe("SaasWhatsAppCloudService — configured", () => {
 
   it("processInbound updates existing conversation when found", async () => {
     inboxSendMock.mockClear();
-    inboxSendMock.mockResolvedValueOnce({ id: "msg-2", inserted: true, body: "Respuesta", direction: "inbound" });
+    inboxSendMock.mockResolvedValueOnce({ id: "msg-2", inserted: true });
     const db = makeDb([[{ id: "conv-existing" }], [], []]);
     const svc = new SaasWhatsAppCloudService(db as never);
     await svc.processInbound(TENANT, {
@@ -213,13 +213,8 @@ describe("SaasWhatsAppCloudService — configured", () => {
 
   it("processInbound skips duplicate wamid (idempotent)", async () => {
     inboxSendMock.mockClear();
-    inboxSendMock.mockResolvedValueOnce({
-      id: "msg-dup",
-      inserted: false,
-      body: "Hola",
-      direction: "inbound",
-      externalId: "wamid.dup.1",
-    });
+    // El contrato real devuelve solo `{ id, inserted }`.
+    inboxSendMock.mockResolvedValueOnce({ id: "msg-dup", inserted: false });
     const db = makeDb([[{ id: "conv-existing" }], [], []]);
     const svc = new SaasWhatsAppCloudService(db as never);
     await svc.processInbound(TENANT, {

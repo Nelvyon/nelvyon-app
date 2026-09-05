@@ -9,7 +9,15 @@ import type { StagingQaResult } from "../qa/playwrightStagingQa";
 export function buildPhaseHPublishPayload(
   project: AutonomousProject,
   preview: {
-    preview_metadata: PreviewMetadata;
+    /**
+     * La ficha de la vista previa.
+     *
+     * Fase H la acaba de generar y viene completa. Fase I la lee del disco de
+     * una ejecucion anterior, donde puede ser un esbozo. Se declaran las dos
+     * posibilidades en vez de convertir a la fuerza: la conversion no cuadraba
+     * —y por eso fallaba— porque un esbozo NO es una ficha completa.
+     */
+    preview_metadata: PreviewMetadata | Record<string, unknown>;
     qa_report: Record<string, unknown>;
     assets_manifest: Record<string, unknown>;
   },

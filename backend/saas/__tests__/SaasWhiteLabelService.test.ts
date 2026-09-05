@@ -1,22 +1,29 @@
 import { describe, it, expect, vi, beforeAll } from "vitest";
 import { SaasWhiteLabelService } from "../SaasWhiteLabelService";
+import { consultaFalsa } from "../../db/__tests__/consultaFalsa";
 
 // Provide a dummy key so stripeRequest doesn't throw NOT_CONFIGURED in unit tests
 beforeAll(() => { process.env.STRIPE_SECRET_KEY = "sk_test_unit_mock"; });
 
 type Row = Record<string, unknown>;
 
-const makeDb = (rows: Row[][] = []) => {
-  let call = 0;
-  return { query: vi.fn(async () => rows[call++] ?? []) };
-};
+const makeDb = (rows: Row[][] = []) => ({ query: consultaFalsa(rows) });
 
+// Devuelve `Response` de verdad y no un objeto con la misma pinta. El servicio
+// recibe `typeof fetch`, asi que un doble que no lo sea no encajaba —y, peor,
+// no comprobaba nada sobre como se le llama: ahora `url` e `init` van tipados.
 const makeFetch = (responses: Array<{ ok: boolean; data: unknown }>) => {
   let call = 0;
-  return vi.fn(async () => {
+  const espia = vi.fn((_url: string, _init?: RequestInit) => {});
+  const f = async (entrada: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+    espia(String(entrada), init);
     const r = responses[call++] ?? { ok: false, data: { error: { message: "fail" } } };
-    return { ok: r.ok, status: r.ok ? 200 : 400, json: async () => r.data };
-  });
+    return new Response(JSON.stringify(r.data), {
+      status: r.ok ? 200 : 400,
+      headers: { "content-type": "application/json" },
+    });
+  };
+  return Object.assign(f, espia);
 };
 
 const TENANT = "tenant-wl";

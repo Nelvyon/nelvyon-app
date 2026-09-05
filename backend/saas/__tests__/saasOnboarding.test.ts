@@ -40,7 +40,7 @@ function makeMemoryDb(opts?: { failInsertCheck?: boolean }) {
 
     if (opts?.failInsertCheck && s.startsWith("INSERT INTO saas_tenants")) {
       const err = new Error("check violation");
-      (err as { code: string }).code = "23514";
+      Object.assign(err, { code: "23514" });
       throw err;
     }
 

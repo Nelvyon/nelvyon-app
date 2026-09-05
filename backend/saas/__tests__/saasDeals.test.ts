@@ -8,6 +8,28 @@ import { GET as GET_DEALS, POST as POST_DEALS } from "../../../apps/web/src/app/
 import { GET as GET_METRICS } from "../../../apps/web/src/app/api/saas/deals/metrics/route";
 import { SaasDealsService } from "../SaasDealsService";
 
+/** El unico metodo de onboarding que tocan estas rutas. */
+const onboardingSoloConGetTenant: Partial<Onboarding.SaasOnboardingService> = {
+  getTenant: async () => ({
+    id: "tenant-1",
+    userId: "u1",
+    workspaceId: null,
+    companyName: "T",
+    industry: "saas",
+    plan: "starter",
+    website: null,
+    phone: null,
+    employees: null,
+    goals: [],
+    onboardingCompleted: true,
+    onboardingStep: 4,
+    billingStatus: "active",
+    createdAt: "",
+    updatedAt: "",
+  }),
+};
+
+
 type DealRow = {
   id: string;
   tenant_id: string;
@@ -188,18 +210,13 @@ describe("API /api/saas/deals", () => {
 
   it("POST → 201 crea deal", async () => {
     const db = makeDb();
-    vi.spyOn(Auth, "authenticate").mockResolvedValue({ userId: "u1", email: "a@test.com", role: "admin" });
-    vi.spyOn(Onboarding, "getSaasOnboardingService").mockReturnValue({
-      getTenant: async () => ({
-        id: "tenant-1",
-        userId: "u1",
-        plan: "starter",
-        companyName: "T",
-        onboardingCompleted: true,
-        createdAt: "",
-        updatedAt: "",
-      }),
-    } as ReturnType<typeof Onboarding.getSaasOnboardingService>);
+    vi.spyOn(Auth, "authenticate").mockResolvedValue({ userId: "u1", email: "a@test.com", tenantId: "tenant-1", plan: "starter" });
+    vi.spyOn(Onboarding, "getSaasOnboardingService").mockReturnValue(
+      // Una unica conversion, de `Partial` al servicio: esta prueba solo pasa
+      // por `getTenant`. El inquilino, en cambio, va COMPLETO — antes le
+      // faltaban seis campos y la conversion anterior lo tapaba.
+      onboardingSoloConGetTenant as Onboarding.SaasOnboardingService,
+    );
     vi.spyOn(Saas, "getSaasDealsService").mockReturnValue(new SaasDealsService(db));
 
     const req = new Request("https://app.test/api/saas/deals", {
@@ -215,18 +232,13 @@ describe("API /api/saas/deals", () => {
 
   it("GET metrics → 200", async () => {
     const db = makeDb();
-    vi.spyOn(Auth, "authenticate").mockResolvedValue({ userId: "u1", email: "a@test.com", role: "admin" });
-    vi.spyOn(Onboarding, "getSaasOnboardingService").mockReturnValue({
-      getTenant: async () => ({
-        id: "tenant-1",
-        userId: "u1",
-        plan: "starter",
-        companyName: "T",
-        onboardingCompleted: true,
-        createdAt: "",
-        updatedAt: "",
-      }),
-    } as ReturnType<typeof Onboarding.getSaasOnboardingService>);
+    vi.spyOn(Auth, "authenticate").mockResolvedValue({ userId: "u1", email: "a@test.com", tenantId: "tenant-1", plan: "starter" });
+    vi.spyOn(Onboarding, "getSaasOnboardingService").mockReturnValue(
+      // Una unica conversion, de `Partial` al servicio: esta prueba solo pasa
+      // por `getTenant`. El inquilino, en cambio, va COMPLETO — antes le
+      // faltaban seis campos y la conversion anterior lo tapaba.
+      onboardingSoloConGetTenant as Onboarding.SaasOnboardingService,
+    );
     vi.spyOn(Saas, "getSaasDealsService").mockReturnValue(new SaasDealsService(db));
 
     const res = await GET_METRICS(new Request("https://app.test/api/saas/deals/metrics"));

@@ -32,7 +32,7 @@ describe("validateProductionEnv", () => {
   });
 
   it("skips validation outside production", () => {
-    process.env.NODE_ENV = "development";
+    vi.stubEnv("NODE_ENV", "development");
     delete process.env.JWT_SECRET;
     const r = validateProductionEnv();
     expect(r.ok).toBe(true);

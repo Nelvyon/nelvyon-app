@@ -123,6 +123,12 @@
       ],
       "vitest": [
         "./node_modules/vitest"
+      ],
+      "@playwright/test": [
+        "./node_modules/@playwright/test"
+      ],
+      "next/server": [
+        "./node_modules/next/server"
       ]
     },
     "types": [

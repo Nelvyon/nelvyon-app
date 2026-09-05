@@ -71,8 +71,10 @@ describe("saasWorkflowDispatch sequence auto-triggers", () => {
       phone: null,
       company: null,
       position: null,
-      status: "active",
-      pipelineStage: "lead",
+      // Estaban cruzados: `ContactStatus` es lead|prospect|client|churned y
+      // `PipelineStage` es new|contacted|qualified|proposal|won|lost.
+      status: "lead",
+      pipelineStage: "new",
       value: 0,
       notes: null,
       tags: [],

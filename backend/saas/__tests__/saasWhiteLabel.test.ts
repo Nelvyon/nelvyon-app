@@ -1,8 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { SaasWhiteLabelService, saasWhiteLabelService, type WhiteLabelConfig } from "../SaasWhiteLabelService";
+import { conAjustes } from "../../__tests__/conAjustes";
 
-const cfg = (over: Partial<WhiteLabelConfig> = {}): WhiteLabelConfig => ({
+const cfg = (over: Partial<WhiteLabelConfig> = {}): WhiteLabelConfig =>
+  conAjustes<WhiteLabelConfig>({
   id: "00000000-0000-0000-0000-000000000001",
   tenantId: "tenant-1",
   agencyName: "Acme Agency",
@@ -17,8 +19,14 @@ const cfg = (over: Partial<WhiteLabelConfig> = {}): WhiteLabelConfig => ({
   active: true,
   createdAt: "2026-01-01T00:00:00.000Z",
   updatedAt: "2026-01-01T00:00:00.000Z",
-  ...over,
-});
+  // Faltaban los cinco campos de Stripe Connect. El `{ ...base, ...over }`
+  // anterior lo tapaba: la fixture llevaba tiempo sin ser una config completa.
+  stripeConnectAccountId: null,
+  stripeConnectStatus: "not_connected",
+  stripeChargesEnabled: false,
+  stripePayoutsEnabled: false,
+  stripeConnectOnboardedAt: null,
+  }, over);
 
 describe("SaasWhiteLabelService", () => {
   it("getConfig devuelve config existente", async () => {

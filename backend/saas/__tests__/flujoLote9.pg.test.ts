@@ -55,15 +55,20 @@ function puerto() {
 // ════════════════════════════════════════════════════════════════════════════
 
 describe("BLOQUE 2 · portal de cliente", () => {
-  const carga = { deliverableId: "e1", tenantId: A, clientEmail: "cliente@final.test" };
+  // La carga REAL del token: `did` (entregable), `wid` (espacio), `cid`
+  // (cliente) y `act`. Antes se firmaba `{ deliverableId, tenantId, clientEmail }`
+  // con un `as never` que tapaba la discrepancia entera — y como este bloque
+  // solo corre con base de datos, nadie llego a ver que `payload.tenantId`
+  // habria sido `undefined`.
+  const carga = { did: "e1", wid: 16, cid: A, act: "approve" as const };
 
   it("EL CONTROL: un token recién firmado verifica y trae su carga", () => {
     // Sin esto, una verificación que rechazara todo aprobaría las pruebas de
     // abajo y dejaría el portal inservible: nadie podría aprobar nada.
-    const t = signPortalApprovalToken(carga as never);
+    const t = signPortalApprovalToken(carga);
     const r = verifyPortalApprovalToken(t);
     expect(r.ok).toBe(true);
-    expect(r.ok && r.payload.tenantId).toBe(A);
+    expect(r.ok && r.payload.cid).toBe(A);
   });
 
   it("un token inventado no verifica", () => {
@@ -73,10 +78,10 @@ describe("BLOQUE 2 · portal de cliente", () => {
   it("cambiar la CARGA invalida la firma", () => {
     // El ataque evidente: coger un token propio y cambiarle el inquilino o el
     // entregable para aprobar el de otro.
-    const t = signPortalApprovalToken(carga as never);
+    const t = signPortalApprovalToken(carga);
     const [datos, firma] = t.split(".");
     const manipulada = Buffer.from(
-      JSON.stringify({ ...carga, tenantId: B, exp: 9_999_999_999 }),
+      JSON.stringify({ ...carga, cid: B, exp: 9_999_999_999 }),
     ).toString("base64url");
 
     expect(verifyPortalApprovalToken(`${manipulada}.${firma}`).ok).toBe(false);
@@ -84,7 +89,7 @@ describe("BLOQUE 2 · portal de cliente", () => {
   });
 
   it("cambiar la FIRMA tampoco cuela", () => {
-    const t = signPortalApprovalToken(carga as never);
+    const t = signPortalApprovalToken(carga);
     const [datos] = t.split(".");
     expect(verifyPortalApprovalToken(`${datos}.firmainventada`).ok).toBe(false);
   });
@@ -92,7 +97,7 @@ describe("BLOQUE 2 · portal de cliente", () => {
   it("un token CADUCADO se rechaza, y lo dice", () => {
     // Un enlace de aprobación que no caduca es una puerta abierta para siempre
     // en el correo de alguien.
-    const t = signPortalApprovalToken(carga as never, -1);
+    const t = signPortalApprovalToken(carga, -1);
     const r = verifyPortalApprovalToken(t);
     expect(r.ok).toBe(false);
     expect(r.ok === false && r.error).toBe("expired");
@@ -107,7 +112,7 @@ describe("BLOQUE 2 · portal de cliente", () => {
   it("el hash del token no es el token", () => {
     // Lo que se guarda para poder revocar es el hash: guardar el token entero
     // sería guardar la llave junto a la cerradura.
-    const t = signPortalApprovalToken(carga as never);
+    const t = signPortalApprovalToken(carga);
     const h = hashApprovalToken(t);
     expect(h).not.toBe(t);
     expect(h).toHaveLength(64);                 // sha256 en hexadecimal
@@ -115,12 +120,12 @@ describe("BLOQUE 2 · portal de cliente", () => {
   });
 
   it("dos tokens del mismo entregable no son iguales entre inquilinos", () => {
-    const deA = signPortalApprovalToken({ ...carga, tenantId: A } as never);
-    const deB = signPortalApprovalToken({ ...carga, tenantId: B } as never);
+    const deA = signPortalApprovalToken({ ...carga, cid: A });
+    const deB = signPortalApprovalToken({ ...carga, cid: B });
     expect(deA).not.toBe(deB);
 
     const rB = verifyPortalApprovalToken(deB);
-    expect(rB.ok && rB.payload.tenantId).toBe(B);
+    expect(rB.ok && rB.payload.cid).toBe(B);
   });
 });
 

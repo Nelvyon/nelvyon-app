@@ -29,7 +29,7 @@ function meta(partial: Partial<RouterExecutionMeta> & Pick<RouterExecutionMeta, 
 
 describe("routerLatencyMetrics", () => {
   it("classifies strategy vs fast_rag vs fast_simple", () => {
-    expect(classifyLatencyBucket(meta({ taskType: "strategy", initialModel: "llama3.1:8b-instruct-q4_K_M" }))).toBe(
+    expect(classifyLatencyBucket(meta({ durationMs: 1_000, taskType: "strategy", initialModel: "llama3.1:8b-instruct-q4_K_M" }))).toBe(
       "strategy",
     );
     expect(classifyLatencyBucket(meta({ durationMs: 1, ragSources: ["a"] }))).toBe("fast_rag");

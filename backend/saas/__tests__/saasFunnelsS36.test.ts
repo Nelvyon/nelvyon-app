@@ -199,7 +199,7 @@ describe("SaasFunnelService.recordEvent", () => {
     const db = makeDb();
     const svc = new SaasFunnelService(db as never);
     await svc.recordEvent("t1", { funnelId: "f1", stepId: "s1", eventType: "visit" });
-    const updateCalls = db.query.mock.calls.filter((c: [string]) =>
+    const updateCalls = db.query.mock.calls.filter((c) =>
       c[0].includes("UPDATE saas_funnel_steps"),
     );
     expect(updateCalls.length).toBeGreaterThan(0);
@@ -209,7 +209,7 @@ describe("SaasFunnelService.recordEvent", () => {
     const db = makeDb();
     const svc = new SaasFunnelService(db as never);
     await svc.recordEvent("t1", { funnelId: "f1", stepId: "s1", eventType: "conversion" });
-    const updateCalls = db.query.mock.calls.filter((c: [string]) =>
+    const updateCalls = db.query.mock.calls.filter((c) =>
       c[0].includes("UPDATE saas_funnel_steps"),
     );
     expect(updateCalls.length).toBeGreaterThan(0);
@@ -221,7 +221,7 @@ describe("SaasFunnelService.recordEvent", () => {
     await svc.recordEvent("t1", {
       funnelId: "f1", stepId: "s1", variantKey: "A", eventType: "visit",
     });
-    const variantUpdate = db.query.mock.calls.filter((c: [string]) =>
+    const variantUpdate = db.query.mock.calls.filter((c) =>
       c[0].includes("UPDATE saas_funnel_step_variants"),
     );
     expect(variantUpdate.length).toBeGreaterThan(0);
@@ -280,7 +280,7 @@ describe("SaasFunnelService.publish v2", () => {
     const db = makeDb({ steps: [stepRow1, checkoutStep] });
     const svc = new SaasFunnelService(db as never);
     await svc.publish("t1", "f1");
-    const updateCall = db.query.mock.calls.find((c: [string]) =>
+    const updateCall = db.query.mock.calls.find((c) =>
       c[0].includes("UPDATE saas_funnels") && c[0].includes("public_slug"),
     );
     expect(updateCall).toBeDefined();
@@ -290,7 +290,7 @@ describe("SaasFunnelService.publish v2", () => {
     const db = makeDb({ funnels: [{ ...funnelRow, public_slug: null }] });
     const svc = new SaasFunnelService(db as never);
     await svc.publish("t1", "f1");
-    const updateCall = db.query.mock.calls.find((c: [string]) =>
+    const updateCall = db.query.mock.calls.find((c) =>
       c[0].includes("UPDATE saas_funnels") && c[0].includes("public_slug"),
     );
     expect(updateCall).toBeDefined();
@@ -303,7 +303,7 @@ describe("SaasFunnelService.publish v2", () => {
     const db = makeDb({ funnels: [{ ...funnelRow, public_slug: "existing-slug-xyz" }] });
     const svc = new SaasFunnelService(db as never);
     await svc.publish("t1", "f1");
-    const updateCall = db.query.mock.calls.find((c: [string]) =>
+    const updateCall = db.query.mock.calls.find((c) =>
       c[0].includes("UPDATE saas_funnels") && c[0].includes("public_slug"),
     );
     const params = updateCall![1] as string[];

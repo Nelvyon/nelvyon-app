@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { Entorno } from "../../config/entorno";
 
 /**
  * STT, imagen y TTS no pueden salir a proveedores externos por el mero hecho de
@@ -16,7 +17,7 @@ import {
 } from "../mediaCapabilities";
 
 const CAPS: MediaCapability[] = ["stt", "image", "tts"];
-const VACIO = {} as NodeJS.ProcessEnv;
+const VACIO = {} as Entorno;
 
 describe("sin ninguna variable configurada", () => {
   it.each(CAPS)("%s queda NOT_CONFIGURED", (cap) => {
@@ -36,17 +37,17 @@ describe("sin ninguna variable configurada", () => {
 
 describe("una clave externa suelta NO activa el proveedor externo", () => {
   it("OPENAI_API_KEY no habilita Whisper", () => {
-    const env = { OPENAI_API_KEY: "sk-x" } as NodeJS.ProcessEnv;
+    const env = { OPENAI_API_KEY: "sk-x" } as Entorno;
     expect(resolveMediaProvider("stt", env).kind).toBe("not_configured");
   });
 
   it("OPENAI_API_KEY + MIDJOURNEY_API_KEY no habilitan imagen", () => {
-    const env = { OPENAI_API_KEY: "sk-x", MIDJOURNEY_API_KEY: "mj-x" } as NodeJS.ProcessEnv;
+    const env = { OPENAI_API_KEY: "sk-x", MIDJOURNEY_API_KEY: "mj-x" } as Entorno;
     expect(resolveMediaProvider("image", env).kind).toBe("not_configured");
   });
 
   it("ELEVENLABS_API_KEY no habilita TTS", () => {
-    const env = { ELEVENLABS_API_KEY: "el-x" } as NodeJS.ProcessEnv;
+    const env = { ELEVENLABS_API_KEY: "el-x" } as Entorno;
     expect(resolveMediaProvider("tts", env).kind).toBe("not_configured");
   });
 });
@@ -57,7 +58,7 @@ describe("proveedor local de NELVYON", () => {
     ["image", "NELVYON_IMAGE_URL"],
     ["tts", "NELVYON_TTS_URL"],
   ] as const)("%s usa el proveedor local cuando está configurado", (cap, envName) => {
-    const env = { [envName]: "http://127.0.0.1:9000/" } as unknown as NodeJS.ProcessEnv;
+    const env = { [envName]: "http://127.0.0.1:9000/" } as unknown as Entorno;
     const p = resolveMediaProvider(cap, env);
     expect(p.kind).toBe("local");
     if (p.kind === "local") expect(p.baseUrl).toBe("http://127.0.0.1:9000");
@@ -69,14 +70,14 @@ describe("proveedor local de NELVYON", () => {
       NELVYON_STT_URL: "http://127.0.0.1:9000",
       NELVYON_ALLOW_EXTERNAL_MEDIA: "1",
       OPENAI_API_KEY: "sk-x",
-    } as NodeJS.ProcessEnv;
+    } as Entorno;
     expect(resolveMediaProvider("stt", env).kind).toBe("local");
   });
 });
 
 describe("doble opt-in explícito para proveedores externos", () => {
   it("el interruptor solo no basta: hace falta la clave", () => {
-    const env = { NELVYON_ALLOW_EXTERNAL_MEDIA: "1" } as NodeJS.ProcessEnv;
+    const env = { NELVYON_ALLOW_EXTERNAL_MEDIA: "1" } as Entorno;
     expect(externalMediaAllowed(env)).toBe(true);
     expect(resolveMediaProvider("stt", env).kind).toBe("not_configured");
   });
@@ -85,7 +86,7 @@ describe("doble opt-in explícito para proveedores externos", () => {
     const env = {
       NELVYON_ALLOW_EXTERNAL_MEDIA: "1",
       OPENAI_API_KEY: "sk-x",
-    } as NodeJS.ProcessEnv;
+    } as Entorno;
     const p = resolveMediaProvider("stt", env);
     expect(p.kind).toBe("external");
     if (p.kind === "external") expect(p.id).toBe("openai-whisper");
@@ -97,7 +98,7 @@ describe("doble opt-in explícito para proveedores externos", () => {
       const env = {
         NELVYON_ALLOW_EXTERNAL_MEDIA: v,
         ELEVENLABS_API_KEY: "el-x",
-      } as NodeJS.ProcessEnv;
+      } as Entorno;
       expect(resolveMediaProvider("tts", env).kind).toBe("not_configured");
     }
   });

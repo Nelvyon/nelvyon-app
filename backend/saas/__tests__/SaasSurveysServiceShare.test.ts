@@ -4,7 +4,12 @@ import { SaasSurveysService } from "../SaasSurveysService";
 type QueryFn = (sql: string, params?: unknown[]) => Promise<unknown[]>;
 
 function makeSvc(queryFn: QueryFn) {
-  return new SaasSurveysService({ db: { query: queryFn } as Parameters<typeof SaasSurveysService.prototype.constructor>[0]["db"] });
+  // `DbClient.query` es generico y un doble no puede saber el tipo que pidio
+  // quien llama. Se adapta aqui, sin convertir el objeto entero, para que `sql`
+  // y `params` sigan comprobandose.
+  const query = async <T,>(sql: string, params?: unknown[]): Promise<T[]> =>
+    (await queryFn(sql, params)) as T[];
+  return new SaasSurveysService({ db: { query } });
 }
 
 const TENANT = "tenant-abc";

@@ -190,8 +190,10 @@ export function evaluateResponse(testCase: BenchmarkCase, response: string): Res
   }
 
   // Penalize refusal when not adversarial and not missing-info case
+  // Sin `difficulty !== "adversarial"`: la funcion ya vuelve arriba en ese caso,
+  // asi que aqui la condicion era siempre cierta y solo hacia creer que este
+  // camino cubria un caso que nunca lo pisa.
   if (
-    testCase.difficulty !== "adversarial" &&
     !testCase.id.includes("missing") &&
     /no tengo (suficiente )?informacion|no puedo proporcionar una respuesta|no puedo responder con precision/i.test(
       normalizeForMatch(response),

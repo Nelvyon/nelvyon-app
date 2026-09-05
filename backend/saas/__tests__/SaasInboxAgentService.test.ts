@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 
 import { pickSkillForMessage, resolveSkillsForChannel } from "../nelvyonAgentSkillsCatalog";
 import { SaasInboxAgentService } from "../SaasInboxAgentService";
+import { consultaFalsaCon } from "../../db/__tests__/consultaFalsa";
 
 const TENANT = "t-agent-1";
 
@@ -54,7 +55,7 @@ describe("nelvyonAgentSkillsCatalog", () => {
 describe("SaasInboxAgentService", () => {
   it("suggestReply uses mock when LLM off", async () => {
     const db = {
-      query: vi.fn(async (sql: string) => {
+      query: consultaFalsaCon((sql) => {
         if (sql.includes("saas_inbox_agent_settings")) {
           return [
             {
@@ -92,7 +93,7 @@ describe("SaasInboxAgentService", () => {
 
   it("handleInbound escalates on legal keywords", async () => {
     const db = {
-      query: vi.fn(async (sql: string) => {
+      query: consultaFalsaCon((sql) => {
         if (sql.includes("saas_inbox_agent_settings")) {
           return [
             {
@@ -130,7 +131,7 @@ describe("SaasInboxAgentService", () => {
 
   it("handleInbound never auto-replies when suggestion is mock", async () => {
     const db = {
-      query: vi.fn(async (sql: string) => {
+      query: consultaFalsaCon((sql) => {
         if (sql.includes("saas_inbox_agent_settings")) {
           return [
             {

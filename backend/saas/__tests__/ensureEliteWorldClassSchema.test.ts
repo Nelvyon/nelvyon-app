@@ -1,11 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { ensureEliteWorldClassSchema, resetEliteWorldClassSchemaForTests } from "../ensureEliteWorldClassSchema";
+import { consultaFalsaCon } from "../../db/__tests__/consultaFalsa";
 
 describe("ensureEliteWorldClassSchema", () => {
   it("runs DDL once per process", async () => {
     resetEliteWorldClassSchemaForTests();
-    const query = vi.fn(async (sql: string) => {
+    const query = consultaFalsaCon((sql) => {
       if (sql.includes("information_schema")) return [{ ok: true }];
       return [];
     });

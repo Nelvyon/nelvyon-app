@@ -18,6 +18,27 @@ import { POST as POST_EXECUTE } from "../../../apps/web/src/app/api/saas/workflo
 import { SaasCrmService } from "../SaasCrmService";
 import { SaasWorkflowService } from "../SaasWorkflowService";
 
+/**
+ * El CRM que este bloque NO usa.
+ *
+ * `SaasWorkflowService` lo exige desde hace tiempo y estas pruebas seguian
+ * construyendolo con un solo argumento. Se pasa un doble que REVIENTA si alguien
+ * lo llama: si un dia el flujo empieza a tocar el CRM, esta prueba lo dice en
+ * vez de seguir en verde con un `undefined` por dentro.
+ */
+const crmNoUsado: Pick<SaasCrmService, "updateContact" | "addActivity" | "getContact"> = {
+  updateContact: () => {
+    throw new Error("el CRM no deberia usarse en esta prueba");
+  },
+  addActivity: () => {
+    throw new Error("el CRM no deberia usarse en esta prueba");
+  },
+  getContact: () => {
+    throw new Error("el CRM no deberia usarse en esta prueba");
+  },
+};
+
+
 type WorkflowRow = {
   id: string;
   tenant_id: string;
@@ -74,7 +95,7 @@ function makeDb() {
       const trigger = String(p[4]);
       if (!["draft", "active", "paused", "archived"].includes(status) || !["contact_created", "contact_updated", "stage_changed", "deal_stage_changed", "job_completed", "manual", "scheduled"].includes(trigger)) {
         const e = new Error("check");
-        (e as { code: string }).code = "23514";
+        Object.assign(e, { code: "23514" });
         throw e;
       }
       const row: WorkflowRow = {
@@ -189,7 +210,7 @@ describe("SaasWorkflowService", () => {
 
   it("createWorkflow serializa jsonb con JSON.stringify", async () => {
     const db = makeDb();
-    const svc = new SaasWorkflowService(db);
+    const svc = new SaasWorkflowService(db, crmNoUsado);
     const wf = await svc.createWorkflow("t1", {
       name: "WF",
       triggerType: "manual",

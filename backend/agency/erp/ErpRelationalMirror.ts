@@ -8,6 +8,7 @@
 import type pg from "pg";
 import type { ErpDomain } from "./ErpDomainSnapshotStore";
 import { isErpRelationalDualWriteEnabled } from "./erpRelationalFlags";
+import type { Entorno } from "../../config/entorno";
 
 type Rec = Record<string, unknown>;
 
@@ -31,7 +32,7 @@ export async function mirrorErpDomainToRelational(
   tenantId: string,
   domain: ErpDomain,
   payload: object,
-  env: NodeJS.ProcessEnv = process.env,
+  env: Entorno = process.env,
 ): Promise<{ mirrored: boolean; entities: number }> {
   if (!isErpRelationalDualWriteEnabled(env)) {
     return { mirrored: false, entities: 0 };

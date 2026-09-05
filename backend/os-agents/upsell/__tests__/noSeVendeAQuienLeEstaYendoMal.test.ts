@@ -26,6 +26,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { OsUpsellEngine } from "../OsUpsellEngine";
+import { consultaFalsaCon } from "../../../db/__tests__/consultaFalsa";
 
 const CLI = "3f1a2b4c-5d6e-4f70-8a91-b2c3d4e5f607";
 const TEN = "9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d";
@@ -47,7 +48,7 @@ vi.mock("../../../portal/CicloDelClienteService", () => ({
 /** Base que responde por forma a las consultas del motor. */
 function baseCon(opciones: { workspace?: number | null; catalogo?: boolean } = {}) {
   const { workspace = 7, catalogo = true } = opciones;
-  return vi.fn(async (sql: string) => {
+  return consultaFalsaCon((sql) => {
     const s = String(sql).replace(/\s+/g, " ");
     if (s.includes("FROM os_clients")) {
       return workspace === null ? [] : [{ workspace_id: workspace }];

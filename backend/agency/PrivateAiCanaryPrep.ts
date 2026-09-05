@@ -14,6 +14,7 @@
  */
 
 import { assertOllamaHostSafeForRuntime } from "../local-ai/OllamaRuntimePrep";
+import type { Entorno } from "../config/entorno";
 
 export type PrivateAiCanaryChecklistItemId =
   | "local_models_only"
@@ -130,7 +131,7 @@ export function isProductionCanaryAuthorized(): boolean {
 
 /** Runtime gate for production inference canary (fail-closed). */
 export function assertPrivateAiProdCanaryRuntimeAllowed(
-  env: NodeJS.ProcessEnv = process.env,
+  env: Entorno = process.env,
 ): void {
   if (!isProductionDeployEnv(env)) return;
   if (!isProductionCanaryAuthorized()) {
@@ -162,7 +163,7 @@ export function assertPrivateAiProdCanaryRuntimeAllowed(
   }
 }
 
-function isProductionDeployEnv(env: NodeJS.ProcessEnv): boolean {
+function isProductionDeployEnv(env: Entorno): boolean {
   const explicit = (env.NELVYON_DEPLOY_ENV ?? "").trim().toLowerCase();
   if (explicit === "production" || explicit === "prod") return true;
   if (explicit === "staging" || explicit === "development" || explicit === "dev" || explicit === "test") {

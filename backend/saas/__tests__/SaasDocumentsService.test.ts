@@ -1,8 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
 import { SaasDocumentsService } from "../SaasDocumentsService";
+import { consultaFalsa } from "../../db/__tests__/consultaFalsa";
 
 type Row = Record<string, unknown>;
-const makeDb = (rows: Row[][] = []) => { let c = 0; return { query: vi.fn(async () => rows[c++] ?? []) }; };
+const makeDb = (rows: Row[][] = []) => ({ query: consultaFalsa(rows) });
 const TENANT = "tenant-docs";
 
 const baseDoc: Row = {

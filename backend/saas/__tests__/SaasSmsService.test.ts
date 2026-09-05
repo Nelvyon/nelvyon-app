@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { SaasSmsService } from "../SaasSmsService";
+import { consultaFalsa, type Fila } from "../../db/__tests__/consultaFalsa";
 
   // La politica de coste esta ENCENDIDA por defecto y deniega el envio
   // facturable. Estas pruebas comprueban la MECANICA del envio, no la politica
@@ -13,7 +14,7 @@ afterEach(() => { delete process.env.NELVYON_MODO_COSTE_CERO; });
 const TENANT = "tenant-sms";
 
 function makeDb() {
-  return { query: vi.fn(async () => []) };
+  return { query: consultaFalsa() };
 }
 
 describe("SaasSmsService", () => {
@@ -119,10 +120,10 @@ describe("SaasSmsService", () => {
 
   it("listRecent maps log rows to camelCase entries ordered by the DB query", async () => {
     const db = {
-      query: vi.fn(async () => [
+      query: consultaFalsa([[
         { id: "log-2", to_number: "+34600000002", body: "Hi", twilio_sid: "SM2", status: "sent", created_at: "2026-07-01T10:00:00Z" },
         { id: "log-1", to_number: "+34600000001", body: "Hello", twilio_sid: null, status: "failed", created_at: "2026-06-30T10:00:00Z" },
-      ]),
+      ]]),
     };
     const svc = new SaasSmsService(db);
     const rows = await svc.listRecent(TENANT, 10);

@@ -39,7 +39,13 @@ export type UserDataExport = {
 };
 
 export class DataSubjectService {
-  constructor(private readonly db: DbClient) {}
+  /**
+   * Solo se usa `query`. Declararlo asi —y no `DbClient` entero— es la verdad:
+   * este servicio no abre transacciones ni cierra el pool. Exigir la clase
+   * completa obligaba a las pruebas a fabricar `pool`, `withTransaction` y
+   * `end` que nadie llama.
+   */
+  constructor(private readonly db: Pick<DbClient, "query">) {}
 
   static getInstance(): DataSubjectService {
     return new DataSubjectService(DbClientSingleton.getInstance());
@@ -344,7 +350,7 @@ function esObjetoAusente(e: unknown): boolean {
   return OBJETO_AUSENTE.has(String((e as { code?: string })?.code ?? ""));
 }
 
-async function tryQuery(db: DbClient, sql: string, params: unknown[]): Promise<unknown[]> {
+async function tryQuery(db: Pick<DbClient, "query">, sql: string, params: unknown[]): Promise<unknown[]> {
   try {
     return await db.query(sql, params);
   } catch (e) {
@@ -356,7 +362,7 @@ async function tryQuery(db: DbClient, sql: string, params: unknown[]): Promise<u
   }
 }
 
-async function tryExec(db: DbClient, sql: string, params: unknown[]): Promise<void> {
+async function tryExec(db: Pick<DbClient, "query">, sql: string, params: unknown[]): Promise<void> {
   try {
     await db.query(sql, params);
   } catch (e) {

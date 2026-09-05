@@ -300,7 +300,14 @@ function coreDocs(): KnowledgeSourceEntry[] {
 function classifiedTopLevelDocs(): KnowledgeSourceEntry[] {
   const out: KnowledgeSourceEntry[] = [];
   for (const c of indexClassifications()) {
-    const domains = Array.isArray(c.domain) ? c.domain : c.domain ? [c.domain] : ["nelvyon"];
+    // Anotado: sin el tipo, el `["nelvyon"]` de reserva se infiere como
+    // `string[]` y ensancha toda la expresion, perdiendo la comprobacion de
+    // que cada dominio existe de verdad.
+    const domains: KnowledgeDomainId[] = Array.isArray(c.domain)
+      ? c.domain
+      : c.domain
+        ? [c.domain]
+        : ["nelvyon"];
     const priority = (c.priority ?? 1) as 0 | 1 | 2 | 3;
     const title = c.title ?? c.path;
     const sourceType = c.sourceType ?? "official_doc";

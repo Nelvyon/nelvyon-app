@@ -49,7 +49,7 @@ const nextConfig: NextConfig = {
     /**
      * EL BUILD SE QUEDABA SIN MEMORIA CON EL TOPE QUE USA EL DESPLIEGUE.
      *
-     * `Dockerfile` y `build:prod` fijan `--max-old-space-size=4096`. Con el
+     * `Dockerfile` y `build:prod` fijan `--max-old-space-size` (hoy 6144). Con el
      * arbol de esta tanda, la fase de compilacion tocaba techo a los ~215 s con
      * el heap en 3.975 MB de 4.142 y moria con «Ineffective mark-compacts».
      * Reproducido en la condicion EXACTA del despliegue —node:20-alpine, el
@@ -64,7 +64,31 @@ const nextConfig: NextConfig = {
      * Esta opcion es la palanca que Next ofrece para exactamente esto: libera
      * antes las estructuras intermedias de webpack a cambio de algo mas de
      * tiempo de compilacion. NO sube ningun limite ni pide mas recursos: el
-     * build sigue cabiendo en los 4.096 MB que ya habia.
+     * build cabe en el techo ya fijado, sin pedir un contenedor mayor.
+     */
+    /*
+     * NOTA SOBRE EL TECHO, 2026-09-04.
+     *
+     * El heap estuvo en 5120 porque se eligio como «el MINIMO medido»: el valor
+     * mas bajo que compilaba. Eso dejaba cero margen, y se agoto solo: con
+     * +146 KB de codigo (0,56% del grafo) el build paso a fallar 4 de 4 veces
+     * en el MISMO commit que semanas antes compilaba.
+     *
+     * Medido de nuevo, en el contenedor real:
+     *
+     *     4096   falla
+     *     5120   falla 4/4
+     *     5632   compila en 6,4 min
+     *     6144   compila en 5,3 min
+     *
+     * Se elige 6144 y no 5632, que tambien pasa. La diferencia no es el
+     * resultado sino el ESFUERZO: mismo trabajo, +21% de tiempo de compilacion
+     * a 5632, que es lo que cuesta un recolector de basura trabajando al borde.
+     * Esa es exactamente la firma que precedio al fallo de hoy, y elegir otra
+     * vez el minimo seria repetir la misma lección.
+     *
+     * No es mas coste: `--max-old-space-size` no compra memoria, dice cuanta
+     * puede usar Node de la que el builder YA tiene.
      */
     webpackMemoryOptimizations: true,
 
@@ -86,7 +110,7 @@ const nextConfig: NextConfig = {
      * lo vuelve necesario—.
      *
      * Cuesta algo mas de tiempo de compilacion. No cuesta memoria ni recursos:
-     * sigue cabiendo en los 4.096 MB que ya habia.
+     * cabe en el techo ya fijado, sin pedir un contenedor mayor.
      */
     webpackBuildWorker: true,
 

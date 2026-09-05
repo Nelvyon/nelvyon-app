@@ -9,7 +9,7 @@ describe("OllamaRuntimePrep fail-closed", () => {
     delete process.env.OLLAMA_HOST;
     delete process.env.OLLAMA_BASE_URL;
     delete process.env.RAILWAY_ENVIRONMENT;
-    delete process.env.NODE_ENV;
+    vi.stubEnv("NODE_ENV", undefined);
     delete process.env.AUTONOMOUS_QUALITY_ROUTING;
   });
 

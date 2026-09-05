@@ -23,7 +23,7 @@ afterEach(() => {
 
 describe("BLOQUE 3 · marca de origen", () => {
   beforeEach(() => {
-    process.env.NODE_ENV = "production";
+    vi.stubEnv("NODE_ENV", "production");
   });
 
   it("EL CONTROL: un texto largo en producción se marca", () => {
@@ -47,7 +47,7 @@ describe("BLOQUE 3 · marca de origen", () => {
   });
 
   it("fuera de producción no se marca, para no ensuciar las pruebas", () => {
-    process.env.NODE_ENV = "test";
+    vi.stubEnv("NODE_ENV", "test");
     const t = "x".repeat(200);
     expect(embedTextWatermark(t)).toBe(t);
   });

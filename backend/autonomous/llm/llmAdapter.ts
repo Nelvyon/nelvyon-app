@@ -97,6 +97,21 @@ export interface LlmResponse {
 
 export type LlmInvokeFn = (req: LlmRequest) => Promise<LlmResponse>;
 
+/**
+ * Lo que puede devolver un doble inyectado con `setLlmInvokeForTests`.
+ *
+ * `provenance` es OPCIONAL aqui a proposito, y no es una relajacion: unas lineas
+ * mas abajo, `normalizarRespuesta` la completa precisamente para que una prueba
+ * no tenga que inventarse de donde salio una respuesta que ella misma fabrica.
+ * El tipo estaba exigiendo algo que el adaptador ya sabia resolver, y por eso
+ * nueve dobles legitimos no compilaban.
+ *
+ * Lo que SALE de `invokeLlm` sigue llevando `provenance` siempre.
+ */
+export type LlmInvokeFnDePrueba = (
+  req: LlmRequest,
+) => Promise<Omit<LlmResponse, "provenance"> & { provenance?: LlmProvenance }>;
+
 export class LlmSinModeloRealError extends Error {
   constructor(
     readonly provenance: LlmProvenance,
@@ -107,9 +122,9 @@ export class LlmSinModeloRealError extends Error {
   }
 }
 
-let customInvoke: LlmInvokeFn | null = null;
+let customInvoke: LlmInvokeFnDePrueba | null = null;
 
-export function setLlmInvokeForTests(fn: LlmInvokeFn | null): void {
+export function setLlmInvokeForTests(fn: LlmInvokeFnDePrueba | null): void {
   customInvoke = fn;
 }
 
@@ -365,8 +380,13 @@ async function intentarProveedor(
  * cualquier doble de `setLlmInvokeForTests` devolveria `provenance: undefined`
  * y quien lo lea aguas abajo trataria "no lo se" como "no hubo degradacion".
  */
-function normalizarRespuesta(req: LlmRequest, res: LlmResponse): LlmResponse {
-  if (res.provenance) return res;
+function normalizarRespuesta(
+  req: LlmRequest,
+  res: Omit<LlmResponse, "provenance"> & { provenance?: LlmProvenance },
+): LlmResponse {
+  // Se reconstruye en vez de devolver `res` tal cual: `Omit<..., "provenance">`
+  // no vuelve a ser un `LlmResponse` solo por comprobar el campo.
+  if (res.provenance) return { ...res, provenance: res.provenance };
   const real = res.mode === "real";
   return {
     ...res,

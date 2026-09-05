@@ -72,7 +72,7 @@ describe("SaasWebBuilderService.reorderSections", () => {
     const db = makeDb({ pages: [{ ...pageRow, sections: [s1, s2] }] });
     const svc = new SaasWebBuilderService(db as never);
     await svc.reorderSections("t1", "p1", ["sec-2", "sec-1"]);
-    const updateCall = db.query.mock.calls.find((c: [string]) => c[0].includes("UPDATE saas_web_pages") && c[0].includes("sections"));
+    const updateCall = db.query.mock.calls.find((c) => c[0].includes("UPDATE saas_web_pages") && c[0].includes("sections"));
     expect(updateCall).toBeDefined();
   });
 
@@ -98,7 +98,7 @@ describe("SaasWebBuilderService.addSection", () => {
     const db = makeDb();
     const svc = new SaasWebBuilderService(db as never);
     await svc.addSection("t1", "p1", { type: "hero" });
-    const updateCall = db.query.mock.calls.find((c: [string]) => c[0].includes("UPDATE saas_web_pages") && c[0].includes("sections"));
+    const updateCall = db.query.mock.calls.find((c) => c[0].includes("UPDATE saas_web_pages") && c[0].includes("sections"));
     expect(updateCall).toBeDefined();
     const sectionsParam = (updateCall![1] as string[])[2];
     const sections = JSON.parse(sectionsParam) as { type: string }[];
@@ -109,7 +109,7 @@ describe("SaasWebBuilderService.addSection", () => {
     const db = makeDb({ pages: [{ ...pageRow, sections: [s1, s3] }] });
     const svc = new SaasWebBuilderService(db as never);
     await svc.addSection("t1", "p1", { type: "text", atIndex: 1 });
-    const updateCall = db.query.mock.calls.find((c: [string]) => c[0].includes("UPDATE saas_web_pages") && c[0].includes("sections"));
+    const updateCall = db.query.mock.calls.find((c) => c[0].includes("UPDATE saas_web_pages") && c[0].includes("sections"));
     const sectionsParam = (updateCall![1] as string[])[2];
     const sections = JSON.parse(sectionsParam) as { type: string }[];
     expect(sections[1]!.type).toBe("text");
@@ -138,7 +138,7 @@ describe("SaasWebBuilderService.deleteSection", () => {
     const db = makeDb({ pages: [{ ...pageRow, sections: [s1, s2, s3] }] });
     const svc = new SaasWebBuilderService(db as never);
     await svc.deleteSection("t1", "p1", "sec-2");
-    const updateCall = db.query.mock.calls.find((c: [string]) => c[0].includes("UPDATE saas_web_pages") && c[0].includes("sections"));
+    const updateCall = db.query.mock.calls.find((c) => c[0].includes("UPDATE saas_web_pages") && c[0].includes("sections"));
     const sections = JSON.parse((updateCall![1] as string[])[2]) as { id: string }[];
     expect(sections.find(s => s.id === "sec-2")).toBeUndefined();
     expect(sections).toHaveLength(2);
@@ -205,7 +205,7 @@ describe("SaasWebBuilderService.restoreVersion", () => {
     const db = makeDb({ versions: [versionRow] });
     const svc = new SaasWebBuilderService(db as never);
     await svc.restoreVersion("t1", "p1", "v1");
-    const updateCall = db.query.mock.calls.find((c: [string]) =>
+    const updateCall = db.query.mock.calls.find((c) =>
       c[0].includes("UPDATE saas_web_pages") && c[0].includes("sections"),
     );
     expect(updateCall).toBeDefined();
@@ -308,7 +308,7 @@ describe("SaasWebBuilderService.getPublicPage", () => {
     const db = makeDb({ pages: [{ ...pageRow, status: "published" }] });
     const svc = new SaasWebBuilderService(db as never);
     await svc.getPublicPage("myco", "test-page");
-    const joinCall = db.query.mock.calls.find((c: [string]) =>
+    const joinCall = db.query.mock.calls.find((c) =>
       c[0].includes("JOIN saas_tenants"),
     );
     expect(joinCall).toBeDefined();
@@ -338,7 +338,7 @@ describe("SaasWebBuilderService.recordView", () => {
     const db = makeDb();
     const svc = new SaasWebBuilderService(db as never);
     await svc.recordView("myco", "test-page");
-    const updateCall = db.query.mock.calls.find((c: [string]) =>
+    const updateCall = db.query.mock.calls.find((c) =>
       c[0].includes("views") && c[0].includes("UPDATE"),
     );
     expect(updateCall).toBeDefined();

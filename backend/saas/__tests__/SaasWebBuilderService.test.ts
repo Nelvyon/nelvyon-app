@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { SaasWebBuilderService, SaasWebBuilderError, resetSaasWebBuilderServiceForTests } from "../SaasWebBuilderService";
+import type { PageSection } from "../SaasWebBuilderService";
 
 beforeEach(() => { resetSaasWebBuilderServiceForTests(); });
 
@@ -107,12 +108,15 @@ describe("SaasWebBuilderService.delete", () => {
 });
 
 describe("SaasWebBuilderService.renderHtml", () => {
-  function makePage(sections: unknown[]) {
+  function makePage(sections: PageSection[]) {
     const svc = new SaasWebBuilderService(makeDb() as never);
     return svc.renderHtml({
       id: "p1", tenantId: "t1", title: "Test Page", slug: "test",
-      type: "landing", status: "published", sections: sections as never,
+      type: "landing", status: "published", sections,
       views: 0, publishedAt: null, customDomain: null,
+      // Faltaban; el `as never` de antes los tapaba.
+      seoTitle: null, seoDescription: null, publishedHtml: null, cdnUrl: null,
+      domainStatus: "none", domainVerifiedAt: null, sslStatus: "pending", sslVerifiedAt: null,
       createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
     });
   }
