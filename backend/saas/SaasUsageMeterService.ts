@@ -31,7 +31,18 @@ export class SaasUsageMeterService {
        ON CONFLICT (tenant_id, meter_date) DO UPDATE SET ${col} = saas_usage_meter_daily.${col} + $2`,
       [tenantId, amount],
     );
-    if (process.env.STRIPE_METER_LIVE !== "0" && process.env.STRIPE_SECRET_KEY?.trim()) {
+    // Cerrado FUERA de produccion, como el correo y las redes.
+    //
+    // Estaba al reves —`!== "0"`, encendido salvo que alguien lo apagara— asi
+    // que cualquier entorno con una clave de Stripe configurada reportaba
+    // consumo a `usage_records`, que es lo que FACTURA al cliente. Que
+    // dependiera de no tener credenciales es proteccion por AUSENCIA, no por
+    // diseño: el dia que alguien copia un `.env` para depurar, factura.
+    //
+    // `STRIPE_METER_LIVE=1` lo enciende a proposito para quien lo necesite.
+    const medidorEncendido =
+      process.env.STRIPE_METER_LIVE === "1" || process.env.NODE_ENV === "production";
+    if (medidorEncendido && process.env.STRIPE_METER_LIVE !== "0" && process.env.STRIPE_SECRET_KEY?.trim()) {
       const meterKey = field === "emailsSent" ? "email" : field === "smsSent" ? "sms" : field === "apiCalls" ? "api_calls" : null;
       if (meterKey) {
         void import("./SaasStripeMeterService").then(({ getSaasStripeMeterService }) =>

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { SaasSocialService } from "../SaasSocialService";
 
 type DbPort = { query: <T = Record<string, unknown>>(sql: string, params?: unknown[]) => Promise<T[]> };
@@ -27,6 +27,16 @@ function joinRow(overrides: Partial<Record<string, unknown>> = {}) {
 // ── processDueScheduled ───────────────────────────────────────────────────────
 
 describe("processDueScheduled", () => {
+  // El cron publica de verdad, asi que necesita el interruptor subido. Cerrado
+  // por defecto, `processDueScheduled` deja los posts en `scheduled` y los
+  // reintenta: no se pierden, pero tampoco salen — que es lo que debe pasar.
+  beforeEach(() => {
+    vi.stubEnv("NELVYON_SOCIAL_PUBLISH_ENABLED", "1");
+  });
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   it("returns zero published/failed when no posts are due", async () => {
     const svc = makeSvc({ query: async () => [] });
     const r = await svc.processDueScheduled();

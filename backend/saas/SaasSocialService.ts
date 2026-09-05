@@ -5,6 +5,7 @@
  */
 import { DbClient } from "../db/DbClient";
 import { EXTERNAL_FETCH_TIMEOUT_MS } from "../http/fetchWithTimeout";
+import { exigirPublicacionSocialPermitida } from "./publicacionSocialPermitida";
 
 export type SocialPlatform = "meta" | "linkedin" | "instagram";
 export type SocialPostStatus = "draft" | "scheduled" | "published" | "failed";
@@ -196,6 +197,11 @@ export class SaasSocialService {
    * Always returns result — never throws on platform error (marks post as failed instead).
    */
   async publishPost(tenantId: string, postId: string): Promise<PublishNowResult> {
+    // ANTES de leer la fila: si se lanzara despues, el `catch` de
+    // `processDueScheduled` contaria el post como fallido y se perderia un
+    // trabajo que solo estaba esperando a que se abriera la puerta.
+    exigirPublicacionSocialPermitida("la red social del post");
+
     const postRows = await this.db.query<PostRow & { access_token: string; page_id: string | null }>(
       `SELECT p.*, a.access_token, a.page_id
        FROM saas_social_posts p

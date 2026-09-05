@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { SaasSocialService } from "../SaasSocialService";
 import { consultaFalsa } from "../../db/__tests__/consultaFalsa";
 
@@ -22,6 +22,19 @@ const postRow = {
 };
 
 describe("SaasSocialService", () => {
+  // Publicar esta CERRADO por defecto fuera de produccion: es una accion real
+  // sobre la cuenta de un cliente. Estas pruebas ejercitan el camino de
+  // publicacion, asi que suben el interruptor a proposito — que es exactamente
+  // lo que tendria que hacer cualquiera que quiera publicar de verdad.
+  //
+  // Ver `nadiePublicaEnNombreDelClienteSinPermiso` para la puerta en si.
+  beforeEach(() => {
+    vi.stubEnv("NELVYON_SOCIAL_PUBLISH_ENABLED", "1");
+  });
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   it("listAccounts returns empty", async () => {
     const db = makeDb([[]]);
     const svc = new SaasSocialService(db);

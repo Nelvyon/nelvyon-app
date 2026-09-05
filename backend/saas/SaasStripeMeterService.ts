@@ -21,6 +21,16 @@ export class SaasStripeMeterService {
   }
 
   async reportUsage(tenantId: string, meterKey: MeterKey, quantity: number): Promise<boolean> {
+    // La puerta tambien AQUI, no solo en el llamante.
+    //
+    // `SaasUsageMeterService` ya decide si medir, pero esto escribe en
+    // `usage_records` de Stripe, que es lo que FACTURA. Un segundo llamante que
+    // apareciera manana heredaria el efecto sin heredar la comprobacion, y esa
+    // es justo la forma en que una puerta deja de proteger.
+    const permitido =
+      process.env.STRIPE_METER_LIVE === "1" || process.env.NODE_ENV === "production";
+    if (!permitido || process.env.STRIPE_METER_LIVE === "0") return;
+
     if (quantity <= 0) return false;
     const secret = process.env.STRIPE_SECRET_KEY?.trim();
     if (!secret) return false;
