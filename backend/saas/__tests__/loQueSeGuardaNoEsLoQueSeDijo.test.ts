@@ -28,10 +28,16 @@ import {
   textoPersistible,
 } from "../loQuePersisteDeUnaEjecucion";
 
-/** Formas reales de credencial, no inventadas. */
+/**
+ * Formas reales de credencial con valores INEQUIVOCAMENTE falsos.
+ *
+ * Casan con los patrones del redactor —que es lo que hay que ejercitar— pero
+ * llevan «FICTICIA/PRUEBA» dentro para que ni una persona ni el guardian de
+ * secretos del arbol puedan confundirlas con una clave viva.
+ */
 const SECRETOS: ReadonlyArray<[string, string]> = [
   ["Stripe restringida", "rk_live_FICTICIA_DE_PRUEBA_0000000000"],
-  ["Stripe secreta", "sk_live_FICTICIA_DE_PRUEBA_AAAAAAAAAA"],
+  ["Stripe secreta", "sk_live_FICTICIA_DE_PRUEBA_0000000000"],
   ["OpenAI", "sk-proj-FICTICIA-DE-PRUEBA-000000"],
   ["GitHub", "ghp_FICTICIAdePRUEBA00000000000000"],
   ["Slack", "xoxb-FICTICIA-DE-PRUEBA-0000000"],
