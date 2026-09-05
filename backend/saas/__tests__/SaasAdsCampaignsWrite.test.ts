@@ -1,5 +1,30 @@
-import { describe, it, expect, vi } from "vitest";
+import { afterEach, beforeEach, describe, it, expect, vi } from "vitest";
 import { SaasAdsDashboardService } from "../SaasAdsDashboardService";
+
+/**
+ * ESTA BATERIA GASTARIA DINERO SI FUERA REAL, Y POR ESO LO DICE.
+ *
+ * Crear una campana, subir un presupuesto y activar una campana pasan ahora por
+ * la puerta de gasto, que con el modo de coste cero —el valor por defecto—
+ * DENIEGA. Lo que se prueba aqui es otra cosa: la FORMA de la llamada (que el
+ * presupuesto viaje en centimos, que un error de la API se traduzca a
+ * `API_ERROR`). Para poder llegar a esa forma hay que apagar el modo, y se
+ * apaga aqui, explicitamente y por prueba, en vez de debilitar la puerta.
+ *
+ * No sale ni un euro: `fetch` es un doble en todos los casos. La diferencia con
+ * antes no es tecnica sino de honestidad — estas pruebas siempre asumieron
+ * autorizacion de gasto; ahora la declaran.
+ *
+ * Que la puerta CIERRA por defecto se comprueba en
+ * `elPanelDeAnunciosNoGastaSinPuerta.test.ts`, sobre las cinco plataformas.
+ */
+beforeEach(() => {
+  vi.stubEnv("NELVYON_MODO_COSTE_CERO", "0");
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 
 type DbPort = { query: <T = Record<string, unknown>>(sql: string, params?: unknown[]) => Promise<T[]> };
 type FetchFn = typeof fetch;

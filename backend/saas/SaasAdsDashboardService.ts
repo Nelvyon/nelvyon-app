@@ -354,6 +354,19 @@ export class SaasAdsDashboardService {
 
   // ─── Campaign management ──────────────────────────────────────────────────
 
+  /**
+   * El proveedor de coste que corresponde a una plataforma.
+   *
+   * Se deriva del nombre en vez de mapearse a mano a proposito: una plataforma
+   * nueva —`pinterest`— produce `pinterest_ads`, que no esta clasificado, y la
+   * politica lo trata como `UNKNOWN_COST`, es decir, DENEGADO. Un mapa escrito a
+   * mano haria lo contrario: la plataforma que se olvide de anadir se quedaria
+   * sin puerta.
+   */
+  private static _proveedorDeCoste(platform: AdsPlatform): string {
+    return `${platform}_ads`;
+  }
+
   async listCampaigns(tenantId: string, platform: AdsPlatform): Promise<AdsCampaign[]> {
     const conn = await this._getLiveConnection(tenantId, platform);
     if (platform === "meta") return this._fetchMetaCampaigns(conn.access_token, conn.account_id);
@@ -365,6 +378,24 @@ export class SaasAdsDashboardService {
   }
 
   async createCampaign(tenantId: string, input: AdsCreateCampaignInput): Promise<AdsCampaign> {
+    // Crear una campana compromete inversion en la cuenta del cliente.
+    //
+    // La puerta va AQUI, en el despachador, y no dentro de `_createMetaCampaign`.
+    // Lo intente primero por metodo y era la misma trampa de siempre: protegia
+    // los tres caminos de Meta que estaba mirando y dejaba abiertos los de
+    // Google, TikTok, Snapchat y LinkedIn, que hacen exactamente lo mismo. En el
+    // despachador no hay camino que la esquive, ni hoy ni cuando se anada la
+    // sexta plataforma.
+    //
+    // Y va ANTES de leer credenciales: si fuera despues, un rechazo podria venir
+    // de que faltara un token en lugar de la politica, que es proteger por
+    // ausencia — justo lo que este fichero dejo de hacer.
+    exigirPuertaDeGasto({
+      proveedor: SaasAdsDashboardService._proveedorDeCoste(input.platform),
+      operacion: "crear_campana",
+      tenantId,
+      importeCents: Math.round(input.dailyBudgetUsd * 100),
+    });
     const conn = await this._getLiveConnection(tenantId, input.platform);
     if (input.platform === "meta") return this._createMetaCampaign(conn.access_token, conn.account_id, input);
     if (input.platform === "google") return this._createGoogleCampaign(conn.access_token, conn.account_id, conn.extra_config, input);
@@ -376,6 +407,14 @@ export class SaasAdsDashboardService {
 
   async updateCampaignBudget(tenantId: string, platform: AdsPlatform, campaignId: string, dailyBudgetUsd: number): Promise<AdsCampaign> {
     if (dailyBudgetUsd <= 0) throw new SaasAdsDashboardError("dailyBudgetUsd must be > 0", "VALIDATION");
+    // Subir el presupuesto diario cambia cuanto se gasta cada dia, en todas las
+    // plataformas por igual.
+    exigirPuertaDeGasto({
+      proveedor: SaasAdsDashboardService._proveedorDeCoste(platform),
+      operacion: "cambiar_presupuesto",
+      tenantId,
+      importeCents: Math.round(dailyBudgetUsd * 100),
+    });
     const conn = await this._getLiveConnection(tenantId, platform);
     if (platform === "meta") return this._updateMetaBudget(conn.access_token, campaignId, dailyBudgetUsd);
     if (platform === "google") return this._updateGoogleBudget(conn.access_token, conn.account_id, conn.extra_config, campaignId, dailyBudgetUsd);
@@ -386,6 +425,22 @@ export class SaasAdsDashboardService {
   }
 
   async setCampaignStatus(tenantId: string, platform: AdsPlatform, campaignId: string, status: "ACTIVE" | "PAUSED"): Promise<void> {
+    // ASIMETRICO A PROPOSITO, y es la parte que casi hago mal.
+    //
+    // Poner una campana en ACTIVE es empezar a gastar: cruza la puerta. PAUSAR
+    // es lo contrario —deja de gastarse— y por eso NO la cruza. La primera
+    // version cerraba las dos direcciones con una sola operacion
+    // «activar_o_pausar_campana», y eso significaba que con el modo de coste
+    // cero encendido —que es el valor por defecto— nadie podia PARAR una
+    // campana que estuviera quemando el dinero del cliente. Una proteccion de
+    // gasto que impide dejar de gastar esta puesta del reves.
+    if (status === "ACTIVE") {
+      exigirPuertaDeGasto({
+        proveedor: SaasAdsDashboardService._proveedorDeCoste(platform),
+        operacion: "activar_campana",
+        tenantId,
+      });
+    }
     const conn = await this._getLiveConnection(tenantId, platform);
     if (platform === "meta") return this._setMetaCampaignStatus(conn.access_token, campaignId, status);
     if (platform === "google") return this._setGoogleCampaignStatus(conn.access_token, conn.account_id, conn.extra_config, campaignId, status);
@@ -459,11 +514,6 @@ export class SaasAdsDashboardService {
   }
 
   private async _setMetaCampaignStatus(token: string, campaignId: string, status: "ACTIVE" | "PAUSED"): Promise<void> {
-    // Activar una campana es empezar a gastar el presupuesto del cliente.
-    // Este panel llegaba hasta Meta sin cruzar ninguna puerta: se declaro como
-    // «reporting» y no lo es. La puerta va ANTES de tocar la red.
-    exigirPuertaDeGasto({ proveedor: "meta_ads", operacion: "activar_o_pausar_campana" });
-
     const metaStatus = status === "ACTIVE" ? "ACTIVE" : "PAUSED";
     const res = await this.fetchFn(
       `https://graph.facebook.com/v19.0/${campaignId}`,
@@ -495,11 +545,6 @@ export class SaasAdsDashboardService {
   // ── Create campaign ─────────────────────────────────────────────────────────
 
   private async _createMetaCampaign(token: string, accountId: string, input: AdsCreateCampaignInput): Promise<AdsCampaign> {
-    // Crear una campana compromete inversion en la cuenta del cliente.
-    // Este panel llegaba hasta Meta sin cruzar ninguna puerta: se declaro como
-    // «reporting» y no lo es. La puerta va ANTES de tocar la red.
-    exigirPuertaDeGasto({ proveedor: "meta_ads", operacion: "crear_campana" });
-
     const budgetCents = Math.round(input.dailyBudgetUsd * 100);
     const res = await this.fetchFn(
       `https://graph.facebook.com/v19.0/act_${accountId}/campaigns`,
@@ -711,11 +756,6 @@ export class SaasAdsDashboardService {
   // ── Update budget ───────────────────────────────────────────────────────────
 
   private async _updateMetaBudget(token: string, campaignId: string, dailyBudgetUsd: number): Promise<AdsCampaign> {
-    // Cambiar el presupuesto diario cambia cuanto se gasta cada dia.
-    // Este panel llegaba hasta Meta sin cruzar ninguna puerta: se declaro como
-    // «reporting» y no lo es. La puerta va ANTES de tocar la red.
-    exigirPuertaDeGasto({ proveedor: "meta_ads", operacion: "cambiar_presupuesto" });
-
     const budgetCents = Math.round(dailyBudgetUsd * 100);
     const res = await this.fetchFn(
       `https://graph.facebook.com/v19.0/${campaignId}`,
