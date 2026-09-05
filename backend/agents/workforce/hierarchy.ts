@@ -240,6 +240,31 @@ export const WORKFORCE_HIERARCHY: WorkforceAgentProfile[] = [
 ];
 
 /** Design-only IDs kept out of permanent runtime — ephemeral workers only (ADR-027). */
+// `creative` y `reputation` existen porque SEIS servicios que se venden no tenian
+// quien respondiera por ellos: diseno, video, fotografia, 3D, marca y ORM. No son
+// asientos de adorno — `duenoDeCadaServicio` los nombra y un guardian comprueba
+// que ningun servicio se quede huerfano.
+WORKFORCE_HIERARCHY.push(
+  {
+    agentId: "creative",
+    level: "L2_domain",
+    reportsTo: "marketing",
+    lifecycle: "draft",
+    operationModesAllowed: ["observe", "draft", "assisted"],
+    owner: "growth",
+  },
+  {
+    agentId: "reputation",
+    level: "L2_domain",
+    reportsTo: "marketing",
+    lifecycle: "draft",
+    // Nunca autonomo: responder en nombre de un cliente ante una resena
+    // publica no es una decision que deba tomar nadie solo.
+    operationModesAllowed: ["observe", "draft", "assisted"],
+    owner: "growth",
+  },
+);
+
 // Los seis especialistas de red cuelgan del head social, que ya existia como
 // L2. Se generan desde la misma lista que el registro de agentes para que no
 // puedan divergir: una red nueva aparece en los dos sitios o en ninguno.

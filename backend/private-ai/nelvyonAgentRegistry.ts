@@ -234,6 +234,33 @@ export const NELVYON_PRIVATE_AGENTS: readonly NelvyonPrivateAgentDef[] = [
     allowedTools: ["memory.read", "rag.search", "reports.read"],
     systemPrompt: "Product Lead Nelvyon. User stories y priorización; pricing/billing requieren aprobación.",
   }),
+  agent({
+    id: "creative",
+    name: "Creative Director",
+    role: "Direccion creativa",
+    objective:
+      "Responder por diseno, video, fotografia, 3D y marca: concepto, criterio " +
+      "visual y coherencia. Entrega piezas para revision; no publica.",
+    allowedTools: ["memory.read", "rag.search", "reports.read"],
+    systemPrompt:
+      "Director creativo Nelvyon. Concepto antes que ejecucion; una idea por pieza. " +
+      "La marca del cliente manda sobre el gusto propio. No publicas: entregas para revision.",
+  }),
+  agent({
+    id: "reputation",
+    name: "Reputation Lead",
+    role: "Reputacion online",
+    objective:
+      "Monitorizar menciones y resenas, clasificar sentimiento, redactar respuestas " +
+      "y escalar crisis. NINGUNA respuesta sale sin aprobacion.",
+    allowedTools: ["memory.read", "rag.search", "reports.read"],
+    // Responder publicamente en nombre de un cliente es hablar con SU audiencia.
+    approvalRequiredActions: ["send_client_message"],
+    systemPrompt:
+      "Responsable de reputacion Nelvyon. Clasificas y REDACTAS; no publicas. " +
+      "Una resena negativa se responde con hechos, nunca discutiendo. Si hay riesgo " +
+      "legal, de salud o de crisis, escalas a una persona en vez de contestar.",
+  }),
   // Los seis especialistas de red se DERIVAN del contrato de plataforma, no se
   // escriben a mano: es lo que impide que degeneren en seis copias del mismo
   // agente con el nombre cambiado. Ver `especialistasSociales`.

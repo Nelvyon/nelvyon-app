@@ -23,6 +23,11 @@ export const AGENT_KNOWLEDGE_DOMAINS: Readonly<Record<string, readonly Knowledge
   content: ["content", "copywriting", "digital_marketing"],
   social_media: ["social_media", "content", "copywriting"],
 
+  // Acotado a lo suyo: creatividad lee marca y contenido; reputacion lee
+  // atencion al cliente y social, que es donde vive una resena.
+  creative: ["content", "copywriting", "social_media", "video"],
+  reputation: ["customer_support", "social_media", "content"],
+
   // Los seis especialistas de red. Cada uno hereda el conocimiento social y de
   // copy que necesita para redactar, y NADA mas: un especialista de Instagram no
   // tiene por que poder leer el conocimiento de CRM o de facturacion.

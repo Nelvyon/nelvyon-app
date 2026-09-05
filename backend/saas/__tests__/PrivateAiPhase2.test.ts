@@ -21,11 +21,12 @@ describe("Private AI modular architecture", () => {
     resetSaasPrivateAiServiceForTests();
   });
 
-  it("registers 29 expert agents including pilot CEO", () => {
-    // 23 nucleo + los 6 especialistas de red, que se generan desde el contrato
-    // de plataforma. El numero exacto es un trinquete a proposito: si alguien
-    // anade un agente sin querer, esto lo dice.
-    expect(NELVYON_PRIVATE_AGENTS.length).toBe(29);
+  it("registers 31 expert agents including pilot CEO", () => {
+    // 23 nucleo + 6 especialistas de red + `creative` y `reputation`, los dos
+    // heads que se crearon porque seis servicios que se venden no tenian quien
+    // respondiera por ellos. El numero exacto es un trinquete a proposito: si
+    // alguien anade un agente sin querer, esto lo dice.
+    expect(NELVYON_PRIVATE_AGENTS.length).toBe(31);
     expect(getPrivateAgent(PILOT_AGENT_ID)?.role).toMatch(/Supervisor/i);
   });
 
