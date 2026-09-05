@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import { requireSaasContext, saasErrorBody, saasErrorStatus } from "@nelvyon/saas";
 import { DbClient } from "../../../../../../../../backend/db/DbClient";
 import { runNelvyonTextTask } from "../../../../../../../../backend/saas/NelvyonAiTextService";
+import { textoPersistible } from "@nelvyon/saas/loQuePersisteDeUnaEjecucion";
+import { errorSeguro } from "../../../../../../../../backend/seguridad/avisoSeguro";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -21,10 +23,15 @@ async function persistAgentRunUpdate(
   try {
     await db.query(
       `UPDATE saas_agent_runs SET output = $1, status = $2, updated_at = NOW() WHERE id = $3 AND tenant_id = $4`,
-      [output, status, runId, tenantId],
+      // Extracto redactado, no la respuesta entera: lo que sale de un agente
+      // puede repetir lo que le dieron, incluida una credencial pegada.
+      [textoPersistible(output), status, runId, tenantId],
     );
   } catch (err) {
-    console.error("[saas/agentes/execute] failed to persist run update", { runId, tenantId, status, err });
+    // `errorSeguro` y no `console.error` con el error crudo: un fallo de
+    // conexion lleva dentro el DSN con su contrasena, y los registros de
+    // produccion los ve quien tenga acceso al panel.
+    errorSeguro("saas/agentes/execute", `no se pudo guardar la ejecucion ${runId}`, err);
   }
 }
 
@@ -50,7 +57,9 @@ export async function POST(req: Request) {
       `INSERT INTO saas_agent_runs (tenant_id, agent_id, input, status)
        VALUES ($1, $2, $3, 'running')
        RETURNING id`,
-      [ctx.tenant.id, agentId, input],
+      // Lo que se GUARDA no es lo que se le dijo al agente: `input` sigue
+      // usandose entero mas abajo para llamarlo. Aqui va un extracto redactado.
+      [ctx.tenant.id, agentId, textoPersistible(input)],
     );
     const runId = runRows[0]?.id;
     if (!runId) {
