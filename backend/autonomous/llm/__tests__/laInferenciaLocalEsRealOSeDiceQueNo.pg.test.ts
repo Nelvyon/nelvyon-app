@@ -70,6 +70,10 @@ describe("se sabe si hay un modelo local, y se dice cuál", () => {
   it("deja constancia de lo que hay en esta máquina", () => {
     // Se escribe pase lo que pase: «no hay modelo» es un resultado, y es el que
     // justifica que todo lo demás siga en UNAVAILABLE.
+    const destino = path.join(RAIZ, "docs", "evidence", "inferencia_local.json");
+    const previo = fs.existsSync(destino)
+      ? (JSON.parse(fs.readFileSync(destino, "utf8")) as Record<string, unknown>)
+      : {};
     const evidencia = {
       _lee_esto: [
         "Lo escribe laInferenciaLocalEsRealOSeDiceQueNo. No se edita a mano.",
@@ -82,6 +86,18 @@ describe("se sabe si hay un modelo local, y se dice cuál", () => {
       modelosInstalados: modelos ?? [],
       modeloElegido: MODELO || null,
       costeExternoEuros: 0,
+      // Lo que midio una ejecucion CON modelo no se pisa.
+      //
+      // Esta prueba reescribe el fichero ENTERO, y `llamadaReal` solo lo anade
+      // la prueba de mas abajo, que unicamente corre si hay Ollama. En una
+      // maquina sin modelo —la mayoria— este write borraba la constancia de la
+      // unica llamada real que se llego a hacer. Una evidencia que desaparece
+      // sola es peor que no tenerla: nadie se entera de que se perdio.
+      //
+      // Se conserva, y se dice de que dia era, para no darla por recien medida.
+      ...(previo.llamadaReal
+        ? { llamadaReal: previo.llamadaReal, llamadaRealMedidaEn: previo.medidoEn ?? null }
+        : {}),
     };
     fs.mkdirSync(path.join(RAIZ, "docs", "evidence"), { recursive: true });
     fs.writeFileSync(
@@ -185,6 +201,10 @@ conModelo("la inferencia local es real, y la procedencia lo demuestra", () => {
       `${JSON.stringify(
         {
           ...previo,
+          // Se acaba de medir AHORA, asi que la fecha de la medida es hoy. Sin
+          // esto quedaria la que dejo la prueba de arriba al conservar la
+          // anterior, y diria que la llamada es mas vieja de lo que es.
+          llamadaRealMedidaEn: new Date().toISOString().slice(0, 10),
           llamadaReal: {
             procedencia: r.provenance?.outcome ?? null,
             proveedor: r.provenance?.provider ?? null,
