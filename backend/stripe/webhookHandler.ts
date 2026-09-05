@@ -48,7 +48,21 @@ function logStripeEvent(event: Stripe.Event, detail: Record<string, unknown>): v
 }
 
 export async function processStripeEvent(event: Stripe.Event, db: ConexionSql): Promise<void> {
-  const dunning = DunningService.getInstance();
+  // EL SERVICIO DE DUNNING SE CONSTRUYE CUANDO HACE FALTA, NO ANTES.
+  //
+  // Estaba arriba, fuera del `switch`, asi que TODO evento de Stripe construia
+  // un `DunningService` —y con el su cliente de base de datos— aunque su rama no
+  // lo tocara. La mayoria no lo toca: seis ramas de las trece lo usan.
+  //
+  // Eso convertia una dependencia opcional en obligatoria: si el cliente de
+  // dunning no se puede construir, un `customer.subscription.updated` que no
+  // tiene nada que ver con la morosidad respondia 500. Stripe reintenta un 500,
+  // asi que el evento entra en bucle de reintentos por un servicio que no
+  // necesitaba.
+  //
+  // Se memoiza para que dos ramas que si lo usen no construyan dos.
+  let servicioDeDunning: DunningService | null = null;
+  const dunning = (): DunningService => (servicioDeDunning ??= DunningService.getInstance());
 
   switch (event.type) {
     case "checkout.session.completed": {
@@ -92,7 +106,7 @@ export async function processStripeEvent(event: Stripe.Event, db: ConexionSql): 
 
       const tenantId = session.metadata?.tenant_id ?? (await resolveTenantIdFromUserId(db, userId));
       if (wasSuspended && tenantId && subscriptionId) {
-        await dunning.handleReactivation(tenantId, subscriptionId);
+        await dunning().handleReactivation(tenantId, subscriptionId);
       } else {
         await notifyPlanActivated(db, userId, plan, periodEnd);
       }
@@ -139,7 +153,7 @@ export async function processStripeEvent(event: Stripe.Event, db: ConexionSql): 
 
       const tenantId = sub.metadata?.tenant_id ?? (await resolveTenantIdFromUserId(db, userId));
       if (wasSuspended && tenantId) {
-        await dunning.handleReactivation(tenantId, sub.id);
+        await dunning().handleReactivation(tenantId, sub.id);
       } else if (event.type === "customer.subscription.created") {
         await notifyPlanActivated(db, userId, plan, periodEnd);
       }
@@ -159,7 +173,7 @@ export async function processStripeEvent(event: Stripe.Event, db: ConexionSql): 
       const subStatus = await getSubscriptionStatus(db, userId);
       if (subStatus === "past_due" || subStatus === "suspended") {
         if (tenantId) {
-          await dunning.handleSuspension(tenantId, sub.id);
+          await dunning().handleSuspension(tenantId, sub.id);
         }
         logStripeEvent(event, { userId, action: "suspension", tenantId });
         break;
@@ -255,7 +269,7 @@ export async function processStripeEvent(event: Stripe.Event, db: ConexionSql): 
       });
 
       if (wasPastDue && tenantId) {
-        await dunning.handleReactivation(tenantId, sub.id);
+        await dunning().handleReactivation(tenantId, sub.id);
       }
 
       logStripeEvent(event, { userId, plan, status, subscriptionId, invoiceId: invoice.id, tenantId });
@@ -292,7 +306,7 @@ export async function processStripeEvent(event: Stripe.Event, db: ConexionSql): 
       const tenantId = await resolveTenantIdFromUserId(db, userId);
       const attemptNumber = invoice.attempt_count ?? 1;
       if (tenantId) {
-        await dunning.handlePaymentFailed(tenantId, subscriptionId, attemptNumber, event.id);
+        await dunning().handlePaymentFailed(tenantId, subscriptionId, attemptNumber, event.id);
       }
 
       logStripeEvent(event, { userId, subscriptionId, attemptNumber, tenantId });

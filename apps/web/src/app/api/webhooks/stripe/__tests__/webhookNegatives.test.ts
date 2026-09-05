@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import crypto from "node:crypto";
 
 /**
@@ -165,11 +165,29 @@ beforeEach(() => {
   estado.eventos.clear();
   estado.upsertsEmitidos = 0;
   estado.fila = null;
+  // SIN `DATABASE_URL`, A PROPOSITO.
+  //
+  // Este fichero decia sustituir Postgres entero y no era verdad: doblaba
+  // `DbJobsClient`, pero `processStripeEvent` construia ademas un
+  // `DunningService`, que usa OTRO cliente (`DbClient`). Con la variable puesta
+  // en el entorno —como suele estar en una maquina de desarrollo— el cliente se
+  // construia sin quejarse y las pruebas pasaban; sin ella, las seis que
+  // atraviesan la ruta devolvian 500. El resultado dependia del entorno, que es
+  // la unica cosa que una prueba no puede permitirse.
+  //
+  // Se quita la variable en vez de ponerla: asi, si alguien vuelve a construir
+  // un cliente real donde no hace falta, esto se pone rojo en TODAS las maquinas
+  // y no solo en las que no la tengan.
+  vi.stubEnv("DATABASE_URL", undefined);
   process.env.STRIPE_WEBHOOK_SECRET = SECRET;
   process.env.STRIPE_SECRET_KEY = "sk_test_para_pruebas";
   process.env.STRIPE_PRICE_ID_STARTER = "price_starter";
   vi.spyOn(console, "error").mockImplementation(() => {});
   vi.spyOn(console, "log").mockImplementation(() => {});
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 
 /**

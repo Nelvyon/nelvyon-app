@@ -1,5 +1,28 @@
-import { afterEach, describe, it, expect, vi } from "vitest";
+import { afterEach, beforeEach, describe, it, expect, vi } from "vitest";
 import { SaasAdsDashboardService, resetSaasAdsDashboardServiceForTests } from "../SaasAdsDashboardService";
+
+/**
+ * ESTAS PRUEBAS GASTARIAN DINERO SI FUERAN REALES, Y POR ESO LO DICEN.
+ *
+ * Crear campana, subir presupuesto y activar campana cruzan ahora la puerta de
+ * gasto, que con el modo de coste cero —el valor por defecto— DENIEGA. Lo que
+ * se prueba aqui es la FORMA de la llamada a TikTok y a Snapchat, no el permiso
+ * para gastar; para llegar a esa forma hay que apagar el modo, y se apaga aqui,
+ * explicitamente, en vez de debilitar la puerta.
+ *
+ * Este fichero es ademas la prueba de que mover la puerta al despachador estaba
+ * bien: cuando la puerta vivia en los tres metodos de Meta, estas rutas de
+ * TikTok y Snapchat pasaban en verde SIN puerta ninguna, y nadie se enteraba.
+ *
+ * No sale ni un euro: `fetch` es un doble en todos los casos.
+ */
+beforeEach(() => {
+  vi.stubEnv("NELVYON_MODO_COSTE_CERO", "0");
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 
 type DbPort = { query: <T = Record<string, unknown>>(sql: string, params?: unknown[]) => Promise<T[]> };
 type FetchFn = typeof fetch;
