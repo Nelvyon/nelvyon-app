@@ -23,7 +23,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const ctx = await requireSaasContext(req, "billing.read");
+    const ctx = await requireSaasContext(req, "invoices.write");
     const { id } = await params;
     const body = await req.json();
     const factura = await getSaasFacturasService().update(ctx.tenant.id, id, body);
@@ -36,7 +36,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const ctx = await requireSaasContext(req, "billing.read");
+    const ctx = await requireSaasContext(req, "invoices.write");
     const { id } = await params;
     const deleted = await getSaasFacturasService().delete(ctx.tenant.id, id);
     if (!deleted) return NextResponse.json({ error: "NOT_FOUND_OR_NOT_DRAFT" }, { status: 404 });

@@ -33,7 +33,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const ctx = await requireSaasContext(req, "billing.read");
+    const ctx = await requireSaasContext(req, "invoices.write");
     const body = await req.json();
     const factura = await getSaasFacturasService().create(ctx.tenant.id, body);
     return NextResponse.json({ factura }, { status: 201 });

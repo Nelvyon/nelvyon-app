@@ -9,7 +9,7 @@ export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
   try {
-    const ctx = await requireSaasContext(req, "contacts.read");
+    const ctx = await requireSaasContext(req, "notifications.write");
     const userId = ctx.claims.userId ?? null;
     const body = (await req.json().catch(() => ({}))) as { platform?: PwaInstallPlatform; displayMode?: string };
     const svc = getSaasPwaService();

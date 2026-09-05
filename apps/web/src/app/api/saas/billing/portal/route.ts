@@ -9,7 +9,7 @@ export const runtime = "nodejs";
 
 export async function POST(req: Request) {
   try {
-    const ctx = await requireSaasContext(req, "billing.read");
+    const ctx = await requireSaasContext(req, "billing.manage");
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? new URL(req.url).origin;
     const returnUrl = `${appUrl}/saas/billing`;
 

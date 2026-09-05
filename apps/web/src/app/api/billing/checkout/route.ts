@@ -116,7 +116,7 @@ export async function POST(req: NextRequest) {
   };
 
   try {
-    const auth = await requireSaasContext(req, "billing.read");
+    const auth = await requireSaasContext(req, "billing.manage");
     logCtx.userId = auth.claims.userId;
 
     let body: CheckoutBody;

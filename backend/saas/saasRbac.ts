@@ -17,6 +17,14 @@ export type SaasAction =
   | "workflows.delete"
   | "workflows.execute"
   | "billing.read"
+  /**
+   * Abrir los flujos de facturacion alojados en Stripe: checkout y portal.
+   *
+   * Misma audiencia que `billing.read` —owner y admin— pero nombre honesto: son
+   * POST que CREAN una sesion, no lecturas. Autorizarlos con una accion de
+   * lectura hacia que la matriz dijera una cosa y el codigo otra.
+   */
+  | "billing.manage"
   | "settings.read"
   | "reports.generate"
   | "analytics.read"
@@ -25,6 +33,16 @@ export type SaasAction =
   | "profile.read"
   | "profile.write"
   | "invoices.read"
+  /**
+   * Mutar facturas: crearlas, editarlas, borrarlas, lanzar reclamacion de pago.
+   *
+   * Existia `invoices.read` —que tienen los cinco roles— pero NADA para
+   * escribir, asi que las rutas que crean, editan, borran o reclaman facturas
+   * se estaban autorizando con una accion de LECTURA. Con `invoices.read` un
+   * `viewer` habria podido lanzar un dunning: enviar avisos de impago a los
+   * clientes del inquilino.
+   */
+  | "invoices.write"
   | "affiliates.read"
   | "affiliates.write"
   | "loyalty.read"
@@ -54,6 +72,7 @@ const ROLE_PERMISSIONS: Record<SaasRole, readonly SaasAction[]> = {
     "workflows.delete",
     "workflows.execute",
     "billing.read",
+    "billing.manage",
     "settings.read",
     "reports.generate",
     "analytics.read",
@@ -62,6 +81,7 @@ const ROLE_PERMISSIONS: Record<SaasRole, readonly SaasAction[]> = {
     "profile.read",
     "profile.write",
     "invoices.read",
+    "invoices.write",
     "affiliates.read",
     "affiliates.write",
     "loyalty.read",
@@ -87,6 +107,7 @@ const ROLE_PERMISSIONS: Record<SaasRole, readonly SaasAction[]> = {
     "workflows.delete",
     "workflows.execute",
     "billing.read",
+    "billing.manage",
     "settings.read",
     "reports.generate",
     "analytics.read",
@@ -95,6 +116,7 @@ const ROLE_PERMISSIONS: Record<SaasRole, readonly SaasAction[]> = {
     "profile.read",
     "profile.write",
     "invoices.read",
+    "invoices.write",
     "affiliates.read",
     "affiliates.write",
     "loyalty.read",

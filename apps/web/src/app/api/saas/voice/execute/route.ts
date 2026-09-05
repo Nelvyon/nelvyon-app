@@ -10,7 +10,7 @@ export const runtime = "nodejs";
 /** Parse + log a command and return navigation/action instructions for the client. */
 export async function POST(req: NextRequest) {
   try {
-    const ctx = await requireSaasContext(req, "contacts.read");
+    const ctx = await requireSaasContext(req, "workflows.execute");
     const userId = ctx.claims.userId ?? null;
     const body = (await req.json().catch(() => ({}))) as { transcript?: string; source?: "web_speech" | "media_upload" };
     if (!body.transcript?.trim()) {

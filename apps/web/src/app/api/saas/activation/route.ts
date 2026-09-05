@@ -78,7 +78,7 @@ export async function GET(req: Request) {
 
 export async function PATCH(req: Request) {
   try {
-    const ctx = await requireSaasContext(req, "contacts.read");
+    const ctx = await requireSaasContext(req, "contacts.write");
     const tenantId = ctx.tenant.id;
     const body = (await req.json()) as Partial<{
       profile: boolean; contact: boolean; campaign: boolean;

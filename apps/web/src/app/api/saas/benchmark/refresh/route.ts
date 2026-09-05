@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 /** Recompute tenant metrics vs industry and persist a fresh snapshot. */
 export async function POST(req: NextRequest) {
   try {
-    const ctx = await requireSaasContext(req, "contacts.read");
+    const ctx = await requireSaasContext(req, "reports.generate");
     const body = (await req.json().catch(() => ({}))) as {
       periodDays?: number;
       sectorKey?: string;

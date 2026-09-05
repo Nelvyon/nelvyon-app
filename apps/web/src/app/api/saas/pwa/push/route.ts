@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
 /** POST /api/saas/pwa/push — save Web Push subscription */
 export async function POST(req: NextRequest) {
   try {
-    const ctx = await requireSaasContext(req, "contacts.read");
+    const ctx = await requireSaasContext(req, "notifications.write");
     const userId = ctx.claims.userId ?? null;
     const body = (await req.json().catch(() => ({}))) as {
       subscription?: { endpoint?: string; keys?: { p256dh?: string; auth?: string } };
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
 /** DELETE /api/saas/pwa/push — remove subscription by endpoint */
 export async function DELETE(req: NextRequest) {
   try {
-    const ctx = await requireSaasContext(req, "contacts.read");
+    const ctx = await requireSaasContext(req, "notifications.write");
     const body = (await req.json().catch(() => ({}))) as { endpoint?: string };
     if (!body.endpoint?.trim()) {
       return NextResponse.json({ error: "endpoint required" }, { status: 400 });

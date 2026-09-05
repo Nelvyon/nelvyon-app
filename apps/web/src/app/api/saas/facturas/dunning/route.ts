@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const ctx = await requireSaasContext(req, "contacts.read");
+    const ctx = await requireSaasContext(req, "invoices.write");
     const { invoiceId } = await req.json() as { invoiceId: string };
     if (!invoiceId) return NextResponse.json({ error: "invoiceId required" }, { status: 400 });
     const events = await getSaasCpqEnterpriseService().scheduleDunning(ctx.tenant.id, invoiceId);

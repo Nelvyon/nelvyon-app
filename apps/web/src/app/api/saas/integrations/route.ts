@@ -56,7 +56,7 @@ export async function GET(req: Request) {
 /** DELETE /api/saas/integrations?provider=slug */
 export async function DELETE(req: Request) {
   try {
-    const ctx = await requireSaasContext(req, "contacts.read");
+    const ctx = await requireSaasContext(req, "settings.write");
     const url = new URL(req.url);
     const provider = url.searchParams.get("provider");
     if (!provider) {

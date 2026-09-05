@@ -23,7 +23,7 @@ export async function GET(req: NextRequest, { params }: Ctx) {
 
 export async function PATCH(req: NextRequest, { params }: Ctx) {
   try {
-    const ctx = await requireSaasContext(req, "contacts.read");
+    const ctx = await requireSaasContext(req, "deals.write");
     const { id } = await params;
     const body = await req.json() as { action?: string };
     const svc = getSaasCpqEnterpriseService();

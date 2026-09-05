@@ -11,7 +11,7 @@ import {
 
 export async function POST(req: Request) {
   try {
-    const ctx = await requireSaasContext(req, "billing.read");
+    const ctx = await requireSaasContext(req, "settings.write");
     const body = (await req.json()) as Record<string, unknown>;
     const action = String(body.action ?? "cancel_at_period_end");
     const db = DbClient.getInstance();

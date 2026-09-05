@@ -36,7 +36,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const ctx = await requireSaasContext(req, "contacts.read");
+    const ctx = await requireSaasContext(req, "contacts.write");
     const body = (await req.json()) as { messages?: ChatMessage[] };
 
     if (!Array.isArray(body.messages) || body.messages.length === 0) {
@@ -88,7 +88,7 @@ Plan actual del cliente: ${ctx.tenant.plan ?? "starter"}.`;
 
 export async function DELETE(req: Request) {
   try {
-    const ctx = await requireSaasContext(req, "contacts.read");
+    const ctx = await requireSaasContext(req, "contacts.write");
     const deleted = await saasChatService.clearHistory(ctx.claims.userId, ctx.tenant.id);
     return NextResponse.json({ deleted });
   } catch (e: unknown) {
