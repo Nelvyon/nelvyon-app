@@ -1,9 +1,35 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { SaasSocialService } from "../SaasSocialService";
 import { consultaFalsa } from "../../db/__tests__/consultaFalsa";
+import { huellaDelContenido } from "../aprobacionDePiezaSocial";
 
 type Row = Record<string, unknown>;
-const makeDb = (rows: Row[][] = []) => ({ query: consultaFalsa(rows) });
+/**
+ * Base de mentira con la pieza YA APROBADA.
+ *
+ * Publicar exige dos puertas: el interruptor de la instancia y la aprobacion de
+ * ESTA pieza con ESTE contenido. Estas pruebas ejercitan la mecanica de
+ * publicacion, asi que cumplen las dos precondiciones a proposito — igual que
+ * tendria que hacerlo cualquiera que quiera publicar de verdad.
+ *
+ * La huella se deriva del contenido REAL de la fixture: si el contenido cambia y
+ * la aprobacion no, estas pruebas se ponen rojas, que es lo correcto.
+ *
+ * Ver `ningunaPiezaSaleSinQueAlguienLaApruebe` para la puerta en si.
+ */
+const makeDb = (rows: Row[][] = [], contenidoAprobado = postRow.content) => {
+  const secuencial = consultaFalsa(rows);
+  const query = Object.assign(
+    async <T,>(sql: string, params?: unknown[]): Promise<T[]> => {
+      if (/saas_private_ai_approvals/i.test(sql)) {
+        return [{ id: "apr-1", huella: huellaDelContenido(contenidoAprobado) }] as T[];
+      }
+      return secuencial<T>(sql, params);
+    },
+    secuencial,
+  );
+  return { query };
+};
 
 const TENANT = "tenant-social";
 const now = new Date();

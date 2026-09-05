@@ -4,6 +4,7 @@ import type { DbClient } from "../db/DbClient";
 import { DbClient as DbClientClass } from "../db/DbClient";
 import { OsAgentError } from "../os-agents/OsAgentError";
 import { fetchWithTimeout } from "../http/fetchWithTimeout";
+import { exigirEnvioDeConversionesPermitido } from "./envioDeConversionesPermitido";
 
 const META_API_VERSION = "v19.0";
 const GRAPH_BASE = `https://graph.facebook.com/${META_API_VERSION}`;
@@ -277,6 +278,10 @@ export class MetaAdsService {
   }
 
   async sendConversionEvent(userId: string, event: ConversionEvent): Promise<{ eventId: string }> {
+    // ANTES de leer credenciales: si no se puede enviar, no hay motivo para
+    // sacar el token del cliente de donde este.
+    exigirEnvioDeConversionesPermitido("la Conversions API de Meta");
+
     const c = await this.requireCredentials(userId);
     const eventId = randomUUID();
     const payload = {

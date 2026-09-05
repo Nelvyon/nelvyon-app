@@ -1,5 +1,6 @@
 import { GLOBAL_SENSITIVE_ACTIONS } from "./sensitiveActions";
 import type { AgentToolId, NelvyonPrivateAgentDef, SensitiveActionType } from "./types";
+import { ESPECIALISTAS_SOCIALES } from "./especialistasSociales";
 
 const ALL_SENSITIVE = [...GLOBAL_SENSITIVE_ACTIONS] as SensitiveActionType[];
 
@@ -233,6 +234,10 @@ export const NELVYON_PRIVATE_AGENTS: readonly NelvyonPrivateAgentDef[] = [
     allowedTools: ["memory.read", "rag.search", "reports.read"],
     systemPrompt: "Product Lead Nelvyon. User stories y priorización; pricing/billing requieren aprobación.",
   }),
+  // Los seis especialistas de red se DERIVAN del contrato de plataforma, no se
+  // escriben a mano: es lo que impide que degeneren en seis copias del mismo
+  // agente con el nombre cambiado. Ver `especialistasSociales`.
+  ...ESPECIALISTAS_SOCIALES,
 ] as const;
 
 export function getPrivateAgent(id: string): NelvyonPrivateAgentDef | undefined {

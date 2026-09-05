@@ -21,7 +21,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { SaasSocialService } from "../SaasSocialService";
-import { consultaFalsa, type Fila } from "../../db/__tests__/consultaFalsa";
+import { consultaFalsa, consultaFalsaCon, type Fila } from "../../db/__tests__/consultaFalsa";
+import { huellaDelContenido } from "../aprobacionDePiezaSocial";
 import {
   PublicacionSocialDesactivadaError,
   publicacionSocialPermitida,
@@ -60,7 +61,16 @@ describe("el interruptor de publicacion social", () => {
     const fetchOk = vi.fn(
       async () => new Response(JSON.stringify({ id: "externo-1" }), { status: 200 }),
     );
-    const db = { query: consultaFalsa([[filaDePost], []]) };
+    // Publicar exige DOS puertas. Aqui se prueba la primera, asi que la
+    // segunda —la aprobacion de la pieza— se cumple a proposito.
+    const db = {
+      query: consultaFalsaCon((sql) => {
+        if (/saas_private_ai_approvals/i.test(sql))
+          return [{ id: "apr-1", huella: huellaDelContenido(String(filaDePost.content)) }];
+        if (/FROM saas_social_posts/i.test(sql)) return [filaDePost];
+        return [];
+      }),
+    };
     const svc = new SaasSocialService(db as never, fetchOk as never);
 
     const r = await svc.publishPost(TENANT, "post-1");

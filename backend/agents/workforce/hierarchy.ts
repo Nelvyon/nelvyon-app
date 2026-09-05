@@ -1,3 +1,7 @@
+import {
+  CABEZA_DEL_DEPARTAMENTO_SOCIAL,
+  IDS_DE_ESPECIALISTAS_SOCIALES,
+} from "../../private-ai/especialistasSociales";
 /**
  * Workforce hierarchy + lifecycle — ADR-027.
  * Does not mint new permanent agents; metadata over existing Unified Registry IDs.
@@ -236,6 +240,21 @@ export const WORKFORCE_HIERARCHY: WorkforceAgentProfile[] = [
 ];
 
 /** Design-only IDs kept out of permanent runtime — ephemeral workers only (ADR-027). */
+// Los seis especialistas de red cuelgan del head social, que ya existia como
+// L2. Se generan desde la misma lista que el registro de agentes para que no
+// puedan divergir: una red nueva aparece en los dos sitios o en ninguno.
+for (const id of IDS_DE_ESPECIALISTAS_SOCIALES) {
+  WORKFORCE_HIERARCHY.push({
+    agentId: id,
+    level: "L3_specialist",
+    reportsTo: CABEZA_DEL_DEPARTAMENTO_SOCIAL,
+    lifecycle: "draft",
+    // Nunca `autonomous`: un especialista entrega borradores y otro los revisa.
+    operationModesAllowed: ["observe", "draft", "assisted"],
+    owner: "growth",
+  });
+}
+
 export const EPHEMERAL_ONLY_DESIGN_IDS = ["design", "video", "image", "documentation"] as const;
 
 /** Deprecated design IDs — still listed for redirect, lifecycle=deprecated */

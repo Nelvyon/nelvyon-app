@@ -63,7 +63,7 @@ _PLATAFORMA = re.compile(
 #: Cualquier nombre que signifique «aqui hay una puerta».
 _PUERTA = re.compile(
     r"\b(exigirPuertaDeGasto|exigirPublicacionSocialPermitida|publicacionSocialPermitida|"
-    r"envioDeCorreoPermitido|modoCosteCeroActivo|assertActionAllowedInMode|"
+    r"envioDeCorreoPermitido|exigirEnvioDeConversionesPermitido|modoCosteCeroActivo|assertActionAllowedInMode|"
     r"_ENABLED|dryRun|DRY_RUN|simulacion|permitido)\b"
 )
 
@@ -100,12 +100,9 @@ SIN_PUERTA_A_PROPOSITO: dict[str, str] = {
     "backend/stripe/stripeApi.ts":
         "cliente HTTP de Stripe; quien decide gastar es quien lo llama, y esos si tienen puerta",
 
-    # --- DEUDA DECLARADA. Mutan de verdad y no tienen puerta propia.
-    #     Solo puede ENCOGER.
-    "backend/integrations/MetaAdsService.ts":
-        "DEUDA: `graphPost` envia eventos de conversion a Meta (Conversions API). "
-        "No gasta, pero manda datos de los usuarios del cliente a una plataforma "
-        "externa y deberia cruzar una puerta propia",
+    # La deuda que habia aqui —`MetaAdsService` enviando conversiones sin puerta—
+    # quedo cerrada con `exigirEnvioDeConversionesPermitido`. La lista solo
+    # encoge: si alguien la reintroduce, el trinquete de abajo lo dice.
 }
 
 

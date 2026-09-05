@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { SaasSocialService } from "../SaasSocialService";
+import { huellaDelContenido } from "../aprobacionDePiezaSocial";
 
 type DbPort = { query: <T = Record<string, unknown>>(sql: string, params?: unknown[]) => Promise<T[]> };
 type FetchFn = typeof fetch;
@@ -48,6 +49,11 @@ describe("processDueScheduled", () => {
       query: async (sql: string) => {
         if (sql.includes("UPDATE saas_social_posts") && sql.includes("RETURNING"))
           return [{ id: "post-1", tenant_id: "t1" }] as never;
+        if (/saas_private_ai_approvals/i.test(sql))
+          // La pieza esta aprobada a proposito: esta bateria prueba la mecanica
+          // del cron, no la puerta. La huella sale del contenido real de la
+          // fixture, asi que si cambia y la aprobacion no, se pone rojo.
+          return [{ id: "apr-1", huella: huellaDelContenido(String(joinRow().content)) }] as never;
         if (sql.includes("JOIN saas_social_accounts"))
           return [joinRow()] as never;
         return [] as never; // UPDATE
@@ -67,6 +73,11 @@ describe("processDueScheduled", () => {
       query: async (sql: string) => {
         if (sql.includes("UPDATE saas_social_posts") && sql.includes("RETURNING"))
           return [{ id: "post-1", tenant_id: "t1" }] as never;
+        if (/saas_private_ai_approvals/i.test(sql))
+          // La pieza esta aprobada a proposito: esta bateria prueba la mecanica
+          // del cron, no la puerta. La huella sale del contenido real de la
+          // fixture, asi que si cambia y la aprobacion no, se pone rojo.
+          return [{ id: "apr-1", huella: huellaDelContenido(String(joinRow().content)) }] as never;
         if (sql.includes("JOIN saas_social_accounts"))
           return [joinRow()] as never;
         return [] as never;
@@ -86,6 +97,11 @@ describe("processDueScheduled", () => {
       query: async (sql: string) => {
         if (sql.includes("UPDATE saas_social_posts") && sql.includes("RETURNING"))
           return [{ id: "p2", tenant_id: "t2" }] as never;
+        if (/saas_private_ai_approvals/i.test(sql))
+          // La pieza esta aprobada a proposito: esta bateria prueba la mecanica
+          // del cron, no la puerta. La huella sale del contenido real de la
+          // fixture, asi que si cambia y la aprobacion no, se pone rojo.
+          return [{ id: "apr-1", huella: huellaDelContenido(String(joinRow().content)) }] as never;
         if (sql.includes("JOIN saas_social_accounts"))
           return [joinRow({ id: "p2", tenant_id: "t2", platform: "linkedin", page_id: "urn:li:organization:999" })] as never;
         return [] as never;
@@ -105,6 +121,11 @@ describe("processDueScheduled", () => {
       query: async (sql: string) => {
         if (sql.includes("UPDATE saas_social_posts") && sql.includes("RETURNING"))
           return [{ id: "p3", tenant_id: "t3" }] as never;
+        if (/saas_private_ai_approvals/i.test(sql))
+          // La pieza esta aprobada a proposito: esta bateria prueba la mecanica
+          // del cron, no la puerta. La huella sale del contenido real de la
+          // fixture, asi que si cambia y la aprobacion no, se pone rojo.
+          return [{ id: "apr-1", huella: huellaDelContenido(String(joinRow().content)) }] as never;
         if (sql.includes("JOIN saas_social_accounts"))
           return [joinRow({ id: "p3", tenant_id: "t3", page_id: null })] as never;
         return [] as never;

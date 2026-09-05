@@ -6,6 +6,7 @@
 import { DbClient } from "../db/DbClient";
 import { EXTERNAL_FETCH_TIMEOUT_MS } from "../http/fetchWithTimeout";
 import { exigirPublicacionSocialPermitida } from "./publicacionSocialPermitida";
+import { exigirPiezaSocialAprobada } from "./aprobacionDePiezaSocial";
 
 export type SocialPlatform = "meta" | "linkedin" | "instagram";
 export type SocialPostStatus = "draft" | "scheduled" | "published" | "failed";
@@ -211,6 +212,16 @@ export class SaasSocialService {
     );
     if (!postRows.length) throw new SaasSocialError("Post not found or already published", "NOT_FOUND");
     const row = postRows[0];
+
+    // Que la instancia PUEDA publicar no significa que ESTA pieza este
+    // aprobada. El interruptor de arriba es de instalacion; esto es por pieza,
+    // por inquilino y por contenido: si el borrador cambio despues de que
+    // alguien lo aprobara, vuelve a revision.
+    //
+    // Se lanza ANTES de tocar la fila, igual que el interruptor: el post se
+    // queda en `scheduled` y el cron lo reintenta cuando haya aprobacion, en
+    // vez de marcarse `failed` y perderse.
+    await exigirPiezaSocialAprobada(this.db, tenantId, postId, String(row.content ?? ""));
 
     let result: PublishNowResult;
     if (row.platform === "meta" || row.platform === "instagram") {

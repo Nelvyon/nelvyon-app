@@ -125,6 +125,11 @@ describe("MetaAdsService", () => {
   });
 
   it("sendConversionEvent", async () => {
+    // Enviar conversiones esta CERRADO fuera de produccion: manda datos de los
+    // usuarios del cliente a Meta y alimenta la optimizacion de campanas que si
+    // gastan. Esta prueba ejercita el envio, asi que abre la puerta a proposito.
+    vi.stubEnv("NELVYON_META_CAPI_ENABLED", "1");
+
     vi.stubGlobal(
       "fetch",
       vi.fn().mockResolvedValue(
