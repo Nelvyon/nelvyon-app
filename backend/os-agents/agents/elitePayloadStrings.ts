@@ -1,4 +1,9 @@
 import type { OsJobPayload } from "../types";
+import {
+  contratoNativoComoTexto,
+  PLATAFORMAS,
+  type Plataforma,
+} from "../../agency/nativoPorPlataforma";
 
 function asTrimmedString(v: unknown, fallback: string): string {
   if (typeof v === "string" && v.trim().length > 0) return v.trim();
@@ -214,5 +219,27 @@ export function eliteSocialIntakeStrings(payload: OsJobPayload): Record<string, 
     socialPlatforms: asJoinedList(payload.platforms, "Redes sociales por priorizar (Instagram, LinkedIn, TikTok, etc.)"),
     postFrequency: asTrimmedString(payload.postFrequency, "Frecuencia de publicación por acordar en calendario"),
     contentStyle: asTrimmedString(payload.contentStyle, "Estilo visual preferido por definir con moodboard"),
+    // Criterio PROPIO de cada red: formato que premia, como se gana la atencion
+    // y —sobre todo— lo que NO se hace ahi. Sin esto el plan sale igual para
+    // Instagram que para LinkedIn, que es lo que pasaba: 129 lineas de
+    // instrucciones con DOS menciones a una plataforma concreta.
+    //
+    // Solo las redes que el cliente usa: pedir criterio para una donde no esta
+    // seria inventarle una presencia que no tiene.
+    contratoNativo: contratoNativoComoTexto(plataformasDelPayload(payload)),
   };
+}
+
+/** Las redes declaradas en el encargo que tienen criterio propio. */
+function plataformasDelPayload(payload: OsJobPayload): Plataforma[] {
+  const crudo = Array.isArray(payload.platforms) ? payload.platforms : [];
+  const normalizadas = crudo
+    .map((p) => String(p).trim().toLowerCase())
+    .map((p) => (p === "twitter" ? "x" : p === "meta" ? "facebook" : p));
+  const vistas = normalizadas.filter((p): p is Plataforma =>
+    (PLATAFORMAS as readonly string[]).includes(p),
+  );
+  // Sin redes declaradas se da el criterio de todas: es preferible que el agente
+  // sepa distinguirlas a que trate la que elija como si fueran intercambiables.
+  return vistas.length > 0 ? [...new Set(vistas)] : [...PLATAFORMAS];
 }

@@ -19,7 +19,9 @@ Brief: {brief}
 Auditoría de presencia social actual. Responde SOLO JSON con:
 platformAudit, contentPillarsToday, engagementSignals, competitorSocialCodes, whitespaceOpportunities, risks, summaryScore.`;
 
-export const PROMPT_SOCIAL_CONTENT_STRATEGY = `Eres el mejor planner de contenido social del mundo. Referencias: estrategias de Netflix y Spotify en social-first.
+export const PROMPT_SOCIAL_CONTENT_STRATEGY = `{{contratoNativo}}
+
+Eres el mejor planner de contenido social del mundo. Referencias: estrategias de Netflix y Spotify en social-first.
 
 Auditoría:
 {step1Result}
@@ -29,7 +31,9 @@ Cliente: {clientName} | Plataformas: {socialPlatforms} | Frecuencia: {postFreque
 Estrategia de contenido por plataforma. Responde SOLO JSON con:
 platformPlaybooks (array con platform, objective, formats, postingRhythm), heroCampaignIdeas, ugcPlan, influencerPosture, measurementMap.`;
 
-export const PROMPT_SOCIAL_CALENDAR = `Eres el mejor editor de calendarios sociales del mundo. Has coordinado launches globales en Meta Business Suite.
+export const PROMPT_SOCIAL_CALENDAR = `{{contratoNativo}}
+
+Eres el mejor editor de calendarios sociales del mundo. Has coordinado launches globales en Meta Business Suite.
 
 Paso 1: {step1Result}
 Paso 2: {step2Result}

@@ -29,7 +29,9 @@ export class SaasStripeMeterService {
     // es justo la forma en que una puerta deja de proteger.
     const permitido =
       process.env.STRIPE_METER_LIVE === "1" || process.env.NODE_ENV === "production";
-    if (!permitido || process.env.STRIPE_METER_LIVE === "0") return;
+    // `false` y no `undefined`: no se reporto, que es exactamente lo que
+    // significa el valor de retorno.
+    if (!permitido || process.env.STRIPE_METER_LIVE === "0") return false;
 
     if (quantity <= 0) return false;
     const secret = process.env.STRIPE_SECRET_KEY?.trim();
