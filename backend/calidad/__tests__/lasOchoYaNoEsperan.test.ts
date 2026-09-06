@@ -26,6 +26,7 @@ import {
   pedirLaFicha,
   sePuedePedirSinCoste,
   textoDelResultado,
+  PLAZO_DE_LA_FICHA_MS,
   TOPE_DE_TEXTO,
 } from "../laFichaQueFaltaba";
 import { comprobacionesDe, type Pieza } from "../MotorDeCalidad";
@@ -161,6 +162,31 @@ describe("no se pide si costaría dinero", () => {
     // comprueba que esto la respeta en vez de decidir por su cuenta.
     vi.stubEnv("NELVYON_MODO_COSTE_CERO", "0");
     expect(sePuedePedirSinCoste("openai")).toBe(true);
+  });
+});
+
+describe("un modelo lento no retrasa una entrega ya terminada", () => {
+  it("si el modelo no contesta a tiempo, se sigue sin ficha", async () => {
+    // El caso que motivo el plazo: en produccion `OLLAMA_HOST` apunta a una IP
+    // de red privada. Una IP que RECHAZA falla rapido; una que se traga los
+    // paquetes deja la peticion colgada hasta el plazo del cliente —120 s para
+    // el modelo rapido—. Eso es un trabajo terminado esperando dos minutos por
+    // una ayuda de calidad opcional.
+    vi.useFakeTimers();
+    try {
+      const modelo = { complete: vi.fn(() => new Promise<string>(() => {})) };
+      const pedida = pedirLaFicha("web", { texto: "x".repeat(200) }, modelo, "ollama");
+      await vi.advanceTimersByTimeAsync(PLAZO_DE_LA_FICHA_MS + 1);
+      await expect(pedida).resolves.toEqual({});
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("el plazo es MUCHO menor que el del cliente de agentes", () => {
+    // Si algun dia se igualara al del cliente, el plazo dejaria de servir para
+    // lo unico que sirve.
+    expect(PLAZO_DE_LA_FICHA_MS).toBeLessThan(120_000);
   });
 });
 

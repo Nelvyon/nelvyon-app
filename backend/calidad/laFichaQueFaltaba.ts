@@ -75,6 +75,24 @@ export interface ModeloQueResponde {
 export const TOPE_DE_TEXTO = 6000;
 
 /**
+ * Cuanto se espera a la ficha antes de seguir sin ella.
+ *
+ * ── POR QUE HACE FALTA UN PLAZO PROPIO ──────────────────────────────────────
+ *
+ * El cliente de los agentes espera hasta 120 s a un modelo rapido y 300 s a uno
+ * grande. Son plazos razonables para PRODUCIR un entregable, y disparatados
+ * para esto: la ficha es una AYUDA de calidad sobre trabajo que YA esta hecho.
+ * Con el plazo del cliente, un modelo inalcanzable —una IP que no responde en
+ * vez de rechazar— dejaria cada trabajo terminado esperando dos minutos antes
+ * de poder entregarse.
+ *
+ * Veinte segundos sobran: se midio el camino real y el modelo local contesta en
+ * unos diez. Si no llega, las ocho comprobaciones dicen «no se pudo comprobar»,
+ * que es la verdad, y la entrega sigue.
+ */
+export const PLAZO_DE_LA_FICHA_MS = 20_000;
+
+/**
  * Qué campos de la ficha necesita esta disciplina.
  *
  * DERIVADO del motor: se miran sus comprobaciones y se devuelven los campos que
@@ -168,7 +186,19 @@ export async function pedirLaFicha(
   if (texto.trim().length < 40) return {};
 
   try {
-    const respuesta = await modelo.complete(`${texto}\n\n${instruccion}`);
+    // Carrera contra el plazo: lo que no llegue a tiempo no se espera.
+    //
+    // No se cancela la peticion al modelo —el cliente no expone como— pero si
+    // se deja de esperarla. Quedarse colgado aqui retrasaria una entrega que ya
+    // esta terminada, y eso es peor que entregar sin ficha.
+    let avisar: (() => void) | undefined;
+    const plazo = new Promise<null>((resolver) => {
+      const reloj = setTimeout(() => resolver(null), PLAZO_DE_LA_FICHA_MS);
+      avisar = () => clearTimeout(reloj);
+    });
+    const respuesta = await Promise.race([modelo.complete(`${texto}\n\n${instruccion}`), plazo]);
+    avisar?.();
+    if (respuesta === null) return {};
     return fichaDe(parseJsonFromLlm(respuesta));
   } catch {
     // El modelo no respondió. Las ocho dirán «no se pudo comprobar», que es la
