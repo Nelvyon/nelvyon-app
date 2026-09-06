@@ -30,6 +30,7 @@
 import { describe, expect, it, vi } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
+import { escribirEvidencia } from "../../evidencia/escribirEvidencia";
 
 import {
   ModeloQueSoloEscucha,
@@ -117,48 +118,45 @@ describe("los servicios no dicen lo mismo a clientes distintos", () => {
       const medidos = veredictos.filter((v) => v.estado === "MEDIDO");
       const genericos = medidos.filter((v) => v.veredicto === "GENERICO");
 
-      fs.writeFileSync(
+      // Solo se reescribe si la MEDICION cambio: un `generado` nuevo en cada
+      // pasada ensuciaba el arbol sin que nada hubiera cambiado.
+      escribirEvidencia(
         path.join(RAIZ, "backend", "calidad", "personalizacion_por_servicio.json"),
-        `${JSON.stringify(
-          {
-            _lee_esto: [
-              "Cuanto distingue cada servicio entre clientes RADICALMENTE distintos.",
-              "",
-              "COBERTURA: que parte de lo que distingue al cliente llega a la",
-              "instruccion. El agente no puede tener en cuenta lo que no ve.",
-              "",
-              "SEPARACION: quitando lo identico para los cinco, cuanto queda de",
-              "propio. Cero significa que los cinco reciben literalmente lo mismo.",
-              "",
-              "Medido con cinco clientes cuyas decisiones correctas se contradicen",
-              "entre si. Coste externo 0 EUR: el modelo nunca se llama.",
-            ],
-            generado: new Date().toISOString(),
-            total: veredictos.length,
-            medidos: medidos.length,
-            porVeredicto: medidos.reduce<Record<string, number>>((acc, v) => {
-              acc[v.veredicto] = (acc[v.veredicto] ?? 0) + 1;
-              return acc;
-            }, {}),
-            servicios: medidos
-              .map((v) => ({
-                servicio: v.servicio,
-                veredicto: v.veredicto,
-                cobertura: Number(v.cobertura.toFixed(3)),
-                separacion: Number(v.separacion.toFixed(3)),
-                hechosQueNoLlegan: v.porCliente
-                  .filter((c) => c.hechosAusentes.length > 0)
-                  .map((c) => `${c.cliente}: ${c.hechosAusentes.join(", ")}`),
-              }))
-              .sort((a, b) => a.separacion - b.separacion),
-            noEjecutables: veredictos
-              .filter((v) => v.estado === "NO_EJECUTABLE")
-              .map((v) => ({ servicio: v.servicio, motivo: v.motivo })),
-          },
-          null,
-          2,
-        )}\n`,
-        "utf8",
+        {
+          _lee_esto: [
+            "Cuanto distingue cada servicio entre clientes RADICALMENTE distintos.",
+            "",
+            "COBERTURA: que parte de lo que distingue al cliente llega a la",
+            "instruccion. El agente no puede tener en cuenta lo que no ve.",
+            "",
+            "SEPARACION: quitando lo identico para los cinco, cuanto queda de",
+            "propio. Cero significa que los cinco reciben literalmente lo mismo.",
+            "",
+            "Medido con cinco clientes cuyas decisiones correctas se contradicen",
+            "entre si. Coste externo 0 EUR: el modelo nunca se llama.",
+          ],
+          generado: new Date().toISOString(),
+          total: veredictos.length,
+          medidos: medidos.length,
+          porVeredicto: medidos.reduce<Record<string, number>>((acc, v) => {
+            acc[v.veredicto] = (acc[v.veredicto] ?? 0) + 1;
+            return acc;
+          }, {}),
+          servicios: medidos
+            .map((v) => ({
+              servicio: v.servicio,
+              veredicto: v.veredicto,
+              cobertura: Number(v.cobertura.toFixed(3)),
+              separacion: Number(v.separacion.toFixed(3)),
+              hechosQueNoLlegan: v.porCliente
+                .filter((c) => c.hechosAusentes.length > 0)
+                .map((c) => `${c.cliente}: ${c.hechosAusentes.join(", ")}`),
+            }))
+            .sort((a, b) => a.separacion - b.separacion),
+          noEjecutables: veredictos
+            .filter((v) => v.estado === "NO_EJECUTABLE")
+            .map((v) => ({ servicio: v.servicio, motivo: v.motivo })),
+        },
       );
 
       expect(

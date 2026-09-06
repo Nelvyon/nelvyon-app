@@ -31,6 +31,7 @@ import { describe, expect, it, vi } from "vitest";
 import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
+import { escribirEvidencia } from "../../evidencia/escribirEvidencia";
 
 /** Plazo del fichero: recorre el arbol. El porque, en `nelvyonEsLaAgencia`. */
 vi.setConfig({ testTimeout: 60_000 });
@@ -320,10 +321,12 @@ describe("qué piden de verdad los 1.605 agentes sectoriales", () => {
         ).sort((a, b) => b[1] - a[1]).slice(0, 25),
       };
 
-      fs.writeFileSync(
+      // Solo se reescribe si la MEDICION cambio: un `generado` nuevo en cada
+      // pasada ensuciaba el arbol sin que nada hubiera cambiado, y con eso se
+      // pierde la senal de «arbol limpio» que usa la certificacion.
+      escribirEvidencia(
         path.join(RAIZ, "backend", "os-agents", "equivalencia_por_salida.json"),
-        `${JSON.stringify(informe, null, 2)}\n`,
-        "utf8",
+        informe,
       );
 
       // ── Lo que se afirma ────────────────────────────────────────────────
