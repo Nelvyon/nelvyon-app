@@ -180,7 +180,7 @@ conModelo("un modelo REAL emite la ficha que las ocho esperaban", () => {
         ).toBeGreaterThan(0);
         expect(instruccionDeFicha(dominio), "no hay instrucción que mandar").toBeTruthy();
 
-        const ficha = await pedirLaFicha(dominio, ENTREGABLES[dominio], modeloReal, "ollama");
+        const ficha = await pedirLaFicha(dominio, ENTREGABLES[dominio], modeloReal, "ollama", 140_000);
         const llegaron = Object.keys(ficha);
 
         expect(

@@ -175,6 +175,17 @@ export async function pedirLaFicha(
   resultado: unknown,
   modelo: ModeloQueResponde,
   proveedor: ProveedorDeFicha,
+  /**
+   * Cuanto se espera, en milisegundos.
+   *
+   * Es un parametro y no una constante fija porque hay dos preguntas
+   * distintas. En produccion importa NO retrasar una entrega terminada: 20 s.
+   * La bateria que comprueba que un modelo REAL emite la forma pregunta otra
+   * cosa —si la emite— y con el resto de la suite compitiendo por la CPU el
+   * mismo modelo que responde en diez segundos tarda mas. Compartir plazo
+   * haria que esa bateria midiera la carga de la maquina en vez del modelo.
+   */
+  plazoMs: number = PLAZO_DE_LA_FICHA_MS,
 ): Promise<FichaDeLaPieza> {
   const instruccion = instruccionDeFicha(dominio);
   if (!instruccion) return {};
@@ -193,7 +204,7 @@ export async function pedirLaFicha(
     // esta terminada, y eso es peor que entregar sin ficha.
     let avisar: (() => void) | undefined;
     const plazo = new Promise<null>((resolver) => {
-      const reloj = setTimeout(() => resolver(null), PLAZO_DE_LA_FICHA_MS);
+      const reloj = setTimeout(() => resolver(null), plazoMs);
       avisar = () => clearTimeout(reloj);
     });
     const respuesta = await Promise.race([modelo.complete(`${texto}\n\n${instruccion}`), plazo]);
