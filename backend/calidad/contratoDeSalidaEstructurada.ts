@@ -91,6 +91,54 @@ export const QUIEN_LEE_CADA_CAMPO: Readonly<Record<keyof FichaDeLaPieza, string>
 };
 
 /**
+ * Cómo se le pide cada campo a un modelo, en una línea.
+ *
+ * Vive aquí, pegado al tipo, para que un campo nuevo no pueda añadirse sin
+ * decir cómo se pide: sin esta frase el modelo no sabe qué se le está pidiendo,
+ * emitiría otra cosa y la comprobación seguiría muerta —que es exactamente
+ * cómo llegaron a estar muertas las ocho—. Un guardián comprueba que no falte
+ * ninguna.
+ */
+export const QUE_ES_CADA_CAMPO: Readonly<Record<keyof FichaDeLaPieza, string>> = {
+  paginas: "cada página propuesta, con la búsqueda o intención que quiere ganar",
+  ctasPrincipales: "el texto de cada llamada a la acción PRINCIPAL de la pieza",
+  camposDelFormulario: "cada campo del formulario, y si es obligatorio",
+  contrasteTextoFondo: "el ratio de contraste entre el texto y su fondo, como número",
+  pasoDondeApareceElPrecio: "en qué paso del proceso se ve el precio, como número",
+  pasosDelProceso: "cuántos pasos tiene el proceso en total, como número",
+  cuandoSeMuestranGastosDeEnvio: "en qué momento se le enseñan al cliente los gastos de envío",
+  criteriosDeCualificacion: "con qué criterios se separa un lead bueno de uno malo",
+  primeraSeccion: "por dónde arranca el informe: de qué habla su primera sección",
+};
+
+/**
+ * La FORMA de cada campo, tal y como se le enseña a un modelo.
+ *
+ * ── POR QUÉ HACEN FALTA LAS DOS COSAS ───────────────────────────────────────
+ *
+ * La primera versión de la instrucción solo describía cada campo con una frase.
+ * Se midió contra el modelo real y devolvió `ctasPrincipales` —una lista de
+ * textos, que se adivina sola— y se dejó `camposDelFormulario` sin emitir: para
+ * una lista de objetos, la descripción no dice si el objeto lleva `nombre` y
+ * `obligatorio` o cualquier otra cosa, y el modelo prefiere omitir a inventar
+ * —que, dicho sea de paso, es lo que se le pidió—.
+ *
+ * Con el esqueleto delante lo emite. No es un adorno del prompt: es la
+ * diferencia entre que una comprobación se dispare o no.
+ */
+export const FORMA_DE_CADA_CAMPO: Readonly<Record<keyof FichaDeLaPieza, string>> = {
+  paginas: '[{"url": "/ruta", "objetivo": "la búsqueda que quiere ganar"}]',
+  ctasPrincipales: '["texto del botón"]',
+  camposDelFormulario: '[{"nombre": "email", "obligatorio": true}]',
+  contrasteTextoFondo: "4.5",
+  pasoDondeApareceElPrecio: "2",
+  pasosDelProceso: "4",
+  cuandoSeMuestranGastosDeEnvio: '"en el carrito, antes de pagar"',
+  criteriosDeCualificacion: '["criterio"]',
+  primeraSeccion: '"de qué habla la primera sección"',
+};
+
+/**
  * Saca la ficha de lo que devolvió el agente, sin romperse con lo que venga.
  *
  * ── POR QUÉ NO VALIDA, FILTRA ───────────────────────────────────────────────

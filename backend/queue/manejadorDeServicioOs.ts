@@ -12,6 +12,8 @@
 
 import mapaDeServicio from "../calidad/mapaDeServicio.json";
 import { MotorDeCalidad, type Pieza } from "../calidad/MotorDeCalidad";
+import { pedirLaFicha, type ModeloQueResponde, type ProveedorDeFicha } from "../calidad/laFichaQueFaltaba";
+import { LlmClient, isOsOllamaConfigured, isOsOpenAiAllowed } from "../os-agents/LlmClient";
 import { osOrchestrator } from "../os-agents/OsOrchestrator";
 import { degradacionPermitida, veredictoDeEntrega } from "../autonomous/llm/llmPolicy";
 import type { LlmProvenance } from "../autonomous/llm/llmProvenance";
@@ -114,6 +116,22 @@ const motorDeCalidad = new MotorDeCalidad();
  * ya existe para que una persona lo mire. El trabajo está hecho y sigue ahí; lo
  * único que se impide es que salga sin que nadie lo haya visto.
  */
+/**
+ * El modelo al que se le pide la ficha: el mismo que usan los agentes.
+ *
+ * No se abre un camino nuevo hacia ningún proveedor. Si el de los agentes no
+ * está disponible, esta llamada falla y la ficha viene vacía, que es justo lo
+ * que debe pasar.
+ */
+function modeloParaLaFicha(): ModeloQueResponde {
+  return LlmClient.getInstance();
+}
+
+/** Quién atendería esa llamada, para que la política de coste pueda decidir. */
+function proveedorDeLaFicha(): ProveedorDeFicha {
+  return isOsOpenAiAllowed() && !isOsOllamaConfigured() ? "openai" : "ollama";
+}
+
 async function revisarCalidad(
   serviceId: string,
   resultado: unknown,
@@ -130,10 +148,28 @@ async function revisarCalidad(
 
   if (!resultado || typeof resultado !== "object") return { pide: false };
 
+  // LA FICHA, QUE ES LO QUE LES FALTABA A OCHO COMPROBACIONES.
+  //
+  // Lo que devuelve cada paso viaja como TEXTO dentro de `steps[].data.output`.
+  // Ocho comprobaciones leen campos concretos —`ctasPrincipales`,
+  // `camposDelFormulario`, `paginas`…— en el primer nivel de la pieza, y ahí no
+  // había nada: estaban dentro de una cadena, y encima nadie se los pedía al
+  // modelo. Llevaban etiquetadas como «bloqueadas por falta de proveedor real»
+  // cuando el proveedor real las emite sin problema; lo que faltaba era esta
+  // línea.
+  //
+  // Se pide una sola vez, aquí, y solo si la política de coste dice que el
+  // proveedor es gratis. Ficha vacía es una respuesta válida: las ocho dirán
+  // «no se pudo comprobar», que es honesto, y la entrega sigue.
+  const ficha = await pedirLaFicha(dominio, resultado, modeloParaLaFicha(), proveedorDeLaFicha());
+
   const pieza: Pieza = {
     dominio,
     autor: serviceId,
-    contenido: resultado as Record<string, unknown>,
+    // La ficha va DEBAJO de lo que trae el resultado: si un agente ya emitió el
+    // campo por su cuenta, manda el suyo. Lo que el trabajo dice de sí mismo
+    // pesa más que lo que un lector saca de leerlo.
+    contenido: { ...ficha, ...(resultado as Record<string, unknown>) },
     contexto: contextoDelCliente(payload),
   };
 

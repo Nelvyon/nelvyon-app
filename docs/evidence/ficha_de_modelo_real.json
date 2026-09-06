@@ -1,0 +1,106 @@
+{
+  "_lee_esto": [
+    "PROVIDER_REAL_OUTPUT_VERIFICATION medido contra un modelo REAL local.",
+    "No hay dobles: la instruccion es la que genera instruccionDeFicha y la",
+    "respuesta pasa por el mismo filtro que usa el manejador de servicios.",
+    "Coste 0 EUR: Ollama sobre hardware que ya estaba encendido, que es el",
+    "camino por defecto de los agentes (ADR-034)."
+  ],
+  "generado": "2026-09-06T08:21:00.333Z",
+  "proveedor": "ollama",
+  "modelo": "llama3.1:8b-instruct-q4_K_M",
+  "costeEuros": 0,
+  "porDisciplina": [
+    {
+      "dominio": "creatividad",
+      "camposPedidos": [
+        "contrasteTextoFondo"
+      ],
+      "camposEmitidos": [
+        "contrasteTextoFondo"
+      ],
+      "comprobacionesQueYaJuzgan": [
+        "se-puede-leer-lo-que-pone"
+      ]
+    },
+    {
+      "dominio": "crm",
+      "camposPedidos": [
+        "criteriosDeCualificacion"
+      ],
+      "camposEmitidos": [
+        "criteriosDeCualificacion"
+      ],
+      "comprobacionesQueYaJuzgan": [
+        "cualificacion-explicada"
+      ]
+    },
+    {
+      "dominio": "ecommerce",
+      "camposPedidos": [
+        "cuandoSeMuestranGastosDeEnvio",
+        "pasoDondeApareceElPrecio",
+        "pasosDelProceso"
+      ],
+      "camposEmitidos": [
+        "cuandoSeMuestranGastosDeEnvio",
+        "pasoDondeApareceElPrecio",
+        "pasosDelProceso"
+      ],
+      "comprobacionesQueYaJuzgan": [
+        "el-precio-no-aparece-tarde",
+        "el-precio-no-aparece-tarde",
+        "gastos-de-envio-sin-sorpresas"
+      ]
+    },
+    {
+      "dominio": "reporting",
+      "camposPedidos": [
+        "primeraSeccion"
+      ],
+      "camposEmitidos": [
+        "primeraSeccion"
+      ],
+      "comprobacionesQueYaJuzgan": [
+        "empieza-por-lo-que-el-cliente-queria"
+      ]
+    },
+    {
+      "dominio": "seo",
+      "camposPedidos": [
+        "paginas"
+      ],
+      "camposEmitidos": [
+        "paginas"
+      ],
+      "comprobacionesQueYaJuzgan": [
+        "canibalizacion"
+      ]
+    },
+    {
+      "dominio": "web",
+      "camposPedidos": [
+        "camposDelFormulario",
+        "ctasPrincipales"
+      ],
+      "camposEmitidos": [
+        "camposDelFormulario",
+        "ctasPrincipales"
+      ],
+      "comprobacionesQueYaJuzgan": [
+        "formulario-pide-lo-justo",
+        "una-idea-por-pantalla"
+      ]
+    }
+  ],
+  "comprobacionesVerificadas": [
+    "canibalizacion",
+    "cualificacion-explicada",
+    "el-precio-no-aparece-tarde",
+    "empieza-por-lo-que-el-cliente-queria",
+    "formulario-pide-lo-justo",
+    "gastos-de-envio-sin-sorpresas",
+    "se-puede-leer-lo-que-pone",
+    "una-idea-por-pantalla"
+  ]
+}
