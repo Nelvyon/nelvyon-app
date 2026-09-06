@@ -44,6 +44,52 @@
 -- migracion vale para produccion y para cualquier base migrada desde cero, que
 -- es lo que exige el guardian de replayabilidad.
 
+
+-- ── ANTES DE CONCEDER: PROTEGER ─────────────────────────────────────────────
+--
+-- `user_provider_api_keys` guarda claves de proveedores de terceros por usuario
+-- y NO tenia RLS. Conceder SELECT sobre ella habria dado a un rol de aplicacion
+-- las claves de TODOS los clientes en cada lectura.
+--
+-- Lo encontro `ningunaTablaConDuenoSeQuedaSinRls` al probar esta misma
+-- migracion: el guardian existia y cazo el fallo de quien lo escribio. Es la
+-- razon de que el orden importe — se protege primero y se concede despues.
+--
+-- Se usa el patron por usuario de la 591, sin inventar nada: politicas de
+-- SELECT/INSERT/UPDATE/DELETE contra `nelvyon_jwt_user_id()`.
+DO $proteger_597$
+DECLARE
+  t text := 'user_provider_api_keys';
+BEGIN
+  IF to_regclass(format('public.%I', t)) IS NULL THEN
+    RAISE NOTICE '597: %I no existe; nada que proteger', t;
+    RETURN;
+  END IF;
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+     WHERE n.nspname = 'public' AND p.proname = 'nelvyon_jwt_user_id'
+  ) THEN
+    RAISE NOTICE '597: falta nelvyon_jwt_user_id; no se activa RLS';
+    RETURN;
+  END IF;
+
+  EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY', t);
+  EXECUTE format('ALTER TABLE public.%I FORCE ROW LEVEL SECURITY', t);
+
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename=t AND policyname=t||'_sel_propio') THEN
+    EXECUTE format('CREATE POLICY %I ON public.%I FOR SELECT USING ((user_id)::text = (nelvyon_jwt_user_id())::text)', t||'_sel_propio', t);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename=t AND policyname=t||'_ins_propio') THEN
+    EXECUTE format('CREATE POLICY %I ON public.%I FOR INSERT WITH CHECK ((user_id)::text = (nelvyon_jwt_user_id())::text)', t||'_ins_propio', t);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename=t AND policyname=t||'_upd_propio') THEN
+    EXECUTE format('CREATE POLICY %I ON public.%I FOR UPDATE USING ((user_id)::text = (nelvyon_jwt_user_id())::text) WITH CHECK ((user_id)::text = (nelvyon_jwt_user_id())::text)', t||'_upd_propio', t);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename=t AND policyname=t||'_del_propio') THEN
+    EXECUTE format('CREATE POLICY %I ON public.%I FOR DELETE USING ((user_id)::text = (nelvyon_jwt_user_id())::text)', t||'_del_propio', t);
+  END IF;
+END $proteger_597$;
+
 DO $$
 DECLARE
   f RECORD;
