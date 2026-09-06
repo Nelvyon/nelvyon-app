@@ -135,7 +135,7 @@ describe("/api/health/deep GET", () => {
     // produccion sin saber si hay alguien al otro lado de la red privada. Su
     // doble devuelve modelos: un servidor vivo SIN modelos no es `ok`, y eso se
     // comprueba aparte.
-    process.env.OLLAMA_HOST = "http://modelo-local.test:11434";
+    process.env.OLLAMA_HOST = "http://100.102.207.30:11434";
     global.fetch = vi.fn(async (input: RequestInfo | URL) => {
       const u = String(input);
       if (u.includes("/ping")) {

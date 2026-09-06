@@ -4,6 +4,7 @@
 // error. `DbJobsClient` cae a `DATABASE_URL` mientras la variable dedicada no
 // exista, asi que hoy no cambia ninguna conducta.
 import { DbJobsClient } from "../db/DbJobsClient";
+import { privateModeFetch } from "../private-ai/privateMode";
 import { sanitizeEnvValue } from "../db/envSanitize";
 import { isNelvyonAiEnabled } from "../private-ai/config";
 import { isSesEnvConfigured, isStripeEnvConfigured, isOpenAiEnvConfigured, missingEnvKeys } from "../saas/saasEnv";
@@ -229,7 +230,26 @@ export async function checkNelvyonAi(timeoutMs = 4000): Promise<HealthCheckResul
     try {
       const ac = new AbortController();
       const tid = setTimeout(() => ac.abort(), timeoutMs);
-      const res = await fetch(`${base.replace(/\/$/, "")}/api/tags`, { signal: ac.signal });
+      // `privateModeFetch`, NO `fetch` a secas.
+      //
+      // En produccion el modelo vive en el tailnet y el contenedor lo alcanza por
+      // un proxy userspace (`ALL_PROXY`/`NELVYON_MESH_HTTP_PROXY`, que el
+      // entrypoint exporta). Node ignora esas variables: un `fetch` normal no
+      // llega y devuelve «Connection failed» aunque el modelo este perfectamente
+      // vivo al otro lado.
+      //
+      // Lo se porque lo hice: la primera version de esta sonda usaba `fetch` y
+      // declaro el modelo INALCANZABLE cuando lo unico inalcanzable era mi
+      // llamada. Una sonda que se equivoca en esa direccion es peor que no
+      // tenerla: manda a buscar una averia de red que no existe.
+      //
+      // El cliente real (`OllamaClient`) ya usa este envoltorio. La sonda tiene
+      // que recorrer EL MISMO camino que el codigo que dice vigilar.
+      const res = await privateModeFetch(
+        `${base.replace(/\/$/, "")}/api/tags`,
+        "external_fetch",
+        { signal: ac.signal },
+      );
       clearTimeout(tid);
       if (!res.ok) {
         return {

@@ -26,7 +26,15 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { checkNelvyonAi } from "../healthChecks";
 
-const HOST = "http://modelo-local.test:11434";
+/**
+ * Una IP del rango de Tailscale, como en produccion.
+ *
+ * No es cosmetico: `privateModeFetch` solo deja salir a la lista blanca de
+ * PRIVATE_MODE —localhost, IP privadas y el CGNAT 100.64/10 del tailnet—. Un
+ * host inventado no pasa el filtro, asi que la prueba mediria el filtro en vez
+ * de la sonda.
+ */
+const HOST = "http://100.102.207.30:11434";
 
 function fetchQueDevuelve(cuerpo: unknown, status = 200) {
   return vi.fn(async () => new Response(JSON.stringify(cuerpo), { status })) as unknown as typeof fetch;
@@ -99,7 +107,7 @@ describe("con la IA encendida, se mira de verdad", () => {
     }) as unknown as typeof fetch;
     const r = await checkNelvyonAi();
     expect(r.status).toBe("down");
-    expect(r.error ?? "").not.toContain("modelo-local.test");
+    expect(r.error ?? "").not.toContain("100.102.207.30");
     expect(r.error ?? "").not.toContain("11434");
   });
 });
@@ -112,7 +120,7 @@ describe("no se llama a ningún proveedor de pago", () => {
     global.fetch = espia as unknown as typeof fetch;
     await checkNelvyonAi();
     for (const [url] of espia.mock.calls as unknown as Array<[string]>) {
-      expect(String(url)).toContain("modelo-local.test");
+      expect(String(url)).toContain("100.102.207.30");
       expect(String(url)).not.toMatch(/openai|anthropic|googleapis/i);
     }
   });
