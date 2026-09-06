@@ -12,6 +12,15 @@ export type HealthCheckResult = {
   status: "ok" | "degraded" | "down";
   latencyMs: number;
   error?: string;
+  /**
+   * Lo que la sonda vio cuando fue bien.
+   *
+   * `error` solo aparece cuando algo falla, asi que un `ok` no podia decir NADA
+   * de lo que encontro. Para el modelo local importa: «alcanzable» y
+   * «alcanzable con seis modelos» no son la misma respuesta, y la segunda es la
+   * que dice si de verdad se puede inferir.
+   */
+  detail?: string;
 };
 
 const PUBLIC_ERROR = "Connection failed";
@@ -166,6 +175,92 @@ export async function checkOpenAI(timeoutMs = 3000): Promise<HealthCheckResult> 
 }
 
 /**
+ * El modelo LOCAL de NELVYON, mirado desde donde de verdad importa.
+ *
+ * ── EL HUECO QUE CIERRA ─────────────────────────────────────────────────────
+ *
+ * `checkOpenAI` mira al proveedor de PAGO, que en produccion esta apagado a
+ * proposito. Del modelo que NELVYON usa de verdad —Ollama, autoalojado, coste
+ * cero— no habia ninguna sonda. Y no es un detalle: en produccion el modelo vive
+ * al otro lado de una red privada, asi que «esta configurado» y «se alcanza» son
+ * dos cosas distintas, y solo se puede distinguir DESDE EL RUNTIME. Desde el
+ * portatil de nadie.
+ *
+ * Sin esto, encender la IA era un acto de fe: la variable a 1 y a esperar que el
+ * primer trabajo real descubriera si habia alguien al otro lado.
+ *
+ * ── NO CUESTA, Y ESO ESTA MEDIDO ────────────────────────────────────────────
+ *
+ * Listar modelos es una lectura de metadatos contra un servidor propio. La
+ * politica de coste clasifica `ollama` como
+ * `FREE_SELF_HOSTED_ON_EXISTING_HARDWARE`: ejecutable bajo el modo de coste
+ * cero. Aqui no se llama a ningun proveedor facturable, ni siquiera si estuviera
+ * configurado.
+ *
+ * ── QUE DEVUELVE, Y POR QUE ASI ─────────────────────────────────────────────
+ *
+ * `ok` solo si responde Y hay al menos un modelo instalado. Un servidor vivo sin
+ * modelos no puede inferir: decir `ok` ahi seria exactamente el «configurado que
+ * parece verificado» que esta sonda existe para impedir.
+ */
+export async function checkNelvyonAi(timeoutMs = 4000): Promise<HealthCheckResult> {
+  return withGlobalCap(async () => {
+    const started = Date.now();
+    if (!isNelvyonAiEnabled()) {
+      return {
+        status: "degraded",
+        latencyMs: Date.now() - started,
+        error: "IA desactivada: NELVYON_AI_ENABLED=0",
+      };
+    }
+    const base = (
+      process.env.OLLAMA_HOST ??
+      process.env.OLLAMA_BASE_URL ??
+      process.env.NELVYON_LOCAL_AI_URL ??
+      ""
+    ).trim();
+    if (!base) {
+      return {
+        status: "degraded",
+        latencyMs: Date.now() - started,
+        error: "Missing: OLLAMA_HOST",
+      };
+    }
+    try {
+      const ac = new AbortController();
+      const tid = setTimeout(() => ac.abort(), timeoutMs);
+      const res = await fetch(`${base.replace(/\/$/, "")}/api/tags`, { signal: ac.signal });
+      clearTimeout(tid);
+      if (!res.ok) {
+        return {
+          status: "degraded",
+          latencyMs: Date.now() - started,
+          error: `HTTP ${res.status}`,
+        };
+      }
+      const cuerpo = (await res.json()) as { models?: Array<{ name?: string }> };
+      const modelos = (cuerpo.models ?? []).filter((m) => typeof m?.name === "string").length;
+      if (modelos === 0) {
+        return {
+          status: "degraded",
+          latencyMs: Date.now() - started,
+          error: "servidor alcanzable y sin modelos instalados",
+        };
+      }
+      return { status: "ok", latencyMs: Date.now() - started, detail: `${modelos} modelos` };
+    } catch {
+      // No se filtra el motivo: la direccion del modelo es informacion de red
+      // interna y esta sonda la puede llamar cualquiera con el secreto de cron.
+      return {
+        status: "down",
+        latencyMs: Math.min(Date.now() - started, timeoutMs),
+        error: PUBLIC_ERROR,
+      };
+    }
+  });
+}
+
+/**
  * Stripe billing readiness: secret key, starter price ID, and API connectivity.
  */
 export async function checkStripe(timeoutMs = 3000): Promise<HealthCheckResult> {
@@ -224,6 +319,7 @@ export type DeepHealthChecks = {
   database: HealthCheckResult;
   redis: HealthCheckResult;
   openai: HealthCheckResult;
+  nelvyon_ai: HealthCheckResult;
   stripe: HealthCheckResult;
   ses: HealthCheckResult;
 };
@@ -257,6 +353,7 @@ export async function runDeepHealthChecks(): Promise<DeepHealthPayload> {
     checkDatabase(),
     checkRedis(),
     checkOpenAI(),
+    checkNelvyonAi(),
     checkStripe(),
     checkSES(),
   ]);
@@ -265,8 +362,9 @@ export async function runDeepHealthChecks(): Promise<DeepHealthPayload> {
     database: unwrapSettled(settled[0]!),
     redis: unwrapSettled(settled[1]!),
     openai: unwrapSettled(settled[2]!),
-    stripe: unwrapSettled(settled[3]!),
-    ses: unwrapSettled(settled[4]!),
+    nelvyon_ai: unwrapSettled(settled[3]!),
+    stripe: unwrapSettled(settled[4]!),
+    ses: unwrapSettled(settled[5]!),
   };
 
   const status = aggregateHealthStatus(checks);

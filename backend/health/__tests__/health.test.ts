@@ -72,6 +72,7 @@ describe("healthChecks", () => {
         database: { status: "down", latencyMs: 1 },
         redis: { status: "ok", latencyMs: 1 },
         openai: { status: "ok", latencyMs: 1 },
+        nelvyon_ai: { status: "ok", latencyMs: 1 },
         stripe: { status: "ok", latencyMs: 1 },
         ses: { status: "ok", latencyMs: 1 },
       }),
@@ -130,10 +131,18 @@ describe("/api/health/deep GET", () => {
     // que hacen falta las DOS condiciones, no solo el opt-in de siempre.
     process.env.NELVYON_AI_ENABLED = "1";
     process.env.OPENAI_API_KEY = "sk-test-hc";
+    // El modelo LOCAL tiene su propia sonda desde que se puede encender la IA en
+    // produccion sin saber si hay alguien al otro lado de la red privada. Su
+    // doble devuelve modelos: un servidor vivo SIN modelos no es `ok`, y eso se
+    // comprueba aparte.
+    process.env.OLLAMA_HOST = "http://modelo-local.test:11434";
     global.fetch = vi.fn(async (input: RequestInfo | URL) => {
       const u = String(input);
       if (u.includes("/ping")) {
         return new Response(JSON.stringify({ result: "PONG" }), { status: 200 });
+      }
+      if (u.includes("/api/tags")) {
+        return new Response(JSON.stringify({ models: [{ name: "llama3.1:8b" }] }), { status: 200 });
       }
       return new Response(null, { status: 200 });
     }) as typeof fetch;
