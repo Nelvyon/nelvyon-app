@@ -18,6 +18,7 @@ on:
     - cron: "0 3 * * *"     # os-sector-certification (daily 03:00 UTC)
     - cron: "*/10 * * * *"  # status-check (public status page probes)
     - cron: "0 10 * * 1"    # saas-competitor-gap digest (Mondays 10:00 UTC)
+    - cron: "30 2 * * *"    # saas-retencion-ejecuciones (daily 02:30 UTC)
   workflow_dispatch:
     inputs:
       job:
@@ -41,6 +42,7 @@ on:
           - status-check
           - local-pack-email-queue
           - saas-competitor-gap
+          - saas-retencion-ejecuciones
           - pwa-push-dispatch
           - all
 
@@ -301,6 +303,24 @@ jobs:
           code=$(curl -s -o /tmp/cron.out -w "%{http_code}" \
             -H "x-cron-secret: $CRON_SECRET" \
             "$BASE_URL/api/cron/local-pack-email-queue")
+          echo "HTTP $code"
+          cat /tmp/cron.out
+          test "$code" = "200" -o "$code" = "204"
+
+  saas-retencion-ejecuciones:
+    # Caduca lo que una persona escribio (90 dias) y retira las ejecuciones de
+    # mas de dos anos. A las 02:30 UTC, antes del resto del mantenimiento: si
+    # algo va mal, se nota con la noche por delante y no a media manana.
+    if: github.event.schedule == '30 2 * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.job == 'saas-retencion-ejecuciones' || github.event.inputs.job == 'all'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Trigger saas-retencion-ejecuciones cron
+        env:
+          BASE_URL: ${{ vars.PRODUCTION_BASE_URL || vars.STAGING_BASE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          code=$(curl -s -o /tmp/cron.out -w "%{http_code}" \n            -H "Authorization: Bearer $CRON_SECRET" \n            "$BASE_URL/api/cron/saas-retencion-ejecuciones")
           echo "HTTP $code"
           cat /tmp/cron.out
           test "$code" = "200" -o "$code" = "204"

@@ -1,0 +1,35 @@
+-- `knowledge_base_articles` se retira: nadie la lee, nadie la escribe.
+--
+-- POR QUE SE MIRO
+-- ---------------
+-- Al auditar la memoria salieron dos almacenes sin las tres respuestas que se
+-- le exigen a cualquiera —quien escribe, quien lee, de quien es—. Uno,
+-- `nelvyon_rag_chunks`, resulto ser infraestructura transitoria DECLARADA: su
+-- plan esta escrito y su escritor canonico existe. El otro es este.
+--
+-- QUE SE COMPROBO ANTES DE TOCARLA
+-- ---------------------------------
+--   · ni una consulta en TypeScript ni en Python. La unica coincidencia en el
+--     arbol es una clave JSON dentro del texto de un prompt del frontend
+--     —`"knowledge_base_articles":[]`—, que no es esta tabla;
+--   · VACIA en produccion: entra en el lote de 127 tablas sin filas que midio
+--     la migracion 567;
+--   · creada en la 416 junto a encuestas y QR, y nunca conectada desde.
+--
+-- POR QUE RETIRARLA Y NO ADOPTARLA
+-- ---------------------------------
+-- Fabricarle un lector para que dejara de aparecer en la auditoria habria sido
+-- codigo ornamental: consumo inventado para poner verde un guardian. Y dejarla
+-- es peor que retirarla, porque una tabla con nombre util y sin dueno acaba
+-- adoptada por error: alguien escribe en ella creyendo que algo la lee.
+--
+-- Si algun dia el departamento de soporte necesita una base de conocimiento, se
+-- crea entonces, con su lector y su escritor a la vez. Decision de Daniel,
+-- 2026-09-06.
+--
+-- REVERSIBLE
+-- ----------
+-- La definicion completa esta en la migracion 416 y su RLS en la 567. Recrearla
+-- es copiar aquel CREATE TABLE. No se pierde ningun dato porque no hay ninguno.
+
+DROP TABLE IF EXISTS knowledge_base_articles;

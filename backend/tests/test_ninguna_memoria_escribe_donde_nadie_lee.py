@@ -25,8 +25,9 @@ LO QUE SE ENCONTRO AL PREGUNTARLO
     saas_shared_memory_entries   escribe y lee                              OK
     saas_tenant_memory_chunks    escribe y lee                              OK
     client_memory                lo usa el backend Python, hoy con 0 filas
-    nelvyon_rag_chunks           LECTOR SIN ESCRITOR
-    knowledge_base_articles      SIN NINGUN CONSUMIDOR
+    nelvyon_rag_chunks           LECTOR SIN ESCRITOR (transitoria declarada)
+    knowledge_base_articles      RETIRADA en la migracion 596: no la leia ni la
+                                 escribia nadie, y estaba vacia en produccion
 
 `nelvyon_rag_chunks` es el caso que importa: `UnifiedRagStore` CAE a el cuando el
 recuperador local certificado no esta disponible. Como nada escribe ahi —ni
@@ -77,7 +78,6 @@ MEMORIAS: tuple[str, ...] = (
     "saas_shared_memory_entries",
     "saas_tenant_memory_chunks",
     "nelvyon_rag_chunks",
-    "knowledge_base_articles",
 )
 
 #: Almacenes sin inquilino a proposito, con su motivo.
@@ -96,11 +96,6 @@ SIN_ESCRITOR_DECLARADO: dict[str, str] = {
         "`UnifiedRagStore` prefiere. Ya NO devuelve cero conocimiento en "
         "silencio: el vacio se propaga hasta la herramienta MCP. Se retira "
         "cuando el soak de Private AI pase en produccion",
-    "knowledge_base_articles":
-        "DEUDA VIVA, PENDIENTE DE DECISION: ningun consumidor, ni en TypeScript "
-        "ni en Python, y vacia en produccion (medido en la migracion 567). No se "
-        "le fabrica un lector para poner esto verde: o alguien la adopta o se "
-        "retira, y las dos cosas son decision de quien manda, no de una prueba",
 }
 
 #: Almacenes sin lector en TypeScript, con su motivo.
@@ -111,8 +106,6 @@ SIN_LECTOR_DECLARADO: dict[str, str] = {
     "os_client_brain_history":
         "historico: se escribe para poder mirarlo, no para que lo lea el "
         "producto en cada ejecucion",
-    "knowledge_base_articles":
-        "DEUDA: ningun consumidor. Misma tabla que arriba",
 }
 
 
