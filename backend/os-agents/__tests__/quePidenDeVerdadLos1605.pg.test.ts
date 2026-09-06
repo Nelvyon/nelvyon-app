@@ -151,15 +151,55 @@ const ES_CLASE = /^\s*class\b/;
  * marca `no_ejecutable` y se queda fuera del recuento: meterlo en un grupo
  * junto a los que si corrieron inventaria una equivalencia que nadie ha medido.
  */
+/**
+ * Importa un modulo aguantando los tropiezos del sistema de ficheros.
+ *
+ * El empaquetador escribe temporales y los renombra; en Windows eso produce
+ * `EPERM` de vez en cuando, sobre todo con mil seiscientos ficheros seguidos.
+ * No dice nada del agente, asi que se reintenta una vez antes de darlo por
+ * imposible. Un solo reintento: si falla dos veces seguidas ya no es una
+ * carrera, es un problema.
+ */
+async function importarAguantandoElSistemaDeFicheros(
+  fichero: string,
+): Promise<Record<string, unknown>> {
+  try {
+    return (await import(/* @vite-ignore */ fichero)) as Record<string, unknown>;
+  } catch (e) {
+    if (!/EPERM|EBUSY|EMFILE|ENFILE|EAGAIN/i.test((e as Error).message)) throw e;
+    await new Promise((r) => setTimeout(r, 50));
+    return (await import(/* @vite-ignore */ fichero)) as Record<string, unknown>;
+  }
+}
+
 async function medir(fichero: string, doble: ModeloQueSoloEscucha): Promise<Medicion> {
   const rel = path.relative(RAIZ, fichero).replace(/\\\\/g, "/");
   const nombre = path.basename(fichero, ".ts");
 
   let mod: Record<string, unknown>;
   try {
-    mod = (await import(/* @vite-ignore */ fichero)) as Record<string, unknown>;
+    mod = await importarAguantandoElSistemaDeFicheros(fichero);
   } catch (e) {
-    return { fichero: rel, agente: nombre, estado: "no_ejecutable", motivo: `no importa: ${(e as Error).message.slice(0, 90)}` };
+    const mensaje = (e as Error).message;
+    // UN FALLO DEL SISTEMA DE FICHEROS NO ES UNA PROPIEDAD DEL AGENTE.
+    //
+    // En Windows aparecen `EPERM` al renombrar ficheros temporales del
+    // empaquetador. Eso se estaba anotando como «no importa», igual que un
+    // agente roto de verdad, y acababa ESCRITO en la evidencia: dos agentes
+    // cambiaban de «medido» a «no ejecutable» segun el humor del disco. Una
+    // evidencia que cambia sin que cambie lo medido deja de servir para nada.
+    //
+    // Se distingue con su nombre para que quien lea el informe sepa que ahi no
+    // se midio, en vez de creer que el agente no se puede cargar.
+    const esDelDisco = /EPERM|EBUSY|EMFILE|ENFILE|EAGAIN/i.test(mensaje);
+    return {
+      fichero: rel,
+      agente: nombre,
+      estado: "no_ejecutable",
+      motivo: esDelDisco
+        ? "no se pudo medir: fallo del sistema de ficheros, no del agente"
+        : `no importa: ${mensaje.slice(0, 90)}`,
+    };
   }
 
   const antes = doble.recibido.length;
