@@ -1,132 +1,33 @@
--- Los dos roles del lado web pasan a ser de verdad DOS roles distintos.
+-- 598 · Quitar al rol de trabajos lo que no usa. La mitad que hay que mirar.
 --
--- LO QUE SE ENCONTRO AL MEDIRLO
--- -----------------------------
--- La aplicacion se conecta a produccion como `postgres`, que es SUPERUSUARIO y
--- por tanto SALTA RLS. Las 651 tablas con RLS y sus 2324 politicas no protegen
--- nada mientras eso siga asi: estan escritas y no se aplican.
+-- NO SE APLICA CON LA 597, Y ES DELIBERADO
+-- -----------------------------------------
+-- Aqui van 969 revocaciones, casi todas de `nelvyon_web_jobs`, que tenia
+-- permisos IDENTICOS al rol web: INSERT en 457 tablas que sus siete consultas
+-- no tocan.
 --
--- Los roles acotados existen desde la 577, pero:
+-- Quitar un permiso que en realidad hacia falta no falla al arrancar: falla la
+-- primera vez que alguien recorre ese camino, con un «permission denied» suelto
+-- que puede tardar semanas en aparecer. Por eso espera al CUTOVER: se aplica
+-- cuando los roles ya sirven trafico y hay observabilidad encima, no antes.
 --
---   1. ninguno de los dos tiene LOGIN, asi que no se pueden usar en una cadena
---      de conexion. Estaban preparados a medias;
---   2. tienen permisos IDENTICOS entre si. Es decir, la separacion web/jobs no
---      existia: eran el mismo rol escrito dos veces, con la unica diferencia de
---      que `nelvyon_web_jobs` lleva BYPASSRLS —que es lo correcto para un
---      trabajo que cruza inquilinos, y muy incorrecto para servir peticiones.
+-- ORDEN OBLIGATORIO
+-- -----------------
+--   1. 597   proteger + conceder          <- se puede aplicar ya
+--   2. LOGIN + contrasena                  <- runbook, fuera del repositorio
+--   3. cutover de DATABASE_URL             <- con verificacion inmediata
+--   4. 598   esta                          <- con el rol ya sirviendo
 --
--- COMO SE DECIDIO QUE NECESITA CADA UNO
--- -------------------------------------
--- No a ojo: se extrajo de las consultas del arbol, POR OPERACION, separando
--- que modulos usan `DbClient` (runtime web) de los que usan `DbJobsClient`
--- (trabajos y cron). Un `SELECT` de una tabla no da derecho a `DELETE` sobre
--- ella, y por eso se conceden por separado.
---
--- El resultado dice que `nelvyon_web_app` ya estaba casi bien —le faltaban 29
--- permisos sueltos— y que `nelvyon_web_jobs` sobraba entero: 933 permisos que
--- no usa, incluido INSERT en 457 tablas que sus 7 consultas no tocan.
---
--- LO QUE ESTA MIGRACION NO HACE
--- ------------------------------
--- No da LOGIN ni contrasena: una credencial no se escribe en el repositorio.
--- Eso va en `docs/ops/CUTOVER_MENOR_PRIVILEGIO.md`, con su rollback.
---
--- Tampoco cambia `DATABASE_URL`. Esta migracion deja los roles LISTOS; el
--- cutover es una decision aparte y reversible con una variable.
--- POR QUE UN BLOQUE Y NO MIL SENTENCIAS SUELTAS
--- ---------------------------------------------
--- El plan se calculo contra PRODUCCION, y no todas sus tablas existen en una
--- base recien migrada (`local_ai_memory`, por ejemplo). Un `GRANT` sobre una
--- tabla que no esta aborta la migracion entera: la primera version lo hizo, y
--- dejo los permisos a medias.
---
--- `GRANT` no admite `IF EXISTS`, asi que se comprueba antes. Asi la misma
--- migracion vale para produccion y para cualquier base migrada desde cero, que
--- es lo que exige el guardian de replayabilidad.
+-- Aplicarla antes del paso 3 no rompe nada —nadie usa estos roles todavia— pero
+-- tampoco se veria si sobra alguna revocacion, que es justo lo que se quiere
+-- poder ver.
 
-
--- ── ANTES DE CONCEDER: PROTEGER ─────────────────────────────────────────────
---
--- `user_provider_api_keys` guarda claves de proveedores de terceros por usuario
--- y NO tenia RLS. Conceder SELECT sobre ella habria dado a un rol de aplicacion
--- las claves de TODOS los clientes en cada lectura.
---
--- Lo encontro `ningunaTablaConDuenoSeQuedaSinRls` al probar esta misma
--- migracion: el guardian existia y cazo el fallo de quien lo escribio. Es la
--- razon de que el orden importe — se protege primero y se concede despues.
---
--- Se usa el patron por usuario de la 591, sin inventar nada: politicas de
--- SELECT/INSERT/UPDATE/DELETE contra `nelvyon_jwt_user_id()`.
-DO $proteger_597$
-DECLARE
-  t text := 'user_provider_api_keys';
-BEGIN
-  IF to_regclass(format('public.%I', t)) IS NULL THEN
-    RAISE NOTICE '597: %I no existe; nada que proteger', t;
-    RETURN;
-  END IF;
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
-     WHERE n.nspname = 'public' AND p.proname = 'nelvyon_jwt_user_id'
-  ) THEN
-    RAISE NOTICE '597: falta nelvyon_jwt_user_id; no se activa RLS';
-    RETURN;
-  END IF;
-
-  EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY', t);
-  EXECUTE format('ALTER TABLE public.%I FORCE ROW LEVEL SECURITY', t);
-
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename=t AND policyname=t||'_sel_propio') THEN
-    EXECUTE format('CREATE POLICY %I ON public.%I FOR SELECT USING ((user_id)::text = (nelvyon_jwt_user_id())::text)', t||'_sel_propio', t);
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename=t AND policyname=t||'_ins_propio') THEN
-    EXECUTE format('CREATE POLICY %I ON public.%I FOR INSERT WITH CHECK ((user_id)::text = (nelvyon_jwt_user_id())::text)', t||'_ins_propio', t);
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename=t AND policyname=t||'_upd_propio') THEN
-    EXECUTE format('CREATE POLICY %I ON public.%I FOR UPDATE USING ((user_id)::text = (nelvyon_jwt_user_id())::text) WITH CHECK ((user_id)::text = (nelvyon_jwt_user_id())::text)', t||'_upd_propio', t);
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename=t AND policyname=t||'_del_propio') THEN
-    EXECUTE format('CREATE POLICY %I ON public.%I FOR DELETE USING ((user_id)::text = (nelvyon_jwt_user_id())::text)', t||'_del_propio', t);
-  END IF;
-END $proteger_597$;
-
-DO $$
+DO $revocar_598$
 DECLARE
   f RECORD;
 BEGIN
   FOR f IN
     SELECT * FROM (VALUES
-    ('GRANT','SELECT','os_service_requests','nelvyon_web_app'),
-    ('GRANT','SELECT','saas_mcp_tool_audit','nelvyon_web_app'),
-    ('GRANT','SELECT','user_provider_api_keys','nelvyon_web_app'),
-    ('GRANT','INSERT','_migrations','nelvyon_web_app'),
-    ('GRANT','INSERT','agrofood_results','nelvyon_web_app'),
-    ('GRANT','INSERT','automotive_results','nelvyon_web_app'),
-    ('GRANT','INSERT','coaching_results','nelvyon_web_app'),
-    ('GRANT','INSERT','construction_results','nelvyon_web_app'),
-    ('GRANT','INSERT','education_results','nelvyon_web_app'),
-    ('GRANT','INSERT','fashion_results','nelvyon_web_app'),
-    ('GRANT','INSERT','finance_results','nelvyon_web_app'),
-    ('GRANT','INSERT','freelancers_results','nelvyon_web_app'),
-    ('GRANT','INSERT','health_results','nelvyon_web_app'),
-    ('GRANT','INSERT','home_results','nelvyon_web_app'),
-    ('GRANT','INSERT','legal_results','nelvyon_web_app'),
-    ('GRANT','INSERT','logistics_results','nelvyon_web_app'),
-    ('GRANT','INSERT','media_results','nelvyon_web_app'),
-    ('GRANT','INSERT','music_results','nelvyon_web_app'),
-    ('GRANT','INSERT','ngo_results','nelvyon_web_app'),
-    ('GRANT','INSERT','pharmacy_results','nelvyon_web_app'),
-    ('GRANT','INSERT','startups_results','nelvyon_web_app'),
-    ('GRANT','INSERT','tourism_results','nelvyon_web_app'),
-    ('GRANT','INSERT','user_provider_api_keys','nelvyon_web_app'),
-    ('GRANT','INSERT','user_roles','nelvyon_web_app'),
-    ('GRANT','INSERT','veterinary_results','nelvyon_web_app'),
-    ('GRANT','INSERT','wellness_results','nelvyon_web_app'),
-    ('GRANT','UPDATE','store_settings','nelvyon_web_app'),
-    ('GRANT','DELETE','saas_agent_runs','nelvyon_web_app'),
-    ('GRANT','DELETE','user_provider_api_keys','nelvyon_web_app'),
-    ('GRANT','SELECT','os_service_requests','nelvyon_web_jobs'),
-    ('GRANT','SELECT','waitlist','nelvyon_web_jobs'),
     ('REVOKE','SELECT','api_key_usage_daily','nelvyon_web_app'),
     ('REVOKE','SELECT','erp_inventory_products','nelvyon_web_app'),
     ('REVOKE','SELECT','erp_manufacturing_orders','nelvyon_web_app'),
@@ -1109,4 +1010,4 @@ BEGIN
       END IF;
     END IF;
   END LOOP;
-END $$;
+END $revocar_598$;

@@ -1,7 +1,16 @@
 # Cutover a menor privilegio — runbook
 
 > Estado: **PREPARADO, NO EJECUTADO.** Falta una decisión humana (§4) y una
-> credencial (§3). La migración 597 ya deja los permisos correctos.
+> credencial (§3).
+>
+> La migración va **partida en dos a propósito**:
+>
+> - **597** — RLS de `user_provider_api_keys` + las 31 concesiones. Sólo suma:
+>   conceder de más no rompe nada. Se puede aplicar ya.
+> - **598** — las 969 revocaciones. Espera al **cutover**, con el rol ya
+>   sirviendo tráfico: quitar un permiso que sí hacía falta no falla al
+>   arrancar, falla la primera vez que alguien recorre ese camino, y eso puede
+>   tardar semanas en verse.
 
 ## 1 · Qué problema resuelve
 
@@ -108,9 +117,11 @@ traía datos aparece vacío, es esto, y el rollback es inmediato.
 ## 5 · Estado
 
 - [x] Permisos calculados por operación y por cliente
-- [x] Migración 597 escrita, aplicada en local y **idempotente** (dos pasadas seguidas)
-- [x] Verificado en local: `nelvyon_web_app` lee **282/282** de lo que consulta el web
-- [x] Verificado en local: `BYPASSRLS = false` — **RLS sí se aplica al rol**
-- [x] `nelvyon_web_jobs` reducido de 968 a **37** permisos
+- [x] Migraciones **597** y **598** escritas, aplicadas e **idempotentes** (dos pasadas cada una)
+- [x] Certificadas sobre una base con **los permisos exactos de producción**, restaurados para la prueba
+- [x] Secuencia medida: antes `290/460/146/62` en ambos → tras **597** `web_app 293/483/147/64` y `web_jobs 292/…` (**nada revocado**) → tras **598** `web_app 282/471/145/63` y `web_jobs 21/7/8/1`
+- [x] Tras **597 sola**: `nelvyon_web_app` lee **282/282** de lo que consulta el web, `BYPASSRLS=false`
+- [x] `user_provider_api_keys`: RLS + FORCE + 4 políticas
+- [x] Guardianes de esquema y RLS en verde sobre la base resultante
 - [ ] LOGIN + contraseña en producción — **requiere decisión humana**
 - [ ] Cambio de `DATABASE_URL` — **requiere decisión humana**
