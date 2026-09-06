@@ -47,9 +47,17 @@ let pool: import("pg").Pool;
  *
  * Cada entrada es una decision comprobada, no un descarte. Si no sabes por que
  * una tabla esta aqui, no deberia estar.
+ *
+ * AQUI NO VAN LAS RETIRADAS NORMALES. Una tabla que una migracion posterior
+ * TIRA con `DROP TABLE` se acepta sola: eso ya esta escrito en el SQL y no hace
+ * falta repetirlo aqui. La primera version exigia una entrada a mano por cada
+ * retirada, y una lista que hay que acordarse de actualizar es una lista que
+ * envejece mal — que es justo lo que este fichero intenta evitar.
+ *
+ * Quedan solo los casos que el SQL NO cuenta: un renombrado, o una creacion
+ * condicional que puede no llegar a ocurrir.
  */
 const RETIRADAS_A_PROPOSITO: Record<string, string> = {
-  scored_leads: "la retira `513_drop_scored_leads.sql`",
   conversation_messages:
     "`535_saas_conversations_recupera_su_prefijo.sql` la renombra a " +
     "`saas_conversation_messages`, que es la que usa `SaasInboxService`",
@@ -78,6 +86,31 @@ function tablasDeclaradas(): Map<string, string> {
     }
   }
   return declaradas;
+}
+
+/**
+ * Tablas que una migracion RETIRA, con el fichero que lo hace.
+ *
+ * Una tabla creada por la 416 y tirada por la 596 no esta «ausente sin
+ * explicacion»: esta retirada, y la explicacion es la propia migracion. Se lee
+ * del SQL en vez de mantenerse a mano para que el dia que se retire otra no
+ * haya que acordarse de tocar este fichero.
+ *
+ * Se exige que el DROP sea POSTERIOR al CREATE: si una migracion antigua tirara
+ * una tabla que otra mas nueva vuelve a crear, la tabla tiene que estar, y su
+ * ausencia sigue siendo un fallo.
+ */
+function tablasRetiradas(): Map<string, string> {
+  const retiradas = new Map<string, string>();
+  for (const f of fs.readdirSync(DIR).filter((x) => x.endsWith(".sql")).sort()) {
+    const sql = fs.readFileSync(path.join(DIR, f), "utf8");
+    const codigo = sql.replace(/--[^\n]*/g, " ").replace(/\/\*[\s\S]*?\*\//g, " ");
+    const patron = /DROP\s+TABLE\s+(?:IF\s+EXISTS\s+)?(?:public\.)?"?([a-zA-Z_][a-zA-Z0-9_]*)"?/gi;
+    for (const m of codigo.matchAll(patron)) {
+      retiradas.set(m[1].toLowerCase(), f);
+    }
+  }
+  return retiradas;
 }
 
 async function tablasQueExisten(): Promise<Set<string>> {
@@ -119,10 +152,14 @@ describeSiHayPg("lo que una migracion dice crear, existe", () => {
 
   it("LA REGLA: ninguna migracion promete una tabla que no esta", async () => {
     const existen = await tablasQueExisten();
+    const retiradas = tablasRetiradas();
     const faltan: string[] = [];
     for (const [tabla, fichero] of tablasDeclaradas()) {
       if (existen.has(tabla)) continue;
       if (tabla in RETIRADAS_A_PROPOSITO) continue;
+      // Retirada por una migracion POSTERIOR: esta explicado en el SQL.
+      const quienLaTira = retiradas.get(tabla);
+      if (quienLaTira && quienLaTira > fichero) continue;
       faltan.push(`${tabla}  (la declara ${fichero})`);
     }
     expect(
@@ -141,8 +178,13 @@ describeSiHayPg("lo que una migracion dice crear, existe", () => {
      */
     const existen = await tablasQueExisten();
     const declaradas = tablasDeclaradas();
+    const retiradas = tablasRetiradas();
     const muertas = Object.keys(RETIRADAS_A_PROPOSITO).filter(
-      (t) => existen.has(t) || !declaradas.has(t),
+      (t) =>
+        existen.has(t) ||
+        !declaradas.has(t) ||
+        // Si ya hay un `DROP TABLE` que lo explica, la entrada a mano sobra.
+        (retiradas.has(t) && retiradas.get(t)! > declaradas.get(t)!),
     );
     expect(
       muertas,
