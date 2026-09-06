@@ -58,6 +58,23 @@ _MINIMIZA = re.compile(r"\btextoPersistible\b|\bresumenPersistible\b")
 #: Columnas de texto libre. Lo que entre ahi sin minimizar es el fallo.
 _COLUMNAS_LIBRES = ("input", "output")
 
+#: Poner una columna de texto a NULL es lo CONTRARIO de guardar texto.
+#:
+#: La regla es «no guardes crudo lo que escribio una persona». Un modulo que
+#: solo VACIA esas columnas —la retencion, que las anula a los 90 dias— cumple
+#: la regla llevandola al extremo, y exigirle que pase por el minimizador seria
+#: pedirle que minimice un valor que no escribe.
+#:
+#: La distincion se hace mirando el SQL, no el nombre del fichero: si ese mismo
+#: modulo escribiera ademas un valor, dejaria de estar exento el mismo dia.
+ANTES_NO_ES_PALABRA = "(?<![A-Za-z_])"
+_SOLO_ANULA = re.compile(
+    ANTES_NO_ES_PALABRA + r"(input|output)\s*=\s*NULL", re.I
+)
+_ESCRIBE_VALOR = re.compile(
+    ANTES_NO_ES_PALABRA + r"(input|output)\s*=\s*(?!NULL)[^,\s]", re.I
+)
+
 
 def _modulos() -> list[pathlib.Path]:
     fuera: list[pathlib.Path] = []
@@ -78,6 +95,11 @@ def _escritores() -> dict[str, bool]:
         if not _ESCRIBE.search(texto):
             continue
         rel = os.path.relpath(p, RAIZ).replace("\\", "/")
+        # Un modulo que SOLO anula las columnas no guarda texto: no hay nada que
+        # minimizar. Si ademas escribiera un valor, vuelve a exigirsele.
+        if _SOLO_ANULA.search(texto) and not _ESCRIBE_VALOR.search(texto):
+            fuera[rel] = True
+            continue
         fuera[rel] = bool(_MINIMIZA.search(texto))
     return fuera
 
@@ -133,4 +155,27 @@ def test_la_huella_no_es_del_texto_original():
     assert "update(redactado" in cuerpo, (
         "la huella dejo de calcularse sobre el texto redactado; asi vuelve a ser "
         "un oraculo para confirmar secretos"
+    )
+
+
+def test_anular_no_es_lo_mismo_que_escribir():
+    """LA EXENCION, Y SU LIMITE.
+
+    La retencion pone `input`/`output` a NULL a los 90 dias: eso no guarda texto,
+    lo borra. Exigirle el minimizador seria pedirle que minimice un valor que no
+    escribe.
+
+    Pero la exencion se gana por lo que hace el SQL, no por el nombre del
+    fichero: se comprueba que un modulo que anule Y ADEMAS escriba un valor
+    vuelve a estar sujeto a la regla. Sin esto, cualquiera podria colar una
+    escritura cruda anadiendo un `input = NULL` en otra consulta del mismo
+    fichero.
+    """
+    assert _SOLO_ANULA.search("SET input = NULL, output = NULL")
+    assert not _ESCRIBE_VALOR.search("SET input = NULL, output = NULL")
+    # Un modulo que anula en una consulta y escribe crudo en otra NO esta exento.
+    mixto = "UPDATE saas_agent_runs SET input = NULL ... INSERT ... input = $2"
+    assert _ESCRIBE_VALOR.search(mixto), (
+        "un modulo que anula en un sitio y escribe un valor en otro quedaria "
+        "exento: la exencion se estaria dando por el fichero y no por el SQL"
     )
