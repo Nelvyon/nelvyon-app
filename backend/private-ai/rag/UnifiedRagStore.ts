@@ -68,7 +68,21 @@ export class UnifiedRagStore implements IRagStore {
       }
     }
 
-    return this.adjunct.searchPlatform(q, limit);
+    // SIN RESULTADOS Y SIN NADA INDEXADO NO SON LO MISMO, Y AQUI SE DECIDE.
+    //
+    // El adjunto ya sabe distinguirlas: devuelve `vacio` cuando la tabla no
+    // tiene ni una fila. Lo que faltaba era propagarlo. Hoy `nelvyon_rag_chunks`
+    // no lo escribe nadie —es el espejo de lectura que el plan de RAG unificado
+    // mantiene hasta el cutover—, asi que este camino se quedaba sin
+    // conocimiento EN SILENCIO: quien preguntara recibia cero trozos y
+    // contestaria igual, sin saber que no habia nada donde mirar.
+    //
+    // «Vacio» de verdad exige que los DOS lados esten vacios: si el recuperador
+    // local tiene contenido y esta busqueda no encaja, eso es un resultado, no
+    // una averia.
+    const delAdjunto = await this.adjunct.searchPlatform(q, limit);
+    if (delAdjunto.vacio !== true) return delAdjunto;
+    return { ...delAdjunto, vacio: (await this.countPlatform()) === 0 };
   }
 }
 

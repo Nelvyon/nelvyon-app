@@ -33,6 +33,20 @@ recuperador local certificado no esta disponible. Como nada escribe ahi —ni
 siquiera hay permiso de INSERT en los roles del web— ese camino de respaldo
 devuelve cero conocimiento en silencio. El sistema no falla: responde peor.
 
+LO QUE SE DECIDIO DESPUES, CON EL PLAN DELANTE
+-----------------------------------------------
+No es un componente muerto por descuido: `docs/PHASE2_RAG_UNIFIED.md` lo declara
+espejo de LECTURA hasta el cutover al vector local, y dice explicitamente que no
+se tire hasta que el soak de Private AI este verde. El equivalente canonico
+existe y si tiene escritor: `KnowledgeIngestService` → `LocalVectorStore`, que es
+a quien `UnifiedRagStore` prefiere.
+
+O sea: infraestructura transitoria deliberada, no olvido. Lo que SI era un
+defecto —y ya no lo es— era que su vacio no llegaba a nadie. Ahora la fachada lo
+propaga y la herramienta MCP lo dice, para que un agente pueda contestar «no lo
+se» en vez de improvisar sin conocimiento. Su retirada depende de un soak en
+PRODUCCION y por eso no se cierra aqui.
+
 QUE VIGILA ESTA PRUEBA
 ----------------------
 El INVENTARIO, no los seis de hoy. Un almacen nuevo tiene que declarar sus tres
@@ -76,12 +90,17 @@ SIN_INQUILINO_A_PROPOSITO: dict[str, str] = {
 #: Almacenes sin escritor en el arbol, con su motivo. Solo puede ENCOGER.
 SIN_ESCRITOR_DECLARADO: dict[str, str] = {
     "nelvyon_rag_chunks":
-        "DEUDA: `UnifiedRagStore` cae aqui cuando el recuperador local no esta, "
-        "y nada escribe —los roles del web solo tienen SELECT—, asi que ese "
-        "camino devuelve cero conocimiento en silencio",
+        "TRANSITORIA DECLARADA: espejo de LECTURA hasta el cutover al vector "
+        "local (docs/PHASE2_RAG_UNIFIED.md). Su escritor canonico es "
+        "`KnowledgeIngestService` sobre `LocalVectorStore`, que es a quien "
+        "`UnifiedRagStore` prefiere. Ya NO devuelve cero conocimiento en "
+        "silencio: el vacio se propaga hasta la herramienta MCP. Se retira "
+        "cuando el soak de Private AI pase en produccion",
     "knowledge_base_articles":
-        "DEUDA: ningun consumidor, ni en TypeScript ni en Python. Tabla creada y "
-        "nunca conectada",
+        "DEUDA VIVA, PENDIENTE DE DECISION: ningun consumidor, ni en TypeScript "
+        "ni en Python, y vacia en produccion (medido en la migracion 567). No se "
+        "le fabrica un lector para poner esto verde: o alguien la adopta o se "
+        "retira, y las dos cosas son decision de quien manda, no de una prueba",
 }
 
 #: Almacenes sin lector en TypeScript, con su motivo.

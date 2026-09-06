@@ -177,6 +177,19 @@ export const productiveTools: McpRegisteredTool[] = [
             title: c.title,
             content: c.content.slice(0, 1500),
           })),
+          // «He buscado y no encaja» y «no hay nada donde buscar» llegaban aqui
+          // como la misma respuesta: cero trozos. Un agente que recibe cero
+          // trozos contesta igual, y nadie se entera de que respondio sin
+          // conocimiento. Cuando el almacen esta vacio se dice, para que quien
+          // lea pueda decir «no lo se» en vez de improvisar.
+          ...(rag.vacio === true
+            ? {
+                sinConocimientoIndexado: true,
+                note:
+                  "no hay conocimiento indexado en la plataforma: esto no es " +
+                  "«sin resultados», es que no hay donde buscar",
+              }
+            : {}),
         };
       } catch {
         return {
