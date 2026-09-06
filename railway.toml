@@ -7,11 +7,38 @@
 builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
-# Sin esto, el servicio que APLICA las migraciones no vigila donde VIVEN. Un
-# commit que solo anade un fichero en `backend/db/migrations/` marcaba su
-# despliegue como SKIPPED mientras el backend desplegaba en SUCCESS: dos
-# despliegues verdes y ninguna migracion aplicada. Paso con la 564.
-watchPatterns = ["apps/web/**", "backend/db/migrations/**"]
+# QUE CAMBIOS MERECEN UN DESPLIEGUE. Si algo que entra en el build no esta aqui,
+# su commit se marca SKIPPED y produccion se queda atras EN VERDE.
+#
+# Ya paso dos veces, y la segunda con esta misma lista:
+#
+#   · con la 564, un commit que solo anadia un fichero en `backend/db/migrations/`
+#     se marco SKIPPED mientras el backend desplegaba en SUCCESS: dos despliegues
+#     verdes y ninguna migracion aplicada. Se anadio ese patron;
+#   · con `95897a55`, un commit que solo tocaba `backend/health/` se marco
+#     SKIPPED. `origin/main` y produccion divergieron sin una sola senal roja.
+#
+# La correccion de la primera vez fue anadir el directorio concreto que dolio.
+# Por eso volvio a pasar: la lista describia SITIOS RECORDADOS en vez del
+# criterio. El criterio es «todo lo que entra en el build», y `apps/web` importa
+# de `backend/` en 870 sitios. Asi que va `backend/**` entero, no sus subcarpetas
+# de una en una.
+#
+# Y va tambien la propia configuracion del despliegue: un cambio en el Dockerfile
+# o en este fichero cambia lo que se construye.
+#
+# Lo vigila `test_ningun_cambio_que_entra_en_el_build_se_queda_sin_desplegar`.
+watchPatterns = [
+  "apps/web/**",
+  "backend/**",
+  "packages/**",
+  "Dockerfile",
+  "railway.toml",
+  "railway.json",
+  "package.json",
+  "pnpm-lock.yaml",
+  "pnpm-workspace.yaml",
+]
 
 [deploy]
 # Official preDeployCommand (array, max 1). Runs after build, before traffic.
