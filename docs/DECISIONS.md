@@ -974,3 +974,58 @@ Prep 2026-07-25: `erpRelationalFlags.ts` + `erpDualWritePrep.test.ts` + runbook.
 | **Por qué** | Staging Railway usa NODE_ENV=production sin Redis → 429 permanente bloqueaba certificación password. Añadir Upstash de pago en staging no autorizado; desactivar RL global prohibido. |
 | **Consecuencias** | Staging certifica login/roles; prod sin Upstash sigue 429 en auth crítico (intencional). claimReady: false hasta autorización. |
 
+
+---
+
+## ADR-078 — Retención de `saas_agent_runs`: 90 días el texto, 2 años el rastro
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-09-06 |
+| **Decisión** | A los **90 días** se anula `input`/`output` (vista previa ya redactada y su huella); a los **2 años** se elimina la fila. Lo aplica el cron diario `saas-retencion-ejecuciones` (02:30 UTC). |
+| **Por qué** | No existía ninguna purga, ni para esta tabla ni para ninguna otra: «para siempre» era la política por omisión, y es la única que no se puede defender ante una petición de supresión. Lo conservado son dos cosas con vidas distintas: lo que escribió una persona (valor de depuración que cae en días, y único dato personal) y el rastro de que la ejecución existió (lo que contesta a una auditoría). Borrar todo a los 90 perdería la trazabilidad; conservar el texto 2 años guardaría datos personales mucho más allá de su utilidad. |
+| **Consecuencias** | `NULL` en `input`/`output` significa **caducó**, no «vino vacío» — se distingue de la cadena vacía. El export unificado de auditoría deja de ver el texto pasados 90 días. Las sentencias van acotadas por tope (5000/pasada) e son idempotentes: si el cron no corre, la siguiente pasada tiene más trabajo y nada más. Decisión de negocio tomada por Daniel; no se cambia sin que la cambie una persona. |
+
+---
+
+## ADR-079 — `knowledge_base_articles` se retira en vez de adoptarse
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-09-06 |
+| **Decisión** | `DROP TABLE` en la migración 596. |
+| **Por qué** | Ni una consulta en TypeScript ni en Python; la única coincidencia del árbol es una clave JSON dentro del texto de un prompt. Vacía en producción (medido en el lote de la migración 567). Creada en la 416 junto a encuestas y QR, y nunca conectada. Fabricarle un lector para que dejara de salir en la auditoría de memoria habría sido consumo inventado para poner verde un guardián. |
+| **Consecuencias** | Reversible: la definición está en la 416 y su RLS en la 567; no se pierde ningún dato porque no hay ninguno. Si soporte necesita una base de conocimiento, se crea entonces con lector y escritor a la vez. Dejarla era peor que retirarla: una tabla con nombre útil y sin dueño acaba adoptada por error. |
+
+---
+
+## ADR-080 — `nelvyon_rag_chunks` es infraestructura transitoria, no deuda
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-09-06 |
+| **Decisión** | Se mantiene como espejo de **lectura** hasta el cutover al vector local. Su retirada depende de un soak de Private AI en producción. |
+| **Por qué** | Su ausencia de escritor no es un olvido: `PHASE2_RAG_UNIFIED.md` lo declara así, y el escritor canónico existe (`KnowledgeIngestService` → `LocalVectorStore`, que es a quien `UnifiedRagStore` prefiere). Lo que **sí** era defecto es que su vacío no llegaba a nadie: el camino de respaldo devolvía cero conocimiento en silencio y el agente contestaba igual. |
+| **Consecuencias** | El vacío se propaga desde el almacén hasta la herramienta MCP (`sinConocimientoIndexado`), para que un agente pueda decir «no lo sé» en vez de improvisar. El guardián de memoria la declara transitoria con su plan, no deuda anónima. |
+
+---
+
+## ADR-081 — La capa ejecutora especialista son los `os-agents`
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-09-06 |
+| **Decisión** | Un departamento L2 tiene capacidad de ejecución especialista por una de tres vías: especialistas L3 en el organigrama, servicios propios con agente ejecutor, o estar declarado **funcional** (supervisa, opera o mide) con su motivo. |
+| **Por qué** | Se midió antes de decidir: de los 16 departamentos L2, **quince** no tienen L3. El único que los tiene es `social_media`, porque cada red es un oficio distinto. `creative` (5 servicios) y `reputation` (1) no son una excepción accidental: están mejor cubiertos que siete departamentos que no venden nada. Los tres heads de plataforma publicitaria no venden porque `ads_premium` es multiplataforma y asignarlo a uno mentiría sobre los otros dos. |
+| **Consecuencias** | `test_ningun_departamento_manda_sobre_nadie` impide que aparezca un jefe sin nadie debajo —un asiento con permisos, ámbito de conocimiento y capacidad de aprobar, y nada que ejecute—. La lista de funcionales solo puede encoger. |
+
+---
+
+## ADR-082 — `PROVIDER_REAL_OUTPUT_VERIFICATION` se verifica con el modelo local
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-09-06 |
+| **Decisión** | La verificación de que un modelo real emite la ficha estructurada se hace contra Ollama `llama3.1:8b-instruct-q4_K_M`, coste 0. |
+| **Por qué** | No es un sustituto: es el camino **por defecto** de los agentes de servicio (ADR-034, OpenAI solo con opt-in). Lo que faltaba no era un proveedor —el modelo emite la forma sin problema— sino la cadena: nadie pedía la ficha y nadie la sacaba del texto de los pasos. La etiqueta «externo» tapaba capacidad construida y sin conectar. |
+| **Consecuencias** | Las 8 comprobaciones dejan de decir «no se pudo comprobar»; evidencia en `docs/evidence/ficha_de_modelo_real.json`. La ficha se pide UNA vez por trabajo, derivada del motor, y **solo si la política de coste dice que el proveedor es gratis**: con OpenAI encendido no se pide, y las ocho vuelven a «no se pudo comprobar», que es honesto. |
