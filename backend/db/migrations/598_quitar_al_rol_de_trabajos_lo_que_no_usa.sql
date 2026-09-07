@@ -1,3 +1,20 @@
+-- NELVYON:MIGRACION_MANUAL
+--
+-- ESTA MARCA NO ES UN COMENTARIO MAS: la lee el migrador y la respeta.
+--
+-- Se anade DESPUES de que esta migracion se aplicara en produccion contra una
+-- instruccion expresa de no aplicarla. Llevaba escrito «espera al cutover» en la
+-- cabecera, y el migrador —que aplica todo lo pendiente— la ejecuto igual. Un
+-- comentario no es una puerta.
+--
+-- Aqui ya esta aplicada. La marca sirve para lo que viene: en cualquier entorno
+-- NUEVO —staging, una base de certificacion, la proxima que se levante— esta
+-- migracion NO se aplicara sola. Recortar permisos antes de que el rol sirva
+-- trafico es exactamente lo que se queria poder decidir.
+--
+-- Para soltarla, hay que nombrarla entera:
+--   NELVYON_MIGRACION_MANUAL_APROBADA=598_quitar_al_rol_de_trabajos_lo_que_no_usa.sql
+
 -- 598 · Quitar al rol de trabajos lo que no usa. La mitad que hay que mirar.
 --
 -- NO SE APLICA CON LA 597, Y ES DELIBERADO

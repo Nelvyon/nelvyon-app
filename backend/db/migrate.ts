@@ -1,4 +1,5 @@
 import fs from "fs";
+import { nombresAprobados, sePuedeAplicar } from "./migracionesRetenidas";
 import path from "path";
 
 import { DbClient } from "./DbClient";
@@ -61,6 +62,11 @@ async function runMigrations(): Promise<void> {
     .filter((f) => f.endsWith(".sql"))
     .sort();
   await assertProdMigrateGate(db, files);
+  // Las que alguien ha nombrado a mano. Vacio por defecto: sin nombrar, ninguna
+  // migracion marcada se aplica.
+  const aprobadasAMano = nombresAprobados(process.env.NELVYON_MIGRACION_MANUAL_APROBADA);
+  let retenidas = 0;
+
   for (const file of files) {
     const rows = await db.query<{ name: string }>("SELECT name FROM _migrations WHERE name = $1", [file]);
     if (rows.length > 0) {
@@ -68,7 +74,27 @@ async function runMigrations(): Promise<void> {
       continue;
     }
     const sql = fs.readFileSync(path.join(migrationsDir, file), "utf8");
-    console.log(`[migrate] run: ${file}`);
+
+    // UNA MIGRACION PUEDE PEDIR QUE NO SE LA APLIQUE SOLA.
+    //
+    // La 598 se ejecuto en produccion contra una instruccion expresa de no
+    // ejecutarla: llevaba escrito en su cabecera «espera al cutover», como si un
+    // comentario pudiera detener a un migrador. La puerta que habia es GLOBAL
+    // —todo lo pendiente o nada—, asi que abrir la ventana para una la abre para
+    // todas las del mismo push.
+    //
+    // Ahora la marca vive en el SQL y hay que nombrar el fichero entero para
+    // soltarlo. Se OMITE en vez de bloquear: una migracion de cutover puede
+    // esperar semanas en el repositorio, y bloquear el despliegue durante esas
+    // semanas seria peor que el problema.
+    const veredicto = sePuedeAplicar(file, sql, aprobadasAMano);
+    if (!veredicto.aplicar) {
+      retenidas += 1;
+      console.log(`[migrate] HELD: ${file} — ${veredicto.motivo}`);
+      continue;
+    }
+
+    console.log(`[migrate] run: ${file}${veredicto.motivo === "normal" ? "" : ` (${veredicto.motivo})`}`);
     if (file === CONSOLIDATED_MIGRATION) {
       await runConsolidatedMigration(db, file, sql);
     } else {
@@ -76,6 +102,11 @@ async function runMigrations(): Promise<void> {
     }
     await db.query("INSERT INTO _migrations (name) VALUES ($1)", [file]);
     console.log(`[migrate] done: ${file}`);
+  }
+  if (retenidas > 0) {
+    // Que se vea en el log del despliegue: una migracion retenida no es un
+    // error, pero tampoco puede pasar desapercibida.
+    console.log(`[migrate] ${retenidas} migracion(es) RETENIDA(s) sin aplicar (marca manual)`);
   }
   console.log("[migrate] all migrations complete");
   await db.end();

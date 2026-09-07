@@ -1029,3 +1029,15 @@ Prep 2026-07-25: `erpRelationalFlags.ts` + `erpDualWritePrep.test.ts` + runbook.
 | **Decisión** | La verificación de que un modelo real emite la ficha estructurada se hace contra Ollama `llama3.1:8b-instruct-q4_K_M`, coste 0. |
 | **Por qué** | No es un sustituto: es el camino **por defecto** de los agentes de servicio (ADR-034, OpenAI solo con opt-in). Lo que faltaba no era un proveedor —el modelo emite la forma sin problema— sino la cadena: nadie pedía la ficha y nadie la sacaba del texto de los pasos. La etiqueta «externo» tapaba capacidad construida y sin conectar. |
 | **Consecuencias** | Las 8 comprobaciones dejan de decir «no se pudo comprobar»; evidencia en `docs/evidence/ficha_de_modelo_real.json`. La ficha se pide UNA vez por trabajo, derivada del motor, y **solo si la política de coste dice que el proveedor es gratis**: con OpenAI encendido no se pide, y las ocho vuelven a «no se pudo comprobar», que es honesto. |
+
+---
+
+## ADR-083 — Una migración puede pedir que no se la aplique sola
+
+| Campo | Valor |
+|-------|-------|
+| **Fecha** | 2026-09-07 |
+| **Decisión** | La marca `-- NELVYON:MIGRACION_MANUAL` dentro de un `.sql` hace que el migrador **NO** lo aplique. Para soltarlo hay que nombrar el fichero entero en `NELVYON_MIGRACION_MANUAL_APROBADA`. Sin nombrar → se omite, se registra `HELD` en el log, y el resto sigue. |
+| **Por qué** | **Incidencia de proceso, 2026-09-07**: la migración 598 se aplicó en producción contra una instrucción expresa de no aplicarla. No hubo mala suerte: `migrate:prod` aplica todo lo pendiente, y la 598 estaba pendiente. Lo único que la «protegía» era una cabecera que decía «espera al cutover» — prosa dentro de un fichero SQL. **Un comentario no es una puerta.** La puerta que ya existía (ADR-064) es global: decide entre aplicar todo lo pendiente o nada, así que abrir la ventana para una migración la abre para todas las del mismo push. |
+| **Consecuencias** | Se omite en vez de bloquear: una migración de cutover puede pasarse semanas en el repositorio y bloquear los despliegues durante ese tiempo sería peor que el problema. Eso impone una regla al escribirlas: **una migración manual no puede tener descendientes que dependan de ella** — son terminales por naturaleza (un cutover, una retirada). Nombrarla exige el nombre exacto: sin prefijos ni comodines, para que quien la suelta haya mirado qué suelta. Verificado de extremo a extremo contra el migrador real: sin aprobar → HELD; nombrada entera → corre; con prefijo `598` → HELD. |
+| **Impacto de la incidencia** | **Cero.** `nelvyon_web_app` y `nelvyon_web_jobs` no tenían ni una conexión viva y `DATABASE_URL` sigue en `postgres`. Lo que se perdió no fue disponibilidad sino **la oportunidad de observar el rol sirviendo tráfico antes de recortarle permisos**, que era la razón de partir la migración en dos. Decisión de Daniel: no revertir, dejar el estado restrictivo final. |
