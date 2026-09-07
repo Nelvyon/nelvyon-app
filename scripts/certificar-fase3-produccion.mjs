@@ -49,7 +49,19 @@ function anotar(bloque, prueba, ok, detalle = {}) {
 
 async function pide(metodo, ruta, { token, tenant, cuerpo, timeoutMs = 60_000 } = {}) {
   const cabeceras = { accept: "application/json", "user-agent": UA };
-  if (token) cabeceras.authorization = `Bearer ${token}`;
+  // LA COOKIE, NO SOLO LA CABECERA.
+  //
+  // El middleware de Next lee `nelvyon_token` de la COOKIE para decidir si deja
+  // pasar una peticion a `/api/saas/*` y `/api/os/*`. Con solo `Authorization`
+  // devuelve 401 antes de que la ruta llegue a mirar nada — y ese 401 parece de
+  // la ruta, no del middleware, que es lo que hace tan facil equivocarse.
+  //
+  // El arnes oficial ya lo sabia: por eso `live-http-cert-helpers` tiene un
+  // `cookieFrom`. Se mandan las dos cosas, que es lo que hace un navegador.
+  if (token) {
+    cabeceras.authorization = `Bearer ${token}`;
+    cabeceras.cookie = `nelvyon_token=${token}`;
+  }
   if (tenant) cabeceras["x-nelvyon-tenant-id"] = tenant;
   if (cuerpo !== undefined) cabeceras["content-type"] = "application/json";
   const t0 = Date.now();
