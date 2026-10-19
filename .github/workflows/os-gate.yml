@@ -1,4 +1,4 @@
-﻿name: OS Autonomous Gate
+name: OS Autonomous Gate
 
 # STAGING ADVISORY ONLY (continue-on-error). The BLOCKING gate is
 # .github/workflows/os-pack-gate.yml — that one must pass to merge.
@@ -20,7 +20,7 @@ jobs:
     if: ${{ vars.STAGING_BASE_URL != '' }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: pnpm/action-setup@v4
         with:
